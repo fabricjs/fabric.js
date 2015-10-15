@@ -297,11 +297,13 @@
    * @static
    * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Line} instance of fabric.Line
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Line.fromObject = function(object) {
-    var points = [object.x1, object.y1, object.x2, object.y2];
-    return new fabric.Line(points, object);
+    return new Promise(function(resolve, reject) {
+      var points = [object.x1, object.y1, object.x2, object.y2];
+      resolve(new fabric.Line(points, object));
+    });
   };
 
   /**

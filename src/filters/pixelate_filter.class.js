@@ -101,10 +101,12 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.Pixelate} Instance of fabric.Image.filters.Pixelate
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Pixelate.fromObject = function(object) {
-    return new fabric.Image.filters.Pixelate(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Pixelate(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

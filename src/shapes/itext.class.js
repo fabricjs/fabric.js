@@ -1118,9 +1118,11 @@
    * @static
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
-   * @return {fabric.IText} instance of fabric.IText
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.IText.fromObject = function(object) {
-    return new fabric.IText(object.text, clone(object));
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.IText(object.text, clone(object)));
+    });
   };
 })();

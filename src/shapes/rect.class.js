@@ -232,10 +232,12 @@
    * @static
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
-   * @return {Object} instance of fabric.Rect
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Rect.fromObject = function(object) {
-    return new fabric.Rect(object);
+    return new Promise(function(resolve, reject) {
+      resolve(fabric.Rect(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

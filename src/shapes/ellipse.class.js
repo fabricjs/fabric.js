@@ -202,10 +202,12 @@
    * @static
    * @memberOf fabric.Ellipse
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Ellipse}
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Ellipse.fromObject = function(object) {
-    return new fabric.Ellipse(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Ellipse(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

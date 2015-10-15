@@ -40,7 +40,8 @@
   "dependencies": {
     "canvas": "1.2.x",
     "jsdom": "1.1.x",
-    "xmldom": "0.1.x"
+    "xmldom": "0.1.x",
+    "es6-promise": "3.0.x"
   },
   "devDependencies": {
     "execSync": "1.0.x",

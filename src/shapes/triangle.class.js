@@ -115,10 +115,12 @@
    * @static
    * @memberOf fabric.Triangle
    * @param {Object} object Object to create an instance from
-   * @return {Object} instance of Canvas.Triangle
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Triangle.fromObject = function(object) {
-    return new fabric.Triangle(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Triangle(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

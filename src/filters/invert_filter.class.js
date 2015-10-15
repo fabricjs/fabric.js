@@ -48,10 +48,12 @@
   /**
    * Returns filter instance from an object representation
    * @static
-   * @return {fabric.Image.filters.Invert} Instance of fabric.Image.filters.Invert
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Invert.fromObject = function() {
-    return new fabric.Image.filters.Invert();
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Invert());
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -174,11 +174,13 @@
    * @static
    * @memberOf fabric.Polyline
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Polyline} Instance of fabric.Polyline
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Polyline.fromObject = function(object) {
-    var points = object.points;
-    return new fabric.Polyline(points, object, true);
+    return new Promise(function(resolve, reject) {
+      var points = object.points;
+      resolve(new fabric.Polyline(points, object, true));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

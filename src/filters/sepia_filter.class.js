@@ -49,10 +49,12 @@
   /**
    * Returns filter instance from an object representation
    * @static
-   * @return {fabric.Image.filters.Sepia} Instance of fabric.Image.filters.Sepia
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Sepia.fromObject = function() {
-    return new fabric.Image.filters.Sepia();
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Sepia());
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -238,10 +238,12 @@
    * @static
    * @memberOf fabric.Circle
    * @param {Object} object Object to create an instance from
-   * @return {Object} Instance of fabric.Circle
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Circle.fromObject = function(object) {
-    return new fabric.Circle(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Circle(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

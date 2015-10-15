@@ -313,10 +313,12 @@
   /**
    * Returns filter instance from an object representation
    * @static
-   * @return {fabric.Image.filters.Resize} Instance of fabric.Image.filters.Resize
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Resize.fromObject = function(object) {
-    return new fabric.Image.filters.Resize(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Resize(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

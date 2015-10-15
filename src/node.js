@@ -127,19 +127,23 @@
     });
   };
 
-  fabric.Image.fromObject = function(object, callback) {
-    fabric.util.loadImage(object.src, function(img) {
-      var oImg = new fabric.Image(img);
+  fabric.Image.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      fabric.util.loadImage(object.src)
+        .then(function(img) {
+          var oImg = new fabric.Image(img);
 
-      oImg._initConfig(object);
-      oImg._initFilters(object.filters, function(filters) {
-        oImg.filters = filters || [ ];
-        oImg._initFilters(object.resizeFilters, function(resizeFilters) {
-          oImg.resizeFilters = resizeFilters || [ ];
-          callback && callback(oImg);
-        });
-      });
-    });
+          oImg._initConfig(object);
+          oImg._initFilters(object.filters, function(filters) {
+            oImg.filters = filters || [ ];
+            oImg._initFilters(object.resizeFilters, function(resizeFilters) {
+              oImg.resizeFilters = resizeFilters || [ ];
+              resolve(oImg);
+            });
+          });
+        })
+        .catch(reject);
+    })
   };
   /**
    * Only available when running fabric on node.js

@@ -938,58 +938,60 @@
      * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
      * @memberOf fabric
      * @param {String} url
-     * @param {Function} callback
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+     * @return {Promise} Promise which receives instance in its `then` handler
      */
-    loadSVGFromURL: function(url, callback, reviver) {
-
+    loadSVGFromURL: function(url, reviver) {
       url = url.replace(/^\n\s*/, '').trim();
-      svgCache.has(url, function (hasUrl) {
-        if (hasUrl) {
-          svgCache.get(url, function (value) {
-            var enlivedRecord = _enlivenCachedObject(value);
-            callback(enlivedRecord.objects, enlivedRecord.options);
-          });
-        }
-        else {
-          new fabric.util.request(url, {
-            method: 'get',
-            onComplete: onComplete
-          });
+
+      return new Promise(function(resolve, reject) {
+        svgCache.has(url, function (hasUrl) {
+          if (hasUrl) {
+            svgCache.get(url, function (value) {
+              var enlivedRecord = _enlivenCachedObject(value);
+              resolve(enlivedRecord.objects, enlivedRecord.options);
+            });
+          }
+          else {
+            new fabric.util.request(url, {
+              method: 'get',
+              onComplete: onComplete
+            });
+          }
+        });
+
+        function onComplete(r) {
+
+          var xml = r.responseXML;
+          if (xml && !xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
+            xml = new ActiveXObject('Microsoft.XMLDOM');
+            xml.async = 'false';
+            //IE chokes on DOCTYPE
+            xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
+          }
+          if (!xml || !xml.documentElement) {
+            reject('Document not found in response');
+          }
+
+          fabric.parseSVGDocument(xml.documentElement, function (results, options) {
+            svgCache.set(url, {
+              objects: fabric.util.array.invoke(results, 'toObject'),
+              options: options
+            });
+            resolve(results, options);
+          }, reviver);
         }
       });
-
-      function onComplete(r) {
-
-        var xml = r.responseXML;
-        if (xml && !xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
-          xml = new ActiveXObject('Microsoft.XMLDOM');
-          xml.async = 'false';
-          //IE chokes on DOCTYPE
-          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
-        }
-        if (!xml || !xml.documentElement) {
-          return;
-        }
-
-        fabric.parseSVGDocument(xml.documentElement, function (results, options) {
-          svgCache.set(url, {
-            objects: fabric.util.array.invoke(results, 'toObject'),
-            options: options
-          });
-          callback(results, options);
-        }, reviver);
-      }
     },
 
     /**
      * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
      * @memberOf fabric
      * @param {String} string
-     * @param {Function} callback
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+     * @return {Promise} Promise which receives instance in its `then` handler
      */
-    loadSVGFromString: function(string, callback, reviver) {
+    loadSVGFromString: function(string, reviver) {
       string = string.trim();
       var doc;
       if (typeof DOMParser !== 'undefined') {
@@ -1005,9 +1007,11 @@
         doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
-      fabric.parseSVGDocument(doc.documentElement, function (results, options) {
-        callback(results, options);
-      }, reviver);
+      return new Promise(function(resolve, reject) {
+        fabric.parseSVGDocument(doc.documentElement, function (results, options) {
+          resolve(results, options);
+        }, reviver);
+      });
     },
 
     /**

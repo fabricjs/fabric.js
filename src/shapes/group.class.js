@@ -587,12 +587,14 @@
    * @memberOf fabric.Group
    * @param {Object} object Object to create a group from
    * @param {Function} [callback] Callback to invoke when an group instance is created
-   * @return {fabric.Group} An instance of fabric.Group
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Group.fromObject = function(object, callback) {
-    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      delete object.objects;
-      callback && callback(new fabric.Group(enlivenedObjects, object, true));
+  fabric.Group.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
+        delete object.objects;
+        resolve(new fabric.Group(enlivenedObjects, object, true));
+      });
     });
   };
 

@@ -91,10 +91,12 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.RemoveWhite} Instance of fabric.Image.filters.RemoveWhite
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.RemoveWhite.fromObject = function(object) {
-    return new fabric.Image.filters.RemoveWhite(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.RemoveWhite(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

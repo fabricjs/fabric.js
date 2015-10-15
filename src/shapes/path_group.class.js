@@ -241,26 +241,28 @@
    * @static
    * @memberOf fabric.PathGroup
    * @param {Object} object Object to create an instance from
-   * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.PathGroup.fromObject = function(object, callback) {
-    if (typeof object.paths === 'string') {
-      fabric.loadSVGFromURL(object.paths, function (elements) {
+  fabric.PathGroup.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      if (typeof object.paths === 'string') {
+        fabric.loadSVGFromURL(object.paths, function (elements) {
 
-        var pathUrl = object.paths;
-        delete object.paths;
+          var pathUrl = object.paths;
+          delete object.paths;
 
-        var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
+          var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
 
-        callback(pathGroup);
-      });
-    }
-    else {
-      fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {
-        delete object.paths;
-        callback(new fabric.PathGroup(enlivenedObjects, object));
-      });
-    }
+          resolve(pathGroup);
+        });
+      }
+      else {
+        fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {
+          delete object.paths;
+          resolve(new fabric.PathGroup(enlivenedObjects, object));
+        });
+      }
+    });
   };
 
   /**

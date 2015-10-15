@@ -86,11 +86,16 @@
    * @static
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when a mask filter instance is created
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Image.filters.Mask.fromObject = function(object, callback) {
-    fabric.util.loadImage(object.mask.src, function(img) {
-      object.mask = new fabric.Image(img, object.mask);
-      callback && callback(new fabric.Image.filters.Mask(object));
+  fabric.Image.filters.Mask.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      fabric.util.loadImage(object.mask.src)
+        .then(function(img) {
+          object.mask = new fabric.Image(img, object.mask);
+          resolve(new fabric.Image.filters.Mask(object));
+        })
+        .catch(reject);
     });
   };
 

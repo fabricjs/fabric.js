@@ -140,7 +140,7 @@ function ifSpecifiedAMDInclude(amdLib) {
 var filesToInclude = [
   'HEADER.js',
 
-  ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
+  ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js', 'lib/es6-promise.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',

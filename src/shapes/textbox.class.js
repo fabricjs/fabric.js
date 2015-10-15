@@ -432,10 +432,12 @@
    * @static
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Textbox} instance of fabric.Textbox
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Textbox.fromObject = function(object) {
-    return new fabric.Textbox(object.text, clone(object));
+    return new Promise(function(resolve, reject) {
+      resolve(fabric.Textbox(object.text, clone(object)));
+    });
   };
   /**
    * Returns the default controls visibility required for Textboxes.

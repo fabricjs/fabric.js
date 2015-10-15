@@ -542,32 +542,40 @@
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an image instance is created
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Image.fromObject = function(object, callback) {
-    fabric.util.loadImage(object.src, function(img) {
-      fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [ ];
-        fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
-          object.resizeFilters = resizeFilters || [ ];
-          var instance = new fabric.Image(img, object);
-          callback && callback(instance);
-        });
-      });
-    }, null, object.crossOrigin);
+  fabric.Image.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      fabric.util.loadImage(object.src, object.crossOrigin)
+        .then(function(img) {
+          fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
+            object.filters = filters || [ ];
+            fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
+              object.resizeFilters = resizeFilters || [ ];
+              var instance = new fabric.Image(img, object);
+              resolve(instance);
+            });
+          });
+        })
+        .catch(reject);
+    });
   };
 
   /**
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
    * @param {Object} [imgOptions] Options object
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Image.fromURL = function(url, callback, imgOptions) {
-    fabric.util.loadImage(url, function(img) {
-      callback && callback(new fabric.Image(img, imgOptions));
-    }, null, imgOptions && imgOptions.crossOrigin);
+  fabric.Image.fromURL = function(url, imgOptions) {
+    return new Promise(function(resolve, reject) {
+      fabric.util.loadImage(url, imgOptions && imgOptions.crossOrigin)
+        .then(function(img) {
+          resolve(new fabric.Image(img, imgOptions));
+        })
+        .catch(reject);
+    });
   };
 
   /* _FROM_SVG_START_ */
@@ -585,9 +593,9 @@
    * @param {SVGElement} element Element to parse
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @param {Object} [options] Options object
-   * @return {fabric.Image} Instance of fabric.Image
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Image.fromElement = function(element, callback, options) {
+  fabric.Image.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
         preserveAR;
 
@@ -596,8 +604,12 @@
       extend(parsedAttributes, preserveAR);
     }
 
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
-      extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    return new Promise(function(resolve, reject) {
+      fabric.Image.fromURL(parsedAttributes['xlink:href'],
+        extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes))
+          .then(resolve)
+          .catch(reject);
+    });
   };
   /* _FROM_SVG_END_ */
 

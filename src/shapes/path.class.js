@@ -911,25 +911,27 @@
    * @static
    * @memberOf fabric.Path
    * @param {Object} object
-   * @param {Function} callback Callback to invoke when an fabric.Path instance is created
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
-  fabric.Path.fromObject = function(object, callback) {
-    if (typeof object.path === 'string') {
-      fabric.loadSVGFromURL(object.path, function (elements) {
-        var path = elements[0],
-            pathUrl = object.path;
+  fabric.Path.fromObject = function(object) {
+    return new Promise(function(resolve, reject) {
+      if (typeof object.path === 'string') {
+        fabric.loadSVGFromURL(object.path, function (elements) {
+          var path = elements[0],
+              pathUrl = object.path;
 
-        delete object.path;
+          delete object.path;
 
-        fabric.util.object.extend(path, object);
-        path.setSourcePath(pathUrl);
+          fabric.util.object.extend(path, object);
+          path.setSourcePath(pathUrl);
 
-        callback(path);
-      });
-    }
-    else {
-      callback(new fabric.Path(object.path, object));
-    }
+          resolve(path);
+        });
+      }
+      else {
+        resolve(new fabric.Path(object.path, object));
+      }
+    });
   };
 
   /* _FROM_SVG_START_ */

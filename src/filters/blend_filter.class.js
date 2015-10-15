@@ -139,7 +139,16 @@
     }
   });
 
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @return {Promise} Promise which receives instance in its `then` handler
+   */
   fabric.Image.filters.Blend.fromObject = function(object) {
-    return new fabric.Image.filters.Blend(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Blend(object));
+    });
   };
+
 })(typeof exports !== 'undefined' ? exports : this);

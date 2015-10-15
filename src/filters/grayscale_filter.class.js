@@ -52,10 +52,12 @@
   /**
    * Returns filter instance from an object representation
    * @static
-   * @return {fabric.Image.filters.Grayscale} Instance of fabric.Image.filters.Grayscale
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Grayscale.fromObject = function() {
-    return new fabric.Image.filters.Grayscale();
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Grayscale());
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

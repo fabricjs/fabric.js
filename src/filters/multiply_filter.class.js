@@ -82,10 +82,12 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.Multiply} Instance of fabric.Image.filters.Multiply
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Image.filters.Multiply.fromObject = function(object) {
-    return new fabric.Image.filters.Multiply(object);
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Image.filters.Multiply(object));
+    });
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

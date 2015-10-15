@@ -1092,10 +1092,12 @@
    * @static
    * @memberOf fabric.Text
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Text} Instance of fabric.Text
+   * @return {Promise} Promise which receives instance in its `then` handler
    */
   fabric.Text.fromObject = function(object) {
-    return new fabric.Text(object.text, clone(object));
+    return new Promise(function(resolve, reject) {
+      resolve(new fabric.Text(object.text, clone(object)));
+    });
   };
 
   fabric.util.createAccessors(fabric.Text);
