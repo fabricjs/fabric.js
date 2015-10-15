@@ -99,25 +99,34 @@
     }
   };
 
-  fabric.loadSVGFromURL = function(url, callback, reviver) {
+  fabric.loadSVGFromURL = function(url, reviver) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-    if (url.indexOf('http') !== 0) {
-      requestFs(url, function(body) {
-        fabric.loadSVGFromString(body.toString(), callback, reviver);
-      });
-    }
-    else {
-      request(url, '', function(body) {
-        fabric.loadSVGFromString(body, callback, reviver);
-      });
-    }
+
+    return new Promise(function(resolve, reject) {
+      if (url.indexOf('http') !== 0) {
+        requestFs(url, function(body) {
+          fabric.loadSVGFromString(body.toString(), reviver)
+            .then(resolve)
+            .catch(reject)
+        });
+      }
+      else {
+        request(url, '', function(body) {
+          fabric.loadSVGFromString(body, reviver)
+            .then(resolve)
+            .catch(reject)
+        });
+      }
+    })
   };
 
-  fabric.loadSVGFromString = function(string, callback, reviver) {
+  fabric.loadSVGFromString = function(string, reviver) {
     var doc = new DOMParser().parseFromString(string);
-    fabric.parseSVGDocument(doc.documentElement, function(results, options) {
-      callback && callback(results, options);
-    }, reviver);
+    return new Promise(function(resolve, reject) {
+      fabric.parseSVGDocument(doc.documentElement, function(results, options) {
+        resolve(results, options);
+      }, reviver);
+    })
   };
 
   fabric.util.getScript = function(url, callback) {
