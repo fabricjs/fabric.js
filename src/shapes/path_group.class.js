@@ -246,15 +246,17 @@
   fabric.PathGroup.fromObject = function(object) {
     return new Promise(function(resolve, reject) {
       if (typeof object.paths === 'string') {
-        fabric.loadSVGFromURL(object.paths, function (elements) {
+        fabric.loadSVGFromURL(object.paths)
+          .then(function (elements) {
 
-          var pathUrl = object.paths;
-          delete object.paths;
+            var pathUrl = object.paths;
+            delete object.paths;
 
-          var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
+            var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
 
-          resolve(pathGroup);
-        });
+            resolve(pathGroup);
+          })
+          .catch(reject);
       }
       else {
         fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {

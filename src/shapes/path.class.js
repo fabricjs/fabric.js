@@ -916,17 +916,19 @@
   fabric.Path.fromObject = function(object) {
     return new Promise(function(resolve, reject) {
       if (typeof object.path === 'string') {
-        fabric.loadSVGFromURL(object.path, function (elements) {
-          var path = elements[0],
-              pathUrl = object.path;
+        fabric.loadSVGFromURL(object.path)
+          .then(function (elements) {
+            var path = elements[0],
+                pathUrl = object.path;
 
-          delete object.path;
+            delete object.path;
 
-          fabric.util.object.extend(path, object);
-          path.setSourcePath(pathUrl);
+            fabric.util.object.extend(path, object);
+            path.setSourcePath(pathUrl);
 
-          resolve(path);
-        });
+            resolve(path);
+          })
+          .catch(reject);
       }
       else {
         resolve(new fabric.Path(object.path, object));
