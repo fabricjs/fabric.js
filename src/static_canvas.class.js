@@ -887,7 +887,7 @@
       }
 
       this.fire('after:render');
-
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, [1, 0, 0, 1, 0, 0]);
       return this;
     },
 
