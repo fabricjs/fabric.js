@@ -4,6 +4,7 @@
       atan2 = Math.atan2,
       atan = Math.atan,
       pow = Math.pow,
+      abs = Math.abs,
       PiBy180 = Math.PI / 180;
 
   /**
@@ -505,13 +506,16 @@
      * @return {Object} Components of transform
      */
     qrDecompose: function(a) {
-      var angle = atan(a[1] / a[0]),
+      var angle = atan(a[1] / a[0]) / PiBy180,
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
           skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
+      if (a[0] < 0) {
+        angle += 180;
+      }
       return {
-        angle: angle / PiBy180,
+        angle: angle,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
@@ -519,6 +523,22 @@
         translateX: a[4],
         translateY: a[5]
       };
+    },
+
+    customTransformMatrix: function(scaleX, scaleY, skewX) {
+      var skewMatrixX = [1, 0, abs(Math.tan(skewX * PiBy180)), 1],
+          scaleMatrix = [abs(scaleX), 0, 0, abs(scaleY)];
+      return fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+    },
+
+    resetObjectTransform: function (target) {
+      target.scaleX = 1;
+      target.scaleY = 1;
+      target.skewX = 0;
+      target.skewY = 0;
+      target.flipX = false;
+      target.flipY = false;
+      target.setAngle(0);
     },
 
     /**

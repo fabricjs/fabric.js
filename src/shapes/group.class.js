@@ -147,6 +147,7 @@
      */
     addWithUpdate: function(object) {
       this._restoreObjectsState();
+      fabric.util.resetObjectTransform(this);
       if (object) {
         this._objects.push(object);
         object.group = this;
@@ -174,7 +175,6 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
-      //this._moveFlippedObject(object);
       this._restoreObjectsState();
 
       // since _restoreObjectsState set objects inactive
@@ -325,8 +325,17 @@
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object) {
-      //this._moveFlippedObject(object);
-      this._setObjectPosition(object);
+      var matrix = object.calcTransformMatrix(),
+          options = fabric.util.qrDecompose(matrix),
+          center = new fabric.Point(options.translateX, options.translateY);
+      object.scaleX = options.scaleX;
+      object.scaleY = options.scaleY;
+      object.skewX = options.skewX;
+      object.skewY = options.skewY;
+      object.angle = options.angle;
+      object.flipX = false;
+      object.flipY = false;
+      object.setPositionByOrigin(center, 'center', 'center');
       return object;
     },
 
@@ -337,8 +346,7 @@
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-
-      this._setObjectPosition(object);
+      this.realizeTransform(object);
       object.setCoords();
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
@@ -349,26 +357,11 @@
     },
 
     /**
-     * @private
-     */
-    _setObjectPosition: function(object) {
-      var matrix = object.calcTransformMatrix(),
-          options = fabric.util.qrDecompose(matrix),
-          center = new fabric.Point(options.translateX, options.translateY);
-          console.log(matrix, options);
-      delete options.translateX;
-      delete options.translateY;
-      object.set(options);
-      object.setPositionByOrigin(center, 'center', 'center');
-    },
-
-    /**
      * Destroys a group (restoring state of its objects)
      * @return {fabric.Group} thisArg
      * @chainable
      */
     destroy: function() {
-      //this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
 
