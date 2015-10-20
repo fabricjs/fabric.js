@@ -188,6 +188,49 @@
     },
 
     /**
+     * Sets a property to an object in a group; Then recalculates group's dimension, position.
+     * @param {Object} object
+     * @param {String} prop Property to set
+     * @param {String} value Value to set
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    setObjectWithUpdate: function(object, prop, value) {
+        this._moveFlippedObject(object);
+        this._restoreObjectsState();
+        # since _restoreObjectsState set objects inactive
+        this.forEachObject(this._setObjectActive, this);
+        
+        object.set(prop, value);
+        this._calcBounds();
+        this._updateObjectsCoords();
+        
+        return this;
+    },
+    
+    /**
+     * Sets a property to all objects in a group; Then recalculates group's dimension, position.
+     * @param {String} prop Property to set
+     * @param {String} value Value to set
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    setObjectsWithUpdate: function(prop, value) {
+        this._moveFlippedObject(object);
+        this._restoreObjectsState();
+        # since _restoreObjectsState set objects inactive
+        this.forEachObject(function(object) {
+            this._setObjectActive(object);
+            object.set(prop, value);
+        }, this);
+        
+        this._calcBounds();
+        this._updateObjectsCoords();
+        
+        return this;
+    },
+    
+    /**
      * @private
      */
     _onObjectAdded: function(object) {
