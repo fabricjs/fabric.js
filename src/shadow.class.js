@@ -146,7 +146,7 @@
           color: this.color,
           blur: this.blur,
           offsetX: this.offsetX,
-          offsetY: this.offsetY
+          offsetY: this.offsetY,
           affectStroke: this.affectStroke
         };
       }
