@@ -147,6 +147,7 @@
           blur: this.blur,
           offsetX: this.offsetX,
           offsetY: this.offsetY
+          affectStroke: this.affectStroke
         };
       }
       var obj = { }, proto = fabric.Shadow.prototype;
@@ -161,6 +162,9 @@
       }
       if (this.offsetY !== proto.offsetY) {
         obj.offsetY = this.offsetY;
+      }
+      if (this.affectStroke !== proto.affectStroke) {
+        obj.affectStroke = this.affectStroke;
       }
       return obj;
     }
