@@ -1248,9 +1248,11 @@
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
     drawControls: function(ctx) {
+      var activeGroup = this.getActiveGroup(),
+          iVpt = fabric.util.invertTransform(this.viewportTransform);
+
       ctx.save();
-      ctx.setTransform.apply(ctx, [1, 0, 0, 1, 0, 0]);
-      var activeGroup = this.getActiveGroup();
+      ctx.transform.apply(ctx, iVpt);
       if (activeGroup) {
         activeGroup._renderControls(ctx);
       }
