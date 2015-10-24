@@ -1168,7 +1168,7 @@
     },
 
     /**
-     * Sets active group to a speicified one
+     * Sets active group to a specified one
      * @param {fabric.Group} group Group to set as a current one
      * @return {fabric.Canvas} thisArg
      * @chainable
