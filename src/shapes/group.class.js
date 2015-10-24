@@ -176,7 +176,7 @@
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-
+      fabric.util.resetObjectTransform(this);
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
 
