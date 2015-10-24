@@ -56,7 +56,6 @@
       if (activeGroup.contains(target)) {
 
         activeGroup.removeWithUpdate(target);
-        this._resetObjectTransform(activeGroup);
         target.set('active', false);
 
         if (activeGroup.size() === 1) {
@@ -69,7 +68,6 @@
       }
       else {
         activeGroup.addWithUpdate(target);
-        this._resetObjectTransform(activeGroup);
       }
       this.fire('selection:created', { target: activeGroup, e: e });
       activeGroup.set('active', true);
