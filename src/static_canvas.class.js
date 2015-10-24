@@ -861,7 +861,7 @@
 
       this.fire('before:render');
 
-      canvasToDrawOn.save()
+      canvasToDrawOn.save();
       if (this.clipTo) {
         fabric.util.clipContext(this, canvasToDrawOn);
       }
