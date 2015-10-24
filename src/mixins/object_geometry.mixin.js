@@ -9,7 +9,8 @@
     ];
   }
 
-  var degreesToRadians = fabric.util.degreesToRadians;
+  var degreesToRadians = fabric.util.degreesToRadians,
+      multiplyMatrices = fabric.util.multiplyTransformMatrices;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -346,12 +347,34 @@
       return this;
     },
 
-    _calcDimensionsTransformMatrix: function(skewX, skewY) {
-      var skewMatrixX = [1, 0, Math.tan(degreesToRadians(skewX)), 1, 0, 0],
-          skewMatrixY = [1, Math.tan(degreesToRadians(skewY)), 0, 1, 0, 0],
-          scaleMatrix = [this.scaleX, 0, 0, this.scaleY, 0, 0],
-          m = fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
-      return fabric.util.multiplyTransformMatrices(m, skewMatrixY, true);
+    _calcRotateMatrix: function() {
+      if (this.angle) {
+        var theta = degreesToRadians(this.angle), cos = Math.cos(theta), sin = Math.sin(theta);
+        return [cos, sin, -sin, cos, 0, 0];
+      }
+      return [1, 0, 0, 1, 0, 0];
+    },
+
+    calcTransformMatrix: function() {
+      var center = this.getCenterPoint(),
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
+          rotateMatrix = this._calcRotateMatrix(),
+          dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
+          matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
+      matrix = multiplyMatrices(matrix, translateMatrix);
+      matrix = multiplyMatrices(matrix, rotateMatrix);
+      matrix = multiplyMatrices(matrix, dimensionMatrix);
+      return matrix;
+    },
+
+    _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
+      var skewMatrixX = [1, 0, Math.tan(degreesToRadians(skewX)), 1],
+          skewMatrixY = [1, Math.tan(degreesToRadians(skewY)), 0, 1],
+          scaleX = this.scaleX * (flipping && this.flipX ? -1 : 1),
+          scaleY = this.scaleY * (flipping && this.flipY ? -1 : 1),
+          scaleMatrix = [scaleX, 0, 0, scaleY],
+          m = multiplyMatrices(scaleMatrix, skewMatrixX, true);
+      return multiplyMatrices(m, skewMatrixY, true);
     }
   });
 })();

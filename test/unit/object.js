@@ -545,7 +545,6 @@ test('getBoundingRectWithStroke', function() {
     }
 
     var dummyContext = canvas.getContext('2d');
-  //  initElement
 
     ok(typeof cObj.drawBorders == 'function');
     equal(cObj.drawBorders(dummyContext), cObj, 'chainable');

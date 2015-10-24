@@ -164,7 +164,7 @@
             x: dimX,
             y: dimY
           }],
-          i, transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY),
+          i, transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY, false),
           bbox;
       for (i = 0; i < points.length; i++) {
         points[i] = fabric.util.transformPoint(points[i], transformMatrix);
@@ -200,25 +200,21 @@
         return this;
       }
 
-      ctx.save();
+      var wh = this._calculateCurrentDimensions(),
+          strokeWidth = 1 / this.borderScaleFactor,
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth;
 
+      ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
-      ctx.lineWidth = 1 / this.borderScaleFactor;
-
-      var wh = this._calculateCurrentDimensions(),
-          width = wh.x,
-          height = wh.y;
-      if (this.group) {
-        width = width * this.group.scaleX;
-        height = height * this.group.scaleY;
-      }
+      ctx.lineWidth = strokeWidth;
 
       ctx.strokeRect(
-        ~~(-(width / 2)) - 0.5, // offset needed to make lines look sharper
-        ~~(-(height / 2)) - 0.5,
-        ~~(width) + 1, // double offset needed to make lines look sharper
-        ~~(height) + 1
+        -width / 2,
+        -height / 2,
+        width,
+        height
       );
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
@@ -231,6 +227,44 @@
         ctx.closePath();
         ctx.stroke();
       }
+
+      ctx.restore();
+      return this;
+    },
+
+    /**
+     * Draws borders of an object's bounding box when it is inside a group.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {object} options object representing current object parameters
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawBordersInGroup: function(ctx, options) {
+      if (!this.hasBorders) {
+        return this;
+      }
+
+      var p = this._getNonTransformedDimensions(),
+          matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
+          wh = fabric.util.transformPoint(p, matrix),
+          strokeWidth = 1 / this.borderScaleFactor,
+          width = wh.x + strokeWidth + 2 * this.padding,
+          height = wh.y + strokeWidth + 2 * this.padding;
+
+      ctx.save();
+
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.strokeStyle = this.borderColor;
+      ctx.lineWidth = strokeWidth;
+
+      ctx.strokeRect(
+        -width / 2,
+        -height / 2,
+        width,
+        height
+      );
 
       ctx.restore();
       return this;
@@ -252,9 +286,9 @@
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          scaleOffset = this.cornerSize / 2,
-          left = -(width / 2) - scaleOffset,
-          top = -(height / 2) - scaleOffset,
+          scaleOffset = this.cornerSize,
+          left = -(width + scaleOffset) / 2,
+          top = -(height + scaleOffset) / 2,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
@@ -310,7 +344,7 @@
       // middle-top-rotate
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
-          left + width/2 ,
+          left + width / 2,
           top - this.rotatingPointOffset);
       }
 

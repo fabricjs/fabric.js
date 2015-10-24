@@ -861,6 +861,7 @@
 
       this.fire('before:render');
 
+      canvasToDrawOn.save();
       if (this.clipTo) {
         fabric.util.clipContext(this, canvasToDrawOn);
       }
@@ -868,7 +869,7 @@
       objsToRender = this._chooseObjectsToRender();
 
       //apply viewport transform once for all rendering process
-      canvasToDrawOn.setTransform.apply(canvasToDrawOn, this.viewportTransform);
+      canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
       this._renderBackground(canvasToDrawOn);
       this._renderObjects(canvasToDrawOn, objsToRender);
       this.preserveObjectStacking || this._renderObjects(canvasToDrawOn, [this.getActiveGroup()]);
@@ -887,7 +888,7 @@
       }
 
       this.fire('after:render');
-
+      canvasToDrawOn.restore();
       return this;
     },
 

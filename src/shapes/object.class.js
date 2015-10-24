@@ -1078,22 +1078,22 @@
       if (!this.active || noTransform) {
         return;
       }
-      var vpt = this.getViewportTransform();
+
+      var vpt = this.getViewportTransform(),
+          matrix = this.calcTransformMatrix(),
+          options;
+      matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
+      options = fabric.util.qrDecompose(matrix);
       ctx.save();
-      var center;
-      if (this.group) {
-        center = fabric.util.transformPoint(this.group.getCenterPoint(), vpt);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(degreesToRadians(this.group.angle));
+      ctx.translate(options.translateX, options.translateY);
+      if (this.group && this.group === this.canvas.getActiveGroup()) {
+        ctx.rotate(degreesToRadians(options.angle));
+        this.drawBordersInGroup(ctx, options);
       }
-      center = fabric.util.transformPoint(this.getCenterPoint(), vpt, null != this.group);
-      if (this.group) {
-        center.x *= this.group.scaleX;
-        center.y *= this.group.scaleY;
+      else {
+        ctx.rotate(degreesToRadians(this.angle));
+        this.drawBorders(ctx);
       }
-      ctx.translate(center.x, center.y);
-      ctx.rotate(degreesToRadians(this.angle));
-      this.drawBorders(ctx);
       this.drawControls(ctx);
       ctx.restore();
     },
