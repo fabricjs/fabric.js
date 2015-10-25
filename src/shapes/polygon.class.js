@@ -66,6 +66,7 @@
       if (!('left' in options)) {
         this.left = this.minX;
       }
+      this._removeTransformMatrix();
     },
 
     /**
@@ -167,9 +168,7 @@
       ctx.beginPath();
 
       if (this._applyPointOffset) {
-        if (!(this.group && this.group.type === 'path-group')) {
-          this._applyPointOffset();
-        }
+        this._applyPointOffset();
         this._applyPointOffset = null;
       }
 

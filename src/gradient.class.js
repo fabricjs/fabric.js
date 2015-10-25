@@ -174,14 +174,12 @@
         return a.offset - b.offset;
       });
 
-      if (!(object.group && object.group.type === 'path-group')) {
-        for (var prop in coords) {
-          if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-            coords[prop] += this.offsetX - object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += this.offsetY - object.height / 2;
-          }
+      for (var prop in coords) {
+        if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+          coords[prop] += this.offsetX - object.width / 2;
+        }
+        else if (prop === 'y1' || prop === 'y2') {
+          coords[prop] += this.offsetY - object.height / 2;
         }
       }
 
@@ -246,17 +244,6 @@
 
       if (!this.type) {
         return;
-      }
-
-      if (object.group && object.group.type === 'path-group') {
-        for (prop in coords) {
-          if (prop === 'x1' || prop === 'x2') {
-            coords[prop] += -this.offsetX + object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += -this.offsetY + object.height / 2;
-          }
-        }
       }
 
       if (this.type === 'linear') {

@@ -101,6 +101,7 @@
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
+      this._removeTransformMatrix();
     },
 
     /**
@@ -154,11 +155,6 @@
           tempY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
-
-      if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
-      }
 
       ctx.beginPath();
 
@@ -472,9 +468,6 @@
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
       }
-      if (this.transformMatrix) {
-        o.transformMatrix = this.transformMatrix;
-      }
       return o;
     },
 
@@ -506,9 +499,7 @@
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-      if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      }
+      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       markup.push(
         //jscs:disable validateIndentation
         '<path ',

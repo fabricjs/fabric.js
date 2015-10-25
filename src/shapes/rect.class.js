@@ -66,7 +66,7 @@
 
       this.callSuper('initialize', options);
       this._initRxRy();
-
+      this._removeTransformMatrix();
     },
 
     /**
@@ -86,7 +86,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
 
       // optimize 1x1 case (used in spray brush)
       if (this.width === 1 && this.height === 1) {
@@ -98,8 +98,8 @@
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
-          x = noTransform ? this.left : -this.width / 2,
-          y = noTransform ? this.top : -this.height / 2,
+          x = -this.width / 2,
+          y = -this.height / 2,
           isRounded = rx !== 0 || ry !== 0,
           k = 1 - 0.5522847498 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */;
 
@@ -166,11 +166,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = this.left, y = this.top;
-      if (!(this.group && this.group.type === 'path-group')) {
-        x = -this.width / 2;
-        y = -this.height / 2;
-      }
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
         '<rect ',
           'x="', x, '" y="', y,
