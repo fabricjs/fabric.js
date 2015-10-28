@@ -335,14 +335,9 @@
      * @param {Object} [options] Options object
      * @return {fabric.Object|fabric.PathGroup}
      */
-    groupSVGElements: function(elements, options, path) {
+    groupSVGElements: function(elements, options) {
       var object;
-
-      object = new fabric.PathGroup(elements, options);
-
-      if (typeof path !== 'undefined') {
-        object.setSourcePath(path);
-      }
+      object = new fabric.Group(elements, {});
       return object;
     },
 

@@ -60,7 +60,6 @@
 
       this.startAngle = options.startAngle || this.startAngle;
       this.endAngle = options.endAngle || this.endAngle;
-      this._removeTransformMatrix();
     },
 
     /**

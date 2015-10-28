@@ -57,7 +57,6 @@
      */
     initialize: function(objects, options, isAlreadyGrouped) {
       options = options || { };
-
       this._objects = [];
       // if objects enclosed in a group have been grouped already,
       // we cannot change properties of objects.
@@ -89,7 +88,6 @@
         this._updateObjectsCoords();
         this.callSuper('initialize', options);
       }
-
       this.setCoords();
       this.saveCoords();
     },

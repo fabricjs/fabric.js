@@ -37,7 +37,6 @@
 
       this.set('width', options.width || 100)
           .set('height', options.height || 100);
-      this._removeTransformMatrix();
     },
 
     /**

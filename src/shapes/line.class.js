@@ -76,7 +76,6 @@
       this.set('y2', points[3]);
 
       this._setWidthHeight(options);
-      this._removeTransformMatrix();
     },
 
     /**

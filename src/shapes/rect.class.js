@@ -66,7 +66,6 @@
 
       this.callSuper('initialize', options);
       this._initRxRy();
-      this._removeTransformMatrix();
     },
 
     /**

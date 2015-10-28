@@ -101,7 +101,6 @@
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
-      this._removeTransformMatrix();
     },
 
     /**

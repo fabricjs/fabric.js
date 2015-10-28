@@ -721,6 +721,30 @@
       }
     },
 
+    _removeTransformMatrix: function(addTranslate) {
+      if (!this.transformMatrix) {
+        return;
+      }
+      var left = this.left + this.width/2;
+      var top = this.top + this.height/2;
+      /*if (addTranslate) {
+        left -= addTranslate.x;
+        top -= addTranslate.y;
+      }*/
+      var matrix = fabric.util.multiplyTransformMatrices(this.transformMatrix, [1, 0, 0, 1, left, top]);
+      var options = fabric.util.qrDecompose(matrix);
+      this.scaleX = options.scaleX;
+      this.scaleY = options.scaleY;
+      this.angle = options.angle;
+      this.skewX = options.skewX;
+      this.skewY = 0;
+      this.flipX = false;
+      this.flipY = false;
+      var point = new fabric.Point(options.translateX, options.translateY);
+      this.setPositionByOrigin(point , 'center', 'center');
+      this.transformMatrix = null;
+    },
+
     /**
      * @private
      * @param {Object} [options] Options object
@@ -1009,9 +1033,8 @@
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       // do not render if width/height are zeros or object is not visible
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
@@ -1021,18 +1044,13 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
+      this.transform(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx, noTransform);
+      this._render(ctx);
       this.clipTo && ctx.restore();
 
       ctx.restore();
@@ -1072,10 +1090,9 @@
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform) {
+    _renderControls: function(ctx) {
+      if (!this.active) {
         return;
       }
 
@@ -1191,6 +1208,11 @@
           var g = this.stroke.gradientTransform;
           ctx.transform.apply(ctx, g);
         }
+        if (this.stroke.toLive) {
+          ctx.translate(
+            -this.width / 2 + this.stroke.offsetX || 0,
+            -this.height / 2 + this.stroke.offsetY || 0);
+        }  
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       ctx.restore();

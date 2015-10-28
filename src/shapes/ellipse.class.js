@@ -53,7 +53,6 @@
 
       this.set('rx', options.rx || 0);
       this.set('ry', options.ry || 0);
-      this._removeTransformMatrix();
     },
 
     /**

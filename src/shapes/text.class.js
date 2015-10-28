@@ -322,7 +322,6 @@
       this.setOptions(options);
       this.__skipDimension = false;
       this._initDimensions();
-      this._removeTransformMatrix();
     },
 
     /**

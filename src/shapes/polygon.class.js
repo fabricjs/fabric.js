@@ -66,7 +66,6 @@
       if (!('left' in options)) {
         this.left = this.minX;
       }
-      this._removeTransformMatrix();
     },
 
     /**

@@ -92,7 +92,6 @@
       this.resizeFilters = [ ];
       this.callSuper('initialize', options);
       this._initElement(element, options);
-      this._removeTransformMatrix();
     },
 
     /**
