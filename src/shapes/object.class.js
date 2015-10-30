@@ -1156,15 +1156,15 @@
       }
 
       ctx.save();
-      if (this.fill.gradientTransform) {
-        var g = this.fill.gradientTransform;
-        ctx.transform.apply(ctx, g);
-      }
       if (this.fill.toLive) {
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
+      if (this.fill.gradientTransform) {
+        var g = this.fill.gradientTransform;
+        ctx.transform.apply(ctx, g);
+      }      
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1204,15 +1204,15 @@
         ctx.stroke();
       }
       else {
-        if (this.stroke.gradientTransform) {
-          var g = this.stroke.gradientTransform;
-          ctx.transform.apply(ctx, g);
-        }
         if (this.stroke.toLive) {
           ctx.translate(
             -this.width / 2 + this.stroke.offsetX || 0,
             -this.height / 2 + this.stroke.offsetY || 0);
         }  
+        if (this.stroke.gradientTransform) {
+          var g = this.stroke.gradientTransform;
+          ctx.transform.apply(ctx, g);
+        }
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       ctx.restore();
