@@ -132,8 +132,8 @@
       }
 
       this.pathOffset = this.pathOffset || {
-        x: this.minX + this.width / 2,
-        y: this.minY + this.height / 2
+        x: this.minX + this.width / 2 + this.strokeWidth / 2,
+        y: this.minY + this.height / 2 + this.strokeWidth / 2
       };
     },
 
