@@ -224,7 +224,6 @@
       var markup = this._createBaseSVGMarkup(),
           p = { x1: this.x1, x2: this.x2, y1: this.y1, y2: this.y2 };
       p = this.calcLinePoints();
-
       markup.push(
         '<line ',
           'x1="', p.x1,

@@ -722,27 +722,23 @@
     },
 
     _removeTransformMatrix: function(addTranslate) {
-      if (!this.transformMatrix) {
-        return;
-      }
-      var left = this.left + this.width/2;
-      var top = this.top + this.height/2;
-      /*if (addTranslate) {
-        left -= addTranslate.x;
-        top -= addTranslate.y;
-      }*/
-      var matrix = fabric.util.multiplyTransformMatrices(this.transformMatrix, [1, 0, 0, 1, left, top]);
+
+      var left = this.left + this.width / 2;
+      var top = this.top + this.height / 2;
+
+      var matrix = fabric.util.multiplyTransformMatrices(this.transformMatrix || [1, 0, 0, 1, 0, 0], [1, 0, 0, 1, left, top]);
       var options = fabric.util.qrDecompose(matrix);
       this.scaleX = options.scaleX;
       this.scaleY = options.scaleY;
       this.angle = options.angle;
       this.skewX = options.skewX;
+      this.skewP = options.skewP;
       this.skewY = 0;
       this.flipX = false;
       this.flipY = false;
       var point = new fabric.Point(options.translateX, options.translateY);
       this.setPositionByOrigin(point , 'center', 'center');
-      this.transformMatrix = null;
+      this.transformMatrix = matrix;
     },
 
     /**
@@ -1034,7 +1030,7 @@
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
@@ -1044,13 +1040,18 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-      this.transform(ctx);
+      if (noTransform) {
+        ctx.transform.apply(ctx, this.transformMatrix || [1, 0, 0, 1, 0, 0]);
+      }
+      else {
+        this.transform(ctx);
+      }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx);
+      this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
 
       ctx.restore();
@@ -1164,7 +1165,7 @@
       if (this.fill.gradientTransform) {
         var g = this.fill.gradientTransform;
         ctx.transform.apply(ctx, g);
-      }      
+      }
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
