@@ -26,9 +26,20 @@
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
           y = point.y,
-          offsetX = originXOffset[toOriginX] - originXOffset[fromOriginX],
-          offsetY = originYOffset[toOriginY] - originYOffset[fromOriginY],
+          offsetX,
+          offsetY,
           dim;
+      
+      if(typeof fromOriginX == 'number')
+          offsetX = originXOffset[toOriginX] - (fromOriginX - 0.5);
+      else 
+          offsetX = originXOffset[toOriginX] - originXOffset[fromOriginX];
+
+      if(typeof fromOriginY == 'number') 
+          offsetY = originYOffset[toOriginY] - (fromOriginY - 0.5);
+      else 
+          offsetY = originYOffset[toOriginY] - originYOffset[fromOriginY];
+
       if (offsetX || offsetY) {
         dim = this._getTransformedDimensions();
         x = point.x + offsetX * dim.x;
@@ -155,9 +166,14 @@
           yFull = Math.sin(angle) * hypotFull;
 
       //TODO: this function does not consider mixed situation like top, center.
-      this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
-      this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
-
+      if(typeof this.originX == 'number') {
+          this.left += xFull * (originXOffset[to] - (this.originX - 0.5));
+          this.top += yFull * (originXOffset[to] - (this.originX - 0.5));
+      }
+      else {
+          this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
+          this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
+      }
       this.setCoords();
       this.originX = to;
     },
