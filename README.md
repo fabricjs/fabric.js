@@ -82,7 +82,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
     $ bower install fabric
 
 <h3 id="npm-install">Install with npm</h3>
-To install Fabric.js using npm, you must first manually [install Cario](http://cairographics.org/download/) on your system. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+To install Fabric.js using npm, you must first manually [install Cario](http://cairographics.org/download/) on your system. Cario is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
 
     $ npm install fabric --save
 
