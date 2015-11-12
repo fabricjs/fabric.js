@@ -577,7 +577,7 @@
           this._setCssDimension(prop, cssValue);
         }
       }
-
+      this._initRetinaScaling();
       this._setImageSmoothing();
       this.calcOffset();
 
