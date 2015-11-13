@@ -136,7 +136,7 @@
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
           dim = target._getTransformedDimensions();
 
-      this._setObjectScale(new fabric.Point(dim.x * s, dim.y * s),
+      this._setObjectScale(new fabric.Point(t.scaleX * dim.x * s / target.scaleX, t.scaleY * dim.y * s / target.scaleY),
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'), dim);
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
