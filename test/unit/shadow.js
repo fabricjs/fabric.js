@@ -135,6 +135,14 @@
     equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0}');
   });
 
+  test('clone with affectStroke', function() {
+    var shadow = new fabric.Shadow({affectStroke: true, blur: 5});
+    ok(typeof shadow.toObject == 'function');
+    var object = shadow.toObject(),
+        shadow2 = new fabric.Shadow(object);
+    deepEqual(shadow, shadow2);
+  });
+
   test('toObject without default value', function() {
     var shadow = new fabric.Shadow();
     shadow.includeDefaultValues = false;
