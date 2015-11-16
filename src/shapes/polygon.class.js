@@ -66,6 +66,8 @@
       if (!('left' in options)) {
         this.left = this.minX;
       }
+      this.offsetX = this.minX + this.width / 2;
+      this.offsetY = this.minY + this.height / 2;
     },
 
     /**
@@ -84,18 +86,6 @@
 
       this.minX = minX || 0,
       this.minY = minY || 0;
-    },
-
-    /**
-     * @private
-     */
-    _applyPointOffset: function() {
-      // change points to offset polygon into a bounding box
-      // executed one time
-      this.points.forEach(function(p) {
-        p.x -= (this.minX + this.width / 2);
-        p.y -= (this.minY + this.height / 2);
-      }, this);
     },
 
     /**
@@ -140,8 +130,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
-      if (!this.commonRender(ctx)) {
+    _render: function(ctx, noTransform) {
+      if (!this.commonRender(ctx, noTransform)) {
         return;
       }
       this._renderFill(ctx);
@@ -155,7 +145,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    commonRender: function(ctx) {
+    commonRender: function(ctx, noTransform) {
       var point, len = this.points.length;
 
       if (!len || isNaN(this.points[len - 1].y)) {
@@ -164,15 +154,8 @@
         return false;
       }
 
+      noTransform || ctx.translate(-this.offsetX, -this.offsetY);
       ctx.beginPath();
-
-      if (this._applyPointOffset) {
-        if (!(this.group && this.group.type === 'path-group')) {
-          this._applyPointOffset();
-        }
-        this._applyPointOffset = null;
-      }
-
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0; i < len; i++) {
         point = this.points[i];
