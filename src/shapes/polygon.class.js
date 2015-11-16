@@ -66,8 +66,10 @@
       if (!('left' in options)) {
         this.left = this.minX;
       }
-      this.offsetX = this.minX + this.width / 2;
-      this.offsetY = this.minY + this.height / 2;
+      this.pathOffset = {
+        x: this.minX + this.width / 2,
+        y: this.minY + this.height / 2
+      };
     },
 
     /**
@@ -106,18 +108,20 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [],
+      var points = [], addTransform,
           markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
       }
-
+      if (!(this.group && this.group.type === 'path-group')) {
+        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
+      }
       markup.push(
         '<', this.type, ' ',
           'points="', points.join(''),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+          '" transform="', this.getSvgTransform(), addTransform,
           ' ', this.getSvgTransformMatrix(),
         '"/>\n'
       );
@@ -154,7 +158,7 @@
         return false;
       }
 
-      noTransform || ctx.translate(-this.offsetX, -this.offsetY);
+      noTransform || ctx.translate(-this.pathOffset.x, -this.pathOffset.y);
       ctx.beginPath();
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0; i < len; i++) {
