@@ -1184,8 +1184,8 @@
      * @param {Number} [options.viewBox.width] Width of viewbox
      * @param {Number} [options.viewBox.height] Height of viewbox
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
-     * @param {String} [options.width] desidered width of svg with or without units 
-     * @param {String} [options.height] desidered width of svg with or without units
+     * @param {String} [options.width] desired width of svg with or without units 
+     * @param {String} [options.height] desired height of svg with or without units
      * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
      * @return {String} SVG string
      * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
