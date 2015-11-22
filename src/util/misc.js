@@ -501,22 +501,17 @@
      * @return {Object} Components of transform
      */
     qrDecompose: function(a) {
-      var angle = atan(a[1] / a[0]),
+      var angle = atan2(a[1], a[0]);
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
-          skewP = (a[0] * a[2] + a[1] * a [3]) / denom,
-          skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
-      if (a[0] < 0) {
-        angle += 180;
-      }
+          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
         angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
         skewY: 0,
-        skewP: skewP,
         translateX: a[4],
         translateY: a[5]
       };
