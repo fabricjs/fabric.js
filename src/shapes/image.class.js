@@ -65,6 +65,14 @@
     meetOrSlice: 'meet',
 
     /**
+     * Width of a stroke.
+     * For image quality a stroke multiple of 2 gives better results.
+     * @type Number
+     * @default
+     */
+    strokeWidth: 0,
+
+    /**
      * private
      * contains last value of scaleX to detect
      * if the Image got resized after the last Render

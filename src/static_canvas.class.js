@@ -577,7 +577,7 @@
           this._setCssDimension(prop, cssValue);
         }
       }
-
+      this._initRetinaScaling();
       this._setImageSmoothing();
       this.calcOffset();
 
@@ -861,28 +861,26 @@
 
       this.fire('before:render');
 
-      canvasToDrawOn.save();
       if (this.clipTo) {
         fabric.util.clipContext(this, canvasToDrawOn);
       }
+      this._renderBackground(canvasToDrawOn);
 
+      canvasToDrawOn.save();
       objsToRender = this._chooseObjectsToRender();
-
       //apply viewport transform once for all rendering process
       canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
-      this._renderBackground(canvasToDrawOn);
       this._renderObjects(canvasToDrawOn, objsToRender);
       this.preserveObjectStacking || this._renderObjects(canvasToDrawOn, [this.getActiveGroup()]);
+      canvasToDrawOn.restore();
+
       if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
       }
-
       if (this.clipTo) {
         canvasToDrawOn.restore();
       }
-
       this._renderOverlay(canvasToDrawOn);
-
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
       }

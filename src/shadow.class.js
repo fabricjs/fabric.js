@@ -146,22 +146,18 @@
           color: this.color,
           blur: this.blur,
           offsetX: this.offsetX,
-          offsetY: this.offsetY
+          offsetY: this.offsetY,
+          affectStroke: this.affectStroke
         };
       }
       var obj = { }, proto = fabric.Shadow.prototype;
-      if (this.color !== proto.color) {
-        obj.color = this.color;
-      }
-      if (this.blur !== proto.blur) {
-        obj.blur = this.blur;
-      }
-      if (this.offsetX !== proto.offsetX) {
-        obj.offsetX = this.offsetX;
-      }
-      if (this.offsetY !== proto.offsetY) {
-        obj.offsetY = this.offsetY;
-      }
+
+      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke'].forEach(function(prop) {
+        if (this[prop] !== proto[prop]) {
+          obj[prop] = this[prop];
+        }
+      }, this);
+
       return obj;
     }
   });
