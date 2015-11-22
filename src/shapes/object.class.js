@@ -723,8 +723,13 @@
 
     _removeTransformMatrix: function(addTranslate) {
 
-      var left = this.left + this.width / 2;
-      var top = this.top + this.height / 2;
+      var left = this.left;
+      var top = this.top;
+
+      if (this.type !== 'text' && this.type !== 'i-text') {
+        left += this.width / 2;
+        top += this.height / 2;
+      }
 
       var matrix = fabric.util.multiplyTransformMatrices(this.transformMatrix || [1, 0, 0, 1, 0, 0], [1, 0, 0, 1, left, top]);
       var options = fabric.util.qrDecompose(matrix);
