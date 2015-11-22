@@ -732,13 +732,12 @@
       this.scaleY = options.scaleY;
       this.angle = options.angle;
       this.skewX = options.skewX;
-      this.skewP = options.skewP;
       this.skewY = 0;
       this.flipX = false;
       this.flipY = false;
       var point = new fabric.Point(options.translateX, options.translateY);
       this.setPositionByOrigin(point , 'center', 'center');
-      this.transformMatrix = matrix;
+      this.transformMatrix = null;
     },
 
     /**
