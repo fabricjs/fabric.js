@@ -1268,8 +1268,7 @@
                   toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
                   toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS) + ' ' +
                   toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
-                  toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS) +
-                  '" ';
+                  toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS) + '" ';
         }
       }
 
@@ -1292,6 +1291,7 @@
         '</defs>\n'
       );
     },
+
     /**
      * @private
      */
