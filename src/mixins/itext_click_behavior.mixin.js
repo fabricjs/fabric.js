@@ -84,7 +84,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   initMousedownHandler: function() {
     this.on('mousedown', function(options) {
-
+      if (!this.editable) {
+        return;
+      }
       var pointer = this.canvas.getPointer(options.e);
 
       this.__mousedownX = pointer.x;
@@ -122,7 +124,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initMouseupHandler: function() {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
-      if (this._isObjectMoved(options.e)) {
+      if (!this.editable || this._isObjectMoved(options.e)) {
         return;
       }
 
