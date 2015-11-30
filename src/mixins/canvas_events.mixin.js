@@ -249,19 +249,17 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-      var target;
-
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
         return;
       }
 
+      var target = this._currentTransform ? this._currentTransform.target : this.findTarget(e, true);
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:up', 'mouseup'))
+        return;
+
       if (this._currentTransform) {
         this._finalizeCurrentTransform();
-        target = this._currentTransform.target;
-      }
-      else {
-        target = this.findTarget(e, true);
       }
 
       var shouldRender = this._shouldRender(target, this.getPointer(e));
@@ -285,9 +283,6 @@
       setTimeout(function () {
         _this._setCursorFromEvent(e, target);
       }, 50);
-
-      this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
     },
 
     /**
@@ -341,6 +336,10 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDownInDrawingMode: function(e) {
+      var target = this.findTarget(e);
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:down', 'mousedown'))
+        return;
+
       this._isCurrentlyDrawing = true;
       this.discardActiveObject(e).renderAll();
       if (this.clipTo) {
@@ -350,11 +349,6 @@
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousedown', { e: e, target: target });
-      }
     },
 
     /**
@@ -362,18 +356,16 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMoveInDrawingMode: function(e) {
+      var target = this.findTarget(e);
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:move', 'mousemove'))
+        return;
+
       if (this._isCurrentlyDrawing) {
         var ivt = fabric.util.invertTransform(this.viewportTransform),
-            pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.setCursor(this.freeDrawingCursor);
-      this.fire('mouse:move', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousemove', { e: e, target: target });
-      }
     },
 
     /**
@@ -381,21 +373,19 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUpInDrawingMode: function(e) {
+      var target = this.findTarget(e);
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:up', 'mouseup'))
+        return;
+
       this._isCurrentlyDrawing = false;
       if (this.clipTo) {
         this.contextTop.restore();
       }
       this.freeDrawingBrush.onMouseUp();
-      this.fire('mouse:up', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mouseup', { e: e, target: target });
-      }
     },
 
     /**
-     * Method that defines the actions when mouse is clic ked on canvas.
+     * Method that defines the actions when mouse is clicked on canvas.
      * The method inits the currentTransform parameters and renders all the
      * canvas so the current image can be placed on the top canvas and the rest
      * in on the container one.
@@ -403,6 +393,9 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
+      var target = this.findTarget(e);
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:down', 'mousedown'))
+        return;
 
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 0;
@@ -420,8 +413,8 @@
         return;
       }
 
-      var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+
+      var pointer = this.getPointer(e, true);
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -443,9 +436,6 @@
       }
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
-
-      this.fire('mouse:down', { target: target, e: e });
-      target && target.fire('mousedown', { e: e });
     },
 
     /**
@@ -525,6 +515,46 @@
     },
 
     /**
+     * The precursor to all mouse events handling.
+     * Dispatch the events and determines whether to continue with default action.
+     * @param e Event object fired
+     * @param target The target of the event
+     * @param canvasEventName The event name the canvas should fire
+     * @param targetEventName The event name the target should fire
+     * @private
+     * @return {Boolean} whether the default action should be executed
+     */
+    __onMouseEventPrecursor: function(e, target, canvasEventName, targetEventName) {
+      var cancelBubble = false, defaultPrevented = false;
+      if (target) {
+        var wrappedEvent = {
+          e: e,
+          target: target,
+          currentTarget: target,
+          cancelBubble: cancelBubble,
+          defaultPrevented: defaultPrevented
+        };
+        target.handleEvent(targetEventName, wrappedEvent);
+        cancelBubble = wrappedEvent.cancelBubble;
+        defaultPrevented = wrappedEvent.defaultPrevented;
+      }
+
+      if (!cancelBubble) {
+        var canvasEvent = {
+          e: e,
+          // target: target, This would be more in line with DOM event, but will break backwards compatibility
+          currentTarget: this,
+          cancelBubble: cancelBubble,
+          defaultPrevented: defaultPrevented
+        };
+        this.fire(canvasEventName, canvasEvent);
+        defaultPrevented = canvasEvent.defaultPrevented;
+      }
+
+      return !defaultPrevented;
+    },
+
+    /**
      * Method that defines the actions when mouse is hovering the canvas.
      * The currentTransform parameter will definde whether the user is rotating/scaling/translating
      * an image or neither of them (only hovering). A group selection is also possible and would cancel
@@ -534,18 +564,22 @@
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
-
-      var target, pointer;
-
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
         return;
       }
+
+      var groupSelector = this._groupSelector;
+      var target = (groupSelector || this._currentTransform) ? undefined : this.findTarget(e);
+
+      if (!this.__onMouseEventPrecursor(e, target, 'mouse:move', 'mousemove'))
+        return;
+
       if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
-      var groupSelector = this._groupSelector;
+      var pointer;
 
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
@@ -557,9 +591,6 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-
-        target = this.findTarget(e);
-
         if (!target || target && !target.selectable) {
           this.setCursor(this.defaultCursor);
         }
