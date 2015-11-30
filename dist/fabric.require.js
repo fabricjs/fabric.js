@@ -23,6 +23,8 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
 
 fabric.isLikelyNode = typeof Buffer !== "undefined" && typeof window === "undefined";
 
+fabric.SHARED_ATTRIBUTES = [ "display", "transform", "fill", "fill-opacity", "fill-rule", "opacity", "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width", "id" ];
+
 fabric.DPI = 96;
 
 fabric.reNum = "(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)";
@@ -1305,6 +1307,949 @@ if (typeof console !== "undefined") {
     });
 }
 
+(function() {
+    function animate(options) {
+        requestAnimFrame(function(timestamp) {
+            options || (options = {});
+            var start = timestamp || +new Date(), duration = options.duration || 500, finish = start + duration, time, onChange = options.onChange || function() {}, abort = options.abort || function() {
+                return false;
+            }, easing = options.easing || function(t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            }, startValue = "startValue" in options ? options.startValue : 0, endValue = "endValue" in options ? options.endValue : 100, byValue = options.byValue || endValue - startValue;
+            options.onStart && options.onStart();
+            (function tick(ticktime) {
+                time = ticktime || +new Date();
+                var currentTime = time > finish ? duration : time - start;
+                if (abort()) {
+                    options.onComplete && options.onComplete();
+                    return;
+                }
+                onChange(easing(currentTime, startValue, byValue, duration));
+                if (time > finish) {
+                    options.onComplete && options.onComplete();
+                    return;
+                }
+                requestAnimFrame(tick);
+            })(start);
+        });
+    }
+    var _requestAnimFrame = fabric.window.requestAnimationFrame || fabric.window.webkitRequestAnimationFrame || fabric.window.mozRequestAnimationFrame || fabric.window.oRequestAnimationFrame || fabric.window.msRequestAnimationFrame || function(callback) {
+        fabric.window.setTimeout(callback, 1e3 / 60);
+    };
+    function requestAnimFrame() {
+        return _requestAnimFrame.apply(fabric.window, arguments);
+    }
+    fabric.util.animate = animate;
+    fabric.util.requestAnimFrame = requestAnimFrame;
+})();
+
+(function() {
+    function normalize(a, c, p, s) {
+        if (a < Math.abs(c)) {
+            a = c;
+            s = p / 4;
+        } else {
+            s = p / (2 * Math.PI) * Math.asin(c / a);
+        }
+        return {
+            a: a,
+            c: c,
+            p: p,
+            s: s
+        };
+    }
+    function elastic(opts, t, d) {
+        return opts.a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p);
+    }
+    function easeOutCubic(t, b, c, d) {
+        return c * ((t = t / d - 1) * t * t + 1) + b;
+    }
+    function easeInOutCubic(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) {
+            return c / 2 * t * t * t + b;
+        }
+        return c / 2 * ((t -= 2) * t * t + 2) + b;
+    }
+    function easeInQuart(t, b, c, d) {
+        return c * (t /= d) * t * t * t + b;
+    }
+    function easeOutQuart(t, b, c, d) {
+        return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+    }
+    function easeInOutQuart(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) {
+            return c / 2 * t * t * t * t + b;
+        }
+        return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+    }
+    function easeInQuint(t, b, c, d) {
+        return c * (t /= d) * t * t * t * t + b;
+    }
+    function easeOutQuint(t, b, c, d) {
+        return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+    }
+    function easeInOutQuint(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) {
+            return c / 2 * t * t * t * t * t + b;
+        }
+        return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+    }
+    function easeInSine(t, b, c, d) {
+        return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+    }
+    function easeOutSine(t, b, c, d) {
+        return c * Math.sin(t / d * (Math.PI / 2)) + b;
+    }
+    function easeInOutSine(t, b, c, d) {
+        return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+    }
+    function easeInExpo(t, b, c, d) {
+        return t === 0 ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+    }
+    function easeOutExpo(t, b, c, d) {
+        return t === d ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+    }
+    function easeInOutExpo(t, b, c, d) {
+        if (t === 0) {
+            return b;
+        }
+        if (t === d) {
+            return b + c;
+        }
+        t /= d / 2;
+        if (t < 1) {
+            return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+        }
+        return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+    }
+    function easeInCirc(t, b, c, d) {
+        return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+    }
+    function easeOutCirc(t, b, c, d) {
+        return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+    }
+    function easeInOutCirc(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) {
+            return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+        }
+        return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+    }
+    function easeInElastic(t, b, c, d) {
+        var s = 1.70158, p = 0, a = c;
+        if (t === 0) {
+            return b;
+        }
+        t /= d;
+        if (t === 1) {
+            return b + c;
+        }
+        if (!p) {
+            p = d * .3;
+        }
+        var opts = normalize(a, c, p, s);
+        return -elastic(opts, t, d) + b;
+    }
+    function easeOutElastic(t, b, c, d) {
+        var s = 1.70158, p = 0, a = c;
+        if (t === 0) {
+            return b;
+        }
+        t /= d;
+        if (t === 1) {
+            return b + c;
+        }
+        if (!p) {
+            p = d * .3;
+        }
+        var opts = normalize(a, c, p, s);
+        return opts.a * Math.pow(2, -10 * t) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p) + opts.c + b;
+    }
+    function easeInOutElastic(t, b, c, d) {
+        var s = 1.70158, p = 0, a = c;
+        if (t === 0) {
+            return b;
+        }
+        t /= d / 2;
+        if (t === 2) {
+            return b + c;
+        }
+        if (!p) {
+            p = d * (.3 * 1.5);
+        }
+        var opts = normalize(a, c, p, s);
+        if (t < 1) {
+            return -.5 * elastic(opts, t, d) + b;
+        }
+        return opts.a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p) * .5 + opts.c + b;
+    }
+    function easeInBack(t, b, c, d, s) {
+        if (s === undefined) {
+            s = 1.70158;
+        }
+        return c * (t /= d) * t * ((s + 1) * t - s) + b;
+    }
+    function easeOutBack(t, b, c, d, s) {
+        if (s === undefined) {
+            s = 1.70158;
+        }
+        return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+    }
+    function easeInOutBack(t, b, c, d, s) {
+        if (s === undefined) {
+            s = 1.70158;
+        }
+        t /= d / 2;
+        if (t < 1) {
+            return c / 2 * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
+        }
+        return c / 2 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
+    }
+    function easeInBounce(t, b, c, d) {
+        return c - easeOutBounce(d - t, 0, c, d) + b;
+    }
+    function easeOutBounce(t, b, c, d) {
+        if ((t /= d) < 1 / 2.75) {
+            return c * (7.5625 * t * t) + b;
+        } else if (t < 2 / 2.75) {
+            return c * (7.5625 * (t -= 1.5 / 2.75) * t + .75) + b;
+        } else if (t < 2.5 / 2.75) {
+            return c * (7.5625 * (t -= 2.25 / 2.75) * t + .9375) + b;
+        } else {
+            return c * (7.5625 * (t -= 2.625 / 2.75) * t + .984375) + b;
+        }
+    }
+    function easeInOutBounce(t, b, c, d) {
+        if (t < d / 2) {
+            return easeInBounce(t * 2, 0, c, d) * .5 + b;
+        }
+        return easeOutBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
+    }
+    fabric.util.ease = {
+        easeInQuad: function(t, b, c, d) {
+            return c * (t /= d) * t + b;
+        },
+        easeOutQuad: function(t, b, c, d) {
+            return -c * (t /= d) * (t - 2) + b;
+        },
+        easeInOutQuad: function(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) {
+                return c / 2 * t * t + b;
+            }
+            return -c / 2 * (--t * (t - 2) - 1) + b;
+        },
+        easeInCubic: function(t, b, c, d) {
+            return c * (t /= d) * t * t + b;
+        },
+        easeOutCubic: easeOutCubic,
+        easeInOutCubic: easeInOutCubic,
+        easeInQuart: easeInQuart,
+        easeOutQuart: easeOutQuart,
+        easeInOutQuart: easeInOutQuart,
+        easeInQuint: easeInQuint,
+        easeOutQuint: easeOutQuint,
+        easeInOutQuint: easeInOutQuint,
+        easeInSine: easeInSine,
+        easeOutSine: easeOutSine,
+        easeInOutSine: easeInOutSine,
+        easeInExpo: easeInExpo,
+        easeOutExpo: easeOutExpo,
+        easeInOutExpo: easeInOutExpo,
+        easeInCirc: easeInCirc,
+        easeOutCirc: easeOutCirc,
+        easeInOutCirc: easeInOutCirc,
+        easeInElastic: easeInElastic,
+        easeOutElastic: easeOutElastic,
+        easeInOutElastic: easeInOutElastic,
+        easeInBack: easeInBack,
+        easeOutBack: easeOutBack,
+        easeInOutBack: easeInOutBack,
+        easeInBounce: easeInBounce,
+        easeOutBounce: easeOutBounce,
+        easeInOutBounce: easeInOutBounce
+    };
+})();
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, capitalize = fabric.util.string.capitalize, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, parseUnit = fabric.util.parseUnit, multiplyTransformMatrices = fabric.util.multiplyTransformMatrices, reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i, reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i, reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i, reAllowedParents = /^(symbol|g|a|svg)$/i, attributesMap = {
+        cx: "left",
+        x: "left",
+        r: "radius",
+        cy: "top",
+        y: "top",
+        display: "visible",
+        visibility: "visible",
+        transform: "transformMatrix",
+        "fill-opacity": "fillOpacity",
+        "fill-rule": "fillRule",
+        "font-family": "fontFamily",
+        "font-size": "fontSize",
+        "font-style": "fontStyle",
+        "font-weight": "fontWeight",
+        "stroke-dasharray": "strokeDashArray",
+        "stroke-linecap": "strokeLineCap",
+        "stroke-linejoin": "strokeLineJoin",
+        "stroke-miterlimit": "strokeMiterLimit",
+        "stroke-opacity": "strokeOpacity",
+        "stroke-width": "strokeWidth",
+        "text-decoration": "textDecoration",
+        "text-anchor": "originX"
+    }, colorAttributes = {
+        stroke: "strokeOpacity",
+        fill: "fillOpacity"
+    };
+    fabric.cssRules = {};
+    fabric.gradientDefs = {};
+    function normalizeAttr(attr) {
+        if (attr in attributesMap) {
+            return attributesMap[attr];
+        }
+        return attr;
+    }
+    function normalizeValue(attr, value, parentAttributes, fontSize) {
+        var isArray = Object.prototype.toString.call(value) === "[object Array]", parsed;
+        if ((attr === "fill" || attr === "stroke") && value === "none") {
+            value = "";
+        } else if (attr === "strokeDashArray") {
+            value = value.replace(/,/g, " ").split(/\s+/).map(function(n) {
+                return parseFloat(n);
+            });
+        } else if (attr === "transformMatrix") {
+            if (parentAttributes && parentAttributes.transformMatrix) {
+                value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+            } else {
+                value = fabric.parseTransformAttribute(value);
+            }
+        } else if (attr === "visible") {
+            value = value === "none" || value === "hidden" ? false : true;
+            if (parentAttributes && parentAttributes.visible === false) {
+                value = false;
+            }
+        } else if (attr === "originX") {
+            value = value === "start" ? "left" : value === "end" ? "right" : "center";
+        } else {
+            parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
+        }
+        return !isArray && isNaN(parsed) ? value : parsed;
+    }
+    function _setStrokeFillOpacity(attributes) {
+        for (var attr in colorAttributes) {
+            if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === "undefined") {
+                continue;
+            }
+            if (attributes[attr].indexOf("url(") === 0) {
+                continue;
+            }
+            var color = new fabric.Color(attributes[attr]);
+            attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
+        }
+        return attributes;
+    }
+    fabric.parseTransformAttribute = function() {
+        function rotateMatrix(matrix, args) {
+            var angle = args[0];
+            matrix[0] = Math.cos(angle);
+            matrix[1] = Math.sin(angle);
+            matrix[2] = -Math.sin(angle);
+            matrix[3] = Math.cos(angle);
+        }
+        function scaleMatrix(matrix, args) {
+            var multiplierX = args[0], multiplierY = args.length === 2 ? args[1] : args[0];
+            matrix[0] = multiplierX;
+            matrix[3] = multiplierY;
+        }
+        function skewXMatrix(matrix, args) {
+            matrix[2] = Math.tan(fabric.util.degreesToRadians(args[0]));
+        }
+        function skewYMatrix(matrix, args) {
+            matrix[1] = Math.tan(fabric.util.degreesToRadians(args[0]));
+        }
+        function translateMatrix(matrix, args) {
+            matrix[4] = args[0];
+            if (args.length === 2) {
+                matrix[5] = args[1];
+            }
+        }
+        var iMatrix = [ 1, 0, 0, 1, 0, 0 ], number = fabric.reNum, commaWsp = "(?:\\s+,?\\s*|,\\s*)", skewX = "(?:(skewX)\\s*\\(\\s*(" + number + ")\\s*\\))", skewY = "(?:(skewY)\\s*\\(\\s*(" + number + ")\\s*\\))", rotate = "(?:(rotate)\\s*\\(\\s*(" + number + ")(?:" + commaWsp + "(" + number + ")" + commaWsp + "(" + number + "))?\\s*\\))", scale = "(?:(scale)\\s*\\(\\s*(" + number + ")(?:" + commaWsp + "(" + number + "))?\\s*\\))", translate = "(?:(translate)\\s*\\(\\s*(" + number + ")(?:" + commaWsp + "(" + number + "))?\\s*\\))", matrix = "(?:(matrix)\\s*\\(\\s*" + "(" + number + ")" + commaWsp + "(" + number + ")" + commaWsp + "(" + number + ")" + commaWsp + "(" + number + ")" + commaWsp + "(" + number + ")" + commaWsp + "(" + number + ")" + "\\s*\\))", transform = "(?:" + matrix + "|" + translate + "|" + scale + "|" + rotate + "|" + skewX + "|" + skewY + ")", transforms = "(?:" + transform + "(?:" + commaWsp + transform + ")*" + ")", transformList = "^\\s*(?:" + transforms + "?)\\s*$", reTransformList = new RegExp(transformList), reTransform = new RegExp(transform, "g");
+        return function(attributeValue) {
+            var matrix = iMatrix.concat(), matrices = [];
+            if (!attributeValue || attributeValue && !reTransformList.test(attributeValue)) {
+                return matrix;
+            }
+            attributeValue.replace(reTransform, function(match) {
+                var m = new RegExp(transform).exec(match).filter(function(match) {
+                    return match !== "" && match != null;
+                }), operation = m[1], args = m.slice(2).map(parseFloat);
+                switch (operation) {
+                  case "translate":
+                    translateMatrix(matrix, args);
+                    break;
+
+                  case "rotate":
+                    args[0] = fabric.util.degreesToRadians(args[0]);
+                    rotateMatrix(matrix, args);
+                    break;
+
+                  case "scale":
+                    scaleMatrix(matrix, args);
+                    break;
+
+                  case "skewX":
+                    skewXMatrix(matrix, args);
+                    break;
+
+                  case "skewY":
+                    skewYMatrix(matrix, args);
+                    break;
+
+                  case "matrix":
+                    matrix = args;
+                    break;
+                }
+                matrices.push(matrix.concat());
+                matrix = iMatrix.concat();
+            });
+            var combinedMatrix = matrices[0];
+            while (matrices.length > 1) {
+                matrices.shift();
+                combinedMatrix = fabric.util.multiplyTransformMatrices(combinedMatrix, matrices[0]);
+            }
+            return combinedMatrix;
+        };
+    }();
+    function parseStyleString(style, oStyle) {
+        var attr, value;
+        style.replace(/;\s*$/, "").split(";").forEach(function(chunk) {
+            var pair = chunk.split(":");
+            attr = normalizeAttr(pair[0].trim().toLowerCase());
+            value = normalizeValue(attr, pair[1].trim());
+            oStyle[attr] = value;
+        });
+    }
+    function parseStyleObject(style, oStyle) {
+        var attr, value;
+        for (var prop in style) {
+            if (typeof style[prop] === "undefined") {
+                continue;
+            }
+            attr = normalizeAttr(prop.toLowerCase());
+            value = normalizeValue(attr, style[prop]);
+            oStyle[attr] = value;
+        }
+    }
+    function getGlobalStylesForElement(element, svgUid) {
+        var styles = {};
+        for (var rule in fabric.cssRules[svgUid]) {
+            if (elementMatchesRule(element, rule.split(" "))) {
+                for (var property in fabric.cssRules[svgUid][rule]) {
+                    styles[property] = fabric.cssRules[svgUid][rule][property];
+                }
+            }
+        }
+        return styles;
+    }
+    function elementMatchesRule(element, selectors) {
+        var firstMatching, parentMatching = true;
+        firstMatching = selectorMatches(element, selectors.pop());
+        if (firstMatching && selectors.length) {
+            parentMatching = doesSomeParentMatch(element, selectors);
+        }
+        return firstMatching && parentMatching && selectors.length === 0;
+    }
+    function doesSomeParentMatch(element, selectors) {
+        var selector, parentMatching = true;
+        while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
+            if (parentMatching) {
+                selector = selectors.pop();
+            }
+            element = element.parentNode;
+            parentMatching = selectorMatches(element, selector);
+        }
+        return selectors.length === 0;
+    }
+    function selectorMatches(element, selector) {
+        var nodeName = element.nodeName, classNames = element.getAttribute("class"), id = element.getAttribute("id"), matcher;
+        matcher = new RegExp("^" + nodeName, "i");
+        selector = selector.replace(matcher, "");
+        if (id && selector.length) {
+            matcher = new RegExp("#" + id + "(?![a-zA-Z\\-]+)", "i");
+            selector = selector.replace(matcher, "");
+        }
+        if (classNames && selector.length) {
+            classNames = classNames.split(" ");
+            for (var i = classNames.length; i--; ) {
+                matcher = new RegExp("\\." + classNames[i] + "(?![a-zA-Z\\-]+)", "i");
+                selector = selector.replace(matcher, "");
+            }
+        }
+        return selector.length === 0;
+    }
+    function elementById(doc, id) {
+        var el;
+        doc.getElementById && (el = doc.getElementById(id));
+        if (el) {
+            return el;
+        }
+        var node, i, nodelist = doc.getElementsByTagName("*");
+        for (i = 0; i < nodelist.length; i++) {
+            node = nodelist[i];
+            if (id === node.getAttribute("id")) {
+                return node;
+            }
+        }
+    }
+    function parseUseDirectives(doc) {
+        var nodelist = doc.getElementsByTagName("use"), i = 0;
+        while (nodelist.length && i < nodelist.length) {
+            var el = nodelist[i], xlink = el.getAttribute("xlink:href").substr(1), x = el.getAttribute("x") || 0, y = el.getAttribute("y") || 0, el2 = elementById(doc, xlink).cloneNode(true), currentTrans = (el2.getAttribute("transform") || "") + " translate(" + x + ", " + y + ")", parentNode, oldLength = nodelist.length, attr, j, attrs, l;
+            applyViewboxTransform(el2);
+            if (/^svg$/i.test(el2.nodeName)) {
+                var el3 = el2.ownerDocument.createElement("g");
+                for (j = 0, attrs = el2.attributes, l = attrs.length; j < l; j++) {
+                    attr = attrs.item(j);
+                    el3.setAttribute(attr.nodeName, attr.nodeValue);
+                }
+                while (el2.firstChild != null) {
+                    el3.appendChild(el2.firstChild);
+                }
+                el2 = el3;
+            }
+            for (j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+                attr = attrs.item(j);
+                if (attr.nodeName === "x" || attr.nodeName === "y" || attr.nodeName === "xlink:href") {
+                    continue;
+                }
+                if (attr.nodeName === "transform") {
+                    currentTrans = attr.nodeValue + " " + currentTrans;
+                } else {
+                    el2.setAttribute(attr.nodeName, attr.nodeValue);
+                }
+            }
+            el2.setAttribute("transform", currentTrans);
+            el2.setAttribute("instantiated_by_use", "1");
+            el2.removeAttribute("id");
+            parentNode = el.parentNode;
+            parentNode.replaceChild(el2, el);
+            if (nodelist.length === oldLength) {
+                i++;
+            }
+        }
+    }
+    var reViewBoxAttrValue = new RegExp("^" + "\\s*(" + fabric.reNum + "+)\\s*,?" + "\\s*(" + fabric.reNum + "+)\\s*,?" + "\\s*(" + fabric.reNum + "+)\\s*,?" + "\\s*(" + fabric.reNum + "+)\\s*" + "$");
+    function applyViewboxTransform(element) {
+        var viewBoxAttr = element.getAttribute("viewBox"), scaleX = 1, scaleY = 1, minX = 0, minY = 0, viewBoxWidth, viewBoxHeight, matrix, el, widthAttr = element.getAttribute("width"), heightAttr = element.getAttribute("height"), x = element.getAttribute("x") || 0, y = element.getAttribute("y") || 0, preserveAspectRatio = element.getAttribute("preserveAspectRatio") || "", missingViewBox = !viewBoxAttr || !reViewBoxTagNames.test(element.tagName) || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue)), missingDimAttr = !widthAttr || !heightAttr || widthAttr === "100%" || heightAttr === "100%", toBeParsed = missingViewBox && missingDimAttr, parsedDim = {}, translateMatrix = "";
+        parsedDim.width = 0;
+        parsedDim.height = 0;
+        parsedDim.toBeParsed = toBeParsed;
+        if (toBeParsed) {
+            return parsedDim;
+        }
+        if (missingViewBox) {
+            parsedDim.width = parseUnit(widthAttr);
+            parsedDim.height = parseUnit(heightAttr);
+            return parsedDim;
+        }
+        minX = -parseFloat(viewBoxAttr[1]), minY = -parseFloat(viewBoxAttr[2]), viewBoxWidth = parseFloat(viewBoxAttr[3]), 
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (!missingDimAttr) {
+            parsedDim.width = parseUnit(widthAttr);
+            parsedDim.height = parseUnit(heightAttr);
+            scaleX = parsedDim.width / viewBoxWidth;
+            scaleY = parsedDim.height / viewBoxHeight;
+        } else {
+            parsedDim.width = viewBoxWidth;
+            parsedDim.height = viewBoxHeight;
+        }
+        preserveAspectRatio = fabric.util.parsePreserveAspectRatioAttribute(preserveAspectRatio);
+        if (preserveAspectRatio.alignX !== "none") {
+            scaleY = scaleX = scaleX > scaleY ? scaleY : scaleX;
+        }
+        if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0 && x === 0 && y === 0) {
+            return parsedDim;
+        }
+        if (x || y) {
+            translateMatrix = " translate(" + parseUnit(x) + " " + parseUnit(y) + ") ";
+        }
+        matrix = translateMatrix + " matrix(" + scaleX + " 0" + " 0 " + scaleY + " " + minX * scaleX + " " + minY * scaleY + ") ";
+        if (element.tagName === "svg") {
+            el = element.ownerDocument.createElement("g");
+            while (element.firstChild != null) {
+                el.appendChild(element.firstChild);
+            }
+            element.appendChild(el);
+        } else {
+            el = element;
+            matrix = el.getAttribute("transform") + matrix;
+        }
+        el.setAttribute("transform", matrix);
+        return parsedDim;
+    }
+    fabric.parseSVGDocument = function() {
+        function hasAncestorWithNodeName(element, nodeName) {
+            while (element && (element = element.parentNode)) {
+                if (nodeName.test(element.nodeName) && !element.getAttribute("instantiated_by_use")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return function(doc, callback, reviver) {
+            if (!doc) {
+                return;
+            }
+            parseUseDirectives(doc);
+            var startTime = new Date(), svgUid = fabric.Object.__uid++, options = applyViewboxTransform(doc), descendants = fabric.util.toArray(doc.getElementsByTagName("*"));
+            options.svgUid = svgUid;
+            if (descendants.length === 0 && fabric.isLikelyNode) {
+                descendants = doc.selectNodes('//*[name(.)!="svg"]');
+                var arr = [];
+                for (var i = 0, len = descendants.length; i < len; i++) {
+                    arr[i] = descendants[i];
+                }
+                descendants = arr;
+            }
+            var elements = descendants.filter(function(el) {
+                applyViewboxTransform(el);
+                return reAllowedSVGTagNames.test(el.tagName) && !hasAncestorWithNodeName(el, reNotAllowedAncestors);
+            });
+            if (!elements || elements && !elements.length) {
+                callback && callback([], {});
+                return;
+            }
+            fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
+            fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+            fabric.parseElements(elements, function(instances) {
+                fabric.documentParsingTime = new Date() - startTime;
+                if (callback) {
+                    callback(instances, options);
+                }
+            }, clone(options), reviver);
+        };
+    }();
+    var svgCache = {
+        has: function(name, callback) {
+            callback(false);
+        },
+        get: function() {},
+        set: function() {}
+    };
+    function _enlivenCachedObject(cachedObject) {
+        var objects = cachedObject.objects, options = cachedObject.options;
+        objects = objects.map(function(o) {
+            return fabric[capitalize(o.type)].fromObject(o);
+        });
+        return {
+            objects: objects,
+            options: options
+        };
+    }
+    function _createSVGPattern(markup, canvas, property) {
+        if (canvas[property] && canvas[property].toSVG) {
+            markup.push('	<pattern x="0" y="0" id="', property, 'Pattern" ', 'width="', canvas[property].source.width, '" height="', canvas[property].source.height, '" patternUnits="userSpaceOnUse">\n', '		<image x="0" y="0" ', 'width="', canvas[property].source.width, '" height="', canvas[property].source.height, '" xlink:href="', canvas[property].source.src, '"></image>\n	</pattern>\n');
+        }
+    }
+    var reFontDeclaration = new RegExp("(normal|italic)?\\s*(normal|small-caps)?\\s*" + "(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(" + fabric.reNum + "(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|" + fabric.reNum + "))?\\s+(.*)");
+    extend(fabric, {
+        parseFontDeclaration: function(value, oStyle) {
+            var match = value.match(reFontDeclaration);
+            if (!match) {
+                return;
+            }
+            var fontStyle = match[1], fontWeight = match[3], fontSize = match[4], lineHeight = match[5], fontFamily = match[6];
+            if (fontStyle) {
+                oStyle.fontStyle = fontStyle;
+            }
+            if (fontWeight) {
+                oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+            }
+            if (fontSize) {
+                oStyle.fontSize = parseUnit(fontSize);
+            }
+            if (fontFamily) {
+                oStyle.fontFamily = fontFamily;
+            }
+            if (lineHeight) {
+                oStyle.lineHeight = lineHeight === "normal" ? 1 : lineHeight;
+            }
+        },
+        getGradientDefs: function(doc) {
+            var linearGradientEls = doc.getElementsByTagName("linearGradient"), radialGradientEls = doc.getElementsByTagName("radialGradient"), el, i, j = 0, id, xlink, elList = [], gradientDefs = {}, idsToXlinkMap = {};
+            elList.length = linearGradientEls.length + radialGradientEls.length;
+            i = linearGradientEls.length;
+            while (i--) {
+                elList[j++] = linearGradientEls[i];
+            }
+            i = radialGradientEls.length;
+            while (i--) {
+                elList[j++] = radialGradientEls[i];
+            }
+            while (j--) {
+                el = elList[j];
+                xlink = el.getAttribute("xlink:href");
+                id = el.getAttribute("id");
+                if (xlink) {
+                    idsToXlinkMap[id] = xlink.substr(1);
+                }
+                gradientDefs[id] = el;
+            }
+            for (id in idsToXlinkMap) {
+                var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
+                el = gradientDefs[id];
+                while (el2.firstChild) {
+                    el.appendChild(el2.firstChild);
+                }
+            }
+            return gradientDefs;
+        },
+        parseAttributes: function(element, attributes, svgUid) {
+            if (!element) {
+                return;
+            }
+            var value, parentAttributes = {}, fontSize;
+            if (typeof svgUid === "undefined") {
+                svgUid = element.getAttribute("svgUid");
+            }
+            if (element.parentNode && reAllowedParents.test(element.parentNode.nodeName)) {
+                parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
+            }
+            fontSize = parentAttributes && parentAttributes.fontSize || element.getAttribute("font-size") || fabric.Text.DEFAULT_SVG_FONT_SIZE;
+            var ownAttributes = attributes.reduce(function(memo, attr) {
+                value = element.getAttribute(attr);
+                if (value) {
+                    attr = normalizeAttr(attr);
+                    value = normalizeValue(attr, value, parentAttributes, fontSize);
+                    memo[attr] = value;
+                }
+                return memo;
+            }, {});
+            ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
+            if (ownAttributes.font) {
+                fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
+            }
+            return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
+        },
+        parseElements: function(elements, callback, options, reviver) {
+            new fabric.ElementsParser(elements, callback, options, reviver).parse();
+        },
+        parseStyleAttribute: function(element) {
+            var oStyle = {}, style = element.getAttribute("style");
+            if (!style) {
+                return oStyle;
+            }
+            if (typeof style === "string") {
+                parseStyleString(style, oStyle);
+            } else {
+                parseStyleObject(style, oStyle);
+            }
+            return oStyle;
+        },
+        parsePointsAttribute: function(points) {
+            if (!points) {
+                return null;
+            }
+            points = points.replace(/,/g, " ").trim();
+            points = points.split(/\s+/);
+            var parsedPoints = [], i, len;
+            i = 0;
+            len = points.length;
+            for (;i < len; i += 2) {
+                parsedPoints.push({
+                    x: parseFloat(points[i]),
+                    y: parseFloat(points[i + 1])
+                });
+            }
+            return parsedPoints;
+        },
+        getCSSRules: function(doc) {
+            var styles = doc.getElementsByTagName("style"), allRules = {}, rules;
+            for (var i = 0, len = styles.length; i < len; i++) {
+                var styleContents = styles[i].textContent;
+                styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, "");
+                if (styleContents.trim() === "") {
+                    continue;
+                }
+                rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
+                rules = rules.map(function(rule) {
+                    return rule.trim();
+                });
+                rules.forEach(function(rule) {
+                    var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/), ruleObj = {}, declaration = match[2].trim(), propertyValuePairs = declaration.replace(/;$/, "").split(/\s*;\s*/);
+                    for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
+                        var pair = propertyValuePairs[i].split(/\s*:\s*/), property = normalizeAttr(pair[0]), value = normalizeValue(property, pair[1], pair[0]);
+                        ruleObj[property] = value;
+                    }
+                    rule = match[1];
+                    rule.split(",").forEach(function(_rule) {
+                        _rule = _rule.replace(/^svg/i, "").trim();
+                        if (_rule === "") {
+                            return;
+                        }
+                        allRules[_rule] = fabric.util.object.clone(ruleObj);
+                    });
+                });
+            }
+            return allRules;
+        },
+        loadSVGFromURL: function(url, callback, reviver) {
+            url = url.replace(/^\n\s*/, "").trim();
+            svgCache.has(url, function(hasUrl) {
+                if (hasUrl) {
+                    svgCache.get(url, function(value) {
+                        var enlivedRecord = _enlivenCachedObject(value);
+                        callback(enlivedRecord.objects, enlivedRecord.options);
+                    });
+                } else {
+                    new fabric.util.request(url, {
+                        method: "get",
+                        onComplete: onComplete
+                    });
+                }
+            });
+            function onComplete(r) {
+                var xml = r.responseXML;
+                if (xml && !xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
+                    xml = new ActiveXObject("Microsoft.XMLDOM");
+                    xml.async = "false";
+                    xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ""));
+                }
+                if (!xml || !xml.documentElement) {
+                    return;
+                }
+                fabric.parseSVGDocument(xml.documentElement, function(results, options) {
+                    svgCache.set(url, {
+                        objects: fabric.util.array.invoke(results, "toObject"),
+                        options: options
+                    });
+                    callback(results, options);
+                }, reviver);
+            }
+        },
+        loadSVGFromString: function(string, callback, reviver) {
+            string = string.trim();
+            var doc;
+            if (typeof DOMParser !== "undefined") {
+                var parser = new DOMParser();
+                if (parser && parser.parseFromString) {
+                    doc = parser.parseFromString(string, "text/xml");
+                }
+            } else if (fabric.window.ActiveXObject) {
+                doc = new ActiveXObject("Microsoft.XMLDOM");
+                doc.async = "false";
+                doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ""));
+            }
+            fabric.parseSVGDocument(doc.documentElement, function(results, options) {
+                callback(results, options);
+            }, reviver);
+        },
+        createSVGFontFacesMarkup: function(objects) {
+            var markup = "";
+            for (var i = 0, len = objects.length; i < len; i++) {
+                if (objects[i].type !== "text" || !objects[i].path) {
+                    continue;
+                }
+                markup += [ "@font-face {", "font-family: ", objects[i].fontFamily, "; ", "src: url('", objects[i].path, "')", "}\n" ].join("");
+            }
+            if (markup) {
+                markup = [ '	<style type="text/css">', "<![CDATA[", markup, "]]>", "</style>\n" ].join("");
+            }
+            return markup;
+        },
+        createSVGRefElementsMarkup: function(canvas) {
+            var markup = [];
+            _createSVGPattern(markup, canvas, "backgroundColor");
+            _createSVGPattern(markup, canvas, "overlayColor");
+            return markup.join("");
+        }
+    });
+})(typeof exports !== "undefined" ? exports : this);
+
+fabric.ElementsParser = function(elements, callback, options, reviver) {
+    this.elements = elements;
+    this.callback = callback;
+    this.options = options;
+    this.reviver = reviver;
+    this.svgUid = options && options.svgUid || 0;
+};
+
+fabric.ElementsParser.prototype.parse = function() {
+    this.instances = new Array(this.elements.length);
+    this.numElements = this.elements.length;
+    this.createObjects();
+};
+
+fabric.ElementsParser.prototype.createObjects = function() {
+    for (var i = 0, len = this.elements.length; i < len; i++) {
+        this.elements[i].setAttribute("svgUid", this.svgUid);
+        (function(_this, i) {
+            setTimeout(function() {
+                _this.createObject(_this.elements[i], i);
+            }, 0);
+        })(this, i);
+    }
+};
+
+fabric.ElementsParser.prototype.createObject = function(el, index) {
+    var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+    if (klass && klass.fromElement) {
+        try {
+            this._createObject(klass, el, index);
+        } catch (err) {
+            fabric.log(err);
+        }
+    } else {
+        this.checkIfDone();
+    }
+};
+
+fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
+    if (klass.async) {
+        klass.fromElement(el, this.createCallback(index, el), this.options);
+    } else {
+        var obj = klass.fromElement(el, this.options);
+        this.resolveGradient(obj, "fill");
+        this.resolveGradient(obj, "stroke");
+        this.reviver && this.reviver(el, obj);
+        this.instances[index] = obj;
+        this.checkIfDone();
+    }
+};
+
+fabric.ElementsParser.prototype.createCallback = function(index, el) {
+    var _this = this;
+    return function(obj) {
+        _this.resolveGradient(obj, "fill");
+        _this.resolveGradient(obj, "stroke");
+        _this.reviver && _this.reviver(el, obj);
+        _this.instances[index] = obj;
+        _this.checkIfDone();
+    };
+};
+
+fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+    var instanceFillValue = obj.get(property);
+    if (!/^url\(/.test(instanceFillValue)) {
+        return;
+    }
+    var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+    if (fabric.gradientDefs[this.svgUid][gradientId]) {
+        obj.set(property, fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+    }
+};
+
+fabric.ElementsParser.prototype.checkIfDone = function() {
+    if (--this.numElements === 0) {
+        this.instances = this.instances.filter(function(el) {
+            return el != null;
+        });
+        this.callback(this.instances);
+    }
+};
+
 (function(global) {
     "use strict";
     var fabric = global.fabric || (global.fabric = {});
@@ -1706,6 +2651,371 @@ if (typeof console !== "undefined") {
         oColor.setSource(source);
         return oColor;
     };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function() {
+    function getColorStop(el) {
+        var style = el.getAttribute("style"), offset = el.getAttribute("offset") || 0, color, colorAlpha, opacity;
+        offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
+        offset = offset < 0 ? 0 : offset > 1 ? 1 : offset;
+        if (style) {
+            var keyValuePairs = style.split(/\s*;\s*/);
+            if (keyValuePairs[keyValuePairs.length - 1] === "") {
+                keyValuePairs.pop();
+            }
+            for (var i = keyValuePairs.length; i--; ) {
+                var split = keyValuePairs[i].split(/\s*:\s*/), key = split[0].trim(), value = split[1].trim();
+                if (key === "stop-color") {
+                    color = value;
+                } else if (key === "stop-opacity") {
+                    opacity = value;
+                }
+            }
+        }
+        if (!color) {
+            color = el.getAttribute("stop-color") || "rgb(0,0,0)";
+        }
+        if (!opacity) {
+            opacity = el.getAttribute("stop-opacity");
+        }
+        color = new fabric.Color(color);
+        colorAlpha = color.getAlpha();
+        opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
+        opacity *= colorAlpha;
+        return {
+            offset: offset,
+            color: color.toRgb(),
+            opacity: opacity
+        };
+    }
+    function getLinearCoords(el) {
+        return {
+            x1: el.getAttribute("x1") || 0,
+            y1: el.getAttribute("y1") || 0,
+            x2: el.getAttribute("x2") || "100%",
+            y2: el.getAttribute("y2") || 0
+        };
+    }
+    function getRadialCoords(el) {
+        return {
+            x1: el.getAttribute("fx") || el.getAttribute("cx") || "50%",
+            y1: el.getAttribute("fy") || el.getAttribute("cy") || "50%",
+            r1: 0,
+            x2: el.getAttribute("cx") || "50%",
+            y2: el.getAttribute("cy") || "50%",
+            r2: el.getAttribute("r") || "50%"
+        };
+    }
+    fabric.Gradient = fabric.util.createClass({
+        offsetX: 0,
+        offsetY: 0,
+        initialize: function(options) {
+            options || (options = {});
+            var coords = {};
+            this.id = fabric.Object.__uid++;
+            this.type = options.type || "linear";
+            coords = {
+                x1: options.coords.x1 || 0,
+                y1: options.coords.y1 || 0,
+                x2: options.coords.x2 || 0,
+                y2: options.coords.y2 || 0
+            };
+            if (this.type === "radial") {
+                coords.r1 = options.coords.r1 || 0;
+                coords.r2 = options.coords.r2 || 0;
+            }
+            this.coords = coords;
+            this.colorStops = options.colorStops.slice();
+            if (options.gradientTransform) {
+                this.gradientTransform = options.gradientTransform;
+            }
+            this.offsetX = options.offsetX || this.offsetX;
+            this.offsetY = options.offsetY || this.offsetY;
+        },
+        addColorStop: function(colorStop) {
+            for (var position in colorStop) {
+                var color = new fabric.Color(colorStop[position]);
+                this.colorStops.push({
+                    offset: position,
+                    color: color.toRgb(),
+                    opacity: color.getAlpha()
+                });
+            }
+            return this;
+        },
+        toObject: function() {
+            return {
+                type: this.type,
+                coords: this.coords,
+                colorStops: this.colorStops,
+                offsetX: this.offsetX,
+                offsetY: this.offsetY,
+                gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
+            };
+        },
+        toSVG: function(object) {
+            var coords = fabric.util.object.clone(this.coords), markup, commonAttributes;
+            this.colorStops.sort(function(a, b) {
+                return a.offset - b.offset;
+            });
+            if (!(object.group && object.group.type === "path-group")) {
+                for (var prop in coords) {
+                    if (prop === "x1" || prop === "x2" || prop === "r2") {
+                        coords[prop] += this.offsetX - object.width / 2;
+                    } else if (prop === "y1" || prop === "y2") {
+                        coords[prop] += this.offsetY - object.height / 2;
+                    }
+                }
+            }
+            commonAttributes = 'id="SVGID_' + this.id + '" gradientUnits="userSpaceOnUse"';
+            if (this.gradientTransform) {
+                commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(" ") + ')" ';
+            }
+            if (this.type === "linear") {
+                markup = [ "<linearGradient ", commonAttributes, ' x1="', coords.x1, '" y1="', coords.y1, '" x2="', coords.x2, '" y2="', coords.y2, '">\n' ];
+            } else if (this.type === "radial") {
+                markup = [ "<radialGradient ", commonAttributes, ' cx="', coords.x2, '" cy="', coords.y2, '" r="', coords.r2, '" fx="', coords.x1, '" fy="', coords.y1, '">\n' ];
+            }
+            for (var i = 0; i < this.colorStops.length; i++) {
+                markup.push("<stop ", 'offset="', this.colorStops[i].offset * 100 + "%", '" style="stop-color:', this.colorStops[i].color, this.colorStops[i].opacity != null ? ";stop-opacity: " + this.colorStops[i].opacity : ";", '"/>\n');
+            }
+            markup.push(this.type === "linear" ? "</linearGradient>\n" : "</radialGradient>\n");
+            return markup.join("");
+        },
+        toLive: function(ctx, object) {
+            var gradient, prop, coords = fabric.util.object.clone(this.coords);
+            if (!this.type) {
+                return;
+            }
+            if (object.group && object.group.type === "path-group") {
+                for (prop in coords) {
+                    if (prop === "x1" || prop === "x2") {
+                        coords[prop] += -this.offsetX + object.width / 2;
+                    } else if (prop === "y1" || prop === "y2") {
+                        coords[prop] += -this.offsetY + object.height / 2;
+                    }
+                }
+            }
+            if (this.type === "linear") {
+                gradient = ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2);
+            } else if (this.type === "radial") {
+                gradient = ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+            }
+            for (var i = 0, len = this.colorStops.length; i < len; i++) {
+                var color = this.colorStops[i].color, opacity = this.colorStops[i].opacity, offset = this.colorStops[i].offset;
+                if (typeof opacity !== "undefined") {
+                    color = new fabric.Color(color).setAlpha(opacity).toRgba();
+                }
+                gradient.addColorStop(parseFloat(offset), color);
+            }
+            return gradient;
+        }
+    });
+    fabric.util.object.extend(fabric.Gradient, {
+        fromElement: function(el, instance) {
+            var colorStopEls = el.getElementsByTagName("stop"), type = el.nodeName === "linearGradient" ? "linear" : "radial", gradientUnits = el.getAttribute("gradientUnits") || "objectBoundingBox", gradientTransform = el.getAttribute("gradientTransform"), colorStops = [], coords = {}, ellipseMatrix;
+            if (type === "linear") {
+                coords = getLinearCoords(el);
+            } else if (type === "radial") {
+                coords = getRadialCoords(el);
+            }
+            for (var i = colorStopEls.length; i--; ) {
+                colorStops.push(getColorStop(colorStopEls[i]));
+            }
+            ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);
+            var gradient = new fabric.Gradient({
+                type: type,
+                coords: coords,
+                colorStops: colorStops,
+                offsetX: -instance.left,
+                offsetY: -instance.top
+            });
+            if (gradientTransform || ellipseMatrix !== "") {
+                gradient.gradientTransform = fabric.parseTransformAttribute((gradientTransform || "") + ellipseMatrix);
+            }
+            return gradient;
+        },
+        forObject: function(obj, options) {
+            options || (options = {});
+            _convertPercentUnitsToValues(obj, options.coords, "userSpaceOnUse");
+            return new fabric.Gradient(options);
+        }
+    });
+    function _convertPercentUnitsToValues(object, options, gradientUnits) {
+        var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = "";
+        for (var prop in options) {
+            propValue = parseFloat(options[prop], 10);
+            if (typeof options[prop] === "string" && /^\d+%$/.test(options[prop])) {
+                multFactor = .01;
+            } else {
+                multFactor = 1;
+            }
+            if (prop === "x1" || prop === "x2" || prop === "r2") {
+                multFactor *= gradientUnits === "objectBoundingBox" ? object.width : 1;
+                addFactor = gradientUnits === "objectBoundingBox" ? object.left || 0 : 0;
+            } else if (prop === "y1" || prop === "y2") {
+                multFactor *= gradientUnits === "objectBoundingBox" ? object.height : 1;
+                addFactor = gradientUnits === "objectBoundingBox" ? object.top || 0 : 0;
+            }
+            options[prop] = propValue * multFactor + addFactor;
+        }
+        if (object.type === "ellipse" && options.r2 !== null && gradientUnits === "objectBoundingBox" && object.rx !== object.ry) {
+            var scaleFactor = object.ry / object.rx;
+            ellipseMatrix = " scale(1, " + scaleFactor + ")";
+            if (options.y1) {
+                options.y1 /= scaleFactor;
+            }
+            if (options.y2) {
+                options.y2 /= scaleFactor;
+            }
+        }
+        return ellipseMatrix;
+    }
+})();
+
+fabric.Pattern = fabric.util.createClass({
+    repeat: "repeat",
+    offsetX: 0,
+    offsetY: 0,
+    initialize: function(options) {
+        options || (options = {});
+        this.id = fabric.Object.__uid++;
+        if (options.source) {
+            if (typeof options.source === "string") {
+                if (typeof fabric.util.getFunctionBody(options.source) !== "undefined") {
+                    this.source = new Function(fabric.util.getFunctionBody(options.source));
+                } else {
+                    var _this = this;
+                    this.source = fabric.util.createImage();
+                    fabric.util.loadImage(options.source, function(img) {
+                        _this.source = img;
+                    });
+                }
+            } else {
+                this.source = options.source;
+            }
+        }
+        if (options.repeat) {
+            this.repeat = options.repeat;
+        }
+        if (options.offsetX) {
+            this.offsetX = options.offsetX;
+        }
+        if (options.offsetY) {
+            this.offsetY = options.offsetY;
+        }
+    },
+    toObject: function() {
+        var source;
+        if (typeof this.source === "function") {
+            source = String(this.source);
+        } else if (typeof this.source.src === "string") {
+            source = this.source.src;
+        } else if (typeof this.source === "object" && this.source.toDataURL) {
+            source = this.source.toDataURL();
+        }
+        return {
+            source: source,
+            repeat: this.repeat,
+            offsetX: this.offsetX,
+            offsetY: this.offsetY
+        };
+    },
+    toSVG: function(object) {
+        var patternSource = typeof this.source === "function" ? this.source() : this.source, patternWidth = patternSource.width / object.getWidth(), patternHeight = patternSource.height / object.getHeight(), patternOffsetX = this.offsetX / object.getWidth(), patternOffsetY = this.offsetY / object.getHeight(), patternImgSrc = "";
+        if (this.repeat === "repeat-x" || this.repeat === "no-repeat") {
+            patternHeight = 1;
+        }
+        if (this.repeat === "repeat-y" || this.repeat === "no-repeat") {
+            patternWidth = 1;
+        }
+        if (patternSource.src) {
+            patternImgSrc = patternSource.src;
+        } else if (patternSource.toDataURL) {
+            patternImgSrc = patternSource.toDataURL();
+        }
+        return '<pattern id="SVGID_' + this.id + '" x="' + patternOffsetX + '" y="' + patternOffsetY + '" width="' + patternWidth + '" height="' + patternHeight + '">\n' + '<image x="0" y="0"' + ' width="' + patternSource.width + '" height="' + patternSource.height + '" xlink:href="' + patternImgSrc + '"></image>\n' + "</pattern>\n";
+    },
+    toLive: function(ctx) {
+        var source = typeof this.source === "function" ? this.source() : this.source;
+        if (!source) {
+            return "";
+        }
+        if (typeof source.src !== "undefined") {
+            if (!source.complete) {
+                return "";
+            }
+            if (source.naturalWidth === 0 || source.naturalHeight === 0) {
+                return "";
+            }
+        }
+        return ctx.createPattern(source, this.repeat);
+    }
+});
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), toFixed = fabric.util.toFixed;
+    if (fabric.Shadow) {
+        fabric.warn("fabric.Shadow is already defined.");
+        return;
+    }
+    fabric.Shadow = fabric.util.createClass({
+        color: "rgb(0,0,0)",
+        blur: 0,
+        offsetX: 0,
+        offsetY: 0,
+        affectStroke: false,
+        includeDefaultValues: true,
+        initialize: function(options) {
+            if (typeof options === "string") {
+                options = this._parseShadow(options);
+            }
+            for (var prop in options) {
+                this[prop] = options[prop];
+            }
+            this.id = fabric.Object.__uid++;
+        },
+        _parseShadow: function(shadow) {
+            var shadowStr = shadow.trim(), offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [], color = shadowStr.replace(fabric.Shadow.reOffsetsAndBlur, "") || "rgb(0,0,0)";
+            return {
+                color: color.trim(),
+                offsetX: parseInt(offsetsAndBlur[1], 10) || 0,
+                offsetY: parseInt(offsetsAndBlur[2], 10) || 0,
+                blur: parseInt(offsetsAndBlur[3], 10) || 0
+            };
+        },
+        toString: function() {
+            return [ this.offsetX, this.offsetY, this.blur, this.color ].join("px ");
+        },
+        toSVG: function(object) {
+            var fBoxX = 40, fBoxY = 40;
+            if (object.width && object.height) {
+                fBoxX = toFixed((Math.abs(this.offsetX) + this.blur) / object.width, 2) * 100 + 20;
+                fBoxY = toFixed((Math.abs(this.offsetY) + this.blur) / object.height, 2) * 100 + 20;
+            }
+            return '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' + 'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + ">\n" + '	<feGaussianBlur in="SourceAlpha" stdDeviation="' + toFixed(this.blur ? this.blur / 2 : 0, 3) + '"></feGaussianBlur>\n' + '	<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '" result="oBlur" ></feOffset>\n' + '	<feFlood flood-color="' + this.color + '"/>\n' + '	<feComposite in2="oBlur" operator="in" />\n' + "	<feMerge>\n" + "		<feMergeNode></feMergeNode>\n" + '		<feMergeNode in="SourceGraphic"></feMergeNode>\n' + "	</feMerge>\n" + "</filter>\n";
+        },
+        toObject: function() {
+            if (this.includeDefaultValues) {
+                return {
+                    color: this.color,
+                    blur: this.blur,
+                    offsetX: this.offsetX,
+                    offsetY: this.offsetY,
+                    affectStroke: this.affectStroke
+                };
+            }
+            var obj = {}, proto = fabric.Shadow.prototype;
+            [ "color", "blur", "offsetX", "offsetY", "affectStroke" ].forEach(function(prop) {
+                if (this[prop] !== proto[prop]) {
+                    obj[prop] = this[prop];
+                }
+            }, this);
+            return obj;
+        }
+    });
+    fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function() {
@@ -2364,6 +3674,1582 @@ if (typeof console !== "undefined") {
     fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 })();
 
+fabric.BaseBrush = fabric.util.createClass({
+    color: "rgb(0, 0, 0)",
+    width: 1,
+    shadow: null,
+    strokeLineCap: "round",
+    strokeLineJoin: "round",
+    strokeDashArray: null,
+    setShadow: function(options) {
+        this.shadow = new fabric.Shadow(options);
+        return this;
+    },
+    _setBrushStyles: function() {
+        var ctx = this.canvas.contextTop;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.width;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        if (this.strokeDashArray && fabric.StaticCanvas.supports("setLineDash")) {
+            ctx.setLineDash(this.strokeDashArray);
+        }
+    },
+    _setShadow: function() {
+        if (!this.shadow) {
+            return;
+        }
+        var ctx = this.canvas.contextTop;
+        ctx.shadowColor = this.shadow.color;
+        ctx.shadowBlur = this.shadow.blur;
+        ctx.shadowOffsetX = this.shadow.offsetX;
+        ctx.shadowOffsetY = this.shadow.offsetY;
+    },
+    _resetShadow: function() {
+        var ctx = this.canvas.contextTop;
+        ctx.shadowColor = "";
+        ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+    }
+});
+
+(function() {
+    fabric.PencilBrush = fabric.util.createClass(fabric.BaseBrush, {
+        initialize: function(canvas) {
+            this.canvas = canvas;
+            this._points = [];
+        },
+        onMouseDown: function(pointer) {
+            this._prepareForDrawing(pointer);
+            this._captureDrawingPath(pointer);
+            this._render();
+        },
+        onMouseMove: function(pointer) {
+            this._captureDrawingPath(pointer);
+            this.canvas.clearContext(this.canvas.contextTop);
+            this._render();
+        },
+        onMouseUp: function() {
+            this._finalizeAndAddPath();
+        },
+        _prepareForDrawing: function(pointer) {
+            var p = new fabric.Point(pointer.x, pointer.y);
+            this._reset();
+            this._addPoint(p);
+            this.canvas.contextTop.moveTo(p.x, p.y);
+        },
+        _addPoint: function(point) {
+            this._points.push(point);
+        },
+        _reset: function() {
+            this._points.length = 0;
+            this._setBrushStyles();
+            this._setShadow();
+        },
+        _captureDrawingPath: function(pointer) {
+            var pointerPoint = new fabric.Point(pointer.x, pointer.y);
+            this._addPoint(pointerPoint);
+        },
+        _render: function() {
+            var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform, p1 = this._points[0], p2 = this._points[1];
+            ctx.save();
+            ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+            ctx.beginPath();
+            if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
+                p1.x -= .5;
+                p2.x += .5;
+            }
+            ctx.moveTo(p1.x, p1.y);
+            for (var i = 1, len = this._points.length; i < len; i++) {
+                var midPoint = p1.midPointFrom(p2);
+                ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+                p1 = this._points[i];
+                p2 = this._points[i + 1];
+            }
+            ctx.lineTo(p1.x, p1.y);
+            ctx.stroke();
+            ctx.restore();
+        },
+        convertPointsToSVGPath: function(points) {
+            var path = [], p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y);
+            path.push("M ", points[0].x, " ", points[0].y, " ");
+            for (var i = 1, len = points.length; i < len; i++) {
+                var midPoint = p1.midPointFrom(p2);
+                path.push("Q ", p1.x, " ", p1.y, " ", midPoint.x, " ", midPoint.y, " ");
+                p1 = new fabric.Point(points[i].x, points[i].y);
+                if (i + 1 < points.length) {
+                    p2 = new fabric.Point(points[i + 1].x, points[i + 1].y);
+                }
+            }
+            path.push("L ", p1.x, " ", p1.y, " ");
+            return path;
+        },
+        createPath: function(pathData) {
+            var path = new fabric.Path(pathData, {
+                fill: null,
+                stroke: this.color,
+                strokeWidth: this.width,
+                strokeLineCap: this.strokeLineCap,
+                strokeLineJoin: this.strokeLineJoin,
+                strokeDashArray: this.strokeDashArray,
+                originX: "center",
+                originY: "center"
+            });
+            if (this.shadow) {
+                this.shadow.affectStroke = true;
+                path.setShadow(this.shadow);
+            }
+            return path;
+        },
+        _finalizeAndAddPath: function() {
+            var ctx = this.canvas.contextTop;
+            ctx.closePath();
+            var pathData = this.convertPointsToSVGPath(this._points).join("");
+            if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
+                this.canvas.renderAll();
+                return;
+            }
+            var path = this.createPath(pathData);
+            this.canvas.add(path);
+            path.setCoords();
+            this.canvas.clearContext(this.canvas.contextTop);
+            this._resetShadow();
+            this.canvas.renderAll();
+            this.canvas.fire("path:created", {
+                path: path
+            });
+        }
+    });
+})();
+
+fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, {
+    width: 10,
+    initialize: function(canvas) {
+        this.canvas = canvas;
+        this.points = [];
+    },
+    drawDot: function(pointer) {
+        var point = this.addPoint(pointer), ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+        ctx.save();
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        ctx.fillStyle = point.fill;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    },
+    onMouseDown: function(pointer) {
+        this.points.length = 0;
+        this.canvas.clearContext(this.canvas.contextTop);
+        this._setShadow();
+        this.drawDot(pointer);
+    },
+    onMouseMove: function(pointer) {
+        this.drawDot(pointer);
+    },
+    onMouseUp: function() {
+        var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+        this.canvas.renderOnAddRemove = false;
+        var circles = [];
+        for (var i = 0, len = this.points.length; i < len; i++) {
+            var point = this.points[i], circle = new fabric.Circle({
+                radius: point.radius,
+                left: point.x,
+                top: point.y,
+                originX: "center",
+                originY: "center",
+                fill: point.fill
+            });
+            this.shadow && circle.setShadow(this.shadow);
+            circles.push(circle);
+        }
+        var group = new fabric.Group(circles, {
+            originX: "center",
+            originY: "center"
+        });
+        group.canvas = this.canvas;
+        this.canvas.add(group);
+        this.canvas.fire("path:created", {
+            path: group
+        });
+        this.canvas.clearContext(this.canvas.contextTop);
+        this._resetShadow();
+        this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
+        this.canvas.renderAll();
+    },
+    addPoint: function(pointer) {
+        var pointerPoint = new fabric.Point(pointer.x, pointer.y), circleRadius = fabric.util.getRandomInt(Math.max(0, this.width - 20), this.width + 20) / 2, circleColor = new fabric.Color(this.color).setAlpha(fabric.util.getRandomInt(0, 100) / 100).toRgba();
+        pointerPoint.radius = circleRadius;
+        pointerPoint.fill = circleColor;
+        this.points.push(pointerPoint);
+        return pointerPoint;
+    }
+});
+
+fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
+    width: 10,
+    density: 20,
+    dotWidth: 1,
+    dotWidthVariance: 1,
+    randomOpacity: false,
+    optimizeOverlapping: true,
+    initialize: function(canvas) {
+        this.canvas = canvas;
+        this.sprayChunks = [];
+    },
+    onMouseDown: function(pointer) {
+        this.sprayChunks.length = 0;
+        this.canvas.clearContext(this.canvas.contextTop);
+        this._setShadow();
+        this.addSprayChunk(pointer);
+        this.render();
+    },
+    onMouseMove: function(pointer) {
+        this.addSprayChunk(pointer);
+        this.render();
+    },
+    onMouseUp: function() {
+        var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+        this.canvas.renderOnAddRemove = false;
+        var rects = [];
+        for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
+            var sprayChunk = this.sprayChunks[i];
+            for (var j = 0, jlen = sprayChunk.length; j < jlen; j++) {
+                var rect = new fabric.Rect({
+                    width: sprayChunk[j].width,
+                    height: sprayChunk[j].width,
+                    left: sprayChunk[j].x + 1,
+                    top: sprayChunk[j].y + 1,
+                    originX: "center",
+                    originY: "center",
+                    fill: this.color
+                });
+                this.shadow && rect.setShadow(this.shadow);
+                rects.push(rect);
+            }
+        }
+        if (this.optimizeOverlapping) {
+            rects = this._getOptimizedRects(rects);
+        }
+        var group = new fabric.Group(rects, {
+            originX: "center",
+            originY: "center"
+        });
+        group.canvas = this.canvas;
+        this.canvas.add(group);
+        this.canvas.fire("path:created", {
+            path: group
+        });
+        this.canvas.clearContext(this.canvas.contextTop);
+        this._resetShadow();
+        this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
+        this.canvas.renderAll();
+    },
+    _getOptimizedRects: function(rects) {
+        var uniqueRects = {}, key;
+        for (var i = 0, len = rects.length; i < len; i++) {
+            key = rects[i].left + "" + rects[i].top;
+            if (!uniqueRects[key]) {
+                uniqueRects[key] = rects[i];
+            }
+        }
+        var uniqueRectsArray = [];
+        for (key in uniqueRects) {
+            uniqueRectsArray.push(uniqueRects[key]);
+        }
+        return uniqueRectsArray;
+    },
+    render: function() {
+        var ctx = this.canvas.contextTop;
+        ctx.fillStyle = this.color;
+        var v = this.canvas.viewportTransform;
+        ctx.save();
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        for (var i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
+            var point = this.sprayChunkPoints[i];
+            if (typeof point.opacity !== "undefined") {
+                ctx.globalAlpha = point.opacity;
+            }
+            ctx.fillRect(point.x, point.y, point.width, point.width);
+        }
+        ctx.restore();
+    },
+    addSprayChunk: function(pointer) {
+        this.sprayChunkPoints = [];
+        var x, y, width, radius = this.width / 2;
+        for (var i = 0; i < this.density; i++) {
+            x = fabric.util.getRandomInt(pointer.x - radius, pointer.x + radius);
+            y = fabric.util.getRandomInt(pointer.y - radius, pointer.y + radius);
+            if (this.dotWidthVariance) {
+                width = fabric.util.getRandomInt(Math.max(1, this.dotWidth - this.dotWidthVariance), this.dotWidth + this.dotWidthVariance);
+            } else {
+                width = this.dotWidth;
+            }
+            var point = new fabric.Point(x, y);
+            point.width = width;
+            if (this.randomOpacity) {
+                point.opacity = fabric.util.getRandomInt(0, 100) / 100;
+            }
+            this.sprayChunkPoints.push(point);
+        }
+        this.sprayChunks.push(this.sprayChunkPoints);
+    }
+});
+
+fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
+    getPatternSrc: function() {
+        var dotWidth = 20, dotDistance = 5, patternCanvas = fabric.document.createElement("canvas"), patternCtx = patternCanvas.getContext("2d");
+        patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
+        patternCtx.fillStyle = this.color;
+        patternCtx.beginPath();
+        patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
+        patternCtx.closePath();
+        patternCtx.fill();
+        return patternCanvas;
+    },
+    getPatternSrcFunction: function() {
+        return String(this.getPatternSrc).replace("this.color", '"' + this.color + '"');
+    },
+    getPattern: function() {
+        return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), "repeat");
+    },
+    _setBrushStyles: function() {
+        this.callSuper("_setBrushStyles");
+        this.canvas.contextTop.strokeStyle = this.getPattern();
+    },
+    createPath: function(pathData) {
+        var path = this.callSuper("createPath", pathData);
+        path.stroke = new fabric.Pattern({
+            source: this.source || this.getPatternSrcFunction()
+        });
+        return path;
+    }
+});
+
+(function() {
+    var getPointer = fabric.util.getPointer, degreesToRadians = fabric.util.degreesToRadians, radiansToDegrees = fabric.util.radiansToDegrees, atan2 = Math.atan2, abs = Math.abs, STROKE_OFFSET = .5;
+    fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, {
+        initialize: function(el, options) {
+            options || (options = {});
+            this._initStatic(el, options);
+            this._initInteractive();
+            this._createCacheCanvas();
+            fabric.Canvas.activeInstance = this;
+        },
+        uniScaleTransform: false,
+        centeredScaling: false,
+        centeredRotation: false,
+        interactive: true,
+        selection: true,
+        selectionColor: "rgba(100, 100, 255, 0.3)",
+        selectionDashArray: [],
+        selectionBorderColor: "rgba(255, 255, 255, 0.3)",
+        selectionLineWidth: 1,
+        hoverCursor: "move",
+        moveCursor: "move",
+        defaultCursor: "default",
+        freeDrawingCursor: "crosshair",
+        rotationCursor: "crosshair",
+        containerClass: "canvas-container",
+        perPixelTargetFind: false,
+        targetFindTolerance: 0,
+        skipTargetFind: false,
+        isDrawingMode: false,
+        _initInteractive: function() {
+            this._currentTransform = null;
+            this._groupSelector = null;
+            this._initWrapperElement();
+            this._createUpperCanvas();
+            this._initEventListeners();
+            this._initRetinaScaling();
+            this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+            this.calcOffset();
+        },
+        _resetCurrentTransform: function() {
+            var t = this._currentTransform;
+            t.target.set({
+                scaleX: t.original.scaleX,
+                scaleY: t.original.scaleY,
+                skewX: t.original.skewX,
+                skewY: t.original.skewY,
+                left: t.original.left,
+                top: t.original.top
+            });
+            if (this._shouldCenterTransform(t.target)) {
+                if (t.action === "rotate") {
+                    this._setOriginToCenter(t.target);
+                } else {
+                    if (t.originX !== "center") {
+                        if (t.originX === "right") {
+                            t.mouseXSign = -1;
+                        } else {
+                            t.mouseXSign = 1;
+                        }
+                    }
+                    if (t.originY !== "center") {
+                        if (t.originY === "bottom") {
+                            t.mouseYSign = -1;
+                        } else {
+                            t.mouseYSign = 1;
+                        }
+                    }
+                    t.originX = "center";
+                    t.originY = "center";
+                }
+            } else {
+                t.originX = t.original.originX;
+                t.originY = t.original.originY;
+            }
+        },
+        containsPoint: function(e, target) {
+            var pointer = this.getPointer(e, true), xy = this._normalizePointer(target, pointer);
+            return target.containsPoint(xy) || target._findTargetCorner(pointer);
+        },
+        _normalizePointer: function(object, pointer) {
+            var activeGroup = this.getActiveGroup(), x = pointer.x, y = pointer.y, isObjectInGroup = activeGroup && object.type !== "group" && activeGroup.contains(object), lt;
+            if (isObjectInGroup) {
+                lt = fabric.util.transformPoint(activeGroup.getCenterPoint(), this.viewportTransform, true);
+                x -= lt.x;
+                y -= lt.y;
+                x /= activeGroup.scaleX;
+                y /= activeGroup.scaleY;
+            }
+            return {
+                x: x,
+                y: y
+            };
+        },
+        isTargetTransparent: function(target, x, y) {
+            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
+            target.hasBorders = target.transparentCorners = false;
+            target.render(this.contextCache);
+            target._renderControls(this.contextCache);
+            target.hasBorders = hasBorders;
+            target.transparentCorners = transparentCorners;
+            var isTransparent = fabric.util.isTransparent(this.contextCache, x, y, this.targetFindTolerance);
+            this.clearContext(this.contextCache);
+            return isTransparent;
+        },
+        _shouldClearSelection: function(e, target) {
+            var activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject();
+            return !target || target && activeGroup && !activeGroup.contains(target) && activeGroup !== target && !e.shiftKey || target && !target.evented || target && !target.selectable && activeObject && activeObject !== target;
+        },
+        _shouldCenterTransform: function(target) {
+            if (!target) {
+                return;
+            }
+            var t = this._currentTransform, centerTransform;
+            if (t.action === "scale" || t.action === "scaleX" || t.action === "scaleY") {
+                centerTransform = this.centeredScaling || target.centeredScaling;
+            } else if (t.action === "rotate") {
+                centerTransform = this.centeredRotation || target.centeredRotation;
+            }
+            return centerTransform ? !t.altKey : t.altKey;
+        },
+        _getOriginFromCorner: function(target, corner) {
+            var origin = {
+                x: target.originX,
+                y: target.originY
+            };
+            if (corner === "ml" || corner === "tl" || corner === "bl") {
+                origin.x = "right";
+            } else if (corner === "mr" || corner === "tr" || corner === "br") {
+                origin.x = "left";
+            }
+            if (corner === "tl" || corner === "mt" || corner === "tr") {
+                origin.y = "bottom";
+            } else if (corner === "bl" || corner === "mb" || corner === "br") {
+                origin.y = "top";
+            }
+            return origin;
+        },
+        _getActionFromCorner: function(target, corner, e) {
+            if (!corner) {
+                return "drag";
+            }
+            switch (corner) {
+              case "mtr":
+                return "rotate";
+
+              case "ml":
+              case "mr":
+                return e.shiftKey ? "skewY" : "scaleX";
+
+              case "mt":
+              case "mb":
+                return e.shiftKey ? "skewX" : "scaleY";
+
+              default:
+                return "scale";
+            }
+        },
+        _setupCurrentTransform: function(e, target) {
+            if (!target) {
+                return;
+            }
+            var pointer = this.getPointer(e), corner = target._findTargetCorner(this.getPointer(e, true)), action = this._getActionFromCorner(target, corner, e), origin = this._getOriginFromCorner(target, corner);
+            this._currentTransform = {
+                target: target,
+                action: action,
+                corner: corner,
+                scaleX: target.scaleX,
+                scaleY: target.scaleY,
+                skewX: target.skewX,
+                skewY: target.skewY,
+                offsetX: pointer.x - target.left,
+                offsetY: pointer.y - target.top,
+                originX: origin.x,
+                originY: origin.y,
+                ex: pointer.x,
+                ey: pointer.y,
+                lastX: pointer.x,
+                lastY: pointer.y,
+                left: target.left,
+                top: target.top,
+                theta: degreesToRadians(target.angle),
+                width: target.width * target.scaleX,
+                mouseXSign: 1,
+                mouseYSign: 1,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey
+            };
+            this._currentTransform.original = {
+                left: target.left,
+                top: target.top,
+                scaleX: target.scaleX,
+                scaleY: target.scaleY,
+                skewX: target.skewX,
+                skewY: target.skewY,
+                originX: origin.x,
+                originY: origin.y
+            };
+            this._resetCurrentTransform();
+        },
+        _translateObject: function(x, y) {
+            var target = this._currentTransform.target;
+            if (!target.get("lockMovementX")) {
+                target.set("left", x - this._currentTransform.offsetX);
+            }
+            if (!target.get("lockMovementY")) {
+                target.set("top", y - this._currentTransform.offsetY);
+            }
+        },
+        _changeSkewTransformOrigin: function(mouseMove, t, by) {
+            var property = "originX", origins = {
+                0: "center"
+            }, skew = t.target.skewX, originA = "left", originB = "right", corner = t.corner === "mt" || t.corner === "ml" ? 1 : -1, flipSign = 1;
+            mouseMove = mouseMove > 0 ? 1 : -1;
+            if (by === "y") {
+                skew = t.target.skewY;
+                originA = "top";
+                originB = "bottom";
+                property = "originY";
+            }
+            origins[-1] = originA;
+            origins[1] = originB;
+            t.target.flipX && (flipSign *= -1);
+            t.target.flipY && (flipSign *= -1);
+            if (skew === 0) {
+                t.skewSign = -corner * mouseMove * flipSign;
+                t[property] = origins[-mouseMove];
+            } else {
+                skew = skew > 0 ? 1 : -1;
+                t.skewSign = skew;
+                t[property] = origins[skew * corner * flipSign];
+            }
+        },
+        _skewObject: function(x, y, by) {
+            var t = this._currentTransform, target = t.target, lockSkewingX = target.get("lockSkewingX"), lockSkewingY = target.get("lockSkewingY");
+            if (lockSkewingX && by === "x" || lockSkewingY && by === "y") {
+                return;
+            }
+            var center = target.getCenterPoint(), actualMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), "center", "center")[by], lastMouseByCenter = target.toLocalPoint(new fabric.Point(t.lastX, t.lastY), "center", "center")[by], actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
+            this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
+            actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by], 
+            constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
+            this._setObjectSkew(actualMouseByOrigin, t, by, dim);
+            t.lastX = x;
+            t.lastY = y;
+            target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+        },
+        _setObjectSkew: function(localMouse, transform, by, _dim) {
+            var target = transform.target, newValue, skewSign = transform.skewSign, newDim, dimNoSkew, otherBy, _otherBy, _by, newDimMouse, skewX, skewY;
+            if (by === "x") {
+                otherBy = "y";
+                _otherBy = "Y";
+                _by = "X";
+                skewX = 0;
+                skewY = target.skewY;
+            } else {
+                otherBy = "x";
+                _otherBy = "X";
+                _by = "Y";
+                skewX = target.skewX;
+                skewY = 0;
+            }
+            dimNoSkew = target._getTransformedDimensions(skewX, skewY);
+            newDimMouse = 2 * Math.abs(localMouse) - dimNoSkew[by];
+            if (newDimMouse <= 2) {
+                newValue = 0;
+            } else {
+                newValue = skewSign * Math.atan(newDimMouse / target["scale" + _by] / (dimNoSkew[otherBy] / target["scale" + _otherBy]));
+                newValue = fabric.util.radiansToDegrees(newValue);
+            }
+            target.set("skew" + _by, newValue);
+            if (target["skew" + _otherBy] !== 0) {
+                newDim = target._getTransformedDimensions();
+                newValue = _dim[otherBy] / newDim[otherBy] * target["scale" + _otherBy];
+                target.set("scale" + _otherBy, newValue);
+            }
+        },
+        _scaleObject: function(x, y, by) {
+            var t = this._currentTransform, target = t.target, lockScalingX = target.get("lockScalingX"), lockScalingY = target.get("lockScalingY"), lockScalingFlip = target.get("lockScalingFlip");
+            if (lockScalingX && lockScalingY) {
+                return;
+            }
+            var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY), localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY), dim = target._getTransformedDimensions();
+            this._setLocalMouse(localMouse, t);
+            this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
+            target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+        },
+        _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, _dim) {
+            var target = transform.target, forbidScalingX = false, forbidScalingY = false;
+            transform.newScaleX = localMouse.x * target.scaleX / _dim.x;
+            transform.newScaleY = localMouse.y * target.scaleY / _dim.y;
+            if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
+                forbidScalingX = true;
+            }
+            if (lockScalingFlip && transform.newScaleY <= 0 && transform.newScaleY < target.scaleY) {
+                forbidScalingY = true;
+            }
+            if (by === "equally" && !lockScalingX && !lockScalingY) {
+                forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform, _dim);
+            } else if (!by) {
+                forbidScalingX || lockScalingX || target.set("scaleX", transform.newScaleX);
+                forbidScalingY || lockScalingY || target.set("scaleY", transform.newScaleY);
+            } else if (by === "x" && !target.get("lockUniScaling")) {
+                forbidScalingX || lockScalingX || target.set("scaleX", transform.newScaleX);
+            } else if (by === "y" && !target.get("lockUniScaling")) {
+                forbidScalingY || lockScalingY || target.set("scaleY", transform.newScaleY);
+            }
+            forbidScalingX || forbidScalingY || this._flipObject(transform, by);
+        },
+        _scaleObjectEqually: function(localMouse, target, transform, _dim) {
+            var dist = localMouse.y + localMouse.x, lastDist = _dim.y * transform.original.scaleY / target.scaleY + _dim.x * transform.original.scaleX / target.scaleX;
+            transform.newScaleX = transform.original.scaleX * dist / lastDist;
+            transform.newScaleY = transform.original.scaleY * dist / lastDist;
+            target.set("scaleX", transform.newScaleX);
+            target.set("scaleY", transform.newScaleY);
+        },
+        _flipObject: function(transform, by) {
+            if (transform.newScaleX < 0 && by !== "y") {
+                if (transform.originX === "left") {
+                    transform.originX = "right";
+                } else if (transform.originX === "right") {
+                    transform.originX = "left";
+                }
+            }
+            if (transform.newScaleY < 0 && by !== "x") {
+                if (transform.originY === "top") {
+                    transform.originY = "bottom";
+                } else if (transform.originY === "bottom") {
+                    transform.originY = "top";
+                }
+            }
+        },
+        _setLocalMouse: function(localMouse, t) {
+            var target = t.target;
+            if (t.originX === "right") {
+                localMouse.x *= -1;
+            } else if (t.originX === "center") {
+                localMouse.x *= t.mouseXSign * 2;
+                if (localMouse.x < 0) {
+                    t.mouseXSign = -t.mouseXSign;
+                }
+            }
+            if (t.originY === "bottom") {
+                localMouse.y *= -1;
+            } else if (t.originY === "center") {
+                localMouse.y *= t.mouseYSign * 2;
+                if (localMouse.y < 0) {
+                    t.mouseYSign = -t.mouseYSign;
+                }
+            }
+            if (abs(localMouse.x) > target.padding) {
+                if (localMouse.x < 0) {
+                    localMouse.x += target.padding;
+                } else {
+                    localMouse.x -= target.padding;
+                }
+            } else {
+                localMouse.x = 0;
+            }
+            if (abs(localMouse.y) > target.padding) {
+                if (localMouse.y < 0) {
+                    localMouse.y += target.padding;
+                } else {
+                    localMouse.y -= target.padding;
+                }
+            } else {
+                localMouse.y = 0;
+            }
+        },
+        _rotateObject: function(x, y) {
+            var t = this._currentTransform;
+            if (t.target.get("lockRotation")) {
+                return;
+            }
+            var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+            if (angle < 0) {
+                angle = 360 + angle;
+            }
+            t.target.angle = angle % 360;
+        },
+        setCursor: function(value) {
+            this.upperCanvasEl.style.cursor = value;
+        },
+        _resetObjectTransform: function(target) {
+            target.scaleX = 1;
+            target.scaleY = 1;
+            target.skewX = 0;
+            target.skewY = 0;
+            target.setAngle(0);
+        },
+        _drawSelection: function() {
+            var ctx = this.contextTop, groupSelector = this._groupSelector, left = groupSelector.left, top = groupSelector.top, aleft = abs(left), atop = abs(top);
+            ctx.fillStyle = this.selectionColor;
+            ctx.fillRect(groupSelector.ex - (left > 0 ? 0 : -left), groupSelector.ey - (top > 0 ? 0 : -top), aleft, atop);
+            ctx.lineWidth = this.selectionLineWidth;
+            ctx.strokeStyle = this.selectionBorderColor;
+            if (this.selectionDashArray.length > 1) {
+                var px = groupSelector.ex + STROKE_OFFSET - (left > 0 ? 0 : aleft), py = groupSelector.ey + STROKE_OFFSET - (top > 0 ? 0 : atop);
+                ctx.beginPath();
+                fabric.util.drawDashedLine(ctx, px, py, px + aleft, py, this.selectionDashArray);
+                fabric.util.drawDashedLine(ctx, px, py + atop - 1, px + aleft, py + atop - 1, this.selectionDashArray);
+                fabric.util.drawDashedLine(ctx, px, py, px, py + atop, this.selectionDashArray);
+                fabric.util.drawDashedLine(ctx, px + aleft - 1, py, px + aleft - 1, py + atop, this.selectionDashArray);
+                ctx.closePath();
+                ctx.stroke();
+            } else {
+                ctx.strokeRect(groupSelector.ex + STROKE_OFFSET - (left > 0 ? 0 : aleft), groupSelector.ey + STROKE_OFFSET - (top > 0 ? 0 : atop), aleft, atop);
+            }
+        },
+        _isLastRenderedObject: function(e) {
+            return this.controlsAboveOverlay && this.lastRenderedObjectWithControlsAboveOverlay && this.lastRenderedObjectWithControlsAboveOverlay.visible && this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) && this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(this.getPointer(e, true));
+        },
+        findTarget: function(e, skipGroup) {
+            if (this.skipTargetFind) {
+                return;
+            }
+            if (this._isLastRenderedObject(e)) {
+                return this.lastRenderedObjectWithControlsAboveOverlay;
+            }
+            var activeGroup = this.getActiveGroup();
+            if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+                return activeGroup;
+            }
+            var target = this._searchPossibleTargets(e, skipGroup);
+            this._fireOverOutEvents(target, e);
+            return target;
+        },
+        _fireOverOutEvents: function(target, e) {
+            if (target) {
+                if (this._hoveredTarget !== target) {
+                    if (this._hoveredTarget) {
+                        this.fire("mouse:out", {
+                            target: this._hoveredTarget,
+                            e: e
+                        });
+                        this._hoveredTarget.fire("mouseout");
+                    }
+                    this.fire("mouse:over", {
+                        target: target,
+                        e: e
+                    });
+                    target.fire("mouseover");
+                    this._hoveredTarget = target;
+                }
+            } else if (this._hoveredTarget) {
+                this.fire("mouse:out", {
+                    target: this._hoveredTarget,
+                    e: e
+                });
+                this._hoveredTarget.fire("mouseout");
+                this._hoveredTarget = null;
+            }
+        },
+        _checkTarget: function(e, obj, pointer) {
+            if (obj && obj.visible && obj.evented && this.containsPoint(e, obj)) {
+                if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
+                    var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
+                    if (!isTransparent) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        },
+        _searchPossibleTargets: function(e, skipGroup) {
+            var target, pointer = this.getPointer(e, true), i = this._objects.length;
+            while (i--) {
+                if ((!this._objects[i].group || skipGroup) && this._checkTarget(e, this._objects[i], pointer)) {
+                    this.relatedTarget = this._objects[i];
+                    target = this._objects[i];
+                    break;
+                }
+            }
+            return target;
+        },
+        getPointer: function(e, ignoreZoom, upperCanvasEl) {
+            if (!upperCanvasEl) {
+                upperCanvasEl = this.upperCanvasEl;
+            }
+            var pointer = getPointer(e), bounds = upperCanvasEl.getBoundingClientRect(), boundsWidth = bounds.width || 0, boundsHeight = bounds.height || 0, cssScale;
+            if (!boundsWidth || !boundsHeight) {
+                if ("top" in bounds && "bottom" in bounds) {
+                    boundsHeight = Math.abs(bounds.top - bounds.bottom);
+                }
+                if ("right" in bounds && "left" in bounds) {
+                    boundsWidth = Math.abs(bounds.right - bounds.left);
+                }
+            }
+            this.calcOffset();
+            pointer.x = pointer.x - this._offset.left;
+            pointer.y = pointer.y - this._offset.top;
+            if (!ignoreZoom) {
+                pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.viewportTransform));
+            }
+            if (boundsWidth === 0 || boundsHeight === 0) {
+                cssScale = {
+                    width: 1,
+                    height: 1
+                };
+            } else {
+                cssScale = {
+                    width: upperCanvasEl.width / boundsWidth,
+                    height: upperCanvasEl.height / boundsHeight
+                };
+            }
+            return {
+                x: pointer.x * cssScale.width,
+                y: pointer.y * cssScale.height
+            };
+        },
+        _createUpperCanvas: function() {
+            var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, "");
+            this.upperCanvasEl = this._createCanvasElement();
+            fabric.util.addClass(this.upperCanvasEl, "upper-canvas " + lowerCanvasClass);
+            this.wrapperEl.appendChild(this.upperCanvasEl);
+            this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
+            this._applyCanvasStyle(this.upperCanvasEl);
+            this.contextTop = this.upperCanvasEl.getContext("2d");
+        },
+        _createCacheCanvas: function() {
+            this.cacheCanvasEl = this._createCanvasElement();
+            this.cacheCanvasEl.setAttribute("width", this.width);
+            this.cacheCanvasEl.setAttribute("height", this.height);
+            this.contextCache = this.cacheCanvasEl.getContext("2d");
+        },
+        _initWrapperElement: function() {
+            this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, "div", {
+                "class": this.containerClass
+            });
+            fabric.util.setStyle(this.wrapperEl, {
+                width: this.getWidth() + "px",
+                height: this.getHeight() + "px",
+                position: "relative"
+            });
+            fabric.util.makeElementUnselectable(this.wrapperEl);
+        },
+        _applyCanvasStyle: function(element) {
+            var width = this.getWidth() || element.width, height = this.getHeight() || element.height;
+            fabric.util.setStyle(element, {
+                position: "absolute",
+                width: width + "px",
+                height: height + "px",
+                left: 0,
+                top: 0
+            });
+            element.width = width;
+            element.height = height;
+            fabric.util.makeElementUnselectable(element);
+        },
+        _copyCanvasStyle: function(fromEl, toEl) {
+            toEl.style.cssText = fromEl.style.cssText;
+        },
+        getSelectionContext: function() {
+            return this.contextTop;
+        },
+        getSelectionElement: function() {
+            return this.upperCanvasEl;
+        },
+        _setActiveObject: function(object) {
+            if (this._activeObject) {
+                this._activeObject.set("active", false);
+            }
+            this._activeObject = object;
+            object.set("active", true);
+        },
+        setActiveObject: function(object, e) {
+            this._setActiveObject(object);
+            this.renderAll();
+            this.fire("object:selected", {
+                target: object,
+                e: e
+            });
+            object.fire("selected", {
+                e: e
+            });
+            return this;
+        },
+        getActiveObject: function() {
+            return this._activeObject;
+        },
+        _discardActiveObject: function() {
+            if (this._activeObject) {
+                this._activeObject.set("active", false);
+            }
+            this._activeObject = null;
+        },
+        discardActiveObject: function(e) {
+            this._discardActiveObject();
+            this.renderAll();
+            this.fire("selection:cleared", {
+                e: e
+            });
+            return this;
+        },
+        _setActiveGroup: function(group) {
+            this._activeGroup = group;
+            if (group) {
+                group.set("active", true);
+            }
+        },
+        setActiveGroup: function(group, e) {
+            this._setActiveGroup(group);
+            if (group) {
+                this.fire("object:selected", {
+                    target: group,
+                    e: e
+                });
+                group.fire("selected", {
+                    e: e
+                });
+            }
+            return this;
+        },
+        getActiveGroup: function() {
+            return this._activeGroup;
+        },
+        _discardActiveGroup: function() {
+            var g = this.getActiveGroup();
+            if (g) {
+                g.destroy();
+            }
+            this.setActiveGroup(null);
+        },
+        discardActiveGroup: function(e) {
+            this._discardActiveGroup();
+            this.fire("selection:cleared", {
+                e: e
+            });
+            return this;
+        },
+        deactivateAll: function() {
+            var allObjects = this.getObjects(), i = 0, len = allObjects.length;
+            for (;i < len; i++) {
+                allObjects[i].set("active", false);
+            }
+            this._discardActiveGroup();
+            this._discardActiveObject();
+            return this;
+        },
+        deactivateAllWithDispatch: function(e) {
+            var activeObject = this.getActiveGroup() || this.getActiveObject();
+            if (activeObject) {
+                this.fire("before:selection:cleared", {
+                    target: activeObject,
+                    e: e
+                });
+            }
+            this.deactivateAll();
+            if (activeObject) {
+                this.fire("selection:cleared", {
+                    e: e
+                });
+            }
+            return this;
+        },
+        drawControls: function(ctx) {
+            var activeGroup = this.getActiveGroup();
+            if (activeGroup) {
+                activeGroup._renderControls(ctx);
+            } else {
+                this._drawObjectsControls(ctx);
+            }
+        },
+        _drawObjectsControls: function(ctx) {
+            for (var i = 0, len = this._objects.length; i < len; ++i) {
+                if (!this._objects[i] || !this._objects[i].active) {
+                    continue;
+                }
+                this._objects[i]._renderControls(ctx);
+                this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
+            }
+        }
+    });
+    for (var prop in fabric.StaticCanvas) {
+        if (prop !== "prototype") {
+            fabric.Canvas[prop] = fabric.StaticCanvas[prop];
+        }
+    }
+    if (fabric.isTouchSupported) {
+        fabric.Canvas.prototype._setCursorFromEvent = function() {};
+    }
+    fabric.Element = fabric.Canvas;
+})();
+
+(function() {
+    var cursorOffset = {
+        mt: 0,
+        tr: 1,
+        mr: 2,
+        br: 3,
+        mb: 4,
+        bl: 5,
+        ml: 6,
+        tl: 7
+    }, addListener = fabric.util.addListener, removeListener = fabric.util.removeListener;
+    fabric.util.object.extend(fabric.Canvas.prototype, {
+        cursorMap: [ "n-resize", "ne-resize", "e-resize", "se-resize", "s-resize", "sw-resize", "w-resize", "nw-resize" ],
+        _initEventListeners: function() {
+            this._bindEvents();
+            addListener(fabric.window, "resize", this._onResize);
+            addListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
+            addListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
+            addListener(this.upperCanvasEl, "mousewheel", this._onMouseWheel);
+            addListener(this.upperCanvasEl, "touchstart", this._onMouseDown);
+            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove);
+            if (typeof eventjs !== "undefined" && "add" in eventjs) {
+                eventjs.add(this.upperCanvasEl, "gesture", this._onGesture);
+                eventjs.add(this.upperCanvasEl, "drag", this._onDrag);
+                eventjs.add(this.upperCanvasEl, "orientation", this._onOrientationChange);
+                eventjs.add(this.upperCanvasEl, "shake", this._onShake);
+                eventjs.add(this.upperCanvasEl, "longpress", this._onLongPress);
+            }
+        },
+        _bindEvents: function() {
+            this._onMouseDown = this._onMouseDown.bind(this);
+            this._onMouseMove = this._onMouseMove.bind(this);
+            this._onMouseUp = this._onMouseUp.bind(this);
+            this._onResize = this._onResize.bind(this);
+            this._onGesture = this._onGesture.bind(this);
+            this._onDrag = this._onDrag.bind(this);
+            this._onShake = this._onShake.bind(this);
+            this._onLongPress = this._onLongPress.bind(this);
+            this._onOrientationChange = this._onOrientationChange.bind(this);
+            this._onMouseWheel = this._onMouseWheel.bind(this);
+        },
+        removeListeners: function() {
+            removeListener(fabric.window, "resize", this._onResize);
+            removeListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
+            removeListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
+            removeListener(this.upperCanvasEl, "mousewheel", this._onMouseWheel);
+            removeListener(this.upperCanvasEl, "touchstart", this._onMouseDown);
+            removeListener(this.upperCanvasEl, "touchmove", this._onMouseMove);
+            if (typeof eventjs !== "undefined" && "remove" in eventjs) {
+                eventjs.remove(this.upperCanvasEl, "gesture", this._onGesture);
+                eventjs.remove(this.upperCanvasEl, "drag", this._onDrag);
+                eventjs.remove(this.upperCanvasEl, "orientation", this._onOrientationChange);
+                eventjs.remove(this.upperCanvasEl, "shake", this._onShake);
+                eventjs.remove(this.upperCanvasEl, "longpress", this._onLongPress);
+            }
+        },
+        _onGesture: function(e, self) {
+            this.__onTransformGesture && this.__onTransformGesture(e, self);
+        },
+        _onDrag: function(e, self) {
+            this.__onDrag && this.__onDrag(e, self);
+        },
+        _onMouseWheel: function(e, self) {
+            this.__onMouseWheel && this.__onMouseWheel(e, self);
+        },
+        _onOrientationChange: function(e, self) {
+            this.__onOrientationChange && this.__onOrientationChange(e, self);
+        },
+        _onShake: function(e, self) {
+            this.__onShake && this.__onShake(e, self);
+        },
+        _onLongPress: function(e, self) {
+            this.__onLongPress && this.__onLongPress(e, self);
+        },
+        _onMouseDown: function(e) {
+            this.__onMouseDown(e);
+            addListener(fabric.document, "touchend", this._onMouseUp);
+            addListener(fabric.document, "touchmove", this._onMouseMove);
+            removeListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
+            removeListener(this.upperCanvasEl, "touchmove", this._onMouseMove);
+            if (e.type === "touchstart") {
+                removeListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
+            } else {
+                addListener(fabric.document, "mouseup", this._onMouseUp);
+                addListener(fabric.document, "mousemove", this._onMouseMove);
+            }
+        },
+        _onMouseUp: function(e) {
+            this.__onMouseUp(e);
+            removeListener(fabric.document, "mouseup", this._onMouseUp);
+            removeListener(fabric.document, "touchend", this._onMouseUp);
+            removeListener(fabric.document, "mousemove", this._onMouseMove);
+            removeListener(fabric.document, "touchmove", this._onMouseMove);
+            addListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
+            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove);
+            if (e.type === "touchend") {
+                var _this = this;
+                setTimeout(function() {
+                    addListener(_this.upperCanvasEl, "mousedown", _this._onMouseDown);
+                }, 400);
+            }
+        },
+        _onMouseMove: function(e) {
+            !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
+            this.__onMouseMove(e);
+        },
+        _onResize: function() {
+            this.calcOffset();
+        },
+        _shouldRender: function(target, pointer) {
+            var activeObject = this.getActiveGroup() || this.getActiveObject();
+            return !!(target && (target.isMoving || target !== activeObject) || !target && !!activeObject || !target && !activeObject && !this._groupSelector || pointer && this._previousPointer && this.selection && (pointer.x !== this._previousPointer.x || pointer.y !== this._previousPointer.y));
+        },
+        __onMouseUp: function(e) {
+            if (this.isDrawingMode && this._isCurrentlyDrawing) {
+                this._onMouseUpInDrawingMode(e);
+                return;
+            }
+            var target = this._currentTransform ? this._currentTransform.target : this.findTarget(e, true);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:up", "mouseup")) return;
+            if (this._currentTransform) {
+                this._finalizeCurrentTransform();
+            }
+            var shouldRender = this._shouldRender(target, this.getPointer(e));
+            this._maybeGroupObjects(e);
+            if (target) {
+                target.isMoving = false;
+            }
+            shouldRender && this.renderAll();
+            this._handleCursorAndEvent(e, target);
+        },
+        _handleCursorAndEvent: function(e, target) {
+            this._setCursorFromEvent(e, target);
+            var _this = this;
+            setTimeout(function() {
+                _this._setCursorFromEvent(e, target);
+            }, 50);
+        },
+        _finalizeCurrentTransform: function() {
+            var transform = this._currentTransform, target = transform.target;
+            if (target._scaling) {
+                target._scaling = false;
+            }
+            target.setCoords();
+            if (this.stateful && target.hasStateChanged()) {
+                this.fire("object:modified", {
+                    target: target
+                });
+                target.fire("modified");
+            }
+            this._restoreOriginXY(target);
+        },
+        _restoreOriginXY: function(target) {
+            if (this._previousOriginX && this._previousOriginY) {
+                var originPoint = target.translateToOriginPoint(target.getCenterPoint(), this._previousOriginX, this._previousOriginY);
+                target.originX = this._previousOriginX;
+                target.originY = this._previousOriginY;
+                target.left = originPoint.x;
+                target.top = originPoint.y;
+                this._previousOriginX = null;
+                this._previousOriginY = null;
+            }
+        },
+        _onMouseDownInDrawingMode: function(e) {
+            var target = this.findTarget(e);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:down", "mousedown")) return;
+            this._isCurrentlyDrawing = true;
+            this.discardActiveObject(e).renderAll();
+            if (this.clipTo) {
+                fabric.util.clipContext(this, this.contextTop);
+            }
+            var ivt = fabric.util.invertTransform(this.viewportTransform), pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+            this.freeDrawingBrush.onMouseDown(pointer);
+            this.fire("mouse:down", {
+                e: e
+            });
+        },
+        _onMouseMoveInDrawingMode: function(e) {
+            var target = this.findTarget(e);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:move", "mousemove")) return;
+            if (this._isCurrentlyDrawing) {
+                var ivt = fabric.util.invertTransform(this.viewportTransform), pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+                this.freeDrawingBrush.onMouseMove(pointer);
+            }
+            this.setCursor(this.freeDrawingCursor);
+        },
+        _onMouseUpInDrawingMode: function(e) {
+            var target = this.findTarget(e);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:up", "mouseup")) return;
+            this._isCurrentlyDrawing = false;
+            if (this.clipTo) {
+                this.contextTop.restore();
+            }
+            this.freeDrawingBrush.onMouseUp();
+        },
+        __onMouseDown: function(e) {
+            var target = this.findTarget(e);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:down", "mousedown")) return;
+            var isLeftClick = "which" in e ? e.which === 1 : e.button === 0;
+            if (!isLeftClick && !fabric.isTouchSupported) {
+                return;
+            }
+            if (this.isDrawingMode) {
+                this._onMouseDownInDrawingMode(e);
+                return;
+            }
+            if (this._currentTransform) {
+                return;
+            }
+            var pointer = this.getPointer(e, true);
+            this._previousPointer = pointer;
+            var shouldRender = this._shouldRender(target, pointer), shouldGroup = this._shouldGroup(e, target);
+            if (this._shouldClearSelection(e, target)) {
+                this._clearSelection(e, target, pointer);
+            } else if (shouldGroup) {
+                this._handleGrouping(e, target);
+                target = this.getActiveGroup();
+            }
+            if (target && target.selectable && (target.__corner || !shouldGroup)) {
+                this._beforeTransform(e, target);
+                this._setupCurrentTransform(e, target);
+            }
+            shouldRender && this.renderAll();
+        },
+        _beforeTransform: function(e, target) {
+            this.stateful && target.saveState();
+            if (target._findTargetCorner(this.getPointer(e))) {
+                this.onBeforeScaleRotate(target);
+            }
+            if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+                this.deactivateAll();
+                this.setActiveObject(target, e);
+            }
+        },
+        _clearSelection: function(e, target, pointer) {
+            this.deactivateAllWithDispatch(e);
+            if (target && target.selectable) {
+                this.setActiveObject(target, e);
+            } else if (this.selection) {
+                this._groupSelector = {
+                    ex: pointer.x,
+                    ey: pointer.y,
+                    top: 0,
+                    left: 0
+                };
+            }
+        },
+        _setOriginToCenter: function(target) {
+            this._previousOriginX = this._currentTransform.target.originX;
+            this._previousOriginY = this._currentTransform.target.originY;
+            var center = target.getCenterPoint();
+            target.originX = "center";
+            target.originY = "center";
+            target.left = center.x;
+            target.top = center.y;
+            this._currentTransform.left = target.left;
+            this._currentTransform.top = target.top;
+        },
+        _setCenterToOrigin: function(target) {
+            var originPoint = target.translateToOriginPoint(target.getCenterPoint(), this._previousOriginX, this._previousOriginY);
+            target.originX = this._previousOriginX;
+            target.originY = this._previousOriginY;
+            target.left = originPoint.x;
+            target.top = originPoint.y;
+            this._previousOriginX = null;
+            this._previousOriginY = null;
+        },
+        __onMouseEventPrecursor: function(e, target, canvasEventName, targetEventName) {
+            var cancelBubble = false, defaultPrevented = false;
+            if (target) {
+                var wrappedEvent = {
+                    e: e,
+                    target: target,
+                    currentTarget: target,
+                    cancelBubble: cancelBubble,
+                    defaultPrevented: defaultPrevented
+                };
+                target.handleEvent(targetEventName, wrappedEvent);
+                cancelBubble = wrappedEvent.cancelBubble;
+                defaultPrevented = wrappedEvent.defaultPrevented;
+            }
+            if (!cancelBubble) {
+                var canvasEvent = {
+                    e: e,
+                    currentTarget: this,
+                    cancelBubble: cancelBubble,
+                    defaultPrevented: defaultPrevented
+                };
+                this.fire(canvasEventName, canvasEvent);
+                defaultPrevented = canvasEvent.defaultPrevented;
+            }
+            return !defaultPrevented;
+        },
+        __onMouseMove: function(e) {
+            if (this.isDrawingMode) {
+                this._onMouseMoveInDrawingMode(e);
+                return;
+            }
+            var groupSelector = this._groupSelector;
+            var target = groupSelector || this._currentTransform ? undefined : this.findTarget(e);
+            if (!this.__onMouseEventPrecursor(e, target, "mouse:move", "mousemove")) return;
+            if (typeof e.touches !== "undefined" && e.touches.length > 1) {
+                return;
+            }
+            var pointer;
+            if (groupSelector) {
+                pointer = this.getPointer(e, true);
+                groupSelector.left = pointer.x - groupSelector.ex;
+                groupSelector.top = pointer.y - groupSelector.ey;
+                this.renderTop();
+            } else if (!this._currentTransform) {
+                if (!target || target && !target.selectable) {
+                    this.setCursor(this.defaultCursor);
+                } else {
+                    this._setCursorFromEvent(e, target);
+                }
+            } else {
+                this._transformObject(e);
+            }
+            this.fire("mouse:move", {
+                target: target,
+                e: e
+            });
+            target && target.fire("mousemove", {
+                e: e
+            });
+        },
+        _transformObject: function(e) {
+            var pointer = this.getPointer(e), transform = this._currentTransform;
+            transform.reset = false, transform.target.isMoving = true;
+            this._beforeScaleTransform(e, transform);
+            this._performTransformAction(e, transform, pointer);
+            this.renderAll();
+        },
+        _performTransformAction: function(e, transform, pointer) {
+            var x = pointer.x, y = pointer.y, target = transform.target, action = transform.action;
+            if (action === "rotate") {
+                this._rotateObject(x, y);
+                this._fire("rotating", target, e);
+            } else if (action === "scale") {
+                this._onScale(e, transform, x, y);
+                this._fire("scaling", target, e);
+            } else if (action === "scaleX") {
+                this._scaleObject(x, y, "x");
+                this._fire("scaling", target, e);
+            } else if (action === "scaleY") {
+                this._scaleObject(x, y, "y");
+                this._fire("scaling", target, e);
+            } else if (action === "skewX") {
+                this._skewObject(x, y, "x");
+                this._fire("skewing", target, e);
+            } else if (action === "skewY") {
+                this._skewObject(x, y, "y");
+                this._fire("skewing", target, e);
+            } else {
+                this._translateObject(x, y);
+                this._fire("moving", target, e);
+                this.setCursor(this.moveCursor);
+            }
+        },
+        _fire: function(eventName, target, e) {
+            this.fire("object:" + eventName, {
+                target: target,
+                e: e
+            });
+            target.fire(eventName, {
+                e: e
+            });
+        },
+        _beforeScaleTransform: function(e, transform) {
+            if (transform.action === "scale" || transform.action === "scaleX" || transform.action === "scaleY") {
+                var centerTransform = this._shouldCenterTransform(transform.target);
+                if (centerTransform && (transform.originX !== "center" || transform.originY !== "center") || !centerTransform && transform.originX === "center" && transform.originY === "center") {
+                    this._resetCurrentTransform();
+                    transform.reset = true;
+                }
+            }
+        },
+        _onScale: function(e, transform, x, y) {
+            if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get("lockUniScaling")) {
+                transform.currentAction = "scale";
+                this._scaleObject(x, y);
+            } else {
+                if (!transform.reset && transform.currentAction === "scale") {
+                    this._resetCurrentTransform();
+                }
+                transform.currentAction = "scaleEqually";
+                this._scaleObject(x, y, "equally");
+            }
+        },
+        _setCursorFromEvent: function(e, target) {
+            if (!target || !target.selectable) {
+                this.setCursor(this.defaultCursor);
+                return false;
+            } else {
+                var activeGroup = this.getActiveGroup(), corner = target._findTargetCorner && (!activeGroup || !activeGroup.contains(target)) && target._findTargetCorner(this.getPointer(e, true));
+                if (!corner) {
+                    this.setCursor(target.hoverCursor || this.hoverCursor);
+                } else {
+                    this._setCornerCursor(corner, target, e);
+                }
+            }
+            return true;
+        },
+        _setCornerCursor: function(corner, target, e) {
+            if (corner in cursorOffset) {
+                this.setCursor(this._getRotatedCornerCursor(corner, target, e));
+            } else if (corner === "mtr" && target.hasRotatingPoint) {
+                this.setCursor(this.rotationCursor);
+            } else {
+                this.setCursor(this.defaultCursor);
+                return false;
+            }
+        },
+        _getRotatedCornerCursor: function(corner, target, e) {
+            var n = Math.round(target.getAngle() % 360 / 45);
+            if (n < 0) {
+                n += 8;
+            }
+            n += cursorOffset[corner];
+            if (e.shiftKey && cursorOffset[corner] % 2 === 0) {
+                n += 2;
+            }
+            n %= 8;
+            return this.cursorMap[n];
+        }
+    });
+})();
+
+(function() {
+    var min = Math.min, max = Math.max;
+    fabric.util.object.extend(fabric.Canvas.prototype, {
+        _shouldGroup: function(e, target) {
+            var activeObject = this.getActiveObject();
+            return e.shiftKey && target && target.selectable && (this.getActiveGroup() || activeObject && activeObject !== target) && this.selection;
+        },
+        _handleGrouping: function(e, target) {
+            if (target === this.getActiveGroup()) {
+                target = this.findTarget(e, true);
+                if (!target || target.isType("group")) {
+                    return;
+                }
+            }
+            if (this.getActiveGroup()) {
+                this._updateActiveGroup(target, e);
+            } else {
+                this._createActiveGroup(target, e);
+            }
+            if (this._activeGroup) {
+                this._activeGroup.saveCoords();
+            }
+        },
+        _updateActiveGroup: function(target, e) {
+            var activeGroup = this.getActiveGroup();
+            if (activeGroup.contains(target)) {
+                activeGroup.removeWithUpdate(target);
+                target.set("active", false);
+                if (activeGroup.size() === 1) {
+                    this.discardActiveGroup(e);
+                    this.setActiveObject(activeGroup.item(0));
+                    return;
+                }
+            } else {
+                activeGroup.addWithUpdate(target);
+            }
+            this.fire("selection:created", {
+                target: activeGroup,
+                e: e
+            });
+            activeGroup.set("active", true);
+        },
+        _createActiveGroup: function(target, e) {
+            if (this._activeObject && target !== this._activeObject) {
+                var group = this._createGroup(target);
+                group.addWithUpdate();
+                this.setActiveGroup(group);
+                this._activeObject = null;
+                this.fire("selection:created", {
+                    target: group,
+                    e: e
+                });
+            }
+            target.set("active", true);
+        },
+        _createGroup: function(target) {
+            var objects = this.getObjects(), isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target), groupObjects = isActiveLower ? [ this._activeObject, target ] : [ target, this._activeObject ];
+            return new fabric.Group(groupObjects, {
+                canvas: this
+            });
+        },
+        _groupSelectedObjects: function(e) {
+            var group = this._collectObjects();
+            if (group.length === 1) {
+                this.setActiveObject(group[0], e);
+            } else if (group.length > 1) {
+                group = new fabric.Group(group.reverse(), {
+                    canvas: this
+                });
+                group.addWithUpdate();
+                this.setActiveGroup(group, e);
+                group.saveCoords();
+                this.fire("selection:created", {
+                    target: group
+                });
+                this.renderAll();
+            }
+        },
+        _collectObjects: function() {
+            var group = [], currentObject, x1 = this._groupSelector.ex, y1 = this._groupSelector.ey, x2 = x1 + this._groupSelector.left, y2 = y1 + this._groupSelector.top, selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)), selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)), isClick = x1 === x2 && y1 === y2;
+            for (var i = this._objects.length; i--; ) {
+                currentObject = this._objects[i];
+                if (!currentObject || !currentObject.selectable || !currentObject.visible) {
+                    continue;
+                }
+                if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) || currentObject.containsPoint(selectionX1Y1) || currentObject.containsPoint(selectionX2Y2)) {
+                    currentObject.set("active", true);
+                    group.push(currentObject);
+                    if (isClick) {
+                        break;
+                    }
+                }
+            }
+            return group;
+        },
+        _maybeGroupObjects: function(e) {
+            if (this.selection && this._groupSelector) {
+                this._groupSelectedObjects(e);
+            }
+            var activeGroup = this.getActiveGroup();
+            if (activeGroup) {
+                activeGroup.setObjectsCoords().setCoords();
+                activeGroup.isMoving = false;
+                this.setCursor(this.defaultCursor);
+            }
+            this._groupSelector = null;
+            this._currentTransform = null;
+        }
+    });
+})();
+
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     toDataURL: function(options) {
         options || (options = {});
@@ -2467,6 +5353,117 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             o.borderColor = o.origBorderColor;
             delete o.origBorderColor;
         });
+    }
+});
+
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    loadFromDatalessJSON: function(json, callback, reviver) {
+        return this.loadFromJSON(json, callback, reviver);
+    },
+    loadFromJSON: function(json, callback, reviver) {
+        if (!json) {
+            return;
+        }
+        var serialized = typeof json === "string" ? JSON.parse(json) : json;
+        this.clear();
+        var _this = this;
+        this._enlivenObjects(serialized.objects, function() {
+            _this._setBgOverlay(serialized, callback);
+        }, reviver);
+        return this;
+    },
+    _setBgOverlay: function(serialized, callback) {
+        var _this = this, loaded = {
+            backgroundColor: false,
+            overlayColor: false,
+            backgroundImage: false,
+            overlayImage: false
+        };
+        if (!serialized.backgroundImage && !serialized.overlayImage && !serialized.background && !serialized.overlay) {
+            callback && callback();
+            return;
+        }
+        var cbIfLoaded = function() {
+            if (loaded.backgroundImage && loaded.overlayImage && loaded.backgroundColor && loaded.overlayColor) {
+                _this.renderAll();
+                callback && callback();
+            }
+        };
+        this.__setBgOverlay("backgroundImage", serialized.backgroundImage, loaded, cbIfLoaded);
+        this.__setBgOverlay("overlayImage", serialized.overlayImage, loaded, cbIfLoaded);
+        this.__setBgOverlay("backgroundColor", serialized.background, loaded, cbIfLoaded);
+        this.__setBgOverlay("overlayColor", serialized.overlay, loaded, cbIfLoaded);
+        cbIfLoaded();
+    },
+    __setBgOverlay: function(property, value, loaded, callback) {
+        var _this = this;
+        if (!value) {
+            loaded[property] = true;
+            return;
+        }
+        if (property === "backgroundImage" || property === "overlayImage") {
+            fabric.Image.fromObject(value, function(img) {
+                _this[property] = img;
+                loaded[property] = true;
+                callback && callback();
+            });
+        } else {
+            this["set" + fabric.util.string.capitalize(property, true)](value, function() {
+                loaded[property] = true;
+                callback && callback();
+            });
+        }
+    },
+    _enlivenObjects: function(objects, callback, reviver) {
+        var _this = this;
+        if (!objects || objects.length === 0) {
+            callback && callback();
+            return;
+        }
+        var renderOnAddRemove = this.renderOnAddRemove;
+        this.renderOnAddRemove = false;
+        fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
+            enlivenedObjects.forEach(function(obj, index) {
+                _this.insertAt(obj, index, true);
+            });
+            _this.renderOnAddRemove = renderOnAddRemove;
+            callback && callback();
+        }, null, reviver);
+    },
+    _toDataURL: function(format, callback) {
+        this.clone(function(clone) {
+            callback(clone.toDataURL(format));
+        });
+    },
+    _toDataURLWithMultiplier: function(format, multiplier, callback) {
+        this.clone(function(clone) {
+            callback(clone.toDataURLWithMultiplier(format, multiplier));
+        });
+    },
+    clone: function(callback, properties) {
+        var data = JSON.stringify(this.toJSON(properties));
+        this.cloneWithoutData(function(clone) {
+            clone.loadFromJSON(data, function() {
+                callback && callback(clone);
+            });
+        });
+    },
+    cloneWithoutData: function(callback) {
+        var el = fabric.document.createElement("canvas");
+        el.width = this.getWidth();
+        el.height = this.getHeight();
+        var clone = new fabric.Canvas(el);
+        clone.clipTo = this.clipTo;
+        if (this.backgroundImage) {
+            clone.setBackgroundImage(this.backgroundImage.src, function() {
+                clone.renderAll();
+                callback && callback(clone);
+            });
+            clone.backgroundImageOpacity = this.backgroundImageOpacity;
+            clone.backgroundImageStretch = this.backgroundImageStretch;
+        } else {
+            callback && callback(clone);
+        }
     }
 });
 
@@ -3323,6 +6320,349 @@ fabric.util.object.extend(fabric.Object.prototype, {
     }
 });
 
+(function() {
+    var degreesToRadians = fabric.util.degreesToRadians, isVML = function() {
+        return typeof G_vmlCanvasManager !== "undefined";
+    };
+    fabric.util.object.extend(fabric.Object.prototype, {
+        _controlsVisibility: null,
+        _findTargetCorner: function(pointer) {
+            if (!this.hasControls || !this.active) {
+                return false;
+            }
+            var ex = pointer.x, ey = pointer.y, xPoints, lines;
+            this.__corner = 0;
+            for (var i in this.oCoords) {
+                if (!this.isControlVisible(i)) {
+                    continue;
+                }
+                if (i === "mtr" && !this.hasRotatingPoint) {
+                    continue;
+                }
+                if (this.get("lockUniScaling") && (i === "mt" || i === "mr" || i === "mb" || i === "ml")) {
+                    continue;
+                }
+                lines = this._getImageLines(this.oCoords[i].corner);
+                xPoints = this._findCrossPoints({
+                    x: ex,
+                    y: ey
+                }, lines);
+                if (xPoints !== 0 && xPoints % 2 === 1) {
+                    this.__corner = i;
+                    return i;
+                }
+            }
+            return false;
+        },
+        _setCornerCoords: function() {
+            var coords = this.oCoords, newTheta = degreesToRadians(45 - this.angle), cornerHypotenuse = this.cornerSize * .707106, cosHalfOffset = cornerHypotenuse * Math.cos(newTheta), sinHalfOffset = cornerHypotenuse * Math.sin(newTheta), x, y;
+            for (var point in coords) {
+                x = coords[point].x;
+                y = coords[point].y;
+                coords[point].corner = {
+                    tl: {
+                        x: x - sinHalfOffset,
+                        y: y - cosHalfOffset
+                    },
+                    tr: {
+                        x: x + cosHalfOffset,
+                        y: y - sinHalfOffset
+                    },
+                    bl: {
+                        x: x - cosHalfOffset,
+                        y: y + sinHalfOffset
+                    },
+                    br: {
+                        x: x + sinHalfOffset,
+                        y: y + cosHalfOffset
+                    }
+                };
+            }
+        },
+        _getNonTransformedDimensions: function() {
+            var strokeWidth = this.strokeWidth, w = this.width, h = this.height, addStrokeToW = true, addStrokeToH = true;
+            if (this.type === "line" && this.strokeLineCap === "butt") {
+                addStrokeToH = w;
+                addStrokeToW = h;
+            }
+            if (addStrokeToH) {
+                h += h < 0 ? -strokeWidth : strokeWidth;
+            }
+            if (addStrokeToW) {
+                w += w < 0 ? -strokeWidth : strokeWidth;
+            }
+            return {
+                x: w,
+                y: h
+            };
+        },
+        _getTransformedDimensions: function(skewX, skewY) {
+            if (typeof skewX === "undefined") {
+                skewX = this.skewX;
+            }
+            if (typeof skewY === "undefined") {
+                skewY = this.skewY;
+            }
+            var dimensions = this._getNonTransformedDimensions(), dimX = dimensions.x / 2, dimY = dimensions.y / 2, points = [ {
+                x: -dimX,
+                y: -dimY
+            }, {
+                x: dimX,
+                y: -dimY
+            }, {
+                x: -dimX,
+                y: dimY
+            }, {
+                x: dimX,
+                y: dimY
+            } ], i, transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY, false), bbox;
+            for (i = 0; i < points.length; i++) {
+                points[i] = fabric.util.transformPoint(points[i], transformMatrix);
+            }
+            bbox = fabric.util.makeBoundingBoxFromPoints(points);
+            return {
+                x: bbox.width,
+                y: bbox.height
+            };
+        },
+        _calculateCurrentDimensions: function() {
+            var vpt = this.getViewportTransform(), dim = this._getTransformedDimensions(), w = dim.x, h = dim.y;
+            w += 2 * this.padding;
+            h += 2 * this.padding;
+            return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+        },
+        drawBorders: function(ctx) {
+            if (!this.hasBorders) {
+                return this;
+            }
+            var wh = this._calculateCurrentDimensions(), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth, height = wh.y + strokeWidth;
+            ctx.save();
+            ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+            ctx.strokeStyle = this.borderColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.strokeRect(-width / 2, -height / 2, width, height);
+            if (this.hasRotatingPoint && this.isControlVisible("mtr") && !this.get("lockRotation") && this.hasControls) {
+                var rotateHeight = -height / 2;
+                ctx.beginPath();
+                ctx.moveTo(0, rotateHeight);
+                ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            ctx.restore();
+            return this;
+        },
+        drawBordersInGroup: function(ctx, options) {
+            if (!this.hasBorders) {
+                return this;
+            }
+            var p = this._getNonTransformedDimensions(), matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX), wh = fabric.util.transformPoint(p, matrix), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth + 2 * this.padding, height = wh.y + strokeWidth + 2 * this.padding;
+            ctx.save();
+            ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+            ctx.strokeStyle = this.borderColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.strokeRect(-width / 2, -height / 2, width, height);
+            ctx.restore();
+            return this;
+        },
+        drawControls: function(ctx) {
+            if (!this.hasControls) {
+                return this;
+            }
+            var wh = this._calculateCurrentDimensions(), width = wh.x, height = wh.y, scaleOffset = this.cornerSize, left = -(width + scaleOffset) / 2, top = -(height + scaleOffset) / 2, methodName = this.transparentCorners ? "strokeRect" : "fillRect";
+            ctx.save();
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+            ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
+            this._drawControl("tl", ctx, methodName, left, top);
+            this._drawControl("tr", ctx, methodName, left + width, top);
+            this._drawControl("bl", ctx, methodName, left, top + height);
+            this._drawControl("br", ctx, methodName, left + width, top + height);
+            if (!this.get("lockUniScaling")) {
+                this._drawControl("mt", ctx, methodName, left + width / 2, top);
+                this._drawControl("mb", ctx, methodName, left + width / 2, top + height);
+                this._drawControl("mr", ctx, methodName, left + width, top + height / 2);
+                this._drawControl("ml", ctx, methodName, left, top + height / 2);
+            }
+            if (this.hasRotatingPoint) {
+                this._drawControl("mtr", ctx, methodName, left + width / 2, top - this.rotatingPointOffset);
+            }
+            ctx.restore();
+            return this;
+        },
+        _drawControl: function(control, ctx, methodName, left, top) {
+            if (!this.isControlVisible(control)) {
+                return;
+            }
+            var size = this.cornerSize;
+            isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
+            ctx[methodName](left, top, size, size);
+        },
+        isControlVisible: function(controlName) {
+            return this._getControlsVisibility()[controlName];
+        },
+        setControlVisible: function(controlName, visible) {
+            this._getControlsVisibility()[controlName] = visible;
+            return this;
+        },
+        setControlsVisibility: function(options) {
+            options || (options = {});
+            for (var p in options) {
+                this.setControlVisible(p, options[p]);
+            }
+            return this;
+        },
+        _getControlsVisibility: function() {
+            if (!this._controlsVisibility) {
+                this._controlsVisibility = {
+                    tl: true,
+                    tr: true,
+                    br: true,
+                    bl: true,
+                    ml: true,
+                    mt: true,
+                    mr: true,
+                    mb: true,
+                    mtr: true
+                };
+            }
+            return this._controlsVisibility;
+        }
+    });
+})();
+
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    FX_DURATION: 500,
+    fxCenterObjectH: function(object, callbacks) {
+        callbacks = callbacks || {};
+        var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
+        fabric.util.animate({
+            startValue: object.get("left"),
+            endValue: this.getCenter().left,
+            duration: this.FX_DURATION,
+            onChange: function(value) {
+                object.set("left", value);
+                _this.renderAll();
+                onChange();
+            },
+            onComplete: function() {
+                object.setCoords();
+                onComplete();
+            }
+        });
+        return this;
+    },
+    fxCenterObjectV: function(object, callbacks) {
+        callbacks = callbacks || {};
+        var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
+        fabric.util.animate({
+            startValue: object.get("top"),
+            endValue: this.getCenter().top,
+            duration: this.FX_DURATION,
+            onChange: function(value) {
+                object.set("top", value);
+                _this.renderAll();
+                onChange();
+            },
+            onComplete: function() {
+                object.setCoords();
+                onComplete();
+            }
+        });
+        return this;
+    },
+    fxRemove: function(object, callbacks) {
+        callbacks = callbacks || {};
+        var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
+        fabric.util.animate({
+            startValue: object.get("opacity"),
+            endValue: 0,
+            duration: this.FX_DURATION,
+            onStart: function() {
+                object.set("active", false);
+            },
+            onChange: function(value) {
+                object.set("opacity", value);
+                _this.renderAll();
+                onChange();
+            },
+            onComplete: function() {
+                _this.remove(object);
+                onComplete();
+            }
+        });
+        return this;
+    }
+});
+
+fabric.util.object.extend(fabric.Object.prototype, {
+    animate: function() {
+        if (arguments[0] && typeof arguments[0] === "object") {
+            var propsToAnimate = [], prop, skipCallbacks;
+            for (prop in arguments[0]) {
+                propsToAnimate.push(prop);
+            }
+            for (var i = 0, len = propsToAnimate.length; i < len; i++) {
+                prop = propsToAnimate[i];
+                skipCallbacks = i !== len - 1;
+                this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+            }
+        } else {
+            this._animate.apply(this, arguments);
+        }
+        return this;
+    },
+    _animate: function(property, to, options, skipCallbacks) {
+        var _this = this, propPair;
+        to = to.toString();
+        if (!options) {
+            options = {};
+        } else {
+            options = fabric.util.object.clone(options);
+        }
+        if (~property.indexOf(".")) {
+            propPair = property.split(".");
+        }
+        var currentValue = propPair ? this.get(propPair[0])[propPair[1]] : this.get(property);
+        if (!("from" in options)) {
+            options.from = currentValue;
+        }
+        if (~to.indexOf("=")) {
+            to = currentValue + parseFloat(to.replace("=", ""));
+        } else {
+            to = parseFloat(to);
+        }
+        fabric.util.animate({
+            startValue: options.from,
+            endValue: to,
+            byValue: options.by,
+            easing: options.easing,
+            duration: options.duration,
+            abort: options.abort && function() {
+                return options.abort.call(_this);
+            },
+            onChange: function(value) {
+                if (propPair) {
+                    _this[propPair[0]][propPair[1]] = value;
+                } else {
+                    _this.set(property, value);
+                }
+                if (skipCallbacks) {
+                    return;
+                }
+                options.onChange && options.onChange();
+            },
+            onComplete: function() {
+                if (skipCallbacks) {
+                    return;
+                }
+                _this.setCoords();
+                options.onComplete && options.onComplete();
+            }
+        });
+    }
+});
+
 (function(global) {
     "use strict";
     var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, coordProps = {
@@ -3439,6 +6779,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return 1;
         }
     });
+    fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x1 y1 x2 y2".split(" "));
+    fabric.Line.fromElement = function(element, options) {
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ parsedAttributes.x1 || 0, parsedAttributes.y1 || 0, parsedAttributes.x2 || 0, parsedAttributes.y2 || 0 ];
+        return new fabric.Line(points, extend(parsedAttributes, options));
+    };
     fabric.Line.fromObject = function(object) {
         var points = [ object.x1, object.y1, object.x2, object.y2 ];
         return new fabric.Line(points, object);
@@ -3527,6 +6872,23 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return 1;
         }
     });
+    fabric.Circle.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("cx cy r".split(" "));
+    fabric.Circle.fromElement = function(element, options) {
+        options || (options = {});
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
+        if (!isValidRadius(parsedAttributes)) {
+            throw new Error("value of `r` attribute is required and can not be negative");
+        }
+        parsedAttributes.left = parsedAttributes.left || 0;
+        parsedAttributes.top = parsedAttributes.top || 0;
+        var obj = new fabric.Circle(extend(parsedAttributes, options));
+        obj.left -= obj.radius;
+        obj.top -= obj.radius;
+        return obj;
+    };
+    function isValidRadius(attributes) {
+        return "radius" in attributes && attributes.radius >= 0;
+    }
     fabric.Circle.fromObject = function(object) {
         return new fabric.Circle(object);
     };
@@ -3644,6 +7006,17 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return 1;
         }
     });
+    fabric.Ellipse.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("cx cy rx ry".split(" "));
+    fabric.Ellipse.fromElement = function(element, options) {
+        options || (options = {});
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+        parsedAttributes.left = parsedAttributes.left || 0;
+        parsedAttributes.top = parsedAttributes.top || 0;
+        var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
+        ellipse.top -= ellipse.ry;
+        ellipse.left -= ellipse.rx;
+        return ellipse;
+    };
     fabric.Ellipse.fromObject = function(object) {
         return new fabric.Ellipse(object);
     };
@@ -3728,6 +7101,19 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return 1;
         }
     });
+    fabric.Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x y rx ry width height".split(" "));
+    fabric.Rect.fromElement = function(element, options) {
+        if (!element) {
+            return null;
+        }
+        options = options || {};
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
+        parsedAttributes.left = parsedAttributes.left || 0;
+        parsedAttributes.top = parsedAttributes.top || 0;
+        var rect = new fabric.Rect(extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
+        rect.visible = rect.width > 0 && rect.height > 0;
+        return rect;
+    };
     fabric.Rect.fromObject = function(object) {
         return new fabric.Rect(object);
     };
@@ -3780,6 +7166,15 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return this.get("points").length;
         }
     });
+    fabric.Polyline.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
+    fabric.Polyline.fromElement = function(element, options) {
+        if (!element) {
+            return null;
+        }
+        options || (options = {});
+        var points = fabric.parsePointsAttribute(element.getAttribute("points")), parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+        return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
+    };
     fabric.Polyline.fromObject = function(object) {
         var points = object.points;
         return new fabric.Polyline(points, object, true);
@@ -3872,6 +7267,15 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return this.points.length;
         }
     });
+    fabric.Polygon.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
+    fabric.Polygon.fromElement = function(element, options) {
+        if (!element) {
+            return null;
+        }
+        options || (options = {});
+        var points = fabric.parsePointsAttribute(element.getAttribute("points")), parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
+        return new fabric.Polygon(points, extend(parsedAttributes, options));
+    };
     fabric.Polygon.fromObject = function(object) {
         return new fabric.Polygon(object.points, object, true);
     };
@@ -4391,6 +7795,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
         } else {
             callback(new fabric.Path(object.path, object));
         }
+    };
+    fabric.Path.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat([ "d" ]);
+    fabric.Path.fromElement = function(element, callback, options) {
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+        callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
     };
     fabric.Path.async = true;
 })(typeof exports !== "undefined" ? exports : this);
@@ -5097,9 +8506,3213 @@ fabric.util.object.extend(fabric.Object.prototype, {
             callback && callback(new fabric.Image(img, imgOptions));
         }, null, imgOptions && imgOptions.crossOrigin);
     };
+    fabric.Image.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x y width height preserveAspectRatio xlink:href".split(" "));
+    fabric.Image.fromElement = function(element, callback, options) {
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES), preserveAR;
+        if (parsedAttributes.preserveAspectRatio) {
+            preserveAR = fabric.util.parsePreserveAspectRatioAttribute(parsedAttributes.preserveAspectRatio);
+            extend(parsedAttributes, preserveAR);
+        }
+        fabric.Image.fromURL(parsedAttributes["xlink:href"], callback, extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
+    };
     fabric.Image.async = true;
     fabric.Image.pngCompression = 1;
 })(typeof exports !== "undefined" ? exports : this);
+
+fabric.util.object.extend(fabric.Object.prototype, {
+    _getAngleValueForStraighten: function() {
+        var angle = this.getAngle() % 360;
+        if (angle > 0) {
+            return Math.round((angle - 1) / 90) * 90;
+        }
+        return Math.round(angle / 90) * 90;
+    },
+    straighten: function() {
+        this.setAngle(this._getAngleValueForStraighten());
+        return this;
+    },
+    fxStraighten: function(callbacks) {
+        callbacks = callbacks || {};
+        var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
+        fabric.util.animate({
+            startValue: this.get("angle"),
+            endValue: this._getAngleValueForStraighten(),
+            duration: this.FX_DURATION,
+            onChange: function(value) {
+                _this.setAngle(value);
+                onChange();
+            },
+            onComplete: function() {
+                _this.setCoords();
+                onComplete();
+            },
+            onStart: function() {
+                _this.set("active", false);
+            }
+        });
+        return this;
+    }
+});
+
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    straightenObject: function(object) {
+        object.straighten();
+        this.renderAll();
+        return this;
+    },
+    fxStraightenObject: function(object) {
+        object.fxStraighten({
+            onChange: this.renderAll.bind(this)
+        });
+        return this;
+    }
+});
+
+fabric.Image.filters = fabric.Image.filters || {};
+
+fabric.Image.filters.BaseFilter = fabric.util.createClass({
+    type: "BaseFilter",
+    initialize: function(options) {
+        if (options) {
+            this.setOptions(options);
+        }
+    },
+    setOptions: function(options) {
+        for (var prop in options) {
+            this[prop] = options[prop];
+        }
+    },
+    toObject: function() {
+        return {
+            type: this.type
+        };
+    },
+    toJSON: function() {
+        return this.toObject();
+    }
+});
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Brightness = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Brightness",
+        initialize: function(options) {
+            options = options || {};
+            this.brightness = options.brightness || 0;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, brightness = this.brightness;
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                data[i] += brightness;
+                data[i + 1] += brightness;
+                data[i + 2] += brightness;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                brightness: this.brightness
+            });
+        }
+    });
+    fabric.Image.filters.Brightness.fromObject = function(object) {
+        return new fabric.Image.filters.Brightness(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Convolute = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Convolute",
+        initialize: function(options) {
+            options = options || {};
+            this.opaque = options.opaque;
+            this.matrix = options.matrix || [ 0, 0, 0, 0, 1, 0, 0, 0, 0 ];
+        },
+        applyTo: function(canvasEl) {
+            var weights = this.matrix, context = canvasEl.getContext("2d"), pixels = context.getImageData(0, 0, canvasEl.width, canvasEl.height), side = Math.round(Math.sqrt(weights.length)), halfSide = Math.floor(side / 2), src = pixels.data, sw = pixels.width, sh = pixels.height, output = context.createImageData(sw, sh), dst = output.data, alphaFac = this.opaque ? 1 : 0, r, g, b, a, dstOff, scx, scy, srcOff, wt;
+            for (var y = 0; y < sh; y++) {
+                for (var x = 0; x < sw; x++) {
+                    dstOff = (y * sh + x) * 4;
+                    r = 0;
+                    g = 0;
+                    b = 0;
+                    a = 0;
+                    for (var cy = 0; cy < side; cy++) {
+                        for (var cx = 0; cx < side; cx++) {
+                            scy = y + cy - halfSide;
+                            scx = x + cx - halfSide;
+                            if (scy < 0 || scy > sh || scx < 0 || scx > sw) {
+                                continue;
+                            }
+                            srcOff = (scy * sw + scx) * 4;
+                            wt = weights[cy * side + cx];
+                            r += src[srcOff] * wt;
+                            g += src[srcOff + 1] * wt;
+                            b += src[srcOff + 2] * wt;
+                            a += src[srcOff + 3] * wt;
+                        }
+                    }
+                    dst[dstOff] = r;
+                    dst[dstOff + 1] = g;
+                    dst[dstOff + 2] = b;
+                    dst[dstOff + 3] = a + alphaFac * (255 - a);
+                }
+            }
+            context.putImageData(output, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                opaque: this.opaque,
+                matrix: this.matrix
+            });
+        }
+    });
+    fabric.Image.filters.Convolute.fromObject = function(object) {
+        return new fabric.Image.filters.Convolute(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.GradientTransparency = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "GradientTransparency",
+        initialize: function(options) {
+            options = options || {};
+            this.threshold = options.threshold || 100;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, threshold = this.threshold, total = data.length;
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                data[i + 3] = threshold + 255 * (total - i) / total;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                threshold: this.threshold
+            });
+        }
+    });
+    fabric.Image.filters.GradientTransparency.fromObject = function(object) {
+        return new fabric.Image.filters.GradientTransparency(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {});
+    fabric.Image.filters.Grayscale = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Grayscale",
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, len = imageData.width * imageData.height * 4, index = 0, average;
+            while (index < len) {
+                average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+                data[index] = average;
+                data[index + 1] = average;
+                data[index + 2] = average;
+                index += 4;
+            }
+            context.putImageData(imageData, 0, 0);
+        }
+    });
+    fabric.Image.filters.Grayscale.fromObject = function() {
+        return new fabric.Image.filters.Grayscale();
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {});
+    fabric.Image.filters.Invert = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Invert",
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i;
+            for (i = 0; i < iLen; i += 4) {
+                data[i] = 255 - data[i];
+                data[i + 1] = 255 - data[i + 1];
+                data[i + 2] = 255 - data[i + 2];
+            }
+            context.putImageData(imageData, 0, 0);
+        }
+    });
+    fabric.Image.filters.Invert.fromObject = function() {
+        return new fabric.Image.filters.Invert();
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Mask",
+        initialize: function(options) {
+            options = options || {};
+            this.mask = options.mask;
+            this.channel = [ 0, 1, 2, 3 ].indexOf(options.channel) > -1 ? options.channel : 0;
+        },
+        applyTo: function(canvasEl) {
+            if (!this.mask) {
+                return;
+            }
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, maskEl = this.mask.getElement(), maskCanvasEl = fabric.util.createCanvasElement(), channel = this.channel, i, iLen = imageData.width * imageData.height * 4;
+            maskCanvasEl.width = canvasEl.width;
+            maskCanvasEl.height = canvasEl.height;
+            maskCanvasEl.getContext("2d").drawImage(maskEl, 0, 0, canvasEl.width, canvasEl.height);
+            var maskImageData = maskCanvasEl.getContext("2d").getImageData(0, 0, canvasEl.width, canvasEl.height), maskData = maskImageData.data;
+            for (i = 0; i < iLen; i += 4) {
+                data[i + 3] = maskData[i + channel];
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                mask: this.mask.toObject(),
+                channel: this.channel
+            });
+        }
+    });
+    fabric.Image.filters.Mask.fromObject = function(object, callback) {
+        fabric.util.loadImage(object.mask.src, function(img) {
+            object.mask = new fabric.Image(img, object.mask);
+            callback && callback(new fabric.Image.filters.Mask(object));
+        });
+    };
+    fabric.Image.filters.Mask.async = true;
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Noise = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Noise",
+        initialize: function(options) {
+            options = options || {};
+            this.noise = options.noise || 0;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, noise = this.noise, rand;
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                rand = (.5 - Math.random()) * noise;
+                data[i] += rand;
+                data[i + 1] += rand;
+                data[i + 2] += rand;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                noise: this.noise
+            });
+        }
+    });
+    fabric.Image.filters.Noise.fromObject = function(object) {
+        return new fabric.Image.filters.Noise(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Pixelate = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Pixelate",
+        initialize: function(options) {
+            options = options || {};
+            this.blocksize = options.blocksize || 4;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = imageData.height, jLen = imageData.width, index, i, j, r, g, b, a;
+            for (i = 0; i < iLen; i += this.blocksize) {
+                for (j = 0; j < jLen; j += this.blocksize) {
+                    index = i * 4 * jLen + j * 4;
+                    r = data[index];
+                    g = data[index + 1];
+                    b = data[index + 2];
+                    a = data[index + 3];
+                    for (var _i = i, _ilen = i + this.blocksize; _i < _ilen; _i++) {
+                        for (var _j = j, _jlen = j + this.blocksize; _j < _jlen; _j++) {
+                            index = _i * 4 * jLen + _j * 4;
+                            data[index] = r;
+                            data[index + 1] = g;
+                            data[index + 2] = b;
+                            data[index + 3] = a;
+                        }
+                    }
+                }
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                blocksize: this.blocksize
+            });
+        }
+    });
+    fabric.Image.filters.Pixelate.fromObject = function(object) {
+        return new fabric.Image.filters.Pixelate(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.RemoveWhite = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "RemoveWhite",
+        initialize: function(options) {
+            options = options || {};
+            this.threshold = options.threshold || 30;
+            this.distance = options.distance || 20;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, threshold = this.threshold, distance = this.distance, limit = 255 - threshold, abs = Math.abs, r, g, b;
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                if (r > limit && g > limit && b > limit && abs(r - g) < distance && abs(r - b) < distance && abs(g - b) < distance) {
+                    data[i + 3] = 1;
+                }
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                threshold: this.threshold,
+                distance: this.distance
+            });
+        }
+    });
+    fabric.Image.filters.RemoveWhite.fromObject = function(object) {
+        return new fabric.Image.filters.RemoveWhite(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {});
+    fabric.Image.filters.Sepia = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Sepia",
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, avg;
+            for (i = 0; i < iLen; i += 4) {
+                avg = .3 * data[i] + .59 * data[i + 1] + .11 * data[i + 2];
+                data[i] = avg + 100;
+                data[i + 1] = avg + 50;
+                data[i + 2] = avg + 255;
+            }
+            context.putImageData(imageData, 0, 0);
+        }
+    });
+    fabric.Image.filters.Sepia.fromObject = function() {
+        return new fabric.Image.filters.Sepia();
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {});
+    fabric.Image.filters.Sepia2 = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Sepia2",
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, r, g, b;
+            for (i = 0; i < iLen; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                data[i] = (r * .393 + g * .769 + b * .189) / 1.351;
+                data[i + 1] = (r * .349 + g * .686 + b * .168) / 1.203;
+                data[i + 2] = (r * .272 + g * .534 + b * .131) / 2.14;
+            }
+            context.putImageData(imageData, 0, 0);
+        }
+    });
+    fabric.Image.filters.Sepia2.fromObject = function() {
+        return new fabric.Image.filters.Sepia2();
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Tint",
+        initialize: function(options) {
+            options = options || {};
+            this.color = options.color || "#000000";
+            this.opacity = typeof options.opacity !== "undefined" ? options.opacity : new fabric.Color(this.color).getAlpha();
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, tintR, tintG, tintB, r, g, b, alpha1, source;
+            source = new fabric.Color(this.color).getSource();
+            tintR = source[0] * this.opacity;
+            tintG = source[1] * this.opacity;
+            tintB = source[2] * this.opacity;
+            alpha1 = 1 - this.opacity;
+            for (i = 0; i < iLen; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                data[i] = tintR + r * alpha1;
+                data[i + 1] = tintG + g * alpha1;
+                data[i + 2] = tintB + b * alpha1;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                color: this.color,
+                opacity: this.opacity
+            });
+        }
+    });
+    fabric.Image.filters.Tint.fromObject = function(object) {
+        return new fabric.Image.filters.Tint(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.Multiply = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Multiply",
+        initialize: function(options) {
+            options = options || {};
+            this.color = options.color || "#000000";
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, source;
+            source = new fabric.Color(this.color).getSource();
+            for (i = 0; i < iLen; i += 4) {
+                data[i] *= source[0] / 255;
+                data[i + 1] *= source[1] / 255;
+                data[i + 2] *= source[2] / 255;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                color: this.color
+            });
+        }
+    });
+    fabric.Image.filters.Multiply.fromObject = function(object) {
+        return new fabric.Image.filters.Multiply(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric;
+    fabric.Image.filters.Blend = fabric.util.createClass({
+        type: "Blend",
+        initialize: function(options) {
+            options = options || {};
+            this.color = options.color || "#000";
+            this.image = options.image || false;
+            this.mode = options.mode || "multiply";
+            this.alpha = options.alpha || 1;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, tr, tg, tb, r, g, b, _r, _g, _b, source, isImage = false;
+            if (this.image) {
+                isImage = true;
+                var _el = fabric.util.createCanvasElement();
+                _el.width = this.image.width;
+                _el.height = this.image.height;
+                var tmpCanvas = new fabric.StaticCanvas(_el);
+                tmpCanvas.add(this.image);
+                var context2 = tmpCanvas.getContext("2d");
+                source = context2.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height).data;
+            } else {
+                source = new fabric.Color(this.color).getSource();
+                tr = source[0] * this.alpha;
+                tg = source[1] * this.alpha;
+                tb = source[2] * this.alpha;
+            }
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                if (isImage) {
+                    tr = source[i] * this.alpha;
+                    tg = source[i + 1] * this.alpha;
+                    tb = source[i + 2] * this.alpha;
+                }
+                switch (this.mode) {
+                  case "multiply":
+                    data[i] = r * tr / 255;
+                    data[i + 1] = g * tg / 255;
+                    data[i + 2] = b * tb / 255;
+                    break;
+
+                  case "screen":
+                    data[i] = 1 - (1 - r) * (1 - tr);
+                    data[i + 1] = 1 - (1 - g) * (1 - tg);
+                    data[i + 2] = 1 - (1 - b) * (1 - tb);
+                    break;
+
+                  case "add":
+                    data[i] = Math.min(255, r + tr);
+                    data[i + 1] = Math.min(255, g + tg);
+                    data[i + 2] = Math.min(255, b + tb);
+                    break;
+
+                  case "diff":
+                  case "difference":
+                    data[i] = Math.abs(r - tr);
+                    data[i + 1] = Math.abs(g - tg);
+                    data[i + 2] = Math.abs(b - tb);
+                    break;
+
+                  case "subtract":
+                    _r = r - tr;
+                    _g = g - tg;
+                    _b = b - tb;
+                    data[i] = _r < 0 ? 0 : _r;
+                    data[i + 1] = _g < 0 ? 0 : _g;
+                    data[i + 2] = _b < 0 ? 0 : _b;
+                    break;
+
+                  case "darken":
+                    data[i] = Math.min(r, tr);
+                    data[i + 1] = Math.min(g, tg);
+                    data[i + 2] = Math.min(b, tb);
+                    break;
+
+                  case "lighten":
+                    data[i] = Math.max(r, tr);
+                    data[i + 1] = Math.max(g, tg);
+                    data[i + 2] = Math.max(b, tb);
+                    break;
+                }
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return {
+                color: this.color,
+                image: this.image,
+                mode: this.mode,
+                alpha: this.alpha
+            };
+        }
+    });
+    fabric.Image.filters.Blend.fromObject = function(object) {
+        return new fabric.Image.filters.Blend(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), pow = Math.pow, floor = Math.floor, sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin, ceil = Math.ceil;
+    fabric.Image.filters.Resize = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "Resize",
+        resizeType: "hermite",
+        scaleX: 0,
+        scaleY: 0,
+        lanczosLobes: 3,
+        applyTo: function(canvasEl, scaleX, scaleY) {
+            this.rcpScaleX = 1 / scaleX;
+            this.rcpScaleY = 1 / scaleY;
+            var oW = canvasEl.width, oH = canvasEl.height, dW = round(oW * scaleX), dH = round(oH * scaleY), imageData;
+            if (this.resizeType === "sliceHack") {
+                imageData = this.sliceByTwo(canvasEl, oW, oH, dW, dH);
+            }
+            if (this.resizeType === "hermite") {
+                imageData = this.hermiteFastResize(canvasEl, oW, oH, dW, dH);
+            }
+            if (this.resizeType === "bilinear") {
+                imageData = this.bilinearFiltering(canvasEl, oW, oH, dW, dH);
+            }
+            if (this.resizeType === "lanczos") {
+                imageData = this.lanczosResize(canvasEl, oW, oH, dW, dH);
+            }
+            canvasEl.width = dW;
+            canvasEl.height = dH;
+            canvasEl.getContext("2d").putImageData(imageData, 0, 0);
+        },
+        sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
+            var context = canvasEl.getContext("2d"), imageData, multW = .5, multH = .5, signW = 1, signH = 1, doneW = false, doneH = false, stepW = width, stepH = height, tmpCanvas = fabric.util.createCanvasElement(), tmpCtx = tmpCanvas.getContext("2d");
+            newWidth = floor(newWidth);
+            newHeight = floor(newHeight);
+            tmpCanvas.width = max(newWidth, width);
+            tmpCanvas.height = max(newHeight, height);
+            if (newWidth > width) {
+                multW = 2;
+                signW = -1;
+            }
+            if (newHeight > height) {
+                multH = 2;
+                signH = -1;
+            }
+            imageData = context.getImageData(0, 0, width, height);
+            canvasEl.width = max(newWidth, width);
+            canvasEl.height = max(newHeight, height);
+            context.putImageData(imageData, 0, 0);
+            while (!doneW || !doneH) {
+                width = stepW;
+                height = stepH;
+                if (newWidth * signW < floor(stepW * multW * signW)) {
+                    stepW = floor(stepW * multW);
+                } else {
+                    stepW = newWidth;
+                    doneW = true;
+                }
+                if (newHeight * signH < floor(stepH * multH * signH)) {
+                    stepH = floor(stepH * multH);
+                } else {
+                    stepH = newHeight;
+                    doneH = true;
+                }
+                imageData = context.getImageData(0, 0, width, height);
+                tmpCtx.putImageData(imageData, 0, 0);
+                context.clearRect(0, 0, stepW, stepH);
+                context.drawImage(tmpCanvas, 0, 0, width, height, 0, 0, stepW, stepH);
+            }
+            return context.getImageData(0, 0, newWidth, newHeight);
+        },
+        lanczosResize: function(canvasEl, oW, oH, dW, dH) {
+            function lanczosCreate(lobes) {
+                return function(x) {
+                    if (x > lobes) {
+                        return 0;
+                    }
+                    x *= Math.PI;
+                    if (abs(x) < 1e-16) {
+                        return 1;
+                    }
+                    var xx = x / lobes;
+                    return sin(x) * sin(xx) / x / xx;
+                };
+            }
+            function process(u) {
+                var v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
+                center.x = (u + .5) * ratioX;
+                icenter.x = floor(center.x);
+                for (v = 0; v < dH; v++) {
+                    center.y = (v + .5) * ratioY;
+                    icenter.y = floor(center.y);
+                    a = 0, red = 0, green = 0, blue = 0, alpha = 0;
+                    for (i = icenter.x - range2X; i <= icenter.x + range2X; i++) {
+                        if (i < 0 || i >= oW) {
+                            continue;
+                        }
+                        fX = floor(1e3 * abs(i - center.x));
+                        if (!cacheLanc[fX]) {
+                            cacheLanc[fX] = {};
+                        }
+                        for (var j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
+                            if (j < 0 || j >= oH) {
+                                continue;
+                            }
+                            fY = floor(1e3 * abs(j - center.y));
+                            if (!cacheLanc[fX][fY]) {
+                                cacheLanc[fX][fY] = lanczos(sqrt(pow(fX * rcpRatioX, 2) + pow(fY * rcpRatioY, 2)) / 1e3);
+                            }
+                            weight = cacheLanc[fX][fY];
+                            if (weight > 0) {
+                                idx = (j * oW + i) * 4;
+                                a += weight;
+                                red += weight * srcData[idx];
+                                green += weight * srcData[idx + 1];
+                                blue += weight * srcData[idx + 2];
+                                alpha += weight * srcData[idx + 3];
+                            }
+                        }
+                    }
+                    idx = (v * dW + u) * 4;
+                    destData[idx] = red / a;
+                    destData[idx + 1] = green / a;
+                    destData[idx + 2] = blue / a;
+                    destData[idx + 3] = alpha / a;
+                }
+                if (++u < dW) {
+                    return process(u);
+                } else {
+                    return destImg;
+                }
+            }
+            var context = canvasEl.getContext("2d"), srcImg = context.getImageData(0, 0, oW, oH), destImg = context.getImageData(0, 0, dW, dH), srcData = srcImg.data, destData = destImg.data, lanczos = lanczosCreate(this.lanczosLobes), ratioX = this.rcpScaleX, ratioY = this.rcpScaleY, rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY, range2X = ceil(ratioX * this.lanczosLobes / 2), range2Y = ceil(ratioY * this.lanczosLobes / 2), cacheLanc = {}, center = {}, icenter = {};
+            return process(0);
+        },
+        bilinearFiltering: function(canvasEl, w, h, w2, h2) {
+            var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl, color, offset = 0, origPix, ratioX = this.rcpScaleX, ratioY = this.rcpScaleY, context = canvasEl.getContext("2d"), w4 = 4 * (w - 1), img = context.getImageData(0, 0, w, h), pixels = img.data, destImage = context.getImageData(0, 0, w2, h2), destPixels = destImage.data;
+            for (i = 0; i < h2; i++) {
+                for (j = 0; j < w2; j++) {
+                    x = floor(ratioX * j);
+                    y = floor(ratioY * i);
+                    xDiff = ratioX * j - x;
+                    yDiff = ratioY * i - y;
+                    origPix = 4 * (y * w + x);
+                    for (chnl = 0; chnl < 4; chnl++) {
+                        a = pixels[origPix + chnl];
+                        b = pixels[origPix + 4 + chnl];
+                        c = pixels[origPix + w4 + chnl];
+                        d = pixels[origPix + w4 + 4 + chnl];
+                        color = a * (1 - xDiff) * (1 - yDiff) + b * xDiff * (1 - yDiff) + c * yDiff * (1 - xDiff) + d * xDiff * yDiff;
+                        destPixels[offset++] = color;
+                    }
+                }
+            }
+            return destImage;
+        },
+        hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
+            var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY, ratioWHalf = ceil(ratioW / 2), ratioHHalf = ceil(ratioH / 2), context = canvasEl.getContext("2d"), img = context.getImageData(0, 0, oW, oH), data = img.data, img2 = context.getImageData(0, 0, dW, dH), data2 = img2.data;
+            for (var j = 0; j < dH; j++) {
+                for (var i = 0; i < dW; i++) {
+                    var x2 = (i + j * dW) * 4, weight = 0, weights = 0, weightsAlpha = 0, gxR = 0, gxG = 0, gxB = 0, gxA = 0, centerY = (j + .5) * ratioH;
+                    for (var yy = floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
+                        var dy = abs(centerY - (yy + .5)) / ratioHHalf, centerX = (i + .5) * ratioW, w0 = dy * dy;
+                        for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
+                            var dx = abs(centerX - (xx + .5)) / ratioWHalf, w = sqrt(w0 + dx * dx);
+                            if (w > 1 && w < -1) {
+                                continue;
+                            }
+                            weight = 2 * w * w * w - 3 * w * w + 1;
+                            if (weight > 0) {
+                                dx = 4 * (xx + yy * oW);
+                                gxA += weight * data[dx + 3];
+                                weightsAlpha += weight;
+                                if (data[dx + 3] < 255) {
+                                    weight = weight * data[dx + 3] / 250;
+                                }
+                                gxR += weight * data[dx];
+                                gxG += weight * data[dx + 1];
+                                gxB += weight * data[dx + 2];
+                                weights += weight;
+                            }
+                        }
+                    }
+                    data2[x2] = gxR / weights;
+                    data2[x2 + 1] = gxG / weights;
+                    data2[x2 + 2] = gxB / weights;
+                    data2[x2 + 3] = gxA / weightsAlpha;
+                }
+            }
+            return img2;
+        },
+        toObject: function() {
+            return {
+                type: this.type,
+                scaleX: this.scaleX,
+                scaleY: this.scaleY,
+                resizeType: this.resizeType,
+                lanczosLobes: this.lanczosLobes
+            };
+        }
+    });
+    fabric.Image.filters.Resize.fromObject = function(object) {
+        return new fabric.Image.filters.Resize(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, supportsLineDash = fabric.StaticCanvas.supports("setLineDash"), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    if (fabric.Text) {
+        fabric.warn("fabric.Text is already defined");
+        return;
+    }
+    var stateProperties = fabric.Object.prototype.stateProperties.concat();
+    stateProperties.push("fontFamily", "fontWeight", "fontSize", "text", "textDecoration", "textAlign", "fontStyle", "lineHeight", "textBackgroundColor");
+    fabric.Text = fabric.util.createClass(fabric.Object, {
+        _dimensionAffectingProps: {
+            fontSize: true,
+            fontWeight: true,
+            fontFamily: true,
+            fontStyle: true,
+            lineHeight: true,
+            stroke: true,
+            strokeWidth: true,
+            text: true,
+            textAlign: true
+        },
+        _reNewline: /\r?\n/,
+        _reSpacesAndTabs: /[ \t\r]+/g,
+        type: "text",
+        fontSize: 40,
+        fontWeight: "normal",
+        fontFamily: "Times New Roman",
+        textDecoration: "",
+        textAlign: "left",
+        fontStyle: "",
+        lineHeight: 1.16,
+        textBackgroundColor: "",
+        stateProperties: stateProperties,
+        stroke: null,
+        shadow: null,
+        _fontSizeFraction: .25,
+        _fontSizeMult: 1.13,
+        initialize: function(text, options) {
+            options = options || {};
+            this.text = text;
+            this.__skipDimension = true;
+            this.setOptions(options);
+            this.__skipDimension = false;
+            this._initDimensions();
+        },
+        _initDimensions: function(ctx) {
+            if (this.__skipDimension) {
+                return;
+            }
+            if (!ctx) {
+                ctx = fabric.util.createCanvasElement().getContext("2d");
+                this._setTextStyles(ctx);
+            }
+            this._textLines = this._splitTextIntoLines();
+            this._clearCache();
+            this._cacheLinesWidth = this.textAlign !== "justify";
+            this.width = this._getTextWidth(ctx);
+            this._cacheLinesWidth = true;
+            this.height = this._getTextHeight(ctx);
+        },
+        toString: function() {
+            return "#<fabric.Text (" + this.complexity() + '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
+        },
+        _render: function(ctx) {
+            this.clipTo && fabric.util.clipContext(this, ctx);
+            this._setOpacity(ctx);
+            this._setShadow(ctx);
+            this._setupCompositeOperation(ctx);
+            this._renderTextBackground(ctx);
+            this._setStrokeStyles(ctx);
+            this._setFillStyles(ctx);
+            this._renderText(ctx);
+            this._renderTextDecoration(ctx);
+            this.clipTo && ctx.restore();
+        },
+        _renderText: function(ctx) {
+            this._translateForTextAlign(ctx);
+            this._renderTextFill(ctx);
+            this._renderTextStroke(ctx);
+            this._translateForTextAlign(ctx, true);
+        },
+        _translateForTextAlign: function(ctx, back) {
+            if (this.textAlign !== "left" && this.textAlign !== "justify") {
+                var sign = back ? -1 : 1;
+                ctx.translate(this.textAlign === "center" ? sign * this.width / 2 : sign * this.width, 0);
+            }
+        },
+        _setTextStyles: function(ctx) {
+            ctx.textBaseline = "alphabetic";
+            if (!this.skipTextAlign) {
+                ctx.textAlign = this.textAlign;
+            }
+            ctx.font = this._getFontDeclaration();
+        },
+        _getTextHeight: function() {
+            return this._textLines.length * this._getHeightOfLine();
+        },
+        _getTextWidth: function(ctx) {
+            var maxWidth = this._getLineWidth(ctx, 0);
+            for (var i = 1, len = this._textLines.length; i < len; i++) {
+                var currentLineWidth = this._getLineWidth(ctx, i);
+                if (currentLineWidth > maxWidth) {
+                    maxWidth = currentLineWidth;
+                }
+            }
+            return maxWidth;
+        },
+        _renderChars: function(method, ctx, chars, left, top) {
+            var shortM = method.slice(0, -4);
+            if (this[shortM].toLive) {
+                var offsetX = -this.width / 2 + this[shortM].offsetX || 0, offsetY = -this.height / 2 + this[shortM].offsetY || 0;
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
+                left -= offsetX;
+                top -= offsetY;
+            }
+            ctx[method](chars, left, top);
+            this[shortM].toLive && ctx.restore();
+        },
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+            top -= this.fontSize * this._fontSizeFraction;
+            var lineWidth = this._getLineWidth(ctx, lineIndex);
+            if (this.textAlign !== "justify" || this.width < lineWidth) {
+                this._renderChars(method, ctx, line, left, top, lineIndex);
+                return;
+            }
+            var words = line.split(/\s+/), wordsWidth = this._getWidthOfWords(ctx, line, lineIndex), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, leftOffset = 0, charOffset = 0, word;
+            for (var i = 0, len = words.length; i < len; i++) {
+                while (line[charOffset] === " " && charOffset < line.length) {
+                    charOffset++;
+                }
+                word = words[i];
+                this._renderChars(method, ctx, word, left + leftOffset, top, lineIndex, charOffset);
+                leftOffset += ctx.measureText(word).width + spaceWidth;
+                charOffset += word.length;
+            }
+        },
+        _getWidthOfWords: function(ctx, line) {
+            return ctx.measureText(line.replace(/\s+/g, "")).width;
+        },
+        _getLeftOffset: function() {
+            return -this.width / 2;
+        },
+        _getTopOffset: function() {
+            return -this.height / 2;
+        },
+        _renderTextFill: function(ctx) {
+            if (!this.fill && !this._skipFillStrokeCheck) {
+                return;
+            }
+            var lineHeights = 0;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight;
+                this._renderTextLine("fillText", ctx, this._textLines[i], this._getLeftOffset(), this._getTopOffset() + lineHeights + maxHeight, i);
+                lineHeights += heightOfLine;
+            }
+        },
+        _renderTextStroke: function(ctx) {
+            if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
+                return;
+            }
+            var lineHeights = 0;
+            if (this.shadow && !this.shadow.affectStroke) {
+                this._removeShadow(ctx);
+            }
+            ctx.save();
+            if (this.strokeDashArray) {
+                if (1 & this.strokeDashArray.length) {
+                    this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+                }
+                supportsLineDash && ctx.setLineDash(this.strokeDashArray);
+            }
+            ctx.beginPath();
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight;
+                this._renderTextLine("strokeText", ctx, this._textLines[i], this._getLeftOffset(), this._getTopOffset() + lineHeights + maxHeight, i);
+                lineHeights += heightOfLine;
+            }
+            ctx.closePath();
+            ctx.restore();
+        },
+        _getHeightOfLine: function() {
+            return this.fontSize * this._fontSizeMult * this.lineHeight;
+        },
+        _renderTextBackground: function(ctx) {
+            this._renderTextBoxBackground(ctx);
+            this._renderTextLinesBackground(ctx);
+        },
+        _renderTextBoxBackground: function(ctx) {
+            if (!this.backgroundColor) {
+                return;
+            }
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(this._getLeftOffset(), this._getTopOffset(), this.width, this.height);
+        },
+        _renderTextLinesBackground: function(ctx) {
+            if (!this.textBackgroundColor) {
+                return;
+            }
+            var lineTopOffset = 0, heightOfLine = this._getHeightOfLine(), lineWidth, lineLeftOffset;
+            ctx.fillStyle = this.textBackgroundColor;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                if (this._textLines[i] !== "") {
+                    lineWidth = this._getLineWidth(ctx, i);
+                    lineLeftOffset = this._getLineLeftOffset(lineWidth);
+                    ctx.fillRect(this._getLeftOffset() + lineLeftOffset, this._getTopOffset() + lineTopOffset, lineWidth, this.fontSize * this._fontSizeMult);
+                }
+                lineTopOffset += heightOfLine;
+            }
+        },
+        _getLineLeftOffset: function(lineWidth) {
+            if (this.textAlign === "center") {
+                return (this.width - lineWidth) / 2;
+            }
+            if (this.textAlign === "right") {
+                return this.width - lineWidth;
+            }
+            return 0;
+        },
+        _clearCache: function() {
+            this.__lineWidths = [];
+            this.__lineHeights = [];
+        },
+        _shouldClearCache: function() {
+            var shouldClear = false;
+            if (this._forceClearCache) {
+                this._forceClearCache = false;
+                return true;
+            }
+            for (var prop in this._dimensionAffectingProps) {
+                if (this["__" + prop] !== this[prop]) {
+                    this["__" + prop] = this[prop];
+                    shouldClear = true;
+                }
+            }
+            return shouldClear;
+        },
+        _getLineWidth: function(ctx, lineIndex) {
+            if (this.__lineWidths[lineIndex]) {
+                return this.__lineWidths[lineIndex];
+            }
+            var width, wordCount, line = this._textLines[lineIndex];
+            if (line === "") {
+                width = 0;
+            } else if (this.textAlign === "justify" && this._cacheLinesWidth) {
+                wordCount = line.split(" ");
+                if (wordCount.length > 1) {
+                    width = this.width;
+                } else {
+                    width = ctx.measureText(line).width;
+                }
+            } else {
+                width = ctx.measureText(line).width;
+            }
+            this._cacheLinesWidth && (this.__lineWidths[lineIndex] = width);
+            return width;
+        },
+        _renderTextDecoration: function(ctx) {
+            if (!this.textDecoration) {
+                return;
+            }
+            var halfOfVerticalBox = this.height / 2, _this = this, offsets = [];
+            function renderLinesAtOffset(offsets) {
+                var i, lineHeight = 0, len, j, oLen, lineWidth, lineLeftOffset, heightOfLine;
+                for (i = 0, len = _this._textLines.length; i < len; i++) {
+                    lineWidth = _this._getLineWidth(ctx, i), lineLeftOffset = _this._getLineLeftOffset(lineWidth), 
+                    heightOfLine = _this._getHeightOfLine(ctx, i);
+                    for (j = 0, oLen = offsets.length; j < oLen; j++) {
+                        ctx.fillRect(_this._getLeftOffset() + lineLeftOffset, lineHeight + (_this._fontSizeMult - 1 + offsets[j]) * _this.fontSize - halfOfVerticalBox, lineWidth, _this.fontSize / 15);
+                    }
+                    lineHeight += heightOfLine;
+                }
+            }
+            if (this.textDecoration.indexOf("underline") > -1) {
+                offsets.push(.85);
+            }
+            if (this.textDecoration.indexOf("line-through") > -1) {
+                offsets.push(.43);
+            }
+            if (this.textDecoration.indexOf("overline") > -1) {
+                offsets.push(-.12);
+            }
+            if (offsets.length > 0) {
+                renderLinesAtOffset(offsets);
+            }
+        },
+        _getFontDeclaration: function() {
+            return [ fabric.isLikelyNode ? this.fontWeight : this.fontStyle, fabric.isLikelyNode ? this.fontStyle : this.fontWeight, this.fontSize + "px", fabric.isLikelyNode ? '"' + this.fontFamily + '"' : this.fontFamily ].join(" ");
+        },
+        render: function(ctx, noTransform) {
+            if (!this.visible) {
+                return;
+            }
+            ctx.save();
+            this._setTextStyles(ctx);
+            if (this._shouldClearCache()) {
+                this._initDimensions(ctx);
+            }
+            if (!noTransform) {
+                this.transform(ctx);
+            }
+            if (this.transformMatrix) {
+                ctx.transform.apply(ctx, this.transformMatrix);
+            }
+            if (this.group && this.group.type === "path-group") {
+                ctx.translate(this.left, this.top);
+            }
+            this._render(ctx);
+            ctx.restore();
+        },
+        _splitTextIntoLines: function() {
+            return this.text.split(this._reNewline);
+        },
+        toObject: function(propertiesToInclude) {
+            var object = extend(this.callSuper("toObject", propertiesToInclude), {
+                text: this.text,
+                fontSize: this.fontSize,
+                fontWeight: this.fontWeight,
+                fontFamily: this.fontFamily,
+                fontStyle: this.fontStyle,
+                lineHeight: this.lineHeight,
+                textDecoration: this.textDecoration,
+                textAlign: this.textAlign,
+                textBackgroundColor: this.textBackgroundColor
+            });
+            if (!this.includeDefaultValues) {
+                this._removeDefaultValues(object);
+            }
+            return object;
+        },
+        toSVG: function(reviver) {
+            var markup = this._createBaseSVGMarkup(), offsets = this._getSVGLeftTopOffsets(this.ctx), textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
+            this._wrapSVGTextAndBg(markup, textAndBg);
+            return reviver ? reviver(markup.join("")) : markup.join("");
+        },
+        _getSVGLeftTopOffsets: function(ctx) {
+            var lineTop = this._getHeightOfLine(ctx, 0), textLeft = -this.width / 2, textTop = 0;
+            return {
+                textLeft: textLeft + (this.group && this.group.type === "path-group" ? this.left : 0),
+                textTop: textTop + (this.group && this.group.type === "path-group" ? -this.top : 0),
+                lineTop: lineTop
+            };
+        },
+        _wrapSVGTextAndBg: function(markup, textAndBg) {
+            markup.push('	<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n', textAndBg.textBgRects.join(""), "		<text ", this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, "'") + '" ' : "", this.fontSize ? 'font-size="' + this.fontSize + '" ' : "", this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : "", this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : "", this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : "", 'style="', this.getSvgStyles(), '" >', textAndBg.textSpans.join(""), "</text>\n", "	</g>\n");
+        },
+        _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
+            var textSpans = [], textBgRects = [], height = 0;
+            this._setSVGBg(textBgRects);
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                if (this.textBackgroundColor) {
+                    this._setSVGTextLineBg(textBgRects, i, textLeftOffset, textTopOffset, height);
+                }
+                this._setSVGTextLineText(i, textSpans, height, textLeftOffset, textTopOffset, textBgRects);
+                height += this._getHeightOfLine(this.ctx, i);
+            }
+            return {
+                textSpans: textSpans,
+                textBgRects: textBgRects
+            };
+        },
+        _setSVGTextLineText: function(i, textSpans, height, textLeftOffset, textTopOffset) {
+            var yPos = this.fontSize * (this._fontSizeMult - this._fontSizeFraction) - textTopOffset + height - this.height / 2;
+            textSpans.push('<tspan x="', toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ', 'y="', toFixed(yPos, NUM_FRACTION_DIGITS), '" ', this._getFillAttributes(this.fill), ">", fabric.util.string.escapeXml(this._textLines[i]), "</tspan>");
+        },
+        _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
+            textBgRects.push("		<rect ", this._getFillAttributes(this.textBackgroundColor), ' x="', toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" y="', toFixed(height - this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(this._getLineWidth(this.ctx, i), NUM_FRACTION_DIGITS), '" height="', toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, NUM_FRACTION_DIGITS), '"></rect>\n');
+        },
+        _setSVGBg: function(textBgRects) {
+            if (this.backgroundColor) {
+                textBgRects.push("		<rect ", this._getFillAttributes(this.backgroundColor), ' x="', toFixed(-this.width / 2, NUM_FRACTION_DIGITS), '" y="', toFixed(-this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(this.width, NUM_FRACTION_DIGITS), '" height="', toFixed(this.height, NUM_FRACTION_DIGITS), '"></rect>\n');
+            }
+        },
+        _getFillAttributes: function(value) {
+            var fillColor = value && typeof value === "string" ? new fabric.Color(value) : "";
+            if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
+                return 'fill="' + value + '"';
+            }
+            return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
+        },
+        _set: function(key, value) {
+            this.callSuper("_set", key, value);
+            if (key in this._dimensionAffectingProps) {
+                this._initDimensions();
+                this.setCoords();
+            }
+        },
+        complexity: function() {
+            return 1;
+        }
+    });
+    fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x y dx dy font-family font-style font-weight font-size text-decoration text-anchor".split(" "));
+    fabric.Text.DEFAULT_SVG_FONT_SIZE = 16;
+    fabric.Text.fromElement = function(element, options) {
+        if (!element) {
+            return null;
+        }
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+        options = fabric.util.object.extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes);
+        options.top = options.top || 0;
+        options.left = options.left || 0;
+        if ("dx" in parsedAttributes) {
+            options.left += parsedAttributes.dx;
+        }
+        if ("dy" in parsedAttributes) {
+            options.top += parsedAttributes.dy;
+        }
+        if (!("fontSize" in options)) {
+            options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+        }
+        if (!options.originX) {
+            options.originX = "left";
+        }
+        var textContent = element.textContent.replace(/^\s+|\s+$|\n+/g, "").replace(/\s+/g, " "), text = new fabric.Text(textContent, options), offX = 0;
+        if (text.originX === "left") {
+            offX = text.getWidth() / 2;
+        }
+        if (text.originX === "right") {
+            offX = -text.getWidth() / 2;
+        }
+        text.set({
+            left: text.getLeft() + offX,
+            top: text.getTop() - text.getHeight() / 2 + text.fontSize * (.18 + text._fontSizeFraction)
+        });
+        return text;
+    };
+    fabric.Text.fromObject = function(object) {
+        return new fabric.Text(object.text, clone(object));
+    };
+    fabric.util.createAccessors(fabric.Text);
+})(typeof exports !== "undefined" ? exports : this);
+
+(function() {
+    var clone = fabric.util.object.clone;
+    fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, {
+        type: "i-text",
+        selectionStart: 0,
+        selectionEnd: 0,
+        selectionColor: "rgba(17,119,255,0.3)",
+        isEditing: false,
+        editable: true,
+        editingBorderColor: "rgba(102,153,255,0.25)",
+        cursorWidth: 2,
+        cursorColor: "#333",
+        cursorDelay: 1e3,
+        cursorDuration: 600,
+        styles: null,
+        caching: true,
+        _skipFillStrokeCheck: false,
+        _reSpace: /\s|\n/,
+        _currentCursorOpacity: 0,
+        _selectionDirection: null,
+        _abortCursorAnimation: false,
+        _charWidthsCache: {},
+        __widthOfSpace: [],
+        initialize: function(text, options) {
+            this.styles = options ? options.styles || {} : {};
+            this.callSuper("initialize", text, options);
+            this.initBehavior();
+        },
+        _clearCache: function() {
+            this.callSuper("_clearCache");
+            this.__widthOfSpace = [];
+        },
+        isEmptyStyles: function() {
+            if (!this.styles) {
+                return true;
+            }
+            var obj = this.styles;
+            for (var p1 in obj) {
+                for (var p2 in obj[p1]) {
+                    for (var p3 in obj[p1][p2]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
+        setSelectionStart: function(index) {
+            index = Math.max(index, 0);
+            if (this.selectionStart !== index) {
+                this.fire("selection:changed");
+                this.canvas && this.canvas.fire("text:selection:changed", {
+                    target: this
+                });
+                this.selectionStart = index;
+            }
+            this._updateTextarea();
+        },
+        setSelectionEnd: function(index) {
+            index = Math.min(index, this.text.length);
+            if (this.selectionEnd !== index) {
+                this.fire("selection:changed");
+                this.canvas && this.canvas.fire("text:selection:changed", {
+                    target: this
+                });
+                this.selectionEnd = index;
+            }
+            this._updateTextarea();
+        },
+        getSelectionStyles: function(startIndex, endIndex) {
+            if (arguments.length === 2) {
+                var styles = [];
+                for (var i = startIndex; i < endIndex; i++) {
+                    styles.push(this.getSelectionStyles(i));
+                }
+                return styles;
+            }
+            var loc = this.get2DCursorLocation(startIndex), style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+            return style || {};
+        },
+        setSelectionStyles: function(styles) {
+            if (this.selectionStart === this.selectionEnd) {
+                this._extendStyles(this.selectionStart, styles);
+            } else {
+                for (var i = this.selectionStart; i < this.selectionEnd; i++) {
+                    this._extendStyles(i, styles);
+                }
+            }
+            this._forceClearCache = true;
+            return this;
+        },
+        _extendStyles: function(index, styles) {
+            var loc = this.get2DCursorLocation(index);
+            if (!this._getLineStyle(loc.lineIndex)) {
+                this._setLineStyle(loc.lineIndex, {});
+            }
+            if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
+                this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
+            }
+            fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
+        },
+        _render: function(ctx) {
+            this.callSuper("_render", ctx);
+            this.ctx = ctx;
+            this.isEditing && this.renderCursorOrSelection();
+        },
+        renderCursorOrSelection: function() {
+            if (!this.active) {
+                return;
+            }
+            var chars = this.text.split(""), boundaries, ctx;
+            if (this.canvas.contextTop) {
+                ctx = this.canvas.contextTop;
+                ctx.save();
+                ctx.transform.apply(ctx, this.canvas.viewportTransform);
+                this.transform(ctx);
+                this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+            } else {
+                ctx = this.ctx;
+                ctx.save();
+            }
+            if (this.selectionStart === this.selectionEnd) {
+                boundaries = this._getCursorBoundaries(chars, "cursor");
+                this.renderCursor(boundaries, ctx);
+            } else {
+                boundaries = this._getCursorBoundaries(chars, "selection");
+                this.renderSelection(chars, boundaries, ctx);
+            }
+            ctx.restore();
+        },
+        get2DCursorLocation: function(selectionStart) {
+            if (typeof selectionStart === "undefined") {
+                selectionStart = this.selectionStart;
+            }
+            var len = this._textLines.length;
+            for (var i = 0; i < len; i++) {
+                if (selectionStart <= this._textLines[i].length) {
+                    return {
+                        lineIndex: i,
+                        charIndex: selectionStart
+                    };
+                }
+                selectionStart -= this._textLines[i].length + 1;
+            }
+            return {
+                lineIndex: i - 1,
+                charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
+            };
+        },
+        getCurrentCharStyle: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return {
+                fontSize: style && style.fontSize || this.fontSize,
+                fill: style && style.fill || this.fill,
+                textBackgroundColor: style && style.textBackgroundColor || this.textBackgroundColor,
+                textDecoration: style && style.textDecoration || this.textDecoration,
+                fontFamily: style && style.fontFamily || this.fontFamily,
+                fontWeight: style && style.fontWeight || this.fontWeight,
+                fontStyle: style && style.fontStyle || this.fontStyle,
+                stroke: style && style.stroke || this.stroke,
+                strokeWidth: style && style.strokeWidth || this.strokeWidth
+            };
+        },
+        getCurrentCharFontSize: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return style && style.fontSize ? style.fontSize : this.fontSize;
+        },
+        getCurrentCharColor: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return style && style.fill ? style.fill : this.cursorColor;
+        },
+        _getCursorBoundaries: function(chars, typeOfBoundaries) {
+            var left = Math.round(this._getLeftOffset()), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(chars, typeOfBoundaries);
+            return {
+                left: left,
+                top: top,
+                leftOffset: offsets.left + offsets.lineLeft,
+                topOffset: offsets.top
+            };
+        },
+        _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+            var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0;
+            for (var i = 0; i < this.selectionStart; i++) {
+                if (chars[i] === "\n") {
+                    leftOffset = 0;
+                    topOffset += this._getHeightOfLine(this.ctx, lineIndex);
+                    lineIndex++;
+                    charIndex = 0;
+                } else {
+                    leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
+                    charIndex++;
+                }
+                lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex));
+            }
+            if (typeOfBoundaries === "cursor") {
+                topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+            }
+            return {
+                top: topOffset,
+                left: leftOffset,
+                lineLeft: lineLeftOffset
+            };
+        },
+        renderCursor: function(boundaries, ctx) {
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)) : boundaries.leftOffset;
+            ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
+            ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+            ctx.fillRect(boundaries.left + leftOffset, boundaries.top + boundaries.topOffset, this.cursorWidth / this.scaleX, charHeight);
+        },
+        renderSelection: function(chars, boundaries, ctx) {
+            ctx.fillStyle = this.selectionColor;
+            var start = this.get2DCursorLocation(this.selectionStart), end = this.get2DCursorLocation(this.selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex;
+            for (var i = startLine; i <= endLine; i++) {
+                var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0, lineHeight = this._getHeightOfLine(this.ctx, i), boxWidth = 0, line = this._textLines[i];
+                if (i === startLine) {
+                    for (var j = 0, len = line.length; j < len; j++) {
+                        if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
+                            boxWidth += this._getWidthOfChar(ctx, line[j], i, j);
+                        }
+                        if (j < start.charIndex) {
+                            lineOffset += this._getWidthOfChar(ctx, line[j], i, j);
+                        }
+                    }
+                } else if (i > startLine && i < endLine) {
+                    boxWidth += this._getLineWidth(ctx, i) || 5;
+                } else if (i === endLine) {
+                    for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
+                        boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
+                    }
+                }
+                ctx.fillRect(boundaries.left + lineOffset, boundaries.top + boundaries.topOffset, boxWidth, lineHeight);
+                boundaries.topOffset += lineHeight;
+            }
+        },
+        _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
+            if (this.isEmptyStyles()) {
+                return this._renderCharsFast(method, ctx, line, left, top);
+            }
+            charOffset = charOffset || 0;
+            this.skipTextAlign = true;
+            left -= this.textAlign === "center" ? this.width / 2 : this.textAlign === "right" ? this.width : 0;
+            var lineHeight = this._getHeightOfLine(ctx, lineIndex), lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)), prevStyle, thisStyle, charsToRender = "";
+            left += lineLeftOffset || 0;
+            ctx.save();
+            top -= lineHeight / this.lineHeight * this._fontSizeFraction;
+            for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
+                prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
+                thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+                if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
+                    this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
+                    charsToRender = "";
+                    prevStyle = thisStyle;
+                }
+                charsToRender += line[i - charOffset];
+            }
+            ctx.restore();
+        },
+        _renderCharsFast: function(method, ctx, line, left, top) {
+            this.skipTextAlign = false;
+            if (method === "fillText" && this.fill) {
+                this.callSuper("_renderChars", method, ctx, line, left, top);
+            }
+            if (method === "strokeText" && (this.stroke && this.strokeWidth > 0 || this.skipFillStrokeCheck)) {
+                this.callSuper("_renderChars", method, ctx, line, left, top);
+            }
+        },
+        _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
+            var charWidth, charHeight, shouldFill, shouldStroke, decl = this._getStyleDeclaration(lineIndex, i), offset, textDecoration;
+            if (decl) {
+                charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
+                shouldStroke = decl.stroke;
+                shouldFill = decl.fill;
+                textDecoration = decl.textDecoration;
+            } else {
+                charHeight = this.fontSize;
+            }
+            shouldStroke = (shouldStroke || this.stroke) && method === "strokeText";
+            shouldFill = (shouldFill || this.fill) && method === "fillText";
+            decl && ctx.save();
+            charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
+            textDecoration = textDecoration || this.textDecoration;
+            shouldFill && ctx.fillText(_char, left, top);
+            shouldStroke && ctx.strokeText(_char, left, top);
+            if (textDecoration || textDecoration !== "") {
+                offset = this._fontSizeFraction * lineHeight / this.lineHeight;
+                this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
+            }
+            decl && ctx.restore();
+            ctx.translate(charWidth, 0);
+        },
+        _hasStyleChanged: function(prevStyle, thisStyle) {
+            return prevStyle.fill !== thisStyle.fill || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.textDecoration !== thisStyle.textDecoration || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth;
+        },
+        _renderCharDecoration: function(ctx, textDecoration, left, top, offset, charWidth, charHeight) {
+            if (!textDecoration) {
+                return;
+            }
+            var decorationWeight = charHeight / 15, positions = {
+                underline: top + charHeight / 10,
+                "line-through": top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
+                overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
+            }, decorations = [ "underline", "line-through", "overline" ], i, decoration;
+            for (i = 0; i < decorations.length; i++) {
+                decoration = decorations[i];
+                if (textDecoration.indexOf(decoration) > -1) {
+                    ctx.fillRect(left, positions[decoration], charWidth, decorationWeight);
+                }
+            }
+        },
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+            if (!this.isEmptyStyles()) {
+                top += this.fontSize * (this._fontSizeFraction + .03);
+            }
+            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex);
+        },
+        _renderTextDecoration: function(ctx) {
+            if (this.isEmptyStyles()) {
+                return this.callSuper("_renderTextDecoration", ctx);
+            }
+        },
+        _renderTextLinesBackground: function(ctx) {
+            if (!this.textBackgroundColor && !this.styles) {
+                return;
+            }
+            ctx.save();
+            if (this.textBackgroundColor) {
+                ctx.fillStyle = this.textBackgroundColor;
+            }
+            var lineHeights = 0;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                var heightOfLine = this._getHeightOfLine(ctx, i);
+                if (this._textLines[i] === "") {
+                    lineHeights += heightOfLine;
+                    continue;
+                }
+                var lineWidth = this._getLineWidth(ctx, i), lineLeftOffset = this._getLineLeftOffset(lineWidth);
+                if (this.textBackgroundColor) {
+                    ctx.fillStyle = this.textBackgroundColor;
+                    ctx.fillRect(this._getLeftOffset() + lineLeftOffset, this._getTopOffset() + lineHeights, lineWidth, heightOfLine / this.lineHeight);
+                }
+                if (this._getLineStyle(i)) {
+                    for (var j = 0, jlen = this._textLines[i].length; j < jlen; j++) {
+                        var style = this._getStyleDeclaration(i, j);
+                        if (style && style.textBackgroundColor) {
+                            var _char = this._textLines[i][j];
+                            ctx.fillStyle = style.textBackgroundColor;
+                            ctx.fillRect(this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), this._getTopOffset() + lineHeights, this._getWidthOfChar(ctx, _char, i, j) + 1, heightOfLine / this.lineHeight);
+                        }
+                    }
+                }
+                lineHeights += heightOfLine;
+            }
+            ctx.restore();
+        },
+        _getCacheProp: function(_char, styleDeclaration) {
+            return _char + styleDeclaration.fontFamily + styleDeclaration.fontSize + styleDeclaration.fontWeight + styleDeclaration.fontStyle + styleDeclaration.shadow;
+        },
+        _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
+            var charDecl = this._getStyleDeclaration(lineIndex, charIndex), styleDeclaration = decl || clone(charDecl), width;
+            this._applyFontStyles(styleDeclaration);
+            var cacheProp = this._getCacheProp(_char, styleDeclaration);
+            if (!charDecl && this._charWidthsCache[cacheProp] && this.caching) {
+                return this._charWidthsCache[cacheProp];
+            }
+            if (typeof styleDeclaration.shadow === "string") {
+                styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
+            }
+            var fill = styleDeclaration.fill || this.fill;
+            ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
+            if (styleDeclaration.stroke) {
+                ctx.strokeStyle = styleDeclaration.stroke && styleDeclaration.stroke.toLive ? styleDeclaration.stroke.toLive(ctx, this) : styleDeclaration.stroke;
+            }
+            ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+            ctx.font = this._getFontDeclaration.call(styleDeclaration);
+            this._setShadow.call(styleDeclaration, ctx);
+            if (!this.caching || !this._charWidthsCache[cacheProp]) {
+                width = ctx.measureText(_char).width;
+                this.caching && (this._charWidthsCache[cacheProp] = width);
+            }
+            return this._charWidthsCache[cacheProp];
+        },
+        _applyFontStyles: function(styleDeclaration) {
+            if (!styleDeclaration.fontFamily) {
+                styleDeclaration.fontFamily = this.fontFamily;
+            }
+            if (!styleDeclaration.fontSize) {
+                styleDeclaration.fontSize = this.fontSize;
+            }
+            if (!styleDeclaration.fontWeight) {
+                styleDeclaration.fontWeight = this.fontWeight;
+            }
+            if (!styleDeclaration.fontStyle) {
+                styleDeclaration.fontStyle = this.fontStyle;
+            }
+        },
+        _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
+            if (returnCloneOrEmpty) {
+                return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? clone(this.styles[lineIndex][charIndex]) : {};
+            }
+            return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+        },
+        _setStyleDeclaration: function(lineIndex, charIndex, style) {
+            this.styles[lineIndex][charIndex] = style;
+        },
+        _deleteStyleDeclaration: function(lineIndex, charIndex) {
+            delete this.styles[lineIndex][charIndex];
+        },
+        _getLineStyle: function(lineIndex) {
+            return this.styles[lineIndex];
+        },
+        _setLineStyle: function(lineIndex, style) {
+            this.styles[lineIndex] = style;
+        },
+        _deleteLineStyle: function(lineIndex) {
+            delete this.styles[lineIndex];
+        },
+        _getWidthOfChar: function(ctx, _char, lineIndex, charIndex) {
+            if (this.textAlign === "justify" && this._reSpacesAndTabs.test(_char)) {
+                return this._getWidthOfSpace(ctx, lineIndex);
+            }
+            var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
+            this._applyFontStyles(styleDeclaration);
+            var cacheProp = this._getCacheProp(_char, styleDeclaration);
+            if (this._charWidthsCache[cacheProp] && this.caching) {
+                return this._charWidthsCache[cacheProp];
+            } else if (ctx) {
+                ctx.save();
+                var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
+                ctx.restore();
+                return width;
+            }
+        },
+        _getHeightOfChar: function(ctx, lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex);
+            return style && style.fontSize ? style.fontSize : this.fontSize;
+        },
+        _getWidthOfCharsAt: function(ctx, lineIndex, charIndex) {
+            var width = 0, i, _char;
+            for (i = 0; i < charIndex; i++) {
+                _char = this._textLines[lineIndex][i];
+                width += this._getWidthOfChar(ctx, _char, lineIndex, i);
+            }
+            return width;
+        },
+        _getLineWidth: function(ctx, lineIndex) {
+            if (this.__lineWidths[lineIndex]) {
+                return this.__lineWidths[lineIndex];
+            }
+            this.__lineWidths[lineIndex] = this._getWidthOfCharsAt(ctx, lineIndex, this._textLines[lineIndex].length);
+            return this.__lineWidths[lineIndex];
+        },
+        _getWidthOfSpace: function(ctx, lineIndex) {
+            if (this.__widthOfSpace[lineIndex]) {
+                return this.__widthOfSpace[lineIndex];
+            }
+            var line = this._textLines[lineIndex], wordsWidth = this._getWidthOfWords(ctx, line, lineIndex), widthDiff = this.width - wordsWidth, numSpaces = line.length - line.replace(this._reSpacesAndTabs, "").length, width = widthDiff / numSpaces;
+            this.__widthOfSpace[lineIndex] = width;
+            return width;
+        },
+        _getWidthOfWords: function(ctx, line, lineIndex) {
+            var width = 0;
+            for (var charIndex = 0; charIndex < line.length; charIndex++) {
+                var _char = line[charIndex];
+                if (!_char.match(/\s/)) {
+                    width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
+                }
+            }
+            return width;
+        },
+        _getHeightOfLine: function(ctx, lineIndex) {
+            if (this.__lineHeights[lineIndex]) {
+                return this.__lineHeights[lineIndex];
+            }
+            var line = this._textLines[lineIndex], maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
+            for (var i = 1, len = line.length; i < len; i++) {
+                var currentCharHeight = this._getHeightOfChar(ctx, lineIndex, i);
+                if (currentCharHeight > maxHeight) {
+                    maxHeight = currentCharHeight;
+                }
+            }
+            this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
+            return this.__lineHeights[lineIndex];
+        },
+        _getTextHeight: function(ctx) {
+            var height = 0;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                height += this._getHeightOfLine(ctx, i);
+            }
+            return height;
+        },
+        _renderTextBoxBackground: function(ctx) {
+            if (!this.backgroundColor) {
+                return;
+            }
+            ctx.save();
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(this._getLeftOffset(), this._getTopOffset(), this.width, this.height);
+            ctx.restore();
+        },
+        toObject: function(propertiesToInclude) {
+            var clonedStyles = {}, i, j, row;
+            for (i in this.styles) {
+                row = this.styles[i];
+                clonedStyles[i] = {};
+                for (j in row) {
+                    clonedStyles[i][j] = clone(row[j]);
+                }
+            }
+            return fabric.util.object.extend(this.callSuper("toObject", propertiesToInclude), {
+                styles: clonedStyles
+            });
+        }
+    });
+    fabric.IText.fromObject = function(object) {
+        return new fabric.IText(object.text, clone(object));
+    };
+})();
+
+(function() {
+    var clone = fabric.util.object.clone;
+    fabric.util.object.extend(fabric.IText.prototype, {
+        initBehavior: function() {
+            this.initAddedHandler();
+            this.initRemovedHandler();
+            this.initCursorSelectionHandlers();
+            this.initDoubleClickSimulation();
+        },
+        initSelectedHandler: function() {
+            this.on("selected", function() {
+                var _this = this;
+                setTimeout(function() {
+                    _this.selected = true;
+                }, 100);
+            });
+        },
+        initAddedHandler: function() {
+            var _this = this;
+            this.on("added", function() {
+                if (this.canvas && !this.canvas._hasITextHandlers) {
+                    this.canvas._hasITextHandlers = true;
+                    this._initCanvasHandlers();
+                }
+                if (_this.canvas) {
+                    _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
+                    _this.canvas._iTextInstances.push(_this);
+                }
+            });
+        },
+        initRemovedHandler: function() {
+            var _this = this;
+            this.on("removed", function() {
+                if (_this.canvas) {
+                    _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
+                    fabric.util.removeFromArray(_this.canvas._iTextInstances, _this);
+                }
+            });
+        },
+        _initCanvasHandlers: function() {
+            var _this = this;
+            this.canvas.on("selection:cleared", function() {
+                fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
+            });
+            this.canvas.on("mouse:up", function() {
+                if (_this.canvas._iTextInstances) {
+                    _this.canvas._iTextInstances.forEach(function(obj) {
+                        obj.__isMousedown = false;
+                    });
+                }
+            });
+            this.canvas.on("object:selected", function() {
+                fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
+            });
+        },
+        _tick: function() {
+            this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, "_onTickComplete");
+        },
+        _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
+            var tickState;
+            tickState = {
+                isAborted: false,
+                abort: function() {
+                    this.isAborted = true;
+                }
+            };
+            obj.animate("_currentCursorOpacity", targetOpacity, {
+                duration: duration,
+                onComplete: function() {
+                    if (!tickState.isAborted) {
+                        obj[completeMethod]();
+                    }
+                },
+                onChange: function() {
+                    if (obj.canvas) {
+                        obj.canvas.clearContext(obj.canvas.contextTop || obj.ctx);
+                        obj.renderCursorOrSelection();
+                    }
+                },
+                abort: function() {
+                    return tickState.isAborted;
+                }
+            });
+            return tickState;
+        },
+        _onTickComplete: function() {
+            var _this = this;
+            if (this._cursorTimeout1) {
+                clearTimeout(this._cursorTimeout1);
+            }
+            this._cursorTimeout1 = setTimeout(function() {
+                _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, "_tick");
+            }, 100);
+        },
+        initDelayedCursor: function(restart) {
+            var _this = this, delay = restart ? 0 : this.cursorDelay;
+            this._currentTickState && this._currentTickState.abort();
+            this._currentTickCompleteState && this._currentTickCompleteState.abort();
+            clearTimeout(this._cursorTimeout1);
+            this._currentCursorOpacity = 1;
+            if (this.canvas) {
+                this.canvas.clearContext(this.canvas.contextTop || this.ctx);
+                this.renderCursorOrSelection();
+            }
+            if (this._cursorTimeout2) {
+                clearTimeout(this._cursorTimeout2);
+            }
+            this._cursorTimeout2 = setTimeout(function() {
+                _this._tick();
+            }, delay);
+        },
+        abortCursorAnimation: function() {
+            this._currentTickState && this._currentTickState.abort();
+            this._currentTickCompleteState && this._currentTickCompleteState.abort();
+            clearTimeout(this._cursorTimeout1);
+            clearTimeout(this._cursorTimeout2);
+            this._currentCursorOpacity = 0;
+            this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
+        },
+        selectAll: function() {
+            this.setSelectionStart(0);
+            this.setSelectionEnd(this.text.length);
+        },
+        getSelectedText: function() {
+            return this.text.slice(this.selectionStart, this.selectionEnd);
+        },
+        findWordBoundaryLeft: function(startFrom) {
+            var offset = 0, index = startFrom - 1;
+            if (this._reSpace.test(this.text.charAt(index))) {
+                while (this._reSpace.test(this.text.charAt(index))) {
+                    offset++;
+                    index--;
+                }
+            }
+            while (/\S/.test(this.text.charAt(index)) && index > -1) {
+                offset++;
+                index--;
+            }
+            return startFrom - offset;
+        },
+        findWordBoundaryRight: function(startFrom) {
+            var offset = 0, index = startFrom;
+            if (this._reSpace.test(this.text.charAt(index))) {
+                while (this._reSpace.test(this.text.charAt(index))) {
+                    offset++;
+                    index++;
+                }
+            }
+            while (/\S/.test(this.text.charAt(index)) && index < this.text.length) {
+                offset++;
+                index++;
+            }
+            return startFrom + offset;
+        },
+        findLineBoundaryLeft: function(startFrom) {
+            var offset = 0, index = startFrom - 1;
+            while (!/\n/.test(this.text.charAt(index)) && index > -1) {
+                offset++;
+                index--;
+            }
+            return startFrom - offset;
+        },
+        findLineBoundaryRight: function(startFrom) {
+            var offset = 0, index = startFrom;
+            while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
+                offset++;
+                index++;
+            }
+            return startFrom + offset;
+        },
+        getNumNewLinesInSelectedText: function() {
+            var selectedText = this.getSelectedText(), numNewLines = 0;
+            for (var i = 0, len = selectedText.length; i < len; i++) {
+                if (selectedText[i] === "\n") {
+                    numNewLines++;
+                }
+            }
+            return numNewLines;
+        },
+        searchWordBoundary: function(selectionStart, direction) {
+            var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart, _char = this.text.charAt(index), reNonWord = /[ \n\.,;!\?\-]/;
+            while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
+                index += direction;
+                _char = this.text.charAt(index);
+            }
+            if (reNonWord.test(_char) && _char !== "\n") {
+                index += direction === 1 ? 0 : 1;
+            }
+            return index;
+        },
+        selectWord: function(selectionStart) {
+            var newSelectionStart = this.searchWordBoundary(selectionStart, -1), newSelectionEnd = this.searchWordBoundary(selectionStart, 1);
+            this.setSelectionStart(newSelectionStart);
+            this.setSelectionEnd(newSelectionEnd);
+        },
+        selectLine: function(selectionStart) {
+            var newSelectionStart = this.findLineBoundaryLeft(selectionStart), newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+            this.setSelectionStart(newSelectionStart);
+            this.setSelectionEnd(newSelectionEnd);
+        },
+        enterEditing: function() {
+            if (this.isEditing || !this.editable) {
+                return;
+            }
+            if (this.canvas) {
+                this.exitEditingOnOthers(this.canvas);
+            }
+            this.isEditing = true;
+            this.initHiddenTextarea();
+            this.hiddenTextarea.focus();
+            this._updateTextarea();
+            this._saveEditingProps();
+            this._setEditingProps();
+            this._tick();
+            this.fire("editing:entered");
+            if (!this.canvas) {
+                return this;
+            }
+            this.canvas.renderAll();
+            this.canvas.fire("text:editing:entered", {
+                target: this
+            });
+            this.initMouseMoveHandler();
+            return this;
+        },
+        exitEditingOnOthers: function(canvas) {
+            if (canvas._iTextInstances) {
+                canvas._iTextInstances.forEach(function(obj) {
+                    obj.selected = false;
+                    if (obj.isEditing) {
+                        obj.exitEditing();
+                    }
+                });
+            }
+        },
+        initMouseMoveHandler: function() {
+            var _this = this;
+            this.canvas.on("mouse:move", function(options) {
+                if (!_this.__isMousedown || !_this.isEditing) {
+                    return;
+                }
+                var newSelectionStart = _this.getSelectionStartFromPointer(options.e);
+                if (newSelectionStart >= _this.__selectionStartOnMouseDown) {
+                    _this.setSelectionStart(_this.__selectionStartOnMouseDown);
+                    _this.setSelectionEnd(newSelectionStart);
+                } else {
+                    _this.setSelectionStart(newSelectionStart);
+                    _this.setSelectionEnd(_this.__selectionStartOnMouseDown);
+                }
+            });
+        },
+        _setEditingProps: function() {
+            this.hoverCursor = "text";
+            if (this.canvas) {
+                this.canvas.defaultCursor = this.canvas.moveCursor = "text";
+            }
+            this.borderColor = this.editingBorderColor;
+            this.hasControls = this.selectable = false;
+            this.lockMovementX = this.lockMovementY = true;
+        },
+        _updateTextarea: function() {
+            if (!this.hiddenTextarea) {
+                return;
+            }
+            this.hiddenTextarea.value = this.text;
+            this.hiddenTextarea.selectionStart = this.selectionStart;
+            this.hiddenTextarea.selectionEnd = this.selectionEnd;
+        },
+        _saveEditingProps: function() {
+            this._savedProps = {
+                hasControls: this.hasControls,
+                borderColor: this.borderColor,
+                lockMovementX: this.lockMovementX,
+                lockMovementY: this.lockMovementY,
+                hoverCursor: this.hoverCursor,
+                defaultCursor: this.canvas && this.canvas.defaultCursor,
+                moveCursor: this.canvas && this.canvas.moveCursor
+            };
+        },
+        _restoreEditingProps: function() {
+            if (!this._savedProps) {
+                return;
+            }
+            this.hoverCursor = this._savedProps.overCursor;
+            this.hasControls = this._savedProps.hasControls;
+            this.borderColor = this._savedProps.borderColor;
+            this.lockMovementX = this._savedProps.lockMovementX;
+            this.lockMovementY = this._savedProps.lockMovementY;
+            if (this.canvas) {
+                this.canvas.defaultCursor = this._savedProps.defaultCursor;
+                this.canvas.moveCursor = this._savedProps.moveCursor;
+            }
+        },
+        exitEditing: function() {
+            this.selected = false;
+            this.isEditing = false;
+            this.selectable = true;
+            this.selectionEnd = this.selectionStart;
+            this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
+            this.hiddenTextarea = null;
+            this.abortCursorAnimation();
+            this._restoreEditingProps();
+            this._currentCursorOpacity = 0;
+            this.fire("editing:exited");
+            this.canvas && this.canvas.fire("text:editing:exited", {
+                target: this
+            });
+            return this;
+        },
+        _removeExtraneousStyles: function() {
+            for (var prop in this.styles) {
+                if (!this._textLines[prop]) {
+                    delete this.styles[prop];
+                }
+            }
+        },
+        _removeCharsFromTo: function(start, end) {
+            while (end !== start) {
+                this._removeSingleCharAndStyle(start + 1);
+                end--;
+            }
+            this.setSelectionStart(start);
+        },
+        _removeSingleCharAndStyle: function(index) {
+            var isBeginningOfLine = this.text[index - 1] === "\n", indexStyle = isBeginningOfLine ? index : index - 1;
+            this.removeStyleObject(isBeginningOfLine, indexStyle);
+            this.text = this.text.slice(0, index - 1) + this.text.slice(index);
+            this._textLines = this._splitTextIntoLines();
+        },
+        insertChars: function(_chars, useCopiedStyle) {
+            var style;
+            if (this.selectionEnd - this.selectionStart > 1) {
+                this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+                this.setSelectionEnd(this.selectionStart);
+            }
+            if (!useCopiedStyle && this.isEmptyStyles()) {
+                this.insertChar(_chars, false);
+                return;
+            }
+            for (var i = 0, len = _chars.length; i < len; i++) {
+                if (useCopiedStyle) {
+                    style = fabric.copiedTextStyle[i];
+                }
+                this.insertChar(_chars[i], i < len - 1, style);
+            }
+        },
+        insertChar: function(_char, skipUpdate, styleObject) {
+            var isEndOfLine = this.text[this.selectionStart] === "\n";
+            this.text = this.text.slice(0, this.selectionStart) + _char + this.text.slice(this.selectionEnd);
+            this._textLines = this._splitTextIntoLines();
+            this.insertStyleObjects(_char, isEndOfLine, styleObject);
+            this.selectionStart += _char.length;
+            this.selectionEnd = this.selectionStart;
+            if (skipUpdate) {
+                return;
+            }
+            this._updateTextarea();
+            this.canvas && this.canvas.renderAll();
+            this.setCoords();
+            this.fire("changed");
+            this.canvas && this.canvas.fire("text:changed", {
+                target: this
+            });
+        },
+        insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+            this.shiftLineStyles(lineIndex, +1);
+            if (!this.styles[lineIndex + 1]) {
+                this.styles[lineIndex + 1] = {};
+            }
+            var currentCharStyle = {}, newLineStyles = {};
+            if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
+                currentCharStyle = this.styles[lineIndex][charIndex - 1];
+            }
+            if (isEndOfLine) {
+                newLineStyles[0] = clone(currentCharStyle);
+                this.styles[lineIndex + 1] = newLineStyles;
+            } else {
+                for (var index in this.styles[lineIndex]) {
+                    if (parseInt(index, 10) >= charIndex) {
+                        newLineStyles[parseInt(index, 10) - charIndex] = this.styles[lineIndex][index];
+                        delete this.styles[lineIndex][index];
+                    }
+                }
+                this.styles[lineIndex + 1] = newLineStyles;
+            }
+            this._forceClearCache = true;
+        },
+        insertCharStyleObject: function(lineIndex, charIndex, style) {
+            var currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = clone(currentLineStyles);
+            if (charIndex === 0 && !style) {
+                charIndex = 1;
+            }
+            for (var index in currentLineStylesCloned) {
+                var numericIndex = parseInt(index, 10);
+                if (numericIndex >= charIndex) {
+                    currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
+                    if (!currentLineStylesCloned[numericIndex - 1]) {
+                        delete currentLineStyles[numericIndex];
+                    }
+                }
+            }
+            this.styles[lineIndex][charIndex] = style || clone(currentLineStyles[charIndex - 1]);
+            this._forceClearCache = true;
+        },
+        insertStyleObjects: function(_chars, isEndOfLine, styleObject) {
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex;
+            if (!this._getLineStyle(lineIndex)) {
+                this._setLineStyle(lineIndex, {});
+            }
+            if (_chars === "\n") {
+                this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
+            } else {
+                this.insertCharStyleObject(lineIndex, charIndex, styleObject);
+            }
+        },
+        shiftLineStyles: function(lineIndex, offset) {
+            var clonedStyles = clone(this.styles);
+            for (var line in this.styles) {
+                var numericLine = parseInt(line, 10);
+                if (numericLine > lineIndex) {
+                    this.styles[numericLine + offset] = clonedStyles[numericLine];
+                    if (!clonedStyles[numericLine - offset]) {
+                        delete this.styles[numericLine];
+                    }
+                }
+            }
+        },
+        removeStyleObject: function(isBeginningOfLine, index) {
+            var cursorLocation = this.get2DCursorLocation(index), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex;
+            this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
+        },
+        _getTextOnPreviousLine: function(lIndex) {
+            return this._textLines[lIndex - 1];
+        },
+        _removeStyleObject: function(isBeginningOfLine, cursorLocation, lineIndex, charIndex) {
+            if (isBeginningOfLine) {
+                var textOnPreviousLine = this._getTextOnPreviousLine(cursorLocation.lineIndex), newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
+                if (!this.styles[lineIndex - 1]) {
+                    this.styles[lineIndex - 1] = {};
+                }
+                for (charIndex in this.styles[lineIndex]) {
+                    this.styles[lineIndex - 1][parseInt(charIndex, 10) + newCharIndexOnPrevLine] = this.styles[lineIndex][charIndex];
+                }
+                this.shiftLineStyles(cursorLocation.lineIndex, -1);
+            } else {
+                var currentLineStyles = this.styles[lineIndex];
+                if (currentLineStyles) {
+                    delete currentLineStyles[charIndex];
+                }
+                var currentLineStylesCloned = clone(currentLineStyles);
+                for (var i in currentLineStylesCloned) {
+                    var numericIndex = parseInt(i, 10);
+                    if (numericIndex >= charIndex && numericIndex !== 0) {
+                        currentLineStyles[numericIndex - 1] = currentLineStylesCloned[numericIndex];
+                        delete currentLineStyles[numericIndex];
+                    }
+                }
+            }
+        },
+        insertNewline: function() {
+            this.insertChars("\n");
+        }
+    });
+})();
+
+fabric.util.object.extend(fabric.IText.prototype, {
+    initDoubleClickSimulation: function() {
+        this.__lastClickTime = +new Date();
+        this.__lastLastClickTime = +new Date();
+        this.__lastPointer = {};
+        this.on("mousedown", this.onMouseDown.bind(this));
+    },
+    onMouseDown: function(options) {
+        this.__newClickTime = +new Date();
+        var newPointer = this.canvas.getPointer(options.e);
+        if (this.isTripleClick(newPointer)) {
+            this.fire("tripleclick", options);
+            this._stopEvent(options.e);
+        } else if (this.isDoubleClick(newPointer)) {
+            this.fire("dblclick", options);
+            this._stopEvent(options.e);
+        }
+        this.__lastLastClickTime = this.__lastClickTime;
+        this.__lastClickTime = this.__newClickTime;
+        this.__lastPointer = newPointer;
+        this.__lastIsEditing = this.isEditing;
+        this.__lastSelected = this.selected;
+    },
+    isDoubleClick: function(newPointer) {
+        return this.__newClickTime - this.__lastClickTime < 500 && this.__lastPointer.x === newPointer.x && this.__lastPointer.y === newPointer.y && this.__lastIsEditing;
+    },
+    isTripleClick: function(newPointer) {
+        return this.__newClickTime - this.__lastClickTime < 500 && this.__lastClickTime - this.__lastLastClickTime < 500 && this.__lastPointer.x === newPointer.x && this.__lastPointer.y === newPointer.y;
+    },
+    _stopEvent: function(e) {
+        e.preventDefault && e.preventDefault();
+        e.stopPropagation && e.stopPropagation();
+    },
+    initCursorSelectionHandlers: function() {
+        this.initSelectedHandler();
+        this.initMousedownHandler();
+        this.initMouseupHandler();
+        this.initClicks();
+    },
+    initClicks: function() {
+        this.on("dblclick", function(options) {
+            this.selectWord(this.getSelectionStartFromPointer(options.e));
+        });
+        this.on("tripleclick", function(options) {
+            this.selectLine(this.getSelectionStartFromPointer(options.e));
+        });
+    },
+    initMousedownHandler: function() {
+        this.on("mousedown", function(options) {
+            if (!this.editable) {
+                return;
+            }
+            var pointer = this.canvas.getPointer(options.e);
+            this.__mousedownX = pointer.x;
+            this.__mousedownY = pointer.y;
+            this.__isMousedown = true;
+            if (this.hiddenTextarea && this.canvas) {
+                this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
+            }
+            if (this.selected) {
+                this.setCursorByClick(options.e);
+            }
+            if (this.isEditing) {
+                this.__selectionStartOnMouseDown = this.selectionStart;
+                this.initDelayedCursor(true);
+            }
+        });
+    },
+    _isObjectMoved: function(e) {
+        var pointer = this.canvas.getPointer(e);
+        return this.__mousedownX !== pointer.x || this.__mousedownY !== pointer.y;
+    },
+    initMouseupHandler: function() {
+        this.on("mouseup", function(options) {
+            this.__isMousedown = false;
+            if (!this.editable || this._isObjectMoved(options.e)) {
+                return;
+            }
+            if (this.__lastSelected && !this.__corner) {
+                this.enterEditing();
+                this.initDelayedCursor(true);
+            }
+            this.selected = true;
+        });
+    },
+    setCursorByClick: function(e) {
+        var newSelectionStart = this.getSelectionStartFromPointer(e);
+        if (e.shiftKey) {
+            if (newSelectionStart < this.selectionStart) {
+                this.setSelectionEnd(this.selectionStart);
+                this.setSelectionStart(newSelectionStart);
+            } else {
+                this.setSelectionEnd(newSelectionStart);
+            }
+        } else {
+            this.setSelectionStart(newSelectionStart);
+            this.setSelectionEnd(newSelectionStart);
+        }
+    },
+    getSelectionStartFromPointer: function(e) {
+        var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, newSelectionStart, line;
+        for (var i = 0, len = this._textLines.length; i < len; i++) {
+            line = this._textLines[i];
+            height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
+            var widthOfLine = this._getLineWidth(this.ctx, i), lineLeftOffset = this._getLineLeftOffset(widthOfLine);
+            width = lineLeftOffset * this.scaleX;
+            if (this.flipX) {
+                this._textLines[i] = line.reverse().join("");
+            }
+            for (var j = 0, jlen = line.length; j < jlen; j++) {
+                prevWidth = width;
+                width += this._getWidthOfChar(this.ctx, line[j], i, this.flipX ? jlen - j : j) * this.scaleX;
+                if (height <= mouseOffset.y || width <= mouseOffset.x) {
+                    charIndex++;
+                    continue;
+                }
+                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i, jlen);
+            }
+            if (mouseOffset.y < height) {
+                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i - 1, jlen);
+            }
+        }
+        if (typeof newSelectionStart === "undefined") {
+            return this.text.length;
+        }
+    },
+    _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+        var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth, distanceBtwNextCharAndCursor = width - mouseOffset.x, offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1, newSelectionStart = index + offset;
+        if (this.flipX) {
+            newSelectionStart = jlen - newSelectionStart;
+        }
+        if (newSelectionStart > this.text.length) {
+            newSelectionStart = this.text.length;
+        }
+        return newSelectionStart;
+    }
+});
+
+fabric.util.object.extend(fabric.IText.prototype, {
+    initHiddenTextarea: function() {
+        this.hiddenTextarea = fabric.document.createElement("textarea");
+        this.hiddenTextarea.setAttribute("autocapitalize", "off");
+        this.hiddenTextarea.style.cssText = "position: fixed; bottom: 20px; left: 0px; opacity: 0;" + " width: 0px; height: 0px; z-index: -999;";
+        fabric.document.body.appendChild(this.hiddenTextarea);
+        fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "input", this.onInput.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "copy", this.copy.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "paste", this.paste.bind(this));
+        if (!this._clickHandlerInitialized && this.canvas) {
+            fabric.util.addListener(this.canvas.upperCanvasEl, "click", this.onClick.bind(this));
+            this._clickHandlerInitialized = true;
+        }
+    },
+    _keysMap: {
+        8: "removeChars",
+        9: "exitEditing",
+        27: "exitEditing",
+        13: "insertNewline",
+        33: "moveCursorUp",
+        34: "moveCursorDown",
+        35: "moveCursorRight",
+        36: "moveCursorLeft",
+        37: "moveCursorLeft",
+        38: "moveCursorUp",
+        39: "moveCursorRight",
+        40: "moveCursorDown",
+        46: "forwardDelete"
+    },
+    _ctrlKeysMap: {
+        65: "selectAll",
+        88: "cut"
+    },
+    onClick: function() {
+        this.hiddenTextarea && this.hiddenTextarea.focus();
+    },
+    onKeyDown: function(e) {
+        if (!this.isEditing) {
+            return;
+        }
+        if (e.keyCode in this._keysMap) {
+            this[this._keysMap[e.keyCode]](e);
+        } else if (e.keyCode in this._ctrlKeysMap && (e.ctrlKey || e.metaKey)) {
+            this[this._ctrlKeysMap[e.keyCode]](e);
+        } else {
+            return;
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        this.canvas && this.canvas.renderAll();
+    },
+    onInput: function(e) {
+        if (!this.isEditing) {
+            return;
+        }
+        var offset = this.selectionStart || 0, offsetEnd = this.selectionEnd || 0, textLength = this.text.length, newTextLength = this.hiddenTextarea.value.length, diff = newTextLength - textLength + offsetEnd - offset, charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+        this.insertChars(charsToInsert);
+        e.stopPropagation();
+    },
+    forwardDelete: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            if (this.selectionStart === this.text.length) {
+                return;
+            }
+            this.moveCursorRight(e);
+        }
+        this.removeChars(e);
+    },
+    copy: function(e) {
+        var selectedText = this.getSelectedText(), clipboardData = this._getClipboardData(e);
+        if (clipboardData) {
+            clipboardData.setData("text", selectedText);
+        }
+        fabric.copiedText = selectedText;
+        fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
+    },
+    paste: function(e) {
+        var copiedText = null, clipboardData = this._getClipboardData(e), useCopiedStyle = true;
+        if (clipboardData) {
+            copiedText = clipboardData.getData("text").replace(/\r/g, "");
+            if (!fabric.copiedTextStyle || fabric.copiedText !== copiedText) {
+                useCopiedStyle = false;
+            }
+        } else {
+            copiedText = fabric.copiedText;
+        }
+        if (copiedText) {
+            this.insertChars(copiedText, useCopiedStyle);
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    },
+    cut: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            return;
+        }
+        this.copy();
+        this.removeChars(e);
+    },
+    _getClipboardData: function(e) {
+        return e && (e.clipboardData || fabric.window.clipboardData);
+    },
+    getDownCursorOffset: function(e, isRight) {
+        var selectionProp = isRight ? this.selectionEnd : this.selectionStart, cursorLocation = this.get2DCursorLocation(selectionProp), _char, lineLeftOffset, lineIndex = cursorLocation.lineIndex, textOnSameLineBeforeCursor = this._textLines[lineIndex].slice(0, cursorLocation.charIndex), textOnSameLineAfterCursor = this._textLines[lineIndex].slice(cursorLocation.charIndex), textOnNextLine = this._textLines[lineIndex + 1] || "";
+        if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
+            return this.text.length - selectionProp;
+        }
+        var widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, lineIndex);
+        lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
+        var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
+        for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
+            _char = textOnSameLineBeforeCursor[i];
+            widthOfCharsOnSameLineBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
+        }
+        var indexOnNextLine = this._getIndexOnNextLine(cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor);
+        return textOnSameLineAfterCursor.length + 1 + indexOnNextLine;
+    },
+    _getIndexOnNextLine: function(cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor) {
+        var lineIndex = cursorLocation.lineIndex + 1, widthOfNextLine = this._getLineWidth(this.ctx, lineIndex), lineLeftOffset = this._getLineLeftOffset(widthOfNextLine), widthOfCharsOnNextLine = lineLeftOffset, indexOnNextLine = 0, foundMatch;
+        for (var j = 0, jlen = textOnNextLine.length; j < jlen; j++) {
+            var _char = textOnNextLine[j], widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+            widthOfCharsOnNextLine += widthOfChar;
+            if (widthOfCharsOnNextLine > widthOfCharsOnSameLineBeforeCursor) {
+                foundMatch = true;
+                var leftEdge = widthOfCharsOnNextLine - widthOfChar, rightEdge = widthOfCharsOnNextLine, offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor), offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
+                indexOnNextLine = offsetFromRightEdge < offsetFromLeftEdge ? j + 1 : j;
+                break;
+            }
+        }
+        if (!foundMatch) {
+            indexOnNextLine = textOnNextLine.length;
+        }
+        return indexOnNextLine;
+    },
+    moveCursorDown: function(e) {
+        this.abortCursorAnimation();
+        this._currentCursorOpacity = 1;
+        var offset = this.getDownCursorOffset(e, this._selectionDirection === "right");
+        if (e.shiftKey) {
+            this.moveCursorDownWithShift(offset);
+        } else {
+            this.moveCursorDownWithoutShift(offset);
+        }
+        this.initDelayedCursor();
+    },
+    moveCursorDownWithoutShift: function(offset) {
+        this._selectionDirection = "right";
+        this.setSelectionStart(this.selectionStart + offset);
+        this.setSelectionEnd(this.selectionStart);
+    },
+    swapSelectionPoints: function() {
+        var swapSel = this.selectionEnd;
+        this.setSelectionEnd(this.selectionStart);
+        this.setSelectionStart(swapSel);
+    },
+    moveCursorDownWithShift: function(offset) {
+        if (this.selectionEnd === this.selectionStart) {
+            this._selectionDirection = "right";
+        }
+        if (this._selectionDirection === "right") {
+            this.setSelectionEnd(this.selectionEnd + offset);
+        } else {
+            this.setSelectionStart(this.selectionStart + offset);
+        }
+        if (this.selectionEnd < this.selectionStart && this._selectionDirection === "left") {
+            this.swapSelectionPoints();
+            this._selectionDirection = "right";
+        }
+        if (this.selectionEnd > this.text.length) {
+            this.setSelectionEnd(this.text.length);
+        }
+    },
+    getUpCursorOffset: function(e, isRight) {
+        var selectionProp = isRight ? this.selectionEnd : this.selectionStart, cursorLocation = this.get2DCursorLocation(selectionProp), lineIndex = cursorLocation.lineIndex;
+        if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+            return selectionProp;
+        }
+        var textOnSameLineBeforeCursor = this._textLines[lineIndex].slice(0, cursorLocation.charIndex), textOnPreviousLine = this._textLines[lineIndex - 1] || "", _char, widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex), lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor), widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
+        for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
+            _char = textOnSameLineBeforeCursor[i];
+            widthOfCharsOnSameLineBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
+        }
+        var indexOnPrevLine = this._getIndexOnPrevLine(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor);
+        return textOnPreviousLine.length - indexOnPrevLine + textOnSameLineBeforeCursor.length;
+    },
+    _getIndexOnPrevLine: function(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor) {
+        var lineIndex = cursorLocation.lineIndex - 1, widthOfPreviousLine = this._getLineWidth(this.ctx, lineIndex), lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine), widthOfCharsOnPreviousLine = lineLeftOffset, indexOnPrevLine = 0, foundMatch;
+        for (var j = 0, jlen = textOnPreviousLine.length; j < jlen; j++) {
+            var _char = textOnPreviousLine[j], widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+            widthOfCharsOnPreviousLine += widthOfChar;
+            if (widthOfCharsOnPreviousLine > widthOfCharsOnSameLineBeforeCursor) {
+                foundMatch = true;
+                var leftEdge = widthOfCharsOnPreviousLine - widthOfChar, rightEdge = widthOfCharsOnPreviousLine, offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor), offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
+                indexOnPrevLine = offsetFromRightEdge < offsetFromLeftEdge ? j : j - 1;
+                break;
+            }
+        }
+        if (!foundMatch) {
+            indexOnPrevLine = textOnPreviousLine.length - 1;
+        }
+        return indexOnPrevLine;
+    },
+    moveCursorUp: function(e) {
+        this.abortCursorAnimation();
+        this._currentCursorOpacity = 1;
+        var offset = this.getUpCursorOffset(e, this._selectionDirection === "right");
+        if (e.shiftKey) {
+            this.moveCursorUpWithShift(offset);
+        } else {
+            this.moveCursorUpWithoutShift(offset);
+        }
+        this.initDelayedCursor();
+    },
+    moveCursorUpWithShift: function(offset) {
+        if (this.selectionEnd === this.selectionStart) {
+            this._selectionDirection = "left";
+        }
+        if (this._selectionDirection === "right") {
+            this.setSelectionEnd(this.selectionEnd - offset);
+        } else {
+            this.setSelectionStart(this.selectionStart - offset);
+        }
+        if (this.selectionEnd < this.selectionStart && this._selectionDirection === "right") {
+            this.swapSelectionPoints();
+            this._selectionDirection = "left";
+        }
+    },
+    moveCursorUpWithoutShift: function(offset) {
+        if (this.selectionStart === this.selectionEnd) {
+            this.setSelectionStart(this.selectionStart - offset);
+        }
+        this.setSelectionEnd(this.selectionStart);
+        this._selectionDirection = "left";
+    },
+    moveCursorLeft: function(e) {
+        if (this.selectionStart === 0 && this.selectionEnd === 0) {
+            return;
+        }
+        this.abortCursorAnimation();
+        this._currentCursorOpacity = 1;
+        if (e.shiftKey) {
+            this.moveCursorLeftWithShift(e);
+        } else {
+            this.moveCursorLeftWithoutShift(e);
+        }
+        this.initDelayedCursor();
+    },
+    _move: function(e, prop, direction) {
+        var propMethod = prop === "selectionStart" ? "setSelectionStart" : "setSelectionEnd";
+        if (e.altKey) {
+            this[propMethod](this["findWordBoundary" + direction](this[prop]));
+        } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
+            this[propMethod](this["findLineBoundary" + direction](this[prop]));
+        } else {
+            this[propMethod](this[prop] + (direction === "Left" ? -1 : 1));
+        }
+    },
+    _moveLeft: function(e, prop) {
+        this._move(e, prop, "Left");
+    },
+    _moveRight: function(e, prop) {
+        this._move(e, prop, "Right");
+    },
+    moveCursorLeftWithoutShift: function(e) {
+        this._selectionDirection = "left";
+        if (this.selectionEnd === this.selectionStart) {
+            this._moveLeft(e, "selectionStart");
+        }
+        this.setSelectionEnd(this.selectionStart);
+    },
+    moveCursorLeftWithShift: function(e) {
+        if (this._selectionDirection === "right" && this.selectionStart !== this.selectionEnd) {
+            this._moveLeft(e, "selectionEnd");
+        } else {
+            this._selectionDirection = "left";
+            this._moveLeft(e, "selectionStart");
+        }
+    },
+    moveCursorRight: function(e) {
+        if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+            return;
+        }
+        this.abortCursorAnimation();
+        this._currentCursorOpacity = 1;
+        if (e.shiftKey) {
+            this.moveCursorRightWithShift(e);
+        } else {
+            this.moveCursorRightWithoutShift(e);
+        }
+        this.initDelayedCursor();
+    },
+    moveCursorRightWithShift: function(e) {
+        if (this._selectionDirection === "left" && this.selectionStart !== this.selectionEnd) {
+            this._moveRight(e, "selectionStart");
+        } else {
+            this._selectionDirection = "right";
+            this._moveRight(e, "selectionEnd");
+        }
+    },
+    moveCursorRightWithoutShift: function(e) {
+        this._selectionDirection = "right";
+        if (this.selectionStart === this.selectionEnd) {
+            this._moveRight(e, "selectionStart");
+            this.setSelectionEnd(this.selectionStart);
+        } else {
+            this.setSelectionEnd(this.selectionEnd + this.getNumNewLinesInSelectedText());
+            this.setSelectionStart(this.selectionEnd);
+        }
+    },
+    removeChars: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            this._removeCharsNearCursor(e);
+        } else {
+            this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+        }
+        this.setSelectionEnd(this.selectionStart);
+        this._removeExtraneousStyles();
+        this.canvas && this.canvas.renderAll();
+        this.setCoords();
+        this.fire("changed");
+        this.canvas && this.canvas.fire("text:changed", {
+            target: this
+        });
+    },
+    _removeCharsNearCursor: function(e) {
+        if (this.selectionStart === 0) {
+            return;
+        }
+        if (e.metaKey) {
+            var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
+            this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
+            this.setSelectionStart(leftLineBoundary);
+        } else if (e.altKey) {
+            var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
+            this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
+            this.setSelectionStart(leftWordBoundary);
+        } else {
+            this._removeSingleCharAndStyle(this.selectionStart);
+            this.setSelectionStart(this.selectionStart - 1);
+        }
+    }
+});
+
+(function() {
+    var toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    fabric.util.object.extend(fabric.IText.prototype, {
+        _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
+            if (!this.styles[lineIndex]) {
+                fabric.Text.prototype._setSVGTextLineText.call(this, lineIndex, textSpans, height, textLeftOffset, textTopOffset);
+            } else {
+                this._setSVGTextLineChars(lineIndex, textSpans, height, textLeftOffset, textBgRects);
+            }
+        },
+        _setSVGTextLineChars: function(lineIndex, textSpans, height, textLeftOffset, textBgRects) {
+            var chars = this._textLines[lineIndex], charOffset = 0, lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) - this.width / 2, lineOffset = this._getSVGLineTopOffset(lineIndex), heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+            for (var i = 0, len = chars.length; i < len; i++) {
+                var styleDecl = this.styles[lineIndex][i] || {};
+                textSpans.push(this._createTextCharSpan(chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
+                var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
+                if (styleDecl.textBackgroundColor) {
+                    textBgRects.push(this._createTextCharBg(styleDecl, lineLeftOffset, lineOffset.lineTop, heightOfLine, charWidth, charOffset));
+                }
+                charOffset += charWidth;
+            }
+        },
+        _getSVGLineTopOffset: function(lineIndex) {
+            var lineTopOffset = 0, lastHeight = 0;
+            for (var j = 0; j < lineIndex; j++) {
+                lineTopOffset += this._getHeightOfLine(this.ctx, j);
+            }
+            lastHeight = this._getHeightOfLine(this.ctx, j);
+            return {
+                lineTop: lineTopOffset,
+                offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
+            };
+        },
+        _createTextCharBg: function(styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset) {
+            return [ '<rect fill="', styleDecl.textBackgroundColor, '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS), '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS), '"></rect>' ].join("");
+        },
+        _createTextCharSpan: function(_char, styleDecl, lineLeftOffset, lineTopOffset, charOffset) {
+            var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
+                visible: true,
+                fill: this.fill,
+                stroke: this.stroke,
+                type: "text",
+                getSvgFilter: fabric.Object.prototype.getSvgFilter
+            }, styleDecl));
+            return [ '<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" ', styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, "'") + '" ' : "", styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : "", styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : "", styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : "", styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : "", 'style="', fillStyles, '">', fabric.util.string.escapeXml(_char), "</tspan>" ].join("");
+        }
+    });
+})();
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), clone = fabric.util.object.clone;
+    fabric.Textbox = fabric.util.createClass(fabric.IText, fabric.Observable, {
+        type: "textbox",
+        minWidth: 20,
+        dynamicMinWidth: 0,
+        __cachedLines: null,
+        initialize: function(text, options) {
+            this.ctx = fabric.util.createCanvasElement().getContext("2d");
+            this.callSuper("initialize", text, options);
+            this.set({
+                lockUniScaling: false,
+                lockScalingY: true,
+                lockScalingFlip: true,
+                hasBorders: true
+            });
+            this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+            this._dimensionAffectingProps.width = true;
+        },
+        _initDimensions: function(ctx) {
+            if (this.__skipDimension) {
+                return;
+            }
+            if (!ctx) {
+                ctx = fabric.util.createCanvasElement().getContext("2d");
+                this._setTextStyles(ctx);
+            }
+            this.dynamicMinWidth = 0;
+            this._textLines = this._splitTextIntoLines();
+            if (this.dynamicMinWidth > this.width) {
+                this._set("width", this.dynamicMinWidth);
+            }
+            this._clearCache();
+            this.height = this._getTextHeight(ctx);
+        },
+        _generateStyleMap: function() {
+            var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
+            for (var i = 0; i < this._textLines.length; i++) {
+                if (this.text[charCount] === "\n") {
+                    realLineCharCount = 0;
+                    charCount++;
+                    realLineCount++;
+                } else if (this.text[charCount] === " ") {
+                    realLineCharCount++;
+                    charCount++;
+                }
+                map[i] = {
+                    line: realLineCount,
+                    offset: realLineCharCount
+                };
+                charCount += this._textLines[i].length;
+                realLineCharCount += this._textLines[i].length;
+            }
+            return map;
+        },
+        _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
+            if (this._styleMap) {
+                var map = this._styleMap[lineIndex];
+                if (!map) {
+                    return returnCloneOrEmpty ? {} : null;
+                }
+                lineIndex = map.line;
+                charIndex = map.offset + charIndex;
+            }
+            return this.callSuper("_getStyleDeclaration", lineIndex, charIndex, returnCloneOrEmpty);
+        },
+        _setStyleDeclaration: function(lineIndex, charIndex, style) {
+            var map = this._styleMap[lineIndex];
+            lineIndex = map.line;
+            charIndex = map.offset + charIndex;
+            this.styles[lineIndex][charIndex] = style;
+        },
+        _deleteStyleDeclaration: function(lineIndex, charIndex) {
+            var map = this._styleMap[lineIndex];
+            lineIndex = map.line;
+            charIndex = map.offset + charIndex;
+            delete this.styles[lineIndex][charIndex];
+        },
+        _getLineStyle: function(lineIndex) {
+            var map = this._styleMap[lineIndex];
+            return this.styles[map.line];
+        },
+        _setLineStyle: function(lineIndex, style) {
+            var map = this._styleMap[lineIndex];
+            this.styles[map.line] = style;
+        },
+        _deleteLineStyle: function(lineIndex) {
+            var map = this._styleMap[lineIndex];
+            delete this.styles[map.line];
+        },
+        _wrapText: function(ctx, text) {
+            var lines = text.split(this._reNewline), wrapped = [], i;
+            for (i = 0; i < lines.length; i++) {
+                wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
+            }
+            return wrapped;
+        },
+        _measureText: function(ctx, text, lineIndex, charOffset) {
+            var width = 0;
+            charOffset = charOffset || 0;
+            for (var i = 0, len = text.length; i < len; i++) {
+                width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
+            }
+            return width;
+        },
+        _wrapLine: function(ctx, text, lineIndex) {
+            var lineWidth = 0, lines = [], line = "", words = text.split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0;
+            for (var i = 0; i < words.length; i++) {
+                word = words[i];
+                wordWidth = this._measureText(ctx, word, lineIndex, offset);
+                offset += word.length;
+                lineWidth += infixWidth + wordWidth;
+                if (lineWidth >= this.width && line !== "") {
+                    lines.push(line);
+                    line = "";
+                    lineWidth = wordWidth;
+                }
+                if (line !== "" || i === 1) {
+                    line += infix;
+                }
+                line += word;
+                infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+                offset++;
+                if (wordWidth > largestWordWidth) {
+                    largestWordWidth = wordWidth;
+                }
+            }
+            i && lines.push(line);
+            if (largestWordWidth > this.dynamicMinWidth) {
+                this.dynamicMinWidth = largestWordWidth;
+            }
+            return lines;
+        },
+        _splitTextIntoLines: function() {
+            var originalAlign = this.textAlign;
+            this.ctx.save();
+            this._setTextStyles(this.ctx);
+            this.textAlign = "left";
+            var lines = this._wrapText(this.ctx, this.text);
+            this.textAlign = originalAlign;
+            this.ctx.restore();
+            this._textLines = lines;
+            this._styleMap = this._generateStyleMap();
+            return lines;
+        },
+        setOnGroup: function(key, value) {
+            if (key === "scaleX") {
+                this.set("scaleX", Math.abs(1 / value));
+                this.set("width", this.get("width") * value / (typeof this.__oldScaleX === "undefined" ? 1 : this.__oldScaleX));
+                this.__oldScaleX = value;
+            }
+        },
+        get2DCursorLocation: function(selectionStart) {
+            if (typeof selectionStart === "undefined") {
+                selectionStart = this.selectionStart;
+            }
+            var numLines = this._textLines.length, removed = 0;
+            for (var i = 0; i < numLines; i++) {
+                var line = this._textLines[i], lineLen = line.length;
+                if (selectionStart <= removed + lineLen) {
+                    return {
+                        lineIndex: i,
+                        charIndex: selectionStart - removed
+                    };
+                }
+                removed += lineLen;
+                if (this.text[removed] === "\n" || this.text[removed] === " ") {
+                    removed++;
+                }
+            }
+            return {
+                lineIndex: numLines - 1,
+                charIndex: this._textLines[numLines - 1].length
+            };
+        },
+        _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+            var topOffset = 0, leftOffset = 0, cursorLocation = this.get2DCursorLocation(), lineChars = this._textLines[cursorLocation.lineIndex].split(""), lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, cursorLocation.lineIndex));
+            for (var i = 0; i < cursorLocation.charIndex; i++) {
+                leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
+            }
+            for (i = 0; i < cursorLocation.lineIndex; i++) {
+                topOffset += this._getHeightOfLine(this.ctx, i);
+            }
+            if (typeOfBoundaries === "cursor") {
+                topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, cursorLocation.lineIndex) / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex) * (1 - this._fontSizeFraction);
+            }
+            return {
+                top: topOffset,
+                left: leftOffset,
+                lineLeft: lineLeftOffset
+            };
+        },
+        getMinWidth: function() {
+            return Math.max(this.minWidth, this.dynamicMinWidth);
+        },
+        toObject: function(propertiesToInclude) {
+            return fabric.util.object.extend(this.callSuper("toObject", propertiesToInclude), {
+                minWidth: this.minWidth
+            });
+        }
+    });
+    fabric.Textbox.fromObject = function(object) {
+        return new fabric.Textbox(object.text, clone(object));
+    };
+    fabric.Textbox.getTextboxControlVisibility = function() {
+        return {
+            tl: false,
+            tr: false,
+            br: false,
+            bl: false,
+            ml: true,
+            mt: false,
+            mr: true,
+            mb: false,
+            mtr: true
+        };
+    };
+    fabric.Textbox.instances = [];
+})(typeof exports !== "undefined" ? exports : this);
+
+(function() {
+    var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
+    fabric.Canvas.prototype._setObjectScale = function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, _dim) {
+        var t = transform.target;
+        if (t instanceof fabric.Textbox) {
+            var w = t.width * (localMouse.x / transform.scaleX / (t.width + t.strokeWidth));
+            if (w >= t.getMinWidth()) {
+                t.set("width", w);
+            }
+        } else {
+            setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, _dim);
+        }
+    };
+    fabric.Group.prototype._refreshControlsVisibility = function() {
+        if (typeof fabric.Textbox === "undefined") {
+            return;
+        }
+        for (var i = this._objects.length; i--; ) {
+            if (this._objects[i] instanceof fabric.Textbox) {
+                this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+                return;
+            }
+        }
+    };
+    var clone = fabric.util.object.clone;
+    fabric.util.object.extend(fabric.Textbox.prototype, {
+        _removeExtraneousStyles: function() {
+            for (var prop in this._styleMap) {
+                if (!this._textLines[prop]) {
+                    delete this.styles[this._styleMap[prop].line];
+                }
+            }
+        },
+        insertCharStyleObject: function(lineIndex, charIndex, style) {
+            var map = this._styleMap[lineIndex];
+            lineIndex = map.line;
+            charIndex = map.offset + charIndex;
+            fabric.IText.prototype.insertCharStyleObject.apply(this, [ lineIndex, charIndex, style ]);
+        },
+        insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+            var map = this._styleMap[lineIndex];
+            lineIndex = map.line;
+            charIndex = map.offset + charIndex;
+            fabric.IText.prototype.insertNewlineStyleObject.apply(this, [ lineIndex, charIndex, isEndOfLine ]);
+        },
+        shiftLineStyles: function(lineIndex, offset) {
+            var clonedStyles = clone(this.styles), map = this._styleMap[lineIndex];
+            lineIndex = map.line;
+            for (var line in this.styles) {
+                var numericLine = parseInt(line, 10);
+                if (numericLine > lineIndex) {
+                    this.styles[numericLine + offset] = clonedStyles[numericLine];
+                    if (!clonedStyles[numericLine - offset]) {
+                        delete this.styles[numericLine];
+                    }
+                }
+            }
+        },
+        _getTextOnPreviousLine: function(lIndex) {
+            var textOnPreviousLine = this._textLines[lIndex - 1];
+            while (this._styleMap[lIndex - 2] && this._styleMap[lIndex - 2].line === this._styleMap[lIndex - 1].line) {
+                textOnPreviousLine = this._textLines[lIndex - 2] + textOnPreviousLine;
+                lIndex--;
+            }
+            return textOnPreviousLine;
+        },
+        removeStyleObject: function(isBeginningOfLine, index) {
+            var cursorLocation = this.get2DCursorLocation(index), map = this._styleMap[cursorLocation.lineIndex], lineIndex = map.line, charIndex = map.offset + cursorLocation.charIndex;
+            this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
+        }
+    });
+})();
+
+(function() {
+    var override = fabric.IText.prototype._getNewSelectionStartFromOffset;
+    fabric.IText.prototype._getNewSelectionStartFromOffset = function(mouseOffset, prevWidth, width, index, jlen) {
+        index = override.call(this, mouseOffset, prevWidth, width, index, jlen);
+        var tmp = 0, removed = 0;
+        for (var i = 0; i < this._textLines.length; i++) {
+            tmp += this._textLines[i].length;
+            if (tmp + removed >= index) {
+                break;
+            }
+            if (this.text[tmp + removed] === "\n" || this.text[tmp + removed] === " ") {
+                removed++;
+            }
+        }
+        return index - i + removed;
+    };
+})();
+
+(function() {
+    if (typeof document !== "undefined" && typeof window !== "undefined") {
+        return;
+    }
+    var DOMParser = require("xmldom").DOMParser, URL = require("url"), HTTP = require("http"), HTTPS = require("https"), Canvas = require("canvas"), Image = require("canvas").Image;
+    function request(url, encoding, callback) {
+        var oURL = URL.parse(url);
+        if (!oURL.port) {
+            oURL.port = oURL.protocol.indexOf("https:") === 0 ? 443 : 80;
+        }
+        var reqHandler = oURL.protocol.indexOf("https:") === 0 ? HTTPS : HTTP, req = reqHandler.request({
+            hostname: oURL.hostname,
+            port: oURL.port,
+            path: oURL.path,
+            method: "GET"
+        }, function(response) {
+            var body = "";
+            if (encoding) {
+                response.setEncoding(encoding);
+            }
+            response.on("end", function() {
+                callback(body);
+            });
+            response.on("data", function(chunk) {
+                if (response.statusCode === 200) {
+                    body += chunk;
+                }
+            });
+        });
+        req.on("error", function(err) {
+            if (err.errno === process.ECONNREFUSED) {
+                fabric.log("ECONNREFUSED: connection refused to " + oURL.hostname + ":" + oURL.port);
+            } else {
+                fabric.log(err.message);
+            }
+            callback(null);
+        });
+        req.end();
+    }
+    function requestFs(path, callback) {
+        var fs = require("fs");
+        fs.readFile(path, function(err, data) {
+            if (err) {
+                fabric.log(err);
+                throw err;
+            } else {
+                callback(data);
+            }
+        });
+    }
+    fabric.util.loadImage = function(url, callback, context) {
+        function createImageAndCallBack(data) {
+            if (data) {
+                img.src = new Buffer(data, "binary");
+                img._src = url;
+                callback && callback.call(context, img);
+            } else {
+                img = null;
+                callback && callback.call(context, null, true);
+            }
+        }
+        var img = new Image();
+        if (url && (url instanceof Buffer || url.indexOf("data") === 0)) {
+            img.src = img._src = url;
+            callback && callback.call(context, img);
+        } else if (url && url.indexOf("http") !== 0) {
+            requestFs(url, createImageAndCallBack);
+        } else if (url) {
+            request(url, "binary", createImageAndCallBack);
+        } else {
+            callback && callback.call(context, url);
+        }
+    };
+    fabric.loadSVGFromURL = function(url, callback, reviver) {
+        url = url.replace(/^\n\s*/, "").replace(/\?.*$/, "").trim();
+        if (url.indexOf("http") !== 0) {
+            requestFs(url, function(body) {
+                fabric.loadSVGFromString(body.toString(), callback, reviver);
+            });
+        } else {
+            request(url, "", function(body) {
+                fabric.loadSVGFromString(body, callback, reviver);
+            });
+        }
+    };
+    fabric.loadSVGFromString = function(string, callback, reviver) {
+        var doc = new DOMParser().parseFromString(string);
+        fabric.parseSVGDocument(doc.documentElement, function(results, options) {
+            callback && callback(results, options);
+        }, reviver);
+    };
+    fabric.util.getScript = function(url, callback) {
+        request(url, "", function(body) {
+            eval(body);
+            callback && callback();
+        });
+    };
+    fabric.Image.fromObject = function(object, callback) {
+        fabric.util.loadImage(object.src, function(img) {
+            var oImg = new fabric.Image(img);
+            oImg._initConfig(object);
+            oImg._initFilters(object.filters, function(filters) {
+                oImg.filters = filters || [];
+                oImg._initFilters(object.resizeFilters, function(resizeFilters) {
+                    oImg.resizeFilters = resizeFilters || [];
+                    callback && callback(oImg);
+                });
+            });
+        });
+    };
+    fabric.createCanvasForNode = function(width, height, options, nodeCanvasOptions) {
+        nodeCanvasOptions = nodeCanvasOptions || options;
+        var canvasEl = fabric.document.createElement("canvas"), nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
+        canvasEl.style = {};
+        canvasEl.width = nodeCanvas.width;
+        canvasEl.height = nodeCanvas.height;
+        var FabricCanvas = fabric.Canvas || fabric.StaticCanvas, fabricCanvas = new FabricCanvas(canvasEl, options);
+        fabricCanvas.contextContainer = nodeCanvas.getContext("2d");
+        fabricCanvas.nodeCanvas = nodeCanvas;
+        fabricCanvas.Font = Canvas.Font;
+        return fabricCanvas;
+    };
+    fabric.StaticCanvas.prototype.createPNGStream = function() {
+        return this.nodeCanvas.createPNGStream();
+    };
+    fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+        return this.nodeCanvas.createJPEGStream(opts);
+    };
+    var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
+    fabric.StaticCanvas.prototype.setWidth = function(width, options) {
+        origSetWidth.call(this, width, options);
+        this.nodeCanvas.width = width;
+        return this;
+    };
+    if (fabric.Canvas) {
+        fabric.Canvas.prototype.setWidth = fabric.StaticCanvas.prototype.setWidth;
+    }
+    var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
+    fabric.StaticCanvas.prototype.setHeight = function(height, options) {
+        origSetHeight.call(this, height, options);
+        this.nodeCanvas.height = height;
+        return this;
+    };
+    if (fabric.Canvas) {
+        fabric.Canvas.prototype.setHeight = fabric.StaticCanvas.prototype.setHeight;
+    }
+})();
 
 window.fabric = fabric;
 
