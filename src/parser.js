@@ -130,12 +130,16 @@
    */
   fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
-      var angle = args[0];
+      var angle = args[0],
+          x = (args.length === 3) ? args[1] : 0,
+          y = (args.length === 3) ? args[2] : 0;
 
       matrix[0] = Math.cos(angle);
       matrix[1] = Math.sin(angle);
       matrix[2] = -Math.sin(angle);
       matrix[3] = Math.cos(angle);
+      matrix[4] = x - (matrix[0] * x + matrix[2] * y);
+      matrix[5] = y - (matrix[1] * x + matrix[3] * y);
     }
 
     function scaleMatrix(matrix, args) {
