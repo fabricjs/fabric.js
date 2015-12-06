@@ -209,7 +209,8 @@
      */
     delegatedProperties: {
       fill:             true,
-      opacity:          true,
+      stroke:           true,
+      strokeWidth:      true,
       fontFamily:       true,
       fontWeight:       true,
       fontSize:         true,
