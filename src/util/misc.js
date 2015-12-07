@@ -98,7 +98,7 @@
         y: ry
       };
     },
-    
+
     /**
      * Apply transform t to point p
      * @static
