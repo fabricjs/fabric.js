@@ -74,11 +74,29 @@
      */
     rotatePoint: function(point, origin, radians) {
       point.subtractEquals(origin);
+      var v = fabric.util.rotateVector(point, radians);
+      return new fabric.Point(v.x, v.y).addEquals(origin);
+    },
+
+    /**
+     * Rotates `vector` with `radians`
+     * @static
+     * @memberOf fabric.util
+     * @param {Object} vector The vector to rotate
+     * @param {Object.x} x coordinate of vector
+     * @param {Object.y} y coordinate of vector
+     * @param {Number} radians The radians of the angle for the rotation
+     * @return {Object} The new rotated point
+     */
+    rotateVector: function(vector, radians) {
       var sin = Math.sin(radians),
           cos = Math.cos(radians),
-          rx = point.x * cos - point.y * sin,
-          ry = point.x * sin + point.y * cos;
-      return new fabric.Point(rx, ry).addEquals(origin);
+          rx = vector.x * cos - vector.y * sin,
+          ry = vector.x * sin + vector.y * cos;
+      return {
+        x: rx, 
+        y: ry
+      };
     },
 
     /**

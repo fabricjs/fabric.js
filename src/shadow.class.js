@@ -111,13 +111,15 @@
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var fBoxX = 40, fBoxY = 40;
+      var fBoxX = 40, fBoxY = 40,
+          offset = fabric.util.rotateVector({x: this.offsetX, y: this.offsetY},
+            fabric.util.degreesToRadians(-object.angle));
 
       if (object.width && object.height) {
         //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
         // we add some extra space to filter box to contain the blur ( 20 )
-        fBoxX = toFixed((Math.abs(this.offsetX) + this.blur) / object.width, 2) * 100 + 20;
-        fBoxY = toFixed((Math.abs(this.offsetY) + this.blur) / object.height, 2) * 100 + 20;
+        fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, 2) * 100 + 20;
+        fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, 2) * 100 + 20;
       }
 
       return (
@@ -125,7 +127,7 @@
           'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
           '\t<feGaussianBlur in="SourceAlpha" stdDeviation="' +
             toFixed(this.blur ? this.blur / 2 : 0, 3) + '"></feGaussianBlur>\n' +
-          '\t<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '" result="oBlur" ></feOffset>\n' +
+          '\t<feOffset dx="' + offset.x + '" dy="' + offset.y + '" result="oBlur" ></feOffset>\n' +
           '\t<feFlood flood-color="' + this.color + '"/>\n' +
           '\t<feComposite in2="oBlur" operator="in" />\n' +
           '\t<feMerge>\n' +
