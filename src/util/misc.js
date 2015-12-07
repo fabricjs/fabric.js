@@ -74,7 +74,7 @@
      */
     rotatePoint: function(point, origin, radians) {
       point.subtractEquals(origin);
-      var v = rotateVector(point);
+      var v = fabric.util.rotateVector(point);
       return new fabric.Point(v.x, v.y).addEquals(origin);
     },
 
