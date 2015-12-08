@@ -926,7 +926,8 @@
 
     _setSVGTextLineText: function(i, textSpans, height, textLeftOffset, textTopOffset) {
       var yPos = this.fontSize * (this._fontSizeMult - this._fontSizeFraction)
-        - textTopOffset + height - this.height / 2;
+        - textTopOffset + height - this.height / 2,
+          textLine = this.textAlign === 'justify' ? this._setSVGTextLineWords(i) : fabric.util.string.escapeXml(._textLines[i]);
       textSpans.push(
         '<tspan x="',
           toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
@@ -936,7 +937,7 @@
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
-          fabric.util.string.escapeXml(this._textLines[i]),
+          textLine,
         '</tspan>'
       );
     },
