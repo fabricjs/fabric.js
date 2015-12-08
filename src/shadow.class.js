@@ -3,8 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
-      NUM_FRACTION_DIGIT = fabric.Object.NUM_FRACTION_DIGITS;
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Shadow) {
     fabric.warn('fabric.Shadow is already defined.');
@@ -112,24 +111,24 @@
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var fBoxX = 40, fBoxY = 40,
+      var fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
           offset = fabric.util.rotateVector({x: this.offsetX, y: this.offsetY},
             fabric.util.degreesToRadians(-object.angle));
 
       if (object.width && object.height) {
         //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
         // we add some extra space to filter box to contain the blur ( 20 )
-        fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, NUM_FRACTION_DIGIT) * 100 + 20;
-        fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, NUM_FRACTION_DIGIT) * 100 + 20;
+        fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, NUM_FRACTION_DIGITS) * 100 + 20;
+        fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, NUM_FRACTION_DIGITS) * 100 + 20;
       }
 
       return (
         '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' +
           'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
           '\t<feGaussianBlur in="SourceAlpha" stdDeviation="' +
-            toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGIT) + '"></feGaussianBlur>\n' +
-          '\t<feOffset dx="' + toFixed(offset.x, NUM_FRACTION_DIGIT) +
-          '" dy="' + toFixed(offset.y, NUM_FRACTION_DIGIT) + '" result="oBlur" ></feOffset>\n' +
+            toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGITS) + '"></feGaussianBlur>\n' +
+          '\t<feOffset dx="' + toFixed(offset.x, NUM_FRACTION_DIGITS) +
+          '" dy="' + toFixed(offset.y, NUM_FRACTION_DIGITS) + '" result="oBlur" ></feOffset>\n' +
           '\t<feFlood flood-color="' + this.color + '"/>\n' +
           '\t<feComposite in2="oBlur" operator="in" />\n' +
           '\t<feMerge>\n' +
