@@ -479,11 +479,12 @@
 
       // stretch the line
       var words = line.split(/\s+/),
-          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          charOffset = 0,
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
           widthDiff = this.width - wordsWidth,
           numSpaces = words.length - 1,
           spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
-          leftOffset = 0, charOffset = 0, word;
+          leftOffset = 0, word;
 
       for (var i = 0, len = words.length; i < len; i++) {
         while (line[charOffset] === ' ' && charOffset < line.length) {
@@ -491,7 +492,7 @@
         }
         word = words[i];
         this._renderChars(method, ctx, word, left + leftOffset, top, lineIndex, charOffset);
-        leftOffset += ctx.measureText(word).width + spaceWidth;
+        leftOffset += this._getWidthOfWords(ctx, word, lineIndex, charOffset) + spaceWidth;
         charOffset += word.length;
       }
     },
@@ -889,9 +890,9 @@
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
-            'style="', this.getSvgStyles(), '" >',
+            'style="', this.getSvgStyles(), '" >\n',
             textAndBg.textSpans.join(''),
-          '</text>\n',
+          '\t\t</text>\n',
         '\t</g>\n'
       );
     },
@@ -929,11 +930,11 @@
         - textTopOffset + height - this.height / 2;
       if (this.textAlign === 'justify') {
         // i call from here to do not intefere with IText
-        this.setSVGTextLineJustifed(i, textSpans, height, textLeftOffset, textTopOffset);
+        this._setSVGTextLineJustifed(i, textSpans, height, textLeftOffset, textTopOffset);
         return;
       }
       textSpans.push(
-        '<tspan x="',
+        '\t\t<tspan x="',
           toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
           'y="',
           toFixed(yPos, NUM_FRACTION_DIGITS),
@@ -942,11 +943,21 @@
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
           fabric.util.string.escapeXml(this._textLines[i]),
-        '</tspan>'
+        '</tspan>\n'
       );
     },
 
-    setSVGTextLineJustifed: function(i, textSpans, height, textLeftOffset, textTopOffset) {
+    _setSVGTextLineJustifed: function(i, textSpans, height, textLeftOffset, textTopOffset) {
+      var ctx = fabric.util.createCanvasElement().getContext('2d');
+          this._setTextStyles(ctx);
+          line = this._textLines[i],
+          words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, i),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
+          word;
+          
       textSpans.push('justified');
     },
 
