@@ -1008,7 +1008,7 @@
         return this.__widthOfSpace[lineIndex];
       }
       var line = this._textLines[lineIndex],
-          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
           widthDiff = this.width - wordsWidth,
           numSpaces = line.length - line.replace(this._reSpacesAndTabs, '').length,
           width = widthDiff / numSpaces;
@@ -1022,14 +1022,14 @@
      * @param {Number} line
      * @param {Number} lineIndex
      */
-    _getWidthOfWords: function (ctx, line, lineIndex) {
+    _getWidthOfWords: function (ctx, line, lineIndex, charOffset) {
       var width = 0;
 
       for (var charIndex = 0; charIndex < line.length; charIndex++) {
         var _char = line[charIndex];
 
         if (!_char.match(/\s/)) {
-          width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
+          width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex + charOffset);
         }
       }
 
