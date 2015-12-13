@@ -97,7 +97,7 @@
 
       for (var y = 0; y < sh; y++) {
         for (var x = 0; x < sw; x++) {
-          dstOff = (y * sh + x) * 4;
+          dstOff = (y * sw + x) * 4;
               // calculate the weighed sum of the source image pixels that
               // fall under the convolution matrix
           r = 0; g = 0; b = 0; a = 0;
