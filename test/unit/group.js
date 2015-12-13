@@ -127,7 +127,7 @@
 
     equal(group.set('opacity', 0.12345), group, 'should be chainable');
     equal(group.get('opacity'), 0.12345, 'group\'s "own" property should be set properly');
-    equal(firstObject.get('opacity'), 0.12345, 'objects\' value should be set properly');
+    equal(firstObject.get('opacity'), 1, 'objects\' value of non delegated property should stay same');
 
     group.set('left', 1234);
     equal(group.get('left'), 1234, 'group\'s own "left" property should be set properly');
