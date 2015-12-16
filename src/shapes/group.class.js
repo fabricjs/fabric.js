@@ -57,7 +57,6 @@
      */
     initialize: function(objects, options, isAlreadyGrouped) {
       options = options || { };
-
       this._objects = [];
       // if objects enclosed in a group have been grouped already,
       // we cannot change properties of objects.
@@ -89,7 +88,6 @@
         this._updateObjectsCoords();
         this.callSuper('initialize', options);
       }
-
       this.setCoords();
       this.saveCoords();
     },
@@ -99,8 +97,9 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsCoords: function(skipCoordsChange) {
+      var center = this.getCenterPoint();
       for (var i = this._objects.length; i--; ){
-        this._updateObjectCoords(this._objects[i], skipCoordsChange);
+        this._updateObjectCoords(this._objects[i], skipCoordsChange, center);
       }
     },
 
@@ -109,7 +108,7 @@
      * @param {Object} object
      * @param {Boolean} [skipCoordsChange] if true, coordinates of object dose not change
      */
-    _updateObjectCoords: function(object, skipCoordsChange) {
+    _updateObjectCoords: function(object, skipCoordsChange, center) {
       // do not display corners of objects enclosed in a group
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
@@ -119,12 +118,9 @@
       }
 
       var objectLeft = object.getLeft(),
-          objectTop = object.getTop(),
-          center = this.getCenterPoint();
+          objectTop = object.getTop();
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
@@ -263,9 +259,6 @@
       }
 
       ctx.save();
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this.transform(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);

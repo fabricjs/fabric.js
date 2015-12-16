@@ -104,9 +104,6 @@
 
       ctx.save();
 
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this.transform(ctx);
 
       this._setShadow(ctx);

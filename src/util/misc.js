@@ -353,14 +353,9 @@
      * @param {Object} [options] Options object
      * @return {fabric.Object|fabric.PathGroup}
      */
-    groupSVGElements: function(elements, options, path) {
+    groupSVGElements: function(elements, options) {
       var object;
-
       object = new fabric.PathGroup(elements, options);
-
-      if (typeof path !== 'undefined') {
-        object.setSourcePath(path);
-      }
       return object;
     },
 
@@ -524,16 +519,13 @@
      * @return {Object} Components of transform
      */
     qrDecompose: function(a) {
-      var angle = atan(a[1] / a[0]) / PiBy180,
+      var angle = atan2(a[1], a[0]);
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
-          skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
-      if (a[0] < 0) {
-        angle += 180;
-      }
+          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
-        angle: angle,
+        angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,

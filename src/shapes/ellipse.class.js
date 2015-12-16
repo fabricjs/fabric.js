@@ -115,10 +115,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
-      if (this.group && this.group.type === 'path-group') {
-        x = this.left + this.rx;
-        y = this.top + this.ry;
-      }
+
       markup.push(
         '<ellipse ',
           'cx="', x, '" cy="', y, '" ',
@@ -137,19 +134,12 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(
-        noTransform ? this.left + this.rx : 0,
-        noTransform ? (this.top + this.ry) * this.rx/this.ry : 0,
-        this.rx,
-        0,
-        piBy2,
-        false);
+      ctx.arc(0, 0, this.rx, 0, piBy2, false);
       ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);

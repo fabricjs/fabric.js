@@ -803,15 +803,7 @@
       if (this._shouldClearCache()) {
         this._initDimensions(ctx);
       }
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(this.left, this.top);
-      }
+      this.transform(ctx);
       this._render(ctx);
       ctx.restore();
     },
@@ -871,8 +863,8 @@
           textTop = 0;
 
       return {
-        textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
-        textTop: textTop + (this.group && this.group.type === 'path-group' ? -this.top : 0),
+        textLeft: textLeft,
+        textTop: textTop,
         lineTop: lineTop
       };
     },

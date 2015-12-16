@@ -174,14 +174,12 @@
         return a.offset - b.offset;
       });
 
-      if (!(object.group && object.group.type === 'path-group')) {
-        for (var prop in coords) {
-          if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-            coords[prop] += this.offsetX - object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += this.offsetY - object.height / 2;
-          }
+      for (var prop in coords) {
+        if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+          coords[prop] += this.offsetX - object.width / 2;
+        }
+        else if (prop === 'y1' || prop === 'y2') {
+          coords[prop] += this.offsetY - object.height / 2;
         }
       }
 
@@ -242,30 +240,22 @@
      * @return {CanvasGradient}
      */
     toLive: function(ctx, object) {
-      var gradient, prop, coords = fabric.util.object.clone(this.coords);
+      var coords = fabric.util.object.clone(this.coords),
+          gradient, props, scaleFactor = 1;
 
       if (!this.type) {
         return;
       }
-
-      if (object.group && object.group.type === 'path-group') {
-        for (prop in coords) {
-          if (prop === 'x1' || prop === 'x2') {
-            coords[prop] += -this.offsetX + object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += -this.offsetY + object.height / 2;
-          }
-        }
+      if (object.type === 'ellipse') {
+        scaleFactor = object.ry / object.rx;
       }
-
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(
           coords.x1, coords.y1, coords.x2, coords.y2);
       }
       else if (this.type === 'radial') {
         gradient = ctx.createRadialGradient(
-          coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+          coords.x1, coords.y1 * scaleFactor, coords.r1, coords.x2, coords.y2 * scaleFactor, coords.r2);
       }
 
       for (var i = 0, len = this.colorStops.length; i < len; i++) {
@@ -336,7 +326,7 @@
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
           gradientTransform = el.getAttribute('gradientTransform'),
           colorStops = [],
-          coords = { }, ellipseMatrix;
+          coords = { }, scaleFactor;
 
       if (type === 'linear') {
         coords = getLinearCoords(el);
@@ -349,19 +339,20 @@
         colorStops.push(getColorStop(colorStopEls[i]));
       }
 
-      ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);
+      scaleFactor = _convertPercentUnitsToValues(instance, coords, gradientUnits);
+      if (gradientTransform || scaleFactor !== 1) {
+        gradientTransform = fabric.parseTransformAttribute((gradientTransform || '') +  ' scale(1, ' + scaleFactor + ')');
+      }
 
       var gradient = new fabric.Gradient({
         type: type,
         coords: coords,
         colorStops: colorStops,
         offsetX: -instance.left,
-        offsetY: -instance.top
+        offsetY: -instance.top,
+        gradientTransform: gradientTransform 
       });
 
-      if (gradientTransform || ellipseMatrix !== '') {
-        gradient.gradientTransform = fabric.parseTransformAttribute((gradientTransform || '') + ellipseMatrix);
-      }
       return gradient;
     },
     /* _FROM_SVG_END_ */
@@ -384,7 +375,7 @@
    * @private
    */
   function _convertPercentUnitsToValues(object, options, gradientUnits) {
-    var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = '';
+    var propValue, addFactor = 0, multFactor = 1, scaleFactor = 1;
     for (var prop in options) {
       propValue = parseFloat(options[prop], 10);
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
@@ -401,6 +392,7 @@
         multFactor *= gradientUnits === 'objectBoundingBox' ? object.height : 1;
         addFactor = gradientUnits === 'objectBoundingBox' ? object.top || 0 : 0;
       }
+
       options[prop] = propValue * multFactor + addFactor;
     }
     if (object.type === 'ellipse' &&
@@ -408,8 +400,7 @@
         gradientUnits === 'objectBoundingBox' &&
         object.rx !== object.ry) {
 
-      var scaleFactor = object.ry/object.rx;
-      ellipseMatrix = ' scale(1, ' + scaleFactor + ')';
+      scaleFactor = object.ry/object.rx;
       if (options.y1) {
         options.y1 /= scaleFactor;
       }
@@ -417,6 +408,6 @@
         options.y2 /= scaleFactor;
       }
     }
-    return ellipseMatrix;
+    return scaleFactor;
   }
 })();

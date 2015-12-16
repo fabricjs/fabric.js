@@ -141,7 +141,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -151,15 +151,10 @@
           controlX = 0, // current control point x
           controlY = 0, // current control point y
           tempX,
-          tempY,
-          l = -this.pathOffset.x,
-          t = -this.pathOffset.y;
+          tempY;
 
-      if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
-      }
-
+      ctx.save();
+      ctx.translate(-this.pathOffset.x, -this.pathOffset.y);
       ctx.beginPath();
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -171,33 +166,33 @@
           case 'l': // lineto, relative
             x += current[1];
             y += current[2];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'h': // horizontal lineto, relative
             x += current[1];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'H': // horizontal lineto, absolute
             x = current[1];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'v': // vertical lineto, relative
             y += current[1];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'V': // verical lineto, absolute
             y = current[1];
-            ctx.lineTo(x + l, y + t);
+            ctx.lineTo(x, y);
             break;
 
           case 'm': // moveTo, relative
@@ -205,7 +200,7 @@
             y += current[2];
             subpathStartX = x;
             subpathStartY = y;
-            ctx.moveTo(x + l, y + t);
+            ctx.moveTo(x, y);
             break;
 
           case 'M': // moveTo, absolute
@@ -213,7 +208,7 @@
             y = current[2];
             subpathStartX = x;
             subpathStartY = y;
-            ctx.moveTo(x + l, y + t);
+            ctx.moveTo(x, y);
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -222,12 +217,12 @@
             controlX = x + current[3];
             controlY = y + current[4];
             ctx.bezierCurveTo(
-              x + current[1] + l, // x1
-              y + current[2] + t, // y1
-              controlX + l, // x2
-              controlY + t, // y2
-              tempX + l,
-              tempY + t
+              x + current[1], // x1
+              y + current[2], // y1
+              controlX, // x2
+              controlY, // y2
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -239,12 +234,12 @@
             controlX = current[3];
             controlY = current[4];
             ctx.bezierCurveTo(
-              current[1] + l,
-              current[2] + t,
-              controlX + l,
-              controlY + t,
-              x + l,
-              y + t
+              current[1],
+              current[2],
+              controlX,
+              controlY,
+              x,
+              y
             );
             break;
 
@@ -267,12 +262,12 @@
             }
 
             ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              x + current[1] + l,
-              y + current[2] + t,
-              tempX + l,
-              tempY + t
+              controlX,
+              controlY,
+              x + current[1],
+              y + current[2],
+              tempX,
+              tempY
             );
             // set control point to 2nd one of this command
             // "... the first control point is assumed to be
@@ -300,12 +295,12 @@
               controlY = 2 * y - controlY;
             }
             ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              current[1] + l,
-              current[2] + t,
-              tempX + l,
-              tempY + t
+              controlX,
+              controlY,
+              current[1],
+              current[2],
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -328,10 +323,10 @@
             controlY = y + current[2];
 
             ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
+              controlX,
+              controlY,
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -342,10 +337,10 @@
             tempY = current[4];
 
             ctx.quadraticCurveTo(
-              current[1] + l,
-              current[2] + t,
-              tempX + l,
-              tempY + t
+              current[1],
+              current[2],
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -372,10 +367,10 @@
             }
 
             ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
+              controlX,
+              controlY,
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -398,10 +393,10 @@
               controlY = 2 * y - controlY;
             }
             ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
+              controlX,
+              controlY,
+              tempX,
+              tempY
             );
             x = tempX;
             y = tempY;
@@ -409,14 +404,14 @@
 
           case 'a':
             // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
+            drawArc(ctx, x, y, [
               current[1],
               current[2],
               current[3],
               current[4],
               current[5],
-              current[6] + x + l,
-              current[7] + y + t
+              current[6] + x,
+              current[7] + y
             ]);
             x += current[6];
             y += current[7];
@@ -424,14 +419,14 @@
 
           case 'A':
             // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
+            drawArc(ctx, x, y, [
               current[1],
               current[2],
               current[3],
               current[4],
               current[5],
-              current[6] + l,
-              current[7] + t
+              current[6],
+              current[7]
             ]);
             x = current[6];
             y = current[7];
@@ -446,6 +441,7 @@
         }
         previous = current;
       }
+      ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },
@@ -471,9 +467,6 @@
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
-      }
-      if (this.transformMatrix) {
-        o.transformMatrix = this.transformMatrix;
       }
       return o;
     },
@@ -506,9 +499,7 @@
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-      if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      }
+      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       markup.push(
         //jscs:disable validateIndentation
         '<path ',

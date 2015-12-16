@@ -721,6 +721,30 @@
       }
     },
 
+    _removeTransformMatrix: function(addTranslate) {
+
+      var left = this.left;
+      var top = this.top;
+
+      if (this.type !== 'text' && this.type !== 'i-text') {
+        left += this.width / 2;
+        top += this.height / 2;
+      }
+
+      var matrix = fabric.util.multiplyTransformMatrices(this.transformMatrix || [1, 0, 0, 1, 0, 0], [1, 0, 0, 1, left, top]);
+      var options = fabric.util.qrDecompose(matrix);
+      this.scaleX = options.scaleX;
+      this.scaleY = options.scaleY;
+      this.angle = options.angle;
+      this.skewX = options.skewX;
+      this.skewY = 0;
+      this.flipX = false;
+      this.flipY = false;
+      var point = new fabric.Point(options.translateX, options.translateY);
+      this.setPositionByOrigin(point , 'center', 'center');
+      this.transformMatrix = null;
+    },
+
     /**
      * @private
      * @param {Object} [options] Options object
@@ -1009,7 +1033,6 @@
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
@@ -1021,14 +1044,14 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-      if (!noTransform) {
+      if (noTransform) {
+        ctx.transform.apply(ctx, this.transformMatrix || [1, 0, 0, 1, 0, 0]);
+      }
+      else {
         this.transform(ctx);
       }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
@@ -1072,10 +1095,9 @@
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform) {
+    _renderControls: function(ctx) {
+      if (!this.active) {
         return;
       }
 
@@ -1139,14 +1161,14 @@
       }
 
       ctx.save();
-      if (this.fill.gradientTransform) {
-        var g = this.fill.gradientTransform;
-        ctx.transform.apply(ctx, g);
-      }
       if (this.fill.toLive) {
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
+      }
+      if (this.fill.gradientTransform) {
+        var g = this.fill.gradientTransform;
+        ctx.transform.apply(ctx, g);
       }
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
@@ -1187,6 +1209,11 @@
         ctx.stroke();
       }
       else {
+        if (this.stroke.toLive) {
+          ctx.translate(
+            -this.width / 2 + this.stroke.offsetX || 0,
+            -this.height / 2 + this.stroke.offsetY || 0);
+        }  
         if (this.stroke.gradientTransform) {
           var g = this.stroke.gradientTransform;
           ctx.transform.apply(ctx, g);

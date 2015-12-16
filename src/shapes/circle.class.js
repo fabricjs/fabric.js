@@ -102,10 +102,6 @@
       angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
-        if (this.group && this.group.type === 'path-group') {
-          x = this.left + this.radius;
-          y = this.top + this.radius;
-        }
         markup.push(
           '<circle ',
             'cx="' + x + '" cy="' + y + '" ',
@@ -141,15 +137,10 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
-      ctx.arc(noTransform ? this.left + this.radius : 0,
-              noTransform ? this.top + this.radius : 0,
-              this.radius,
-              this.startAngle,
-              this.endAngle, false);
+      ctx.arc(0, 0, this.radius, this.startAngle, this.endAngle, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },

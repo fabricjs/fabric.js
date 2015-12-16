@@ -150,19 +150,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
-
-      if (noTransform) {
-        //  Line coords are distances from left-top of canvas to origin of line.
-        //  To render line in a path-group, we need to translate them to
-        //  distances from center of path-group to center of line.
-        var cp = this.getCenterPoint();
-        ctx.translate(
-          cp.x - this.strokeWidth / 2,
-          cp.y - this.strokeWidth / 2
-        );
-      }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
         // move from center (of virtual box) to its left/top corner
@@ -234,10 +223,7 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(),
           p = { x1: this.x1, x2: this.x2, y1: this.y1, y2: this.y2 };
-
-      if (!(this.group && this.group.type === 'path-group')) {
-        p = this.calcLinePoints();
-      }
+      p = this.calcLinePoints();
       markup.push(
         '<line ',
           'x1="', p.x1,
