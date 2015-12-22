@@ -426,6 +426,52 @@
     }
   });
 
+  test('fill-opacity attribute with fill attribute', function() {
+    var el = fabric.document.createElement(rect);
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('fill-opacity', opacityValue);
+    el.setAttribute('fill', '#FF0000');
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) * 255 + ')',
+      'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+  });
+
+  test('fill-opacity attribute without fill attribute', function() {
+    var el = fabric.document.createElement(rect);
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('fill-opacity', opacityValue);
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) * 255 + ')',
+      'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+  });
+
+  test('stroke-opacity attribute with fill attribute', function() {
+    var el = fabric.document.createElement(rect);
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('fill-opacity', opacityValue);
+    el.setAttribute('fill', '#FF0000');
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) * 255 + ')',
+      'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+  });
+
+  test('stroke-opacity attribute without fill attribute', function() {
+    var el = fabric.document.createElement(rect);
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('fill-opacity', opacityValue);
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) * 255 + ')',
+      'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+  });
+
   test('getCssRule', function() {
 
     ok(fabric.getCSSRules);
