@@ -1540,6 +1540,18 @@
       if (this.globalCompositeOperation) {
         ctx.globalCompositeOperation = this.globalCompositeOperation;
       }
+    },
+
+    /**
+     * Handles events dispatched from parent object or canvas. By default it just fires the event.
+     * Subclasses may override this function to, say, dispatch the events to their composite objects.
+     * @param {string} eventName
+     * @param e the fabric custom event
+     */
+    handleEvent: function(eventName, e) {
+      e.target = this;
+      e.currentTarget = this;
+      this.fire(eventName, e);
     }
   });
 
