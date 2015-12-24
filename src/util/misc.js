@@ -2,7 +2,6 @@
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
-      atan = Math.atan,
       pow = Math.pow,
       abs = Math.abs,
       PiBy180 = Math.PI / 180;
@@ -82,9 +81,7 @@
      * Rotates `vector` with `radians`
      * @static
      * @memberOf fabric.util
-     * @param {Object} vector The vector to rotate
-     * @param {Object.x} x coordinate of vector
-     * @param {Object.y} y coordinate of vector
+     * @param {Object} vector The vector to rotate (x and y)
      * @param {Number} radians The radians of the angle for the rotation
      * @return {Object} The new rotated point
      */
@@ -94,7 +91,7 @@
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
       return {
-        x: rx, 
+        x: rx,
         y: ry
       };
     },

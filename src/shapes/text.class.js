@@ -949,16 +949,21 @@
 
     _setSVGTextLineJustifed: function(i, textSpans, yPos, textLeftOffset) {
       var ctx = fabric.util.createCanvasElement().getContext('2d');
+
       this._setTextStyles(ctx);
+
       var line = this._textLines[i],
           words = line.split(/\s+/),
           wordsWidth = this._getWidthOfWords(ctx, line),
           widthDiff = this.width - wordsWidth,
           numSpaces = words.length - 1,
           spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
-          word, attributes = this._getFillAttributes(this.fill);
-      textLeftOffset += this._getLineLeftOffset(this._getLineWidth(ctx, i))
-      for (var i = 0, len = words.length; i < len; i++) {
+          word, attributes = this._getFillAttributes(this.fill),
+          len;
+
+      textLeftOffset += this._getLineLeftOffset(this._getLineWidth(ctx, i));
+
+      for (i = 0, len = words.length; i < len; i++) {
         word = words[i];
         textSpans.push(
           '\t\t\t<tspan x="',
@@ -974,7 +979,6 @@
         );
         textLeftOffset += this._getWidthOfWords(ctx, word) + spaceWidth;
       }
-      
     },
 
     _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
@@ -1102,7 +1106,7 @@
 
     var textContent = '';
 
-    // The XML is not properly parsed in IE9 so a workaround to get 
+    // The XML is not properly parsed in IE9 so a workaround to get
     // textContent is through firstChild.data. Another workaround would be
     // to convert XML loaded from a file to be converted using DOMParser (same way loadSVGFromString() does)
     if (!('textContent' in element)) {
@@ -1111,12 +1115,13 @@
           textContent = element.firstChild.data;
         }
       }
-    } else {
+    }
+    else {
       textContent = element.textContent;
     }
 
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
-    
+
     var text = new fabric.Text(textContent, options),
         /*
           Adjust positioning:
