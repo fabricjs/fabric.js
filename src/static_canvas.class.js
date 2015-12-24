@@ -1491,6 +1491,10 @@
     dispose: function () {
       this.clear();
       this.interactive && this.removeListeners();
+      var klass = fabric[fabric.util.string.capitalize(this.type)];
+      if (klass.activeInstance === this) {
+        klass.activeInstance = null;
+      }
       return this;
     },
 
