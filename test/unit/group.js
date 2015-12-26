@@ -515,13 +515,15 @@ test('toObject without default values', function() {
   });
 
   test('test group transformMatrix', function() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 10, height: 10, strokeWidth: 0 }),
-        rect2 = new fabric.Rect({ top: 120, left: 120, width: 10, height: 10, strokeWidth: 0 }),
+    var rect1 = new fabric.Rect({ top: 5, left: 5, width: 5, height: 5, strokeWidth: 0, fill: 'black', opacity: 1}),
+        rect2 = new fabric.Rect({ top: 15, left: 15, width: 5, height: 5, strokeWidth: 0, fill: 'black', opacity: 1}),
         group = new fabric.Group([ rect1, rect2 ]),
         ctx = canvas.contextContainer, isTransparent = fabric.util.isTransparent;
     canvas.add(group);
-    equal(isTransparent(ctx, 80, 80, 0), true);
-    equal(isTransparent(ctx, 101, 101, 0), false);
+    equal(isTransparent(ctx, 3, 3, 0), true);
+    equal(isTransparent(ctx, 8, 8, 0), false);
+    var imageData = ctx.getImageData(0, 0, (tolerance * 2) || 1, (tolerance * 2) || 1);
+    equal(imageData, [0]);
     group.transformMatrix = [1.2, 0, 0, 1.2, 1, 1];
     canvas.renderAll();
     equal(isTransparent(ctx, 101, 101, 0), true);
