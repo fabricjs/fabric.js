@@ -2,7 +2,6 @@
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
-      atan = Math.atan,
       pow = Math.pow,
       abs = Math.abs,
       PiBy180 = Math.PI / 180;
@@ -82,9 +81,7 @@
      * Rotates `vector` with `radians`
      * @static
      * @memberOf fabric.util
-     * @param {Object} vector The vector to rotate
-     * @param {Object.x} x coordinate of vector
-     * @param {Object.y} y coordinate of vector
+     * @param {Object} vector The vector to rotate (x and y)
      * @param {Number} radians The radians of the angle for the rotation
      * @return {Object} The new rotated point
      */
@@ -94,7 +91,7 @@
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
       return {
-        x: rx, 
+        x: rx,
         y: ry
       };
     },
@@ -286,7 +283,7 @@
       // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
       // see https://code.google.com/p/chromium/issues/detail?id=315152
       //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      if (url.indexOf('data') !== 0 && typeof crossOrigin !== 'undefined') {
+      if (url.indexOf('data') !== 0 && crossOrigin) {
         img.crossOrigin = crossOrigin;
       }
 
@@ -524,16 +521,13 @@
      * @return {Object} Components of transform
      */
     qrDecompose: function(a) {
-      var angle = atan(a[1] / a[0]) / PiBy180,
+      var angle = atan2(a[1], a[0]),
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
-          skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
-      if (a[0] < 0) {
-        angle += 180;
-      }
+          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
-        angle: angle,
+        angle: angle  / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
