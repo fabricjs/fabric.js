@@ -434,7 +434,7 @@
     el.setAttribute('fill', '#FF0000');
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) * 255 + ')',
+    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
       'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
   });
 
@@ -445,7 +445,7 @@
     el.setAttribute('fill-opacity', opacityValue);
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) * 255 + ')',
+    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
       'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
   });
 
@@ -457,7 +457,7 @@
     el.setAttribute('fill', '#FF0000');
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) * 255 + ')',
+    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
       'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
   });
 
@@ -468,7 +468,7 @@
     el.setAttribute('fill-opacity', opacityValue);
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) * 255 + ')',
+    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
       'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
   });
 
