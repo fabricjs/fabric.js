@@ -427,7 +427,7 @@
   });
 
   test('fill-opacity attribute with fill attribute', function() {
-    var el = fabric.document.createElement(rect);
+    var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -439,7 +439,7 @@
   });
 
   test('fill-opacity attribute without fill attribute', function() {
-    var el = fabric.document.createElement(rect);
+    var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -450,7 +450,7 @@
   });
 
   test('stroke-opacity attribute with fill attribute', function() {
-    var el = fabric.document.createElement(rect);
+    var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -462,7 +462,7 @@
   });
 
   test('stroke-opacity attribute without fill attribute', function() {
-    var el = fabric.document.createElement(rect);
+    var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
