@@ -3,7 +3,7 @@
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el);
 
   // function _createImageElement() {
   //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
@@ -515,19 +515,25 @@ test('toObject without default values', function() {
   });
 
   test('test group transformMatrix', function() {
-    var rect1 = new fabric.Rect({ top: 5, left: 5, width: 5, height: 5, strokeWidth: 0, fill: 'black', opacity: 1}),
-        rect2 = new fabric.Rect({ top: 15, left: 15, width: 5, height: 5, strokeWidth: 0, fill: 'black', opacity: 1}),
-        group = new fabric.Group([ rect1, rect2 ]),
-        ctx = canvas.contextContainer, isTransparent = fabric.util.isTransparent;
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
+        rect2 = new fabric.Rect({ top: 4, left: 4, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
+        group = new fabric.Group([ rect1, rect2 ], {opacity: 1, fill: 'blue', strokeWidth: 0}),
+        isTransparent = fabric.util.isTransparent,
+        ctx = canvas.contextContainer;
     canvas.add(group);
+    equal(canvas.enableRetinaScaling, false);
+    equal(isTransparent(ctx, 0, 0, 0), true);
+    equal(isTransparent(ctx, 1, 1, 0), false);
+    equal(isTransparent(ctx, 2, 2, 0), false);
     equal(isTransparent(ctx, 3, 3, 0), true);
-    equal(isTransparent(ctx, 8, 8, 0), false);
-    var imageData = ctx.getImageData(0, 0, (tolerance * 2) || 1, (tolerance * 2) || 1);
-    equal(imageData, [0]);
-    group.transformMatrix = [1.2, 0, 0, 1.2, 1, 1];
+    equal(isTransparent(ctx, 4, 4, 0), false);
+    group.transformMatrix = [2, 0, 0, 2, 1, 1];
     canvas.renderAll();
-    equal(isTransparent(ctx, 101, 101, 0), true);
-    equal(isTransparent(ctx, 131, 131, 0), false);
+    equal(isTransparent(ctx, 0, 0, 0), true);
+    equal(isTransparent(ctx, 1, 1, 0), true);
+    equal(isTransparent(ctx, 2, 2, 0), true);    
+    equal(isTransparent(ctx, 3, 3, 0), false);
+    equal(isTransparent(ctx, 4, 4, 0), false);
   });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),

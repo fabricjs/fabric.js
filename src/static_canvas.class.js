@@ -887,7 +887,6 @@
       }
 
       this.fire('after:render');
-      canvasToDrawOn.restore();
       return this;
     },
 
