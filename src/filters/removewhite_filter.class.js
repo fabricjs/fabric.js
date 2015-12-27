@@ -68,7 +68,7 @@
             abs(r - b) < distance &&
             abs(g - b) < distance
         ) {
-          data[i + 3] = 1;
+          data[i + 3] = 0;
         }
       }
 
