@@ -184,7 +184,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.flipX) {
         // when oject is horizontally flipped we reverse chars
         // we should reverse also style or do not revers at all.
-        this._textLines[i] = line.reverse().join('');
+        this._textLines[i] = line.split('').reverse().join('');
       }
 
       for (var j = 0, jlen = line.length; j < jlen; j++) {
