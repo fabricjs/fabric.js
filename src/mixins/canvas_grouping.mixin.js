@@ -24,18 +24,16 @@
      * @param {fabric.Object} target
      */
     _handleGrouping: function (e, target) {
-
-      if (target === this.getActiveGroup()) {
-
-        // if it's a group, find target again, this time skipping group
-        target = this.findTarget(e, true);
-
+      var activeGroup = this.getActiveGroup();
+      // if it's the activeGroup, find target again, specifiy active group objects
+      if (target === activeGroup) {
+        target = this._searchPossibleTargets(e, activeGroup._objects);
         // if even object is not found, bail out
-        if (!target || target.isType('group')) {
+        if (!target) {
           return;
         }
       }
-      if (this.getActiveGroup()) {
+      if (this.activeGroup) {
         this._updateActiveGroup(target, e);
       }
       else {
