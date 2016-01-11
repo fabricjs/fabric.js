@@ -273,21 +273,17 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-      var activeGroup = this.getActiveGroup(),
-          isObjectInGroup = (
-            activeGroup &&
-            object.type !== 'group' &&
-            activeGroup.contains(object)),
+      var group = object.group,
           lt, m;
 
-      if (isObjectInGroup) {
+      if (group) {
         m = fabric.util.multiplyTransformMatrices(
               this.viewportTransform,
-              activeGroup.calcTransformMatrix());
+              group.calcTransformMatrix());
 
         m = fabric.util.invertTransform(m);
         pointer = fabric.util.transformPoint(pointer, m , false);
-        lt = fabric.util.transformPoint(activeGroup.getCenterPoint(), m , false);
+        lt = fabric.util.transformPoint(group.getCenterPoint(), m , false);
         pointer.x -= lt.x;
         pointer.y -= lt.y;
       }
@@ -874,7 +870,7 @@
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, ActiveGroup is skipped and only objects are traversed through
      */
-    findTarget: function (e) {
+    findTarget: function (e, skipGroup) {
       if (this.skipTargetFind) {
         return;
       }
@@ -885,13 +881,11 @@
 
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-      if (activeGroup && this.containsPoint(pointer, activeGroup)) {
+      if (activeGroup && !skipGroup && this.containsPoint(pointer, activeGroup)) {
         return activeGroup;
       }
 
-      var target = this._searchPossibleTargets(pointer, this._objects);
-      this._fireOverOutEvents(target, e);
-
+      var target = this._searchPossibleTargets(e, pointer, this._objects);
       return target;
     },
 
@@ -940,16 +934,16 @@
     /**
      * @private
      */
-    _searchPossibleTargets: function(pointer, objects) {
+    _searchPossibleTargets: function(e, pointer, objects) {
 
       // Cache all targets where their bounding box contains point.
       var target,i = objects.length;
       // Do not check for currently grouped objects, since we check the parent group itself.
       // untill we call this function specifically to search inside the activeGroup
       while (i--) {
-        if ((!this._objects[i].group) && this._checkTarget(pointer, this._objects[i])) {
-          this.relatedTarget = objects[i];
+        if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
+          this._fireOverOutEvents(target, e);
           break;
         }
       }
