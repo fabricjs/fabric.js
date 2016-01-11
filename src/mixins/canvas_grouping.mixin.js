@@ -25,15 +25,16 @@
      */
     _handleGrouping: function (e, target) {
       var activeGroup = this.getActiveGroup();
-      // if it's the activeGroup, find target again, specifiy active group objects
       if (target === activeGroup) {
-        target = this._searchPossibleTargets(e, activeGroup._objects);
+        // if it's a group, find target again, specifiy active group objects
+        target = this.findTarget(e, true);
+
         // if even object is not found, bail out
         if (!target) {
           return;
         }
       }
-      if (this.activeGroup) {
+      if (activeGroup) {
         this._updateActiveGroup(target, e);
       }
       else {
