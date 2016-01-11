@@ -943,11 +943,13 @@
       while (i--) {
         if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
-          this._fireOverOutEvents(target, e);
+          if (target.type === 'group') {
+            this._searchPossibleTargets(e, pointer, target._objects);
+          }
           break;
         }
       }
-
+      this._fireOverOutEvents(target, e);
       return target;
     },
 
