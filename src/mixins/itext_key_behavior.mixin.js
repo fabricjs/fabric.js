@@ -4,17 +4,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea: function() {
-    var text = this.canvas.getActiveObject();
     // Position in the middle because we don't know where the cursor is
-    var left = text.oCoords.ml.x;
-    var top = text.oCoords.ml.y;
+    var rect = this.getBoundingRect();
+    var left = rect.left;
+    var top = rect.top + rect.height / 2;
 
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.style.cssText = 'position: absolute; left: ' + left + 'px; top: ' + top + 'px;'
                                         + 'opacity: 0; width: 0; height: 0; z-index: -999;';
-    this.canvas.contextContainer.canvas.parentNode.appendChild(this.hiddenTextarea);
+    this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
