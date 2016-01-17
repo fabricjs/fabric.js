@@ -262,8 +262,14 @@
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (pointer, target) {
-      var xy = this._normalizePointer(target, pointer);
 
+      var xy;
+      if (target.group && target.group === this.getActiveGroup()) {
+        xy = this._normalizePointer(target.group, pointer);
+      }
+      else {
+        xy = { x: pointer.x, y: pointer.y };
+      }
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
       return (target.containsPoint(xy) || target._findTargetCorner(pointer));
@@ -273,20 +279,17 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-      var group = object.group,
-          lt, m;
+      var lt, m;
 
-      if (group) {
-        m = fabric.util.multiplyTransformMatrices(
-              this.viewportTransform,
-              group.calcTransformMatrix());
+      m = fabric.util.multiplyTransformMatrices(
+            this.viewportTransform,
+            object.calcTransformMatrix());
 
-        m = fabric.util.invertTransform(m);
-        pointer = fabric.util.transformPoint(pointer, m , false);
-        lt = fabric.util.transformPoint(group.getCenterPoint(), m , false);
-        pointer.x -= lt.x;
-        pointer.y -= lt.y;
-      }
+      m = fabric.util.invertTransform(m);
+      pointer = fabric.util.transformPoint(pointer, m , false);
+      lt = fabric.util.transformPoint(object.getCenterPoint(), m , false);
+      pointer.x -= lt.x;
+      pointer.y -= lt.y;
       return { x: pointer.x, y: pointer.y };
     },
 
@@ -874,6 +877,7 @@
       if (this.skipTargetFind) {
         return;
       }
+      this.targets = [ ];
       var pointer = this.getPointer(e, true);
       if (this._isLastRenderedObject(pointer)) {
         return this.lastRenderedObjectWithControlsAboveOverlay;
@@ -884,7 +888,6 @@
       if (activeGroup && !skipGroup && this.containsPoint(pointer, activeGroup)) {
         return activeGroup;
       }
-
       var target = this._searchPossibleTargets(e, pointer, this._objects);
       return target;
     },
@@ -937,14 +940,16 @@
     _searchPossibleTargets: function(e, pointer, objects) {
 
       // Cache all targets where their bounding box contains point.
-      var target,i = objects.length;
+      var target, i = objects.length, normalizedPointer;
       // Do not check for currently grouped objects, since we check the parent group itself.
       // untill we call this function specifically to search inside the activeGroup
       while (i--) {
         if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
+          this.targets.push(target);
           if (target.type === 'group') {
-            this._searchPossibleTargets(e, pointer, target._objects);
+            normalizedPointer = this._normalizePointer(target, pointer);
+            this._searchPossibleTargets(e, normalizedPointer, target._objects);
           }
           break;
         }
@@ -1287,3 +1292,4 @@
    */
   fabric.Element = fabric.Canvas;
 })();
+s
