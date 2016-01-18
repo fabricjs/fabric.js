@@ -77,19 +77,25 @@
      * @private
      */
     _createActiveGroup: function(target, e) {
+      if (!this._activeObject) {
+        // Group cannot be created if no existing active object is present.
+        return;
+      }
 
-      if (this._activeObject && target !== this._activeObject) {
+      var groupSelectable = (this._activeObject.groupSelectable && target.groupSelectable),
+          isNewSelectionObject = (target !== this._activeObject),
+          group;
 
-        var group = this._createGroup(target);
+      if (isNewSelectionObject && groupSelectable) {
+        group = this._createGroup(target);
         group.addWithUpdate();
 
         this.setActiveGroup(group);
         this._activeObject = null;
 
         this.fire('selection:created', { target: group, e: e });
+        target.set('active', true);
       }
-
-      target.set('active', true);
     },
 
     /**
@@ -150,7 +156,7 @@
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject || !currentObject.selectable || !currentObject.visible) {
+        if (!currentObject || !currentObject.selectable || !currentObject.groupSelectable || !currentObject.visible) {
           continue;
         }
 
