@@ -574,7 +574,6 @@
 
     /**
      * When set to `false`, an object can not be selected for modification using group-based selection.
-     * But events still fire on it.
      * @type Boolean
      * @default
      */
