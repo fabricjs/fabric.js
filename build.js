@@ -286,7 +286,7 @@ else if (buildSh) {
     minFilesStr + ' >> ' + path + '\n')
 }
 else {
-  // Change the current working directory
+  // change the current working directory
   process.chdir(distributionPath);
 
   appendFileContents(filesToInclude, function() {
