@@ -190,6 +190,14 @@
     isDrawingMode:          false,
 
     /**
+     * A brush definition for free drawing.
+     * @tutorial {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
+     * @type fabric.BaseBrush
+     * @default
+     */
+    freeDrawingBrush:       null,
+
+    /**
      * @private
      */
     _initInteractive: function() {
