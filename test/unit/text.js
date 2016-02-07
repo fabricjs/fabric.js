@@ -271,7 +271,7 @@
 
     // temp workaround for text objects not obtaining width under node
     text.width = 100;
-    text.textAlign = 'justify'
+    text.textAlign = 'justify';
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
 

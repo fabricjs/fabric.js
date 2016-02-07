@@ -141,7 +141,7 @@
     var object = shadow.toObject(),
         shadow2 = new fabric.Shadow(object),
         object2 = shadow2.toObject();
-    equal(shadow.affectStroke, shadow2.affectStroke)
+    equal(shadow.affectStroke, shadow2.affectStroke);
     deepEqual(object, object2);
   });
 
