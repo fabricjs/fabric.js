@@ -43,7 +43,7 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "execSync": "1.0.x",
+    "sync-exec": "0.6.x",
     "uglify-js": "2.4.x",
     "jscs": "2.1.x",
     "jshint": "2.8.x",
