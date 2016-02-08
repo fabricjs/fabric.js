@@ -59,7 +59,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.renderAll();
 
-    var canvasEl = this.lowerCanvasEl,
+    var canvasEl = this.contextContainer.canvas,
         croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
 
     // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
