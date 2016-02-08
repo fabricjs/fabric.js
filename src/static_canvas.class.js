@@ -397,13 +397,13 @@
       if (typeof image === 'string') {
         fabric.util.loadImage(image, function(img) {
           this[property] = new fabric.Image(img, options);
-          callback && callback();
+          callback && callback(img);
         }, this, options && options.crossOrigin);
       }
       else {
         options && image.setOptions(options);
         this[property] = image;
-        callback && callback();
+        callback && callback(image);
       }
 
       return this;
@@ -886,7 +886,6 @@
       }
 
       this.fire('after:render');
-      canvasToDrawOn.restore();
       return this;
     },
 
