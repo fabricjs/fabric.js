@@ -34,7 +34,12 @@
             })(property);
           }
           else {
-            klass.prototype[property] = source[property];
+            var descriptor = Object.getOwnPropertyDescriptor(source, property);
+            if (descriptor && (descriptor.get || descriptor.set)) {
+              Object.defineProperty(klass.prototype, property, descriptor);
+            } else {
+              klass.prototype[property] = source[property];
+            }
           }
 
           if (IS_DONTENUM_BUGGY) {
