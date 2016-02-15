@@ -2,6 +2,19 @@
 
   var slice = Array.prototype.slice, emptyFunction = function() { },
 
+      getOwnPropertyDescriptor = (function() {
+        function getOwnPropertyDescriptorPolyfill(obj, prop) {
+          return (prop in obj) ? {
+            value: obj[prop],
+            writable: true,
+            enumerable: true,
+            configurable: true
+          } : undefined;
+        }
+
+        return Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorPolyfill;
+      })(),
+
       IS_DONTENUM_BUGGY = (function() {
         for (var p in { toString: 1 }) {
           if (p === 'toString') {
@@ -34,7 +47,7 @@
             })(property);
           }
           else {
-            var descriptor = Object.getOwnPropertyDescriptor(source, property);
+            var descriptor = getOwnPropertyDescriptor(source, property);
             if (descriptor && (descriptor.get || descriptor.set)) {
               Object.defineProperty(klass.prototype, property, descriptor);
             } else {
