@@ -50,7 +50,8 @@
             var descriptor = getOwnPropertyDescriptor(source, property);
             if (descriptor && (descriptor.get || descriptor.set)) {
               Object.defineProperty(klass.prototype, property, descriptor);
-            } else {
+            }
+            else {
               klass.prototype[property] = source[property];
             }
           }
