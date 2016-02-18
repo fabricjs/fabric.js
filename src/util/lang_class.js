@@ -2,14 +2,18 @@
 
   var slice = Array.prototype.slice, emptyFunction = function() { },
 
+      makePropertyDescriptor = function(value) {
+        return {
+          value: value,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        };
+      },
+
       getOwnPropertyDescriptor = (function() {
         function getOwnPropertyDescriptorPolyfill(obj, prop) {
-          return (prop in obj) ? {
-            value: obj[prop],
-            writable: true,
-            enumerable: true,
-            configurable: true
-          } : undefined;
+          return (prop in obj) ? makePropertyDescriptor(obj[prop]) : undefined;
         }
 
         return Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorPolyfill;
@@ -48,12 +52,12 @@
           }
           else {
             var descriptor = getOwnPropertyDescriptor(source, property);
-            if (descriptor && (descriptor.get || descriptor.set)) {
-              Object.defineProperty(klass.prototype, property, descriptor);
+
+            if (!descriptor || !(descriptor.get || descriptor.set)) {
+              descriptor = makePropertyDescriptor(source[property]);
             }
-            else {
-              klass.prototype[property] = source[property];
-            }
+
+            Object.defineProperty(klass.prototype, property, descriptor);
           }
 
           if (IS_DONTENUM_BUGGY) {
