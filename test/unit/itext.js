@@ -588,4 +588,28 @@
     // TODO: more SVG tests here?
   });
 
+  test('toSVGWithFonts', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { fill: '#112233' },
+          2: { stroke: '#223344', fontFamily: 'Engagement' },
+          3: { backgroundColor: '#00FF00' }
+        }
+      },
+      fontFamily: 'Plaster'
+    });
+    fabric.fontPaths = {
+      Engagement: 'path-to-engagement-font-file',
+      Plaster: 'path-to-plaster-font-file',
+    };
+    canvas.add(iText);
+    equal(typeof iText.toSVG, 'function');
+    
+    // because translate values differ
+    if (!fabric.isLikelyNode) {
+      equal(canvas.toSVG(), '\t<g transform=\"translate(124.88 52.93)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" ><tspan x=\"-124.384765625\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: #112233; fill-rule: ; opacity: 1;\">t</tspan><tspan x=\"-113.271484375\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan><tspan x=\"-95.517578125\" y=\"-17.232\" style=\"stroke: #223344; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan><tspan x=\"-79.951171875\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan><tspan x=\"-68.837890625\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\"> </tspan><tspan x=\"-58.837890625\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">f</tspan><tspan x=\"-45.517578125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">o</tspan><tspan x=\"-25.517578125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">o</tspan><tspan x=\"-5.517578125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\"> </tspan><tspan x=\"4.482421875\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">b</tspan><tspan x=\"24.482421875\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">a</tspan><tspan x=\"42.236328125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">r</tspan><tspan x=\"55.556640625\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">-</tspan><tspan x=\"68.876953125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">b</tspan><tspan x=\"88.876953125\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">a</tspan><tspan x=\"106.630859375\" y=\"-17.232\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">z</tspan><tspan x=\"-124.38\" y=\"35.2\" fill=\"rgb(0,0,0)\">qux</tspan></text>\n\t</g>\n');
+    }
+  });
+
 })();
