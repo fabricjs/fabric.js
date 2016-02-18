@@ -593,7 +593,8 @@
       styles: {
         0: {
           0: { fill: '#112233' },
-          2: { stroke: '#223344', fontFamily: 'Engagement' }
+          2: { stroke: '#223344', fontFamily: 'Engagement' },
+          3: { backgroundColor: '#00FF00' }
         }
       },
       fontFamily: 'Plaster'
@@ -601,7 +602,7 @@
     fabric.fontPaths = {
       Engagement: 'path-to-engagement-font-file',
       Plaster: 'path-to-plaster-font-file',
-    }
+    };
     canvas.add(iText);
     equal(typeof iText.toSVG, 'function');
     
