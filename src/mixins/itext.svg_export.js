@@ -31,7 +31,7 @@
           heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
 
       for (var i = 0, len = chars.length; i < len; i++) {
-        var styleDecl = this.styles[lineIndex][i] || { };
+        var styleDecl = this._getStyleDeclaration(lineIndex, i) || { };
 
         textSpans.push(
           this._createTextCharSpan(
