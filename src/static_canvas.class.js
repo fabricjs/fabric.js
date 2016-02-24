@@ -194,8 +194,15 @@
     /**
      * @private
      */
+    _isRetinaScaling: function() {
+      return (fabric.devicePixelRatio !== 1 && this.enableRetinaScaling);
+    },
+
+    /**
+     * @private
+     */
     _initRetinaScaling: function() {
-      if (fabric.devicePixelRatio === 1 || !this.enableRetinaScaling) {
+      if (!this._isRetinaScaling()) {
         return;
       }
 
