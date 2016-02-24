@@ -44,6 +44,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           height: options.height
         };
 
+    if (this._isRetinaScaling()) {
+      multiplier *= fabric.devicePixelRatio;
+    }
+
     if (multiplier !== 1) {
       return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
     }
@@ -111,16 +115,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var origWidth = this.getWidth(),
         origHeight = this.getHeight(),
+        origRetinaScaling = this.enableRetinaScaling,
         scaledWidth = origWidth * multiplier,
         scaledHeight = origHeight * multiplier,
         activeObject = this.getActiveObject(),
         activeGroup = this.getActiveGroup(),
-
         ctx = this.contextContainer;
 
+    this.enableRetinaScaling = false;
     if (multiplier > 1) {
-      this.setWidth(scaledWidth).setHeight(scaledHeight);
+      this.setDimensions({width: scaledWidth, height: scaledHeight});
     }
+    ctx.save();
     ctx.scale(multiplier, multiplier);
 
     if (cropping.left) {
@@ -156,9 +162,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     // background properly (while context is scaled)
     this.width = origWidth;
     this.height = origHeight;
-
-    ctx.scale(1 / multiplier,  1 / multiplier);
-    this.setWidth(origWidth).setHeight(origHeight);
+    this.enableRetinaScaling = origRetinaScaling;
+    this.setDimensions({width: origWidth, height: origHeight});
 
     if (activeGroup) {
       this._restoreBordersControlsOnGroup(activeGroup);
