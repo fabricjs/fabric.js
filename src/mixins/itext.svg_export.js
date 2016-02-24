@@ -31,7 +31,7 @@
           heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
 
       for (var i = 0, len = chars.length; i < len; i++) {
-        var styleDecl = this.styles[lineIndex][i] || { };
+        var styleDecl = this._getStyleDeclaration(lineIndex, i) || { };
 
         textSpans.push(
           this._createTextCharSpan(
@@ -70,12 +70,12 @@
     _createTextCharBg: function(styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset) {
       return [
         //jscs:disable validateIndentation
-        '<rect fill="', styleDecl.textBackgroundColor,
+        '\t\t<rect fill="', styleDecl.textBackgroundColor,
         '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS),
         '" y="', toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS),
         '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS),
         '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS),
-        '"></rect>'
+        '"></rect>\n'
         //jscs:enable validateIndentation
       ].join('');
     },
@@ -95,7 +95,7 @@
 
       return [
         //jscs:disable validateIndentation
-        '<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
+        '\t\t\t<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
           toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS), '" ',
           (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
           (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
@@ -104,7 +104,7 @@
           (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
           'style="', fillStyles, '">',
           fabric.util.string.escapeXml(_char),
-        '</tspan>'
+        '</tspan>\n'
         //jscs:enable validateIndentation
       ].join('');
     }
