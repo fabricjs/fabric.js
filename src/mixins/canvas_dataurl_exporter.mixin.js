@@ -124,7 +124,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.enableRetinaScaling = false;
     if (multiplier > 1) {
-      this.setDimensions({width: scaledWidth, height: scaledHeight});
+      this.setDimensions({ width: scaledWidth, height: scaledHeight });
     }
     ctx.save();
     ctx.scale(multiplier, multiplier);
@@ -163,7 +163,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     this.width = origWidth;
     this.height = origHeight;
     this.enableRetinaScaling = origRetinaScaling;
-    this.setDimensions({width: origWidth, height: origHeight});
+    this.setDimensions({ width: origWidth, height: origHeight });
 
     if (activeGroup) {
       this._restoreBordersControlsOnGroup(activeGroup);
