@@ -115,19 +115,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var origWidth = this.getWidth(),
         origHeight = this.getHeight(),
-        origRetinaScaling = this.enableRetinaScaling,
         scaledWidth = origWidth * multiplier,
         scaledHeight = origHeight * multiplier,
         activeObject = this.getActiveObject(),
         activeGroup = this.getActiveGroup(),
         ctx = this.contextContainer;
 
-    this.enableRetinaScaling = false;
     if (multiplier > 1) {
       this.setDimensions({ width: scaledWidth, height: scaledHeight });
     }
     ctx.save();
-    ctx.scale(multiplier, multiplier);
+    ctx.scale(multiplier / fabric.devicePixelRatio, multiplier / fabric.devicePixelRatio);
 
     if (cropping.left) {
       cropping.left *= multiplier;
@@ -162,7 +160,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     // background properly (while context is scaled)
     this.width = origWidth;
     this.height = origHeight;
-    this.enableRetinaScaling = origRetinaScaling;
     this.setDimensions({ width: origWidth, height: origHeight });
 
     if (activeGroup) {
