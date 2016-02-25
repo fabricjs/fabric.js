@@ -657,6 +657,9 @@
       charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
       textDecoration = textDecoration || this.textDecoration;
 
+      if (decl && decl.textBackgroundColor) {
+        this._removeShadow(ctx);
+      }
       shouldFill && ctx.fillText(_char, left, top);
       shouldStroke && ctx.strokeText(_char, left, top);
 
