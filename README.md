@@ -33,7 +33,8 @@
 
 Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection.
 
-Use Fabric.js to create collages, charts, basic games, basic drawing(paintbrush, diagrams) on your webpage. You can also use it to design custom t-shirts! Fabric.js is a framework used to make positioning and creating shapes easier in the HTML5 Canvas element. With this technology you're able to move objects around rotate, change the properties(color, transparency, z-index). You can group your shapes together with the mouse and can also manipulate your shapes altogether while they're grouped.
+### What To Use Fabric.js For And When To Use It
+You can use Fabric.js to create collages, charts, basic games and do basic drawing (paintbrush or diagrams) on a webpage. You can also use it to design custom t-shirts by manipulating the position of the graphics to be printed on them! Fabric.js is a framework used to make positioning and creating shapes easier in the HTML5 `<canvas>` element. Fabric.js is also useful when you want an easier way to convert SVG images into JavaScript objects to use with the `<canvas>` element or in the opposite direction when converting `<canvas>` objects into SVG.
 
 [Contributions](https://github.com/kangax/fabric.js/wiki/Love-Fabric%3F-Help-us-by...) are very much welcome!
 
