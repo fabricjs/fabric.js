@@ -95,8 +95,9 @@
 
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
-
-    deepEqual(rectWithAttrs.toObject(), REFERENCE_RECT);
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.visible = false;
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
 
   });
 
@@ -109,12 +110,10 @@
 
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
-
-    var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
-      width:            100,
-      height:           100,
-      visible:          false
-    });
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.width = 100;
+    expectedObject.height = 100;
+    expectedObject.visible = false;
     deepEqual(rectWithAttrs.toObject(), expectedObject);
 
   });
@@ -129,11 +128,10 @@
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
 
-    var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
-      width:            100,
-      height:           100,
-      visible:          false
-    });
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.width = 100;
+    expectedObject.height = 100;
+    expectedObject.visible = false;
     deepEqual(rectWithAttrs.toObject(), expectedObject);
 
   });
