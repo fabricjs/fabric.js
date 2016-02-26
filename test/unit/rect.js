@@ -96,7 +96,7 @@
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
 
-    deepEqual(rectWithAttrs.toObject(), expectedObject);
+    deepEqual(rectWithAttrs.toObject(), REFERENCE_RECT);
 
   });
 
