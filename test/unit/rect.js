@@ -82,9 +82,41 @@
     var elRect = fabric.document.createElement('rect');
     var rect = fabric.Rect.fromElement(elRect);
     var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    //standard element has no dimensions so is not visible.
     expectedObject.visible = false;
     ok(rect instanceof fabric.Rect);
     deepEqual(rect.toObject(), expectedObject);
+  });
+
+  test('rect from element with 0 dimension is not visible', function() {
+    var elRectWithAttrs = fabric.document.createElement('rect');
+
+    elRectWithAttrs.setAttribute('visibility', true);
+
+    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
+    ok(rectWithAttrs instanceof fabric.Rect);
+
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
+
+  });
+
+  test('rect from element with dimensions is not visible if visibility is false', function() {
+    var elRectWithAttrs = fabric.document.createElement('rect');
+
+    elRectWithAttrs.setAttribute('visibility', false);
+    elRectWithAttrs.setAttribute('width', 100);
+    elRectWithAttrs.setAttribute('height', 100);
+
+    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
+    ok(rectWithAttrs instanceof fabric.Rect);
+
+    var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
+      width:            100,
+      height:           100,
+      visible:          false
+    });
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
+
   });
 
   test('fabric.Rect.fromElement with custom attributes', function() {
