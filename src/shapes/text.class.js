@@ -624,7 +624,9 @@
         this.width,
         this.height
       );
-
+      // if there is background color no other shadows
+      // should be casted
+      this._removeShadow(ctx);
     },
 
     /**
@@ -635,11 +637,12 @@
       if (!this.textBackgroundColor) {
         return;
       }
-      var lineTopOffset = 0, heightOfLine = this._getHeightOfLine(),
+      var lineTopOffset = 0, heightOfLine,
           lineWidth, lineLeftOffset;
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        heightOfLine = this._getHeightOfLine(ctx, i);
         if (this._textLines[i] !== '') {
           lineWidth = this.textAlign === 'justify' ? this.width : this._getLineWidth(ctx, i);
           lineLeftOffset = this._getLineLeftOffset(lineWidth);
@@ -647,11 +650,14 @@
             this._getLeftOffset() + lineLeftOffset,
             this._getTopOffset() + lineTopOffset,
             lineWidth,
-            this.fontSize * this._fontSizeMult
+            heightOfLine / this.lineHeight
           );
         }
         lineTopOffset += heightOfLine;
       }
+      // if there is text background color no
+      // other shadows should be casted
+      this._removeShadow(ctx);
     },
 
     /**
