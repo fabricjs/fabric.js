@@ -99,14 +99,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Composition start
    */
-  onCompositionStart: function(e) {
+  onCompositionStart: function() {
     this.inCompositionMode = true;
   },
 
   /**
    * Composition end
    */
-  onCompositionEnd: function(e) {
+  onCompositionEnd: function() {
     this.inCompositionMode = false;
   },
 
