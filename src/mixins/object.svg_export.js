@@ -3,6 +3,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * Returns styles-string for svg-export
+   * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
   getSvgStyles: function(skipShadow) {
