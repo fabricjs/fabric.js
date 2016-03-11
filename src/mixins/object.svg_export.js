@@ -5,7 +5,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Returns styles-string for svg-export
    * @return {String}
    */
-  getSvgStyles: function() {
+  getSvgStyles: function(skipShadow) {
 
     var fill = this.fill
           ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
@@ -23,7 +23,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
 
         visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = this.getSvgFilter();
+        filter = skipShadow ? '' : this.getSvgFilter();
 
     return [
       'stroke: ', stroke, '; ',
