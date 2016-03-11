@@ -882,7 +882,7 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg) {
       var noShadow = true, filter = this.getSvgFilter(),
-          style = filter === '' ? '' : ' style="' + this.getSvgFilter() + '"';
+          style = filter === '' ? '' : ' style="' + filter + '"';
 
       markup.push(
         '\t<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
