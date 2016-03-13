@@ -43,6 +43,11 @@
            (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
+        
+        if (this.get('lockAslantScaling') &&
+           (i === 'tr' || i === 'tl' || i === 'br' || i === 'bl')) {
+          continue;
+        }
 
         lines = this._getImageLines(this.oCoords[i].corner);
 
@@ -298,25 +303,27 @@
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
-      // top-left
-      this._drawControl('tl', ctx, methodName,
-        left,
-        top);
+			if (!this.get('lockAslantScaling')) {
+		    // top-left
+		    this._drawControl('tl', ctx, methodName,
+		      left,
+		      top);
 
-      // top-right
-      this._drawControl('tr', ctx, methodName,
-        left + width,
-        top);
+		    // top-right
+		    this._drawControl('tr', ctx, methodName,
+		      left + width,
+		      top);
 
-      // bottom-left
-      this._drawControl('bl', ctx, methodName,
-        left,
-        top + height);
+		    // bottom-left
+		    this._drawControl('bl', ctx, methodName,
+		      left,
+		      top + height);
 
-      // bottom-right
-      this._drawControl('br', ctx, methodName,
-        left + width,
-        top + height);
+		    // bottom-right
+		    this._drawControl('br', ctx, methodName,
+		      left + width,
+		      top + height);
+			}
 
       if (!this.get('lockUniScaling')) {
 

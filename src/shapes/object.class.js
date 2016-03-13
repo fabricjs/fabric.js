@@ -678,6 +678,13 @@
     lockUniScaling:           false,
 
     /**
+     * When `true`, object scaling by angles is locked
+     * @type Boolean
+     * @default
+     */
+    lockAslantScaling:           false,
+
+    /**
      * When `true`, object horizontal skewing is locked
      * @type Boolean
      * @default

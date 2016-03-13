@@ -649,7 +649,7 @@
         forbidScalingY = true;
       }
 
-      if (by === 'equally' && !lockScalingX && !lockScalingY) {
+      if (by === 'equally' && !lockScalingX && !lockScalingY && !target.get('lockAslantScaling')) {
         forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform, _dim);
       }
       else if (!by) {
