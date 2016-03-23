@@ -1075,7 +1075,8 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform) {
+      if (!this.active || noTransform
+          || (this.group && this.group !== this.canvas.getActiveGroup())) {
         return;
       }
 
