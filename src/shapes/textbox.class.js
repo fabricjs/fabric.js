@@ -147,7 +147,7 @@
       }
       return this.styles[lineIndex];
     },
-    
+
     /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
