@@ -132,23 +132,6 @@
     },
 
     /**
-     * This function is a TEMPORARY fix before restyling svg export
-     * and tspan generation
-     * @param {Number} lineIndex
-     * @private
-     */
-    hasStyleOnLine: function(lineIndex) {
-      if (this._styleMap) {
-        var map = this._styleMap[lineIndex];
-        if (!map) {
-          return null;
-        }
-        lineIndex = map.line;
-      }
-      return this.styles[lineIndex];
-    },
-
-    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @param {Boolean} [returnCloneOrEmpty=false]
