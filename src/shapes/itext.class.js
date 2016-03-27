@@ -880,16 +880,6 @@
     },
 
     /**
-     * This function is a TEMPORARY fix before restyling svg export
-     * and tspan generation
-     * @param {Number} lineIndex
-     * @private
-     */
-    hasStyleOnLine: function(lineIndex) {
-      return this.styles[lineIndex];
-    },
-
-    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @param {Boolean} [returnCloneOrEmpty=false]
