@@ -17,7 +17,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + p.y + 'px; left: ' + p.x + 'px; opacity: 0;'
                                         + ' width: 0px; height: 0px; z-index: -999;';
-    this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
+    if (this.canvas) {
+      this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
+    }
+    else {
+      fabric.document.body.appendChild(this.hiddenTextarea);
+    }
+    
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
