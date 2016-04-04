@@ -337,7 +337,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function() {
+    enterEditing: function(e) {
       if (this.isEditing || !this.editable) {
         return;
       }
@@ -348,7 +348,7 @@
 
       this.isEditing = true;
 
-      this.initHiddenTextarea();
+      this.initHiddenTextarea(e);
       this.hiddenTextarea.focus();
       this._updateTextarea();
       this._saveEditingProps();
@@ -420,13 +420,37 @@
      * @private
      */
     _updateTextarea: function() {
-      if (!this.hiddenTextarea) {
+      if (!this.hiddenTextarea || this.inCompositionMode) {
         return;
       }
 
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      if (this.selectionStart === this.selectionEnd) {
+        var p = this._calcTextareaPosition();
+        this.hiddenTextarea.style.left = p.x + 'px';
+        this.hiddenTextarea.style.top = p.y + 'px';
+      }
+    },
+
+    /**
+     * @private
+     */
+    _calcTextareaPosition: function() {
+      var chars = this.text.split(''),
+          boundaries = this._getCursorBoundaries(chars, 'cursor'),
+          cursorLocation = this.get2DCursorLocation(),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex,
+          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          leftOffset = (lineIndex === 0 && charIndex === 0)
+                    ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
+                    : boundaries.leftOffset,
+          m = this.calcTransformMatrix(),
+          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight};
+      this.hiddenTextarea.style.fontSize = charHeight + 'px';
+      return fabric.util.transformPoint(p, m);
     },
 
     /**
