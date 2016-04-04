@@ -782,6 +782,7 @@
             heightOfLine / this.lineHeight
           );
         }
+        lineTopOffset += heightOfLine;
       }
     },
 
