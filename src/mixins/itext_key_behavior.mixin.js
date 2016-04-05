@@ -3,7 +3,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
-  initHiddenTextarea: function() {
+  initHiddenTextarea: function(e) {
     var p;
     if (e && this.canvas) {
       p = this.canvas.getPointer(e);
