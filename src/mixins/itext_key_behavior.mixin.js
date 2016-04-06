@@ -163,7 +163,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   onCompositionUpdate: function(e) {
     var data = e.data;
     this.selectionStart = this.compositionStart;
-    this.selectionEnd = this.selectionEnd === this.selectionStart ? 
+    this.selectionEnd = this.selectionEnd === this.selectionStart ?
       this.compositionStart + this.prevCompositionLength : this.selectionEnd;
     this.insertChars(data, false);
     this.prevCompositionLength = data.length;
