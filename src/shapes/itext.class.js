@@ -839,10 +839,16 @@
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
 
       //if we want this._setShadow.call to work with styleDeclarion
-      // we have to add those references
-      styleDeclaration.scaleX = this.scaleX;
-      styleDeclaration.scaleY = this.scaleY;
-      styleDeclaration.canvas = this.canvas;      
+      //we have to add those references
+      if (styleDeclaration.shadow) {
+        styleDeclaration.scaleX = this.scaleX;
+        styleDeclaration.scaleY = this.scaleY;
+        styleDeclaration.canvas = this.canvas;
+        this._setShadow.call(styleDeclaration, ctx);
+        delete styleDeclaration.scaleX;
+        delete styleDeclaration.scaleY;
+        delete styleDeclaration.canvas;
+      }
       this._setShadow.call(styleDeclaration, ctx);
 
       if (!this.caching || !this._charWidthsCache[cacheProp]) {
