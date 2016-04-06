@@ -448,7 +448,7 @@
                     ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight};
+          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
       return fabric.util.transformPoint(p, m);
     },
