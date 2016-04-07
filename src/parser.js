@@ -82,12 +82,15 @@
         value = fabric.parseTransformAttribute(value);
       }
     }
-    else if (attr === 'visible') {
-      value = (value === 'none' || value === 'hidden') ? false : true;
+    else if (attr === 'display') {
+      value = (value === 'none') ? false : true;
       // display=none on parent element always takes precedence over child element
-      if (parentAttributes && parentAttributes.visible === false) {
+      if (parentAttributes && parentAttributes.display === false) {
         value = false;
       }
+    }
+    else if (attr === 'visible') {
+      value = (value === 'hidden') ? false : true;
     }
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
@@ -818,7 +821,10 @@
       if (ownAttributes.font) {
         fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
       }
-      return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
+      ownAttributes = _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
+      ownAttributes.visible = ownAttributes.visible && ownAttributes.display && parentAttributes.display;
+      delete ownAttributes.display;
+      return ownAttributes;
     },
 
     /**
