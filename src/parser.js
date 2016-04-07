@@ -821,10 +821,8 @@
       if (ownAttributes.font) {
         fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
       }
-      ownAttributes = _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
-      ownAttributes.visible = ownAttributes.visible && ownAttributes.display && parentAttributes.display;
-      delete ownAttributes.display;
-      return ownAttributes;
+      ownAttributes.visible = ownAttributes.visible && ownAttributes.display;
+      return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
 
     /**
