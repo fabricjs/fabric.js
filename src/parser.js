@@ -26,7 +26,7 @@
         r:                    'radius',
         cy:                   'top',
         y:                    'top',
-        display:              'visible',
+        display:              'display',
         visibility:           'visible',
         transform:            'transformMatrix',
         'fill-opacity':       'fillOpacity',
