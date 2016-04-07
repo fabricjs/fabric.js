@@ -119,6 +119,24 @@
 
   });
 
+  test('rect from element display block does not win over visibility hidden', function() {
+    var elRectWithAttrs = fabric.document.createElement('rect');
+
+    elRectWithAttrs.setAttribute('display', 'block');
+    elRectWithAttrs.setAttribute('visibility', 'hidden');
+    elRectWithAttrs.setAttribute('width', 100);
+    elRectWithAttrs.setAttribute('height', 100);
+
+    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
+    ok(rectWithAttrs instanceof fabric.Rect);
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.width = 100;
+    expectedObject.height = 100;
+    expectedObject.visible = false;
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
+
+  });
+
   test('rect from element with dimensions is not visible if display is none', function() {
     var elRectWithAttrs = fabric.document.createElement('rect');
 
