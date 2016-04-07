@@ -7,9 +7,42 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
-    fabric.document.body.appendChild(this.hiddenTextarea);
+    this.hiddenTextarea.style.cssText = 'position: absolute; opacity: 0; font-size: 0pt;' +
+                                        'color: transparent; z-index: -999;';
+    //If at all possible, show the textarea within the canvas wrapper where it can exist
+    //at the same height as the iText display. This prevents iOS from scrolling to whatever
+    //height the textarea is at when you type.
+    if (this.canvas && this.canvas.wrapperEl) {
+      this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
+
+      var updateHiddenTextareaPosition = function () {
+        if (this.isEditing && this.canvas.getActiveObject() === this) {
+          //The text's bounding rectangle, IN CANVAS SPACE (not fabric logical coordinates)
+          var rect = this.getBoundingRect(),
+
+          // Compute the scale transform between fabric coords and DOM coords
+            canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect(),
+            xScale = canvasRect.width / this.canvas.width,
+            yScale = canvasRect.height / this.canvas.height;
+
+          this.hiddenTextarea.style.top = rect.top * xScale + 'px';
+          this.hiddenTextarea.style.left = rect.left * yScale + 'px';
+          this.hiddenTextarea.style.width = rect.width * xScale + 'px';
+          this.hiddenTextarea.style.height = rect.height * yScale + 'px';
+        }
+      }.bind(this);
+
+      this.on('event:scaling', updateHiddenTextareaPosition);
+      this.on('event:moving', updateHiddenTextareaPosition);
+      this.on('editing:exited', function() {
+        this.off('event:scaling', updateHiddenTextareaPosition);
+        this.off('event:moving', updateHiddenTextareaPosition);
+      }.bind(this));
+      updateHiddenTextareaPosition();
+    }
+    else {
+      fabric.document.body.appendChild(this.hiddenTextarea);
+    }
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
