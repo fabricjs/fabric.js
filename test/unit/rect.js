@@ -92,6 +92,7 @@
     var elRectWithAttrs = fabric.document.createElement('rect');
 
     elRectWithAttrs.setAttribute('visibility', 'visible');
+    elRectWithAttrs.setAttribute('display', 'block');
 
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
@@ -136,6 +137,24 @@
 
   });
 
+  test('rect from element display none win over visibility', function() {
+    var elRectWithAttrs = fabric.document.createElement('rect');
+
+    elRectWithAttrs.setAttribute('display', 'none');
+    elRectWithAttrs.setAttribute('visibility', 'visible');
+    elRectWithAttrs.setAttribute('width', 100);
+    elRectWithAttrs.setAttribute('height', 100);
+
+    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
+    ok(rectWithAttrs instanceof fabric.Rect);
+
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.width = 100;
+    expectedObject.height = 100;
+    expectedObject.visible = false;
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
+
+  });
 
   test('fabric.Rect.fromElement with custom attributes', function() {
     var elRectWithAttrs = fabric.document.createElement('rect');
