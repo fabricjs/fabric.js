@@ -884,19 +884,17 @@
     parentEl.appendChild(el);
     equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
     wrapperEl = canvas.wrapperEl;
-    equal(parentEl.firstChild, wrapperEl, 'Wrapper should have 1 child');
-    equal(wrapperEl.tagName, 'div', 'We wrapped canvas with DIV');
+    equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
+    equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    if (!fabric.isLikelyNode) {
-      //in node the canvas is not wrapped looks like
-      notEqual(parentEl.firstChild, el, 'canvas should be wrapped now');
-      equal(el.parentNode.childNodes.length, 1, 'Wrapper should have 1 child');
-      equal(parentEl.firstChild.childNodes.length, 2, 'wrapper should have 2 children');
-      equal(parentEl.firstChild, el.parentNode, 'canvas wrapperEl should be firstChild now');
-    }
-    equal(parentEl.childNodes.length, 1, 'parent should have 1 child');
+    equal(wrapperEl, canvas.getElement().parentElement, 'Canvas is appended to wrapperEl');
+    equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
+    equal(parentEl.firstChild, wrapperEl, 'parent div child should be wrapperEl');
+    notEqual(parentEl.firstChild, el, 'canvas should not be parent div firstChild');
+
     ok(typeof canvas.dispose == 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
