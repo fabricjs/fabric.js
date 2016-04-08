@@ -93,6 +93,21 @@
   }
 
   /**
+   * @memberOf fabric.util
+   * Remove parent from selected element
+   * @param {HTMLElement} element Element to unwrap
+   * @return {HTMLElement} element
+   */
+  function unWrapElement(element) {
+    if (!element.parentNode || element.parentNode.parentNode) {
+      return element;
+    }
+    var wrapper = element.parentNode, origParent = wrapper.parentNode;
+    origParent.replaceChild(element, wrapper);
+    return element;
+  }
+
+  /**
    * Returns element scroll offsets
    * @memberOf fabric.util
    * @param {HTMLElement} element Element to operate on
