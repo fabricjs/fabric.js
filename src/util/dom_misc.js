@@ -98,7 +98,7 @@
    * @param {HTMLElement} element Element to unwrap
    * @return {HTMLElement} element
    */
-  function unWrapElement(element) {
+  function unwrapElement(element) {
     if (!element.parentNode || element.parentNode.parentNode) {
       return element;
     }
