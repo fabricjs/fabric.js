@@ -909,7 +909,9 @@
     canvas.dispose();
     equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     equal(parentEl.firstChild, el, 'canvas should be back to its firstChild place');
-    equal(canvas.getElement().parentNode.className, 'rootNode', 'canvas is back to rootNode');
+    if (lowerCanvasEl.parentNode) {
+      equal(lowerCanvasEl.parentNode.className, 'rootNode', 'canvas is back to rootNode');
+    }
     equal(parentEl.childNodes.length, 1, 'parent should have 1 child now');
   });
   
