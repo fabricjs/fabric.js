@@ -879,7 +879,7 @@
     var el = fabric.document.createElement('canvas'),
         parentEl = fabric.document.createElement('div'),
         wrapperEl;
-    el.width = 600; el.height = 600;
+    el.width = 200; el.height = 200;
    
     parentEl.appendChild(el);
     equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
@@ -890,11 +890,14 @@
     equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
     equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    equal(wrapperEl, canvas.getElement().parentElement, 'Canvas is appended to wrapperEl');
+    if (el.parentNode) {
+      equal(wrapperEl, canvas.getElement().parentNode, 'Canvas is appended to wrapperEl');
+    }
+    if (wrapperEl.parentNode) {
+      equal(parentEl, wrapperEl.parentNode, 'parent div child should be wrapperEl');
+    }
     equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
-    equal(parentEl.firstChild, wrapperEl, 'parent div child should be wrapperEl');
-    notEqual(parentEl.firstChild, el, 'canvas should not be parent div firstChild');
-
+    notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
     ok(typeof canvas.dispose == 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
