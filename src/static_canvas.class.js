@@ -1496,6 +1496,7 @@
     dispose: function () {
       this.clear();
       this.interactive && this.removeListeners();
+      fabric.util.unwrapElement(this.lowerCanvasEl);
       return this;
     },
 
