@@ -875,6 +875,28 @@
     equal(aGroup._objects[3], circle2);
   });
   
+  test('dispose', function() {
+    var el = fabric.document.createElement('canvas'),
+        parentEl = fabric.document.createElement('div');
+    el.width = 600; el.height = 600;
+
+    parentEl.appendChild(el);
+    equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+    equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    notEqual(parentEl.firstChild, el, 'canvas shoul be wrapped now');
+    equal(parentEl.childNodes.length, 1, 'Wrapper should have 1 child');
+    equal(parentEl.childNodes.length, 1, 'parent should have 1 child');
+    equal(parentEl.firstChild.childNodes.length, 2, 'wrapper should have 2 children');
+    equal(parentEl.firstChild, el.parentNode, 'canvas wrapperEl should be firstChild now');
+    ok(typeof canvas.dispose == 'function');
+    canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.dispose();
+    equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    equal(parentEl.firstChild, el, 'canvas should be back to its firstChild place');
+    equal(parentEl.childNodes.length, 1, 'parent should have 1 child now');
+  });
+  
   // test('dispose', function() {
   //   function invokeEventsOnCanvas() {
   //     // nextSibling because we need to invoke events on upper canvas
