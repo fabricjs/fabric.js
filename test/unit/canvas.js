@@ -876,9 +876,10 @@
   });
   
   test('dispose', function() {
+    //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
         parentEl = fabric.document.createElement('div'),
-        wrapperEl;
+        wrapperEl, lowerCanvasEl, upperCanvasEl;
     el.width = 200; el.height = 200;
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
@@ -888,15 +889,18 @@
 
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
     wrapperEl = canvas.wrapperEl;
+    lowerCanvasEl = canvas.lowerCanvasEl;
+    upperCanvasEl = canvas.upperCanvasEl;
     equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
     equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    equal(canvas.getElement().parentNode.className, canvas.containerClass, 'double check failed');
-    if (el.parentNode) {
-      equal(wrapperEl, canvas.getElement().parentNode, 'Canvas is appended to wrapperEl');
+    if (lowerCanvasEl.parentNode) {
+      equal(lowerCanvasEl.parentNode.className, canvas.containerClass, 'double check failed');
+      equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
+      equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
     }
     if (wrapperEl.parentNode) {
-      equal(parentEl, wrapperEl.parentNode, 'parent div child should be wrapperEl');
+      equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
     }
     equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
     notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
