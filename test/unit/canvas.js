@@ -889,9 +889,9 @@
       notEqual(parentEl.firstChild, el, 'canvas should be wrapped now');
       equal(el.parentNode.childNodes.length, 1, 'Wrapper should have 1 child');
       equal(parentEl.firstChild.childNodes.length, 2, 'wrapper should have 2 children');
+      equal(parentEl.firstChild, el.parentNode, 'canvas wrapperEl should be firstChild now');
     }
     equal(parentEl.childNodes.length, 1, 'parent should have 1 child');
-    equal(parentEl.firstChild, el.parentNode, 'canvas wrapperEl should be firstChild now');
     ok(typeof canvas.dispose == 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
