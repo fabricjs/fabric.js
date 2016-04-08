@@ -877,13 +877,18 @@
   
   test('dispose', function() {
     var el = fabric.document.createElement('canvas'),
-        parentEl = fabric.document.createElement('div');
+        parentEl = fabric.document.createElement('div'),
+        wrapperEl;
     el.width = 600; el.height = 600;
-
+   
     parentEl.appendChild(el);
     equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
-    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    wrapperEl = canvas.wrapperEl;
+    equal(parentEl.firstChild, wrapperEl, 'Wrapper should have 1 child');
+    equal(wrapperEl.tagName, 'div', 'We wrapped canvas with DIV');
+    equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
     if (!fabric.isLikelyNode) {
       //in node the canvas is not wrapped looks like
       notEqual(parentEl.firstChild, el, 'canvas should be wrapped now');
