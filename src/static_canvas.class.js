@@ -1495,8 +1495,10 @@
      */
     dispose: function () {
       this.clear();
-      this.interactive && this.removeListeners();
-      fabric.util.unwrapElement(this.lowerCanvasEl);
+      if (this.interactive) {
+        this.removeListeners();
+        fabric.util.unwrapElement(this.lowerCanvasEl);
+      }
       return this;
     },
 
