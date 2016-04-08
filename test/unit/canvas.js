@@ -880,8 +880,9 @@
         parentEl = fabric.document.createElement('div'),
         wrapperEl;
     el.width = 200; el.height = 200;
-   
+    parentEl.className = 'rootNode';
     parentEl.appendChild(el);
+
     equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
@@ -890,6 +891,7 @@
     equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
     equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
+    equal(canvas.getElement().parentNode.className, canvas.containerClass, 'double check failed');
     if (el.parentNode) {
       equal(wrapperEl, canvas.getElement().parentNode, 'Canvas is appended to wrapperEl');
     }
@@ -903,6 +905,7 @@
     canvas.dispose();
     equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     equal(parentEl.firstChild, el, 'canvas should be back to its firstChild place');
+    equal(canvas.getElement().parentNode.className, 'rootNode', 'canvas is back to rootNode');
     equal(parentEl.childNodes.length, 1, 'parent should have 1 child now');
   });
   
