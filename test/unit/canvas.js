@@ -897,7 +897,9 @@
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
     equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
     equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-    equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+    if (!fabric.isLikelyNode) {
+      equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+    }
     //looks like i cannot use parentNode
     //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
     //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
@@ -909,11 +911,11 @@
     canvas.dispose();
     equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-    equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
-    //equal(lowerCanvasEl.parentNode.className, 'rootNode', 'canvas is back to rootNode');
+    if (!fabric.isLikelyNode) {
+      equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
+    }
     equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
-    
   });
   
   // test('dispose', function() {
