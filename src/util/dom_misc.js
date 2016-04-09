@@ -99,7 +99,7 @@
    * @return {HTMLElement} element
    */
   function unwrapElement(element) {
-    if (!element.parentNode || element.parentNode.parentNode) {
+    if (!element.parentNode || !element.parentNode.parentNode) {
       return element;
     }
     var wrapper = element.parentNode, origParent = wrapper.parentNode;
