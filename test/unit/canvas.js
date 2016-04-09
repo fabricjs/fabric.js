@@ -894,6 +894,8 @@
     equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
     equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
+    equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
+    equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
     if (lowerCanvasEl.parentNode) {
       equal(lowerCanvasEl.parentNode.className, canvas.containerClass, 'double check failed');
       equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
