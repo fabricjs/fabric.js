@@ -1495,7 +1495,6 @@
      */
     dispose: function () {
       this.clear();
-      this.interactive && this.removeListeners();
       return this;
     },
 

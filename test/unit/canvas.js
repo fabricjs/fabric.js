@@ -875,6 +875,49 @@
     equal(aGroup._objects[3], circle2);
   });
   
+  test('dispose', function() {
+    //made local vars to do not dispose the external canvas
+    var el = fabric.document.createElement('canvas'),
+        parentEl = fabric.document.createElement('div'),
+        wrapperEl, lowerCanvasEl, upperCanvasEl;
+    el.width = 200; el.height = 200;
+    parentEl.className = 'rootNode';
+    parentEl.appendChild(el);
+
+    equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+    equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    wrapperEl = canvas.wrapperEl;
+    lowerCanvasEl = canvas.lowerCanvasEl;
+    upperCanvasEl = canvas.upperCanvasEl;
+    equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
+    equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
+    equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
+    equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
+    equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
+    equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
+    if (!fabric.isLikelyNode) {
+      equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+    }
+    //looks like i cannot use parentNode
+    //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
+    //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
+    //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
+    equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
+    notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
+    ok(typeof canvas.dispose == 'function');
+    canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.dispose();
+    equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
+    if (!fabric.isLikelyNode) {
+      equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
+    }
+    equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
+    equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
+  });
+  
   // test('dispose', function() {
   //   function invokeEventsOnCanvas() {
   //     // nextSibling because we need to invoke events on upper canvas
