@@ -909,7 +909,7 @@
     canvas.dispose();
     equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-    equal(parentEl.firstChild, lowerCanvasEl, 'canvas should be back to its firstChild place');
+    equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
     //equal(lowerCanvasEl.parentNode.className, 'rootNode', 'canvas is back to rootNode');
     equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
