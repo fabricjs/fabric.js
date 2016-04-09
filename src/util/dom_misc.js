@@ -93,21 +93,6 @@
   }
 
   /**
-   * @memberOf fabric.util
-   * Remove parent from selected element
-   * @param {HTMLElement} element Element to unwrap
-   * @return {HTMLElement} element
-   */
-  function unwrapElement(element) {
-    if (!element.parentNode || !element.parentNode.parentNode) {
-      return element;
-    }
-    var wrapper = element.parentNode, origParent = wrapper.parentNode;
-    origParent.replaceChild(element, wrapper);
-    return element;
-  }
-
-  /**
    * Returns element scroll offsets
    * @memberOf fabric.util
    * @param {HTMLElement} element Element to operate on
@@ -308,7 +293,6 @@
   fabric.util.makeElement = makeElement;
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
-  fabric.util.unwrapElement = unwrapElement;
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getElementStyle = getElementStyle;
