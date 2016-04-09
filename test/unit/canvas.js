@@ -912,8 +912,8 @@
     if (lowerCanvasEl.parentNode) {
       equal(lowerCanvasEl.parentNode.className, 'rootNode', 'canvas is back to rootNode');
     }
-    equal(wrapperEl, null, 'wrapperEl should be deleted');
-    equal(upperCanvasEl, null, 'upperCanvas should be deleted');
+    equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
+    equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
     equal(parentEl.childNodes.length, 1, 'parent should have 1 child now');
   });
   
