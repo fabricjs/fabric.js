@@ -896,14 +896,11 @@
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
     equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
     equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-    if (lowerCanvasEl.parentNode) {
-      equal(lowerCanvasEl.parentNode.className, canvas.containerClass, 'double check failed');
-      equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
-      equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
-    }
-    if (wrapperEl.parentNode) {
-      equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
-    }
+    equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+    equal(lowerCanvasEl.parentNode.className, canvas.containerClass, 'double check failed');
+    equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
+    equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
+    equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
     equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
     notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
     ok(typeof canvas.dispose == 'function');
