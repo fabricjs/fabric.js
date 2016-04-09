@@ -891,6 +891,7 @@
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
+    equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
     equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
     equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
     equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
@@ -907,11 +908,12 @@
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
     equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     equal(parentEl.firstChild, lowerCanvasEl, 'canvas should be back to its firstChild place');
     //equal(lowerCanvasEl.parentNode.className, 'rootNode', 'canvas is back to rootNode');
     equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
-    equal(parentEl.childNodes.length, 1, 'parent should have 1 child now');
+    
   });
   
   // test('dispose', function() {
