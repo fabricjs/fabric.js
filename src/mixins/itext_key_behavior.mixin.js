@@ -125,11 +125,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         offsetEnd = this.selectionEnd || 0,
         textLength = this.text.length,
         newTextLength = this.hiddenTextarea.value.length,
-        diff, charsToInsert;
+        diff, charsToInsert, start;
     if (newTextLength > textLength) {
       //we added some character
+      start = this._selectionDirection === 'left' ? offsetEnd : offset;
       diff = newTextLength - textLength;
-      charsToInsert = this.hiddenTextarea.value.slice(offsetEnd, offsetEnd + diff);
+      charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
     }
     else {
       //we selected a portion of text and then input something else.
