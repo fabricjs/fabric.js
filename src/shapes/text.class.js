@@ -526,7 +526,7 @@
      * Returns true because text has no style
      */
     isEmptyStyles: function() {
-        return true;
+      return true;
     },
 
     /**
