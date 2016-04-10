@@ -144,13 +144,6 @@
 
     /**
      * @private
-     * @type Boolean
-     * @default
-     */
-    _skipFillStrokeCheck: false,
-
-    /**
-     * @private
      */
     _reSpace: /\s|\n/,
 
