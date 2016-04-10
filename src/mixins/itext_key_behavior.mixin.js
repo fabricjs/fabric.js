@@ -7,8 +7,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: 20px; left: 0px; opacity: 0;'
+                                            + ' width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.top = (this.getBoundingRect().top + 100 +(document.body.scrollTop || document.documentElement.scrollTop)) + "px";
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
