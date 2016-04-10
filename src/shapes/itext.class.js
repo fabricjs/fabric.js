@@ -808,7 +808,7 @@
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = decl || clone(charDecl), width;
+          styleDeclaration = clone(decl) || clone(charDecl), width;
 
       this._applyFontStyles(styleDeclaration);
 
@@ -845,11 +845,7 @@
         styleDeclaration.scaleY = this.scaleY;
         styleDeclaration.canvas = this.canvas;
         this._setShadow.call(styleDeclaration, ctx);
-        delete styleDeclaration.scaleX;
-        delete styleDeclaration.scaleY;
-        delete styleDeclaration.canvas;
       }
-      this._setShadow.call(styleDeclaration, ctx);
 
       if (!this.caching || !this._charWidthsCache[cacheProp]) {
         width = ctx.measureText(_char).width;
