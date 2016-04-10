@@ -801,7 +801,7 @@
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = clone(decl) || clone(charDecl), width;
+          styleDeclaration = (decl && clone(decl)) || clone(charDecl), width;
 
       this._applyFontStyles(styleDeclaration);
 
