@@ -144,13 +144,6 @@
 
     /**
      * @private
-     * @type Boolean
-     * @default
-     */
-    _skipFillStrokeCheck: false,
-
-    /**
-     * @private
      */
     _reSpace: /\s|\n/,
 
@@ -808,7 +801,7 @@
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = decl || clone(charDecl), width;
+          styleDeclaration = (decl && clone(decl)) || clone(charDecl), width;
 
       this._applyFontStyles(styleDeclaration);
 
@@ -837,7 +830,15 @@
 
       ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
-      this._setShadow.call(styleDeclaration, ctx);
+
+      //if we want this._setShadow.call to work with styleDeclarion
+      //we have to add those references
+      if (styleDeclaration.shadow) {
+        styleDeclaration.scaleX = this.scaleX;
+        styleDeclaration.scaleY = this.scaleY;
+        styleDeclaration.canvas = this.canvas;
+        this._setShadow.call(styleDeclaration, ctx);
+      }
 
       if (!this.caching || !this._charWidthsCache[cacheProp]) {
         width = ctx.measureText(_char).width;
