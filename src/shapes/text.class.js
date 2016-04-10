@@ -523,11 +523,18 @@
     },
 
     /**
+     * Returns true because text has no style
+     */
+    isEmptyStyles: function() {
+        return true;
+    },
+
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextFill: function(ctx) {
-      if (!this.fill && !this._skipFillStrokeCheck) {
+      if (!this.fill && this.isEmptyStyles()) {
         return;
       }
 
@@ -554,7 +561,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextStroke: function(ctx) {
-      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
+      if ((!this.stroke || this.strokeWidth === 0) && this.isEmptyStyles()) {
         return;
       }
 
