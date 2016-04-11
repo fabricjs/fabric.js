@@ -382,14 +382,9 @@
     _setImageSmoothing: function() {
       var ctx = this.getContext();
 
-      if (typeof ctx.imageSmoothingEnabled !== 'undefined') {
-        ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-        return;
-      }
-      ctx.webkitImageSmoothingEnabled = this.imageSmoothingEnabled;
-      ctx.mozImageSmoothingEnabled    = this.imageSmoothingEnabled;
-      ctx.msImageSmoothingEnabled     = this.imageSmoothingEnabled;
-      ctx.oImageSmoothingEnabled      = this.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
+        || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     },
 
     /**
