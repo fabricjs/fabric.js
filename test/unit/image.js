@@ -130,7 +130,7 @@
       if (toObject.height === 0) {
         toObject.height = IMG_HEIGHT;
       }
-      deepEqual(toObject, fabric.util.object.extend({src: ''}, REFERENCE_IMG_OBJECT));
+      deepEqual(toObject, fabric.util.object.extend(REFERENCE_IMG_OBJECT, {src: ''}));
       start();
     });
   });
