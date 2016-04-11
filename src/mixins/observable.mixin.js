@@ -9,12 +9,12 @@
     if (!this.__eventListeners[eventName]) {
       return;
     }
-
+    var eventListener = this.__eventListeners[eventName];
     if (handler) {
-      fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
+      eventListener[eventListener.indexOf(handler)] = false;
     }
     else {
-      this.__eventListeners[eventName].length = 0;
+      fabric.util.array.fill(eventListener, false);
     }
   }
 
@@ -65,6 +65,7 @@
 
     // remove all key/value pairs (event name -> event handler)
     if (arguments.length === 0) {
+      // this still to figure out.
       this.__eventListeners = { };
     }
     // one object with key/value pairs was passed
@@ -101,8 +102,9 @@
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
-      listenersForEvent[i].call(this, options || { });
+      listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
     }
+    listenerForEvent = listenersForEvent.filter(function(value) { return value; });
     return this;
   }
 
