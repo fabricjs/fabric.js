@@ -200,14 +200,14 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var filters = [ ];
+      var filters = [ ], element = this._originalElement;
       this.filters.forEach(function(filterObj) {
         if (filterObj) {
           filters.push(filterObj.toObject());
         }
       });
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: this._originalElement.src || this._originalElement._src,
+        src: element ? element.src || element._src : '',
         filters: filters,
         crossOrigin: this.crossOrigin,
         alignX: this.alignX,

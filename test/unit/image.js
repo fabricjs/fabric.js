@@ -118,6 +118,23 @@
     });
   });
 
+  asyncTest('toObject with no element', function() {
+    createImageObject(function(image) {
+      image._originalElement = null;
+      ok(typeof image.toObject == 'function');
+      var toObject = image.toObject();
+      // workaround for node-canvas sometimes producing images with width/height and sometimes not
+      if (toObject.width === 0) {
+        toObject.width = IMG_WIDTH;
+      }
+      if (toObject.height === 0) {
+        toObject.height = IMG_HEIGHT;
+      }
+      deepEqual(toObject, fabric.util.object.extend(REFERENCE_IMG_OBJECT, {src: ''}));
+      start();
+    });
+  });
+
   asyncTest('toObject with resize filter', function() {
     createImageObject(function(image) {
       ok(typeof image.toObject == 'function');
