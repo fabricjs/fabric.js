@@ -104,7 +104,7 @@
       // avoiding try/catch for perf. reasons
       listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
     }
-    listenerForEvent = listenersForEvent.filter(function(value) { return value; });
+    listenersForEvent = listenersForEvent.filter(function(value) { return value; });
     return this;
   }
 
