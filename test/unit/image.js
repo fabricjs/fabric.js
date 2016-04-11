@@ -119,7 +119,7 @@
   });
 
   asyncTest('toObject with no element', function() {
-    createBrokenImageObject(function(image) {
+    createImageObject(function(image) {
       image._originalElement = null;
       ok(typeof image.toObject == 'function');
       var toObject = image.toObject();
