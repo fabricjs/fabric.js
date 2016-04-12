@@ -449,27 +449,49 @@
       'opacity should be parsed correctly from "opacity" attribute of rect element');
   });
 
-  test('stroke-opacity attribute with fill attribute', function() {
+  test('fill-opacity attribute with fill none', function() {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
-    el.setAttribute('fill', '#FF0000');
+    el.setAttribute('fill', 'none');
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+    equal(obj.fill, '', 'fill should stay empty');
+  });
+
+  test('stroke-opacity attribute with stroke attribute', function() {
+    var el = fabric.document.createElement('rect');
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('stroke-opacity', opacityValue);
+    el.setAttribute('stroke', '#FF0000');
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.stroke, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
       'opacity should be parsed correctly from "opacity" attribute of rect element');
   });
 
-  test('stroke-opacity attribute without fill attribute', function() {
+  test('stroke-opacity attribute without stroke attribute', function() {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
-    el.setAttribute('fill-opacity', opacityValue);
+    el.setAttribute('stroke-opacity', opacityValue);
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
+    equal(obj.stroke, '',
       'opacity should be parsed correctly from "opacity" attribute of rect element');
+  });
+
+  test('stroke-opacity attribute with stroke none', function() {
+    var el = fabric.document.createElement('rect');
+    var opacityValue = Math.random().toFixed(2);
+
+    el.setAttribute('stroke-opacity', opacityValue);
+    el.setAttribute('stroke', 'none');
+    var obj = fabric.Rect.fromElement(el);
+
+    equal(obj.stroke, '', 'stroke should stay empty');
   });
 
   test('getCssRule', function() {
