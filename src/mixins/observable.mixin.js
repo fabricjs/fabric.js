@@ -104,7 +104,7 @@
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
     }
-    this.__eventListeners[eventName] = listenersForEvent.filter(function(value) { return value; });
+    this.__eventListeners[eventName] = listenersForEvent.filter(function(value) { return value === false ? false : true; });
     return this;
   }
 
