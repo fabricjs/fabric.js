@@ -192,7 +192,9 @@ test('removal of past events', function() {
   foo.on('bar:baz', handler2);
   foo.on('bar:baz', handler3);
   foo.on('bar:baz', handler4);
+  equal(foo.__eventListeners['bar:baz'].length, 4, 'There should be 4 events registered now');
   foo.trigger('bar:baz');
+  equal(foo.__eventListeners['bar:baz'].length, 3, 'There should be 3 events registered now');
   equal(event1Fired, true, 'Event 1 should fire');
   equal(event2Fired, true, 'Event 2 should fire');
   equal(event3Fired, true, 'Event 3 should fire');
@@ -206,11 +208,13 @@ test('removal of past events inner loop', function() {
       handler1 = function() {
         event1Fired++;
         foo.off('bar:baz', handler1);
+        equal(foo.__eventListeners['bar:baz'].length, 4, 'There should be still 4 handlers registered');
         equal(event1Fired, 1, 'Event 1 should fire once');
         equal(event2Fired, 0, 'Event 2 should not be fired yet');
         equal(event3Fired, 0, 'Event 3 should not be fired yet');
         equal(event4Fired, 0, 'Event 4 should not be fired yet');        
         foo.trigger('bar:baz');
+        equal(foo.__eventListeners['bar:baz'].length, 3, 'There should be 3 handlers registered now');
       },
       handler2 = function() {
         event2Fired++;
@@ -232,6 +236,41 @@ test('removal of past events inner loop', function() {
   equal(event2Fired, 2, 'Event 2 should fire twice');
   equal(event3Fired, 2, 'Event 3 should fire twice');
   equal(event4Fired, 2, 'Event 4 should fire twice');
+});
+
+test('tricky removal of events', function() {
+  var foo = { },
+      event1Fired = 0, event2Fired = 0,
+      event3Fired = 0, event4Fired = 0,
+      handler1 = function() {
+        event1Fired++;
+        if (event1Fired >= 2) {
+          foo.off('bar:baz');
+        }
+        foo.trigger('bar:baz');
+      },
+      handler2 = function() {
+        event2Fired++;
+      },
+      handler3 = function() {
+        event3Fired++;
+      },
+      handler4 = function() {
+        event4Fired++;
+      };
+
+  fabric.util.object.extend(foo, fabric.Observable);
+  foo.on('bar:baz', handler1);
+  foo.on('bar:baz', handler2);
+  foo.on('bar:baz', handler3);
+  foo.on('bar:baz', handler4);
+  foo.trigger('bar:baz');
+  equal(event1Fired, 2, 'Event 1 should fire twice');
+  equal(event2Fired, 1, 'Event 2 should fire once');
+  equal(event3Fired, 1, 'Event 3 should fire once');
+  equal(event4Fired, 1, 'Event 4 should fire once');
+  foo.trigger('bar:baz');
+  equal(event1Fired, 2, 'Event 1 should fire just twice');
 });
 
 test('adding events', function() {
