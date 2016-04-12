@@ -238,53 +238,6 @@ test('removal of past events inner loop', function() {
   equal(event4Fired, 2, 'Event 4 should fire twice');
 });
 
-test('tricky removal of events', function() {
-  var foo = { },
-      event1Fired = 0, event2Fired = 0,
-      event3Fired = 0, event4Fired = 0,
-      handler1 = function() {
-        event1Fired++;
-        if (event1Fired === 1) {
-          foo.off('bar:baz', handler4);
-        }
-        if (event1Fired === 2) {
-          foo.off('bar:baz', handler3);
-        }
-        if (event1Fired === 3) {
-          foo.off('bar:baz', handler2);
-        }
-        if (event1Fired === 4) {
-          foo.off('bar:baz', handler1);
-        }
-        foo.trigger('bar:baz');
-      },
-      handler2 = function() {
-        event2Fired++;
-      },
-      handler3 = function() {
-        event3Fired++;
-      },
-      handler4 = function() {
-        event4Fired++;
-      };
-
-  fabric.util.object.extend(foo, fabric.Observable);
-  foo.on('bar:baz', handler1);
-  foo.on('bar:baz', handler2);
-  foo.on('bar:baz', handler3);
-  foo.on('bar:baz', handler4);
-  foo.trigger('bar:baz');
-  equal(event1Fired, 4, 'Event 1 should fire 4 times');
-  equal(event2Fired, 2, 'Event 2 should not fire');
-  equal(event3Fired, 1, 'Event 3 should not fire');
-  equal(event4Fired, 0, 'Event 4 should not fire');
-  foo.trigger('bar:baz');
-  equal(event1Fired, 4, 'Event 1 should fire 4 times');
-  equal(event2Fired, 2, 'Event 2 should not fire');
-  equal(event3Fired, 1, 'Event 3 should not fire');
-  equal(event4Fired, 0, 'Event 4 should not fire');
-});
-
 test('adding events', function() {
   var foo = { },
       event1Fired = false, event2Fired = false,
@@ -313,6 +266,9 @@ test('adding events', function() {
   equal(event2Fired, true, 'Event 2 should fire');
   equal(event3Fired, false, 'Event 3 should not fire');
   equal(event4Fired, false, 'Event 4 should not fire');
+  foo.trigger('bar:baz');
+  equal(event3Fired, true, 'Event 3 should be triggered now');
+  equal(event4Fired, true, 'Event 4 should be triggered now');
 });
 
 
