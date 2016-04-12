@@ -65,8 +65,9 @@
 
     // remove all key/value pairs (event name -> event handler)
     if (arguments.length === 0) {
-      // this still to figure out.
-      this.__eventListeners = { };
+      for (eventName in this.__eventListeners) {
+        _removeEventListener.call(this, eventName);
+      }
     }
     // one object with key/value pairs was passed
     else if (arguments.length === 1 && typeof arguments[0] === 'object') {
