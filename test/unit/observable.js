@@ -175,7 +175,7 @@ test('removal of past events', function() {
       event3Fired = false, event4Fired = false,
       handler1 = function() {
         event1Fired = true;
-        foo.on('bar:baz', handler1);
+        foo.off('bar:baz', handler1);
       },
       handler2 = function() {
         event2Fired = true;
