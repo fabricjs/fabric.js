@@ -244,7 +244,7 @@ test('tricky removal of events', function() {
       event3Fired = 0, event4Fired = 0,
       handler1 = function() {
         event1Fired++;
-        if (event1Fired >= 2) {
+        if (event1Fired > 2) {
           foo.off('bar:baz');
         }
         foo.trigger('bar:baz');
@@ -265,12 +265,12 @@ test('tricky removal of events', function() {
   foo.on('bar:baz', handler3);
   foo.on('bar:baz', handler4);
   foo.trigger('bar:baz');
-  equal(event1Fired, 2, 'Event 1 should fire twice');
-  equal(event2Fired, 1, 'Event 2 should fire once');
-  equal(event3Fired, 1, 'Event 3 should fire once');
-  equal(event4Fired, 1, 'Event 4 should fire once');
+  equal(event1Fired, 3, 'Event 1 should fire three times');
+  equal(event2Fired, 0, 'Event 2 should not fire');
+  equal(event3Fired, 0, 'Event 3 should not fire');
+  equal(event4Fired, 0, 'Event 4 should not fire');
   foo.trigger('bar:baz');
-  equal(event1Fired, 2, 'Event 1 should fire just twice');
+  equal(event1Fired, 3, 'Event 1 should fire just three times');
 });
 
 test('adding events', function() {
