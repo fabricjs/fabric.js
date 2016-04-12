@@ -106,11 +106,11 @@
   function _setStrokeFillOpacity(attributes) {
     for (var attr in colorAttributes) {
 
-      if (typeof attributes[colorAttributes[attr]] === 'undefined') {
+      if (typeof attributes[colorAttributes[attr]] === 'undefined' || attributes[attr] === '') {
         continue;
       }
 
-      if (!attributes[attr]) {
+      if (typeof attributes[attr] === 'undefined') {
         if (!fabric.Object.prototype[attr]) {
           continue;
         }
