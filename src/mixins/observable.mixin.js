@@ -102,10 +102,9 @@
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      // avoiding try/catch for perf. reasons
       listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
     }
-    listenersForEvent = listenersForEvent.filter(function(value) { return value; });
+    this.__eventListeners[eventName] = listenersForEvent.filter(function(value) { return value; });
     return this;
   }
 
