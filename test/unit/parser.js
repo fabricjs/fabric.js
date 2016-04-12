@@ -479,8 +479,7 @@
     el.setAttribute('stroke-opacity', opacityValue);
     var obj = fabric.Rect.fromElement(el);
 
-    equal(obj.stroke, '',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    equal(obj.stroke, null, 'Default stroke is null');
   });
 
   test('stroke-opacity attribute with stroke none', function() {
