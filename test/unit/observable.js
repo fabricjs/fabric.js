@@ -199,6 +199,41 @@ test('removal of past events', function() {
   equal(event4Fired, true, 'Event 4 should fire');
 });
 
+test('removal of past events inner loop', function() {
+  var foo = { },
+      event1Fired = 0, event2Fired = 0,
+      event3Fired = 0, event4Fired = 0,
+      handler1 = function() {
+        event1Fired++;
+        foo.off('bar:baz', handler1);
+        equal(event1Fired, 1, 'Event 1 should fire once');
+        equal(event2Fired, 0, 'Event 2 should not be fired yet');
+        equal(event3Fired, 0, 'Event 3 should not be fired yet');
+        equal(event4Fired, 0, 'Event 4 should not be fired yet');        
+        foo.trigger('bar:baz');
+      },
+      handler2 = function() {
+        event2Fired++;
+      },
+      handler3 = function() {
+        event3Fired++;
+      },
+      handler4 = function() {
+        event4Fired++;
+      };
+
+  fabric.util.object.extend(foo, fabric.Observable);
+  foo.on('bar:baz', handler1);
+  foo.on('bar:baz', handler2);
+  foo.on('bar:baz', handler3);
+  foo.on('bar:baz', handler4);
+  foo.trigger('bar:baz');
+  equal(event1Fired, 1, 'Event 1 should fire once');
+  equal(event2Fired, 2, 'Event 2 should fire twice');
+  equal(event3Fired, 2, 'Event 3 should fire twice');
+  equal(event4Fired, 2, 'Event 4 should fire twice');
+});
+
 test('adding events', function() {
   var foo = { },
       event1Fired = false, event2Fired = false,
