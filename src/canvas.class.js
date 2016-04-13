@@ -569,7 +569,7 @@
      * @return {Boolean} true if the skewing occurred
      */
     _setObjectSkew: function(localMouse, transform, by, _dim) {
-      var target = transform.target, newValue,
+      var target = transform.target, newValue, skewed = false,
           skewSign = transform.skewSign, newDim, dimNoSkew,
           otherBy, _otherBy, _by, newDimMouse, skewX, skewY;
 
@@ -598,12 +598,14 @@
                                         (dimNoSkew[otherBy] / target['scale' + _otherBy]));
         newValue = fabric.util.radiansToDegrees(newValue);
       }
+      skewed = target['skew' + _by] !== newValue;
       target.set('skew' + _by, newValue);
       if (target['skew' + _otherBy] !== 0) {
         newDim = target._getTransformedDimensions();
         newValue = (_dim[otherBy] / newDim[otherBy]) * target['scale' + _otherBy];
         target.set('scale' + _otherBy, newValue);
       }
+      return skewed;
     },
 
     /**
@@ -651,8 +653,8 @@
 
       transform.newScaleX = localMouse.x * target.scaleX / _dim.x;
       transform.newScaleY = localMouse.y * target.scaleY / _dim.y;
-      changeX = target.scaleX != transform.newScaleX;
-      changeY = target.scaleY != transform.newScaleY;
+      changeX = target.scaleX !== transform.newScaleX;
+      changeY = target.scaleY !== transform.newScaleY;
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -695,7 +697,7 @@
       // because the object may have a min scale and we'll loose the proportions
       transform.newScaleX = transform.original.scaleX * dist / lastDist;
       transform.newScaleY = transform.original.scaleY * dist / lastDist;
-      scaled = transform.newScaleX != target.scaleX || transform.newScaleY != target.scaleY;
+      scaled = transform.newScaleX !== target.scaleX || transform.newScaleY !== target.scaleY;
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);
       return scaled;
