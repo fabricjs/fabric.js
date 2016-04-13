@@ -3,6 +3,9 @@ var fs = require('fs'),
 
 var modules = [
   'text',
+  'itext',
+  'textbox',
+  'animation',
   'gestures',
   'easing',
   'parser',
