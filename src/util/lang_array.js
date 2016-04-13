@@ -214,6 +214,17 @@
   /**
    * @private
    */
+  function fill(array, value) {
+    var k = array.length;
+    while (k--) {
+      array[k] = value;
+    }
+    return array;
+  }
+
+  /**
+   * @private
+   */
   function find(array, byProperty, condition) {
     if (!array || array.length === 0) {
       return;
@@ -242,6 +253,7 @@
    * @namespace fabric.util.array
    */
   fabric.util.array = {
+    fill: fill,
     invoke: invoke,
     min: min,
     max: max
