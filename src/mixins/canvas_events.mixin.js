@@ -305,7 +305,7 @@
       target.setCoords();
       this._restoreOriginXY(target);
 
-      if (target.isMoving || (this.stateful && target.hasStateChanged())) {
+      if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         this.fire('object:modified', { target: target });
         target.fire('modified');
       }
@@ -598,33 +598,32 @@
       var x = pointer.x,
           y = pointer.y,
           target = transform.target,
-          action = transform.action;
+          action = transform.action,
+          actionPerformed = false;
 
       if (action === 'rotate') {
-        this._rotateObject(x, y) && this._fire('rotating', target, e);
+        (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', target, e);
       }
       else if (action === 'scale') {
-        this._onScale(e, transform, x, y) && this._fire('scaling', target, e);
+        (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', target, e);
       }
       else if (action === 'scaleX') {
-        this._scaleObject(x, y, 'x') && this._fire('scaling', target, e);
+        (actionPerformed = this._scaleObject(x, y, 'x')) && this._fire('scaling', target, e);
       }
       else if (action === 'scaleY') {
-        this._scaleObject(x, y, 'y') && this._fire('scaling', target, e);
+        (actionPerformed = this._scaleObject(x, y, 'y')) && this._fire('scaling', target, e);
       }
       else if (action === 'skewX') {
-        this._skewObject(x, y, 'x');
-        this._fire('skewing', target, e);
+        (actionPerformed = this._skewObject(x, y, 'x')) && this._fire('skewing', target, e);
       }
       else if (action === 'skewY') {
-        this._skewObject(x, y, 'y');
-        this._fire('skewing', target, e);
+        (actionPerformed = this._skewObject(x, y, 'y')) && this._fire('skewing', target, e);
       }
       else {
-        this._translateObject(x, y);
-        this._fire('moving', target, e);
+        (actionPerformed = this._translateObject(x, y)) && this._fire('moving', target, e);
         this.setCursor(this.moveCursor);
       }
+      transform.actionPerformed = actionPerformed;
     },
 
     /**
