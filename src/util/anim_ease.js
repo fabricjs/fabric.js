@@ -9,7 +9,8 @@
       //handle the 0/0 case:
       if (c === 0 && a === 0) {
         s = p / (2 * Math.PI) * Math.asin(1);
-      } else {
+      }
+      else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
     }
