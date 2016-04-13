@@ -601,20 +601,16 @@
           action = transform.action;
 
       if (action === 'rotate') {
-        this._rotateObject(x, y);
-        this._fire('rotating', target, e);
+        this._rotateObject(x, y) && this._fire('rotating', target, e);
       }
       else if (action === 'scale') {
-        this._onScale(e, transform, x, y);
-        this._fire('scaling', target, e);
+        this._onScale(e, transform, x, y) && this._fire('scaling', target, e);
       }
       else if (action === 'scaleX') {
-        this._scaleObject(x, y, 'x');
-        this._fire('scaling', target, e);
+        this._scaleObject(x, y, 'x') && this._fire('scaling', target, e);
       }
       else if (action === 'scaleY') {
-        this._scaleObject(x, y, 'y');
-        this._fire('scaling', target, e);
+        this._scaleObject(x, y, 'y') && this._fire('scaling', target, e);
       }
       else if (action === 'skewX') {
         this._skewObject(x, y, 'x');
@@ -659,13 +655,14 @@
 
     /**
      * @private
+     * @return {Boolean} true if the scaling occurred
      */
     _onScale: function(e, transform, x, y) {
       // rotate object only if shift key is not pressed
       // and if it is not a group we are transforming
       if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
         transform.currentAction = 'scale';
-        this._scaleObject(x, y);
+        return this._scaleObject(x, y);
       }
       else {
         // Switch from a normal resize to proportional
@@ -674,7 +671,7 @@
         }
 
         transform.currentAction = 'scaleEqually';
-        this._scaleObject(x, y, 'equally');
+        return this._scaleObject(x, y, 'equally');
       }
     },
 
