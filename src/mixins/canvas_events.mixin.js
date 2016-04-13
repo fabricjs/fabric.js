@@ -303,12 +303,11 @@
       }
 
       target.setCoords();
+      this._restoreOriginXY(target);
 
       //was under this condition (this.stateful && target.hasStateChanged())
       this.fire('object:modified', { target: target });
       target.fire('modified');
-
-      this._restoreOriginXY(target);
     },
 
     /**
