@@ -479,16 +479,19 @@
      * @private
      * @param {Number} x pointer's x coordinate
      * @param {Number} y pointer's y coordinate
+     * @return {Boolean} true if the translation occurred
      */
     _translateObject: function (x, y) {
-      var target = this._currentTransform.target;
+      var transform = this._currentTransform,
+          target = transform.target,
+          newLeft = x - transform.offsetX,
+          newTop = y - transform.offsetY,
+          moveX = !target.get('lockMovementX') && target.left !== newLeft,
+          moveY = !target.get('lockMovementY') && target.top !== newTop;
 
-      if (!target.get('lockMovementX')) {
-        target.set('left', x - this._currentTransform.offsetX);
-      }
-      if (!target.get('lockMovementY')) {
-        target.set('top', y - this._currentTransform.offsetY);
-      }
+      moveX && target.set('left', newLeft);
+      moveY && target.set('top', newTop);
+      return moveX || moveY;
     },
 
     /**
