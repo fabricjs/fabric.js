@@ -304,20 +304,30 @@
      */
     isTargetTransparent: function (target, x, y) {
       var hasBorders = target.hasBorders,
-          transparentCorners = target.transparentCorners;
-
+          transparentCorners = target.transparentCorners,
+          ctx = this.contextCache,
+          shouldTransform = target.group && target.group === this.getActiveGroup();
       target.hasBorders = target.transparentCorners = false;
 
-      target.render(this.contextCache);
-      target._renderControls(this.contextCache);
+      if (shouldTransform) {
+        ctx.save();
+        var m = target.group.calcTransformMatrix();
+        console.log(m);
+        ctx.transform.apply(ctx, m);
+      }
+
+      target.render(ctx);
+      target._renderControls(ctx);
+
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
 
       var isTransparent = fabric.util.isTransparent(
-        this.contextCache, x, y, this.targetFindTolerance);
+        ctx, x, y, this.targetFindTolerance);
+      shouldTransform && ctx.restore();
 
-      this.clearContext(this.contextCache);
+      this.clearContext(ctx);
 
       return isTransparent;
     },
