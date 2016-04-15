@@ -855,7 +855,7 @@
     renderAll: function () {
       var canvasToDrawOn = this.contextContainer, objsToRender;
 
-      if (this.contextTop && this.selection && !this._groupSelector &&!this.isDrawingMode) {
+      if (this.contextTop && this.selection && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
       }
 
