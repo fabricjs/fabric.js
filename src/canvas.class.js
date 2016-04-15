@@ -307,18 +307,16 @@
           transparentCorners = target.transparentCorners,
           ctx = this.contextCache,
           shouldTransform = target.group && target.group === this.getActiveGroup();
+
       target.hasBorders = target.transparentCorners = false;
 
       if (shouldTransform) {
         ctx.save();
         var m = target.group.calcTransformMatrix();
-        console.log(m);
         ctx.transform.apply(ctx, m);
       }
-
       target.render(ctx);
       target._renderControls(ctx);
-
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
