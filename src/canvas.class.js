@@ -916,7 +916,7 @@
 
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+      if (!skipGroup && this._checkTarget(e, activeGroup, this.getPointer(e, true))) {
         return activeGroup;
       }
 
