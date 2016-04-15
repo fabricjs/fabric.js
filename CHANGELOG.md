@@ -61,7 +61,7 @@
 - Fix gradientTransform not exported in gradient toObject [#2486](https://github.com/kangax/fabric.js/pull/2486)
 - Fix object.toDataUrl with multiplier [#2487](https://github.com/kangax/fabric.js/pull/2487)
 BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.renderAll.
-- Fix mask filter, mask image is now streched on all image [#2543](https://github.com/kangax/fabric.js/pull/2487)
+- Fix mask filter, mask image is now streched on all image [#2543](https://github.com/kangax/fabric.js/pull/2543)
 - Fix text onInput event to behave correctly if some text is selected [#2501](https://github.com/kangax/fabric.js/pull/2502)
 - Fix object with selectable = false could be selected with shift click [#2503](https://github.com/kangax/fabric.js/pull/2503)
 - Fix for mask filter when bigger or smaller image is used [#2534](https://github.com/kangax/fabric.js/pull/2534)
