@@ -312,8 +312,7 @@
 
       if (shouldTransform) {
         ctx.save();
-        var m = target.group.calcTransformMatrix();
-        ctx.transform.apply(ctx, m);
+        ctx.transform.apply(ctx, target.group.calcTransformMatrix());
       }
       target.render(ctx);
       target._renderControls(ctx);
