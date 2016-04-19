@@ -271,10 +271,8 @@
       if (target) {
         target.isMoving = false;
       }
-
-      shouldRender && this.renderAll();
-
       this._handleCursorAndEvent(e, target);
+      shouldRender && this.renderAll();
     },
 
     _handleCursorAndEvent: function(e, target) {
@@ -287,7 +285,9 @@
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mouseup', { e: e })
+      }
     },
 
     /**
@@ -350,8 +350,8 @@
       this.fire('mouse:down', { e: e });
 
       var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousedown', { e: e, target: target });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mousedown', { e: e })
       }
     },
 
@@ -369,8 +369,8 @@
       this.fire('mouse:move', { e: e });
 
       var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousemove', { e: e, target: target });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mousemove', { e: e })
       }
     },
 
@@ -387,8 +387,8 @@
       this.fire('mouse:up', { e: e });
 
       var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mouseup', { e: e, target: target });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mouseup', { e: e })
       }
     },
 
@@ -420,7 +420,6 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true);
-
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
@@ -439,11 +438,12 @@
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
-      // we must renderAll so that active image is placed on the top canvas
-      shouldRender && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
-      target && target.fire('mousedown', { e: e });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mousedown', { e: e })
+      }
+      shouldRender && this.renderAll();
     },
 
     /**
@@ -571,7 +571,9 @@
       }
 
       this.fire('mouse:move', { target: target, e: e });
-      target && target.fire('mousemove', { e: e });
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mousemove', { e: e })
+      }
     },
 
     /**
