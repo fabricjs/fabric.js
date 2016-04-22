@@ -258,7 +258,7 @@
 
   test('findTarget on activegroup', function() {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
-    var rect2 = makeRect({ left: 20, top: 0 }), target;
+    var rect2 = makeRect({ left: 20, top: 0 });
     canvas.add(rect1);
     canvas.add(rect2);
     var group = new fabric.Group([ rect1, rect2 ]);
