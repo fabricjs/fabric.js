@@ -235,8 +235,6 @@
   asyncTest('getPointer', function() {
     ok(typeof canvas.getPointer == 'function');
 
-    window.scroll(0, 0);
-
     fabric.util.addListener(upperCanvasEl, 'click', function(e) {
        canvas.calcOffset();
        var pointer = canvas.getPointer(e);
