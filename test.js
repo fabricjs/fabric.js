@@ -5,7 +5,7 @@ testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 
 testrunner.options.coverage = true;
-testrunner.options.maxBlockDuration = 240000;
+testrunner.options.maxBlockDuration = 120000;
 
 testrunner.run({
     deps: "./test/fixtures/test_script.js",
