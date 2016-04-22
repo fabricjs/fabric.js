@@ -231,6 +231,7 @@
       clientX: 30, clientY: 30
     }, true);
     equal(target, null, 'Should not find target');
+    canvas.remove(rect);
   });
 
   test('findTarget with perPixelTargetFind', function() {
@@ -246,10 +247,12 @@
       clientX: 2, clientY: 1
     }, true);
     equal(target, null, 'Should return null because of transparency checks');
-    //target = canvas.findTarget({
-    //  clientX: 5, clientY: 5
-    //}, true);
-    //equal(target, triangle, 'Should return the triangle now');
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, triangle, 'Should return the triangle now');
+    canvas.perPixelTargetFind = false;
+    canvas.remove(triangle);
   });
 
   test('toDataURL', function() {
