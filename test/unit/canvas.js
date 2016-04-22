@@ -62,7 +62,7 @@
 
   function makeTriangle(options) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Traingle(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
   QUnit.module('fabric.Canvas', {
