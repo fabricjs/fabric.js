@@ -216,6 +216,12 @@
 
   test('findTarget', function() {
     ok(typeof canvas.findTarget == 'function');
+    var rect = makeRect({ left: 0, top: 0 });
+    canvas.add(rect);
+    var target canvas.findTarget({
+      pointerX: 5, pointerY: 5
+    });
+    equal(rect, target, 'Should return the rect')
   });
 
   test('toDataURL', function() {
