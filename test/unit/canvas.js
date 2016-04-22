@@ -219,8 +219,8 @@
     var rect = makeRect({ left: 0, top: 0 });
     canvas.add(rect);
     var target = canvas.findTarget({
-      pointerX: 5, pointerY: 5
-    });
+      clientX: 5, clientY: 5
+    }, true);
     equal(rect, target, 'Should return the rect')
   });
 
