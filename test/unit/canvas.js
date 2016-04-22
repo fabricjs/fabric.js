@@ -256,6 +256,22 @@
     canvas.remove(triangle);
   });
 
+  test('findTarget on activegroup', function() {
+    var rect1 = makeRect({ left: 0, top: 0 }), target;
+    var rect2 = makeRect({ left: 20, top: 0 }), target;
+    canvas.add(rect1);
+    canvas.add(rect2);
+    var group = new fabric.Group([ rect1, rect2 ]);
+    canvas.add(group);
+    canvas.setActiveGroup(group);
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, group, 'Should return the activegroup');
+    //TODO: make it work with perPixelTargetFind
+  });
+
+
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
