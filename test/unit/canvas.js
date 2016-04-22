@@ -238,24 +238,24 @@
     }
   });
 
-  asyncTest('getPointer', function() {
-    ok(typeof canvas.getPointer == 'function');
+//  asyncTest('getPointer', function() {
+//    ok(typeof canvas.getPointer == 'function');
+//
+//    fabric.util.addListener(upperCanvasEl, 'click', function(e) {
+//       canvas.calcOffset();
+//       var pointer = canvas.getPointer(e);
+//       equal(pointer.x, 101, 'pointer.x should be correct');
+//       equal(pointer.y, 102, 'pointer.y should be correct');
+//
+//       start();
+//   });
 
-    fabric.util.addListener(upperCanvasEl, 'click', function(e) {
-       canvas.calcOffset();
-       var pointer = canvas.getPointer(e);
-       equal(pointer.x, 101, 'pointer.x should be correct');
-       equal(pointer.y, 102, 'pointer.y should be correct');
-
-       start();
-   });
-
-     setTimeout(function() {
-       simulateEvent(upperCanvasEl, 'click', {
-         pointerX: 101, pointerY: 102
-       });
-     }, 100);
- });
+//     setTimeout(function() {
+//       simulateEvent(upperCanvasEl, 'click', {
+//         pointerX: 101, pointerY: 102
+//       });
+//     }, 100);
+// });
 
   test('getCenter', function() {
     ok(typeof canvas.getCenter == 'function');
