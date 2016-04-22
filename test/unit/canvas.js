@@ -60,6 +60,11 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
+  function makeTriangle(options) {
+    var defaultOptions = { width: 10, height: 10 };
+    return new fabric.Traingle(fabric.util.object.extend(defaultOptions, options || { }));
+  }
+
   QUnit.module('fabric.Canvas', {
     setup: function() {
       upperCanvasEl.style.display = '';
@@ -216,12 +221,35 @@
 
   test('findTarget', function() {
     ok(typeof canvas.findTarget == 'function');
-    var rect = makeRect({ left: 0, top: 0 });
+    var rect = makeRect({ left: 0, top: 0 }), target;
     canvas.add(rect);
-    var target = canvas.findTarget({
+    target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
-    equal(rect, target, 'Should return the rect')
+    equal(target, rect, 'Should return the rect');
+    target = canvas.findTarget({
+      clientX: 30, clientY: 30
+    }, true);
+    equal(target, null, 'Should not find target');
+  });
+
+  test('findTarget with perPixelTargetFind', function() {
+    ok(typeof canvas.findTarget == 'function');
+    var triangle = makeTriangle({ left: 0, top: 0 }), target;
+    canvas.add(triangle);
+    target = canvas.findTarget({
+      clientX: 2, clientY: 1
+    }, true);
+    equal(target, triangle, 'Should return the triangle by bounding box');
+    canvas.perPixelTargetFind = true;
+    target = canvas.findTarget({
+      clientX: 2, clientY: 1
+    }, true);
+    equal(target, null, 'Should return null because of transparency checks');
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, triangle, 'Should return the triangle now');
   });
 
   test('toDataURL', function() {
