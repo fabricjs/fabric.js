@@ -241,7 +241,7 @@
       clientX: 2, clientY: 1
     }, true);
     equal(target, triangle, 'Should return the triangle by bounding box');
-    canvas.perPixelTargetFind = true;
+    //canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
       clientX: 2, clientY: 1
     }, true);
