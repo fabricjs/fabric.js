@@ -37,7 +37,7 @@
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "canvas": "1.3.x",
     "jsdom": "3.x.x",
     "xmldom": "0.1.x"
