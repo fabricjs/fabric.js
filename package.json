@@ -37,14 +37,13 @@
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "canvas": "1.3.x",
     "jsdom": "3.x.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "execSync": "1.0.x",
-    "uglify-js": "2.4.x",
+    "uglify-js": "2.6.x",
     "jscs": "2.1.x",
     "jshint": "2.8.x",
     "qunit": "0.7.x",
