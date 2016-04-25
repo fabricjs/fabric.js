@@ -249,20 +249,19 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-      var target;
+      var target, searchTarget = true, transform = this._currentTransform;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
         return;
       }
 
-      if (this._currentTransform) {
+      if (transform) {
         this._finalizeCurrentTransform();
-        target = this._currentTransform.target;
+        searchTarget = !transform.actionPerformed;
       }
-      else {
-        target = this.findTarget(e, true);
-      }
+
+      target = searchTarget ? this.findTarget(e, true) : transform.target;
 
       var shouldRender = this._shouldRender(target, this.getPointer(e));
 
@@ -280,11 +279,12 @@
     _handleCursorAndEvent: function(e, target) {
       this._setCursorFromEvent(e, target);
 
+      // Can't find any reason, disabling for now
       // TODO: why are we doing this?
-      var _this = this;
+      /* var _this = this;
       setTimeout(function () {
         _this._setCursorFromEvent(e, target);
-      }, 50);
+      }, 50); */
 
       this.fire('mouse:up', { target: target, e: e });
       target && target.fire('mouseup', { e: e });
