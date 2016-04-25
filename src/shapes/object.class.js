@@ -31,6 +31,8 @@
    *
    * @fires mousedown
    * @fires mouseup
+   * @fires mouseover
+   * @fires mouseout
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
