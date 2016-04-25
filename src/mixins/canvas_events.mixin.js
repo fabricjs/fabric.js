@@ -449,9 +449,16 @@
         target = this.getActiveGroup();
       }
 
-      if (target && target.selectable && (target.__corner || !shouldGroup)) {
-        this._beforeTransform(e, target);
-        this._setupCurrentTransform(e, target);
+      if (target) {
+        if (target.selectable && (target.__corner || !shouldGroup)) {
+          this._beforeTransform(e, target);
+          this._setupCurrentTransform(e, target);
+        }
+
+        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+          this.deactivateAll();
+          this.setActiveObject(target, e);
+        }
       }
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
@@ -471,10 +478,6 @@
         this.onBeforeScaleRotate(target);
       }
 
-      if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-        this.deactivateAll();
-        this.setActiveObject(target, e);
-      }
     },
 
     /**
