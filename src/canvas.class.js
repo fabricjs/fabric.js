@@ -315,7 +315,7 @@
         ctx.transform.apply(ctx, target.group.calcTransformMatrix());
       }
       target.render(ctx);
-      target._renderControls(ctx);
+      target.active && target._renderControls(ctx);
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
