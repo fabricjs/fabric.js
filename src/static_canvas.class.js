@@ -1401,22 +1401,37 @@
     },
 
     /**
-     * Moves an object down in stack of drawn objects
+     * Moves an object or a selection down in stack of drawn objects
      * @param {fabric.Object} object Object to send
      * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     sendBackwards: function (object, intersecting) {
-      var idx = this._objects.indexOf(object);
+      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+          i, obj, idx, newIdx;
 
-      // if object is not on the bottom of stack
-      if (idx !== 0) {
-        var newIdx = this._findNewLowerIndex(object, idx, intersecting);
-
-        removeFromArray(this._objects, object);
-        this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
+      if (object === activeGroup) {
+        for (i = activeGroup._objects.length; i--;) {
+          obj = activeGroup._objects[i];
+          idx = this._objects.indexOf(obj);
+          if (idx === 0) {
+            continue;
+          }
+          newIdx = idx - 1;
+          removeFromArray(this._objects, obj);
+          this._objects.splice(newIdx, 0, obj);
+        }
+      }
+      else {
+        idx = this._objects.indexOf(object);
+        if (idx !== 0) {
+          // if object is not on the bottom of stack
+          newIdx = this._findNewLowerIndex(object, idx, intersecting);
+          removeFromArray(this._objects, object);
+          this._objects.splice(newIdx, 0, object);
+          this.renderAll && this.renderAll();
+        }
       }
       return this;
     },
@@ -1451,23 +1466,35 @@
     },
 
     /**
-     * Moves an object up in stack of drawn objects
+     * Moves an object or a selection up in stack of drawn objects
      * @param {fabric.Object} object Object to send
      * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     bringForward: function (object, intersecting) {
-      var idx = this._objects.indexOf(object);
+      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+          i, obj, idx = this._objects.indexOf(object), newIdx;
 
-      // if object is not on top of stack (last item in an array)
-      if (idx !== this._objects.length - 1) {
+      if (object === activeGroup) {
+        newIdx = idx + 1;
+        for (i = activeGroup._objects.length; i--;) {
+          if (idx === this._objects.length - 1) {
+            continue;
+          }
+          obj = activeGroup._objects[i];
+          removeFromArray(this._objects, obj);
+          this._objects.splice(newIdx, 0, obj);
+        }
+      }
+      else if (idx !== this._objects.length - 1) {
+        // if object is not on top of stack (last item in an array)
         var newIdx = this._findNewUpperIndex(object, idx, intersecting);
-
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
       }
+
       return this;
     },
 
