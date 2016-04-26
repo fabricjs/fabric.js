@@ -1347,7 +1347,7 @@
     /* _TO_SVG_END_ */
 
     /**
-     * Moves an object or the objects of a multiple selection 
+     * Moves an object or the objects of a multiple selection
      * to the bottom of the stack of drawn objects
      * @param {fabric.Object} object Object to send to back
      * @return {fabric.Canvas} thisArg
@@ -1374,7 +1374,7 @@
     },
 
     /**
-     * Moves an object or the objects of a multiple selection 
+     * Moves an object or the objects of a multiple selection
      * to the top of the stack of drawn objects
      * @param {fabric.Object} object Object to send
      * @return {fabric.Canvas} thisArg
