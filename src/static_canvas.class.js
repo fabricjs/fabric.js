@@ -1357,7 +1357,8 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup(), i, obj;
+      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+          i, obj;
       if (object === activeGroup) {
         for (i = activeGroup._objects.length; i--;) {
           obj = activeGroup._objects[i];
@@ -1383,7 +1384,8 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup(), i, obj;
+      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+          i, obj;
       if (object === activeGroup) {
         for (i = 0; i < activeGroup._objects.length; i++) {
           obj = activeGroup._objects[i];
