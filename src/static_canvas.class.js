@@ -1412,7 +1412,7 @@
           i, obj, idx, newIdx;
 
       if (object === activeGroup) {
-        for (i = activeGroup._objects.length; i--;) {
+        for (i = 0; i < activeGroup._objects.length; i++) {
           obj = activeGroup._objects[i];
           idx = this._objects.indexOf(obj);
           if (idx === 0) {
@@ -1489,7 +1489,7 @@
       }
       else if (idx !== this._objects.length - 1) {
         // if object is not on top of stack (last item in an array)
-        var newIdx = this._findNewUpperIndex(object, idx, intersecting);
+        newIdx = this._findNewUpperIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
