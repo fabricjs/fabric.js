@@ -1355,7 +1355,8 @@
     sendToBack: function (object) {
       removeFromArray(this._objects, object);
       this._objects.unshift(object);
-      return this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.renderAll();
+      return this;
     },
 
     /**
@@ -1367,7 +1368,8 @@
     bringToFront: function (object) {
       removeFromArray(this._objects, object);
       this._objects.push(object);
-      return this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.renderAll();
+      return this;
     },
 
     /**
@@ -1386,7 +1388,7 @@
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
+        this.renderOnAddRemove && this.renderAll();
       }
       return this;
     },
@@ -1436,7 +1438,7 @@
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
+        this.renderOnAddRemove && this.renderAll();
       }
       return this;
     },
@@ -1480,7 +1482,8 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.renderAll();
+      return this;
     },
 
     /**
