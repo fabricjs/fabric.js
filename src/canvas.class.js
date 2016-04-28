@@ -1336,6 +1336,7 @@
   }
 
   /**
+   * @ignore
    * @class fabric.Element
    * @alias fabric.Canvas
    * @deprecated Use {@link fabric.Canvas} instead.
