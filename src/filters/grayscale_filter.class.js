@@ -9,7 +9,7 @@
    * @class fabric.Image.filters.Grayscale
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Grayscale();
    * object.filters.push(filter);

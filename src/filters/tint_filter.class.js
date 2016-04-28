@@ -12,7 +12,7 @@
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
    * @see {@link fabric.Image.filters.Tint#initialize} for constructor definition
-   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example <caption>Tint filter with hex color and opacity</caption>
    * var filter = new fabric.Image.filters.Tint({
    *   color: '#3513B0',

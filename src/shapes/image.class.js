@@ -17,7 +17,7 @@
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#images}
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
