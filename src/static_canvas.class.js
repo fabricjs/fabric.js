@@ -1358,10 +1358,11 @@
         return this;
       }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
-          i, obj;
+          i, obj, objs;
       if (object === activeGroup) {
-        for (i = activeGroup._objects.length; i--;) {
-          obj = activeGroup._objects[i];
+        objs = activeGroup._objects;
+        for (i = objs.length; i--;) {
+          obj = objs[i];
           removeFromArray(this._objects, obj);
           this._objects.unshift(obj);
         }
@@ -1385,10 +1386,11 @@
         return this;
       }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
-          i, obj;
+          i, obj, objs;
       if (object === activeGroup) {
-        for (i = 0; i < activeGroup._objects.length; i++) {
-          obj = activeGroup._objects[i];
+        objs = activeGroup._objects;
+        for (i = 0; i < objs.length; i++) {
+          obj = objs[i];
           removeFromArray(this._objects, obj);
           this._objects.push(obj);
         }
@@ -1412,11 +1414,12 @@
         return this;
       }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
-          i, obj, idx, newIdx;
+          i, obj, idx, newIdx, objs;
 
       if (object === activeGroup) {
-        for (i = 0; i < activeGroup._objects.length; i++) {
-          obj = activeGroup._objects[i];
+        objs = activeGroup._objects;
+        for (i = 0; i < objs.length; i++) {
+          obj = objs[i];
           idx = this._objects.indexOf(obj);
           if (idx !== 0) {
             newIdx = idx - 1;
@@ -1479,12 +1482,13 @@
         return this;
       }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
-          i, obj, idx, newIdx;
+          i, obj, idx, newIdx, objs;
 
       if (object === activeGroup) {
-        for (i = activeGroup._objects.length; i--;) {
-          obj = activeGroup._objects[i];
-          idx = this._objects.indexOf(obj)
+        objs = activeGroup._objects;
+        for (i = objs.length; i--;) {
+          obj = objs[i];
+          idx = this._objects.indexOf(obj);
           if (idx !== this._objects.length - 1) {
             newIdx = idx + 1;
             removeFromArray(this._objects, obj);
