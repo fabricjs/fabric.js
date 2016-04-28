@@ -1415,12 +1415,11 @@
         for (i = 0; i < activeGroup._objects.length; i++) {
           obj = activeGroup._objects[i];
           idx = this._objects.indexOf(obj);
-          if (idx === 0) {
-            continue;
+          if (idx !== 0) {
+            newIdx = idx - 1;
+            removeFromArray(this._objects, obj);
+            this._objects.splice(newIdx, 0, obj);
           }
-          newIdx = idx - 1;
-          removeFromArray(this._objects, obj);
-          this._objects.splice(newIdx, 0, obj);
         }
       }
       else {
@@ -1474,24 +1473,27 @@
      */
     bringForward: function (object, intersecting) {
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
-          i, obj, idx = this._objects.indexOf(object), newIdx;
+          i, obj, idx, newIdx;
 
       if (object === activeGroup) {
-        newIdx = idx + 1;
         for (i = activeGroup._objects.length; i--;) {
-          if (idx === this._objects.length - 1) {
-            continue;
-          }
           obj = activeGroup._objects[i];
-          removeFromArray(this._objects, obj);
-          this._objects.splice(newIdx, 0, obj);
+          idx = this._objects.indexOf(obj)
+          if (idx !== this._objects.length - 1) {
+            newIdx = idx + 1;
+            removeFromArray(this._objects, obj);
+            this._objects.splice(newIdx, 0, obj);
+          }
         }
       }
-      else if (idx !== this._objects.length - 1) {
-        // if object is not on top of stack (last item in an array)
-        newIdx = this._findNewUpperIndex(object, idx, intersecting);
-        removeFromArray(this._objects, object);
-        this._objects.splice(newIdx, 0, object);
+      else {
+        obj = activeGroup._objects[i];
+        if (idx !== this._objects.length - 1) {
+          // if object is not on top of stack (last item in an array)
+          newIdx = this._findNewUpperIndex(object, idx, intersecting);
+          removeFromArray(this._objects, object);
+          this._objects.splice(newIdx, 0, object);
+        }
       }
       this.renderAll && this.renderAll();
       return this;
