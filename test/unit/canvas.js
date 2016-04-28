@@ -278,6 +278,11 @@
         rect3 = makeRect(),
         rect4 = makeRect();
 
+    rect1.id = 'rect1';
+    rect2.id = 'rect2';
+    rect3.id = 'rect3';
+    rect4.id = 'rect4';
+
     canvas.add(rect1, rect2, rect3, rect4);
 
     var group = new fabric.Group([ rect1, rect2 ]);
