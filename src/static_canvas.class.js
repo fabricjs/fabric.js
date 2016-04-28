@@ -1408,6 +1408,9 @@
      * @chainable
      */
     sendBackwards: function (object, intersecting) {
+      if (!object) {
+        return this;
+      }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
           i, obj, idx, newIdx;
 
@@ -1472,6 +1475,9 @@
      * @chainable
      */
     bringForward: function (object, intersecting) {
+      if (!object) {
+        return this;
+      }
       var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
           i, obj, idx, newIdx;
 
@@ -1487,7 +1493,7 @@
         }
       }
       else {
-        obj = activeGroup._objects[i];
+        idx = this._objects.indexOf(object);
         if (idx !== this._objects.length - 1) {
           // if object is not on top of stack (last item in an array)
           newIdx = this._findNewUpperIndex(object, idx, intersecting);
