@@ -1430,9 +1430,9 @@
           newIdx = this._findNewLowerIndex(object, idx, intersecting);
           removeFromArray(this._objects, object);
           this._objects.splice(newIdx, 0, object);
-          this.renderAll && this.renderAll();
         }
       }
+      this.renderAll && this.renderAll();
       return this;
     },
 
@@ -1492,9 +1492,8 @@
         newIdx = this._findNewUpperIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
       }
-
+      this.renderAll && this.renderAll();
       return this;
     },
 
