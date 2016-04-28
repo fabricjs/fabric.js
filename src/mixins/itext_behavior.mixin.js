@@ -495,7 +495,7 @@
      * @chainable
      */
     exitEditing: function() {
-      var isTextChanged = this._textBeforeEdit !== this.text
+      var isTextChanged = (this._textBeforeEdit !== this.text);
       this.selected = false;
       this.isEditing = false;
       this.selectable = true;
