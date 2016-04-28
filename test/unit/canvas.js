@@ -290,6 +290,65 @@
     equal(canvas._objects[2], rect1, 'rect1 should be the third object');
     equal(canvas._objects[3], rect2, 'rect2 should be on top now');
   });
+  
+  test('activeGroup bringToFront', function() {
+
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
+
+    canvas.add(rect1, rect2, rect3, rect4);
+
+    var group = new fabric.Group([ rect1, rect2 ]);
+    canvas.setActiveGroup(group);
+    equal(canvas._objects[0], rect1, 'rect1 should be last');
+    equal(canvas._objects[1], rect2, 'rect2 should be second');
+    canvas.bringToFront(group);
+    equal(canvas._objects[0], rect3, 'rect3 should be the new last');
+    equal(canvas._objects[1], rect4, 'rect3 should be the new second');
+    equal(canvas._objects[2], rect1, 'rect1 should be the third object');
+    equal(canvas._objects[3], rect2, 'rect2 should be on top now');
+  });
+
+  test('activeGroup bringForward', function() {
+
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
+
+    canvas.add(rect1, rect2, rect3, rect4);
+
+    var group = new fabric.Group([ rect1, rect2 ]);
+    canvas.setActiveGroup(group);
+    equal(canvas._objects[0], rect1, 'rect1 should be last');
+    equal(canvas._objects[1], rect2, 'rect2 should be second');
+    canvas.bringForward(group);
+    equal(canvas._objects[0], rect3, 'rect3 should be the new last');
+    equal(canvas._objects[1], rect1, 'rect1 should be the new second');
+    equal(canvas._objects[2], rect2, 'rect2 should be the third object');
+    equal(canvas._objects[3], rect4, 'rect4 did not move');
+  });
+
+  test('activeGroup sendBackwards', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
+
+    canvas.add(rect1, rect2, rect3, rect4);
+
+    var group = new fabric.Group([ rect3, rect4 ]);
+    canvas.setActiveGroup(group);
+    equal(canvas._objects[0], rect1, 'rect1 should be last');
+    equal(canvas._objects[1], rect2, 'rect2 should be second');
+    canvas.sendBackwards(group);
+    equal(canvas._objects[0], rect1, 'rect1 is still last');
+    equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
+    equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
+    equal(canvas._objects[3], rect2, 'rect2 is the new top');
+  });
 
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
