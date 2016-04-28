@@ -11,7 +11,7 @@
    * @class fabric.Image.filters.Resize
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Resize();
    * object.filters.push(filter);
