@@ -272,23 +272,22 @@
   });
 
   test('activeGroup sendToBack', function() {
-    ok(typeof canvas.sendToBack == 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
         rect3 = makeRect(),
-        rect4 = makeRect()
+        rect4 = makeRect();
 
     canvas.add(rect1, rect2, rect3, rect4);
 
     var group = new fabric.Group([ rect1, rect2 ]);
-    canvas.setActiveGroup(group);
-    equal(canvas.item(0), rect1, 'rect1 should be on top');
-    equal(canvas.item(1), rect2, 'rect2 should follow rect1');
+    canvas.setActiveGroup(group).renderAll();
+    equal(canvas._objects[0], rect1, 'rect1 should be on top');
+    equal(canvas._objects[1], rect2, 'rect2 should follow rect1');
     canvas.sendToBack(group);
-    equal(canvas.item(2), rect1, 'rect1 should be the third object');
-    equal(canvas.item(3), rect2, 'rect2 should be the last now');
-    equal(canvas.item(0), rect3, 'rect3 should be the new first');
+    equal(canvas._objects[0], rect3, 'rect3 should be the new first');
+    equal(canvas._objects[2], rect1, 'rect1 should be the third object');
+    equal(canvas._objects[3], rect2, 'rect2 should be the last now');
   });
 
   test('toDataURL', function() {
