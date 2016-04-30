@@ -631,7 +631,7 @@
       else {
         if (actionPerformed = this._translateObject(x, y)) {
           this._fire('moving', target, e);
-          this.setCursor(this.moveCursor);
+          this.setCursor(target.moveCursor || this.moveCursor);
         }
       }
       transform.actionPerformed = actionPerformed;
