@@ -774,9 +774,9 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(fabric.Canvas.prototype.controlsAboveOverlay, false);
       equal(fabric.Canvas.prototype.preserveObjectStacking, false);
-      equal(canvas.controlsAboveOverlay, true);
-      equal(canvas.preserveObjectStacking, true);
     });
+    equal(canvas.controlsAboveOverlay, true);
+    equal(canvas.preserveObjectStacking, true);
   });
 
   test('loadFromJSON custom properties', function() {
