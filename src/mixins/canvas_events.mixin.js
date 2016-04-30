@@ -629,8 +629,10 @@
         (actionPerformed = this._skewObject(x, y, 'y')) && this._fire('skewing', target, e);
       }
       else {
-        (actionPerformed = this._translateObject(x, y)) && this._fire('moving', target, e);
-        this.setCursor(this.moveCursor);
+        if (actionPerformed = this._translateObject(x, y)) {
+          this._fire('moving', target, e);
+          this.setCursor(this.moveCursor);
+        }
       }
       transform.actionPerformed = actionPerformed;
     },
