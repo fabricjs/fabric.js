@@ -766,6 +766,19 @@
     });
   });
 
+  test('loadFromJSON with custom properties on Canvas', function() {
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.controlsAboveOverlay = true;
+    serialized.preserveObjectStacking = true;
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(fabric.Canvas.prototype.controlsAboveOverlay, false);
+      equal(fabric.Canvas.prototype.preserveObjectStacking, false);
+    });
+    equal(canvas.controlsAboveOverlay, true);
+    equal(canvas.preserveObjectStacking, true);
+  });
+
   test('loadFromJSON custom properties', function() {
     var rect = new fabric.Rect({ width: 10, height: 20 });
     rect.padding = 123;
