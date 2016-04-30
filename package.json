@@ -44,9 +44,9 @@
   },
   "devDependencies": {
     "uglify-js": "2.6.x",
-    "jscs": "2.1.x",
-    "jshint": "2.8.x",
-    "qunit": "0.7.x",
+    "jscs": "2.x.x",
+    "jshint": "2.9.x",
+    "qunit": "0.9.x",
     "istanbul": "0.4.x"
   },
   "engines": {
