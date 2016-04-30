@@ -64,8 +64,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     // call it. Normally loading an Object from JSON
     // create the Object instance. Here the Canvas is
     // already an instance and we are just loading things over it
-    for (var prop in serialize) {
-      this[prop] = serialize[prop];
+    for (var prop in serialized) {
+      this[prop] = serialized[prop];
     }
     return this;
   },
