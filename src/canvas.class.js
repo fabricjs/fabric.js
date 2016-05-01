@@ -89,6 +89,14 @@
     selection:              true,
 
     /**
+     * Indicates which key enable multiple click selection
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    selectionKey:           'shiftKey',
+
+    /**
      * Color of selection
      * @type String
      * @default
@@ -345,7 +353,7 @@
           activeGroup &&
           !activeGroup.contains(target) &&
           activeGroup !== target &&
-          !e.shiftKey)
+          !e[this.selectionKey])
         ||
         (target && !target.evented)
         ||
