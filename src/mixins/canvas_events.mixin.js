@@ -457,7 +457,7 @@
 
         if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
           this.deactivateAll();
-          this.setActiveObject(target, e);
+          target.selectable && this.setActiveObject(target, e);
         }
       }
       // we must renderAll so that active image is placed on the top canvas
@@ -693,12 +693,13 @@
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var hoverCursor = target.hoverCursor || this.hoverCursor;
       if (!target) {
         this.setCursor(this.defaultCursor);
         return false;
       }
-      else if (!target.selectable) {
+
+      var hoverCursor = target.hoverCursor || this.hoverCursor;
+      if (!target.selectable) {
         //let's skip _findTargetCorner if object is not selectable
         this.setCursor(hoverCursor);
       }
