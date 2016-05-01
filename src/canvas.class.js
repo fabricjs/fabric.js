@@ -58,6 +58,7 @@
 
     /**
      * Indicates which key enable unproportional scaling
+     * values: altKey, shiftKey, ctrlKey
      * @since 1.6.2
      * @type String
      * @default
