@@ -84,6 +84,7 @@
 
     /**
      * Indicates which key enable centered Transfrom
+     * values: altKey, shiftKey, ctrlKey
      * @since 1.6.2
      * @type String
      * @default
@@ -92,6 +93,7 @@
 
     /**
      * Indicates which key enable alternate action on corner
+     * values: altKey, shiftKey, ctrlKey
      * @since 1.6.2
      * @type String
      * @default
@@ -114,6 +116,7 @@
 
     /**
      * Indicates which key enable multiple click selection
+     * values: altKey, shiftKey, ctrlKey
      * @since 1.6.2
      * @type String
      * @default
