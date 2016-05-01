@@ -164,12 +164,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {
-      ctx.save();
-      this._setStrokeStyles(ctx);
+      if (!this.stroke || this.strokeWidth === 0) {
+        return;
+      }
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.closePath();
-      ctx.restore();
     },
 
     /**
@@ -410,6 +410,7 @@
                                      imageMargins.height
                                     );
 
+      this._stroke(ctx);
       this._renderStroke(ctx);
     },
 
