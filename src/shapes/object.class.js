@@ -1194,6 +1194,11 @@
         var g = this.stroke.gradientTransform;
         ctx.transform.apply(ctx, g);
       }
+      if (this.stroke.toLive) {
+        ctx.translate(
+          -this.width / 2 + this.stroke.offsetX || 0,
+          -this.height / 2 + this.stroke.offsetY || 0);
+      }
       ctx.stroke();
       ctx.restore();
     },
