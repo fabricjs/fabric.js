@@ -302,6 +302,27 @@
     equal(changed, 1, 'event will fire once');
   });
 
+  test('insertChar with style', function() {
+    var iText = new fabric.IText('test'),
+        style = {fontSize: 4};
+
+    equal(typeof iText.insertChar, 'function');
+    iText.insertChar('f', false, style);
+    equal(iText.text, 'ftest');
+    deepEqual(iText.styles[0][0], style);
+  });
+
+  test('insertChar with selectionStart with style', function() {
+    var iText = new fabric.IText('test'),
+        style = {fontSize: 4};
+    equal(typeof iText.insertChar, 'function');
+    iText.selectionStart = 2;
+    iText.selectionEnd = 2;
+    iText.insertChar('f', false, style);
+    equal(iText.text, 'tefst');
+    deepEqual(iText.styles[0][2], style);
+  });
+
 
   test('insertChars', function() {
     var iText = new fabric.IText('test');
