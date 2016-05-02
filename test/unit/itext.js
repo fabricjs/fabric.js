@@ -368,7 +368,7 @@
     iText.on('changed', textChanged);
     equal(changed, 0);
     iText.insertChars('foo_', true);
-    equal(changed, 4, 'insertChars fires each character if there is style to use');
+    equal(changed, 1, 'insertChars fires once even if style is used');
     equal(iText.text, 'foo_test');
     deepEqual(iText.styles[0][0], style[0], 'style should be copied');
   });
