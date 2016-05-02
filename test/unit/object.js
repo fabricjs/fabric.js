@@ -756,7 +756,7 @@ test('toDataURL & reference to canvas', function() {
   });
 
   test('_setLineDash', function() {
-    var object = new fabric.Rect({ left: 100, top: 124, width: 210, height: 66 });
+    var object = new fabric.Rect({ left: 100, top: 124, width: 210, height: 66, stroke: 'black', strokeWidth: 2});
     ok(typeof object._setLineDash === 'function');
 
     canvas.add(object);
