@@ -243,6 +243,67 @@
     ok(!iText.isEditing);
   });
 
+  test('event firing', function() {
+    var iText = new fabric.IText('test'),
+        enter = 0, exit = 0, modify = 0;
+
+    function countEnter() {
+      enter++;
+    }
+
+    function countEnter() {
+      exit++;
+    }
+
+    function countEnter() {
+      modify++;
+    }
+
+    iText.on('editing:entered', countEnter);
+    iText.on('editing:exited', countExit);
+    iText.on('modified', countModify);
+
+    equal(typeof iText.enterEditing, 'function');
+    equal(typeof iText.exitEditing, 'function');
+
+    iText.enterEditing();
+    equal(entered, 1);
+    equal(exit, 0);
+    equal(modify, 0);
+
+    iText.exitEditing();
+    equal(entered, 1);
+    equal(exit, 1);
+    equal(modify, 0);
+
+    iText.enterEditing();
+    equal(entered, 2);
+    equal(exit, 1);
+    equal(modify, 0);
+
+    iText.text = 'Test+';
+    iText.exitEditing();
+    equal(entered, 2);
+    equal(exit, 2);
+    equal(modify, 1);
+  });
+
+  test('insertChar and text:changed', function() {
+    var iText = new fabric.IText('test'), changed = 0;
+
+    function textChanged () {
+      changed++;
+    }
+    fabric.copiedStyle = style;
+    equal(typeof iText.insertChar, 'function');
+    iText.on('text:changed', textChanged);
+    equal(changed, 0);
+    iText.insertChar('foo_');
+    equal(iText.text, 'foo_test');
+    equal(changed, 1, 'event will fire once');
+  });
+
+
   test('insertChars', function() {
     var iText = new fabric.IText('test');
 
@@ -262,6 +323,36 @@
     iText.insertChars('_foo_');
     equal(iText.text, 't_foo_t');
   });
+
+  test('insertChars text:changed', function() {
+    var iText = new fabric.IText('test'), changed = 0;
+    function textChanged () {
+      changed++;
+    }
+    equal(typeof iText.insertChars, 'function');
+    iText.on('text:changed', textChanged);
+    equal(changed, 0);
+    iText.insertChars('foo_');
+    equal(changed, 1, 'insertChars fires the event once if there is no style');
+    equal(iText.text, 'foo_test');
+  });
+
+  test('insertChars text:changed with copied style', function() {
+    var iText = new fabric.IText('test'), changed = 0;
+        style = {0: {fontSize: 20}, 1: {fontSize: 22}};
+    function textChanged () {
+      changed++;
+    }
+    fabric.copiedStyle = style;
+    equal(typeof iText.insertChars, 'function');
+    iText.on('text:changed', textChanged);
+    equal(changed, 0);
+    iText.insertChars('foo_', true);
+    equal(changed, 4, 'insertChars fires each character if there is style to use');
+    equal(iText.text, 'foo_test');
+    deepEqual(iText.styles[0][0], style[0], 'style should be copied');
+  });
+
 
   test('insertNewline', function() {
     var iText = new fabric.IText('test');
