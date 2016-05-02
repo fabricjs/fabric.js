@@ -441,6 +441,13 @@
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
+     /**
+      * Array specifying dash pattern of an object's borders (hasBorder must be true)
+      * @since 1.6.2
+      * @type Array
+      */
+     borderDashArray:          null,
+ 
     /**
      * Color of controlling corners of an object (when it's active)
      * @type String
