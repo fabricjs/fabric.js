@@ -251,11 +251,11 @@
       enter++;
     }
 
-    function countEnter() {
+    function countExit() {
       exit++;
     }
 
-    function countEnter() {
+    function countModify() {
       modify++;
     }
 
@@ -267,23 +267,23 @@
     equal(typeof iText.exitEditing, 'function');
 
     iText.enterEditing();
-    equal(entered, 1);
+    equal(enter, 1);
     equal(exit, 0);
     equal(modify, 0);
 
     iText.exitEditing();
-    equal(entered, 1);
+    equal(enter, 1);
     equal(exit, 1);
     equal(modify, 0);
 
     iText.enterEditing();
-    equal(entered, 2);
+    equal(enter, 2);
     equal(exit, 1);
     equal(modify, 0);
 
     iText.text = 'Test+';
     iText.exitEditing();
-    equal(entered, 2);
+    equal(enter, 2);
     equal(exit, 2);
     equal(modify, 1);
   });
@@ -294,7 +294,6 @@
     function textChanged () {
       changed++;
     }
-    fabric.copiedStyle = style;
     equal(typeof iText.insertChar, 'function');
     iText.on('changed', textChanged);
     equal(changed, 0);
@@ -339,7 +338,7 @@
 
   test('insertChars changed with copied style', function() {
     var iText = new fabric.IText('test'), changed = 0;
-        style = {0: {fontSize: 20}, 1: {fontSize: 22}};
+        style = {0: {0: {fontSize: 20}, 1: {fontSize: 22}}};
     function textChanged () {
       changed++;
     }
