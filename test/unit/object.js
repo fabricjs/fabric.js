@@ -755,6 +755,17 @@ test('toDataURL & reference to canvas', function() {
     equal(object.get('left'), 112.45, 'non boolean properties should not be affected');
   });
 
+  test('_setLineDash', function() {
+    var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
+    ok(typeof object._setLineDash == 'function');
+
+    canvas.add(object);
+    object.strokeDashArray = [3, 2, 1];
+    equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
+    canvas.renderAll();
+    equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
+  });
+
   test('straighten', function() {
     var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
     ok(typeof object.straighten == 'function');
