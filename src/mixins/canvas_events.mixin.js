@@ -671,7 +671,7 @@
     _onScale: function(e, transform, x, y) {
       // rotate object only if shift key is not pressed
       // and if it is not a group we are transforming
-      if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
+      if ((e[this.uniScaleKey] || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
         transform.currentAction = 'scale';
         return this._scaleObject(x, y);
       }
@@ -748,7 +748,7 @@
         n += 8; // full circle ahead
       }
       n += cursorOffset[corner];
-      if (e.shiftKey && cursorOffset[corner] % 2 === 0) {
+      if (e[this.altActionKey] && cursorOffset[corner] % 2 === 0) {
         //if we are holding shift and we are on a mx corner...
         n += 2;
       }
