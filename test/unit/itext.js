@@ -359,11 +359,11 @@
 
   test('insertChars changed with copied style', function() {
     var iText = new fabric.IText('test'), changed = 0;
-        style = {0: {0: {fontSize: 20}, 1: {fontSize: 22}}};
+        style = {0: {fontSize: 20}, 1: {fontSize: 22}};
     function textChanged () {
       changed++;
     }
-    fabric.copiedStyle = style;
+    fabric.copiedTextStyle = style;
     equal(typeof iText.insertChars, 'function');
     iText.on('changed', textChanged);
     equal(changed, 0);
