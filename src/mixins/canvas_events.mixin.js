@@ -457,7 +457,7 @@
 
         if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
           this.deactivateAll();
-          this.setActiveObject(target, e);
+          target.selectable && this.setActiveObject(target, e);
         }
       }
       // we must renderAll so that active image is placed on the top canvas
@@ -572,18 +572,10 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-
         target = this.findTarget(e);
-
-        if (!target || target && !target.selectable) {
-          this.setCursor(this.defaultCursor);
-        }
-        else {
-          this._setCursorFromEvent(e, target);
-        }
+        this._setCursorFromEvent(e, target);
       }
       else {
-
         this._transformObject(e);
       }
 
@@ -637,8 +629,11 @@
         (actionPerformed = this._skewObject(x, y, 'y')) && this._fire('skewing', target, e);
       }
       else {
-        (actionPerformed = this._translateObject(x, y)) && this._fire('moving', target, e);
-        this.setCursor(this.moveCursor);
+        actionPerformed = this._translateObject(x, y);
+        if (actionPerformed) {
+          this._fire('moving', target, e);
+          this.setCursor(target.moveCursor || this.moveCursor);
+        }
       }
       transform.actionPerformed = actionPerformed;
     },
@@ -676,7 +671,7 @@
     _onScale: function(e, transform, x, y) {
       // rotate object only if shift key is not pressed
       // and if it is not a group we are transforming
-      if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
+      if ((e[this.uniScaleKey] || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
         transform.currentAction = 'scale';
         return this._scaleObject(x, y);
       }
@@ -698,9 +693,15 @@
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      if (!target || !target.selectable) {
+      if (!target) {
         this.setCursor(this.defaultCursor);
         return false;
+      }
+
+      var hoverCursor = target.hoverCursor || this.hoverCursor;
+      if (!target.selectable) {
+        //let's skip _findTargetCorner if object is not selectable
+        this.setCursor(hoverCursor);
       }
       else {
         var activeGroup = this.getActiveGroup(),
@@ -710,12 +711,14 @@
                       && target._findTargetCorner(this.getPointer(e, true));
 
         if (!corner) {
-          this.setCursor(target.hoverCursor || this.hoverCursor);
+          this.setCursor(hoverCursor);
         }
         else {
           this._setCornerCursor(corner, target, e);
         }
       }
+      //actually unclear why it should return something
+      //is never evaluated
       return true;
     },
 
@@ -745,7 +748,7 @@
         n += 8; // full circle ahead
       }
       n += cursorOffset[corner];
-      if (e.shiftKey && cursorOffset[corner] % 2 === 0) {
+      if (e[this.altActionKey] && cursorOffset[corner] % 2 === 0) {
         //if we are holding shift and we are on a mx corner...
         n += 2;
       }

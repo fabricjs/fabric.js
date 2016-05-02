@@ -164,12 +164,17 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {
-      ctx.save();
-      this._setStrokeStyles(ctx);
+      if (!this.stroke || this.strokeWidth === 0) {
+        return;
+      }
+      var w = this.width / 2, h = this.height / 2;
       ctx.beginPath();
-      ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.moveTo(-w, -h);
+      ctx.lineTo(w, -h);
+      ctx.lineTo(w, h);
+      ctx.lineTo(-w, h);
+      ctx.lineTo(-w, -h);
       ctx.closePath();
-      ctx.restore();
     },
 
     /**
@@ -410,6 +415,7 @@
                                      imageMargins.height
                                     );
 
+      this._stroke(ctx);
       this._renderStroke(ctx);
     },
 

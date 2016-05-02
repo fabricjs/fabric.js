@@ -57,6 +57,15 @@
     uniScaleTransform:      false,
 
     /**
+     * Indicates which key enable unproportional scaling
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    uniScaleKey:           'shiftKey',
+
+    /**
      * When true, objects use center point as the origin of scale transformation.
      * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
      * @since 1.3.4
@@ -75,6 +84,24 @@
     centeredRotation:       false,
 
     /**
+     * Indicates which key enable centered Transfrom
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    centeredKey:           'altKey',
+
+    /**
+     * Indicates which key enable alternate action on corner
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    altActionKey:           'shiftKey',
+
+    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -87,6 +114,15 @@
      * @default
      */
     selection:              true,
+
+    /**
+     * Indicates which key enable multiple click selection
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    selectionKey:           'shiftKey',
 
     /**
      * Color of selection
@@ -345,7 +381,7 @@
           activeGroup &&
           !activeGroup.contains(target) &&
           activeGroup !== target &&
-          !e.shiftKey)
+          !e[this.selectionKey])
         ||
         (target && !target.evented)
         ||
@@ -417,10 +453,10 @@
           return 'rotate';
         case 'ml':
         case 'mr':
-          return e.shiftKey ? 'skewY' : 'scaleX';
+          return e[this.altActionKey] ? 'skewY' : 'scaleX';
         case 'mt':
         case 'mb':
-          return e.shiftKey ? 'skewX' : 'scaleY';
+          return e[this.altActionKey] ? 'skewX' : 'scaleY';
         default:
           return 'scale';
       }
@@ -464,7 +500,7 @@
         mouseXSign: 1,
         mouseYSign: 1,
         shiftKey: e.shiftKey,
-        altKey: e.altKey
+        altKey: e[this.centeredKey]
       };
 
       this._currentTransform.original = {

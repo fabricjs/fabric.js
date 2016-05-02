@@ -421,6 +421,13 @@
     hoverCursor:              null,
 
     /**
+     * Default cursor value used when moving this object on canvas
+     * @type String
+     * @default
+     */
+    moveCursor:               null,
+
+    /**
      * Padding between object and its controlling borders (in pixels)
      * @type Number
      * @default
@@ -1185,20 +1192,21 @@
         }
         if (supportsLineDash) {
           ctx.setLineDash(this.strokeDashArray);
-          this._stroke && this._stroke(ctx);
         }
         else {
           this._renderDashedStroke && this._renderDashedStroke(ctx);
         }
-        ctx.stroke();
       }
-      else {
-        if (this.stroke.gradientTransform) {
-          var g = this.stroke.gradientTransform;
-          ctx.transform.apply(ctx, g);
-        }
-        this._stroke ? this._stroke(ctx) : ctx.stroke();
+      if (this.stroke.gradientTransform) {
+        var g = this.stroke.gradientTransform;
+        ctx.transform.apply(ctx, g);
       }
+      if (this.stroke.toLive) {
+        ctx.translate(
+          -this.width / 2 + this.stroke.offsetX || 0,
+          -this.height / 2 + this.stroke.offsetY || 0);
+      }
+      ctx.stroke();
       ctx.restore();
     },
 
