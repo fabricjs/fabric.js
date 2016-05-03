@@ -362,7 +362,7 @@
       var size = this.cornerSize;
       isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
       ctx[methodName](left, top, size, size);
-      if (!this.transparentCorners) {
+      if (!this.transparentCorners && this.cornerStrokeColor) {
         ctx.strokeRect(left, top, size, size);
       }
     },
