@@ -1049,7 +1049,7 @@
           row = style[rowIndex];
           for (charIndex in row) {
             _char = row[charIndex];
-            fontFamily = char.fontFamily;
+            fontFamily = _char.fontFamily;
             if (!fontList[fontFamily] && fontPaths[fontFamily]) {
               fontList[fontFamily] = true;
             }
