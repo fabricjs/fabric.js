@@ -461,7 +461,7 @@
      * @type String
      * @default
      */
-    cornerStrokeColor:        'rgba(102,153,255,0.5)',
+    cornerStrokeColor:        null,
 
     /**
      * Array specifying dash pattern of an object's control (hasBorder must be true)
