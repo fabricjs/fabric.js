@@ -441,12 +441,12 @@
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
-     /**
-      * Array specifying dash pattern of an object's borders (hasBorder must be true)
-      * @since 1.6.2
-      * @type Array
-      */
-     borderDashArray:          null,
+    /**
+     * Array specifying dash pattern of an object's borders (hasBorder must be true)
+     * @since 1.6.2
+     * @type Array
+     */
+    borderDashArray:          null,
  
     /**
      * Color of controlling corners of an object (when it's active)
@@ -455,12 +455,12 @@
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
-     /**
-      * Array specifying dash pattern of an object's control (hasBorder must be true)
-      * @since 1.6.2
-      * @type Array
-      */
-     cornerDashArray:          null,
+    /**
+     * Array specifying dash pattern of an object's control (hasBorder must be true)
+     * @since 1.6.2
+     * @type Array
+     */
+    cornerDashArray:          null,
 
     /**
      * When true, this object will use center point as the origin of transformation
