@@ -206,8 +206,8 @@
           height = wh.y + strokeWidth;
 
       ctx.save();
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
+      this._setLineDash(ctx, this.borderDashArray, null);
       ctx.lineWidth = strokeWidth;
 
       ctx.strokeRect(
@@ -254,8 +254,7 @@
           height = wh.y + strokeWidth + 2 * this.padding;
 
       ctx.save();
-
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      this._setLineDash(ctx, this.borderDashArray, null);
       ctx.strokeStyle = this.borderColor;
       ctx.lineWidth = strokeWidth;
 
@@ -294,8 +293,6 @@
       ctx.save();
 
       ctx.lineWidth = 1;
-
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
       // top-left
