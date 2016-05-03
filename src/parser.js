@@ -1031,7 +1031,7 @@
      */
     createSVGFontFacesMarkup: function(objects) {
       var markup = '', fontList = { }, obj, fontFamily,
-          style, row, rowIndex, char, charIndex,
+          style, row, rowIndex, _char, charIndex,
           fontPaths = fabric.fontPaths;
 
       for (var i = 0, len = objects.length; i < len; i++) {
@@ -1046,9 +1046,9 @@
         }
         style = obj.styles;
         for (rowIndex in style) {
-          char = style[rowIndex];
+          row = style[rowIndex];
           for (charIndex in row) {
-            char = row[charIndex];
+            _char = row[charIndex];
             fontFamily = char.fontFamily;
             if (!fontList[fontFamily] && fontPaths[fontFamily]) {
               fontList[fontFamily] = true;
