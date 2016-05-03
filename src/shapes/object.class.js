@@ -460,7 +460,7 @@
       * @since 1.6.2
       * @type Array
       */
-     controlDashArray:          null,
+     cornerDashArray:          null,
 
     /**
      * When true, this object will use center point as the origin of transformation
