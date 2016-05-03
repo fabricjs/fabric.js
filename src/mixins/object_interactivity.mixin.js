@@ -292,7 +292,7 @@
 
       ctx.lineWidth = 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
-      this._setLineDash(ctx, this.controlDashArray, null);
+      this._setLineDash(ctx, this.cornerDashArray, null);
 
       // top-left
       this._drawControl('tl', ctx, methodName,
