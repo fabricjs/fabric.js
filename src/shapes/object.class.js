@@ -447,7 +447,7 @@
      * @type Array
      */
     borderDashArray:          null,
- 
+
     /**
      * Color of controlling corners of an object (when it's active)
      * @type String
