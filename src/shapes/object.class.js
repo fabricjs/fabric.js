@@ -404,7 +404,7 @@
      * @type Number
      * @default
      */
-    cornerSize:               12,
+    cornerSize:               13,
 
     /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
@@ -442,11 +442,25 @@
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
+     * Array specifying dash pattern of an object's borders (hasBorder must be true)
+     * @since 1.6.2
+     * @type Array
+     */
+    borderDashArray:          null,
+
+    /**
      * Color of controlling corners of an object (when it's active)
      * @type String
      * @default
      */
     cornerColor:              'rgba(102,153,255,0.5)',
+
+    /**
+     * Array specifying dash pattern of an object's control (hasBorder must be true)
+     * @since 1.6.2
+     * @type Array
+     */
+    cornerDashArray:          null,
 
     /**
      * When true, this object will use center point as the origin of transformation
@@ -1117,8 +1131,12 @@
           options;
       matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
       options = fabric.util.qrDecompose(matrix);
+
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
+      ctx.lineWidth = 1 / this.borderScaleFactor;
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
         this.drawBordersInGroup(ctx, options);
