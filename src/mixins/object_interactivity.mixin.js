@@ -293,7 +293,7 @@
       ctx.lineWidth = 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
       if (!this.transparentCorners) {
-        ctx.strokeStyle = this.strokeCorneColor;
+        ctx.strokeStyle = this.cornerStrokeColor;
       }
       this._setLineDash(ctx, this.cornerDashArray, null);
 
