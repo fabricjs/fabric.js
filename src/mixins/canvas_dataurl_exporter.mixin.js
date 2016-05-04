@@ -119,13 +119,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         scaledHeight = origHeight * multiplier,
         activeObject = this.getActiveObject(),
         activeGroup = this.getActiveGroup(),
-        ctx = this.contextContainer;
+        ctx = this.contextContainer,
+        zoom = this.getZoom(),
+        newZoom = actualZoom * multiplier / fabric.devicePixelRatio;
 
     if (multiplier > 1) {
       this.setDimensions({ width: scaledWidth, height: scaledHeight });
     }
-    ctx.save();
-    ctx.scale(multiplier / fabric.devicePixelRatio, multiplier / fabric.devicePixelRatio);
+
+    this.setZoom(newZoom);
 
     if (cropping.left) {
       cropping.left *= multiplier;
@@ -155,22 +157,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
 
     var data = this.__toDataURL(format, quality, cropping);
-
-    // restoring width, height for `renderAll` to draw
-    // background properly (while context is scaled)
-    this.width = origWidth;
-    this.height = origHeight;
-    this.setDimensions({ width: origWidth, height: origHeight });
-
     if (activeGroup) {
       this._restoreBordersControlsOnGroup(activeGroup);
     }
     else if (activeObject && this.setActiveObject) {
       this.setActiveObject(activeObject);
     }
-
-    this.contextTop && this.clearContext(this.contextTop);
-    this.renderAll();
+    this.setZoom(zoom);
+    //setDimensions with no option object is taking care of:
+    //this.width, this.height, this.renderAll()
+    this.setDimensions({ width: origWidth, height: origHeight });
 
     return data;
   },
