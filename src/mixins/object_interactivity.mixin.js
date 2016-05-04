@@ -289,8 +289,6 @@
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
-
-      ctx.lineWidth = 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
       if (!this.transparentCorners) {
         ctx.strokeStyle = this.cornerStrokeColor;
