@@ -121,7 +121,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         activeGroup = this.getActiveGroup(),
         ctx = this.contextContainer,
         zoom = this.getZoom(),
-        newZoom = actualZoom * multiplier / fabric.devicePixelRatio;
+        newZoom = zoom * multiplier / fabric.devicePixelRatio;
 
     if (multiplier > 1) {
       this.setDimensions({ width: scaledWidth, height: scaledHeight });
