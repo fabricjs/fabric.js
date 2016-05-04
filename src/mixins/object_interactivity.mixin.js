@@ -289,9 +289,10 @@
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
-
-      ctx.lineWidth = 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
+      if (!this.transparentCorners) {
+        ctx.strokeStyle = this.cornerStrokeColor;
+      }
       this._setLineDash(ctx, this.cornerDashArray, null);
 
       // top-left
@@ -359,6 +360,9 @@
       var size = this.cornerSize;
       isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
       ctx[methodName](left, top, size, size);
+      if (!this.transparentCorners && this.cornerStrokeColor) {
+        ctx.strokeRect(left, top, size, size);
+      }
     },
 
     /**

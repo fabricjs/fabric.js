@@ -456,6 +456,14 @@
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * Color of controlling corners of an object (when it's active and transparentCorners false)
+     * @since 1.6.2
+     * @type String
+     * @default
+     */
+    cornerStrokeColor:        null,
+
+    /**
      * Array specifying dash pattern of an object's control (hasBorder must be true)
      * @since 1.6.2
      * @type Array
