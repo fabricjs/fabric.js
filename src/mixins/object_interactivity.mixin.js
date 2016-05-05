@@ -358,15 +358,15 @@
         return;
       }
       var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-      switch(this.cornerStyle) {
+      switch (this.cornerStyle) {
         case 'circle':
           ctx.beginPath();
           ctx.arc(left + size/2, top + size/2, size/2, 0, 2 * Math.PI, false);
           ctx[methodName]();
-          if(stroke) {
+          if (stroke) {
             ctx.stroke();
           }
-        break;
+          break;
         default:
           isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
           ctx[methodName + 'Rect'](left, top, size, size);
