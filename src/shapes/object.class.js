@@ -468,7 +468,7 @@
      * @since 1.6.2
      * @type String
      */
-    cornerStyle:          'rect,
+    cornerStyle:          'rect',
 
     /**
      * Array specifying dash pattern of an object's control (hasBorder must be true)
