@@ -367,7 +367,6 @@
             ctx.stroke();
           }
         break;
-        case 'rect':
         default:
           isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
           ctx[methodName + 'Rect'](left, top, size, size);
