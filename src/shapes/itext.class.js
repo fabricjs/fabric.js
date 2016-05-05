@@ -190,6 +190,7 @@
     _clearCache: function() {
       this.callSuper('_clearCache');
       this.__widthOfSpace = [ ];
+      this._charWidthsCache = [ ];
     },
 
     /**
