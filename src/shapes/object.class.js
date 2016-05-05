@@ -464,6 +464,13 @@
     cornerStrokeColor:        null,
 
     /**
+     * Specify style of control, 'rect' or 'circle'
+     * @since 1.6.2
+     * @type String
+     */
+    cornerStyle:          'rect',
+
+    /**
      * Array specifying dash pattern of an object's control (hasBorder must be true)
      * @since 1.6.2
      * @type Array
