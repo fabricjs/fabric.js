@@ -843,6 +843,7 @@
       if (!this.caching || !this._charWidthsCache[cacheProp]) {
         width = ctx.measureText(_char).width;
         this.caching && (this._charWidthsCache[cacheProp] = width);
+        return width;
       }
 
       return this._charWidthsCache[cacheProp];
