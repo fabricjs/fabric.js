@@ -75,6 +75,8 @@
 
     /**
      * Sets object's fontSize
+     * Does not update the object .width and .height,
+     * call ._initDimensions() to update the values.
      * @method setFontSize
      * @memberOf fabric.Text.prototype
      * @param {Number} fontSize Font size (in pixels)
@@ -91,6 +93,8 @@
 
     /**
      * Sets object's fontWeight
+     * Does not update the object .width and .height,
+     * call ._initDimensions() to update the values.
      * @method setFontWeight
      * @memberOf fabric.Text.prototype
      * @param {(Number|String)} fontWeight Font weight
@@ -107,6 +111,8 @@
 
     /**
      * Sets object's fontFamily
+     * Does not update the object .width and .height,
+     * call ._initDimensions() to update the values.
      * @method setFontFamily
      * @memberOf fabric.Text.prototype
      * @param {String} fontFamily Font family
@@ -123,6 +129,8 @@
 
     /**
      * Sets object's text
+     * Does not update the object .width and .height,
+     * call ._initDimensions() to update the values.
      * @method setText
      * @memberOf fabric.Text.prototype
      * @param {String} text Text
@@ -155,6 +163,8 @@
 
     /**
      * Sets object's fontStyle
+     * Does not update the object .width and .height,
+     * call ._initDimensions() to update the values.
      * @method setFontStyle
      * @memberOf fabric.Text.prototype
      * @param {String} fontStyle Font style
