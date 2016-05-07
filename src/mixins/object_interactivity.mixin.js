@@ -197,7 +197,7 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.backgroundSelectionColor || !this.active || this.group) {
+      if (!this.selectionBackgroundColor || !this.active || this.group) {
         return this;
       }
       var pad = this.padding, width = this.width + 2 * pad,
