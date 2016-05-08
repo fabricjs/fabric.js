@@ -830,6 +830,7 @@
       if (this._shouldClearCache()) {
         this._initDimensions(ctx);
       }
+      this.drawSelectionBackground(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
