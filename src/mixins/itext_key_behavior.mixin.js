@@ -62,10 +62,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _ctrlKeysMap: {
-    65: 'selectAll',
+  _ctrlKeysMapUp: {
     67: 'copy',
     88: 'cut'
+  },
+
+  /**
+   * @private
+   */
+  _ctrlKeysMapDown: {
+    65: 'selectAll'
   },
 
   onClick: function() {
@@ -84,6 +90,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.keyCode in this._keysMap) {
       this[this._keysMap[e.keyCode]](e);
     }
+    else if ((e.keyCode in this._ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      this[this._ctrlKeysMapDown[e.keyCode]](e);
+    }
     else {
       return;
     }
@@ -94,6 +103,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Handles keyup event
+   * We handle KeyUp because ie11 and edge have difficulties copy/pasting
    * if a copy/cut event fired, keyup is dismissed
    * @param {Event} e Event object
    */
@@ -102,8 +112,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._copyDone = false;
       return;
     }
-    if ((e.keyCode in this._ctrlKeysMap) && (e.ctrlKey || e.metaKey)) {
-      this[this._ctrlKeysMap[e.keyCode]](e);
+    if ((e.keyCode in this._ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      this[this._ctrlKeysMapUp[e.keyCode]](e);
     }
     else {
       return;
