@@ -15,7 +15,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
         strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
         opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
-
         visibility = this.visible ? '' : ' visibility: hidden;',
         filter = skipShadow ? '' : this.getSvgFilter(),
         fill = this.getSvgColorString('fill', this.fill),
