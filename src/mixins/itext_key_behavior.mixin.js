@@ -71,7 +71,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _ctrlKeysMapDown: {
-    65: 'selectAll',
+    65: 'selectAll'
   },
 
   onClick: function() {
