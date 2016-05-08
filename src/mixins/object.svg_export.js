@@ -8,14 +8,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   getSvgStyles: function(skipShadow) {
 
-    var fill = this.fill
-          ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-          : 'none',
-        fillRule = this.fillRule,
-        stroke = this.stroke
-          ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-          : 'none',
-
+    var fillRule = this.fillRule,
         strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
         strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
         strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
@@ -24,21 +17,46 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
 
         visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = skipShadow ? '' : this.getSvgFilter();
+        filter = skipShadow ? '' : this.getSvgFilter(),
+        fill = this.getSvgColorString('fill', this.fill),
+        stroke = this.getSvgColorString('stroke', this.stroke);
 
     return [
-      'stroke: ', stroke, '; ',
+      stroke,
       'stroke-width: ', strokeWidth, '; ',
       'stroke-dasharray: ', strokeDashArray, '; ',
       'stroke-linecap: ', strokeLineCap, '; ',
       'stroke-linejoin: ', strokeLineJoin, '; ',
       'stroke-miterlimit: ', strokeMiterLimit, '; ',
-      'fill: ', fill, '; ',
+      fill,
       'fill-rule: ', fillRule, '; ',
       'opacity: ', opacity, ';',
       filter,
       visibility
     ].join('');
+  },
+
+  /**
+   * Returns stroke or fill property, taking in account
+   * that svg spec does not allow for rgba notation.
+   * @return {String}
+   */
+  getSvgColorString: function(prop, value) {
+    if (!value) {
+      return prop + ': none; ';
+    }
+    else if (value.toLive) {
+      return = prop + ': url(#SVGID_' + this.fill.id + '); ';
+    }
+    else {
+      var color = new fabric.Color(value),
+          str = prop + ': ' + color.toRGB() + '; ',
+          opacity = colore.getAlpha();
+      if (opacity !== 1) {
+        str += prop + '-opacity: ' + opacity.toString() + '; ';
+      }
+      return str;
+    }
   },
 
   /**
