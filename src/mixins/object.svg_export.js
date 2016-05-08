@@ -45,7 +45,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return prop + ': none; ';
     }
     else if (value.toLive) {
-      return = prop + ': url(#SVGID_' + value.id + '); ';
+      return prop + ': url(#SVGID_' + value.id + '); ';
     }
     else {
       var color = new fabric.Color(value),
