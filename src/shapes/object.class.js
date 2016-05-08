@@ -464,6 +464,14 @@
     cornerStrokeColor:        null,
 
     /**
+     * Object with icons for the corners.
+     * Example: {mtr: {icon: ImageObject, action: handlerForInteraction, cursor: 'pointer'}}
+     * @since 1.6.2
+     * @type Object
+     */
+    cornerCustomization:             { },
+
+    /**
      * Specify style of control, 'rect' or 'circle'
      * @since 1.6.2
      * @type String

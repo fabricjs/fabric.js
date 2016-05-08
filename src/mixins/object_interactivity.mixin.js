@@ -305,9 +305,8 @@
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          scaleOffset = this.cornerSize,
-          left = -(width + scaleOffset) / 2,
-          top = -(height + scaleOffset) / 2,
+          left = -width / 2,
+          top = -height / 2,
           methodName = this.transparentCorners ? 'stroke' : 'fill';
 
       ctx.save();
@@ -379,17 +378,26 @@
       if (!this.isControlVisible(control)) {
         return;
       }
+      var customCtrl = this.cornerCustomization[control];
+      if (customCtrl && customCtrl.icon) {
+        var icon = customCtrl.icon, iW = icon.width / 2, iH = icon.height / 2;
+        customCtrl.clear && ctx.clearRect(left - iW, top - iH, icon.width, icon.height);
+        ctx.drawImage(icon, left - iW, top - iH);
+        return;
+      }
       var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
       switch (this.cornerStyle) {
         case 'circle':
           ctx.beginPath();
-          ctx.arc(left + size/2, top + size/2, size/2, 0, 2 * Math.PI, false);
+          ctx.arc(left, top, size/2, 0, 2 * Math.PI, false);
           ctx[methodName]();
           if (stroke) {
             ctx.stroke();
           }
           break;
         default:
+          left -= size / 2;
+          top -= size / 2;
           isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
           ctx[methodName + 'Rect'](left, top, size, size);
           if (stroke) {
