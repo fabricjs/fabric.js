@@ -208,7 +208,7 @@
       var filters = [ ], resizeFilters = [ ],
           element = this._originalElement,
           scaleX = 1, scaleY = 1;
-      
+
       this.filters.forEach(function(filterObj) {
         filterObj && filters.push(filterObj.toObject());
       });
@@ -220,7 +220,7 @@
           resizeFilters.push(filterObj.toObject());
         }
       });
-      
+
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         src: element ? element.src || element._src : '',
         filters: filters,
@@ -230,7 +230,7 @@
         alignY: this.alignY,
         meetOrSlice: this.meetOrSlice
       });
-      
+
       object.width /= scaleX;
       object.height /= scaleY;
 
