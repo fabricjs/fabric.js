@@ -17,29 +17,44 @@
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
   fabric.Textbox = fabric.util.createClass(fabric.IText, fabric.Observable, {
+
     /**
      * Type of an object
      * @type String
      * @default
      */
     type: 'textbox',
+
     /**
      * Minimum width of textbox, in pixels.
      * @type Number
      * @default
      */
     minWidth: 20,
+
     /**
      * Minimum calculated width of a textbox, in pixels.
      * @type Number
      * @default
      */
     dynamicMinWidth: 0,
+
     /**
      * Cached array of text wrapping.
      * @type Array
      */
     __cachedLines: null,
+
+    /**
+     * Override standard Object class values
+     */
+    lockScalingY: true,
+
+    /**
+     * Override standard Object class values
+     */
+    lockScalingFlip: true,
+
     /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
@@ -50,14 +65,7 @@
      */
     initialize: function(text, options) {
       this.ctx = fabric.util.createCanvasElement().getContext('2d');
-
       this.callSuper('initialize', text, options);
-      this.set({
-        lockUniScaling: false,
-        lockScalingY: true,
-        lockScalingFlip: true,
-        hasBorders: true
-      });
       this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
 
       // add width to this list of props that effect line wrapping.
