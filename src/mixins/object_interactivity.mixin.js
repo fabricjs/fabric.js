@@ -189,7 +189,6 @@
 
     /**
      * Draws a colored layer behind the object, inside its selection borders.
-     * Requires public properties: width, height
      * Requires public options: padding, backgroundSelectionColor
      * this function is called when the context is transformed
      * @param {CanvasRenderingContext2D} ctx Context to draw on
@@ -200,11 +199,13 @@
       if (!this.selectionBackgroundColor || !this.active || this.group) {
         return this;
       }
-      var pad = this.padding, width = this.width + 2 * pad,
-          height = this.height + 2 * pad, top = this.top + pad,
-          left = this.left + pad;
-          
-      ctx.fillRect(-left, -top, width, height);
+      ctx.save();
+      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions();
+      ctx.translate(center.x, center.y);
+      ctx.rotate(degreesToRadians(this.angle));
+      ctx.fillStyle = this.selectionBackgroundColor;
+      ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
+      ctx.restore();
       return this;
     },
 
