@@ -189,7 +189,7 @@
 
     /**
      * Draws a colored layer behind the object, inside its selection borders.
-     * Requires public options: padding, backgroundSelectionColor
+     * Requires public options: padding, selectionBackgroundColor
      * this function is called when the context is transformed
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
