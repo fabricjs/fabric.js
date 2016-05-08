@@ -157,6 +157,36 @@
     });
   });
 
+  asyncTest('toObject with applied resize filter', function() {
+    createImageObject(function(image) {
+      ok(typeof image.toObject == 'function');
+      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.5, scaleY: 0.5});
+      image.filters.push(filter);
+      var width = image.width, height = image.height;
+      ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      image.applyFilters(function() {
+        equal(image.width, width / 2, 'width should be halved now');
+        equal(image.height, height / 2, 'height should be halved now');
+        var toObject = image.toObject();
+        deepEqual(toObject.filters[0], filter.toObject());
+        equal(toObject.width, width, 'width is stored as before filters');
+        equal(toObject.height, height, 'height is stored as before filters');
+        fabric.Image.fromObject(toObject, function(imageFromObject) {
+          var filterFromObj = imageFromObject.resizeFilters[0];
+          deepEqual(filterFromObj, filter);
+          ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+          equal(filterFromObj.scaleX, 0.3);
+          equal(filterFromObj.scaleY, 0.3);
+          equal(filterFromObj.resizeType, 'bilinear');
+          equal(imageFromObject.width, width / 2, 'on image reload width is halved again');
+          equal(imageFromObject.height, height / 2, 'on image reload width is halved again');
+        });
+        start();
+      });
+    });
+  });
+
+
   // asyncTest('toObject without default values', function() {
   //   createImageObject(function(image) {
 
