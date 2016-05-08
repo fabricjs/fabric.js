@@ -188,6 +188,28 @@
     },
 
     /**
+     * Draws a colored layer behind the object, inside its selection borders.
+     * Requires public options: padding, selectionBackgroundColor
+     * this function is called when the context is transformed
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawSelectionBackground: function(ctx) {
+      if (!this.selectionBackgroundColor || !this.active || this.group) {
+        return this;
+      }
+      ctx.save();
+      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions();
+      ctx.translate(center.x, center.y);
+      ctx.rotate(degreesToRadians(this.angle));
+      ctx.fillStyle = this.selectionBackgroundColor;
+      ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
+      ctx.restore();
+      return this;
+    },
+
+    /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor

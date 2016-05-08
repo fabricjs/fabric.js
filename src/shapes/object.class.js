@@ -528,6 +528,14 @@
     backgroundColor:          '',
 
     /**
+     * Selection Background color of an object. colored layer behind the object when it is active.
+     * does not mix good with globalCompositeOperation methods.
+     * @type String
+     * @default
+     */
+    selectionBackgroundColor:          '',
+
+    /**
      * When defined, an object is rendered via stroke and this property specifies its color
      * @type String
      * @default
@@ -1059,6 +1067,7 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
+      this.drawSelectionBackground(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
