@@ -608,9 +608,13 @@
           y = pointer.y,
           target = transform.target,
           action = transform.action,
-          actionPerformed = false;
+          actionPerformed = false,
+          customCorner = target.cornerCustomization[corner];
 
-      if (action === 'rotate') {
+      if (customCorner && customCorner.action) {
+        actionPerformed = customCorner.action(target, x, y, corner);
+      }
+      else if (action === 'rotate') {
         (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', target, e);
       }
       else if (action === 'scale') {
