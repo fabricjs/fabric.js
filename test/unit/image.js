@@ -180,8 +180,8 @@
           equal(filterFromObj.resizeType, 'bilinear');
           equal(imageFromObject.width, width / 2, 'on image reload width is halved again');
           equal(imageFromObject.height, height / 2, 'on image reload width is halved again');
+          start();
         });
-        start();
       });
     });
   });
