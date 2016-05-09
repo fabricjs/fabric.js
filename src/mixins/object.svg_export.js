@@ -20,7 +20,7 @@
       return str;
     }
   }
-  
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
      * Returns styles-string for svg-export
@@ -123,7 +123,7 @@
       return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ') ' : '';
     },
 
-   /**
+    /**
      * @private
      */
     _createBaseSVGMarkup: function() {
