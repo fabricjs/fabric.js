@@ -210,15 +210,17 @@
           scaleX = 1, scaleY = 1;
 
       this.filters.forEach(function(filterObj) {
-        filterObj && filters.push(filterObj.toObject());
+        if (filterObj) {
+          if (filterObj.type === 'Resize') {
+            scaleX *= filterObj.scaleX;
+            scaleY *= filterObj.scaleY;
+          }
+          filters.push(filterObj.toObject());
+        }
       });
 
       this.resizeFilters.forEach(function(filterObj) {
-        if (filterObj) {
-          scaleX *= filterObj.scaleX;
-          scaleY *= filterObj.scaleY;
-          resizeFilters.push(filterObj.toObject());
-        }
+        filterObj && resizeFilters.push(filterObj.toObject());
       });
 
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
