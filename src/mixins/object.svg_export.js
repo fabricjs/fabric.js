@@ -49,11 +49,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     }
     else {
       var color = new fabric.Color(value),
-          str = prop + ': ' + color.toRgb() + '; ',
+          str = prop + ': ' + value + '; ',
           opacity = color.getAlpha();
+
       if (opacity !== 1) {
+        //change the color in rgb + opacity
+        str = prop + ': ' + color.toRgb() + '; ';
         str += prop + '-opacity: ' + opacity.toString() + '; ';
       }
+
       return str;
     }
   },
