@@ -172,7 +172,7 @@
         equal(toObject.width, width, 'width is stored as before filters');
         equal(toObject.height, height, 'height is stored as before filters');
         fabric.Image.fromObject(toObject, function(imageFromObject) {
-          var filterFromObj = imageFromObject.resizeFilters[0];
+          var filterFromObj = imageFromObject.filters[0];
           deepEqual(filterFromObj, filter);
           ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
           equal(filterFromObj.scaleY, 0.5);
