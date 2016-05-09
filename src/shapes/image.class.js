@@ -205,26 +205,36 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var filters = [ ], element = this._originalElement;
+      var filters = [ ], resizeFilters = [ ],
+          element = this._originalElement,
+          scaleX = 1, scaleY = 1;
+
       this.filters.forEach(function(filterObj) {
         if (filterObj) {
+          if (filterObj.type === 'Resize') {
+            scaleX *= filterObj.scaleX;
+            scaleY *= filterObj.scaleY;
+          }
           filters.push(filterObj.toObject());
         }
       });
+
+      this.resizeFilters.forEach(function(filterObj) {
+        filterObj && resizeFilters.push(filterObj.toObject());
+      });
+
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         src: element ? element.src || element._src : '',
         filters: filters,
+        resizeFilters: resizeFilters,
         crossOrigin: this.crossOrigin,
         alignX: this.alignX,
         alignY: this.alignY,
         meetOrSlice: this.meetOrSlice
       });
 
-      if (this.resizeFilters.length > 0) {
-        object.resizeFilters = this.resizeFilters.map(function(filterObj) {
-          return filterObj && filterObj.toObject();
-        });
-      }
+      object.width /= scaleX;
+      object.height /= scaleY;
 
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
