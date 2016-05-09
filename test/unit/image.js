@@ -175,8 +175,8 @@
           var filterFromObj = imageFromObject.resizeFilters[0];
           deepEqual(filterFromObj, filter);
           ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-          equal(filterFromObj.scaleX, 0.3);
-          equal(filterFromObj.scaleY, 0.3);
+          equal(filterFromObj.scaleY, 0.5);
+          equal(filterFromObj.scaleX, 0.5);
           equal(filterFromObj.resizeType, 'bilinear');
           equal(imageFromObject.width, width / 2, 'on image reload width is halved again');
           equal(imageFromObject.height, height / 2, 'on image reload width is halved again');
