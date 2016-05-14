@@ -101,16 +101,19 @@
 
   test('set and minScaleLimit', function() {
     var cObj = new fabric.Object({ left: 11, top: 22, width: 50, height: 60, opacity: 0.7 });
-
-    equal(cObj.minScaleLimit, 0.02);
+    
+    //the min scale limit is given by height.
+    equal(cObj.minScaleLimit.toFixed(3), 0.016);
 
     cObj.set('width', 1000);
     equal(cObj.width, 1000);
+    //the min scale limit is given by width.
     equal(cObj.minScaleLimit, 0.001);
 
     cObj.set('width', 1);
     equal(cObj.width, 1);    
-    equal(cObj.minScaleLimit, 0.1);
+    //the min scale limit is given by height.
+    equal(cObj.minScaleLimit.toFixed(3), 0.016);
   });
 
   test('set with object of prop/values', function() {
