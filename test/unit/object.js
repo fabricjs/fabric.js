@@ -99,6 +99,15 @@
     equal(cObj.set('opacity', 0.5), cObj, 'chainable');
   });
 
+  test('set and minScaleLimit', function() {
+    var cObj = new fabric.Object({ left: 11, top: 22, width: 50, height: 60, opacity: 0.7 });
+    equal(cObj.get('minScaleLimit'), 0.01);
+    cObj.set('width', 1000);
+    equal(cObj.get('minScaleLimit'), 0.001);
+    cObj.set('width', 1);
+    equal(cObj.get('minScaleLimit'), 0.01);
+  });
+
   test('set with object of prop/values', function() {
     var cObj = new fabric.Object({  });
 
