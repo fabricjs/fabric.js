@@ -105,9 +105,11 @@
     equal(cObj.minScaleLimit, 0.02);
 
     cObj.set('width', 1000);
+    equal(cObj.width, 1000);
     equal(cObj.minScaleLimit, 0.001);
 
     cObj.set('width', 1);
+    equal(cObj.width, 1);    
     equal(cObj.minScaleLimit, 0.1);
   });
 
