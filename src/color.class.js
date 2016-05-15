@@ -296,7 +296,7 @@
     blue:    '#0000FF',
     fuchsia: '#FF00FF',
     gray:    '#808080',
-    grey:    '#808080',    
+    grey:    '#808080',
     green:   '#008000',
     lime:    '#00FF00',
     maroon:  '#800000',
