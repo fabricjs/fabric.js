@@ -1,3 +1,25 @@
+**Version 1.6.2**
+
+- Fix: restore canvas properties on loadFromJSON with includeProperties. [#2921](https://github.com/kangax/fabric.js/pull/2921)
+- Fix: Allow hoverCursor on non selectable objects, moveCursor does not appear if the object is not moveable.
+Added object.moveCursor to specify a cursor for moving per object. [#2924](https://github.com/kangax/fabric.js/pull/2924)
+- Fix: Add missing stroke.live translation, allow gradientTransform for dashed line. [#2926](https://github.com/kangax/fabric.js/pull/2926)
+- Improvement: Allow customization of keys that iteract with mouse action ( multiselect key, free tranform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
+- Added: Make iText fires object:modified on text change on exit editing [#2927](https://github.com/kangax/fabric.js/pull/2927)
+- Added: [control customization part 1] cornerDashArray, borderDashArray. Now borderScaleFactor influences both border and controls, changed default corner size to 13 [#2932](https://github.com/kangax/fabric.js/pull/2932)
+- Fix: createSVGFontFacesMarkup was failing to retrieve fonts in style [#2935](https://github.com/kangax/fabric.js/pull/2935)
+- Fix: shadow not scaled with dataUrl to multiplier [#2940](https://github.com/kangax/fabric.js/pull/2940)
+- Added: [control customization part 2] cornerStrokeColor. Now is possible to specify separate stroke and fill color for the controls [#2933](https://github.com/kangax/fabric.js/pull/2933)
+- Fix: Itext width calculation with caching false was returning nan. [#2943](https://github.com/kangax/fabric.js/pull/2943)
+- Added: [control customization part 3] Rounded corners. It is possible to specify cornerStyle for the object. 'rect' or 'circle' [#2942](https://github.com/kangax/fabric.js/pull/2942)
+- Added: [control customization part 4] Selection background. It is possible to specify selectionBackgroundColor for the object. [#2950](https://github.com/kangax/fabric.js/pull/2950)
+- Fix: Behaviour of image with filters with resize effects and Object to/from json [#2954](https://github.com/kangax/fabric.js/pull/2954)
+- Fix: Svg export should not output color notation in rgba format [#2955](https://github.com/kangax/fabric.js/pull/2955)
+- Fix: minScaleLimit rounding bug [#2964](https://github.com/kangax/fabric.js/pull/2964)
+- Fix: Itext spacing in justify mode bug [#2971](https://github.com/kangax/fabric.js/pull/2971)
+- Fix: Object.toDataUrl export when some window.devicepixelRatio is present (retina or browser zoom) [#2972](https://github.com/kangax/fabric.js/pull/2972)
+
+
 **Version 1.6.1**
 
 - Fix: image with broken element throwing error on toObject() [#2878](https://github.com/kangax/fabric.js/pull/2878)
