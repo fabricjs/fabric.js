@@ -59,7 +59,7 @@
       if (!source) {
         //if color is not recognize let's make black as canvas does
         source = [0, 0, 0, 1];
-      }      
+      }
       if (source) {
         this.setSource(source);
       }
