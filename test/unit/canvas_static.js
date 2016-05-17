@@ -630,7 +630,7 @@
     ok(typeof canvas.toSVG == 'function');
     canvas.clear();
 
-    var circle = new fabric.Circle(),
+    var circle = new fabric.Circle({excludeFromExport: true}),
         rect = new fabric.Rect({excludeFromExport: true}),
         path1 = new fabric.Path('M 100 100 L 300 100 L 200 300 z'),
         tria = new fabric.Triangle(),
@@ -640,7 +640,7 @@
         text = new fabric.Text('Text'),
         group = new fabric.Group([text, line]),
         ellipse = new fabric.Ellipse(),
-        image = new fabric.Image({width: 0, height: 0, excludeFromExport: true}),
+        image = new fabric.Image({width: 0, height: 0}),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.PathGroup([path2, path3]);
