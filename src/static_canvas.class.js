@@ -1073,9 +1073,11 @@
      * @private
      */
     _toObjects: function(methodName, propertiesToInclude) {
-      return this.getObjects().map(function(instance) {
-        return this._toObject(instance, methodName, propertiesToInclude);
-      }, this);
+      return this.getObjects().filter(function(object) {
+          return !object.excludeFromExport;
+        }).map(function(instance) {
+          return this._toObject(instance, methodName, propertiesToInclude);
+        }, this);
     },
 
     /**
@@ -1296,11 +1298,15 @@
      * @private
      */
     _setSVGObjects: function(markup, reviver) {
+      var instance, originalProperties;
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        var instance = objects[i],
-            //If the object is in a selection group, simulate what would happen to that
-            //object when the group is deselected
-            originalProperties = this._realizeGroupTransformOnObject(instance);
+        instance = objects[i];
+        if (instance.excludeFromExport) {
+          continue;
+        }
+        //If the object is in a selection group, simulate what would happen to that
+        //object when the group is deselected
+        originalProperties = this._realizeGroupTransformOnObject(instance);
         markup.push(instance.toSVG(reviver));
         this._unwindGroupTransformOnObject(instance, originalProperties);
       }
