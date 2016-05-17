@@ -744,6 +744,16 @@
      */
 
     lockScalingFlip:          false,
+
+    /**
+     * When `true`, object is not exported in SVG or OBJECT/JSON
+     * since 1.6.3
+     * @type Boolean
+     * @default
+     */
+
+    excludeFromExport:          false,
+
     /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
