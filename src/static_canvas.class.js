@@ -1077,7 +1077,7 @@
           return !object.excludeFromExport;
         }).map(function(instance) {
           return this._toObject(instance, methodName, propertiesToInclude);
-      }, this);
+        }, this);
     },
 
     /**
