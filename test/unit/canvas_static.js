@@ -621,7 +621,8 @@
 
     canvas.toSVG(null, reviver);
     equal(reviverCount, len + 2, 'reviver should include background and overlay image');
-
+    canvas.setBackgroundImage(null);
+    canvas.setOverlayImage(null);
     canvas.renderOnAddRemove = true;
   });
 
