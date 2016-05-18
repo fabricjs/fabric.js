@@ -346,11 +346,14 @@
 
       target.hasBorders = target.transparentCorners = false;
 
+      ctx.save();
+      ctx.transform.apply(ctx, this.viewportTransform);
       if (shouldTransform) {
-        ctx.save();
         ctx.transform.apply(ctx, target.group.calcTransformMatrix());
       }
       target.render(ctx);
+      ctx.restore();
+
       target.active && target._renderControls(ctx);
 
       target.hasBorders = hasBorders;
@@ -358,7 +361,6 @@
 
       var isTransparent = fabric.util.isTransparent(
         ctx, x, y, this.targetFindTolerance);
-      shouldTransform && ctx.restore();
 
       this.clearContext(ctx);
 
