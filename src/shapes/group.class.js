@@ -90,6 +90,11 @@
         this.callSuper('initialize', options);
       }
 
+      this.on('added', function() {
+        this._setupStateOnObjects();
+      });
+
+      this._setupStateOnObjects();
       this.setCoords();
       this.saveCoords();
     },
@@ -193,6 +198,23 @@
     _onObjectAdded: function(object) {
       object.group = this;
       object._set('canvas', this.canvas);
+      this._setupStateOnObject(object);
+    },
+
+    /**
+     * @private
+     */
+    _setupStateOnObjects: function() {
+      for (var i = 0; i < this._objects.length; i++) {
+        this._setupStateOnObject(this._objects[i]);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _setupStateOnObject: function(object) {
+      this.canvas && this.canvas.stateful && object.setupState();
     },
 
     /**
