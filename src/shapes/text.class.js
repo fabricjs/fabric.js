@@ -370,16 +370,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      this._setupCompositeOperation(ctx);
       this._renderTextBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
-      this.clipTo && ctx.restore();
     },
 
     /**
@@ -387,7 +380,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderText: function(ctx) {
-
       this._translateForTextAlign(ctx);
       this._renderTextFill(ctx);
       this._renderTextStroke(ctx);
@@ -825,8 +817,16 @@
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
-      if (!this.visible) {
+      if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
+      }
+
+      if (this.caching && !this._cacheCanvasEl) {
+        this._createCacheCanvas();
+        this._updateCacheCanvas();
+      }
+      if (this.caching && this.isCacheDirty) {
+        this.refreshCache();
       }
 
       ctx.save();
@@ -836,6 +836,7 @@
         this._initDimensions(ctx);
       }
       this.drawSelectionBackground(ctx);
+      this._setupCompositeOperation(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
@@ -845,8 +846,27 @@
       if (this.group && this.group.type === 'path-group') {
         ctx.translate(this.left, this.top);
       }
-      this._render(ctx);
+      this._setShadow(ctx);
+      if (this.caching) {
+        this._drawCache(ctx, noTransform);
+      }
+      else {
+        this._draw(ctx, noTransform);
+      }
       ctx.restore();
+    },
+
+    refreshCache: function() {
+      var ctx = this.cacheContext,
+          width = this.width, height = this.height;
+      ctx.clearRect(-width / 2, -height / 2, width, height);
+      ctx.globalAlpha = 1;
+      this._setTextStyles(ctx);
+      if (this._shouldClearCache()) {
+        this._initDimensions(ctx);
+      }
+      this._draw(ctx);
+      this.isCacheDirty = false;
     },
 
     /**
