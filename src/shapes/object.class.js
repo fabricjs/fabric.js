@@ -752,7 +752,34 @@
      * @default
      */
 
-    excludeFromExport:          false,
+    excludeFromExport:        false,
+
+    /**
+     * enable object caching
+     * since 1.6.3
+     * @type Boolean
+     * @default
+     */
+
+    caching:                   true,
+
+    /**
+     * Dirty cache flage
+     * since 1.6.3
+     * @type Boolean
+     * @default
+     */
+
+    isCacheDirty:                   true,
+
+    /**
+     * Canvas element used to store cache
+     * since 1.6.3
+     * @type CanvasElement
+     * @default
+     */
+
+    _cacheCanvasEl:              null,
 
     /**
      * List of properties to consider when checking if state
@@ -775,6 +802,37 @@
       if (options) {
         this.setOptions(options);
       }
+    },
+
+    /**
+     * @private
+     */
+    _createCacheCanvas: function() {
+      this._cacheCanvasEl = fabric.util.createCanvasElement();
+    },
+
+    /**
+     * @private
+     */
+    _updateCacheCanvas: function() {
+      var ratio = fabric.devicePixelRatio,
+          dim = this._getNonTransformedDimensions(),
+          width = dim.x * ratio,
+          height = dim.y * ratio;
+      this._cacheCanvasEl.width = width;
+      this._cacheCanvasEl.height = height;
+      this.cacheContext = this._cacheCanvasEl.getContext("2d");
+      this.cacheContext.translate(width/2, height/2);
+      this.cacheContext.scale(ratio, ratio);
+    },
+
+    refreshCache: function() {
+      var ctx = this.cacheContext,
+          dim = this._getNonTransformedDimensions(),
+          width = dim.x, height = dim.y;
+      ctx.clearRect(-width / 2, -height / 2, width, height);
+      ctx.globalAlpha = 1;
+      this._draw(ctx);
     },
 
     /**
@@ -1073,7 +1131,13 @@
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
-
+      if (this.caching && !this._cacheCanvasEl) {
+        this._createCacheCanvas();
+        this._updateCacheCanvas();
+      }
+      if (this.caching && this.isCacheDirty) {
+        this.refreshCache();
+      }
       ctx.save();
 
       //setup fill rule for current object
@@ -1082,18 +1146,32 @@
       if (!noTransform) {
         this.transform(ctx);
       }
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      this._setOpacity(ctx);
       this._setShadow(ctx);
+      if (this.caching) {
+        this._drawCache(ctx, noTransform);
+      }
+      else {
+        this._draw(ctx, noTransform);
+      }
+      ctx.restore();
+    },
+
+
+    _draw: function(ctx, noTransform) {
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
+      this._setOpacity(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
+    },
 
-      ctx.restore();
+    _drawCache: function(ctx) {
+      var dim = this._getNonTransformedDimensions();
+      ctx.drawImage(this._cacheCanvasEl, -dim.x/2,  -dim.y/2);
     },
 
     /**
