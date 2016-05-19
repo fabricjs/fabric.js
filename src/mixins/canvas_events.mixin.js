@@ -334,7 +334,8 @@
     _finalizeCurrentTransform: function() {
 
       var transform = this._currentTransform,
-          target = transform.target;
+          target = transform.target,
+          group = target.group;
 
       if (target._scaling) {
         target._scaling = false;
@@ -346,6 +347,13 @@
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         this.fire('object:modified', { target: target });
         target.fire('modified');
+      }
+
+      while (group) {
+        group.addWithUpdate();
+        this.fire('object:modified', { target: group });
+        group.fire('modified');
+        group = group.group;
       }
     },
 
@@ -442,7 +450,8 @@
       }
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+          pointer = this.getPointer(e, true),
+          deepTarget;
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -458,15 +467,20 @@
         target = this.getActiveGroup();
       }
 
-      if (target) {
-        if (target.selectable && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
-          this._setupCurrentTransform(e, target);
-        }
+      for (var i = this.targets.length - 1; i >= 0; i--) {
+        deepTarget = this.targets[i];
 
-        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+        if (deepTarget.selectable && (deepTarget.__corner || !this._shouldGroup(e, deepTarget))) {
+          this._beforeTransform(e, deepTarget);
+          this._setupCurrentTransform(e, deepTarget);
+          break;
+        }
+      }
+
+      if (deepTarget) {
+        if (deepTarget !== this.getActiveGroup() && deepTarget !== this.getActiveObject()) {
           this.deactivateAll();
-          target.selectable && this.setActiveObject(target, e);
+          deepTarget.selectable && this.setActiveObject(deepTarget, e);
         }
       }
       this._handleEvent(e, 'down', target ? target : null);
