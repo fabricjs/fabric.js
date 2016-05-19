@@ -122,10 +122,6 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of object dose not change
      */
     _updateObjectCoords: function(object, skipCoordsChange) {
-      // do not display corners of objects enclosed in a group
-      object.__origHasControls = object.hasControls;
-      object.hasControls = false;
-
       if (skipCoordsChange) {
         return;
       }
@@ -165,8 +161,8 @@
         object.group = this;
         object._set('canvas', this.canvas);
       }
-      // since _restoreObjectsState set objects inactive
-      this.forEachObject(this._setObjectActive, this);
+      // since _restoreObjectsState obliterates group
+      this.forEachObject(this._setObjectGroup, this);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -175,8 +171,7 @@
     /**
      * @private
      */
-    _setObjectActive: function(object) {
-      object.set('active', true);
+    _setObjectGroup: function(object) {
       object.group = this;
     },
 
@@ -189,8 +184,8 @@
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
-      // since _restoreObjectsState set objects inactive
-      this.forEachObject(this._setObjectActive, this);
+      // since _restoreObjectsState obliterates group
+      this.forEachObject(this._setObjectGroup, this);
 
       this.remove(object);
       this._calcBounds();
@@ -378,7 +373,6 @@
     _restoreObjectState: function(object) {
       this.realizeTransform(object);
       object.setCoords();
-      object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
       object.set('active', false);
       delete object.group;

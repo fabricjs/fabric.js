@@ -1367,12 +1367,22 @@
      * @private
      */
     _drawObjectsControls: function(ctx) {
-      for (var i = 0, len = this._objects.length; i < len; ++i) {
-        if (!this._objects[i] || !this._objects[i].active) {
+      this._drawCollectionControls(ctx, this);
+    },
+
+    /**
+     * @private
+     */
+    _drawCollectionControls: function(ctx, collection) {
+      for (var i = 0, len = collection._objects.length; i < len; ++i) {
+        if (collection._objects[i] && collection._objects[i]._objects) {
+          this._drawCollectionControls(ctx, collection._objects[i]);
+        }
+        if (!collection._objects[i] || !collection._objects[i].active) {
           continue;
         }
-        this._objects[i]._renderControls(ctx);
-        this.lastRenderedWithControls = this._objects[i];
+        collection._objects[i]._renderControls(ctx);
+        this.lastRenderedWithControls = collection._objects[i];
       }
     },
 
