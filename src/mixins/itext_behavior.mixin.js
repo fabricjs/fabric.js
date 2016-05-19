@@ -451,7 +451,9 @@
           m = this.calcTransformMatrix(),
           p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, this.getViewportTransform());
+      return p;
     },
 
     /**

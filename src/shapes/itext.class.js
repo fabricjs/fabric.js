@@ -487,6 +487,7 @@
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          scaleFactor = this.scaleX,
           leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
                     : boundaries.leftOffset;
@@ -494,10 +495,14 @@
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
+      if (this.canvas) {
+        scaleFactor *= this.canvas.getZoom();
+      }
+
       ctx.fillRect(
         boundaries.left + leftOffset,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / this.scaleX,
+        this.cursorWidth / scaleFactor,
         charHeight);
 
     },
