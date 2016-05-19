@@ -14,8 +14,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
+    var vpt = this.getViewportTransform();
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + (p.y * this.canvas.viewportTransform[3]) + 'px; left: ' + (p.x * this.canvas.viewportTransform[0]) + 'px; opacity: 0;'
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + (p.y * vpt[3]) + 'px; left: ' + (p.x * vpt[0]) + 'px; opacity: 0;'
                                         + ' width: 0px; height: 0px; z-index: -999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
