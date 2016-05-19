@@ -497,7 +497,7 @@
       ctx.fillRect(
         boundaries.left + leftOffset,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / this.scaleX,
+        this.cursorWidth / this.scaleX / this.canvas.viewportTransform[0],
         charHeight);
 
     },

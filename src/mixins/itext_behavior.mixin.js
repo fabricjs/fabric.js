@@ -430,8 +430,8 @@
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
       if (this.selectionStart === this.selectionEnd) {
         var p = this._calcTextareaPosition();
-        this.hiddenTextarea.style.left = p.x + 'px';
-        this.hiddenTextarea.style.top = p.y + 'px';
+        this.hiddenTextarea.style.left = (p.x * this.canvas.viewportTransform[0]) + 'px';
+        this.hiddenTextarea.style.top = (p.y * this.canvas.viewportTransform[3]) + 'px';
       }
     },
 
