@@ -342,15 +342,22 @@
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners,
           ctx = this.contextCache,
-          shouldTransform = target.group && target.group === this.getActiveGroup();
+          shouldTransform = target.group && target.group === this.getActiveGroup(),
+          matrix = shouldTransform ? target.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
 
       target.hasBorders = target.transparentCorners = false;
 
       if (shouldTransform) {
         ctx.save();
-        ctx.transform.apply(ctx, target.group.calcTransformMatrix());
+        ctx.transform.apply(ctx, matrix);
       }
+
+      ctx.save();
+      ctx.transform.apply(ctx,
+        fabric.util.multiplyTransformMatrices(matrix, this.viewportTransform));
       target.render(ctx);
+      ctx.restore();
+
       target.active && target._renderControls(ctx);
 
       target.hasBorders = hasBorders;
