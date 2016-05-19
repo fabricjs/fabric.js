@@ -430,8 +430,8 @@
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
       if (this.selectionStart === this.selectionEnd) {
         var p = this._calcTextareaPosition();
-        this.hiddenTextarea.style.left = (p.x * this.canvas.viewportTransform[0]) + 'px';
-        this.hiddenTextarea.style.top = (p.y * this.canvas.viewportTransform[3]) + 'px';
+        this.hiddenTextarea.style.left = p.x + 'px';
+        this.hiddenTextarea.style.top = p.y + 'px';
       }
     },
 
@@ -451,7 +451,9 @@
           m = this.calcTransformMatrix(),
           p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, this.getViewportTransform());
+      return p;
     },
 
     /**
