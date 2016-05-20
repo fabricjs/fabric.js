@@ -761,7 +761,7 @@
      * @default
      */
 
-    caching:                   true,
+    objectCaching:            true,
 
     /**
      * Dirty cache flage
@@ -770,7 +770,7 @@
      * @default
      */
 
-    isCacheDirty:                   true,
+    isCacheDirty:             true,
 
     /**
      * Canvas element used to store cache
@@ -779,7 +779,7 @@
      * @default
      */
 
-    _cacheCanvasEl:              null,
+    _cacheCanvasEl:           null,
 
     /**
      * List of properties to consider when checking if state
@@ -830,9 +830,16 @@
       var ctx = this.cacheContext,
           dim = this._getNonTransformedDimensions(),
           width = dim.x, height = dim.y;
-      ctx.clearRect(-width / 2, -height / 2, width, height);
+      if (dim.x !== this._cacheCanvasEl.width || dim.y !== this._cacheCanvasEl.height) {
+        this._updateCacheCanvas();
+      }
+      else {
+        ctx.clearRect(-width / 2, -height / 2, width, height);
+      }
       ctx.globalAlpha = 1;
+      this._cachingNeeds && this._cachingNeeds(ctx);
       this._draw(ctx);
+      this.isCacheDirty = false;
     },
 
     /**
@@ -1131,11 +1138,11 @@
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
-      if (this.caching && !this._cacheCanvasEl) {
+      if (this.objectCaching && !this._cacheCanvasEl) {
         this._createCacheCanvas();
         this._updateCacheCanvas();
       }
-      if (this.caching && this.isCacheDirty) {
+      if (this.objectCaching && this.isCacheDirty) {
         this.refreshCache();
       }
       ctx.save();
@@ -1150,7 +1157,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this._setShadow(ctx);
-      if (this.caching) {
+      if (this.objectCaching) {
         this._drawCache(ctx, noTransform);
       }
       else {
