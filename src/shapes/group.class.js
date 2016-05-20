@@ -426,10 +426,39 @@
       return this;
     },
 
+    getOverflowBounds: function() {
+      var bounds = this._getBounds(),
+          largestControl = 0;
+
+      for (var i = 0; i < this._objects.length; i++) {
+        if (this._objects[i].rotatingPointOffset > largestControl) {
+          largestControl = this._objects[i].rotatingPointOffset;
+        }
+
+        if (this._objects[i].cornerSize > largestControl) {
+          largestControl = this._objects[i].cornerSize;
+        }
+      }
+
+      bounds.left -= largestControl;
+      bounds.top -= largestControl;
+      bounds.width += 2 * largestControl;
+      bounds.height += 2 * largestControl;
+
+      return bounds;
+    },
+
     /**
      * @private
      */
     _calcBounds: function(onlyWidthHeight) {
+      this.set(this._getBounds(onlyWidthHeight));
+    },
+
+    /**
+     * @private
+     */
+    _getObjectsBounds: function() {
       var aX = [],
           aY = [],
           o, prop,
@@ -447,14 +476,17 @@
         }
       }
 
-      this.set(this._getBounds(aX, aY, onlyWidthHeight));
+      return [aX, aY];
     },
 
     /**
      * @private
      */
-    _getBounds: function(aX, aY, onlyWidthHeight) {
+    _getBounds: function(onlyWidthHeight) {
       var ivt = fabric.util.invertTransform(this.getViewportTransform()),
+          aXY = this._getObjectsBounds(),
+          aX = aXY[0],
+          aY = aXY[1],
           minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
           maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
           obj = {
