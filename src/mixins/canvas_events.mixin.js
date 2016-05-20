@@ -350,7 +350,7 @@
       }
 
       while (group) {
-        group.addWithUpdate();
+        group.update();
         group.setCoords();
         this.fire('object:modified', { target: group });
         group.fire('modified');
@@ -473,7 +473,7 @@
 
         if (deepTarget.selectable && (deepTarget.__corner || !this._shouldGroup(e, deepTarget))) {
           if (deepTarget !== target) {
-            deepTarget.group.addWithUpdate();
+            deepTarget.group.update();
           }
           this._beforeTransform(e, deepTarget);
           this._setupCurrentTransform(e, deepTarget);
