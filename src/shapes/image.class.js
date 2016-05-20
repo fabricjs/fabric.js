@@ -89,6 +89,14 @@
     _lastScaleY: 1,
 
     /**
+     * enable object caching
+     * since 1.6.3
+     * @type Boolean
+     * @default
+     */
+    objectCaching: false,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
