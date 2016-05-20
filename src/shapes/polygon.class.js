@@ -147,6 +147,14 @@
 
     /**
      * @private
+     * per class specific caching needs
+     */
+    _cachingNeeds: function(ctx, noTranform) {
+      noTransform || ctx.translate(this.pathOffset.x, this.pathOffset.y);
+    },
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     commonRender: function(ctx, noTransform) {
