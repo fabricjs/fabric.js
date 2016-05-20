@@ -162,6 +162,16 @@
     },
 
     /**
+     * Recalculates group's dimension, position.
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    update: function() {
+      this.addWithUpdate();
+      return this;
+    },
+
+    /**
      * @private
      */
     _setObjectGroup: function(object) {
@@ -210,6 +220,9 @@
      */
     _setupStateOnObject: function(object) {
       this.canvas && this.canvas.stateful && object.setupState();
+      if (object._objects) {
+        object._setupStateOnObjects();
+      }
     },
 
     /**
