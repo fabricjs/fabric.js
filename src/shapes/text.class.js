@@ -371,6 +371,8 @@
      */
     _render: function(ctx) {
       this._renderTextBackground(ctx);
+      //this command is actually duplicated for text based class
+      this._setFillStyles(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
     },
@@ -821,11 +823,11 @@
         return;
       }
 
-      if (this.caching && !this._cacheCanvasEl) {
+      if (this.objectCaching && !this._cacheCanvasEl) {
         this._createCacheCanvas();
         this._updateCacheCanvas();
       }
-      if (this.caching && this.isCacheDirty) {
+      if (this.objectCaching && this.isCacheDirty) {
         this.refreshCache();
       }
 
@@ -847,26 +849,25 @@
         ctx.translate(this.left, this.top);
       }
       this._setShadow(ctx);
-      if (this.caching) {
+      if (this.objectCaching) {
         this._drawCache(ctx, noTransform);
       }
       else {
         this._draw(ctx, noTransform);
       }
       ctx.restore();
+      //this.ctx = ctx;
     },
 
-    refreshCache: function() {
-      var ctx = this.cacheContext,
-          width = this.width, height = this.height;
-      ctx.clearRect(-width / 2, -height / 2, width, height);
-      ctx.globalAlpha = 1;
+    /**
+     * @private
+     * per class specific caching needs
+     */
+    _cachingNeeds: function(ctx) {
       this._setTextStyles(ctx);
       if (this._shouldClearCache()) {
         this._initDimensions(ctx);
       }
-      this._draw(ctx);
-      this.isCacheDirty = false;
     },
 
     /**
