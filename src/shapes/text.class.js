@@ -828,7 +828,7 @@
         this._updateCacheCanvas();
       }
       if (this.objectCaching && this.isCacheDirty) {
-        this.refreshCache();
+        this.refreshCache(noTransform);
       }
 
       ctx.save();
