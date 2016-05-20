@@ -386,8 +386,6 @@
     _restoreObjectState: function(object) {
       this.realizeTransform(object);
       object.setCoords();
-      delete object.__origHasControls;
-      object.set('active', false);
       delete object.group;
 
       return this;
