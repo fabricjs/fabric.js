@@ -742,7 +742,6 @@
      * @type Boolean
      * @default
      */
-
     lockScalingFlip:          false,
 
     /**
@@ -751,7 +750,6 @@
      * @type Boolean
      * @default
      */
-
     excludeFromExport:        false,
 
     /**
@@ -760,7 +758,6 @@
      * @type Boolean
      * @default
      */
-
     objectCaching:            true,
 
     /**
@@ -769,7 +766,6 @@
      * @type Boolean
      * @default
      */
-
     isCacheDirty:             true,
 
     /**
@@ -778,7 +774,6 @@
      * @type CanvasElement
      * @default
      */
-
     _cacheCanvasEl:           null,
 
     /**
