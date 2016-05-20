@@ -597,8 +597,16 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-        target = this.findTarget(e);
-        this._setCursorFromEvent(e, target);
+        this.findTarget(e);
+
+        if (this.targets.length) {
+          for (var i = 0; i < this.targets.length; i++) {
+            this._setCursorFromEvent(e, this.targets[i]);
+          }
+        }
+        else {
+          this._setCursorFromEvent(e, null);
+        }
       }
       else {
         this._transformObject(e);
@@ -733,10 +741,17 @@
       }
       else {
         var activeGroup = this.getActiveGroup(),
-            // only show proper corner when group selection is not active
-            corner = target._findTargetCorner
-                      && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(this.getPointer(e, true));
+            pointer = this.getPointer(e, true),
+            corner;
+
+        if (target.group) {
+          pointer = this._normalizePointer(target.group, pointer);
+        }
+
+        // only show proper corner when group selection is not active
+        corner = target._findTargetCorner
+                  && (!activeGroup || !activeGroup.contains(target))
+                  && target._findTargetCorner(pointer);
 
         if (!corner) {
           this.setCursor(hoverCursor);
