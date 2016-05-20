@@ -29,6 +29,11 @@
           xPoints,
           lines;
       this.__corner = 0;
+
+      if (this.group) {
+        this.group.update();
+      }
+
       for (var i in this.oCoords) {
 
         if (!this.isControlVisible(i)) {
