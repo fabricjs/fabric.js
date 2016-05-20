@@ -777,6 +777,7 @@ test('toDataURL & reference to canvas', function() {
     ok(typeof object._setLineDash === 'function');
 
     canvas.add(object);
+    object.objectCache = false;
     object.strokeDashArray = [3, 2, 1];
     equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
     canvas.renderAll();
