@@ -1173,7 +1173,13 @@
 
       if (this.group) {
         ctx.rotate(degreesToRadians(options.angle));
-        this.drawBordersInGroup(ctx, options);
+
+        if (this.active) {
+          this.drawBorders(ctx, options);
+        }
+        else {
+          this.drawBordersInGroup(ctx, options);
+        }
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));

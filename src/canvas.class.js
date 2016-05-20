@@ -473,9 +473,17 @@
       }
 
       var pointer = this.getPointer(e),
-          corner = target._findTargetCorner(this.getPointer(e, true)),
-          action = this._getActionFromCorner(target, corner, e),
-          origin = this._getOriginFromCorner(target, corner);
+          unzoomedPointer = this.getPointer(e, true),
+          corner, action, origin;
+
+      if (target.group) {
+        pointer = this._normalizePointer(target.group, pointer);
+        unzoomedPointer = this._normalizePointer(target.group, unzoomedPointer)
+      }
+
+      corner = target._findTargetCorner(unzoomedPointer);
+      action = this._getActionFromCorner(target, corner, e);
+      origin = this._getOriginFromCorner(target, corner);
 
       this._currentTransform = {
         target: target,
