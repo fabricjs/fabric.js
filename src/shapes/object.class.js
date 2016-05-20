@@ -826,7 +826,11 @@
       this.cacheContext.scale(ratio, ratio);
     },
 
-    refreshCache: function() {
+    /**
+     * redraw the cache and update the cacheCanvas by request
+     * @param {Boolean} [noTransform] for pathgroup rendering purpouse, leave it to false.
+     */
+    refreshCache: function(noTransform) {
       var ctx = this.cacheContext,
           dim = this._getNonTransformedDimensions(),
           width = dim.x, height = dim.y;
@@ -837,7 +841,7 @@
         ctx.clearRect(-width / 2, -height / 2, width, height);
       }
       ctx.globalAlpha = 1;
-      this._cachingNeeds && this._cachingNeeds(ctx);
+      this._cachingNeeds && this._cachingNeeds(ctx, noTransform);
       this._draw(ctx);
       this.isCacheDirty = false;
     },
@@ -1143,7 +1147,7 @@
         this._updateCacheCanvas();
       }
       if (this.objectCaching && this.isCacheDirty) {
-        this.refreshCache();
+        this.refreshCache(noTransform);
       }
       ctx.save();
 
