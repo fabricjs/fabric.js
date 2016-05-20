@@ -462,6 +462,9 @@
         deepTarget = this.targets[i];
 
         if (deepTarget.selectable && (deepTarget.__corner || !this._shouldGroup(e, deepTarget))) {
+          if (deepTarget !== target) {
+            deepTarget.group.addWithUpdate();
+          }
           this._beforeTransform(e, deepTarget);
           this._setupCurrentTransform(e, deepTarget);
           break;
