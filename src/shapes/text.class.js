@@ -450,7 +450,7 @@
      * @private
      */
     _getNonTransformedDimensions: function() {
-      return {x: this.width, y: this.height};
+      return { x: this.width, y: this.height };
     },
 
     /**
