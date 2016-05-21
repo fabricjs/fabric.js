@@ -515,7 +515,7 @@
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex;
-
+      ctx.clearRect(-this.width / 2, -this.height / 2, this.width, this.height);
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0,
             lineHeight = this._getHeightOfLine(this.ctx, i),
@@ -539,7 +539,6 @@
             boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
           }
         }
-        ctx.clearRect(-this.width / 2, -this.height / 2, this.width, this.height);
         ctx.fillRect(
           boundaries.left + lineOffset,
           boundaries.top + boundaries.topOffset,
