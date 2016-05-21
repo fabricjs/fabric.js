@@ -172,7 +172,7 @@
         y = -this.height / 2;
       }
       markup.push(
-        '<rect ',
+        '<rect ', this.getSvgId(),
           'x="', x, '" y="', y,
           '" rx="', this.get('rx'), '" ry="', this.get('ry'),
           '" width="', this.width, '" height="', this.height,
