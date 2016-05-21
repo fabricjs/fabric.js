@@ -444,6 +444,16 @@
       return maxWidth;
     },
 
+    /*
+     * Calculate object dimensions from its properties
+     * @override
+     * @private
+     */
+    _getNonTransformedDimensions = function() {
+      return {x: this.width, y: this.height};
+    },
+
+
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
