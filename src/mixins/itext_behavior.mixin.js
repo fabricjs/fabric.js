@@ -113,7 +113,6 @@
         },
         onChange: function() {
           if (obj.canvas) {
-            obj.canvas.clearContext(obj.canvas.contextTop || obj.ctx);
             obj.renderCursorOrSelection();
           }
         },
