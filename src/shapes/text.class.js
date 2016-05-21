@@ -453,7 +453,6 @@
       return {x: this.width, y: this.height};
     },
 
-
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
