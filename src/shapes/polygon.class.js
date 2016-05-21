@@ -118,7 +118,7 @@
         addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       }
       markup.push(
-        '<', this.type, ' ',
+        '<', this.type, ' ', this.getSvgId(),
           'points="', points.join(''),
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(), addTransform,
