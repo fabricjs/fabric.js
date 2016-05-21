@@ -68,7 +68,7 @@
      * @return {String}
      */
     getSvgId: function() {
-      return this.id ? 'id="' + this.id + '"' : '';
+      return this.id ? 'id="' + this.id + '" ' : '';
     },
 
     /**
