@@ -981,7 +981,7 @@
           xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
         }
         if (!xml || !xml.documentElement) {
-          return;
+          callback && callback(null);
         }
 
         fabric.parseSVGDocument(xml.documentElement, function (results, options) {
@@ -989,7 +989,7 @@
             objects: fabric.util.array.invoke(results, 'toObject'),
             options: options
           });
-          callback(results, options);
+          callback && callback(results, options);
         }, reviver);
       }
     },
