@@ -64,6 +64,14 @@
     },
 
     /**
+     * Returns id attribute for svg output
+     * @return {String}
+     */
+    getSvgId: function() {
+      return this.id ? 'id="' + this.id + '"' : '';
+    },
+
+    /**
      * Returns transform-string for svg-export
      * @return {String}
      */
