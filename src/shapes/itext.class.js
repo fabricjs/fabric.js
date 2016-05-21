@@ -493,13 +493,12 @@
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
+      ctx.clearRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.fillRect(
         boundaries.left + leftOffset,
         boundaries.top + boundaries.topOffset,
         this.cursorWidth / this.scaleX,
         charHeight);
-
     },
 
     /**
@@ -540,7 +539,7 @@
             boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
           }
         }
-
+        ctx.clearRect(-this.width / 2, -this.height / 2, this.width, this.height);
         ctx.fillRect(
           boundaries.left + lineOffset,
           boundaries.top + boundaries.topOffset,
