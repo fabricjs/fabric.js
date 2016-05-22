@@ -947,7 +947,7 @@
       }
 
       var pointer = this.getPointer(e, true);
-      this.targets = [ ]
+      this.targets = [ ];
 
       if (this._isLastRenderedObject(pointer)) {
         return this.lastRenderedWithControls;
