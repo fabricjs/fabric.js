@@ -313,7 +313,7 @@
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < this.targets.length; i++) {
-        this.targets[i].fire('mouse' + eventType, options)
+        this.targets[i].fire('mouse' + eventType, options);
       }
     },
 
