@@ -295,7 +295,7 @@
      * Checks if point is contained within an area of given object
      * @param {Event} e Event object
      * @param {fabric.Object} target Object to test against
-     * @param {Object} point x,y object of point coordinates we want to check.
+     * @param {Object} [point] x,y object of point coordinates we want to check.
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target, point) {
