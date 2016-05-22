@@ -285,23 +285,36 @@
         target.isMoving = false;
       }
 
+      this._handleCursorAndEvent(e, target, 'up');
       shouldRender && this.renderAll();
-
-      this._handleCursorAndEvent(e, target);
     },
 
-    _handleCursorAndEvent: function(e, target) {
+    /**
+     * set cursor for mouse up and handle mouseUp event
+     * @param {Event} e event from mouse
+     * @param {fabric.Object} target receiving event
+     * @param {String} eventType event to fire (up, down or move)
+     */
+    _handleCursorAndEvent: function(e, target, eventType) {
       this._setCursorFromEvent(e, target);
+      this._handleEvent(e, eventType, target);
+    },
 
-      // Can't find any reason, disabling for now
-      // TODO: why are we doing this?
-      /* var _this = this;
-      setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
-      }, 50); */
+    /**
+     * Handle event firing for target and subtargets
+     * @param {Event} e event from mouse
+     * @param {fabric.Object} target receiving event
+     * @param {String} eventType event to fire (up, down or move)
+     */
+    _handleEvent: function(e, eventType, targetObj) {
+      var target = targetObj || this.findTarget(e),
+          options = { e: e, target: target };
 
-      this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
+      this.fire('mouse:' + eventType, options);
+      target && target.fire('mouse' + eventType, options);
+      for (var i = 0; i < this.targets.length; i++) {
+        this.targets[i].fire('mouse' + eventType, options)
+      }
     },
 
     /**
@@ -361,12 +374,7 @@
       var ivt = fabric.util.invertTransform(this.viewportTransform),
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
-      this.fire('mouse:down', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousedown', { e: e, target: target });
-      }
+      this._handleEvent(e, 'down');
     },
 
     /**
@@ -380,12 +388,7 @@
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.setCursor(this.freeDrawingCursor);
-      this.fire('mouse:move', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousemove', { e: e, target: target });
-      }
+      this._handleEvent(e, 'move');
     },
 
     /**
@@ -398,12 +401,7 @@
         this.contextTop.restore();
       }
       this.freeDrawingBrush.onMouseUp();
-      this.fire('mouse:up', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mouseup', { e: e, target: target });
-      }
+      this._handleEvent(e, 'up');
     },
 
     /**
@@ -460,11 +458,9 @@
           target.selectable && this.setActiveObject(target, e);
         }
       }
+      this._handleEvent(e, 'down');
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
-
-      this.fire('mouse:down', { target: target, e: e });
-      target && target.fire('mousedown', { e: e });
     },
 
     /**
@@ -578,9 +574,7 @@
       else {
         this._transformObject(e);
       }
-
-      this.fire('mouse:move', { target: target, e: e });
-      target && target.fire('mousemove', { e: e });
+      this._handleEvent(e, 'move');
     },
 
     /**
