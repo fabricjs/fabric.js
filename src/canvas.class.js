@@ -946,20 +946,24 @@
         return;
       }
 
-      var pointer = this.getPointer(e, true);
-      this.targets = [ ];
-
-      if (this._isLastRenderedObject(pointer)) {
-        return this.lastRenderedWithControls;
-      }
-
       // first check current group (if one exists)
+      // avtive group does not check sub targets like normal groups.
+      // if active group just exits.
       var activeGroup = this.getActiveGroup();
-      if (!skipGroup && this._checkTarget(pointer, activeGroup)) {
+      if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
 
-      var target = this._searchPossibleTargets(this._objects, pointer);
+	  
+      var pointer = this.getPointer(e, true),
+          objects = this._objects;
+      this.targets = [ ];
+
+      if (this._isLastRenderedObject(pointer)) {
+        objects = [this.lastRenderedWithControls];
+      }
+
+      var target = this._searchPossibleTargets(objects, pointer);
       this._fireOverOutEvents(target, e);
       return target;
     },
@@ -1020,7 +1024,7 @@
           target = objects[i];
           if (target.type === 'group' && target.subTargetCheck) {
             normalizedPointer = this._normalizePointer(target, pointer);
-            subTarget = this._searchPossibleTargets(normalizedPointer, target._objects);
+            subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
             subTarget && this.targets.push(subTarget);
           }
           break;
