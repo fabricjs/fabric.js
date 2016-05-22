@@ -954,7 +954,6 @@
         return activeGroup;
       }
 
-	  
       var pointer = this.getPointer(e, true),
           objects = this._objects;
       this.targets = [ ];
