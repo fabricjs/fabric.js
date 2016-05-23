@@ -442,7 +442,7 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true),
-          deepTarget;
+          deepTargetHandled = false;
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -459,27 +459,40 @@
       }
 
       for (var i = this.targets.length - 1; i >= 0; i--) {
-        deepTarget = this.targets[i];
-
-        if (deepTarget.selectable && (deepTarget.__corner || !this._shouldGroup(e, deepTarget))) {
-          if (deepTarget !== target) {
-            deepTarget.group.update();
-          }
-          this._beforeTransform(e, deepTarget);
-          this._setupCurrentTransform(e, deepTarget);
+        if (this._handleTargetMouseDown(e, this.targets[i], target)) {
+          deepTargetHandled = true;
           break;
         }
       }
 
-      if (deepTarget) {
-        if (deepTarget !== this.getActiveGroup() && deepTarget !== this.getActiveObject()) {
-          this.deactivateAll();
-          deepTarget.selectable && this.setActiveObject(deepTarget, e);
-        }
+      if (target && !deepTargetHandled) {
+        this._handleTargetMouseDown(e, target, target);
       }
+
       this._handleEvent(e, 'down');
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _handleTargetMouseDown: function(e, target, topTarget) {
+      if (target.selectable && (target.__corner || !this._shouldGroup(e, target))) {
+        if (target !== topTarget) {
+          target.group.update();
+        }
+        this._beforeTransform(e, target);
+        this._setupCurrentTransform(e, target);
+
+        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+          this.deactivateAll();
+          target.selectable && this.setActiveObject(target, e);
+        }
+        return true;
+      }
+
+      return false;
     },
 
     /**
