@@ -1217,6 +1217,18 @@
     });
   });
 
+  //how to test with an exception?
+  /*asyncTest('options in setBackgroundImage from invalid URL', function() {
+    canvas.backgroundImage = null;
+    canvas.setBackgroundImage(IMG_SRC + '_not_exist', function() {
+      equal(canvas.backgroundImage, null);
+      start();
+    }, {
+      left: 50,
+      originX: 'right'
+    });
+  });*/
+
   asyncTest('options in setBackgroundImage from image instance', function() {
     createImageObject(function(imageInstance) {
       canvas.setBackgroundImage(imageInstance, function() {
