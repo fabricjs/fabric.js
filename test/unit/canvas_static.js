@@ -1219,7 +1219,7 @@
 
   asyncTest('options in setBackgroundImage from invalid URL', function() {
     canvas.backgroundImage = null;
-    canvas.setBackgroundImage('SOME_ERROR', function() {
+    canvas.setBackgroundImage(IMG_SRC + '_not_exist', function() {
       equal(canvas.backgroundImage, null);
       start();
     }, {
