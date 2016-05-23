@@ -165,11 +165,6 @@
     /**
      * @private
      */
-    _charWidthsCache: { },
-
-    /**
-     * @private
-     */
     __widthOfSpace: [ ],
 
     /**
@@ -782,11 +777,21 @@
      */
     _getCacheProp: function(_char, styleDeclaration) {
       return _char +
-             styleDeclaration.fontFamily +
              styleDeclaration.fontSize +
              styleDeclaration.fontWeight +
-             styleDeclaration.fontStyle +
-             styleDeclaration.shadow;
+             styleDeclaration.fontStyle;
+    },
+
+    /**
+     * @private
+     * @param {String} fontFamily name
+     * @return {Object} reference to cache
+     */
+    _getFontCache: function(fontFamily) {
+      if (!fabric.charWidthsCache[fontFamily]) {
+        fabric.charWidthsCache[fontFamily] = { };
+      }
+      return fabric.charWidthsCache[fontFamily];
     },
 
     /**
@@ -799,16 +804,17 @@
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = (decl && clone(decl)) || clone(charDecl), width;
+          styleDeclaration = (decl && clone(decl)) || clone(charDecl),
+          width, cacheProp, charWidthsCache;
 
       this._applyFontStyles(styleDeclaration);
-
-      var cacheProp = this._getCacheProp(_char, styleDeclaration);
+      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
+      cacheProp = this._getCacheProp(_char, styleDeclaration);
 
       // short-circuit if no styles for this char
       // global style from object is always applyed and handled by save and restore
-      if (!charDecl && this._charWidthsCache[cacheProp] && this.caching) {
-        return this._charWidthsCache[cacheProp];
+      if (!charDecl && charWidthsCache[cacheProp] && this.caching) {
+        return charWidthsCache[cacheProp];
       }
 
       if (typeof styleDeclaration.shadow === 'string') {
@@ -838,13 +844,13 @@
         this._setShadow.call(styleDeclaration, ctx);
       }
 
-      if (!this.caching || !this._charWidthsCache[cacheProp]) {
+      if (!this.caching || !charWidthsCache[cacheProp]) {
         width = ctx.measureText(_char).width;
-        this.caching && (this._charWidthsCache[cacheProp] = width);
+        this.caching && (charWidthsCache[cacheProp] = width);
         return width;
       }
 
-      return this._charWidthsCache[cacheProp];
+      return charWidthsCache[cacheProp];
     },
 
     /**
@@ -935,13 +941,14 @@
       if (!this._isMeasuring && this.textAlign === 'justify' && this._reSpacesAndTabs.test(_char)) {
         return this._getWidthOfSpace(ctx, lineIndex);
       }
-
-      var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
+      var charWidthsCache, cacheProp,
+          styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
       this._applyFontStyles(styleDeclaration);
-      var cacheProp = this._getCacheProp(_char, styleDeclaration);
+      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
+      cacheProp = this._getCacheProp(_char, styleDeclaration);
 
-      if (this._charWidthsCache[cacheProp] && this.caching) {
-        return this._charWidthsCache[cacheProp];
+      if (charWidthsCache[cacheProp] && this.caching) {
+        return charWidthsCache[cacheProp];
       }
       else if (ctx) {
         ctx.save();
