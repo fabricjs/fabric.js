@@ -786,7 +786,7 @@
 
     /**
      * @private
-     * @param {String} font name
+     * @param {String} fontFamily name
      * @return {Object} reference to cache
      */
     _getFontCache: function(fontFamily) {
