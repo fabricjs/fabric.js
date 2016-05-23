@@ -1217,6 +1217,17 @@
     });
   });
 
+  asyncTest('options in setBackgroundImage from invalid URL', function() {
+    canvas.backgroundImage = null;
+    canvas.setBackgroundImage('SOME_ERROR', function() {
+      equal(canvas.backgroundImage, null);
+      start();
+    }, {
+      left: 50,
+      originX: 'right'
+    });
+  });
+
   asyncTest('options in setBackgroundImage from image instance', function() {
     createImageObject(function(imageInstance) {
       canvas.setBackgroundImage(imageInstance, function() {
