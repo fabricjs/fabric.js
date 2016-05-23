@@ -779,10 +779,21 @@
      */
     _getCacheProp: function(_char, styleDeclaration) {
       return _char +
-             styleDeclaration.fontFamily +
              styleDeclaration.fontSize +
              styleDeclaration.fontWeight +
              styleDeclaration.fontStyle;
+    },
+
+    /**
+     * @private
+     * @param {String} font name
+     * @return {Object} reference to cache
+     */
+    _getFontCache: function(fontFamily) {
+      if (!fabric.charWidthsCache[fontFamily]) {
+        fabric.charWidthsCache[fontFamily] = { };
+      }
+      return fabric.charWidthsCache[fontFamily];
     },
 
     /**
@@ -796,9 +807,10 @@
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
           styleDeclaration = (decl && clone(decl)) || clone(charDecl),
-          width, cacheProp, charWidthsCache = fabric.charWidthsCache;
+          width, cacheProp, charWidthsCache;
 
       this._applyFontStyles(styleDeclaration);
+      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
       cacheProp = this._getCacheProp(_char, styleDeclaration);
 
       // short-circuit if no styles for this char
@@ -931,9 +943,10 @@
       if (!this._isMeasuring && this.textAlign === 'justify' && this._reSpacesAndTabs.test(_char)) {
         return this._getWidthOfSpace(ctx, lineIndex);
       }
-      var charWidthsCache = fabric.charWidthsCache, cacheProp,
+      var charWidthsCache, cacheProp,
           styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
       this._applyFontStyles(styleDeclaration);
+      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
       cacheProp = this._getCacheProp(_char, styleDeclaration);
 
       if (charWidthsCache[cacheProp] && this.caching) {
