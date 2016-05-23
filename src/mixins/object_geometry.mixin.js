@@ -291,10 +291,17 @@
      * @chainable
      */
     setCoords: function() {
+      this._setCoords();
+      this._setCoords(true);
+      return this;
+    },
+
+    _setCoords: function(normalized) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           dim = this._calculateCurrentDimensions(),
-          currentWidth = dim.x, currentHeight = dim.y;
+          currentWidth = dim.x, currentHeight = dim.y,
+          oCoords;
 
       // If width is negative, make postive. Fixes path selection issue
       if (currentWidth < 0) {
@@ -309,7 +316,7 @@
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
 
           // offset added for rotate and scale actions
-          coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+          coords = fabric.util.transformPoint(this.getCenterPoint(normalized), vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
@@ -334,7 +341,7 @@
          canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
        }, 50); */
 
-      this.oCoords = {
+      oCoords = {
         // corners
         tl: tl, tr: tr, br: br, bl: bl,
         // middle
@@ -343,10 +350,15 @@
         mtr: mtr
       };
 
-      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this._setCornerCoords && this._setCornerCoords();
+      if (normalized) {
+        this.oCoordsNormal = oCoords;
+      }
+      else {
+        this.oCoords = oCoords;
+      }
 
-      return this;
+      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
+      this._setCornerCoords && this._setCornerCoords(normalized);
     },
 
     _calcRotateMatrix: function() {

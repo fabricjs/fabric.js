@@ -71,8 +71,16 @@
      * Returns the real center coordinates of the object
      * @return {fabric.Point}
      */
-    getCenterPoint: function() {
-      var leftTop = new fabric.Point(this.left, this.top);
+    getCenterPoint: function(ignoreGroup) {
+      var leftTop;
+
+      if (ignoreGroup) {
+        leftTop = new fabric.Point(this.originalLeft, this.originalTop);
+      }
+      else {
+        leftTop = new fabric.Point(this.left, this.top);
+      }
+
       return this.translateToCenterPoint(leftTop, this.originX, this.originY);
     },
 
