@@ -398,7 +398,7 @@
     __setBgOverlayImage: function(property, image, callback, options) {
       if (typeof image === 'string') {
         fabric.util.loadImage(image, function(img) {
-          this[property] = new fabric.Image(img, options);
+          img && (this[property] = new fabric.Image(img, options));
           callback && callback(img);
         }, this, options && options.crossOrigin);
       }
