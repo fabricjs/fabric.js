@@ -634,8 +634,8 @@
         alignY: alignY
       };
     },
-    
-   /**
+
+    /**
      * Clear char widths cache for a font family.
      * @memberOf fabric.util
      * @param {String} fontFamily
