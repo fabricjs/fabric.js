@@ -600,12 +600,15 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-        this.findTarget(e);
+        target = this.findTarget(e);
 
         if (this.targets.length) {
           for (var i = 0; i < this.targets.length; i++) {
             this._setCursorFromEvent(e, this.targets[i]);
           }
+        }
+        else if (target) {
+          this._setCursorFromEvent(e, target);
         }
         else {
           this._setCursorFromEvent(e, null);
