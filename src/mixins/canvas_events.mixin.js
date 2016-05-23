@@ -304,7 +304,7 @@
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
-     * @param {fabric.Object} target receiving event
+     * @param {fabric.Object} targetObj receiving event
      */
     _handleEvent: function(e, eventType, targetObj) {
       var target = targetObj || this.findTarget(e),
