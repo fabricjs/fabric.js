@@ -627,10 +627,12 @@
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
           transform = this._currentTransform,
-          target = transform.target;
+          target = transform.target,
+          parentGroup = target.group;
 
-      if (target.group) {
-        pointer = this._normalizePointer(target.group, pointer);
+      while (parentGroup) {
+        pointer = this._normalizePointer(parentGroup, pointer);
+        parentGroup = parentGroup.group;
       }
 
       transform.reset = false,
