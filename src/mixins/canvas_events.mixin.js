@@ -750,10 +750,12 @@
       else {
         var activeGroup = this.getActiveGroup(),
             pointer = this.getPointer(e, true),
+            parentGroup = target.group,
             corner;
 
-        if (target.group) {
-          pointer = this._normalizePointer(target.group, pointer);
+        while (parentGroup) {
+          pointer = this._normalizePointer(parentGroup, pointer);
+          parentGroup = parentGroup.group;
         }
 
         // only show proper corner when group selection is not active
