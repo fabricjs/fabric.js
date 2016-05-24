@@ -324,8 +324,7 @@
     _finalizeCurrentTransform: function() {
 
       var transform = this._currentTransform,
-          target = transform.target,
-          parentGroup = target.group;
+          target = transform.target;
 
       if (target._scaling) {
         target._scaling = false;
@@ -339,13 +338,12 @@
         target.fire('modified');
       }
 
-      while (parentGroup) {
-        parentGroup.update();
-        parentGroup.setCoords();
-        this.fire('object:modified', { target: parentGroup });
-        parentGroup.fire('modified');
-        parentGroup = parentGroup.group;
-      }
+      target.bubbleThroughGroups(function(g) {
+        g.update();
+        g.setCoords();
+        this.fire('object:modified', { target: g });
+        g.fire('modified');
+      }, this);
     },
 
     /**
@@ -627,13 +625,11 @@
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
           transform = this._currentTransform,
-          target = transform.target,
-          parentGroup = target.group;
+          target = transform.target;
 
-      while (parentGroup) {
-        pointer = this._normalizePointer(parentGroup, pointer);
-        parentGroup = parentGroup.group;
-      }
+      target.bubbleThroughGroups(function(g) {
+        pointer = this._normalizePointer(g, pointer);
+      }, this);
 
       transform.reset = false,
       target.isMoving = true;
@@ -750,13 +746,11 @@
       else {
         var activeGroup = this.getActiveGroup(),
             pointer = this.getPointer(e, true),
-            parentGroup = target.group,
             corner;
 
-        while (parentGroup) {
-          pointer = this._normalizePointer(parentGroup, pointer);
-          parentGroup = parentGroup.group;
-        }
+        target.bubbleThroughGroups(function(g) {
+          pointer = this._normalizePointer(g, pointer);
+        }, this);
 
         // only show proper corner when group selection is not active
         corner = target._findTargetCorner

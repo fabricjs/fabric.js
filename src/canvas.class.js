@@ -474,14 +474,12 @@
 
       var pointer = this.getPointer(e),
           unzoomedPointer = this.getPointer(e, true),
-          parentGroup = target.group,
           corner, action, origin;
 
-      while (parentGroup) {
-        pointer = this._normalizePointer(parentGroup, pointer);
-        unzoomedPointer = this._normalizePointer(parentGroup, unzoomedPointer);
-        parentGroup = parentGroup.group;
-      }
+      target.bubbleThroughGroups(function(g) {
+        pointer = this._normalizePointer(g, pointer);
+        unzoomedPointer = this._normalizePointer(g, unzoomedPointer);
+      }, this);
 
       corner = target._findTargetCorner(unzoomedPointer);
       action = this._getActionFromCorner(target, corner, e);
