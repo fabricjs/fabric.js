@@ -80,7 +80,7 @@
       if (this._activeObject && target !== this._activeObject) {
 
         var group = this._createGroup(target);
-        group.addWithUpdate();
+        group.update();
 
         this.setActiveGroup(group);
         this._activeObject = null;
@@ -124,7 +124,7 @@
         group = new fabric.Group(group.reverse(), {
           canvas: this
         });
-        group.addWithUpdate();
+        group.update();
         this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
