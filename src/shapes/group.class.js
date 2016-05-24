@@ -86,12 +86,7 @@
         this.originY = options.originY;
       }
 
-      if (isAlreadyGrouped) {
-        // do not change coordinate of objects enclosed in a group,
-        // because objects coordinate system have been group coodinate system already.
-        this._updateObjectsCoords(true);
-      }
-      else {
+      if (!isAlreadyGrouped) {
         this._calcBounds();
         this._updateObjectsCoords();
         this.callSuper('initialize', options);
@@ -108,24 +103,18 @@
 
     /**
      * @private
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
-    _updateObjectsCoords: function(skipCoordsChange) {
+    _updateObjectsCoords: function() {
       for (var i = this._objects.length; i--; ){
-        this._updateObjectCoords(this._objects[i], skipCoordsChange);
+        this._updateObjectCoords(this._objects[i]);
       }
     },
 
     /**
      * @private
      * @param {Object} object
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of object dose not change
      */
-    _updateObjectCoords: function(object, skipCoordsChange) {
-      if (skipCoordsChange) {
-        return;
-      }
-
+    _updateObjectCoords: function(object) {
       var objectLeft = object.getLeft(),
           objectTop = object.getTop(),
           center = this.getCenterPoint();
