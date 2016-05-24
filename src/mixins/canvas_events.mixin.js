@@ -335,7 +335,7 @@
 
       var transform = this._currentTransform,
           target = transform.target,
-          group = target.group;
+          parentGroup = target.group;
 
       if (target._scaling) {
         target._scaling = false;
@@ -349,12 +349,12 @@
         target.fire('modified');
       }
 
-      while (group) {
-        group.update();
-        group.setCoords();
-        this.fire('object:modified', { target: group });
-        group.fire('modified');
-        group = group.group;
+      while (parentGroup) {
+        parentGroup.update();
+        parentGroup.setCoords();
+        this.fire('object:modified', { target: parentGroup });
+        parentGroup.fire('modified');
+        parentGroup = parentGroup.group;
       }
     },
 
