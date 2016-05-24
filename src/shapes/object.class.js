@@ -935,6 +935,25 @@
     },
 
     /**
+     * Executes given function for each parent group all the way up
+     * @param {Function} callback
+     *                   Callback invoked with current group object as first argument.
+     *                   Callback is invoked in a context of Global Object (e.g. `window`)
+     *                   when no `context` argument is given
+     *
+     * @param {Object} context Context (aka thisObject)
+     * @return {Self} thisArg
+     */
+    bubbleThroughGroups: function(callback, context) {
+      var parentGroup = this.group;
+      while (parentGroup) {
+        callback.call(context, parentGroup);
+        parentGroup = parentGroup.group;
+      }
+      return this;
+    },
+
+    /**
      * Returns a string representation of an instance
      * @return {String}
      */
