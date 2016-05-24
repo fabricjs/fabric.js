@@ -485,11 +485,13 @@
 
       var pointer = this.getPointer(e),
           unzoomedPointer = this.getPointer(e, true),
+          parentGroup = target.group,
           corner, action, origin;
 
-      if (target.group) {
-        pointer = this._normalizePointer(target.group, pointer);
-        unzoomedPointer = this._normalizePointer(target.group, unzoomedPointer);
+      while (parentGroup) {
+        pointer = this._normalizePointer(parentGroup, pointer);
+        unzoomedPointer = this._normalizePointer(parentGroup, unzoomedPointer);
+        parentGroup = parentGroup.group;
       }
 
       corner = target._findTargetCorner(unzoomedPointer);
