@@ -489,7 +489,7 @@
 
       if (target.group) {
         pointer = this._normalizePointer(target.group, pointer);
-        unzoomedPointer = this._normalizePointer(target.group, unzoomedPointer)
+        unzoomedPointer = this._normalizePointer(target.group, unzoomedPointer);
       }
 
       corner = target._findTargetCorner(unzoomedPointer);
