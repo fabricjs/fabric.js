@@ -468,15 +468,15 @@
         target = this.getActiveGroup();
       }
 
-      for (var i = this.targets.length - 1; i >= 0; i--) {
-        if (this._handleTargetMouseDown(e, this.targets[i], target)) {
+      for (var i = 0; i < this.targets.length; i++) {
+        if (this._handleTargetMouseDown(e, this.targets[i])) {
           deepTargetHandled = true;
           break;
         }
       }
 
       if (target && !deepTargetHandled) {
-        this._handleTargetMouseDown(e, target, target);
+        this._handleTargetMouseDown(e, target);
       }
 
       this._handleEvent(e, 'down', target ? target : null);
@@ -487,9 +487,9 @@
     /**
      * @private
      */
-    _handleTargetMouseDown: function(e, target, topTarget) {
+    _handleTargetMouseDown: function(e, target) {
       if (target.selectable && (target.__corner || !this._shouldGroup(e, target))) {
-        if (target !== topTarget) {
+        if (target.group) {
           target.group.update();
         }
         this._beforeTransform(e, target);
@@ -613,7 +613,7 @@
         target = this.findTarget(e);
 
         if (this.targets.length) {
-          for (var i = 0; i < this.targets.length; i++) {
+          for (var i = this.targets.length - 1; i >= 0; i--) {
             this._setCursorFromEvent(e, this.targets[i]);
           }
         }
