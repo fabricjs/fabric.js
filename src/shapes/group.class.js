@@ -433,28 +433,6 @@
       return this;
     },
 
-    getOverflowBounds: function() {
-      var bounds = this._getBounds(),
-          largestControl = 0;
-
-      for (var i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].rotatingPointOffset > largestControl) {
-          largestControl = this._objects[i].rotatingPointOffset;
-        }
-
-        if (this._objects[i].cornerSize > largestControl) {
-          largestControl = this._objects[i].cornerSize;
-        }
-      }
-
-      bounds.left -= largestControl;
-      bounds.top -= largestControl;
-      bounds.width += 2 * largestControl;
-      bounds.height += 2 * largestControl;
-
-      return bounds;
-    },
-
     /**
      * @private
      */
