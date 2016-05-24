@@ -147,10 +147,48 @@
      * @chainable
      */
     addWithUpdate: function(object) {
+      this._addWithUpdate(object);
+      return this;
+    },
+
+    /**
+     * Inserts an object into collection at specified index; Then recalculates group's dimension, position.
+     * @param {Object} object Object to insert
+     * @param {Number} index Index to insert object at
+     * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    insertAtWithUpdate: function(object, index, nonSplicing) {
+      this._addWithUpdate(object, index, nonSplicing);
+      return this;
+    },
+
+    /*
+     * @private
+     */
+    _addWithUpdate: function(object, index, nonSplicing) {
+      if (this.group) {
+        var parentGroup = this.group,
+            index = parentGroup._objects.indexOf(this);
+
+        parentGroup.removeWithUpdate(this);
+      }
+
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
       if (object) {
-        this._objects.push(object);
+        if (typeof index == 'undefined') {
+          this._objects.push(object);
+        }
+        else {
+          if (nonSplicing) {
+            this._objects[index] = object;
+          }
+          else {
+            this._objects.splice(index, 0, object);
+          }
+        }
         object.group = this;
         object._set('canvas', this.canvas);
       }
@@ -158,7 +196,10 @@
       this.forEachObject(this._setObjectGroup, this);
       this._calcBounds();
       this._updateObjectsCoords();
-      return this;
+
+      if (parentGroup) {
+        parentGroup.insertAtWithUpdate(this, index);
+      }
     },
 
     /**
