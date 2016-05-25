@@ -57,6 +57,11 @@
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
+
+      // for double click
+      this.__lastClickTime = +new Date();
+      this.__lastPointer = { };
+      this._drillDownDepth = 0;
     },
 
     /**
@@ -440,13 +445,18 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true),
-          deepTargetHandled = false;
+          deepTargetHandled = false,
+          newDrillDownDepth;
+
+      // for double click checking
+      this.__newClickTime = +new Date();
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
       var shouldRender = this._shouldRender(target, pointer),
-          shouldGroup = this._shouldGroup(e, target);
+          shouldGroup = this._shouldGroup(e, target),
+          shouldDrillDown = this._isDoubleClick(pointer);
 
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
@@ -456,20 +466,43 @@
         target = this.getActiveGroup();
       }
 
-      for (var i = 0; i < this.targets.length; i++) {
-        if (this._handleTargetMouseDown(e, this.targets[i])) {
-          deepTargetHandled = true;
-          break;
+      if (shouldDrillDown || this._drillDownDepth) {
+        for (var i = 0; i < this.targets.length; i++) {
+          newDrillDownDepth = this.targets.length - i;
+
+          if (!shouldDrillDown && newDrillDownDepth > this._drillDownDepth) {
+            continue;
+          }
+          else if (this._handleTargetMouseDown(e, this.targets[i])) {
+            deepTargetHandled = true;
+            this._drillDownDepth = newDrillDownDepth;
+            break;
+          }
         }
       }
 
-      if (target && !deepTargetHandled) {
-        this._handleTargetMouseDown(e, target);
+      if (!deepTargetHandled) {
+        if (target) {
+          this._handleTargetMouseDown(e, target);
+        }
+
+        this._drillDownDepth = 0;
       }
 
       this._handleEvent(e, 'down');
+      this.__lastClickTime = this.__newClickTime;
+      this.__lastPointer = pointer;
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _isDoubleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
     },
 
     /**
