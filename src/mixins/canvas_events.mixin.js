@@ -57,6 +57,11 @@
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
+
+      // for double click
+      this.__lastClickTime = +new Date();
+      this.__lastPointer = { };
+      this._drillDownDepth = 0;
     },
 
     /**
@@ -285,23 +290,37 @@
         target.isMoving = false;
       }
 
+      this._handleCursorAndEvent(e, target, 'up');
       shouldRender && this.renderAll();
-
-      this._handleCursorAndEvent(e, target);
     },
 
-    _handleCursorAndEvent: function(e, target) {
+    /**
+     * set cursor for mouse up and handle mouseUp event
+     * @param {Event} e event from mouse
+     * @param {fabric.Object} target receiving event
+     * @param {String} eventType event to fire (up, down or move)
+     */
+    _handleCursorAndEvent: function(e, target, eventType) {
       this._setCursorFromEvent(e, target);
+      this._handleEvent(e, eventType, target);
+    },
 
-      // Can't find any reason, disabling for now
-      // TODO: why are we doing this?
-      /* var _this = this;
-      setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
-      }, 50); */
+    /**
+     * Handle event firing for target and subtargets
+     * @param {Event} e event from mouse
+     * @param {String} eventType event to fire (up, down or move)
+     * @param {fabric.Object} targetObj receiving event
+     */
+    _handleEvent: function(e, eventType, targetObj) {
+      var target = targetObj || this.findTarget(e),
+          targets = this.targets,
+          options = { e: e, target: target, subTargets: targets };
 
-      this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
+      this.fire('mouse:' + eventType, options);
+      target && target.fire('mouse' + eventType, options);
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].fire('mouse' + eventType, options);
+      }
     },
 
     /**
@@ -323,6 +342,13 @@
         this.fire('object:modified', { target: target });
         target.fire('modified');
       }
+
+      target.bubbleThroughGroups(function(g) {
+        g.update();
+        g.setCoords();
+        this.fire('object:modified', { target: g });
+        g.fire('modified');
+      }, this);
     },
 
     /**
@@ -361,12 +387,7 @@
       var ivt = fabric.util.invertTransform(this.viewportTransform),
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
-      this.fire('mouse:down', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousedown', { e: e, target: target });
-      }
+      this._handleEvent(e, 'down');
     },
 
     /**
@@ -380,12 +401,7 @@
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.setCursor(this.freeDrawingCursor);
-      this.fire('mouse:move', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mousemove', { e: e, target: target });
-      }
+      this._handleEvent(e, 'move');
     },
 
     /**
@@ -398,12 +414,7 @@
         this.contextTop.restore();
       }
       this.freeDrawingBrush.onMouseUp();
-      this.fire('mouse:up', { e: e });
-
-      var target = this.findTarget(e);
-      if (typeof target !== 'undefined') {
-        target.fire('mouseup', { e: e, target: target });
-      }
+      this._handleEvent(e, 'up');
     },
 
     /**
@@ -433,13 +444,19 @@
       }
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+          pointer = this.getPointer(e, true),
+          deepTargetHandled = false,
+          newDrillDownDepth;
+
+      // for double click checking
+      this.__newClickTime = +new Date();
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
       var shouldRender = this._shouldRender(target, pointer),
-          shouldGroup = this._shouldGroup(e, target);
+          shouldGroup = this._shouldGroup(e, target),
+          shouldDrillDown = this._isDoubleClick(pointer);
 
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
@@ -449,22 +466,64 @@
         target = this.getActiveGroup();
       }
 
-      if (target) {
-        if (target.selectable && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
-          this._setupCurrentTransform(e, target);
+      if (shouldDrillDown || this._drillDownDepth) {
+        for (var i = 0; i < this.targets.length; i++) {
+          newDrillDownDepth = this.targets.length - i;
+
+          if (!shouldDrillDown && newDrillDownDepth > this._drillDownDepth) {
+            continue;
+          }
+          else if (this._handleTargetMouseDown(e, this.targets[i])) {
+            deepTargetHandled = true;
+            this._drillDownDepth = newDrillDownDepth;
+            break;
+          }
         }
+      }
+
+      if (!deepTargetHandled) {
+        if (target) {
+          this._handleTargetMouseDown(e, target);
+        }
+
+        this._drillDownDepth = 0;
+      }
+
+      this._handleEvent(e, 'down');
+      this.__lastClickTime = this.__newClickTime;
+      this.__lastPointer = pointer;
+      // we must renderAll so that active image is placed on the top canvas
+      shouldRender && this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _isDoubleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
+    },
+
+    /**
+     * @private
+     */
+    _handleTargetMouseDown: function(e, target) {
+      if (target.selectable && (target.__corner || !this._shouldGroup(e, target))) {
+        if (target.group) {
+          target.group.update();
+        }
+        this._beforeTransform(e, target);
+        this._setupCurrentTransform(e, target);
 
         if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
           this.deactivateAll();
           target.selectable && this.setActiveObject(target, e);
         }
+        return true;
       }
-      // we must renderAll so that active image is placed on the top canvas
-      shouldRender && this.renderAll();
 
-      this.fire('mouse:down', { target: target, e: e });
-      target && target.fire('mousedown', { e: e });
+      return false;
     },
 
     /**
@@ -573,14 +632,23 @@
       }
       else if (!this._currentTransform) {
         target = this.findTarget(e);
-        this._setCursorFromEvent(e, target);
+
+        if (this.targets.length) {
+          for (var i = this.targets.length - 1; i >= 0; i--) {
+            this._setCursorFromEvent(e, this.targets[i]);
+          }
+        }
+        else if (target) {
+          this._setCursorFromEvent(e, target);
+        }
+        else {
+          this._setCursorFromEvent(e, null);
+        }
       }
       else {
         this._transformObject(e);
       }
-
-      this.fire('mouse:move', { target: target, e: e });
-      target && target.fire('mousemove', { e: e });
+      this._handleEvent(e, 'move');
     },
 
     /**
@@ -589,10 +657,15 @@
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
+          transform = this._currentTransform,
+          target = transform.target;
+
+      target.bubbleThroughGroups(function(g) {
+        pointer = this._normalizePointer(g, pointer);
+      }, this);
 
       transform.reset = false,
-      transform.target.isMoving = true;
+      target.isMoving = true;
 
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
@@ -705,10 +778,17 @@
       }
       else {
         var activeGroup = this.getActiveGroup(),
-            // only show proper corner when group selection is not active
-            corner = target._findTargetCorner
-                      && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(this.getPointer(e, true));
+            pointer = this.getPointer(e, true),
+            corner;
+
+        target.bubbleThroughGroups(function(g) {
+          pointer = this._normalizePointer(g, pointer);
+        }, this);
+
+        // only show proper corner when group selection is not active
+        corner = target._findTargetCorner
+                  && (!activeGroup || !activeGroup.contains(target))
+                  && target._findTargetCorner(pointer);
 
         if (!corner) {
           this.setCursor(hoverCursor);

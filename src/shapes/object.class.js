@@ -935,6 +935,25 @@
     },
 
     /**
+     * Executes given function for each parent group all the way up
+     * @param {Function} callback
+     *                   Callback invoked with current group object as first argument.
+     *                   Callback is invoked in a context of Global Object (e.g. `window`)
+     *                   when no `context` argument is given
+     *
+     * @param {Object} context Context (aka thisObject)
+     * @return {Self} thisArg
+     */
+    bubbleThroughGroups: function(callback, context) {
+      var parentGroup = this.group;
+      while (parentGroup) {
+        callback.call(context, parentGroup);
+        parentGroup = parentGroup.group;
+      }
+      return this;
+    },
+
+    /**
      * Returns a string representation of an instance
      * @return {String}
      */
@@ -1156,8 +1175,7 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform
-          || (this.group && this.group !== this.canvas.getActiveGroup())) {
+      if (!this.active || noTransform) {
         return;
       }
 
@@ -1172,9 +1190,15 @@
       ctx.lineWidth = 1 / this.borderScaleFactor;
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
 
-      if (this.group && this.group === this.canvas.getActiveGroup()) {
+      if (this.group) {
         ctx.rotate(degreesToRadians(options.angle));
-        this.drawBordersInGroup(ctx, options);
+
+        if (this.active) {
+          this.drawBorders(ctx, options);
+        }
+        else {
+          this.drawBordersInGroup(ctx, options);
+        }
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
