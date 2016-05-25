@@ -136,7 +136,7 @@
      * @chainable
      */
     addWithUpdate: function(object) {
-      return this.insertAtWithUpdate(object);
+      return this.insertWithUpdate(object);
     },
 
     /**
@@ -147,7 +147,7 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    insertAtWithUpdate: function(object, index, nonSplicing) {
+    insertWithUpdate: function(object, index, nonSplicing) {
       if (this.group) {
         var parentGroup = this.group,
             index = parentGroup._objects.indexOf(this);
@@ -178,7 +178,7 @@
       this._updateObjectsCoords();
 
       if (parentGroup) {
-        parentGroup.insertAtWithUpdate(this, index);
+        parentGroup.insertWithUpdate(this, index);
       }
 
       return this;
