@@ -143,8 +143,7 @@
      * @chainable
      */
     addWithUpdate: function(object) {
-      this._addWithUpdate(object);
-      return this;
+      return this.insertAtWithUpdate(object);
     },
 
     /**
@@ -156,14 +155,6 @@
      * @chainable
      */
     insertAtWithUpdate: function(object, index, nonSplicing) {
-      this._addWithUpdate(object, index, nonSplicing);
-      return this;
-    },
-
-    /*
-     * @private
-     */
-    _addWithUpdate: function(object, index, nonSplicing) {
       if (this.group) {
         var parentGroup = this.group,
             index = parentGroup._objects.indexOf(this);
@@ -196,6 +187,8 @@
       if (parentGroup) {
         parentGroup.insertAtWithUpdate(this, index);
       }
+
+      return this;
     },
 
     /**
