@@ -243,7 +243,7 @@
      */
     _setupStateOnObject: function(object) {
       this.canvas && this.canvas.stateful && object.setupState();
-      if (object._objects) {
+      if (object instanceof fabric.Group) {
         object._setupStateOnObjects();
       }
     },
