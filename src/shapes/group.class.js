@@ -148,12 +148,13 @@
      * @chainable
      */
     insertWithUpdate: function(object, index, nonSplicing) {
-      if (this.group) {
-        var parentGroup = this.group,
-            index = parentGroup._objects.indexOf(this);
+      var parentGroups = [],
+          parentGroup;
 
-        parentGroup.removeWithUpdate(this);
-      }
+      this.trickleThroughGroups(function(g, child) {
+        parentGroups.push({group: g, child: child, index: g._objects.indexOf(child)});
+        g.removeWithUpdate(child);
+      }, this);
 
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
@@ -177,8 +178,9 @@
       this._calcBounds();
       this._updateObjectsCoords();
 
-      if (parentGroup) {
-        parentGroup.insertWithUpdate(this, index);
+      for (var i = 0; i < parentGroups.length; i++) {
+        parentGroup = parentGroups[i];
+        parentGroup.group.insertWithUpdate(parentGroup.child, parentGroup.index);
       }
 
       return this;
