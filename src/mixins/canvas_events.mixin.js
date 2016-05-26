@@ -455,8 +455,7 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true),
-          deepTargetHandled = false,
-          newDrillDownDepth;
+          deepTargetHandled = false;
 
       // for double click checking
       this.__newClickTime = +new Date();
@@ -477,7 +476,7 @@
       }
 
       if (shouldDrillDown || this._drillDownDepth) {
-        for (var i = 0; i < this.targets.length; i++) {
+        for (var i = 0, newDrillDownDepth; i < this.targets.length; i++) {
           newDrillDownDepth = this.targets.length - i;
 
           if (!shouldDrillDown && newDrillDownDepth > this._drillDownDepth) {

@@ -155,8 +155,7 @@
      * @chainable
      */
     insertWithUpdate: function(object, index, nonSplicing) {
-      var parentGroups = [],
-          parentGroup;
+      var parentGroups = [];
 
       this.trickleThroughGroups(function(g, child) {
         parentGroups.push({group: g, child: child, index: g._objects.indexOf(child)});
@@ -185,7 +184,7 @@
       this._calcBounds();
       this._updateObjectsCoords();
 
-      for (var i = 0; i < parentGroups.length; i++) {
+      for (var i = 0, parentGroup; i < parentGroups.length; i++) {
         parentGroup = parentGroups[i];
         parentGroup.group.insertWithUpdate(parentGroup.child, parentGroup.index);
       }
