@@ -937,7 +937,8 @@
     /**
      * Executes given function for each parent group all the way up
      * @param {Function} callback
-     *                   Callback invoked with current group object as first argument.
+     *                   Callback invoked with current group object as first argument,
+     *                   and previous group as second argument
      *                   Callback is invoked in a context of Global Object (e.g. `window`)
      *                   when no `context` argument is given
      *
@@ -945,11 +946,38 @@
      * @return {Self} thisArg
      */
     bubbleThroughGroups: function(callback, context) {
-      var parentGroup = this.group;
+      var parentGroup = this.group,
+          child = this;
       while (parentGroup) {
-        callback.call(context, parentGroup);
+        callback.call(context, parentGroup, child);
+        child = parentGroup;
         parentGroup = parentGroup.group;
       }
+      return this;
+    },
+
+    /**
+     * Executes given function for each parent group starting at the top and running down
+     * @param {Function} callback
+     *                   Callback invoked with current group object as first argument,
+     *                   and previous group as second argument
+     *                   Callback is invoked in a context of Global Object (e.g. `window`)
+     *                   when no `context` argument is given
+     *
+     * @param {Object} context Context (aka thisObject)
+     * @return {Self} thisArg
+     */
+    trickleThroughGroups: function(callback, context) {
+      var memo = [];
+
+      this.bubbleThroughGroups(function() {
+        memo.push(arguments);
+      });
+
+      for (var i = memo.length - 1; i >= 0; i--) {
+        callback.apply(context, memo[i]);
+      }
+
       return this;
     },
 
