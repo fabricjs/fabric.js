@@ -57,6 +57,11 @@
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
+
+      // for double click
+      this.__lastClickTime = +new Date();
+      this.__lastPointer = { };
+      this._drillDownDepth = 0;
     },
 
     /**
@@ -337,6 +342,13 @@
         this.fire('object:modified', { target: target });
         target.fire('modified');
       }
+
+      target.bubbleThroughGroups(function(g) {
+        g.update();
+        g.setCoords();
+        this.fire('object:modified', { target: g });
+        g.fire('modified');
+      }, this);
     },
 
     /**
@@ -432,13 +444,18 @@
       }
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+          pointer = this.getPointer(e, true),
+          deepTargetHandled = false;
+
+      // for double click checking
+      this.__newClickTime = +new Date();
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
       var shouldRender = this._shouldRender(target, pointer),
-          shouldGroup = this._shouldGroup(e, target);
+          shouldGroup = this._shouldGroup(e, target),
+          shouldDrillDown = this._isDoubleClick(pointer);
 
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
@@ -448,20 +465,64 @@
         target = this.getActiveGroup();
       }
 
-      if (target) {
-        if (target.selectable && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
-          this._setupCurrentTransform(e, target);
+      if (shouldDrillDown || this._drillDownDepth) {
+        for (var i = 0, newDrillDownDepth; i < this.targets.length; i++) {
+          newDrillDownDepth = this.targets.length - i;
+
+          if (!shouldDrillDown && newDrillDownDepth > this._drillDownDepth) {
+            continue;
+          }
+          else if (this._handleTargetMouseDown(e, this.targets[i])) {
+            deepTargetHandled = true;
+            this._drillDownDepth = newDrillDownDepth;
+            break;
+          }
         }
+      }
+
+      if (!deepTargetHandled) {
+        if (target) {
+          this._handleTargetMouseDown(e, target);
+        }
+
+        this._drillDownDepth = 0;
+      }
+
+      this._handleEvent(e, 'down');
+      this.__lastClickTime = this.__newClickTime;
+      this.__lastPointer = pointer;
+      // we must renderAll so that active image is placed on the top canvas
+      shouldRender && this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _isDoubleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
+    },
+
+    /**
+     * @private
+     */
+    _handleTargetMouseDown: function(e, target) {
+      if (target.selectable && (target.__corner || !this._shouldGroup(e, target))) {
+        if (target.group) {
+          target.group.update();
+        }
+        this._beforeTransform(e, target);
+        this._setupCurrentTransform(e, target);
 
         if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
           this.deactivateAll();
           target.selectable && this.setActiveObject(target, e);
         }
+        return true;
       }
-      this._handleEvent(e, 'down');
-      // we must renderAll so that active image is placed on the top canvas
-      shouldRender && this.renderAll();
+
+      return false;
     },
 
     /**
@@ -570,7 +631,18 @@
       }
       else if (!this._currentTransform) {
         target = this.findTarget(e);
-        this._setCursorFromEvent(e, target);
+
+        if (this.targets.length) {
+          for (var i = this.targets.length - 1; i >= 0; i--) {
+            this._setCursorFromEvent(e, this.targets[i]);
+          }
+        }
+        else if (target) {
+          this._setCursorFromEvent(e, target);
+        }
+        else {
+          this._setCursorFromEvent(e, null);
+        }
       }
       else {
         this._transformObject(e);
@@ -584,10 +656,15 @@
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
+          transform = this._currentTransform,
+          target = transform.target;
+
+      target.bubbleThroughGroups(function(g) {
+        pointer = this._normalizePointer(g, pointer);
+      }, this);
 
       transform.reset = false,
-      transform.target.isMoving = true;
+      target.isMoving = true;
 
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
@@ -700,10 +777,17 @@
       }
       else {
         var activeGroup = this.getActiveGroup(),
-            // only show proper corner when group selection is not active
-            corner = target._findTargetCorner
-                      && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(this.getPointer(e, true));
+            pointer = this.getPointer(e, true),
+            corner;
+
+        target.bubbleThroughGroups(function(g) {
+          pointer = this._normalizePointer(g, pointer);
+        }, this);
+
+        // only show proper corner when group selection is not active
+        corner = target._findTargetCorner
+                  && (!activeGroup || !activeGroup.contains(target))
+                  && target._findTargetCorner(pointer);
 
         if (!corner) {
           this.setCursor(hoverCursor);
