@@ -1047,7 +1047,10 @@
             subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
             subTarget && this.targets.push(subTarget);
           }
-          break;
+
+          if (subTarget || !(target instanceof fabric.Group)) {
+            break;
+          }
         }
       }
       return target;
