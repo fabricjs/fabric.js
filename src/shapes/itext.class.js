@@ -341,7 +341,7 @@
 
     _clearTextArea: function(ctx) {
       // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.width + 4, height = this.height + 4
+      var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
     },
     /**
