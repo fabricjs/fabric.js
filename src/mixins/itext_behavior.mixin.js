@@ -112,7 +112,8 @@
           }
         },
         onChange: function() {
-          if (obj.canvas) {
+          // we do not want to animate a selection, only cursor
+          if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
             obj.renderCursorOrSelection();
           }
         },
@@ -145,17 +146,8 @@
       var _this = this,
           delay = restart ? 0 : this.cursorDelay;
 
-      this._currentTickState && this._currentTickState.abort();
-      this._currentTickCompleteState && this._currentTickCompleteState.abort();
-      clearTimeout(this._cursorTimeout1);
+      this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
-      if (this.canvas) {
-        this.canvas.clearContext(this.canvas.contextTop || this.ctx);
-        this.renderCursorOrSelection();
-      }
-      if (this._cursorTimeout2) {
-        clearTimeout(this._cursorTimeout2);
-      }
       this._cursorTimeout2 = setTimeout(function() {
         _this._tick();
       }, delay);
@@ -172,6 +164,8 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
+      // to clear just itext area we need to transform the context
+      // it may not be worth it
       this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
     },
 
