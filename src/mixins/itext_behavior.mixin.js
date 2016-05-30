@@ -376,7 +376,7 @@
      * Initializes "mousemove" event handler
      */
     initMouseMoveHandler: function() {
-      this.canvas.on('mouse:move', this.mouseMoveHandler);
+      this.canvas.on('mouse:move', this.mouseMoveHandler.bind(this));
     },
 
     /**
@@ -505,7 +505,7 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
-      
+
       this.fire('editing:exited');
       isTextChanged && this.fire('modified');
       if (this.canvas) {
