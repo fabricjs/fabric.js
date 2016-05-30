@@ -245,15 +245,15 @@
 
   test('enterEditing, exitEditing eventlistener counts', function() {
     var iText = new fabric.IText('test');
-
+    canvas.add(iText);
     equal(typeof iText.enterEditing, 'function');
     equal(typeof iText.exitEditing, 'function');
-    equal(iText.__eventListeners["mousemove"], undefined);
+    var length = iText.canvas.__eventListeners["mouse:move"].length;
+    equal(iText.canvas.__eventListeners["mouse:move"], length);
     iText.enterEditing();
-    ok(iText.__eventListeners["mousemove"] instanceof Array);
-    equal(iText.__eventListeners["mousemove"].length, 1);
+    equal(iText.canvas.__eventListeners["mouse:move"].length, length + 1);
     iText.exitEditing();
-    equal(iText.__eventListeners["mousemove"].length, 0);
+    equal(iText.canvas__eventListeners["mouse:move"].length, length);
   });
 
   test('event firing', function() {
