@@ -388,13 +388,16 @@
       }
 
       var newSelectionStart = this.getSelectionStartFromPointer(options.e);
-      if (newSelectionStart >= this.__selectionStartOnMouseDown) {
+      if (newSelectionStart === this.__selectionStartOnMouseDown) {
+        return;
+      }
+      if (newSelectionStart > this.__selectionStartOnMouseDown) {
         this.setSelectionStart(this.__selectionStartOnMouseDown);
         this.setSelectionEnd(newSelectionStart);
       }
       else {
         this.setSelectionStart(newSelectionStart);
-        this.setSelectionEnd(_this.__selectionStartOnMouseDown);
+        this.setSelectionEnd(this.__selectionStartOnMouseDown);
       }
       this.renderCursorOrSelection();
     },
