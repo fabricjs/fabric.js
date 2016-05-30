@@ -299,6 +299,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      this.oldWidth = this.width;
+      this.oldHeight = this.height;
       this.callSuper('_render', ctx);
       this.ctx = ctx;
       this.isEditing && this.renderCursorOrSelection();
@@ -341,7 +343,7 @@
 
     _clearTextArea: function(ctx) {
       // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.width + 4, height = this.height + 4;
+      var width = this.oldWidth + 4, height = this.oldHeight + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
     },
     /**
