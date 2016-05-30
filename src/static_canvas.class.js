@@ -938,12 +938,12 @@
       }
       object = this[property + 'Image'];
       if (object) {
-        if (this.[property + 'Vpt']) {
+        if (this[property + 'Vpt']) {
           ctx.save();
           ctx.transform.apply(ctx, this.viewportTransform);
         }
         object.render(ctx);
-        this.[property + 'Vpt'] && ctx.restore();
+        this[property + 'Vpt'] && ctx.restore();
       }
     },
 
