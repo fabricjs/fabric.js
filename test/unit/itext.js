@@ -248,16 +248,12 @@
 
     equal(typeof iText.enterEditing, 'function');
     equal(typeof iText.exitEditing, 'function');
-    var NumberOfEvents = iText.__eventListeners["mousemove"].length,
-        eventArray = iText.__eventListeners["mousemove"];
-    ok(!iText.isEditing);
-    equal(eventArray.length, NumberOfEvents);
+    equal(iText.__eventListeners["mousemove"], undefined);
     iText.enterEditing();
-    ok(iText.isEditing);
-    equal(eventArray.length, NumberOfEvents + 1);
+    ok(iText.__eventListeners["mousemove"] instanceof Array);
+    equal(iText.__eventListeners["mousemove"].length, 1);
     iText.exitEditing();
-    equal(eventArray.length, NumberOfEvents);
-    ok(!iText.isEditing);
+    equal(iText.__eventListeners["mousemove"].length, 0);
   });
 
   test('event firing', function() {
