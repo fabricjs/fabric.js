@@ -148,6 +148,22 @@
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
+     * if set to false background image is not affected by viewport transform
+     * @since 1.6.3
+     * @type Boolean
+     * @default
+     */
+    backgroundVpt: true,
+
+    /**
+     * if set to false overlya image is not affected by viewport transform
+     * @since 1.6.3
+     * @type Boolean
+     * @default
+     */
+    overlayVpt: true,
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      */
     onBeforeScaleRotate: function () {
@@ -922,7 +938,12 @@
       }
       object = this[property + 'Image'];
       if (object) {
+        if (this[property + 'Vpt']) {
+          ctx.save();
+          ctx.transform.apply(ctx, this.viewportTransform);
+        }
         object.render(ctx);
+        this[property + 'Vpt'] && ctx.restore();
       }
     },
 
