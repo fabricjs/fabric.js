@@ -248,12 +248,11 @@
     canvas.add(iText);
     equal(typeof iText.enterEditing, 'function');
     equal(typeof iText.exitEditing, 'function');
+    iText.enterEditing();
     var length = iText.canvas.__eventListeners["mouse:move"].length;
     equal(iText.canvas.__eventListeners["mouse:move"], length);
-    iText.enterEditing();
-    equal(iText.canvas.__eventListeners["mouse:move"].length, length + 1);
     iText.exitEditing();
-    equal(iText.canvas__eventListeners["mouse:move"].length, length);
+    equal(iText.canvas__eventListeners["mouse:move"].length, length - 1);
   });
 
   test('event firing', function() {
