@@ -243,6 +243,23 @@
     ok(!iText.isEditing);
   });
 
+  test('enterEditing, exitEditing eventlistener counts', function() {
+    var iText = new fabric.IText('test');
+
+    equal(typeof iText.enterEditing, 'function');
+    equal(typeof iText.exitEditing, 'function');
+    var NumberOfEvents = iText.__eventListeners["mousemove"].length,
+        eventArray = iText.__eventListeners["mousemove"];
+    ok(!iText.isEditing);
+    equal(eventArray.length, NumberOfEvents);
+    iText.enterEditing();
+    ok(iText.isEditing);
+    equal(eventArray.length, NumberOfEvents + 1);
+    iText.exitEditing();
+    equal(eventArray.length, NumberOfEvents);
+    ok(!iText.isEditing);
+  });
+
   test('event firing', function() {
     var iText = new fabric.IText('test'),
         enter = 0, exit = 0, modify = 0;
