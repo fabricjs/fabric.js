@@ -317,7 +317,7 @@
      * @param {fabric.Object} targetObj receiving event
      */
     _handleEvent: function(e, eventType, targetObj) {
-      var target = targetObj || this.findTarget(e),
+      var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
           targets = this.targets,
           options = { e: e, target: target, subTargets: targets };
 
@@ -469,7 +469,7 @@
           target.selectable && this.setActiveObject(target, e);
         }
       }
-      this._handleEvent(e, 'down');
+      this._handleEvent(e, 'down', target);
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
     },
@@ -585,7 +585,7 @@
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move');
+      this._handleEvent(e, 'move', target);
     },
 
     /**
