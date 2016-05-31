@@ -47,7 +47,7 @@
      * @default
      */
     strokeWidth: 0,
-    
+
     /**
      * Indicates if click events should also check for subtargets
      * @type Boolean
