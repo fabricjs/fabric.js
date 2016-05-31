@@ -310,7 +310,7 @@
      */
     containsPoint: function (e, target, point, onlyCorners) {
       var pointer = point || this.getPointer(e, true),
-          containsCorners;
+          xy, containsCorners;
 
       if (target.group && target.group === this.getActiveGroup()) {
         xy = this._normalizePointer(target.group, pointer);
