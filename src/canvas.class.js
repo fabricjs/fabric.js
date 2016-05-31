@@ -984,7 +984,7 @@
 
       // We need to make sure that the object being targeted is not being targeted using
       // an adjusted coordinate system outside the bounds of the actual containing parent
-      if (target !== originalTarget && !target.isDescendantOfGroup(originalTarget)) {
+      if (target !== originalTarget && target.group !== originalTarget) {
         // If we have in fact discovered an errorneous target, we want to either clear
         // the target or if possible, target the control point by *normalized coords only*
         target = this._searchPossibleTargets(objects, pointer, true);
