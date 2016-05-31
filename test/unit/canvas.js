@@ -234,6 +234,40 @@
     canvas.remove(rect);
   });
 
+  test('findTarget with subTargetCheck', function() {
+    var rect = makeRect({ left: 0, top: 0 }), 
+        rect2 = makeRect({ left: 30, top:  30}), target,
+        group = fabric.Group([rect, rect2]);
+
+    canvas.add(group);
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, group, 'Should return the group');
+    equal(canvas.targets[0], undefined, 'no subtarget should return');
+    target = canvas.findTarget({
+      clientX: 30, clientY: 30
+    }, true);
+    equal(target, group, 'Should return the group');
+    group.subTargetCheck = true;
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, group, 'Should return the group');
+    equal(canvas.targets[0], rect, 'should return the rect');
+    target = canvas.findTarget({
+      clientX: 15, clientY: 15
+    }, true);
+    equal(target, group, 'Should return the group');
+    equal(canvas.targets[0], undefined, 'no subtarget should return');
+    target = canvas.findTarget({
+      clientX: 32, clientY: 32
+    }, true);
+    equal(target, group, 'Should return the group');
+    equal(canvas.targets[0], rect2, 'should return the rect2');
+    canvas.remove(group);
+  });
+
   test('findTarget with perPixelTargetFind', function() {
     ok(typeof canvas.findTarget == 'function');
     var triangle = makeTriangle({ left: 0, top: 0 }), target;
