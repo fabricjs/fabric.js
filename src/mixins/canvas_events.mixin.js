@@ -790,14 +790,10 @@
             pointer = this.getPointer(e, true),
             corner;
 
-        target.bubbleThroughGroups(function(g) {
-          pointer = this._normalizePointer(g, pointer);
-        }, this);
-
         // only show proper corner when group selection is not active
         corner = target._findTargetCorner
                   && (!activeGroup || !activeGroup.contains(target))
-                  && target._findTargetCorner(pointer);
+                  && target._findTargetCorner(pointer, true);
 
         if (!corner) {
           this.setCursor(hoverCursor);
