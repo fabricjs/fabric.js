@@ -17,9 +17,10 @@
      * Determines which corner has been clicked
      * @private
      * @param {Object} pointer The pointer indicating the mouse position
+     * @param {Boolean} normalCoords Only find target corner using normal coordinates
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
-    _findTargetCorner: function(pointer) {
+    _findTargetCorner: function(pointer, normalCoords) {
       if (!this.hasControls || !this.active) {
         return false;
       }
@@ -33,6 +34,10 @@
 
       if (this.oCoordsNormal) {
         result = this._findTargetCornerByCoords(pointer, this.oCoordsNormal);
+
+        if (normalCoords) {
+          return result;
+        }
       }
 
       if (!result) {
