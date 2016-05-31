@@ -979,14 +979,22 @@
         objects = [this.lastRenderedWithControls];
       }
 
-      target = this._searchPossibleTargets(objects, pointer);
+      // First let's try to find a corner
+      target = this._searchPossibleTargets(objects, pointer, true);
 
-      // We need to make sure that the object being targeted is not being targeted using
-      // an adjusted coordinate system outside the bounds of the actual containing parent
-      if (target !== originalTarget && target.group !== originalTarget) {
-        // If we have in fact discovered an errorneous target, we want to either clear
-        // the target or if possible, target the control point by *normalized coords only*
-        target = this._searchPossibleTargets(objects, pointer, true);
+      // We didn't find a corner
+      if (!target) {
+        // so let's search for any target
+        target = this._searchPossibleTargets(objects, pointer);
+
+        // We need to make sure that the object being targeted is not being targeted using
+        // an adjusted coordinate system outside the bounds of the actual containing parent
+        if (target !== originalTarget && target.group !== originalTarget) {
+          // We have in fact found an erroneous target
+          // Therefore lets clear it out
+          target = undefined;
+          this.targets = [ ];
+        }
       }
 
       this._fireOverOutEvents(target, e);
