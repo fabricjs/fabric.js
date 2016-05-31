@@ -237,7 +237,7 @@
   test('findTarget with subTargetCheck', function() {
     var rect = makeRect({ left: 0, top: 0 }), 
         rect2 = makeRect({ left: 30, top:  30}), target,
-        group = fabric.Group([rect, rect2]);
+        group = new fabric.Group([rect, rect2]);
 
     canvas.add(group);
     target = canvas.findTarget({
