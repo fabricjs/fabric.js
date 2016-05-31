@@ -307,7 +307,7 @@
      */
     _handleCursorAndEvent: function(e, target, eventType) {
       this._setCursorFromEvent(e, target);
-      this._handleEvent(e, eventType, target);
+      this._handleEvent(e, eventType, target ? target : null);
     },
 
     /**
@@ -469,7 +469,7 @@
           target.selectable && this.setActiveObject(target, e);
         }
       }
-      this._handleEvent(e, 'down', target);
+      this._handleEvent(e, 'down', target ? target : null);
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
     },
@@ -585,7 +585,7 @@
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move', target);
+      this._handleEvent(e, 'move', target ? target : null);
     },
 
     /**
