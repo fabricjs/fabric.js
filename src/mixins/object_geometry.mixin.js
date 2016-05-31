@@ -87,6 +87,9 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point) {
+      if (!this.oCoords) {
+        this.setCoords();
+      }
       var lines = this._getImageLines(this.oCoords),
           xPoints = this._findCrossPoints(point, lines);
 
