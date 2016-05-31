@@ -979,7 +979,7 @@
       var objects = this._objects;
       this.targets = [ ];
 
-      if (this._isLastRenderedObject(pointer, e)) {
+      if (this._isLastRenderedObject(pointer, e) && !this.lastRenderedWithControls.group) {
         objects = [this.lastRenderedWithControls];
       }
 
