@@ -269,7 +269,6 @@
      */
     _onObjectRemoved: function(object) {
       delete object.group;
-      object.set('active', false);
     },
 
     /**
