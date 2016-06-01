@@ -86,6 +86,27 @@ fabric.Collection = {
   },
 
   /**
+   * Executes given function for each object in this group, recursively
+   * @param {Function} callback
+   *                   Callback invoked with current object as first argument,
+   *                   index - as second and an array of all objects - as third.
+   *                   Iteration happens in reverse order (for performance reasons).
+   *                   Callback is invoked in a context of Global Object (e.g. `window`)
+   *                   when no `context` argument is given
+   *
+   * @param {Object} context Context (aka thisObject)
+   * @return {Self} thisArg
+   */
+  forEachObjectDeep: function(callback, context) {
+    this.forEachObject(function(o) {
+      o.forEachObjectDeep && o.forEachObjectDeep(callback, context);
+      callback.apply(context, arguments);
+    });
+
+    return this;
+  },
+
+  /**
    * Returns an array of children objects of this instance
    * Type parameter introduced in 1.3.10
    * @param {String} [type] When specified, only objects of this type are returned
