@@ -353,6 +353,10 @@
         target.fire('modified');
       }
 
+      target.forEachObjectDeep && target.forEachObjectDeep(function(o) {
+        o.setCoords();
+      }, this);
+
       target.bubbleThroughGroups(function(g) {
         g.update();
         g.setCoords();
