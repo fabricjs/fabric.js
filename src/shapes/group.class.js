@@ -148,39 +148,29 @@
      * @chainable
      */
     insertWithUpdate: function(object, index, nonSplicing) {
-      var parentGroups = [];
-
-      this.trickleThroughGroups(function(g, child) {
-        parentGroups.push({group: g, child: child, index: g._objects.indexOf(child)});
-        g.removeWithUpdate(child);
-      }, this);
-
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-      if (object) {
-        if (typeof index == 'undefined') {
-          this._objects.push(object);
-        }
-        else {
-          if (nonSplicing) {
-            this._objects[index] = object;
+      this._updateWrapper(function() {
+        this._restoreObjectsState();
+        fabric.util.resetObjectTransform(this);
+        if (object) {
+          if (typeof index == 'undefined') {
+            this._objects.push(object);
           }
           else {
-            this._objects.splice(index, 0, object);
+            if (nonSplicing) {
+              this._objects[index] = object;
+            }
+            else {
+              this._objects.splice(index, 0, object);
+            }
           }
+          object.group = this;
+          object._set('canvas', this.canvas);
         }
-        object.group = this;
-        object._set('canvas', this.canvas);
-      }
-      // since _restoreObjectsState obliterates group
-      this.forEachObject(this._setObjectGroup, this);
-      this._calcBounds();
-      this._updateObjectsCoords();
-
-      for (var i = 0, parentGroup; i < parentGroups.length; i++) {
-        parentGroup = parentGroups[i];
-        parentGroup.group.insertWithUpdate(parentGroup.child, parentGroup.index);
-      }
+        // since _restoreObjectsState obliterates group
+        this.forEachObject(this._setObjectGroup, this);
+        this._calcBounds();
+        this._updateObjectsCoords();
+      }, this);
 
       return this;
     },
@@ -209,16 +199,41 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-      // since _restoreObjectsState obliterates group
-      this.forEachObject(this._setObjectGroup, this);
+      this._updateWrapper(function() {
+        this._restoreObjectsState();
+        fabric.util.resetObjectTransform(this);
+        // since _restoreObjectsState obliterates group
+        this.forEachObject(this._setObjectGroup, this);
 
-      this.remove(object);
-      this._calcBounds();
-      this._updateObjectsCoords();
+        this.remove(object);
+        this._calcBounds();
+        this._updateObjectsCoords();
+      }, this);
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _updateWrapper: function(callback, context) {
+      var parentGroups = [];
+
+      context.trickleThroughGroups(function(g, child) {
+        parentGroups.push({
+          group: g,
+          child: child,
+          index: g._objects.indexOf(child)
+        });
+        g.removeWithUpdate(child);
+      }, context);
+
+      callback.call(context);
+
+      for (var i = 0, parentGroup; i < parentGroups.length; i++) {
+        parentGroup = parentGroups[i];
+        parentGroup.group.insertWithUpdate(parentGroup.child, parentGroup.index);
+      }
     },
 
     /**
