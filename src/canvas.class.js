@@ -1086,7 +1086,7 @@
             }
           }
 
-          if (subTarget || !(target instanceof fabric.Group)) {
+          if (subTarget || !(target instanceof fabric.Group && target.subTargetCheck)) {
             break;
           }
         }
