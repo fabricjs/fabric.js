@@ -1002,7 +1002,7 @@
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
+      this._centerObject(object, new fabric.Point(this.getCenter().left / this.viewportTransform[0], object.getCenterPoint().y));
       this.renderAll();
       return this;
     },
@@ -1015,7 +1015,7 @@
      * @chainable
      */
     centerObjectV: function (object) {
-      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
+      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top / this.viewportTransform[3]));
       this.renderAll();
       return this;
     },
@@ -1030,7 +1030,7 @@
     centerObject: function(object) {
       var center = this.getCenter();
 
-      this._centerObject(object, new fabric.Point(center.left, center.top));
+      this._centerObject(object, new fabric.Point(center.left / this.viewportTransform[0], center.top / this.viewportTransform[3]));
       this.renderAll();
       return this;
     },
