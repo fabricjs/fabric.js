@@ -569,7 +569,10 @@
         }
         else {
           for (var i = 0, len = this._objects.length; i < len; i++) {
-            if (this._objects[i][prop]) {
+            if (this._objects[i] instanceof fabric.Group) {
+              return this._objects[i].get(prop);
+            }
+            else if (this._objects[i][prop]) {
               return true;
             }
           }
