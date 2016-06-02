@@ -241,6 +241,7 @@
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
+    canvas.setActiveObject(target);
     equal(target, rect, 'Should return the rect');
     canvas.renderAll();
     equal(canvas.lastRenderedWithControls, rect);
