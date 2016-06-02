@@ -1361,6 +1361,17 @@
         this._objects[i]._renderControls(ctx);
         this.lastRenderedWithControls = this._objects[i];
       }
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} obj Object that was removed
+     */
+    _onObjectRemoved: function(obj) {
+      if (obj === this.lastRenderedWithControls) {
+        delete this.lastRenderedWithControls;
+      }
+      this.callSuper('_onObjectRemoved', obj);
     }
   });
 
