@@ -234,6 +234,24 @@
     canvas.remove(rect);
   });
 
+  test('findTarget last rendered', function() {
+    ok(typeof canvas.findTarget == 'function');
+    var rect = makeRect({ left: 0, top: 0 }), target;
+    canvas.add(rect);
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, rect, 'Should return the rect');
+    canvas.renderAll();
+    equal(canvas.lastRenderedWithControls, rect);
+    canvas.remove(rect);
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, null, 'Should not find target');
+    equal(canvas.lastRenderedWithControls, undefined, 'lastRendereWithControls reference should disappear');
+  });
+
   test('findTarget with subTargetCheck', function() {
     var rect = makeRect({ left: 0, top: 0 }), 
         rect2 = makeRect({ left: 30, top:  30}), target,
