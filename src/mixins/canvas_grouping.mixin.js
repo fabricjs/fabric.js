@@ -43,6 +43,10 @@
 
       if (this._activeGroup) {
         this._activeGroup.saveCoords();
+
+        for (var i = 0; i < this._activeGroup._objects.length; i++) {
+          this._activeGroup._objects[i].set('active', false);
+        }
       }
     },
 
