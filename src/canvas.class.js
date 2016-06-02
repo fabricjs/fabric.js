@@ -1003,7 +1003,7 @@
 
         // We need to make sure that the object being targeted is not being targeted using
         // an adjusted coordinate system outside the bounds of the actual containing parent
-        if (target !== originalTarget && target.group !== originalTarget) {
+        if (target && target !== originalTarget && target.group !== originalTarget) {
           // We have in fact found an erroneous target
           // Therefore lets clear it out
           target = undefined;
