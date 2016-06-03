@@ -106,6 +106,15 @@
           groupObjects = isActiveLower
             ? [ this._activeObject, target ]
             : [ target, this._activeObject ];
+
+      for (var i = 0, groupObject; i < groupObjects.length; i++) {
+        groupObject = groupObjects[i];
+
+        if (groupObject.group) {
+          groupObject.group.pluckWithUpdate(groupObject);
+        }
+      }
+
       this._activeObject.isEditing && this._activeObject.exitEditing();
       return new fabric.Group(groupObjects, {
         canvas: this
