@@ -1121,6 +1121,14 @@
         return;
       }
 
+      var shouldTransformByGroup = !this.__group && this.group !== this.canvas.getActiveGroup();
+
+      if (shouldTransformByGroup) {
+        this.trickleThroughGroups(function(g) {
+          g._transformCtx(ctx);
+        });
+      }
+
       ctx.save();
 
       //setup fill rule for current object
@@ -1141,6 +1149,12 @@
       this.clipTo && ctx.restore();
 
       ctx.restore();
+
+      if (shouldTransformByGroup) {
+        this.trickleThroughGroups(function(g) {
+          g._untransformCtx(ctx);
+        });
+      }
     },
 
     /**

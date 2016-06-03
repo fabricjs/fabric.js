@@ -148,7 +148,7 @@
      * @chainable
      */
     insertWithUpdate: function(object, index, nonSplicing) {
-      this._updateWrapper(function() {
+      this._nestWrapper(function() {
         this._restoreObjectsState();
         fabric.util.resetObjectTransform(this);
         if (object) {
@@ -199,7 +199,7 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
-      this._updateWrapper(function() {
+      this._nestWrapper(function() {
         this._restoreObjectsState();
         fabric.util.resetObjectTransform(this);
         // since _restoreObjectsState obliterates group
@@ -214,9 +214,24 @@
     },
 
     /**
+     * Plucks an object from a group for temporary use as an independent object
+     * @param {Object} object
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    pluckWithUpdate: function(object) {
+      this._nestWrapper(function() {
+        object.__group = this;
+        this._restoreObjectState(object);
+      }, this);
+
+      return this;
+    },
+
+    /**
      * @private
      */
-    _updateWrapper: function(callback, context) {
+    _nestWrapper: function(callback, context) {
       var parentGroups = [];
 
       context.trickleThroughGroups(function(g, child) {
@@ -330,6 +345,16 @@
         return;
       }
 
+      // the array is now sorted in order of highest first, so start from end
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._renderObject(this._objects[i], ctx);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _transformCtx: function(ctx) {
       ctx.save();
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
@@ -337,13 +362,13 @@
       this.transform(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      // the array is now sorted in order of highest first, so start from end
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._renderObject(this._objects[i], ctx);
-      }
+    },
 
+    /**
+     * @private
+     */
+    _untransformCtx: function(ctx) {
       this.clipTo && ctx.restore();
-
       ctx.restore();
     },
 
