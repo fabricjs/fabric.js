@@ -157,6 +157,9 @@
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
+      canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
+      canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
+      canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -856,10 +859,10 @@
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(fabric.Canvas.prototype.controlsAboveOverlay, false);
-      equal(fabric.Canvas.prototype.preserveObjectStacking, false);
       equal(canvas.controlsAboveOverlay, true);
       equal(canvas.preserveObjectStacking, true);
     });
@@ -874,25 +877,23 @@
     var serialized = JSON.parse(JSON_STRING);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(fabric.Canvas.prototype.controlsAboveOverlay, false);
-      equal(fabric.Canvas.prototype.preserveObjectStacking, false);
       equal(canvas.controlsAboveOverlay, true);
       equal(canvas.preserveObjectStacking, true);
     });
     // before callback the properties are still false.
     equal(canvas.controlsAboveOverlay, false);
     equal(canvas.preserveObjectStacking, false);
-    delete canvas.controlsAboveOverlay;
-    delete canvas.preserveObjectStacking;
   });
 
 
   test('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundImage = IMG_SRC;
+    serialized.backgroundImage = '{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}';
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.backgroundColor, 'green');
