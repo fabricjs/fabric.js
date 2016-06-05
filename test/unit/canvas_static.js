@@ -868,6 +868,19 @@
     equal(canvas.preserveObjectStacking, false);
   });
 
+  test('loadFromJSON with image background and color', function() {
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = IMG_SRC;
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(canvas.backgroundColor, 'green');
+      ok(canvas.backgroundImage instanceof fabric.Image);
+    });
+    // before callback the properties are still false.
+    equal(canvas.backgroundColor, '');
+  });
+
   test('loadFromJSON custom properties', function() {
     var rect = new fabric.Rect({ width: 10, height: 20 });
     rect.padding = 123;
