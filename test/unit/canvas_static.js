@@ -899,8 +899,6 @@
       equal(canvas.backgroundColor, 'green');
       ok(canvas.backgroundImage instanceof fabric.Image);
     });
-    // before callback the properties are still false.
-    equal(canvas.backgroundColor, '');
   });
 
   test('loadFromJSON custom properties', function() {
