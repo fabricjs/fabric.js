@@ -52,21 +52,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
-      _this._setBgOverlay(serialized, callback);
+      _this._setBgOverlay(serialized, function () {
+        // remove parts i cannot set as options
+        delete serialized.objects;
+        delete serialized.backgroundImage;
+        delete serialized.overlayImage;
+        delete serialized.background;
+        delete serialized.overlay;
+        // this._initOptions does too many things to just
+        // call it. Normally loading an Object from JSON
+        // create the Object instance. Here the Canvas is
+        // already an instance and we are just loading things over it
+        for (var prop in serialized) {
+          this[prop] = serialized[prop];
+        }
+        callback && callback();
+      });
     }, reviver);
-    // remove parts i cannot set as options
-    delete serialized.objects;
-    delete serialized.backgroundImage;
-    delete serialized.overlayImage;
-    delete serialized.background;
-    delete serialized.overlay;
-    // this._initOptions does too many things to just
-    // call it. Normally loading an Object from JSON
-    // create the Object instance. Here the Canvas is
-    // already an instance and we are just loading things over it
-    for (var prop in serialized) {
-      this[prop] = serialized[prop];
-    }
     return this;
   },
 
