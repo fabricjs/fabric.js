@@ -871,7 +871,7 @@
     equal(canvas.preserveObjectStacking, true);
   });
 
-  test('loadFromJSON with custom properties on Canvas with image', function() {
+  asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
     var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
 + '"background":"green"}';
     var serialized = JSON.parse(JSON_STRING);
@@ -883,6 +883,7 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.controlsAboveOverlay, true);
       equal(canvas.preserveObjectStacking, true);
+      start();
     });
     // before callback the properties are still false.
     equal(canvas.controlsAboveOverlay, false);
@@ -890,7 +891,7 @@
   });
 
 
-  test('loadFromJSON with image background and color', function() {
+  asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
     serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
@@ -898,6 +899,7 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.backgroundColor, 'green');
       ok(canvas.backgroundImage instanceof fabric.Image);
+      start();
     });
   });
 
