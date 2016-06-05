@@ -1016,12 +1016,49 @@
      * @chainable
      */
     viewportCenterObject: function(object) {
-      var center = this.getCenter(),
-          iVpt = fabric.util.invertTransform(this.viewportTransform),
-          vpCenter = fabric.util.transformPoint(new fabric.Point(center.left, center.top), iVpt);
+      var vpCenter = this.getVpCenter();
 
       return this._centerObject(object, vpCenter);
     },
+
+    /**
+     * Centers object horizontally in the viewport, object.top is unchanged
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    viewportCenterObjectH: function(object) {
+      var vpCenter = this.getVpCenter();
+
+      return this._centerObject(object, new fabric.Point(vpCenter.x, object.top));
+    },
+
+    /**
+     * Centers object Vertically in the viewport, object.top is unchanged
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    viewportCenterObjectV: function(object) {
+      var vpCenter = this.getVpCenter();
+
+      return this._centerObject(object, new fabric.Point(object.left, vpCenter.y));
+    },
+
+    /**
+     * Calculate center of the viewport
+     * @return {fabric.Point} vpCenter, viewport center
+     * @chainable
+     */
+    getVpCenter: function() {
+      var center = this.getCenter(),
+          iVpt = fabric.util.invertTransform(this.viewportTransform),
+          vpCenter = fabric.util.transformPoint(center, iVpt);
+
+      return vpCenter;
+    }
 
     /**
      * @private
