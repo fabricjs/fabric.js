@@ -1048,17 +1048,16 @@
     },
 
     /**
-     * Calculate center of the viewport
+     * Calculate the point in canvas that correspond to the center of actual viewport.
      * @return {fabric.Point} vpCenter, viewport center
      * @chainable
      */
     getVpCenter: function() {
       var center = this.getCenter(),
-          iVpt = fabric.util.invertTransform(this.viewportTransform),
-          vpCenter = fabric.util.transformPoint(center, iVpt);
+          iVpt = fabric.util.invertTransform(this.viewportTransform);
 
-      return vpCenter;
-    }
+      return fabric.util.transformPoint(center, iVpt);
+    },
 
     /**
      * @private
