@@ -156,10 +156,10 @@
     teardown: function() {
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
+      canvas.backgroundImage = fabric.StaticCanvas.prototype.backgroundImage;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
-      canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
