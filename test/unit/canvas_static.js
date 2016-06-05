@@ -860,9 +860,12 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(fabric.Canvas.prototype.controlsAboveOverlay, false);
       equal(fabric.Canvas.prototype.preserveObjectStacking, false);
+      equal(canvas.controlsAboveOverlay, true);
+      equal(canvas.preserveObjectStacking, true);
     });
-    equal(canvas.controlsAboveOverlay, true);
-    equal(canvas.preserveObjectStacking, true);
+    // before callback the properties are still false.
+    equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.preserveObjectStacking, false);
   });
 
   test('loadFromJSON custom properties', function() {
