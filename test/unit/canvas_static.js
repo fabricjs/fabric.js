@@ -884,6 +884,8 @@
     // before callback the properties are still false.
     equal(canvas.controlsAboveOverlay, false);
     equal(canvas.preserveObjectStacking, false);
+    delete canvas.controlsAboveOverlay;
+    delete canvas.preserveObjectStacking;
   });
 
 
