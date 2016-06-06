@@ -482,6 +482,19 @@
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
+  test('viewportCenterObjectH', function() {
+    ok(typeof canvas.viewportCenterObjectH == 'function');
+    var rect = makeRect({ left: 102, top: 202 });
+    canvas.add(rect);
+    equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "left" property should correspond to canvas element\'s center when canvas is not transformed');
+    canvas.setZoom(2);
+    canvas.viewportCenterObjectH(rect);
+    equal(rect.getCenterPoint().x, canvas.width / 4, 'object\'s "left" property should correspond to viewport center');
+    canvas.absolutePan(10, 10);
+    equal(rect.getCenterPoint().x, (canvas.width / 4 ) + 10, 'object\'s "left" property should correspond to viewport center');
+  });
+
   test('centerObjectV', function() {
     ok(typeof canvas.centerObjectV == 'function');
     var rect = makeRect({ left: 102, top: 202 });
