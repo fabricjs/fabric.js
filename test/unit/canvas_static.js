@@ -488,7 +488,6 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
-    console.log(rect);
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "left" property should correspond to canvas element\'s center when canvas is not transformed');
     canvas.setZoom(2);
     canvas.viewportCenterObjectH(rect);
