@@ -157,7 +157,6 @@
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
-      canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
       canvas.calcOffset();
     }
   });
@@ -499,6 +498,7 @@
     canvas.viewportCenterObjectH(rect);
     equal(rect.getCenterPoint().x, (canvas.width / (2 * canvas.getZoom())) + pan, 'object\'s "left" property should correspond to viewport center');
     equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
   });
 
   test('centerObjectV', function() {
@@ -525,6 +525,7 @@
     canvas.viewportCenterObjectV(rect);
     equal(rect.getCenterPoint().y, (canvas.height / (2 * canvas.getZoom())) + pan, 'object\'s "top" property should correspond to viewport center');
     equal(rect.getCenterPoint().x, oldX, 'x position did not change');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
   });
 
   test('centerObject', function() {
