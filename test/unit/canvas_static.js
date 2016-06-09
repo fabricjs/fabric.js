@@ -495,7 +495,7 @@
     canvas.viewportCenterObjectH(rect);
     equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "left" property should correspond to viewport center');
     equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
-    canvas.absolutePan(pan, pan);
+    canvas.absolutePan({x: pan, y: pan});
     canvas.viewportCenterObjectH(rect);
     equal(rect.getCenterPoint().x, (canvas.width / (2 * canvas.getZoom())) + pan, 'object\'s "left" property should correspond to viewport center');
     equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
@@ -521,7 +521,7 @@
     canvas.viewportCenterObjectV(rect);
     equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "top" property should correspond to viewport center');
     equal(rect.getCenterPoint().x, oldX, 'x position did not change');
-    canvas.absolutePan(pan, pan);
+    canvas.absolutePan({x: pan, y: pan});
     canvas.viewportCenterObjectV(rect);
     equal(rect.getCenterPoint().y, (canvas.height / (2 * canvas.getZoom())) + pan, 'object\'s "top" property should correspond to viewport center');
     equal(rect.getCenterPoint().x, oldX, 'x position did not change');
