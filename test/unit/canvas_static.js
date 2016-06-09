@@ -485,12 +485,50 @@
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
+  test('viewportCenterObjectH', function() {
+    ok(typeof canvas.viewportCenterObjectH == 'function');
+    var rect = makeRect({ left: 102, top: 202 }), pan = 10;
+    canvas.add(rect);
+    var oldY = rect.getCenterPoint().y;
+    equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "left" property should correspond to canvas element\'s center when canvas is not transformed');
+    equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
+    canvas.setZoom(2);
+    canvas.viewportCenterObjectH(rect);
+    equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "left" property should correspond to viewport center');
+    equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
+    canvas.absolutePan({x: pan, y: pan});
+    canvas.viewportCenterObjectH(rect);
+    equal(rect.getCenterPoint().x, (canvas.width / (2 * canvas.getZoom())) + pan, 'object\'s "left" property should correspond to viewport center');
+    equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
   test('centerObjectV', function() {
     ok(typeof canvas.centerObjectV == 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
     equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+  });
+
+  test('viewportCenterObjectV', function() {
+    ok(typeof canvas.viewportCenterObjectV == 'function');
+    var rect = makeRect({ left: 102, top: 202 }), pan = 10;
+    canvas.add(rect);
+    var oldX = rect.getCenterPoint().x;
+    equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "top" property should correspond to canvas element\'s center when canvas is not transformed');
+    equal(rect.getCenterPoint().x, oldX, 'x position did not change');
+    canvas.setZoom(2);
+    canvas.viewportCenterObjectV(rect);
+    equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "top" property should correspond to viewport center');
+    equal(rect.getCenterPoint().x, oldX, 'x position did not change');
+    canvas.absolutePan({x: pan, y: pan});
+    canvas.viewportCenterObjectV(rect);
+    equal(rect.getCenterPoint().y, (canvas.height / (2 * canvas.getZoom())) + pan, 'object\'s "top" property should correspond to viewport center');
+    equal(rect.getCenterPoint().x, oldX, 'x position did not change');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
   });
 
   test('centerObject', function() {
