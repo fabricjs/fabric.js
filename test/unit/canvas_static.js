@@ -483,11 +483,11 @@
   });
 
   test('viewportCenterObjectH', function() {
-    ok(typeof canvas.viewportCenterObjectH === 'function');
+    ok(typeof canvas.viewportCenterObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 }), pan = 10;
     canvas.add(rect);
     var oldY = rect.getCenterPoint().y;
-    //equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
     equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "left" property should correspond to canvas element\'s center when canvas is not transformed');
     equal(rect.getCenterPoint().y, oldY, 'object\'s "top" should not change');
     canvas.setZoom(2);
@@ -510,11 +510,11 @@
   });
 
   test('viewportCenterObjectV', function() {
-    ok(typeof canvas.viewportCenterObjectV === 'function');
+    ok(typeof canvas.viewportCenterObjectV == 'function');
     var rect = makeRect({ left: 102, top: 202 }), pan = 10;
     canvas.add(rect);
     var oldX = rect.getCenterPoint().x;
-    //equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
+    equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
     equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "top" property should correspond to canvas element\'s center when canvas is not transformed');
     equal(rect.getCenterPoint().x, oldX, 'x position did not change');
     canvas.setZoom(2);
