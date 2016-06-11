@@ -148,6 +148,13 @@
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
+     * The transformation applied by retina screens
+     * @type Array
+     * @default
+     */
+    retinaTransform: [1, 0, 0, 1, 0, 0],
+
+    /**
      * if set to false background image is not affected by viewport transform
      * @since 1.6.3
      * @type Boolean
@@ -207,6 +214,19 @@
       this.calcOffset();
     },
 
+	/**
+	 * Return a matrix that represent current retina scaling
+     * @return {Array} retinaTransform matrix.
+	 */
+	getRetinaTransform: function() {
+      if (this._isRetinaScaling) {
+        return this.retinaTransform;
+      }
+      else {
+        return this.prototype.retinaTransform;
+      }
+	}
+
     /**
      * @private
      */
@@ -224,7 +244,7 @@
 
       this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
       this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
-
+      this.retinaTransform = [fabric.devicePixelRatio, 0, 0, fabric.devicePixelRatio, 0, 0];
       this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
     },
 
