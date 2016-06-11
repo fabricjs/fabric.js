@@ -1051,8 +1051,8 @@
      */
     viewportCenterObjectH: function(object) {
       var vpCenter = this.getVpCenter();
-
-      return this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenter().y));
+      this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenter().y));
+      return this;
     },
 
     /**
