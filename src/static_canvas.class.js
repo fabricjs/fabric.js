@@ -225,7 +225,7 @@
       else {
         return this.prototype.retinaTransform;
       }
-	}
+	},
 
     /**
      * @private

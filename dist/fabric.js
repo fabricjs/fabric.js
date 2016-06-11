@@ -6098,7 +6098,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       else {
         return this.prototype.retinaTransform;
       }
-	}
+	},
 
     /**
      * @private
