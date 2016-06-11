@@ -996,32 +996,28 @@
     },
 
     /**
-     * Centers object horizontally.
+     * Centers object horizontally in the canvas
      * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
-      this.renderAll();
-      return this;
+      return this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
     },
 
     /**
-     * Centers object vertically.
+     * Centers object vertically in the canvas
      * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center vertically
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
-      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
-      this.renderAll();
-      return this;
+      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
     },
 
     /**
-     * Centers object vertically and horizontally.
+     * Centers object vertically and horizontally in the canvas
      * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center vertically and horizontally
      * @return {fabric.Canvas} thisArg
@@ -1030,9 +1026,57 @@
     centerObject: function(object) {
       var center = this.getCenter();
 
-      this._centerObject(object, new fabric.Point(center.left, center.top));
-      this.renderAll();
+      return this._centerObject(object, new fabric.Point(center.left, center.top));
+    },
+
+    /**
+     * Centers object vertically and horizontally in the viewport
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    viewportCenterObject: function(object) {
+      var vpCenter = this.getVpCenter();
+
+      return this._centerObject(object, vpCenter);
+    },
+
+    /**
+     * Centers object horizontally in the viewport, object.top is unchanged
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    viewportCenterObjectH: function(object) {
+      var vpCenter = this.getVpCenter();
+      this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenterPoint().y));
       return this;
+    },
+
+    /**
+     * Centers object Vertically in the viewport, object.top is unchanged
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    viewportCenterObjectV: function(object) {
+      var vpCenter = this.getVpCenter();
+
+      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, vpCenter.y));
+    },
+
+    /**
+     * Calculate the point in canvas that correspond to the center of actual viewport.
+     * @return {fabric.Point} vpCenter, viewport center
+     * @chainable
+     */
+    getVpCenter: function() {
+      var center = this.getCenter(),
+          iVpt = fabric.util.invertTransform(this.viewportTransform);
+      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
@@ -1044,6 +1088,7 @@
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
+      this.renderAll();
       return this;
     },
 

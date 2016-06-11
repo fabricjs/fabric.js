@@ -153,13 +153,14 @@
   }
 
   QUnit.module('fabric.StaticCanvas', {
-    teardown: function() {
+    setup: function() {
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.backgroundImage = fabric.StaticCanvas.prototype.backgroundImage;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
+      canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
       canvas.calcOffset();
     }
   });
@@ -482,7 +483,10 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
-    equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
+    canvas.setZoom(4);
+    equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
+
   });
 
   test('centerObjectV', function() {
@@ -490,7 +494,10 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
-    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
+    canvas.setZoom(2);
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
+
   });
 
   test('centerObject', function() {
@@ -499,8 +506,70 @@
     canvas.add(rect);
     equal(canvas.centerObject(rect), canvas, 'should be chainable');
 
-    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
-    equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center');
+    canvas.setZoom(4);
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
+    equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
+  });
+
+  test('viewportCenterObjectH', function() {
+    ok(typeof canvas.viewportCenterObjectH == 'function');
+    var rect = makeRect({ left: 102, top: 202 }), pan = 10;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.add(rect);
+    var oldY = rect.top;
+    equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
+    equal(rect.top, oldY, 'object\'s "top" should not change');
+    canvas.setZoom(2);
+    canvas.viewportCenterObjectH(rect);
+    equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "center.x" property should correspond to viewport center');
+    equal(rect.top, oldY, 'object\'s "top" should not change');
+    canvas.absolutePan({x: pan, y: pan});
+    canvas.viewportCenterObjectH(rect);
+    equal(rect.getCenterPoint().x, (canvas.width / 2 + pan) / canvas.getZoom(), 'object\'s "center.x" property should correspond to viewport center');
+    equal(rect.top, oldY, 'object\'s "top" should not change');
+  });
+
+  test('viewportCenterObjectV', function() {
+    ok(typeof canvas.viewportCenterObjectV == 'function');
+    var rect = makeRect({ left: 102, top: 202 }), pan = 10;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.add(rect);
+    var oldX = rect.left;
+    equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
+    equal(rect.left, oldX, 'x position did not change');
+    canvas.setZoom(2);
+    canvas.viewportCenterObjectV(rect);
+    equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "center.y" property should correspond to viewport center');
+    equal(rect.left, oldX, 'x position did not change');
+    canvas.absolutePan({x: pan, y: pan});
+    canvas.viewportCenterObjectV(rect);
+    equal(rect.getCenterPoint().y, (canvas.height / 2 + pan) / canvas.getZoom(), 'object\'s "top" property should correspond to viewport center');
+    equal(rect.left, oldX, 'x position did not change');
+  });
+
+  test('viewportCenterObject', function() {
+    ok(typeof canvas.viewportCenterObject == 'function');
+    var rect = makeRect({ left: 102, top: 202 }), pan = 10;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.add(rect);
+    equal(canvas.viewportCenterObject(rect), canvas, 'should be chainable');
+    equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
+    equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
+
+    canvas.setZoom(2);
+    canvas.viewportCenterObject(rect);
+    equal(rect.getCenterPoint().y, canvas.height / (2 * canvas.getZoom()), 'object\'s "center.y" property should correspond to viewport center');
+    equal(rect.getCenterPoint().x, canvas.width / (2 * canvas.getZoom()), 'object\'s "center.x" property should correspond to viewport center');
+
+    canvas.absolutePan({x: pan, y: pan});
+    canvas.viewportCenterObject(rect);
+    equal(rect.getCenterPoint().y, (canvas.height / 2 + pan) / canvas.getZoom(), 'object\'s "center.y" property should correspond to viewport center');
+    equal(rect.getCenterPoint().x, (canvas.width / 2 + pan) / canvas.getZoom(), 'object\'s "center.x" property should correspond to viewport center');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   test('straightenObject', function() {
@@ -522,7 +591,7 @@
   test('toSVG', function() {
     ok(typeof canvas.toSVG == 'function');
     canvas.clear();
-
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     var svg = canvas.toSVG();
     equal(svg, CANVAS_SVG);
   });
@@ -530,7 +599,7 @@
   test('toSVG with different encoding (ISO-8859-1)', function() {
     ok(typeof canvas.toSVG == 'function');
     canvas.clear();
-
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
     var svgDefaultEncoding = canvas.toSVG();
     ok(svg != svgDefaultEncoding);
