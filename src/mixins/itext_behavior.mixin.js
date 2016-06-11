@@ -456,18 +456,23 @@
           p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight },
           maxWidth = this.canvas.upperCanvasEl.width - charHeight,
           maxHeight = this.canvas.upperCanvasEl.height - charHeight;
-
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
 
       p = fabric.util.transformPoint(p, this.getViewportTransform());
 	  p = fabric.util.transformPoint(p, m);
       
       // check that we are not going outside the canvas
+      if (p.x < 0) {
+        p.x = 0;
+      }      
       if (p.x > maxWidth) {
         p.x = maxWidth;
       }      
-      if (p.y > maxWidth) {
-        p.y = maxWidth;
+      if (p.y < 0) {
+        p.y = 0;
+      }      
+      if (p.y > maxHeight) {
+        p.y = maxHeight;
       }      
 
       return p;
