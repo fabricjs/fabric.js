@@ -1554,7 +1554,18 @@
      * @chainable
      */
     centerH: function () {
-      this.canvas.centerObjectH(this);
+      this.canvas && this.canvas.centerObjectH(this);
+      return this;
+    },
+
+    /**
+     * Centers object horizontally on current viewport of canvas to which it was added last.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    viewportCenterH: function () {
+      this.canvas && this.canvas.viewportCenterObjectH(this);
       return this;
     },
 
@@ -1565,7 +1576,18 @@
      * @chainable
      */
     centerV: function () {
-      this.canvas.centerObjectV(this);
+      this.canvas && this.canvas.centerObjectV(this);
+      return this;
+    },
+
+    /**
+     * Centers object vertically on current viewport of canvas to which it was added last.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    viewportCenterV: function () {
+      this.canvas && this.canvas.viewportCenterObjectV(this);
       return this;
     },
 
@@ -1576,7 +1598,18 @@
      * @chainable
      */
     center: function () {
-      this.canvas.centerObject(this);
+      this.canvas && this.canvas.centerObject(this);
+      return this;
+    },
+
+    /**
+     * Centers object on current viewport of canvas to which it was added last.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    viewportCenter: function () {
+      this.canvas && this.canvas.viewportCenterObject(this);
       return this;
     },
 
@@ -1586,7 +1619,7 @@
      * @chainable
      */
     remove: function() {
-      this.canvas.remove(this);
+      this.canvas && this.canvas.remove(this);
       return this;
     },
 

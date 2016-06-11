@@ -995,36 +995,109 @@ test('toDataURL & reference to canvas', function() {
   test('center', function() {
     var object = new fabric.Object();
     object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     ok(typeof object.center == 'function');
 
     canvas.add(object);
     equal(object.center(), object, 'should be chainable');
 
-    equal(object.getLeft(), canvas.getWidth() / 2);
-    equal(object.getTop(), canvas.getHeight() / 2);
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2);
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2);
+
+	canvas.setZoom(2)
+    object.center()
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2, 'object center.x is in canvas center when the canvas is transformed');
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2, 'object center.y is in canvas center when the canvas is transformed');
+
   });
 
   test('centerH', function() {
     var object = new fabric.Object();
     object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     ok(typeof object.centerH == 'function');
+    var oldY = object.top;
 
     canvas.add(object);
     equal(object.centerH(), object, 'should be chainable');
 
-    equal(object.getLeft(), canvas.getWidth() / 2);
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2);
+	equal(object.top, oldY, 'object top did not change');
+	canvas.setZoom(2)
+    object.centerH()
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2, 'object center.x is in canvas center when the canvas is transformed');
   });
 
   test('centerV', function() {
     var object = new fabric.Object();
     object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     ok(typeof object.centerV == 'function');
+    var oldX = object.left;
 
     canvas.add(object);
     equal(object.centerV(), object, 'should be chainable');
+	equal(object.left, oldX, 'object top did not change');
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2);
 
-    equal(object.getTop(), canvas.getHeight() / 2);
+	canvas.setZoom(2)
+    object.centerV()
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2, 'object center.y is in canvas center when the canvas is transformed');
   });
+
+  test('viewportCenter', function() {
+    var object = new fabric.Object();
+    object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    ok(typeof object.viewportCenter == 'function');
+
+    canvas.add(object);
+    equal(object.viewportCenter(), object, 'should be chainable');
+
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2);
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2);
+
+	canvas.setZoom(2)
+    object.viewportCenter()
+    equal(object.getCenterPoint().x, canvas.getWidth() / (2 * canvas.getZoom()));
+    equal(object.getCenterPoint().y, canvas.getHeight() / (2 * canvas.getZoom()));
+  });
+
+  test('viewportCenterH', function() {
+    var object = new fabric.Object();
+    object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    ok(typeof object.viewportCenterH == 'function');
+
+    var oldY = object.top;
+    canvas.add(object);
+    equal(object.viewportCenterH(), object, 'should be chainable');
+    equal(object.getCenterPoint().x, canvas.getWidth() / 2);
+	equal(object.top, oldY, 'object top did not change');
+	canvas.setZoom(2)
+    object.viewportCenterH()
+    equal(object.getCenterPoint().x, canvas.getWidth() / (2 * canvas.getZoom()));
+	equal(object.top, oldY, 'object top did not change');
+  });
+
+  test('viewportCenterV', function() {
+    var object = new fabric.Object();
+    object.strokeWidth = 0;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    ok(typeof object.viewportCenterV == 'function');
+
+    var oldX = object.left;
+
+    canvas.add(object);
+    equal(object.viewportCenterV(), object, 'should be chainable');
+    equal(object.getCenterPoint().y, canvas.getHeight() / 2);
+	equal(object.left, oldX, 'object left did not change');
+	canvas.setZoom(2)
+    object.viewportCenterV()
+    equal(object.getCenterPoint().y, canvas.getHeight() / (2 * canvas.getZoom()));
+	equal(object.left, oldX, 'object left did not change');
+  });
+
 
   test('sendToBack', function() {
     var object = new fabric.Object();
