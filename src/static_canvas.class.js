@@ -1076,7 +1076,7 @@
     getVpCenter: function() {
       var center = this.getCenter(),
           iVpt = fabric.util.invertTransform(this.viewportTransform);
-      return fabric.util.transformPoint({x: center.left, y: center.top}, iVpt);
+      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
