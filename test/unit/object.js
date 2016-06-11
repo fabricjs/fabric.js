@@ -1005,7 +1005,7 @@ test('toDataURL & reference to canvas', function() {
     equal(object.getCenterPoint().y, canvas.getHeight() / 2);
 
     canvas.setZoom(2);
-    object.center()
+    object.center();
     equal(object.getCenterPoint().x, canvas.getWidth() / 2, 'object center.x is in canvas center when the canvas is transformed');
     equal(object.getCenterPoint().y, canvas.getHeight() / 2, 'object center.y is in canvas center when the canvas is transformed');
 
