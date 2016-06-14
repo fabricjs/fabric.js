@@ -30,6 +30,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,gestures",
+    "build_with_gestures": "node build.js modules=ALL exclude=json",
     "test": "node test.js",
     "lint": "jshint src && jscs src",
     "lint_tests": "jshint test/unit --config .jshintrc_tests",
