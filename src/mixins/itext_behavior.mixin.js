@@ -440,6 +440,9 @@
      * @private
      */
     _calcTextareaPosition: function() {
+      if (!this.canvas) {
+        return { x: 1, y: 1 };
+      }
       var chars = this.text.split(''),
           boundaries = this._getCursorBoundaries(chars, 'cursor'),
           cursorLocation = this.get2DCursorLocation(),
@@ -450,9 +453,29 @@
                     ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
+          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight },
+          maxWidth = this.canvas.upperCanvasEl.width - charHeight,
+          maxHeight = this.canvas.upperCanvasEl.height - charHeight;
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+
+      p = fabric.util.transformPoint(p, this.getViewportTransform());
+	  p = fabric.util.transformPoint(p, m);
+      
+      // check that we are not going outside the canvas
+      if (p.x < 0) {
+        p.x = 0;
+      }      
+      if (p.x > maxWidth) {
+        p.x = maxWidth;
+      }      
+      if (p.y < 0) {
+        p.y = 0;
+      }      
+      if (p.y > maxHeight) {
+        p.y = maxHeight;
+      }      
+
+      return p;
     },
 
     /**

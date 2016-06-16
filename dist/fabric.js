@@ -6021,6 +6021,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
+     * The transformation applied by retina screens
+     * @type Array
+     * @default
+     */
+    retinaTransform: [1, 0, 0, 1, 0, 0],
+
+    /**
      * if set to false background image is not affected by viewport transform
      * @since 1.6.3
      * @type Boolean
@@ -6080,6 +6087,19 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this.calcOffset();
     },
 
+	/**
+	 * Return a matrix that represent current retina scaling
+     * @return {Array} retinaTransform matrix.
+	 */
+	getRetinaTransform: function() {
+      if (this._isRetinaScaling) {
+        return this.retinaTransform;
+      }
+      else {
+        return this.prototype.retinaTransform;
+      }
+	},
+
     /**
      * @private
      */
@@ -6097,7 +6117,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
       this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
       this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
-
+      this.retinaTransform = [fabric.devicePixelRatio, 0, 0, fabric.devicePixelRatio, 0, 0];
       this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
     },
 
@@ -6949,7 +6969,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     getVpCenter: function() {
       var center = this.getCenter(),
           iVpt = fabric.util.invertTransform(this.viewportTransform);
-      return fabric.util.transformPoint({x: center.left, y: center.top}, iVpt);
+      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
@@ -12186,6 +12206,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     getViewportTransform: function() {
       if (this.canvas && this.canvas.viewportTransform) {
         return this.canvas.viewportTransform;
+      }
+      return [1, 0, 0, 1, 0, 0];
+    },
+
+    /**
+     * Retrieves retinaScaling from Object's canvas if possible
+     * @method getViewportTransform
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipY value // TODO
+     */
+    getRetinaTransform: function() {
+      if (this.canvas && this.canvas.getRetinaTransform && this.canvas.isF) {
+        return this.canvas.getRetinaTransform;
       }
       return [1, 0, 0, 1, 0, 0];
     },
@@ -22975,6 +23008,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      */
     _calcTextareaPosition: function() {
+      if (!this.canvas) {
+        return { x: 1, y: 1 };
+      }
       var chars = this.text.split(''),
           boundaries = this._getCursorBoundaries(chars, 'cursor'),
           cursorLocation = this.get2DCursorLocation(),
@@ -22985,9 +23021,24 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
                     ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
+          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight },
+          maxWidth = this.canvas.upperCanvasEl.width - charHeight,
+          maxHeight = this.canvas.upperCanvasEl.height - charHeight;
+
       this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+
+      p = fabric.util.transformPoint(p, this.getViewportTransform());
+	  p = fabric.util.transformPoint(p, m);
+      
+      // check that we are not going outside the canvas
+      if (p.x > maxWidth) {
+        p.x = maxWidth;
+      }      
+      if (p.y > maxWidth) {
+        p.y = maxWidth;
+      }      
+
+      return p;
     },
 
     /**

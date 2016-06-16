@@ -1064,6 +1064,19 @@
     },
 
     /**
+     * Retrieves retinaScaling from Object's canvas if possible
+     * @method getViewportTransform
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipY value // TODO
+     */
+    getRetinaTransform: function() {
+      if (this.canvas && this.canvas.getRetinaTransform && this.canvas.isF) {
+        return this.canvas.getRetinaTransform;
+      }
+      return [1, 0, 0, 1, 0, 0];
+    },
+
+    /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
