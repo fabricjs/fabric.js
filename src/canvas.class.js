@@ -1317,7 +1317,23 @@
     _discardActiveGroup: function() {
       var g = this.getActiveGroup();
       if (g) {
+        var toRegroup = [];
+
+        g.forEachObject(function(o) {
+          if (o.__group) {
+            toRegroup.push(o);
+          }
+        });
+
         g.destroy();
+
+        for (var i = 0, object, index; i < toRegroup.length; i++) {
+          object = toRegroup[i];
+          index = object.__group._objects.indexOf(object);
+          object.__group.insertWithUpdate(object, index, true);
+          object.group = object.__group;
+          delete object.__group;
+        }
       }
       this.setActiveGroup(null);
     },

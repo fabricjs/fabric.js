@@ -440,9 +440,11 @@
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-      this.realizeTransform(object);
-      object.setCoords();
-      delete object.group;
+      if (object.group === this) {
+        this.realizeTransform(object);
+        object.setCoords();
+        delete object.group;
+      }
 
       return this;
     },
