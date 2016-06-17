@@ -178,13 +178,9 @@
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
-          dim = this._getTransformedDimensions(),
-          w = dim.x, h = dim.y;
+          dim = this._getTransformedDimensions();
 
-      w += 2 * this.padding;
-      h += 2 * this.padding;
-
-      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+      return fabric.util.transformPoint(dim, vpt, true).scalarAdd(2 * this.padding);
     },
 
     /**
