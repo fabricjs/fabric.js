@@ -140,6 +140,11 @@
         group.update();
         this.setActiveGroup(group, e);
         group.saveCoords();
+
+        for (var i = 0; i < group._objects.length; i++) {
+          group._objects[i].set('active', false);
+        }
+
         this.fire('selection:created', { target: group });
         this.renderAll();
       }
