@@ -4,19 +4,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea: function(e) {
-    var p;
-    if (e && this.canvas) {
-      p = this.canvas.getPointer(e);
-    }
-    else {
-      this.oCoords || this.setCoords();
-      p = this.oCoords.tl;
-    }
+
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + p.y + 'px; left: ' + p.x + 'px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+    var style = this._calcTextareaPosition();
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 1;'
+                                        + ' width: 10px; height: 10px; z-index: 999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
     }

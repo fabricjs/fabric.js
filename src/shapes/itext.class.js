@@ -492,15 +492,16 @@
           leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
                     : boundaries.leftOffset,
-          multiplier = this.scaleX * this.canvas.getZoom();
+          multiplier = this.scaleX * this.canvas.getZoom(),
+          cursorWidth = this.cursorWidth / multiplier;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        boundaries.left + leftOffset,
+        boundaries.left + leftOffset - cursorWidth/2,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / multiplier,
+        cursorWidth,
         charHeight);
     },
 

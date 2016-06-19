@@ -13398,13 +13398,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return [1, 0, 0, 1, 0, 0];
     },
 
-    calcTransformMatrix: function() {
-      var center = this.getCenterPoint(),
-          translateMatrix = [1, 0, 0, 1, center.x, center.y],
-          rotateMatrix = this._calcRotateMatrix(),
+    /*
+     * calculate trasform Matrix that represent current transformation from
+     * object properties.
+     * @param {Boolean} ignoreTranslation Ignores center translation.
+     * @return {Array} matrix Transform Matrix for the object
+     */
+    calcTransformMatrix: function(ignoreTranslation) {
+      var rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
-      matrix = multiplyMatrices(matrix, translateMatrix);
+          matrix = this.group ? this.group.calcTransformMatrix(ignoreTranslation) : [1, 0, 0, 1, 0, 0];
+
+      if (!ignoreTranslation) {
+        var center = this.getCenterPoint(),
+            translateMatrix = [1, 0, 0, 1, center.x, center.y];
+        matrix = multiplyMatrices(matrix, translateMatrix);
+      }
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
       return matrix;
@@ -21930,15 +21939,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
                     : boundaries.leftOffset,
-          multiplier = this.scaleX * this.canvas.getZoom();
+          multiplier = this.scaleX * this.canvas.getZoom(),
+          cursorWidth = this.cursorWidth / multiplier;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        boundaries.left + leftOffset,
+        boundaries.left + leftOffset - cursorWidth/2,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / multiplier,
+        cursorWidth,
         charHeight);
     },
 
@@ -22973,21 +22983,25 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!this.hiddenTextarea || this.inCompositionMode) {
         return;
       }
-
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
       if (this.selectionStart === this.selectionEnd) {
-        var p = this._calcTextareaPosition();
-        this.hiddenTextarea.style.left = p.x + 'px';
-        this.hiddenTextarea.style.top = p.y + 'px';
+        var style = this._calcTextareaPosition();
+        this.hiddenTextarea.style.left = style.left;
+        this.hiddenTextarea.style.top = style.top;
+        this.hiddenTextarea.style.fontSize = style.fontSize;
       }
     },
 
     /**
      * @private
+     * @return {Object} style contains style for hiddenTextarea
      */
     _calcTextareaPosition: function() {
+      if (!this.canvas) {
+        return { x: 1, y: 1 };
+      }
       var chars = this.text.split(''),
           boundaries = this._getCursorBoundaries(chars, 'cursor'),
           cursorLocation = this.get2DCursorLocation(),
@@ -22998,9 +23012,31 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
                     ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
-      this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+          p = {
+            x: boundaries.left + leftOffset,
+            y: boundaries.top + boundaries.topOffset + charHeight
+          },
+          upperCanvas = this.canvas.upperCanvasEl,
+          maxWidth = upperCanvas.width - charHeight,
+          maxHeight = upperCanvas.height - charHeight;
+
+      p = fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+
+      if (p.x < 0) {
+        p.x = 0;
+      }
+      if (p.x > maxWidth) {
+        p.x = maxWidth;
+      }
+      if (p.y < 0) {
+        p.y = 0;
+      }
+      if (p.y > maxHeight) {
+        p.y = maxHeight;
+      }
+
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight};
     },
 
     /**
@@ -23574,19 +23610,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea: function(e) {
-    var p;
-    if (e && this.canvas) {
-      p = this.canvas.getPointer(e);
-    }
-    else {
-      this.oCoords || this.setCoords();
-      p = this.oCoords.tl;
-    }
+
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + p.y + 'px; left: ' + p.x + 'px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+    var style = this._calcTextareaPosition();
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 1;'
+                                        + ' width: 10px; height: 10px; z-index: 999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
     }
