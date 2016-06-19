@@ -151,7 +151,7 @@
   });
 
   test('_calculateCurrentDimensions', function(){
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
     ok(typeof cObj._calculateCurrentDimensions == 'function', '_calculateCurrentDimensions should exist');
 
     dim = cObj._calculateCurrentDimensions();
