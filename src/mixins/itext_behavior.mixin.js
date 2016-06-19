@@ -478,7 +478,7 @@
         p.y = maxHeight;
       }
 
-      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight};
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight };
     },
 
     /**
