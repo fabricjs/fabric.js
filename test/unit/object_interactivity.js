@@ -132,6 +132,24 @@
 
   });
 
+  test('_findTargetCorner', function(){
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    ok(typeof cObj._findTargetCorner == 'function', '_findTargetCorner should exist');
+    cObj.setCoords();
+    cObj.active = true;
+    equal(cObj._findTargetCorner(cObj.oCoords.br), 'br');
+    equal(cObj._findTargetCorner(cObj.oCoords.tl), 'tl');
+    equal(cObj._findTargetCorner(cObj.oCoords.tr), 'tr');
+    equal(cObj._findTargetCorner(cObj.oCoords.bl), 'bl');
+    equal(cObj._findTargetCorner(cObj.oCoords.mr), 'mr');
+    equal(cObj._findTargetCorner(cObj.oCoords.ml), 'ml');
+    equal(cObj._findTargetCorner(cObj.oCoords.mt), 'mt');
+    equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
+    equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
+    equal(cObj._findTargetCorner({ x: 0, y: 0 }), false);
+
+  });
+
   test('_calculateCurrentDimensions', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     ok(typeof cObj._calculateCurrentDimensions == 'function', '_calculateCurrentDimensions should exist');
