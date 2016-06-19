@@ -360,16 +360,14 @@
     /*
      * calculate trasform Matrix that represent current transformation from
      * object properties.
-     * @param {Boolean} ignoreTranslation Ignores center translation.
      * @return {Array} matrix Transform Matrix for the object
      */
     calcTransformMatrix: function() {
       var center = this.getCenterPoint(),
-          translateMatrix = [1, 0, 0, 1, center.x, center.y];
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
           matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
-
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
