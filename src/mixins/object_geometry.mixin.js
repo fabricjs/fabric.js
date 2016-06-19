@@ -205,20 +205,19 @@
     },
 
     /**
-     * Returns width of an object
+     * Returns width of an object bounding box counting transformations
      * @return {Number} width value
      */
     getWidth: function() {
-      //needs to be changed
       return this._getTransformedDimensions().x;
     },
 
     /**
-     * Returns height of an object
+     * Returns height of an object bounding box counting transformations
+     * to be renamed in 2.0
      * @return {Number} height value
      */
     getHeight: function() {
-      //needs to be changed
       return this._getTransformedDimensions().y;
     },
 
@@ -369,7 +368,7 @@
           translateMatrix = [1, 0, 0, 1, center.x, center.y];
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group ? this.group.calcTransformMatrix(ignoreTranslation) : [1, 0, 0, 1, 0, 0];
+          matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
 
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);

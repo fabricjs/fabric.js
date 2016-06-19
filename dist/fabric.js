@@ -13409,7 +13409,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           translateMatrix = [1, 0, 0, 1, center.x, center.y];
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group ? this.group.calcTransformMatrix(ignoreTranslation) : [1, 0, 0, 1, 0, 0];
+          matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
 
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
@@ -23613,8 +23613,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 1;'
-                                        + ' width: 10px; height: 10px; z-index: 999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 0;'
+                                        + ' width: 0px; height: 0px; z-index: -999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
     }
