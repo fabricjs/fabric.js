@@ -101,7 +101,7 @@
 
   test('set and minScaleLimit', function() {
     var cObj = new fabric.Object({ left: 11, top: 22, width: 50, height: 60, opacity: 0.7 });
-    
+
     //the min scale limit is given by height.
     equal(cObj.minScaleLimit.toFixed(3), 0.017);
 
@@ -111,7 +111,7 @@
     equal(cObj.minScaleLimit, 0.001);
 
     cObj.set('width', 1);
-    equal(cObj.width, 1);    
+    equal(cObj.width, 1);
     //the min scale limit is given by height.
     equal(cObj.minScaleLimit.toFixed(3), 0.017);
   });
@@ -339,7 +339,7 @@
     deepEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
     notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
-    
+
   });
 
   test('toDatalessObject', function() {
@@ -520,37 +520,6 @@ test('getBoundingRectWithStroke', function() {
     equal(cObj.get('angle'), 0);
     equal(cObj.setAngle(45), cObj, 'chainable');
     equal(cObj.get('angle'), 45);
-  });
-
-  test('setCoords', function() {
-    var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
-    ok(typeof cObj.setCoords == 'function');
-    equal(cObj.setCoords(), cObj, 'chainable');
-
-    cObj.set('left', 250).set('top', 250);
-
-    // coords should still correspond to initial one, even after invoking `set`
-    equal(cObj.oCoords.tl.x, 150);
-    equal(cObj.oCoords.tl.y, 150);
-    equal(cObj.oCoords.tr.x, 250);
-    equal(cObj.oCoords.tr.y, 150);
-    equal(cObj.oCoords.bl.x, 150);
-    equal(cObj.oCoords.bl.y, 250);
-    equal(cObj.oCoords.br.x, 250);
-    equal(cObj.oCoords.br.y, 250);
-
-    // recalculate coords
-    cObj.setCoords();
-
-    // check that coords are now updated
-    equal(cObj.oCoords.tl.x, 250);
-    equal(cObj.oCoords.tl.y, 250);
-    equal(cObj.oCoords.tr.x, 350);
-    equal(cObj.oCoords.tr.y, 250);
-    equal(cObj.oCoords.bl.x, 250);
-    equal(cObj.oCoords.bl.y, 350);
-    equal(cObj.oCoords.br.x, 350);
-    equal(cObj.oCoords.br.y, 350);
   });
 
   test('drawBorders', function() {

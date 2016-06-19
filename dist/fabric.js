@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=gestures,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.6.2" };
@@ -6949,7 +6949,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     getVpCenter: function() {
       var center = this.getCenter(),
           iVpt = fabric.util.invertTransform(this.viewportTransform);
-      return fabric.util.transformPoint({x: center.left, y: center.top}, iVpt);
+      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
@@ -8413,6 +8413,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     altActionKey:           'shiftKey',
 
     /**
+     * Indicates which key enable last rendered selection independently of stack position
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.3
+     * @type String
+     * @default
+     */
+    lastRenderedKey:        'altKey',
+
+    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -9238,9 +9247,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _isLastRenderedObject: function(pointer) {
+    _isLastRenderedObject: function(pointer, e) {
       var lastRendered = this.lastRenderedWithControls;
       return (
+        (this.preserveObjectStacking || e[this.lastRenderedKey]) &&
         lastRendered &&
         lastRendered.visible &&
         (this.containsPoint(null, lastRendered, pointer) ||
@@ -9269,7 +9279,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           objects = this._objects;
       this.targets = [ ];
 
-      if (this._isLastRenderedObject(pointer)) {
+      if (this._isLastRenderedObject(pointer, e)) {
         objects = [this.lastRenderedWithControls];
       }
 
@@ -13388,12 +13398,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return [1, 0, 0, 1, 0, 0];
     },
 
+    /*
+     * calculate trasform Matrix that represent current transformation from
+     * object properties.
+     * @param {Boolean} ignoreTranslation Ignores center translation.
+     * @return {Array} matrix Transform Matrix for the object
+     */
     calcTransformMatrix: function() {
       var center = this.getCenterPoint(),
-          translateMatrix = [1, 0, 0, 1, center.x, center.y],
+          translateMatrix = [1, 0, 0, 1, center.x, center.y];
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
           matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
+
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
@@ -13877,12 +13894,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          w = dim.x, h = dim.y;
+          w = dim.x, h = dim.y,
+          p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
 
-      w += 2 * this.padding;
-      h += 2 * this.padding;
-
-      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+      return p.scalarAdd(2 * this.padding);
     },
 
     /**
@@ -13898,8 +13913,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return this;
       }
       ctx.save();
-      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions();
+      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
+          vpt = this.canvas.viewportTransform,
+          iVpt = fabric.util.invertTransform(vpt);
       ctx.translate(center.x, center.y);
+      ctx.transform.apply(ctx, iVpt);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.fillStyle = this.selectionBackgroundColor;
       ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
@@ -21918,14 +21936,17 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
-                    : boundaries.leftOffset;
+                    : boundaries.leftOffset,
+          multiplier = this.scaleX * this.canvas.getZoom(),
+          cursorWidth = this.cursorWidth / multiplier;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+
       ctx.fillRect(
-        boundaries.left + leftOffset,
+        boundaries.left + leftOffset - cursorWidth/2,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / this.scaleX,
+        cursorWidth,
         charHeight);
     },
 
@@ -22960,21 +22981,25 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!this.hiddenTextarea || this.inCompositionMode) {
         return;
       }
-
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
       if (this.selectionStart === this.selectionEnd) {
-        var p = this._calcTextareaPosition();
-        this.hiddenTextarea.style.left = p.x + 'px';
-        this.hiddenTextarea.style.top = p.y + 'px';
+        var style = this._calcTextareaPosition();
+        this.hiddenTextarea.style.left = style.left;
+        this.hiddenTextarea.style.top = style.top;
+        this.hiddenTextarea.style.fontSize = style.fontSize;
       }
     },
 
     /**
      * @private
+     * @return {Object} style contains style for hiddenTextarea
      */
     _calcTextareaPosition: function() {
+      if (!this.canvas) {
+        return { x: 1, y: 1 };
+      }
       var chars = this.text.split(''),
           boundaries = this._getCursorBoundaries(chars, 'cursor'),
           cursorLocation = this.get2DCursorLocation(),
@@ -22985,9 +23010,31 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
                     ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = { x: boundaries.left + leftOffset, y: boundaries.top + boundaries.topOffset + charHeight };
-      this.hiddenTextarea.style.fontSize = charHeight + 'px';
-      return fabric.util.transformPoint(p, m);
+          p = {
+            x: boundaries.left + leftOffset,
+            y: boundaries.top + boundaries.topOffset + charHeight
+          },
+          upperCanvas = this.canvas.upperCanvasEl,
+          maxWidth = upperCanvas.width - charHeight,
+          maxHeight = upperCanvas.height - charHeight;
+
+      p = fabric.util.transformPoint(p, m);
+      p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+
+      if (p.x < 0) {
+        p.x = 0;
+      }
+      if (p.x > maxWidth) {
+        p.x = maxWidth;
+      }
+      if (p.y < 0) {
+        p.y = 0;
+      }
+      if (p.y > maxHeight) {
+        p.y = maxHeight;
+      }
+
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight};
     },
 
     /**
@@ -23561,18 +23608,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea: function(e) {
-    var p;
-    if (e && this.canvas) {
-      p = this.canvas.getPointer(e);
-    }
-    else {
-      this.oCoords || this.setCoords();
-      p = this.oCoords.tl;
-    }
+
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + p.y + 'px; left: ' + p.x + 'px; opacity: 0;'
+    var style = this._calcTextareaPosition();
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 0;'
                                         + ' width: 0px; height: 0px; z-index: -999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);

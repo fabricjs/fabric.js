@@ -205,20 +205,19 @@
     },
 
     /**
-     * Returns width of an object
+     * Returns width of an object bounding box counting transformations
      * @return {Number} width value
      */
     getWidth: function() {
-      //needs to be changed
       return this._getTransformedDimensions().x;
     },
 
     /**
-     * Returns height of an object
+     * Returns height of an object bounding box counting transformations
+     * to be renamed in 2.0
      * @return {Number} height value
      */
     getHeight: function() {
-      //needs to be changed
       return this._getTransformedDimensions().y;
     },
 
@@ -358,6 +357,11 @@
       return [1, 0, 0, 1, 0, 0];
     },
 
+    /*
+     * calculate trasform Matrix that represent current transformation from
+     * object properties.
+     * @return {Array} matrix Transform Matrix for the object
+     */
     calcTransformMatrix: function() {
       var center = this.getCenterPoint(),
           translateMatrix = [1, 0, 0, 1, center.x, center.y],
