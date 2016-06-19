@@ -102,6 +102,15 @@
     altActionKey:           'shiftKey',
 
     /**
+     * Indicates which key enable last rendered selection independently of stack position
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.3
+     * @type String
+     * @default
+     */
+    lastRenderedKey:        'altKey',
+
+    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -927,9 +936,10 @@
     /**
      * @private
      */
-    _isLastRenderedObject: function(pointer) {
+    _isLastRenderedObject: function(pointer, e) {
       var lastRendered = this.lastRenderedWithControls;
       return (
+        (this.preserveObjectStacking || e[this.lastRenderedKey]) &&
         lastRendered &&
         lastRendered.visible &&
         (this.containsPoint(null, lastRendered, pointer) ||
@@ -958,7 +968,7 @@
           objects = this._objects;
       this.targets = [ ];
 
-      if (this._isLastRenderedObject(pointer)) {
+      if (this._isLastRenderedObject(pointer, e)) {
         objects = [this.lastRenderedWithControls];
       }
 

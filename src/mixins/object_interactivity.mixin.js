@@ -179,12 +179,10 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          w = dim.x, h = dim.y;
+          w = dim.x, h = dim.y,
+          p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
 
-      w += 2 * this.padding;
-      h += 2 * this.padding;
-
-      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+      return p.scalarAdd(2 * this.padding);
     },
 
     /**
@@ -200,8 +198,11 @@
         return this;
       }
       ctx.save();
-      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions();
+      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
+          vpt = this.canvas.viewportTransform,
+          iVpt = fabric.util.invertTransform(vpt);
       ctx.translate(center.x, center.y);
+      ctx.transform.apply(ctx, iVpt);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.fillStyle = this.selectionBackgroundColor;
       ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);

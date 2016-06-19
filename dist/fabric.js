@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=gestures,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.6.2" };
@@ -6949,7 +6949,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     getVpCenter: function() {
       var center = this.getCenter(),
           iVpt = fabric.util.invertTransform(this.viewportTransform);
-      return fabric.util.transformPoint({x: center.left, y: center.top}, iVpt);
+      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
@@ -8413,6 +8413,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     altActionKey:           'shiftKey',
 
     /**
+     * Indicates which key enable last rendered selection independently of stack position
+     * values: altKey, shiftKey, ctrlKey
+     * @since 1.6.3
+     * @type String
+     * @default
+     */
+    lastRenderedKey:        'altKey',
+
+    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -9238,9 +9247,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _isLastRenderedObject: function(pointer) {
+    _isLastRenderedObject: function(pointer, e) {
       var lastRendered = this.lastRenderedWithControls;
       return (
+        (this.preserveObjectStacking || e[this.lastRenderedKey]) &&
         lastRendered &&
         lastRendered.visible &&
         (this.containsPoint(null, lastRendered, pointer) ||
@@ -9269,7 +9279,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           objects = this._objects;
       this.targets = [ ];
 
-      if (this._isLastRenderedObject(pointer)) {
+      if (this._isLastRenderedObject(pointer, e)) {
         objects = [this.lastRenderedWithControls];
       }
 
@@ -13877,12 +13887,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          w = dim.x, h = dim.y;
+          w = dim.x, h = dim.y,
+          p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
 
-      w += 2 * this.padding;
-      h += 2 * this.padding;
-
-      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+      return p.scalarAdd(2 * this.padding);
     },
 
     /**
@@ -13898,8 +13906,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return this;
       }
       ctx.save();
-      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions();
+      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
+          vpt = this.canvas.viewportTransform,
+          iVpt = fabric.util.invertTransform(vpt);
       ctx.translate(center.x, center.y);
+      ctx.transform.apply(ctx, iVpt);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.fillStyle = this.selectionBackgroundColor;
       ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
@@ -21918,14 +21929,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
-                    : boundaries.leftOffset;
+                    : boundaries.leftOffset,
+          multiplier = this.scaleX * this.canvas.getZoom();
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+
       ctx.fillRect(
         boundaries.left + leftOffset,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth / this.scaleX,
+        this.cursorWidth / multiplier,
         charHeight);
     },
 
