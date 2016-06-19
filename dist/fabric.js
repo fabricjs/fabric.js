@@ -13404,16 +13404,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Boolean} ignoreTranslation Ignores center translation.
      * @return {Array} matrix Transform Matrix for the object
      */
-    calcTransformMatrix: function(ignoreTranslation) {
-      var rotateMatrix = this._calcRotateMatrix(),
+    calcTransformMatrix: function() {
+      var center = this.getCenterPoint(),
+          translateMatrix = [1, 0, 0, 1, center.x, center.y];
+          rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
           matrix = this.group ? this.group.calcTransformMatrix(ignoreTranslation) : [1, 0, 0, 1, 0, 0];
 
-      if (!ignoreTranslation) {
-        var center = this.getCenterPoint(),
-            translateMatrix = [1, 0, 0, 1, center.x, center.y];
-        matrix = multiplyMatrices(matrix, translateMatrix);
-      }
+      matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
       return matrix;
