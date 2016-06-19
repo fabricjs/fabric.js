@@ -1373,6 +1373,17 @@
       }
       this.callSuper('_onObjectRemoved', obj);
     }
+
+    /**
+     * Clears all contexts (background, main, top) of an instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function () {
+      delete this.lastRenderedWithControls;
+      return this.callSuper('clear');
+    },
+    
   });
 
   // copying static properties manually to work around Opera's bug,
