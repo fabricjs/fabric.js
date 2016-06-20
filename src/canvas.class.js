@@ -1382,6 +1382,16 @@
         delete this.lastRenderedWithControls;
       }
       this.callSuper('_onObjectRemoved', obj);
+    },
+
+    /**
+     * Clears all contexts (background, main, top) of an instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function () {
+      delete this.lastRenderedWithControls;
+      return this.callSuper('clear');
     }
   });
 
