@@ -955,7 +955,9 @@
       if (this.skipTargetFind) {
         return;
       }
-
+      
+      var pointer = this.getPointer(e, true);
+      
       // first check current group (if one exists)
       // avtive group does not check sub targets like normal groups.
       // if active group just exits.
@@ -964,8 +966,7 @@
         return activeGroup;
       }
 
-      var pointer = this.getPointer(e, true),
-          objects = this._objects;
+      var objects = this._objects;
       this.targets = [ ];
 
       if (this._isLastRenderedObject(pointer, e)) {
