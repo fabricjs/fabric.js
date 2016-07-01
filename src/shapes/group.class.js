@@ -496,7 +496,7 @@
      */
     get: function(prop) {
       if (prop in _lockProperties) {
-        if (this[prop]) {
+        if (this.hasOwnProperty(prop) && typeof this[prop] !== 'undefined') {
           return this[prop];
         }
         else {

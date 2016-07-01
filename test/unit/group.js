@@ -432,9 +432,11 @@ test('toObject without default values', function() {
     equal(group.get('lockMovementX'), true);
 
     group.set('lockMovementX', false);
+    group.getObjects()[0].lockMovementX = true;
+    equal(group.get('lockMovementX'), false);
+
     group.getObjects()[0].lockMovementY = true;
     group.getObjects()[1].lockRotation = true;
-
     equal(group.get('lockMovementY'), true);
     equal(group.get('lockRotation'), true);
   });
@@ -531,7 +533,7 @@ test('toObject without default values', function() {
     canvas.renderAll();
     equal(isTransparent(ctx, 0, 0, 0), true);
     equal(isTransparent(ctx, 1, 1, 0), true);
-    equal(isTransparent(ctx, 2, 2, 0), true);    
+    equal(isTransparent(ctx, 2, 2, 0), true);
     equal(isTransparent(ctx, 3, 3, 0), false);
     equal(isTransparent(ctx, 4, 4, 0), false);
   });
