@@ -13,7 +13,7 @@
     return;
   }
 
-  /**d
+  /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
