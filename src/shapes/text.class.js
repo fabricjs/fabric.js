@@ -424,7 +424,7 @@
      * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function() {
-      return this._textLines.length * this._getHeightOfLine();
+      return this._getHeightOfSingleLine() + (this._textLines.length - 1) * this._getHeightOfLine();
     },
 
     /**
@@ -619,8 +619,20 @@
       ctx.restore();
     },
 
+    /**
+     * @private
+     * @return {Number} height of line
+     */
     _getHeightOfLine: function() {
-      return this.fontSize * this._fontSizeMult * this.lineHeight;
+      return this._getHeightOfSingleLine() * this.lineHeight;
+    },
+
+    /**
+     * @private
+     * @return {Number} height of line without lineHeight
+     */
+    _getHeightOfSingleLine: function() {
+      return this.fontSize * this._fontSizeMult;
     },
 
     /**

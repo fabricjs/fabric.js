@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=gestures,json minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.6.2" };
@@ -8666,11 +8666,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       target.hasBorders = target.transparentCorners = false;
 
+      ctx.save();
+      ctx.transform.apply(ctx, this.viewportTransform);
       if (shouldTransform) {
-        ctx.save();
         ctx.transform.apply(ctx, target.group.calcTransformMatrix());
       }
       target.render(ctx);
+      ctx.restore();
+
       target.active && target._renderControls(ctx);
 
       target.hasBorders = hasBorders;
@@ -8678,7 +8681,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var isTransparent = fabric.util.isTransparent(
         ctx, x, y, this.targetFindTolerance);
-      shouldTransform && ctx.restore();
 
       this.clearContext(ctx);
 
@@ -9693,6 +9695,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         delete this.lastRenderedWithControls;
       }
       this.callSuper('_onObjectRemoved', obj);
+    },
+
+    /**
+     * Clears all contexts (background, main, top) of an instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function () {
+      delete this.lastRenderedWithControls;
+      return this.callSuper('clear');
     }
   });
 
@@ -10040,7 +10052,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _handleEvent: function(e, eventType, targetObj) {
       var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
-          targets = this.targets,
+          targets = this.targets || [ ],
           options = { e: e, target: target, subTargets: targets };
 
       this.fire('mouse:' + eventType, options);
@@ -13245,20 +13257,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Returns width of an object
+     * Returns width of an object bounding box counting transformations
      * @return {Number} width value
      */
     getWidth: function() {
-      //needs to be changed
       return this._getTransformedDimensions().x;
     },
 
     /**
-     * Returns height of an object
+     * Returns height of an object bounding box counting transformations
+     * to be renamed in 2.0
      * @return {Number} height value
      */
     getHeight: function() {
-      //needs to be changed
       return this._getTransformedDimensions().y;
     },
 
@@ -13401,16 +13412,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /*
      * calculate trasform Matrix that represent current transformation from
      * object properties.
-     * @param {Boolean} ignoreTranslation Ignores center translation.
      * @return {Array} matrix Transform Matrix for the object
      */
     calcTransformMatrix: function() {
       var center = this.getCenterPoint(),
-          translateMatrix = [1, 0, 0, 1, center.x, center.y];
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
           matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
-
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
@@ -13909,15 +13918,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || !this.active || this.group) {
+      if (!this.selectionBackgroundColor || this.group
+        || this !== this.canvas.getActiveObject()) {
         return this;
       }
       ctx.save();
       var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
-          vpt = this.canvas.viewportTransform,
-          iVpt = fabric.util.invertTransform(vpt);
+          vpt = this.canvas.viewportTransform;
       ctx.translate(center.x, center.y);
-      ctx.transform.apply(ctx, iVpt);
+      ctx.scale(1 / vpt[0], 1 / vpt[3]);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.fillStyle = this.selectionBackgroundColor;
       ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
@@ -20660,7 +20669,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function() {
-      return this._textLines.length * this._getHeightOfLine();
+      return this._getHeightOfSingleLine() + (this._textLines.length - 1) * this._getHeightOfLine();
     },
 
     /**
@@ -20855,8 +20864,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       ctx.restore();
     },
 
+    /**
+     * @private
+     * @return {Number} height of line
+     */
     _getHeightOfLine: function() {
-      return this.fontSize * this._fontSizeMult * this.lineHeight;
+      return this._getHeightOfSingleLine() * this.lineHeight;
+    },
+
+    /**
+     * @private
+     * @return {Number} height of line without lineHeight
+     */
+    _getHeightOfSingleLine: function() {
+      return this.fontSize * this._fontSizeMult;
     },
 
     /**
@@ -22513,8 +22534,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getTextHeight: function(ctx) {
-      var height = 0;
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
+      var height = this._getHeightOfLine(ctx, 0) / this.lineHeight;
+      for (var i = 1, len = this._textLines.length; i < len; i++) {
         height += this._getHeightOfLine(ctx, i);
       }
       return height;
@@ -23034,7 +23055,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         p.y = maxHeight;
       }
 
-      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight};
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight };
     },
 
     /**
@@ -23607,14 +23628,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
-  initHiddenTextarea: function(e) {
-
+  initHiddenTextarea: function() {
     this.hiddenTextarea = fabric.document.createElement('textarea');
-
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
+                                        + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
     }
