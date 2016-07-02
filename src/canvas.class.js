@@ -955,9 +955,9 @@
       if (this.skipTargetFind) {
         return;
       }
-      
+
       var pointer = this.getPointer(e, true);
-      
+
       // first check current group (if one exists)
       // avtive group does not check sub targets like normal groups.
       // if active group just exits.
