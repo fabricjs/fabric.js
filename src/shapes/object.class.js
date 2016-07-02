@@ -1078,9 +1078,7 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-      if (this === this.canvas.getActiveObject()) {
-        this.drawSelectionBackground(ctx);
-      }
+      this.drawSelectionBackground(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
