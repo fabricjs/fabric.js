@@ -957,11 +957,11 @@
       }
 
       var pointer = this.getPointer(e, true);
+      var activeGroup = this.getActiveGroup();
 
       // first check current group (if one exists)
-      // avtive group does not check sub targets like normal groups.
+      // active group does not check sub targets like normal groups.
       // if active group just exits.
-      var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
