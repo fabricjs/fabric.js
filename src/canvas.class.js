@@ -956,8 +956,8 @@
         return;
       }
 
-      var pointer = this.getPointer(e, true);
-      var activeGroup = this.getActiveGroup();
+      var pointer = this.getPointer(e, true),
+      activeGroup = this.getActiveGroup();
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
