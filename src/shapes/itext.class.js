@@ -1068,8 +1068,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getTextHeight: function(ctx) {
-      var height = 0;
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
+      var height = this._getHeightOfLine(ctx, 0) / this.lineHeight;
+      for (var i = 1, len = this._textLines.length; i < len; i++) {
         height += this._getHeightOfLine(ctx, i);
       }
       return height;

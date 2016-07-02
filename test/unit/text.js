@@ -15,7 +15,7 @@
     'left':                      0,
     'top':                       0,
     'width':                     CHAR_WIDTH,
-    'height':                    52.43,
+    'height':                    45.2,
     'fill':                      'rgb(0,0,0)',
     'stroke':                    null,
     'strokeWidth':               1,
@@ -46,11 +46,11 @@
     'globalCompositeOperation':  'source-over',
     'skewX':                      0,
     'skewY':                      0,
-    'transformMatrix':           null  
+    'transformMatrix':           null
   };
 
-  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="8.98" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
-  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-50" y="8.98" fill="rgb(0,0,0)">x</tspan>\n\t\t\t<tspan x="30" y="8.98" fill="rgb(0,0,0)">y</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-50" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t\t<tspan x="30" y="12.6" fill="rgb(0,0,0)">y</tspan>\n\t\t</text>\n\t</g>\n';
 
   test('constructor', function() {
     ok(fabric.Text);
@@ -92,6 +92,28 @@
     equal(text.get('left'), 1234);
     equal(text.get('top'), 2345);
     equal(text.get('angle'), 55);
+  });
+
+  test('lineHeight with single line', function() {
+    var text = createTextObject();
+    text.text = 'text with one line';
+    text.lineHeight = 2;
+    text._initDimensions();
+    var height = text.height;
+    text.lineHeight = 0.5;
+    text._initDimensions();
+    var heightNew = text.height;
+    equal(height, heightNew, 'text height does not change with one single line');
+  });
+
+  test('lineHeight with multi line', function() {
+    var text = createTextObject();
+    text.text = 'text with\ntwo lines';
+    text.lineHeight = 0.1;
+    text._initDimensions();
+    var height = text.height,
+        minimumHeight = text.fontSize * text._fontSizeMult;
+    equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
   });
 
   test('set with "hash"', function() {
@@ -158,9 +180,9 @@
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       left: 4,
-      top: -3.61,
+      top: -2.16,
       width: 8,
-      height: 20.97,
+      height: 18.08,
       fontSize: 16,
       originX: 'left'
     });
@@ -199,9 +221,9 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -7.72,
+      top:              3.4,
       width:            CHAR_WIDTH,
-      height:           161.23,
+      height:           138.99,
       fill:             'rgb(255,255,255)',
       opacity:          0.45,
       stroke:           'blue',
