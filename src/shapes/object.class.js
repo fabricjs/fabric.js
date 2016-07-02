@@ -13,7 +13,7 @@
     return;
   }
 
-  /**
+  /**d
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
@@ -1078,7 +1078,9 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-      this.drawSelectionBackground(ctx);
+      if (this === this.canvas.getActiveObject()) {
+        this.drawSelectionBackground(ctx);
+      }
       if (!noTransform) {
         this.transform(ctx);
       }
