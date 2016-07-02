@@ -844,9 +844,7 @@
       if (this._shouldClearCache()) {
         this._initDimensions(ctx);
       }
-      if (this === this.canvas.getActiveObject()) {
-        this.drawSelectionBackground(ctx);
-      }
+      this.drawSelectionBackground(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
