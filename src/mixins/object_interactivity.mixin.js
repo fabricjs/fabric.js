@@ -194,15 +194,15 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || !this.active || this.group) {
+      if (!this.selectionBackgroundColor || this.group
+        || this !== this.canvas.getActiveObject()) {
         return this;
       }
       ctx.save();
       var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
-          vpt = this.canvas.viewportTransform,
-          iVpt = fabric.util.invertTransform(vpt);
+          vpt = this.canvas.viewportTransform;
       ctx.translate(center.x, center.y);
-      ctx.transform.apply(ctx, iVpt);
+      ctx.scale(1 / vpt[0], 1 / vpt[3]);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.fillStyle = this.selectionBackgroundColor;
       ctx.fillRect(-wh.x/2, -wh.y/2, wh.x, wh.y);
