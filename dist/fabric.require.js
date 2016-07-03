@@ -4623,11 +4623,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this.skipTargetFind) {
                 return;
             }
-            var activeGroup = this.getActiveGroup();
+            var pointer = this.getPointer(e, true), activeGroup = this.getActiveGroup();
             if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
                 return activeGroup;
             }
-            var pointer = this.getPointer(e, true), objects = this._objects;
+            var objects = this._objects;
             this.targets = [];
             if (this._isLastRenderedObject(pointer, e)) {
                 objects = [ this.lastRenderedWithControls ];
