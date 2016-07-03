@@ -25,7 +25,7 @@ fabric.ElementsParser.prototype.createObjects = function() {
 };
 
 fabric.ElementsParser.prototype.createObject = function(el, index) {
-  var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+  var klass = fabric[fabric.util.string.capitalize(el.tagName.replace('svg:', ''))];
   if (klass && klass.fromElement) {
     try {
       this._createObject(klass, el, index);

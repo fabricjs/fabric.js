@@ -569,7 +569,7 @@
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (nodeName.test(element.nodeName) && !element.getAttribute('instantiated_by_use')) {
+        if (nodeName.test(element.tagName.replace('svg:', '')) && !element.getAttribute('instantiated_by_use')) {
           return true;
         }
       }
@@ -603,7 +603,7 @@
 
       var elements = descendants.filter(function(el) {
         applyViewboxTransform(el);
-        return reAllowedSVGTagNames.test(el.tagName) &&
+        return reAllowedSVGTagNames.test(el.tagName.replace('svg:', '')) &&
               !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
