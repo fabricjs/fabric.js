@@ -386,6 +386,12 @@
   function _convertPercentUnitsToValues(object, options, gradientUnits) {
     var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = '';
     for (var prop in options) {
+      if (options[prop] === 'Infinity') {
+        options[prop] = 1;
+      }
+      else if (options[prop] === '-Infinity') {
+        options[prop] = 0;
+      }
       propValue = parseFloat(options[prop], 10);
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         multFactor = 0.01;
