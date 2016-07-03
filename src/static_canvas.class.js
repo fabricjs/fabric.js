@@ -842,19 +842,20 @@
      */
     _chooseObjectsToRender: function() {
       var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject(),
           object, objsToRender = [ ], activeGroupObjects = [ ];
 
-      if (activeGroup && !this.preserveObjectStacking) {
+      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if (!activeGroup.contains(object)) {
+          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
             objsToRender.push(object);
           }
           else {
             activeGroupObjects.push(object);
           }
         }
-        activeGroup._set('_objects', activeGroupObjects);
+        activeGroup && activeGroup._set('_objects', activeGroupObjects);
       }
       else {
         objsToRender = this._objects;
@@ -889,7 +890,10 @@
       //apply viewport transform once for all rendering process
       canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
       this._renderObjects(canvasToDrawOn, objsToRender);
-      this.preserveObjectStacking || this._renderObjects(canvasToDrawOn, [this.getActiveGroup()]);
+      if (!this.preserveObjectStacking) {
+        objsToRender = [this.getActiveGroup(), this.getActiveObject()];
+        this._renderObjects(canvasToDrawOn, objsToRender);
+      }
       canvasToDrawOn.restore();
 
       if (!this.controlsAboveOverlay && this.interactive) {
