@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.6.2" };
+var fabric = fabric || { version: "1.6.3" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -6715,19 +6715,20 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      */
     _chooseObjectsToRender: function() {
       var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject(),
           object, objsToRender = [ ], activeGroupObjects = [ ];
 
-      if (activeGroup && !this.preserveObjectStacking) {
+      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if (!activeGroup.contains(object)) {
+          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
             objsToRender.push(object);
           }
           else {
             activeGroupObjects.push(object);
           }
         }
-        activeGroup._set('_objects', activeGroupObjects);
+        activeGroup && activeGroup._set('_objects', activeGroupObjects);
       }
       else {
         objsToRender = this._objects;
@@ -6762,7 +6763,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       //apply viewport transform once for all rendering process
       canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
       this._renderObjects(canvasToDrawOn, objsToRender);
-      this.preserveObjectStacking || this._renderObjects(canvasToDrawOn, [this.getActiveGroup()]);
+      if (!this.preserveObjectStacking) {
+        objsToRender = [this.getActiveGroup(), this.getActiveObject()];
+        this._renderObjects(canvasToDrawOn, objsToRender);
+      }
       canvasToDrawOn.restore();
 
       if (!this.controlsAboveOverlay && this.interactive) {
@@ -9269,16 +9273,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         return;
       }
 
+      var pointer = this.getPointer(e, true),
+      activeGroup = this.getActiveGroup();
+
       // first check current group (if one exists)
-      // avtive group does not check sub targets like normal groups.
+      // active group does not check sub targets like normal groups.
       // if active group just exits.
-      var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
 
-      var pointer = this.getPointer(e, true),
-          objects = this._objects;
+      var objects = this._objects;
       this.targets = [ ];
 
       if (this._isLastRenderedObject(pointer, e)) {
@@ -21426,13 +21431,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        /*
-          Adjust positioning:
-            x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-            top/left properties in Fabric correspond to center point of text bounding box
-        */
+        textHeightScaleFactor = text.getHeight() / text.height,
+        lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
+        scaledDiff = lineHeightDiff * textHeightScaleFactor,
+        textHeight = text.getHeight() + scaledDiff,
         offX = 0;
-
+    /*
+      Adjust positioning:
+        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+        top/left properties in Fabric correspond to center point of text bounding box
+    */
     if (text.originX === 'left') {
       offX = text.getWidth() / 2;
     }
@@ -21441,7 +21449,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - text.getHeight() / 2 + text.fontSize * (0.18 + text._fontSizeFraction) /* 0.3 is the old lineHeight */
+      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight /* 0.3 is the old lineHeight */
     });
 
     return text;

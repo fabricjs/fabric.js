@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.6.2"
+    version: "1.6.3"
 };
 
 if (typeof exports !== "undefined") {
@@ -3403,17 +3403,17 @@ fabric.Pattern = fabric.util.createClass({
             return this;
         },
         _chooseObjectsToRender: function() {
-            var activeGroup = this.getActiveGroup(), object, objsToRender = [], activeGroupObjects = [];
-            if (activeGroup && !this.preserveObjectStacking) {
+            var activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject(), object, objsToRender = [], activeGroupObjects = [];
+            if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
                 for (var i = 0, length = this._objects.length; i < length; i++) {
                     object = this._objects[i];
-                    if (!activeGroup.contains(object)) {
+                    if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
                         objsToRender.push(object);
                     } else {
                         activeGroupObjects.push(object);
                     }
                 }
-                activeGroup._set("_objects", activeGroupObjects);
+                activeGroup && activeGroup._set("_objects", activeGroupObjects);
             } else {
                 objsToRender = this._objects;
             }
@@ -3434,7 +3434,10 @@ fabric.Pattern = fabric.util.createClass({
             objsToRender = this._chooseObjectsToRender();
             canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
             this._renderObjects(canvasToDrawOn, objsToRender);
-            this.preserveObjectStacking || this._renderObjects(canvasToDrawOn, [ this.getActiveGroup() ]);
+            if (!this.preserveObjectStacking) {
+                objsToRender = [ this.getActiveGroup(), this.getActiveObject() ];
+                this._renderObjects(canvasToDrawOn, objsToRender);
+            }
             canvasToDrawOn.restore();
             if (!this.controlsAboveOverlay && this.interactive) {
                 this.drawControls(canvasToDrawOn);
@@ -4620,11 +4623,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this.skipTargetFind) {
                 return;
             }
-            var activeGroup = this.getActiveGroup();
+            var pointer = this.getPointer(e, true), activeGroup = this.getActiveGroup();
             if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
                 return activeGroup;
             }
-            var pointer = this.getPointer(e, true), objects = this._objects;
+            var objects = this._objects;
             this.targets = [];
             if (this._isLastRenderedObject(pointer, e)) {
                 objects = [ this.lastRenderedWithControls ];
@@ -10058,7 +10061,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             textContent = element.textContent;
         }
         textContent = textContent.replace(/^\s+|\s+$|\n+/g, "").replace(/\s+/g, " ");
-        var text = new fabric.Text(textContent, options), offX = 0;
+        var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.getHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getHeight() + scaledDiff, offX = 0;
         if (text.originX === "left") {
             offX = text.getWidth() / 2;
         }
@@ -10067,7 +10070,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         }
         text.set({
             left: text.getLeft() + offX,
-            top: text.getTop() - text.getHeight() / 2 + text.fontSize * (.18 + text._fontSizeFraction)
+            top: text.getTop() - textHeight / 2 + text.fontSize * (.18 + text._fontSizeFraction) / text.lineHeight
         });
         return text;
     };
