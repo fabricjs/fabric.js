@@ -958,16 +958,17 @@
         return;
       }
 
+      var pointer = this.getPointer(e, true),
+      activeGroup = this.getActiveGroup();
+
       // first check current group (if one exists)
-      // avtive group does not check sub targets like normal groups.
+      // active group does not check sub targets like normal groups.
       // if active group just exits.
-      var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
 
-      var pointer = this.getPointer(e, true),
-          objects = this._objects;
+      var objects = this._objects;
       this.targets = [ ];
 
       if (this._isLastRenderedObject(pointer, e)) {
