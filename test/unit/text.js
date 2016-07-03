@@ -179,8 +179,8 @@
     // text.width = CHAR_WIDTH;
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 0,
-      top: -3.61,
+      left: 4,
+      top: -5.14,
       width: 8,
       height: 18.08,
       fontSize: 16,
@@ -221,7 +221,7 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              3.4,
+      top:              -16.76,
       width:            CHAR_WIDTH,
       height:           138.99,
       fill:             'rgb(255,255,255)',
