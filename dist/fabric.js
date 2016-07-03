@@ -3087,6 +3087,19 @@ if (typeof console !== 'undefined') {
   }
 
   /**
+   * @private
+   */
+  function _getMultipleNodes(doc, nodeNames) {
+    var nodeName, nodeArray = [ ], nodeList;
+    for (var i = 0; i < nodeNames.length; i++) {
+      nodeName = nodeNames[i];
+      nodeList = doc.getElementsByTagName(nodeName);
+      nodeArray = nodeArray.concat(Array.prototype.slice.call(nodeList));
+    }
+    return nodeArray;
+  }
+
+  /**
    * Parses "transform" attribute, returning an array of values
    * @static
    * @function
@@ -3365,7 +3378,8 @@ if (typeof console !== 'undefined') {
    * @private
    */
   function parseUseDirectives(doc) {
-    var nodelist = doc.getElementsByTagName('use'), i = 0;
+    var nodelist = _getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
+
     while (nodelist.length && i < nodelist.length) {
       var el = nodelist[i],
           xlink = el.getAttribute('xlink:href').substr(1),
@@ -3441,7 +3455,7 @@ if (typeof console !== 'undefined') {
         x = element.getAttribute('x') || 0,
         y = element.getAttribute('y') || 0,
         preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '',
-        missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.tagName)
+        missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.nodeName)
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
@@ -3499,7 +3513,7 @@ if (typeof console !== 'undefined') {
                   (minX * scaleX) + ' ' +
                   (minY * scaleY) + ') ';
 
-    if (element.tagName === 'svg') {
+    if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
       while (element.firstChild != null) {
         el.appendChild(element.firstChild);
@@ -3528,7 +3542,7 @@ if (typeof console !== 'undefined') {
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (nodeName.test(element.nodeName) && !element.getAttribute('instantiated_by_use')) {
+        if (element.nodeName && nodeName.test(element.nodeName.replace('svg:', '')) && !element.getAttribute('instantiated_by_use')) {
           return true;
         }
       }
@@ -3562,7 +3576,7 @@ if (typeof console !== 'undefined') {
 
       var elements = descendants.filter(function(el) {
         applyViewboxTransform(el);
-        return reAllowedSVGTagNames.test(el.tagName) &&
+        return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
               !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
@@ -3695,20 +3709,16 @@ if (typeof console !== 'undefined') {
      * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
      */
     getGradientDefs: function(doc) {
-      var linearGradientEls = doc.getElementsByTagName('linearGradient'),
-          radialGradientEls = doc.getElementsByTagName('radialGradient'),
-          el, i, j = 0, id, xlink, elList = [ ],
+      var tagArray = [
+            'linearGradient',
+            'radialGradient',
+            'svg:linearGradient',
+            'svg:radialGradient'],
+          elList = _getMultipleNodes(doc, tagArray),
+          el, j = 0, id, xlink,
           gradientDefs = { }, idsToXlinkMap = { };
 
-      elList.length = linearGradientEls.length + radialGradientEls.length;
-      i = linearGradientEls.length;
-      while (i--) {
-        elList[j++] = linearGradientEls[i];
-      }
-      i = radialGradientEls.length;
-      while (i--) {
-        elList[j++] = radialGradientEls[i];
-      }
+      j = elList.length;
 
       while (j--) {
         el = elList[j];
@@ -4087,7 +4097,7 @@ fabric.ElementsParser.prototype.createObjects = function() {
 };
 
 fabric.ElementsParser.prototype.createObject = function(el, index) {
-  var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+  var klass = fabric[fabric.util.string.capitalize(el.tagName.replace('svg:', ''))];
   if (klass && klass.fromElement) {
     try {
       this._createObject(klass, el, index);
