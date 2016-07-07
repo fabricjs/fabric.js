@@ -70,6 +70,10 @@
         }
       }
       else {
+        if (target.group) {
+          target.group.pluckWithUpdate(target);
+        }
+
         activeGroup.addWithUpdate(target);
       }
       this.fire('selection:created', { target: activeGroup, e: e });
