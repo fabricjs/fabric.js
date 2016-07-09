@@ -48,10 +48,11 @@
       fontFamily: true,
       fontStyle: true,
       lineHeight: true,
-      stroke: true,
-      strokeWidth: true,
       text: true,
-      textAlign: true
+      charSpacing: true,
+      //textAlign: false,
+      //stroke: false,
+      //strokeWidth: false,
     },
 
     /**
@@ -395,11 +396,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderText: function(ctx) {
-
-      this._translateForTextAlign(ctx);
+      //this._translateForTextAlign(ctx);
       this._renderTextFill(ctx);
       this._renderTextStroke(ctx);
-      this._translateForTextAlign(ctx, true);
+      //this._translateForTextAlign(ctx, true);
     },
 
     /**
@@ -420,9 +420,6 @@
      */
     _setTextStyles: function(ctx) {
       ctx.textBaseline = 'alphabetic';
-      if (!this.skipTextAlign) {
-        ctx.textAlign = this.textAlign;
-      }
       ctx.font = this._getFontDeclaration();
     },
 
@@ -471,7 +468,7 @@
      */
     _renderChars: function(method, ctx, chars, left, top) {
       // remove Text word from method var
-      var shortM = method.slice(0, -4);
+      var shortM = method.slice(0, -4), char;
       if (this[shortM].toLive) {
         var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
             offsetY = -this.height / 2 + this[shortM].offsetY || 0;
@@ -482,8 +479,10 @@
       }
       if (this.charSpacing > 0) {
         chars = chars.split('');
-        for (var i = 0, len < chars.length: i < len; i++) {
-
+        for (var i = 0, len = chars.length; i < len; i++) {
+          char = chars[i];
+          ctx[method](char, left, top);
+          left += this._getWidthOfWords(ctx, char);
         }
       }
       else {
@@ -507,6 +506,7 @@
 
       // short-circuit
       var lineWidth = this._getLineWidth(ctx, lineIndex);
+      left += this._getLineLeftOffset(lineWidth);
       if (this.textAlign !== 'justify' || this.width < lineWidth) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
@@ -541,8 +541,8 @@
       var width = ctx.measureText(word).width, charCount, additionalSpace;
       if (this.charSpacing > 0) {
         charCount = word.split('').length;
-        additionalSpace = charCount * this.fontSize * this.letterSpacing / 1000;
-        width =+ additionalSpace;
+        additionalSpace = charCount * this.fontSize * this.charSpacing / 1000;
+        width += additionalSpace;
       }
       return width;
     },
@@ -584,7 +584,6 @@
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight;
-
         this._renderTextLine(
           'fillText',
           ctx,
@@ -813,7 +812,6 @@
       if (!this.textDecoration) {
         return;
       }
-
       var halfOfVerticalBox = this.height / 2,
           _this = this, offsets = [];
 

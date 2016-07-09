@@ -9622,10 +9622,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             fontFamily: true,
             fontStyle: true,
             lineHeight: true,
-            stroke: true,
-            strokeWidth: true,
             text: true,
-            textAlign: true
+            charSpacing: true
         },
         _reNewline: /\r?\n/,
         _reSpacesAndTabs: /[ \t\r]+/g,
@@ -9643,6 +9641,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         shadow: null,
         _fontSizeFraction: .25,
         _fontSizeMult: 1.13,
+        charSpacing: 0,
         initialize: function(text, options) {
             options = options || {};
             this.text = text;
@@ -9680,10 +9679,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.clipTo && ctx.restore();
         },
         _renderText: function(ctx) {
-            this._translateForTextAlign(ctx);
             this._renderTextFill(ctx);
             this._renderTextStroke(ctx);
-            this._translateForTextAlign(ctx, true);
         },
         _translateForTextAlign: function(ctx, back) {
             if (this.textAlign !== "left" && this.textAlign !== "justify") {
@@ -9693,9 +9690,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         },
         _setTextStyles: function(ctx) {
             ctx.textBaseline = "alphabetic";
-            if (!this.skipTextAlign) {
-                ctx.textAlign = this.textAlign;
-            }
             ctx.font = this._getFontDeclaration();
         },
         _getTextHeight: function() {
@@ -9718,7 +9712,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             };
         },
         _renderChars: function(method, ctx, chars, left, top) {
-            var shortM = method.slice(0, -4);
+            var shortM = method.slice(0, -4), char;
             if (this[shortM].toLive) {
                 var offsetX = -this.width / 2 + this[shortM].offsetX || 0, offsetY = -this.height / 2 + this[shortM].offsetY || 0;
                 ctx.save();
@@ -9726,17 +9720,28 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 left -= offsetX;
                 top -= offsetY;
             }
-            ctx[method](chars, left, top);
+            if (this.charSpacing > 0) {
+                chars = chars.split("");
+                for (var i = 0, len = chars.length; i < len; i++) {
+                    char = chars[i];
+                    ctx[method](char, left, top);
+                    left += this._getWidthOfWords(ctx, char);
+                }
+            } else {
+                ctx[method](chars, left, top);
+            }
             this[shortM].toLive && ctx.restore();
         },
         _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
             top -= this.fontSize * this._fontSizeFraction;
             var lineWidth = this._getLineWidth(ctx, lineIndex);
+            console.log(left, lineWidth, left + this._getLineLeftOffset(lineWidth), lineIndex, this.width);
+            left += this._getLineLeftOffset(lineWidth);
             if (this.textAlign !== "justify" || this.width < lineWidth) {
                 this._renderChars(method, ctx, line, left, top, lineIndex);
                 return;
             }
-            var words = line.split(/\s+/), charOffset = 0, wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, leftOffset = 0, word;
+            var words = line.split(/\s+/), charOffset = 0, wordsWidth = this._getWidthOfWords(ctx, words.join(""), lineIndex, 0), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, leftOffset = 0, word;
             for (var i = 0, len = words.length; i < len; i++) {
                 while (line[charOffset] === " " && charOffset < line.length) {
                     charOffset++;
@@ -9747,8 +9752,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 charOffset += word.length;
             }
         },
-        _getWidthOfWords: function(ctx, line) {
-            return ctx.measureText(line.replace(/\s+/g, "")).width;
+        _getWidthOfWords: function(ctx, word) {
+            var width = ctx.measureText(word).width, charCount, additionalSpace;
+            if (this.charSpacing > 0) {
+                charCount = word.split("").length;
+                additionalSpace = charCount * this.fontSize * this.charSpacing / 1e3;
+                width += additionalSpace;
+            }
+            return width;
         },
         _getLeftOffset: function() {
             return -this.width / 2;
@@ -9860,11 +9871,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             if (this.__lineWidths[lineIndex]) {
                 return this.__lineWidths[lineIndex] === -1 ? this.width : this.__lineWidths[lineIndex];
             }
-            var width, wordCount, line = this._textLines[lineIndex];
+            var width, wordCount, line = this._textLines[lineIndex], charCount, additionalSpace = 0;
             if (line === "") {
                 width = 0;
             } else {
-                width = this._measureLine(ctx, lineIndex);
+                if (this.charSpacing > 0) {
+                    charCount = line.split("").length;
+                    additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1e3;
+                }
+                width = this._measureLine(ctx, lineIndex) + additionalSpace;
             }
             this.__lineWidths[lineIndex] = width;
             if (width && this.textAlign === "justify") {
@@ -9995,7 +10010,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         _setSVGTextLineJustifed: function(i, textSpans, yPos, textLeftOffset) {
             var ctx = fabric.util.createCanvasElement().getContext("2d");
             this._setTextStyles(ctx);
-            var line = this._textLines[i], words = line.split(/\s+/), wordsWidth = this._getWidthOfWords(ctx, line), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, word, attributes = this._getFillAttributes(this.fill), len;
+            var line = this._textLines[i], words = line.split(/\s+/), wordsWidth = this._getWidthOfWords(ctx, words.join("")), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, word, attributes = this._getFillAttributes(this.fill), len;
             textLeftOffset += this._getLineLeftOffset(this._getLineWidth(ctx, i));
             for (i = 0, len = words.length; i < len; i++) {
                 word = words[i];
