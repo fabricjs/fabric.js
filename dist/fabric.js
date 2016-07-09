@@ -20767,8 +20767,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       // short-circuit
       var lineWidth = this._getLineWidth(ctx, lineIndex);
-      console.log(left, lineWidth, left + this._getLineLeftOffset(lineWidth), lineIndex, this.width);
-      left += this._getLineLeftOffset(lineWidth);
       if (this.textAlign !== 'justify' || this.width < lineWidth) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
@@ -20836,26 +20834,37 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
+    _renderTextCommon: function(ctx, method) {
+
+      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
+
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        var heightOfLine = this._getHeightOfLine(ctx, i),
+            maxHeight = heightOfLine / this.lineHeight,
+            lineWidth = this._getLineWidth(ctx, i),
+            leftOffset = this._getLineLeftOffset(lineWidth)
+        this._renderTextLine(
+          method,
+          ctx,
+          this._textLines[i],
+          left + leftOffset,
+          top + lineHeights + maxHeight,
+          i
+        );
+        lineHeights += heightOfLine;
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
     _renderTextFill: function(ctx) {
       if (!this.fill && this.isEmptyStyles()) {
         return;
       }
 
-      var lineHeights = 0;
-
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i),
-            maxHeight = heightOfLine / this.lineHeight;
-        this._renderTextLine(
-          'fillText',
-          ctx,
-          this._textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + lineHeights + maxHeight,
-          i
-        );
-        lineHeights += heightOfLine;
-      }
+      this._renderTextCommon(ctx, 'fillText');
     },
 
     /**
@@ -20884,20 +20893,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       ctx.beginPath();
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i),
-            maxHeight = heightOfLine / this.lineHeight;
-
-        this._renderTextLine(
-          'strokeText',
-          ctx,
-          this._textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + lineHeights + maxHeight,
-          i
-        );
-        lineHeights += heightOfLine;
-      }
+      this._renderTextCommon(ctx, 'strokeText');
       ctx.closePath();
       ctx.restore();
     },
