@@ -320,6 +320,14 @@
     _fontSizeMult:             1.13,
 
     /**
+     * additional space between characters
+     * expressed in thousands of em unit
+     * @type Number
+     * @default
+     */
+    charSpacing:             0,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -472,7 +480,15 @@
         left -= offsetX;
         top -= offsetY;
       }
-      ctx[method](chars, left, top);
+      if (this.charSpacing > 0) {
+        chars = chars.split('');
+        for (var i = 0, len < chars.length: i < len; i++) {
+
+        }
+      }
+      else {
+        ctx[method](chars, left, top);
+      }
       this[shortM].toLive && ctx.restore();
     },
 
@@ -499,7 +515,7 @@
       // stretch the line
       var words = line.split(/\s+/),
           charOffset = 0,
-          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
+          wordsWidth = this._getWidthOfWords(ctx, words.join(''), lineIndex, 0),
           widthDiff = this.width - wordsWidth,
           numSpaces = words.length - 1,
           spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
@@ -521,8 +537,14 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Number} line
      */
-    _getWidthOfWords: function (ctx, line) {
-      return ctx.measureText(line.replace(/\s+/g, '')).width;
+    _getWidthOfWords: function (ctx, word) {
+      var width = ctx.measureText(word).width, charCount, additionalSpace;
+      if (this.charSpacing > 0) {
+        charCount = word.split('').length;
+        additionalSpace = charCount * this.fontSize * this.letterSpacing / 1000;
+        width =+ additionalSpace;
+      }
+      return width;
     },
 
     /**
@@ -750,13 +772,17 @@
         return this.__lineWidths[lineIndex] === -1 ? this.width : this.__lineWidths[lineIndex];
       }
 
-      var width, wordCount, line = this._textLines[lineIndex];
+      var width, wordCount, line = this._textLines[lineIndex], charCount, additionalSpace = 0;
 
       if (line === '') {
         width = 0;
       }
       else {
-        width = this._measureLine(ctx, lineIndex);
+        if (this.charSpacing > 0) {
+          charCount = line.split('').length;
+          additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1000;
+        }
+        width = this._measureLine(ctx, lineIndex) + additionalSpace;
       }
       this.__lineWidths[lineIndex] = width;
 
@@ -1012,7 +1038,7 @@
 
       var line = this._textLines[i],
           words = line.split(/\s+/),
-          wordsWidth = this._getWidthOfWords(ctx, line),
+          wordsWidth = this._getWidthOfWords(ctx, words.join('')),
           widthDiff = this.width - wordsWidth,
           numSpaces = words.length - 1,
           spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
