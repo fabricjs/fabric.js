@@ -9868,15 +9868,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             if (this.__lineWidths[lineIndex]) {
                 return this.__lineWidths[lineIndex] === -1 ? this.width : this.__lineWidths[lineIndex];
             }
-            var width, wordCount, line = this._textLines[lineIndex], charCount, additionalSpace = 0;
+            var width, wordCount, line = this._textLines[lineIndex];
             if (line === "") {
                 width = 0;
             } else {
-                if (this.charSpacing > 0) {
-                    charCount = line.split("").length;
-                    additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1e3;
-                }
-                width = this._measureLine(ctx, lineIndex) + additionalSpace;
+                width = this._measureLine(ctx, lineIndex);
             }
             this.__lineWidths[lineIndex] = width;
             if (width && this.textAlign === "justify") {
@@ -9888,7 +9884,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             return width;
         },
         _measureLine: function(ctx, lineIndex) {
-            return ctx.measureText(this._textLines[lineIndex]).width;
+            var width = ctx.measureText(this._textLines[lineIndex]).width, additionalSpace = 0, charCount;
+            if (this.charSpacing > 0) {
+                charCount = line.split("").length;
+                additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1e3;
+            }
+            return width;
         },
         _renderTextDecoration: function(ctx) {
             if (!this.textDecoration) {
@@ -10336,10 +10337,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 return this._renderCharsFast(method, ctx, line, left, top);
             }
             charOffset = charOffset || 0;
-            this.skipTextAlign = true;
-            left -= this.textAlign === "center" ? this.width / 2 : this.textAlign === "right" ? this.width : 0;
-            var lineHeight = this._getHeightOfLine(ctx, lineIndex), lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)), prevStyle, thisStyle, charsToRender = "";
-            left += lineLeftOffset || 0;
+            var lineHeight = this._getHeightOfLine(ctx, lineIndex), prevStyle, thisStyle, charsToRender = "";
             ctx.save();
             top -= lineHeight / this.lineHeight * this._fontSizeFraction;
             for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
@@ -10355,7 +10353,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             ctx.restore();
         },
         _renderCharsFast: function(method, ctx, line, left, top) {
-            this.skipTextAlign = false;
             if (method === "fillText" && this.fill) {
                 this.callSuper("_renderChars", method, ctx, line, left, top);
             }
@@ -10364,7 +10361,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
         },
         _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-            var charWidth, charHeight, shouldFill, shouldStroke, decl = this._getStyleDeclaration(lineIndex, i), offset, textDecoration;
+            var charWidth, charHeight, shouldFill, shouldStroke, decl = this._getStyleDeclaration(lineIndex, i), offset, textDecoration, chars;
             if (decl) {
                 charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
                 shouldStroke = decl.stroke;
@@ -10376,13 +10373,24 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             shouldStroke = (shouldStroke || this.stroke) && method === "strokeText";
             shouldFill = (shouldFill || this.fill) && method === "fillText";
             decl && ctx.save();
-            charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
+            charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || null);
             textDecoration = textDecoration || this.textDecoration;
             if (decl && decl.textBackgroundColor) {
                 this._removeShadow(ctx);
             }
-            shouldFill && ctx.fillText(_char, left, top);
-            shouldStroke && ctx.strokeText(_char, left, top);
+            if (this.charSpacing !== 0) {
+                chars = _char.split("");
+                charWidth = 0;
+                for (var j = 0, len = chars.length, char; j < len; j++) {
+                    char = chars[j];
+                    shouldFill && ctx.fillText(char, left + charWidth, top);
+                    shouldStroke && ctx.strokeText(char, left + charWidth, top);
+                    charWidth += ctx.measureText(char).width + this.fontSize * this.charSpacing / 1e3;
+                }
+            } else {
+                shouldFill && ctx.fillText(_char, left, top);
+                shouldStroke && ctx.strokeText(_char, left, top);
+            }
             if (textDecoration || textDecoration !== "") {
                 offset = this._fontSizeFraction * lineHeight / this.lineHeight;
                 this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
@@ -10454,7 +10462,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             return fabric.charWidthsCache[fontFamily];
         },
         _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-            var charDecl = this._getStyleDeclaration(lineIndex, charIndex), styleDeclaration = decl && clone(decl) || clone(charDecl), width, cacheProp, charWidthsCache;
+            var charDecl = decl || this._getStyleDeclaration(lineIndex, charIndex), styleDeclaration = clone(charDecl), width, cacheProp, charWidthsCache;
             this._applyFontStyles(styleDeclaration);
             charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
             cacheProp = this._getCacheProp(_char, styleDeclaration);
@@ -10523,18 +10531,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             if (!this._isMeasuring && this.textAlign === "justify" && this._reSpacesAndTabs.test(_char)) {
                 return this._getWidthOfSpace(ctx, lineIndex);
             }
-            var charWidthsCache, cacheProp, styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
-            this._applyFontStyles(styleDeclaration);
-            charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
-            cacheProp = this._getCacheProp(_char, styleDeclaration);
-            if (charWidthsCache[cacheProp] && this.caching) {
-                return charWidthsCache[cacheProp];
-            } else if (ctx) {
-                ctx.save();
-                var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
-                ctx.restore();
-                return width;
+            ctx.save();
+            var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
+            if (this.charSpacing !== 0) {
+                width += this.charSpacing * this.fontSize / 1e3;
             }
+            ctx.restore();
+            return width;
         },
         _getHeightOfChar: function(ctx, lineIndex, charIndex) {
             var style = this._getStyleDeclaration(lineIndex, charIndex);

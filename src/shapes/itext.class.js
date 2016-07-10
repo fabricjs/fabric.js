@@ -564,23 +564,12 @@
       }
 
       charOffset = charOffset || 0;
-      this.skipTextAlign = true;
-
-      // set proper box offset
-      left -= this.textAlign === 'center'
-        ? (this.width / 2)
-        : (this.textAlign === 'right')
-          ? this.width
-          : 0;
 
       // set proper line offset
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
-          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)),
           prevStyle,
           thisStyle,
           charsToRender = '';
-
-      left += lineLeftOffset || 0;
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
@@ -607,7 +596,6 @@
      * @param {Number} top Top coordinate
      */
     _renderCharsFast: function(method, ctx, line, left, top) {
-      this.skipTextAlign = false;
 
       if (method === 'fillText' && this.fill) {
         this.callSuper('_renderChars', method, ctx, line, left, top);
@@ -631,7 +619,7 @@
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
-          offset, textDecoration;
+          offset, textDecoration, chars;
 
       if (decl) {
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
@@ -648,14 +636,26 @@
 
       decl && ctx.save();
 
-      charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
+      charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || null);
       textDecoration = textDecoration || this.textDecoration;
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
       }
-      shouldFill && ctx.fillText(_char, left, top);
-      shouldStroke && ctx.strokeText(_char, left, top);
+      if (this.charSpacing !== 0) {
+        chars = _char.split('');
+        charWidth = 0;
+        for (var j = 0, len = chars.length, char; j < len; j++) {
+          char = chars[j];
+          shouldFill && ctx.fillText(char, left + charWidth, top);
+          shouldStroke && ctx.strokeText(char, left + charWidth, top);
+          charWidth += ctx.measureText(char).width + this.fontSize * this.charSpacing / 1000;
+        }
+      }
+      else {
+        shouldFill && ctx.fillText(_char, left, top);
+        shouldStroke && ctx.strokeText(_char, left, top);
+      }
 
       if (textDecoration || textDecoration !== '') {
         offset = this._fontSizeFraction * lineHeight / this.lineHeight;
@@ -811,8 +811,8 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = (decl && clone(decl)) || clone(charDecl),
+      var charDecl = decl || this._getStyleDeclaration(lineIndex, charIndex),
+          styleDeclaration = clone(charDecl),
           width, cacheProp, charWidthsCache;
 
       this._applyFontStyles(styleDeclaration);
@@ -949,21 +949,13 @@
       if (!this._isMeasuring && this.textAlign === 'justify' && this._reSpacesAndTabs.test(_char)) {
         return this._getWidthOfSpace(ctx, lineIndex);
       }
-      var charWidthsCache, cacheProp,
-          styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
-      this._applyFontStyles(styleDeclaration);
-      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
-      cacheProp = this._getCacheProp(_char, styleDeclaration);
-
-      if (charWidthsCache[cacheProp] && this.caching) {
-        return charWidthsCache[cacheProp];
+      ctx.save();
+      var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
+      if (this.charSpacing !== 0) {
+        width += this.charSpacing * this.fontSize / 1000;
       }
-      else if (ctx) {
-        ctx.save();
-        var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
-        ctx.restore();
-        return width;
-      }
+      ctx.restore();
+      return width;
     },
 
     /**

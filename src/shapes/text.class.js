@@ -768,17 +768,13 @@
         return this.__lineWidths[lineIndex] === -1 ? this.width : this.__lineWidths[lineIndex];
       }
 
-      var width, wordCount, line = this._textLines[lineIndex], charCount, additionalSpace = 0;
+      var width, wordCount, line = this._textLines[lineIndex];
 
       if (line === '') {
         width = 0;
       }
       else {
-        if (this.charSpacing > 0) {
-          charCount = line.split('').length;
-          additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1000;
-        }
-        width = this._measureLine(ctx, lineIndex) + additionalSpace;
+        width = this._measureLine(ctx, lineIndex);
       }
       this.__lineWidths[lineIndex] = width;
 
@@ -798,7 +794,13 @@
      * @return {Number} Line width
      */
     _measureLine: function(ctx, lineIndex) {
-      return ctx.measureText(this._textLines[lineIndex]).width;
+      var width = ctx.measureText(this._textLines[lineIndex]).width,
+          additionalSpace = 0, charCount;
+      if (this.charSpacing > 0) {
+        charCount = line.split('').length;
+        additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1000;
+      }
+      return width;
     },
 
     /**
