@@ -179,7 +179,7 @@
 
       //TODO: this function does not consider mixed situation like top, center.
       if (typeof(this.originX) === 'number') {
-        this.left += xFull * (originXOffset[to] - (this-originX - 0.5))
+        this.left += xFull * (originXOffset[to] - (this.originX - 0.5))
         this.top += yFull * (originXOffset[to] - (this.originX - 0.5))
       }
       else {
