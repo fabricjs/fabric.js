@@ -649,7 +649,7 @@
           char = chars[j];
           shouldFill && ctx.fillText(char, left + charWidth, top);
           shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          charWidth += ctx.measureText(char).width + this.fontSize * this.charSpacing / 1000;
+          charWidth += ctx.measureText(char).width + this._getWidthOfCharSpacing();
         }
       }
       else {
@@ -952,7 +952,7 @@
       ctx.save();
       var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
       if (this.charSpacing !== 0) {
-        width += this.charSpacing * this.fontSize / 1000;
+        width += this._getWidthOfCharSpacing();
       }
       ctx.restore();
       return width;
@@ -991,6 +991,9 @@
     _measureLine: function(ctx, lineIndex) {
       this._isMeasuring = true;
       var width = this._getWidthOfCharsAt(ctx, lineIndex, this._textLines[lineIndex].length);
+      if (this.charSpacing !== 0) {
+        width -= this._getWidthOfCharSpacing();
+      }
       this._isMeasuring = false;
       return width;
     },

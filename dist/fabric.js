@@ -20738,7 +20738,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         left -= offsetX;
         top -= offsetY;
       }
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         chars = chars.split('');
         for (var i = 0, len = chars.length; i < len; i++) {
           char = chars[i];
@@ -20799,9 +20799,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _getWidthOfWords: function (ctx, word) {
       var width = ctx.measureText(word).width, charCount, additionalSpace;
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         charCount = word.split('').length;
-        additionalSpace = charCount * this.fontSize * this.charSpacing / 1000;
+        additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
       return width;
@@ -21048,6 +21048,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       return width;
     },
 
+    _getWidthOfCharSpacing: function() {
+      if (this.charSpacing !== 0) {
+        return this.fontSize * this.charSpacing / 1000;
+      }
+      return 0;
+    },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -21057,9 +21064,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _measureLine: function(ctx, lineIndex) {
       var width = ctx.measureText(this._textLines[lineIndex]).width,
           additionalSpace = 0, charCount;
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         charCount = line.split('').length;
-        additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1000;
+        additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
       return width;
     },
@@ -22157,7 +22164,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           char = chars[j];
           shouldFill && ctx.fillText(char, left + charWidth, top);
           shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          charWidth += ctx.measureText(char).width + this.fontSize * this.charSpacing / 1000;
+          charWidth += ctx.measureText(char).width + this._getWidthOfCharSpacing();
         }
       }
       else {
@@ -22460,7 +22467,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       ctx.save();
       var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
       if (this.charSpacing !== 0) {
-        width += this.charSpacing * this.fontSize / 1000;
+        width += this._getWidthOfCharSpacing();
       }
       ctx.restore();
       return width;
@@ -22499,6 +22506,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _measureLine: function(ctx, lineIndex) {
       this._isMeasuring = true;
       var width = this._getWidthOfCharsAt(ctx, lineIndex, this._textLines[lineIndex].length);
+      if (this.charSpacing !== 0) {
+        width -= this._getWidthOfCharSpacing();
+      }
       this._isMeasuring = false;
       return width;
     },

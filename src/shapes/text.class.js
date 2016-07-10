@@ -477,7 +477,7 @@
         left -= offsetX;
         top -= offsetY;
       }
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         chars = chars.split('');
         for (var i = 0, len = chars.length; i < len; i++) {
           char = chars[i];
@@ -538,9 +538,9 @@
      */
     _getWidthOfWords: function (ctx, word) {
       var width = ctx.measureText(word).width, charCount, additionalSpace;
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         charCount = word.split('').length;
-        additionalSpace = charCount * this.fontSize * this.charSpacing / 1000;
+        additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
       return width;
@@ -787,6 +787,13 @@
       return width;
     },
 
+    _getWidthOfCharSpacing: function() {
+      if (this.charSpacing !== 0) {
+        return this.fontSize * this.charSpacing / 1000;
+      }
+      return 0;
+    },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -796,9 +803,9 @@
     _measureLine: function(ctx, lineIndex) {
       var width = ctx.measureText(this._textLines[lineIndex]).width,
           additionalSpace = 0, charCount;
-      if (this.charSpacing > 0) {
+      if (this.charSpacing !== 0) {
         charCount = line.split('').length;
-        additionalSpace = (charCount - 1) * this.fontSize * this.charSpacing / 1000;
+        additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
       return width;
     },
