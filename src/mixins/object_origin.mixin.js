@@ -27,27 +27,35 @@
       var x = point.x,
           y = point.y,
 
-      if (typeof(fromOriginX) === 'string')
+      if (typeof(fromOriginX) === 'string') {
         fromOriginX = originXOffset[fromOriginX];
-      else
+      }
+      else {
         fromOriginX -= 0.5;
+      }
 
-      if (typeof(toOriginX) === 'string')
+      if (typeof(toOriginX) === 'string') {
         toOriginX = originXOffset[toOriginX];
-      else
+      }
+      else {
         toOriginX -= 0.5;
+      }
 
       offsetX = toOriginX - fromOriginX;
 
-      if (typeof(fromOriginY) === 'string')
+      if (typeof(fromOriginY) === 'string') {
         fromOriginY = originYOffset[fromOriginY];
-      else
+      }
+      else {
         fromOriginY -= 0.5;
+      }
 
-      if (typeof(toOriginY) === 'string')
+      if (typeof(toOriginY) === 'string') {
         toOriginY = originYOffset[toOriginY];
-      else
+      }
+      else {
         toOriginY -= 0.5;
+      }
 
       offsetY = toOriginY - fromOriginY;
 
@@ -179,8 +187,8 @@
 
       //TODO: this function does not consider mixed situation like top, center.
       if (typeof(this.originX) === 'number') {
-        this.left += xFull * (originXOffset[to] - (this.originX - 0.5))
-        this.top += yFull * (originXOffset[to] - (this.originX - 0.5))
+        this.left += xFull * (originXOffset[to] - (this.originX - 0.5));
+        this.top += yFull * (originXOffset[to] - (this.originX - 0.5));
       }
       else {
         this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
