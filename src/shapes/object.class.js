@@ -946,12 +946,14 @@
      * @return {Self} thisArg
      */
     bubbleThroughGroups: function(callback, context) {
-      var parentGroup = this.group,
-          child = this;
+      var child = this,
+          isPartOfActiveGroup = !!this.__group,
+          parentGroup = this.__group || this.group;
       while (parentGroup) {
-        callback.call(context, parentGroup, child);
+        callback.call(context, parentGroup, child, isPartOfActiveGroup);
         child = parentGroup;
-        parentGroup = parentGroup.group;
+        isPartOfActiveGroup = !!parentGroup.__group;
+        parentGroup = parentGroup.__group || parentGroup.group;
       }
       return this;
     },
