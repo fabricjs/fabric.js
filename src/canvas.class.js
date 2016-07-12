@@ -1047,15 +1047,13 @@
 
     /**
      * Returns pointer coordinates relative to canvas.
-     * @param {Event} e
+     * @param {Event} e mouse event
+     * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e, ignoreZoom, upperCanvasEl) {
-      if (!upperCanvasEl) {
-        upperCanvasEl = this.upperCanvasEl;
-      }
-      var pointer = getPointer(e),
-          bounds = upperCanvasEl.getBoundingClientRect(),
+    getPointer: function (e, ignoreZoom) {
+      var pointer = getPointer(e, this.upperCanvasEl),
+          bounds = this.upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
           cssScale;
@@ -1086,8 +1084,8 @@
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          width: this.upperCanvasEl.width / boundsWidth,
+          height: this.upperCanvasEl.height / boundsHeight
         };
       }
 
