@@ -453,11 +453,11 @@
       return object;
     },
 
-    forEachObject: function(callback, context) {
+    forEachObject: function(callback, context, dontSkipActiveGrouped) {
       var objects = this.getObjects(),
           i = objects.length;
       while (i--) {
-        if (objects[i].__group === this) {
+        if (!dontSkipActiveGrouped && objects[i].__group === this) {
           continue;
         }
         callback.call(context, objects[i], i, objects);

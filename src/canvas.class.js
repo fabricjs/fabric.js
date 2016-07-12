@@ -1341,9 +1341,11 @@
 
         g.destroy();
 
-        for (var i = 0, object, index; i < toRegroup.length; i++) {
+        for (var i = 0, object, group; i < toRegroup.length; i++) {
           object = toRegroup[i];
-          object.__group.unpluckWithUpdate(object);
+          group = object.__group;
+          group.unpluckWithUpdate(object);
+          group.setCoords();
         }
       }
       this.setActiveGroup(null);
