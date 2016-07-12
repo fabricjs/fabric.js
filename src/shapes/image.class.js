@@ -224,7 +224,7 @@
       });
 
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: element ? element.src || element._src : '',
+        src: element ? element.src || element._src : this.src || '',
         filters: filters,
         resizeFilters: resizeFilters,
         crossOrigin: this.crossOrigin,
@@ -299,6 +299,9 @@
     getSrc: function() {
       if (this.getElement()) {
         return this.getElement().src || this.getElement()._src;
+      }
+      else {
+        return this.src;
       }
     },
 
