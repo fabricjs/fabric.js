@@ -646,7 +646,7 @@
       else if (!this._currentTransform) {
         target = this.findTarget(e);
 
-        if (this.targets.length) {
+        if (this.targets && this.targets.length) {
           for (var i = this.targets.length - 1; i >= 0; i--) {
             this._setCursorFromEvent(e, this.targets[i]);
           }
