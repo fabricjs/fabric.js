@@ -106,6 +106,9 @@
      */
     _updateObjectsCoords: function() {
       for (var i = this._objects.length; i--; ){
+        if (this._objects[i].__group === this) {
+          continue;
+        }
         this._updateObjectCoords(this._objects[i]);
       }
     },
@@ -235,6 +238,13 @@
       return this;
     },
 
+    unpluckWithUpdate: function(object) {
+      var index = this._objects.indexOf(object);
+      delete object.__group;
+      this.insertWithUpdate(object, index, true);
+      return this;
+    },
+
     /**
      * @private
      */
@@ -272,6 +282,9 @@
      */
     _setupStateOnObjects: function() {
       for (var i = 0; i < this._objects.length; i++) {
+        if (this._objects[i].__group === this) {
+          continue;
+        }
         this._setupStateOnObject(this._objects[i]);
       }
     },
@@ -413,7 +426,7 @@
      * @chainable
      */
     _restoreObjectsState: function() {
-      this._objects.forEach(this._restoreObjectState, this);
+      this.forEachObject(this._restoreObjectState, this);
       return this;
     },
 
@@ -438,6 +451,18 @@
       object.flipY = false;
       object.setPositionByOrigin(center, 'center', 'center');
       return object;
+    },
+
+    forEachObject: function(callback, context) {
+      var objects = this.getObjects(),
+          i = objects.length;
+      while (i--) {
+        if (objects[i].__group === this) {
+          continue;
+        }
+        callback.call(context, objects[i], i, objects);
+      }
+      return this;
     },
 
     /**
@@ -517,6 +542,9 @@
           j, jLen = props.length;
 
       for ( ; i < iLen; ++i) {
+        if (this._objects[i].__group === this) {
+          continue;
+        }
         o = this._objects[i];
         o.setCoords();
         for (j = 0; j < jLen; j++) {

@@ -47,6 +47,8 @@
         for (var i = 0; i < this._activeGroup._objects.length; i++) {
           this._activeGroup._objects[i].set('active', false);
         }
+
+        this._activeGroup.setCoords();
       }
     },
 
@@ -60,6 +62,11 @@
 
         activeGroup.removeWithUpdate(target);
         target.set('active', false);
+
+        if (target.__group) {
+          target.__group.unpluckWithUpdate(target);
+          // this._refreshActiveGroup();
+        }
 
         if (activeGroup.size() === 1) {
           // remove group alltogether if after removal it only contains 1 object
