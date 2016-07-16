@@ -350,16 +350,12 @@
     isTargetTransparent: function (target, x, y) {
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners,
-          ctx = this.contextCache,
-          shouldTransform = target.group && target.group === this.getActiveGroup();
+          ctx = this.contextCache;
 
       target.hasBorders = target.transparentCorners = false;
 
       ctx.save();
       ctx.transform.apply(ctx, this.viewportTransform);
-      if (shouldTransform) {
-        ctx.transform.apply(ctx, target.group.calcTransformMatrix());
-      }
       target.render(ctx);
       ctx.restore();
 

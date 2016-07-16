@@ -153,7 +153,8 @@
     nodeCanvasOptions = nodeCanvasOptions || options;
 
     var canvasEl = fabric.document.createElement('canvas'),
-        nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
+        nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions),
+        nodeCacheCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
 
     // jsdom doesn't create style on canvas element, so here be temp. workaround
     canvasEl.style = { };
@@ -166,6 +167,8 @@
 
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
+    fabricCanvas.contextCache = nodeCacheCanvas.getContext('2d');
+    fabricCanvas.nodeCacheCanvas = nodeCacheCanvas;
     fabricCanvas.Font = Canvas.Font;
 
     return fabricCanvas;
