@@ -61,7 +61,7 @@
   }
 
   function makeTriangle(options) {
-    var defaultOptions = { width: 10, height: 10 };
+    var defaultOptions = { width: 30, height: 30 };
     return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
@@ -225,11 +225,11 @@
     canvas.add(rect);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     equal(target, rect, 'Should return the rect');
     target = canvas.findTarget({
       clientX: 30, clientY: 30
-    }, true);
+    });
     equal(target, null, 'Should not find target');
     canvas.remove(rect);
   });
@@ -240,7 +240,7 @@
     canvas.add(rect);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     canvas.setActiveObject(target);
     equal(target, rect, 'Should return the rect');
     canvas.renderAll();
@@ -248,13 +248,13 @@
     canvas.remove(rect);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     equal(target, null, 'Should not find target');
     equal(canvas.lastRenderedWithControls, undefined, 'lastRendereWithControls reference should disappear');
   });
 
   test('findTarget with subTargetCheck', function() {
-    var rect = makeRect({ left: 0, top: 0 }), 
+    var rect = makeRect({ left: 0, top: 0 }),
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
 
@@ -266,22 +266,22 @@
     equal(canvas.targets[0], undefined, 'no subtarget should return');
     target = canvas.findTarget({
       clientX: 30, clientY: 30
-    }, true);
+    });
     equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     equal(target, group, 'Should return the group');
     equal(canvas.targets[0], rect, 'should return the rect');
     target = canvas.findTarget({
       clientX: 15, clientY: 15
-    }, true);
+    });
     equal(target, group, 'Should return the group');
     equal(canvas.targets[0], undefined, 'no subtarget should return');
     target = canvas.findTarget({
       clientX: 32, clientY: 32
-    }, true);
+    });
     equal(target, group, 'Should return the group');
     equal(canvas.targets[0], rect2, 'should return the rect2');
     canvas.remove(group);
@@ -292,18 +292,18 @@
     var triangle = makeTriangle({ left: 0, top: 0 }), target;
     canvas.add(triangle);
     target = canvas.findTarget({
-      clientX: 2, clientY: 1
-    }, true);
+      clientX: 5, clientY: 5
+    });
     equal(target, triangle, 'Should return the triangle by bounding box');
     //TODO find out why this stops the tests
-    //canvas.perPixelTargetFind = true;
-    //target = canvas.findTarget({
-    //  clientX: 2, clientY: 1
-    //}, true);
-    //equal(target, null, 'Should return null because of transparency checks');
+    canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
+    equal(target, null, 'Should return null because of transparency checks');
+    target = canvas.findTarget({
+      clientX: 15, clientY: 15
+    });
     equal(target, triangle, 'Should return the triangle now');
     canvas.perPixelTargetFind = false;
     canvas.remove(triangle);
@@ -311,17 +311,53 @@
 
   test('findTarget on activegroup', function() {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
-    var rect2 = makeRect({ left: 20, top: 0 });
+    var rect2 = makeRect({ left: 20, top: 20 });
+    var rect3 = makeRect({ left: 20, top: 0 });
     canvas.add(rect1);
     canvas.add(rect2);
+    canvas.add(rect3);
     var group = new fabric.Group([ rect1, rect2 ]);
-    canvas.add(group);
     canvas.setActiveGroup(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     equal(target, group, 'Should return the activegroup');
-    //TODO: make it work with perPixelTargetFind
+    target = canvas.findTarget({
+      clientX: 40, clientY: 15
+    });
+    equal(target, null, 'Should miss the activegroup');
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    }, true);
+    equal(target, rect1, 'Should return the rect inside activegroup');
+    target = canvas.findTarget({
+      clientX: 25, clientY: 5
+    });
+    equal(target, group, 'Should return the activegroup');
+    target = canvas.findTarget({
+      clientX: 25, clientY: 5
+    }, true);
+    equal(target, rect3, 'Should return the rect behind activegroup');
+  });
+
+  test('findTarget on activegroup with perPixelTargetFind', function() {
+    var rect1 = makeRect({ left: 0, top: 0 }), target;
+    var rect2 = makeRect({ left: 20, top: 20 });
+    canvas.perPixelTargetFind = true;
+    canvas.add(rect1);
+    canvas.add(rect2);
+    var group = new fabric.Group([ rect1, rect2 ]);
+    canvas.setActiveGroup(group);
+    target = canvas.findTarget({
+      clientX: 10, clientY: 10
+    });
+    equal(target, group, 'Should return the activegroup');
+
+    target = canvas.findTarget({
+      clientX: 15, clientY: 15
+    });
+    equal(target, null, 'Should miss the activegroup');
+    canvas.perPixelTargetFind = false;
   });
 
   test('activeGroup sendToBack', function() {
@@ -343,7 +379,7 @@
     equal(canvas._objects[2], rect1, 'rect1 should be the third object');
     equal(canvas._objects[3], rect2, 'rect2 should be on top now');
   });
-  
+
   test('activeGroup bringToFront', function() {
 
     var rect1 = makeRect(),
@@ -656,7 +692,7 @@
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-      
+
     });
   });
 
@@ -675,7 +711,7 @@
       ok(fired, 'Callback should be fired even if no "objects" property exists');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-      
+
     });
   });
 
@@ -1057,7 +1093,7 @@
     equal(aGroup._objects[2], circle1);
     equal(aGroup._objects[3], circle2);
   });
-  
+
   test('dispose', function() {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
@@ -1100,7 +1136,7 @@
     equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
   });
-  
+
   // test('dispose', function() {
   //   function invokeEventsOnCanvas() {
   //     // nextSibling because we need to invoke events on upper canvas

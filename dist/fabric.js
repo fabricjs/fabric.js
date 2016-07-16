@@ -8676,16 +8676,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     isTargetTransparent: function (target, x, y) {
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners,
-          ctx = this.contextCache,
-          shouldTransform = target.group && target.group === this.getActiveGroup();
+          ctx = this.contextCache;
 
       target.hasBorders = target.transparentCorners = false;
 
       ctx.save();
       ctx.transform.apply(ctx, this.viewportTransform);
-      if (shouldTransform) {
-        ctx.transform.apply(ctx, target.group.calcTransformMatrix());
-      }
       target.render(ctx);
       ctx.restore();
 
@@ -25292,7 +25288,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     nodeCanvasOptions = nodeCanvasOptions || options;
 
     var canvasEl = fabric.document.createElement('canvas'),
-        nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
+        nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions),
+        nodeCacheCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
 
     // jsdom doesn't create style on canvas element, so here be temp. workaround
     canvasEl.style = { };
@@ -25305,6 +25302,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
+    fabricCanvas.contextCache = nodeCacheCanvas.getContext('2d');
+    fabricCanvas.nodeCacheCanvas = nodeCacheCanvas;
     fabricCanvas.Font = Canvas.Font;
 
     return fabricCanvas;

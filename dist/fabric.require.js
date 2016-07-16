@@ -4287,13 +4287,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             };
         },
         isTargetTransparent: function(target, x, y) {
-            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache, shouldTransform = target.group && target.group === this.getActiveGroup();
+            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache;
             target.hasBorders = target.transparentCorners = false;
             ctx.save();
             ctx.transform.apply(ctx, this.viewportTransform);
-            if (shouldTransform) {
-                ctx.transform.apply(ctx, target.group.calcTransformMatrix());
-            }
             target.render(ctx);
             ctx.restore();
             target.active && target._renderControls(ctx);
@@ -12116,13 +12113,15 @@ fabric.util.object.extend(fabric.IText.prototype, {
     };
     fabric.createCanvasForNode = function(width, height, options, nodeCanvasOptions) {
         nodeCanvasOptions = nodeCanvasOptions || options;
-        var canvasEl = fabric.document.createElement("canvas"), nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
+        var canvasEl = fabric.document.createElement("canvas"), nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions), nodeCacheCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
         canvasEl.style = {};
         canvasEl.width = nodeCanvas.width;
         canvasEl.height = nodeCanvas.height;
         var FabricCanvas = fabric.Canvas || fabric.StaticCanvas, fabricCanvas = new FabricCanvas(canvasEl, options);
         fabricCanvas.contextContainer = nodeCanvas.getContext("2d");
         fabricCanvas.nodeCanvas = nodeCanvas;
+        fabricCanvas.contextCache = nodeCacheCanvas.getContext("2d");
+        fabricCanvas.nodeCacheCanvas = nodeCacheCanvas;
         fabricCanvas.Font = Canvas.Font;
         return fabricCanvas;
     };
