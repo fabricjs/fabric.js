@@ -4287,8 +4287,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             };
         },
         isTargetTransparent: function(target, x, y) {
-            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache;
+            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache, originalColor = target.selectionBackgroundColor;
             target.hasBorders = target.transparentCorners = false;
+            target.selectionBackgroundColor = "";
             ctx.save();
             ctx.transform.apply(ctx, this.viewportTransform);
             target.render(ctx);
@@ -4296,6 +4297,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             target.active && target._renderControls(ctx);
             target.hasBorders = hasBorders;
             target.transparentCorners = transparentCorners;
+            target.selectionBackgroundColor = originalColor;
             var isTransparent = fabric.util.isTransparent(ctx, x, y, this.targetFindTolerance);
             this.clearContext(ctx);
             return isTransparent;
@@ -4615,7 +4617,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _isLastRenderedObject: function(pointer, e) {
             var lastRendered = this.lastRenderedWithControls;
-            return (this.preserveObjectStacking || e[this.lastRenderedKey]) && lastRendered && lastRendered.visible && (this.containsPoint(null, lastRendered, pointer) || lastRendered._findTargetCorner(pointer));
+            return (!this.preserveObjectStacking || e[this.lastRenderedKey]) && lastRendered && lastRendered.visible && (this.containsPoint(null, lastRendered, pointer) || lastRendered._findTargetCorner(pointer));
         },
         findTarget: function(e, skipGroup) {
             if (this.skipTargetFind) {
