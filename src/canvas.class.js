@@ -102,15 +102,6 @@
     altActionKey:           'shiftKey',
 
     /**
-     * Indicates which key enable last rendered selection independently of stack position
-     * values: altKey, shiftKey, ctrlKey
-     * @since 1.6.3
-     * @type String
-     * @default
-     */
-    lastRenderedKey:        'altKey',
-
-    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -935,19 +926,6 @@
     },
 
     /**
-     * @private
-     */
-    _isLastRenderedObject: function(pointer, e) {
-      var lastRendered = this.lastRenderedWithControls;
-      return (
-        (!this.preserveObjectStacking || e[this.lastRenderedKey]) &&
-        lastRendered &&
-        lastRendered.visible &&
-        (this.containsPoint(null, lastRendered, pointer) ||
-        lastRendered._findTargetCorner(pointer)));
-    },
-
-    /**
      * Method that determines what object we are clicking on
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
@@ -958,7 +936,8 @@
       }
 
       var pointer = this.getPointer(e, true),
-      activeGroup = this.getActiveGroup();
+      activeGroup = this.getActiveGroup(),
+      activeObject = this.getActiveObject();
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -967,14 +946,13 @@
         return activeGroup;
       }
 
-      var objects = this._objects;
-      this.targets = [ ];
-
-      if (this._isLastRenderedObject(pointer, e)) {
-        objects = [this.lastRenderedWithControls];
+      if (activeObject && this._checkTarget(pointer, activeObject)) {
+        return activeObject;
       }
 
-      var target = this._searchPossibleTargets(objects, pointer);
+      this.targets = [ ];
+
+      var target = this._searchPossibleTargets(this._objects, pointer);
       this._fireOverOutEvents(target, e);
       return target;
     },
@@ -1371,7 +1349,6 @@
           continue;
         }
         this._objects[i]._renderControls(ctx);
-        this.lastRenderedWithControls = this._objects[i];
       }
     },
 
@@ -1380,9 +1357,6 @@
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
-      if (obj === this.lastRenderedWithControls) {
-        delete this.lastRenderedWithControls;
-      }
       this.callSuper('_onObjectRemoved', obj);
     },
 
@@ -1392,7 +1366,6 @@
      * @chainable
      */
     clear: function () {
-      delete this.lastRenderedWithControls;
       return this.callSuper('clear');
     }
   });

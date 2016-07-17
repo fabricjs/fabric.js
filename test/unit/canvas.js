@@ -234,26 +234,7 @@
     canvas.remove(rect);
   });
 
-  test('findTarget last rendered', function() {
-    ok(typeof canvas.findTarget == 'function');
-    var rect = makeRect({ left: 0, top: 0 }), target;
-    canvas.add(rect);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5
-    });
-    canvas.setActiveObject(target);
-    equal(target, rect, 'Should return the rect');
-    canvas.renderAll();
-    equal(canvas.lastRenderedWithControls, rect);
-    canvas.remove(rect);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5
-    });
-    equal(target, null, 'Should not find target');
-    equal(canvas.lastRenderedWithControls, undefined, 'lastRendereWithControls reference should disappear');
-  });
-
-  test('findTarget last rendered preserveObjectStacking false', function() {
+  test('findTarget preserveObjectStacking false', function() {
     ok(typeof canvas.findTarget == 'function');
     canvas.preserveObjectStacking = false;
     var rect = makeRect({ left: 0, top: 0 }),
@@ -265,13 +246,10 @@
     canvas.setActiveObject(rect);
     canvas.renderAll();
     target = canvas.findTarget(pointer);
-    var isLast = canvas._isLastRenderedObject(pointer, { });
-    equal(canvas.lastRenderedWithControls, rect, 'lastRenderedWithControls is rect');
     equal(target, rect, 'Should return the rect');
-    equal(isLast, true, 'Is last rendered object returns true');
   });
 
-  test('findTarget last rendered preserveObjectStacking true', function() {
+  test('findTarget preserveObjectStacking true', function() {
     ok(typeof canvas.findTarget == 'function');
     canvas.preserveObjectStacking = true;
     var rect = makeRect({ left: 0, top: 0 }),
@@ -280,12 +258,12 @@
         pointer = { clientX: 5, clientY: 5 };
     canvas.add(rect);
     canvas.add(rectOver);
+    target = canvas.findTarget(pointer);
+    equal(target, rectOver, 'Should return the rectOver, rect is not considered');
     canvas.setActiveObject(rect);
     target = canvas.findTarget(pointer);
-    var isLast = canvas._isLastRenderedObject(pointer, { });
-    equal(canvas.lastRenderedWithControls, rect, 'lastRenderedWithControls is rect');
-    equal(target, rectOver, 'Should return the rectOver, rect is not considered');
-    equal(isLast, undefined, 'Is last rendered object returns false');
+    equal(target, rect, 'Should return the rect, because it is active');
+    canvas.preserveObjectStacking = false;
   });
 
   test('findTarget with subTargetCheck', function() {
