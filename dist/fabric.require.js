@@ -2877,7 +2877,12 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     });
     fabric.util.object.extend(fabric.Gradient, {
         fromElement: function(el, instance) {
-            var colorStopEls = el.getElementsByTagName("stop"), type = el.nodeName === "linearGradient" ? "linear" : "radial", gradientUnits = el.getAttribute("gradientUnits") || "objectBoundingBox", gradientTransform = el.getAttribute("gradientTransform"), colorStops = [], coords = {}, ellipseMatrix;
+            var colorStopEls = el.getElementsByTagName("stop"), type, gradientUnits = el.getAttribute("gradientUnits") || "objectBoundingBox", gradientTransform = el.getAttribute("gradientTransform"), colorStops = [], coords, ellipseMatrix;
+            if (el.nodeName === "linearGradient" || el.nodeName === "LINEARGRADIENT") {
+                type = "linear";
+            } else {
+                type = "radial";
+            }
             if (type === "linear") {
                 coords = getLinearCoords(el);
             } else if (type === "radial") {
@@ -2908,6 +2913,11 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     function _convertPercentUnitsToValues(object, options, gradientUnits) {
         var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = "";
         for (var prop in options) {
+            if (options[prop] === "Infinity") {
+                options[prop] = 1;
+            } else if (options[prop] === "-Infinity") {
+                options[prop] = 0;
+            }
             propValue = parseFloat(options[prop], 10);
             if (typeof options[prop] === "string" && /^\d+%$/.test(options[prop])) {
                 multFactor = .01;
@@ -4174,9 +4184,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         this.canvas.contextTop.strokeStyle = this.getPattern();
     },
     createPath: function(pathData) {
-        var path = this.callSuper("createPath", pathData);
+        var path = this.callSuper("createPath", pathData), topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
         path.stroke = new fabric.Pattern({
-            source: this.source || this.getPatternSrcFunction()
+            source: this.source || this.getPatternSrcFunction(),
+            offsetX: -topLeft.x,
+            offsetY: -topLeft.y
         });
         return path;
     }
