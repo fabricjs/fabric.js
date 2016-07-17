@@ -255,8 +255,8 @@
     equal(gradient.coords.y1, 20);
     equal(gradient.coords.x2, 40);
     equal(gradient.coords.y2, 200);
-    var object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
-    var gradient = fabric.Gradient.fromElement(element, object);
+    object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
+    gradient = fabric.Gradient.fromElement(element, object);
     equal(gradient.coords.x1, 70);
     equal(gradient.coords.y1, 70);
     equal(gradient.coords.x2, 50);
@@ -283,8 +283,8 @@
     equal(gradient.coords.r1, 0, 'should change with width height');
     equal(gradient.coords.r2, 200, 'should change with width height');
 
-    var object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
-    var gradient = fabric.Gradient.fromElement(element, object);
+    object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
+    gradient = fabric.Gradient.fromElement(element, object);
     equal(gradient.coords.x1, 70, 'should change with top left');
     equal(gradient.coords.y1, 50, 'should change with top left');
     equal(gradient.coords.x2, 30, 'should change with top left');
@@ -314,8 +314,8 @@
     equal(gradient.coords.r1, 0, 'should not change with width height');
     equal(gradient.coords.r2, 100, 'should not change with width height');
 
-    var object = new fabric.Object({ width: 200, height: 200, top: 50, left: 60 });
-    var gradient = fabric.Gradient.fromElement(element, object);
+    object = new fabric.Object({ width: 200, height: 200, top: 50, left: 60 });
+    gradient = fabric.Gradient.fromElement(element, object);
     equal(gradient.coords.x1, 30, 'should not change with top left');
     equal(gradient.coords.y1, 20, 'should not change with top left');
     equal(gradient.coords.x2, 15, 'should not change with top left');
@@ -342,8 +342,8 @@
     equal(gradient.coords.x2, 15, 'should not change with width height');
     equal(gradient.coords.y2, 18, 'should not change with width height');
 
-    var object = new fabric.Object({ width: 200, height: 200, top: 40, left: 40 });
-    var gradient = fabric.Gradient.fromElement(element, object);
+    object = new fabric.Object({ width: 200, height: 200, top: 40, left: 40 });
+    gradient = fabric.Gradient.fromElement(element, object);
     equal(gradient.coords.x1, 30, 'should not change with top left');
     equal(gradient.coords.y1, 20, 'should not change with top left');
     equal(gradient.coords.x2, 15, 'should not change with top left');
