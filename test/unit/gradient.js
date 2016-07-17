@@ -160,13 +160,50 @@
 
     ok(gradient instanceof fabric.Gradient);
 
-    // TODO: need to double check these values
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x2, 100);
+    equal(gradient.coords.y2, 0);
 
-    equal(gradient.coords.x1, 50);
-    equal(gradient.coords.y1, 50);
+    equal(gradient.colorStops[0].offset, 1);
+    equal(gradient.colorStops[1].offset, 0);
 
-    //equal(gradient.coords.x2, 100);
-    //equal(gradient.coords.y2, 100);
+    equal(gradient.colorStops[0].color, 'rgb(0,0,0)');
+    equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
+
+    equal(gradient.colorStops[0].opacity, 0);
+  });
+
+  test('fromElement linearGradient with Infinity', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('linearGradient');
+    var stop1 = fabric.document.createElement('stop');
+    var stop2 = fabric.document.createElement('stop');
+
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', 'white');
+
+    stop2.setAttribute('offset', '100%');
+    stop2.setAttribute('stop-color', 'black');
+    stop2.setAttribute('stop-opacity', '0');
+
+    element.setAttribute('x1', '-Infinity');
+    element.setAttribute('x2', 'Infinity');
+    element.setAttribute('y1', 'Infinity');
+    element.setAttribute('y2', '-Infinity');
+    element.appendChild(stop1);
+    element.appendChild(stop2);
+
+    var object = new fabric.Object({ width: 100, height: 100, top: 0, left: 0 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+
+    ok(gradient instanceof fabric.Gradient);
+
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 100);
+    equal(gradient.coords.x2, 100);
+    equal(gradient.coords.y2, 0);
 
     equal(gradient.colorStops[0].offset, 1);
     equal(gradient.colorStops[1].offset, 0);
@@ -202,6 +239,117 @@
     equal(gradient.colorStops[1].offset, 0);
   });
 
+  test('fromElement with x1,x2,y1,2 linear', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('linearGradient');
+
+    element.setAttribute('x1', '30%');
+    element.setAttribute('x2', '20%');
+    element.setAttribute('y1', '0.1');
+    element.setAttribute('y2', 'Infinity');
+
+    var object = new fabric.Object({ width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 60);
+    equal(gradient.coords.y1, 20);
+    equal(gradient.coords.x2, 40);
+    equal(gradient.coords.y2, 200);
+    object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
+    gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 70);
+    equal(gradient.coords.y1, 70);
+    equal(gradient.coords.x2, 50);
+    equal(gradient.coords.y2, 250);
+  });
+
+  test('fromElement with x1,x2,y1,2 radial', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('radialGradient');
+
+    element.setAttribute('fx', '30%');
+    element.setAttribute('fy', '20%');
+    element.setAttribute('cx', '0.1');
+    element.setAttribute('cy', '1');
+    element.setAttribute('r', '100%');
+
+    var object = new fabric.Object({ width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 60, 'should change with width height');
+    equal(gradient.coords.y1, 40, 'should change with width height');
+    equal(gradient.coords.x2, 20, 'should change with width height');
+    equal(gradient.coords.y2, 200, 'should change with width height');
+    equal(gradient.coords.r1, 0, 'should change with width height');
+    equal(gradient.coords.r2, 200, 'should change with width height');
+
+    object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
+    gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 70, 'should change with top left');
+    equal(gradient.coords.y1, 50, 'should change with top left');
+    equal(gradient.coords.x2, 30, 'should change with top left');
+    equal(gradient.coords.y2, 210, 'should change with top left');
+    equal(gradient.coords.r1, 10, 'should change with top left');
+    equal(gradient.coords.r2, 210, 'should change with top left');
+  });
+
+  test('fromElement with x1,x2,y1,2 radial userSpaceOnUse', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('radialGradient');
+
+    element.setAttribute('fx', '30');
+    element.setAttribute('fy', '20');
+    element.setAttribute('cx', '15');
+    element.setAttribute('cy', '18');
+    element.setAttribute('r', '100');
+    element.setAttribute('gradientUnits', 'userSpaceOnUse');
+
+    var object = new fabric.Object({ width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 30, 'should not change with width height');
+    equal(gradient.coords.y1, 20, 'should not change with width height');
+    equal(gradient.coords.x2, 15, 'should not change with width height');
+    equal(gradient.coords.y2, 18, 'should not change with width height');
+    equal(gradient.coords.r1, 0, 'should not change with width height');
+    equal(gradient.coords.r2, 100, 'should not change with width height');
+
+    object = new fabric.Object({ width: 200, height: 200, top: 50, left: 60 });
+    gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 30, 'should not change with top left');
+    equal(gradient.coords.y1, 20, 'should not change with top left');
+    equal(gradient.coords.x2, 15, 'should not change with top left');
+    equal(gradient.coords.y2, 18, 'should not change with top left');
+    equal(gradient.coords.r1, 0, 'should not change with top left');
+    equal(gradient.coords.r2, 100, 'should not change with top left');
+  });
+
+  test('fromElement with x1,x2,y1,2 linear userSpaceOnUse', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('linearGradient');
+
+    element.setAttribute('x1', '30');
+    element.setAttribute('y1', '20');
+    element.setAttribute('x2', '15');
+    element.setAttribute('y2', '18');
+    element.setAttribute('gradientUnits', 'userSpaceOnUse');
+
+    var object = new fabric.Object({ width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 30, 'should not change with width height');
+    equal(gradient.coords.y1, 20, 'should not change with width height');
+    equal(gradient.coords.x2, 15, 'should not change with width height');
+    equal(gradient.coords.y2, 18, 'should not change with width height');
+
+    object = new fabric.Object({ width: 200, height: 200, top: 40, left: 40 });
+    gradient = fabric.Gradient.fromElement(element, object);
+    equal(gradient.coords.x1, 30, 'should not change with top left');
+    equal(gradient.coords.y1, 20, 'should not change with top left');
+    equal(gradient.coords.x2, 15, 'should not change with top left');
+    equal(gradient.coords.y2, 18, 'should not change with top left');
+  });
+
   test('fromElement radialGradient', function() {
     ok(typeof fabric.Gradient.fromElement == 'function');
 
@@ -223,13 +371,10 @@
 
     ok(gradient instanceof fabric.Gradient);
 
-    // TODO: need to double check these values
-
     equal(gradient.coords.x1, 50);
     equal(gradient.coords.y1, 50);
-
-    //equal(gradient.coords.x2, 100);
-    //equal(gradient.coords.y2, 100);
+    equal(gradient.coords.x2, 50);
+    equal(gradient.coords.y2, 50);
 
     equal(gradient.colorStops[0].offset, 1);
     equal(gradient.colorStops[1].offset, 0);
@@ -259,13 +404,10 @@
 
     ok(gradient instanceof fabric.Gradient);
 
-    // TODO: need to double check these values
-
     equal(gradient.coords.x1, 50);
     equal(gradient.coords.y1, 50);
-
-    //equal(gradient.coords.x2, 100);
-    //equal(gradient.coords.y2, 100);
+    equal(gradient.coords.x2, 50);
+    equal(gradient.coords.y2, 50);
 
     equal(gradient.colorStops[0].offset, 1);
     equal(gradient.colorStops[1].offset, 0);
@@ -311,13 +453,10 @@
 
     ok(gradient instanceof fabric.Gradient);
 
-    // TODO: need to double check these values
-
-    equal(gradient.coords.x1, 50);
-    equal(gradient.coords.y1, 50);
-
-    //equal(gradient.coords.x2, 100);
-    //equal(gradient.coords.y2, 100);
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x2, 100);
+    equal(gradient.coords.y2, 0);
 
     equal(gradient.colorStops[0].offset, 1);
     equal(gradient.colorStops[1].offset, 0.75);
@@ -371,13 +510,10 @@
 
     ok(gradient instanceof fabric.Gradient);
 
-    // TODO: need to double check these values
-
     equal(gradient.coords.x1, 50);
     equal(gradient.coords.y1, 50);
-
-    //equal(gradient.coords.x2, 100);
-    //equal(gradient.coords.y2, 100);
+    equal(gradient.coords.x2, 50);
+    equal(gradient.coords.y2, 50);
 
     equal(gradient.colorStops[0].offset, 1);
     equal(gradient.colorStops[1].offset, 0.75);
@@ -395,7 +531,7 @@
     equal(gradient.colorStops[3].opacity, 1);
   });
 
-  test('forObject linearCradient', function() {
+  test('forObject linearGradient', function() {
     ok(typeof fabric.Gradient.forObject == 'function');
 
     var object = new fabric.Object({ width: 50, height: 50 });
