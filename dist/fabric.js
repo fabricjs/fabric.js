@@ -8428,15 +8428,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     altActionKey:           'shiftKey',
 
     /**
-     * Indicates which key enable last rendered selection independently of stack position
-     * values: altKey, shiftKey, ctrlKey
-     * @since 1.6.3
-     * @type String
-     * @default
-     */
-    lastRenderedKey:        'altKey',
-
-    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -8676,9 +8667,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     isTargetTransparent: function (target, x, y) {
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners,
-          ctx = this.contextCache;
+          ctx = this.contextCache,
+          originalColor = target.selectionBackgroundColor;
 
       target.hasBorders = target.transparentCorners = false;
+      target.selectionBackgroundColor = '';
 
       ctx.save();
       ctx.transform.apply(ctx, this.viewportTransform);
@@ -8689,6 +8682,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
+      target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
         ctx, x, y, this.targetFindTolerance);
@@ -9258,19 +9252,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * @private
-     */
-    _isLastRenderedObject: function(pointer, e) {
-      var lastRendered = this.lastRenderedWithControls;
-      return (
-        (this.preserveObjectStacking || e[this.lastRenderedKey]) &&
-        lastRendered &&
-        lastRendered.visible &&
-        (this.containsPoint(null, lastRendered, pointer) ||
-        lastRendered._findTargetCorner(pointer)));
-    },
-
-    /**
      * Method that determines what object we are clicking on
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
@@ -9281,7 +9262,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       var pointer = this.getPointer(e, true),
-      activeGroup = this.getActiveGroup();
+      activeGroup = this.getActiveGroup(),
+      activeObject = this.getActiveObject();
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -9290,14 +9272,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         return activeGroup;
       }
 
-      var objects = this._objects;
-      this.targets = [ ];
-
-      if (this._isLastRenderedObject(pointer, e)) {
-        objects = [this.lastRenderedWithControls];
+      if (activeObject && this._checkTarget(pointer, activeObject)) {
+        return activeObject;
       }
 
-      var target = this._searchPossibleTargets(objects, pointer);
+      this.targets = [ ];
+
+      var target = this._searchPossibleTargets(this._objects, pointer);
       this._fireOverOutEvents(target, e);
       return target;
     },
@@ -9694,7 +9675,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           continue;
         }
         this._objects[i]._renderControls(ctx);
-        this.lastRenderedWithControls = this._objects[i];
       }
     },
 
@@ -9703,9 +9683,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
-      if (obj === this.lastRenderedWithControls) {
-        delete this.lastRenderedWithControls;
-      }
       this.callSuper('_onObjectRemoved', obj);
     },
 
@@ -9715,7 +9692,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @chainable
      */
     clear: function () {
-      delete this.lastRenderedWithControls;
       return this.callSuper('clear');
     }
   });
@@ -11998,7 +11974,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+      if (this.group && !this.group._transformDone && this.group === this.canvas._activeGroup) {
         this.group.transform(ctx);
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -17534,14 +17510,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.transform(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
+      this._transformDone = true;
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);
       }
 
       this.clipTo && ctx.restore();
-
       ctx.restore();
+      this._transformDone = false;
     },
 
     /**

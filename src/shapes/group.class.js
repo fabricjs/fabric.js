@@ -276,14 +276,15 @@
       this.transform(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
+      this._transformDone = true;
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);
       }
 
       this.clipTo && ctx.restore();
-
       ctx.restore();
+      this._transformDone = false;
     },
 
     /**

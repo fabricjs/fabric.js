@@ -234,23 +234,36 @@
     canvas.remove(rect);
   });
 
-  test('findTarget last rendered', function() {
+  test('findTarget preserveObjectStacking false', function() {
     ok(typeof canvas.findTarget == 'function');
-    var rect = makeRect({ left: 0, top: 0 }), target;
+    canvas.preserveObjectStacking = false;
+    var rect = makeRect({ left: 0, top: 0 }),
+        rectOver = makeRect({ left: 0, top: 0 }),
+        target,
+        pointer = { clientX: 5, clientY: 5 };
     canvas.add(rect);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5
-    });
-    canvas.setActiveObject(target);
-    equal(target, rect, 'Should return the rect');
+    canvas.add(rectOver);
+    canvas.setActiveObject(rect);
     canvas.renderAll();
-    equal(canvas.lastRenderedWithControls, rect);
-    canvas.remove(rect);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5
-    });
-    equal(target, null, 'Should not find target');
-    equal(canvas.lastRenderedWithControls, undefined, 'lastRendereWithControls reference should disappear');
+    target = canvas.findTarget(pointer);
+    equal(target, rect, 'Should return the rect');
+  });
+
+  test('findTarget preserveObjectStacking true', function() {
+    ok(typeof canvas.findTarget == 'function');
+    canvas.preserveObjectStacking = true;
+    var rect = makeRect({ left: 0, top: 0 }),
+        rectOver = makeRect({ left: 0, top: 0 }),
+        target,
+        pointer = { clientX: 5, clientY: 5 };
+    canvas.add(rect);
+    canvas.add(rectOver);
+    target = canvas.findTarget(pointer);
+    equal(target, rectOver, 'Should return the rectOver, rect is not considered');
+    canvas.setActiveObject(rect);
+    target = canvas.findTarget(pointer);
+    equal(target, rect, 'Should return the rect, because it is active');
+    canvas.preserveObjectStacking = false;
   });
 
   test('findTarget with subTargetCheck', function() {
@@ -344,12 +357,13 @@
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
     canvas.perPixelTargetFind = true;
+    canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
     var group = new fabric.Group([ rect1, rect2 ]);
     canvas.setActiveGroup(group);
     target = canvas.findTarget({
-      clientX: 10, clientY: 10
+      clientX: 8, clientY: 8
     });
     equal(target, group, 'Should return the activegroup');
 
@@ -358,6 +372,7 @@
     });
     equal(target, null, 'Should miss the activegroup');
     canvas.perPixelTargetFind = false;
+    canvas.preserveObjectStacking = false;
   });
 
   test('activeGroup sendToBack', function() {

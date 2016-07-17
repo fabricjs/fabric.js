@@ -4197,7 +4197,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         centeredRotation: false,
         centeredKey: "altKey",
         altActionKey: "shiftKey",
-        lastRenderedKey: "altKey",
         interactive: true,
         selection: true,
         selectionKey: "shiftKey",
@@ -4287,8 +4286,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             };
         },
         isTargetTransparent: function(target, x, y) {
-            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache;
+            var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache, originalColor = target.selectionBackgroundColor;
             target.hasBorders = target.transparentCorners = false;
+            target.selectionBackgroundColor = "";
             ctx.save();
             ctx.transform.apply(ctx, this.viewportTransform);
             target.render(ctx);
@@ -4296,6 +4296,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             target.active && target._renderControls(ctx);
             target.hasBorders = hasBorders;
             target.transparentCorners = transparentCorners;
+            target.selectionBackgroundColor = originalColor;
             var isTransparent = fabric.util.isTransparent(ctx, x, y, this.targetFindTolerance);
             this.clearContext(ctx);
             return isTransparent;
@@ -4613,24 +4614,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 ctx.strokeRect(groupSelector.ex + STROKE_OFFSET - (left > 0 ? 0 : aleft), groupSelector.ey + STROKE_OFFSET - (top > 0 ? 0 : atop), aleft, atop);
             }
         },
-        _isLastRenderedObject: function(pointer, e) {
-            var lastRendered = this.lastRenderedWithControls;
-            return (this.preserveObjectStacking || e[this.lastRenderedKey]) && lastRendered && lastRendered.visible && (this.containsPoint(null, lastRendered, pointer) || lastRendered._findTargetCorner(pointer));
-        },
         findTarget: function(e, skipGroup) {
             if (this.skipTargetFind) {
                 return;
             }
-            var pointer = this.getPointer(e, true), activeGroup = this.getActiveGroup();
+            var pointer = this.getPointer(e, true), activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject();
             if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
                 return activeGroup;
             }
-            var objects = this._objects;
-            this.targets = [];
-            if (this._isLastRenderedObject(pointer, e)) {
-                objects = [ this.lastRenderedWithControls ];
+            if (activeObject && this._checkTarget(pointer, activeObject)) {
+                return activeObject;
             }
-            var target = this._searchPossibleTargets(objects, pointer);
+            this.targets = [];
+            var target = this._searchPossibleTargets(this._objects, pointer);
             this._fireOverOutEvents(target, e);
             return target;
         },
@@ -4894,17 +4890,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                     continue;
                 }
                 this._objects[i]._renderControls(ctx);
-                this.lastRenderedWithControls = this._objects[i];
             }
         },
         _onObjectRemoved: function(obj) {
-            if (obj === this.lastRenderedWithControls) {
-                delete this.lastRenderedWithControls;
-            }
             this.callSuper("_onObjectRemoved", obj);
         },
         clear: function() {
-            delete this.lastRenderedWithControls;
             return this.callSuper("clear");
         }
     });
@@ -5792,7 +5783,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this._initClipping(options);
         },
         transform: function(ctx, fromLeft) {
-            if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+            if (this.group && !this.group._transformDone && this.group === this.canvas._activeGroup) {
                 this.group.transform(ctx);
             }
             var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -8378,11 +8369,13 @@ fabric.util.object.extend(fabric.Object.prototype, {
             this.transform(ctx);
             this._setShadow(ctx);
             this.clipTo && fabric.util.clipContext(this, ctx);
+            this._transformDone = true;
             for (var i = 0, len = this._objects.length; i < len; i++) {
                 this._renderObject(this._objects[i], ctx);
             }
             this.clipTo && ctx.restore();
             ctx.restore();
+            this._transformDone = false;
         },
         _renderControls: function(ctx, noTransform) {
             this.callSuper("_renderControls", ctx, noTransform);
