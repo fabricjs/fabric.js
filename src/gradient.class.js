@@ -332,11 +332,18 @@
        */
 
       var colorStopEls = el.getElementsByTagName('stop'),
-          type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
+          type,
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
           gradientTransform = el.getAttribute('gradientTransform'),
           colorStops = [],
-          coords = { }, ellipseMatrix;
+          coords, ellipseMatrix;
+
+      if (el.nodeName === 'linearGradient' || el.nodeName === 'LINEARGRADIENT') {
+        type = 'linear';
+      }
+      else {
+        type = 'radial';
+      }
 
       if (type === 'linear') {
         coords = getLinearCoords(el);
