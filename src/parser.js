@@ -931,7 +931,6 @@
         }
         rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
         rules = rules.map(function(rule) { return rule.trim(); });
-
         rules.forEach(function(rule) {
 
           var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
@@ -950,7 +949,12 @@
             if (_rule === '') {
               return;
             }
-            allRules[_rule] = fabric.util.object.clone(ruleObj);
+            if (allRules[_rule]) {
+              fabric.util.object.extend(allRules[_rule], ruleObj);
+            }
+            else {
+              allRules[_rule] = fabric.util.object.clone(ruleObj);
+            }
           });
         });
       }
