@@ -236,11 +236,35 @@
       };
 
       /** @ignore */
-      img.onerror = function() {
-        fabric.log('Error loading ' + img.src);
-        callback && callback.call(context, null, true);
-        img = img.onload = img.onerror = null;
-      };
+      // Copypasta from loadImageRetry/index.module.js - will retry loading
+      // the image a few times before bailing
+      img.onerror = function(event) {
+        const imgEl = this;
+
+        // If we haven't initialised the load attempt counter, then this call
+        // is in response to the first failure.
+        //
+        // Don't use `HTMLElement.dataset`; IE versions < 11 don't support it.
+        //
+        // REVISIT: send to some kind of local failure stats to be batched up and
+        // eventually sent to Rollbar?
+        const loadAttemptsAttr = imgEl.getAttribute('data-load-attempts');
+        const loadAttempts = loadAttemptsAttr && parseInt(loadAttemptsAttr, 10) || 1;
+        const getImageElementSource = require('imageLoadRetry/libs/getImageElementSource');
+        const imgSrc = getImageElementSource(imgEl);
+        if (loadAttempts === 3) {
+          // Ok, the image probably isn't going to load;
+          // Put the original fabric failure case code in here.
+          fabric.log('Error loading ' + img.src);
+          callback && callback.call(context, null, true);
+          img = img.onload = img.onerror = null;
+          return;
+        }
+
+        // Try loading the image again.
+        imgEl.setAttribute('data-load-attempts', loadAttempts + 1);
+        imgEl.setAttribute('src', imgSrc);
+      }
 
       // data-urls appear to be buggy with crossOrigin
       // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
