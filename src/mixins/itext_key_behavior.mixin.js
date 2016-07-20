@@ -473,7 +473,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   _moveCursorUpOrDown: function(direction, e) {
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
-    var action = 'get' + direction + 'CursorOffset,
+    var action = 'get' + direction + 'CursorOffset',
         moveAction = 'moveCursor' + direction,
         offset = this[action](e, this._selectionDirection === 'right');
     if (e.shiftKey) {
