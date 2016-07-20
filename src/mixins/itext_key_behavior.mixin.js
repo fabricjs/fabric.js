@@ -525,7 +525,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorUpWithoutShift: function(offset) {
     this._selectionDirection = 'left';
-    this.selectionStart = this.selectionStart - offset;
+    if (this.selectionStart === this.selectionEnd) {
+      this.selectionStart -= offset;
+    }
     this.selectionEnd = this.selectionStart;
   },
 
