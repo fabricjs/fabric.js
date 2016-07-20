@@ -343,6 +343,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorDown: function(e) {
+    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+      return;
+    }
     this._moveCursorUpOrDown('Down', e);
   },
 
@@ -353,7 +356,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   moveCursorDownWithoutShift: function(offset) {
     this._selectionDirection = 'right';
     this.selectionStart = this.selectionStart + offset;
-    this.setSelectionEnd(this.selectionStart);
+    this.selectionEnd = this.selectionStart;
   },
 
   /**
@@ -362,7 +365,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   swapSelectionPoints: function() {
     var swapSel = this.selectionEnd;
     this.selectionEnd = this.selectionStart;
-    this.setSelectionStart(swapSel);
+    this.selectionStart = swapSel;
   },
 
   /**
@@ -374,17 +377,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._selectionDirection = 'right';
     }
     if (this._selectionDirection === 'right') {
-      this.setSelectionEnd(this.selectionEnd + offset);
+      this.selectionEnd += offset;
     }
     else {
-      this.setSelectionStart(this.selectionStart + offset);
+      this.selectionStart += offset;
     }
     if (this.selectionEnd < this.selectionStart  && this._selectionDirection === 'left') {
       this.swapSelectionPoints();
       this._selectionDirection = 'right';
     }
     if (this.selectionEnd > this.text.length) {
-      this.setSelectionEnd(this.text.length);
+      this.selectionEnd = this.text.length;
     }
   },
 
@@ -467,9 +470,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorUp: function(e) {
+    if (this.selectionStart === 0 && this.selectionEnd === 0) {
+      return;
+    }
     this._moveCursorUpOrDown('Up', e);
   },
 
+  /**
+   * Moves cursor up or down, fires the events
+   * @param {String} direction 'Up' or 'Down'
+   * @param {Event} e Event object
+   */
   _moveCursorUpOrDown: function(direction, e) {
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
@@ -484,6 +495,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     this[moveAction](offset);
     this.initDelayedCursor();
+    this._fireSelectionChanged();
+    this._updateTextarea();
   },
 
   /**
@@ -495,10 +508,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._selectionDirection = 'left';
     }
     if (this._selectionDirection === 'right') {
-      this.setSelectionEnd(this.selectionEnd - offset);
+      this.selectionEnd -= offset;
     }
     else {
-      this.setSelectionStart(this.selectionStart - offset);
+      this.selectionStart -= offset;
     }
     if (this.selectionEnd < this.selectionStart && this._selectionDirection === 'right') {
       this.swapSelectionPoints();
@@ -513,7 +526,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   moveCursorUpWithoutShift: function(offset) {
     this._selectionDirection = 'left';
     this.selectionStart = this.selectionStart - offset;
-    this.setSelectionEnd(this.selectionStart);
+    this.selectionEnd = this.selectionStart;
   },
 
   /**
@@ -524,22 +537,21 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
-    this.moveCursorWhere('Left', e);
+    this.moveCursorLeftOrRight('Left', e);
   },
 
   /**
    * @private
    */
   _move: function(e, prop, direction) {
-    var propMethod = (prop === 'selectionStart' ? 'setSelectionStart' : 'setSelectionEnd');
     if (e.altKey) {
-      this[propMethod](this['findWordBoundary' + direction](this[prop]));
+      this[prop] = this['findWordBoundary' + direction](this[prop]);
     }
     else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      this[propMethod](this['findLineBoundary' + direction](this[prop]));
+      this[prop] = this['findLineBoundary' + direction](this[prop]);
     }
     else {
-      this[propMethod](this[prop] + (direction === 'Left' ? -1 : 1));
+      this[prop] += direction === 'Left' ? -1 : 1;
     }
   },
 
@@ -569,7 +581,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd === this.selectionStart) {
       this._moveLeft(e, 'selectionStart');
     }
-    this.setSelectionEnd(this.selectionStart);
+    this.selectionEnd = this.selectionStart;
   },
 
   /**
@@ -594,10 +606,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
       return;
     }
-    this._moveCursorWhere('Right', e);
+    this._moveCursorLeftOrRight('Right', e);
   },
 
-  _moveCursorWhere: function(direction, e) {
+  /**
+   * Moves cursor right or Left, fires event
+   * @param {String} direction 'Left', 'Right'
+   * @param {Event} e Event object
+   */
+  _moveCursorLeftOrRight: function(direction, e) {
     var actionName ='moveCursor' + direction + 'With';
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
@@ -610,6 +627,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     this[actionName](e);
     this.initDelayedCursor();
+    this._fireSelectionChanged();
+    this._updateTextarea();
   },
 
   /**
@@ -635,11 +654,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     if (this.selectionStart === this.selectionEnd) {
       this._moveRight(e, 'selectionStart');
-      this.setSelectionEnd(this.selectionStart);
+      this.selectionEnd = this.selectionStart;
     }
     else {
-      this.setSelectionEnd(this.selectionEnd + this.getNumNewLinesInSelectedText());
-      this.setSelectionStart(this.selectionEnd);
+      this.selectionEnd += this.getNumNewLinesInSelectedText();
+      this.selectionStart = this.selectionEnd;
     }
   },
 
