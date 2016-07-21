@@ -491,7 +491,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       moveAction += 'WithShift';
     }
     else {
-      moveAction += 'WithOutShift';
+      moveAction += 'WithoutShift';
     }
     this[moveAction](offset);
     this.initDelayedCursor();
