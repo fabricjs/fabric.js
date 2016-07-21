@@ -617,7 +617,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   _moveCursorLeftOrRight: function(direction, e) {
-    var actionName ='moveCursor' + direction + 'With';
+    var actionName = 'moveCursor' + direction + 'With';
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
 
