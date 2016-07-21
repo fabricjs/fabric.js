@@ -1237,8 +1237,18 @@
       fabric.util.setStyle(this.wrapperEl, {
         width: this.getWidth() + 'px',
         height: this.getHeight() + 'px',
-        position: 'relative'
+        position: this.inheritCanvasStyle ? this.wrapperEl.style.position : 'relative'
       });
+      if (this.inheritCanvasStyle) {
+        for (var i = 0; i < this.lowerCanvasEl.style.length; i++) {
+          var elem = this.lowerCanvasEl.style[i];
+          this.wrapperEl.style[elem] = this.lowerCanvasEl.style[elem];
+        }
+        this.lowerCanvasEl.style = {};
+        this.lowerCanvasEl.style.position = 'absolute';
+        this.lowerCanvasEl.style.top = 0;
+        this.lowerCanvasEl.style.left = 0;
+      }
       fabric.util.makeElementUnselectable(this.wrapperEl);
     },
 
@@ -1249,13 +1259,12 @@
     _applyCanvasStyle: function (element) {
       var width = this.getWidth() || element.width,
           height = this.getHeight() || element.height;
-
       fabric.util.setStyle(element, {
         position: 'absolute',
         width: width + 'px',
         height: height + 'px',
-        left: 0,
-        top: 0
+        left: this.inheritCanvasStyle === true ? undefined : 0,
+        top: this.inheritCanvasStyle === true ? undefined : 0
       });
       element.width = width;
       element.height = height;
