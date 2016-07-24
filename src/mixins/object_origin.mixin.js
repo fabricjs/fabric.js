@@ -26,14 +26,45 @@
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
           y = point.y,
-          offsetX = originXOffset[toOriginX] - originXOffset[fromOriginX],
-          offsetY = originYOffset[toOriginY] - originYOffset[fromOriginY],
-          dim;
+
+      if (typeof(fromOriginX) === 'string') {
+        fromOriginX = originXOffset[fromOriginX];
+      }
+      else {
+        fromOriginX -= 0.5;
+      }
+
+      if (typeof(toOriginX) === 'string') {
+        toOriginX = originXOffset[toOriginX];
+      }
+      else {
+        toOriginX -= 0.5;
+      }
+
+      offsetX = toOriginX - fromOriginX;
+
+      if (typeof(fromOriginY) === 'string') {
+        fromOriginY = originYOffset[fromOriginY];
+      }
+      else {
+        fromOriginY -= 0.5;
+      }
+
+      if (typeof(toOriginY) === 'string') {
+        toOriginY = originYOffset[toOriginY];
+      }
+      else {
+        toOriginY -= 0.5;
+      }
+
+      offsetY = toOriginY - fromOriginY;
+
       if (offsetX || offsetY) {
         dim = this._getTransformedDimensions();
         x = point.x + offsetX * dim.x;
         y = point.y + offsetY * dim.y;
       }
+
       return new fabric.Point(x, y);
     },
 
@@ -155,8 +186,14 @@
           yFull = Math.sin(angle) * hypotFull;
 
       //TODO: this function does not consider mixed situation like top, center.
-      this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
-      this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
+      if (typeof(this.originX) === 'number') {
+        this.left += xFull * (originXOffset[to] - (this.originX - 0.5));
+        this.top += yFull * (originXOffset[to] - (this.originX - 0.5));
+      }
+      else {
+        this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
+        this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
+      }
 
       this.setCoords();
       this.originX = to;
