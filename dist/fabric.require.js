@@ -2129,7 +2129,11 @@ if (typeof console !== "undefined") {
                         if (_rule === "") {
                             return;
                         }
-                        allRules[_rule] = fabric.util.object.clone(ruleObj);
+                        if (allRules[_rule]) {
+                            fabric.util.object.extend(allRules[_rule], ruleObj);
+                        } else {
+                            allRules[_rule] = fabric.util.object.clone(ruleObj);
+                        }
                     });
                 });
             }
@@ -7402,7 +7406,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         parsedAttributes.left = parsedAttributes.left || 0;
         parsedAttributes.top = parsedAttributes.top || 0;
         var rect = new fabric.Rect(extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
-        rect.visible = rect.width > 0 && rect.height > 0;
+        rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
         return rect;
     };
     fabric.Rect.fromObject = function(object) {
@@ -10129,25 +10133,24 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         },
         setSelectionStart: function(index) {
             index = Math.max(index, 0);
-            if (this.selectionStart !== index) {
-                this.fire("selection:changed");
-                this.canvas && this.canvas.fire("text:selection:changed", {
-                    target: this
-                });
-                this.selectionStart = index;
-            }
-            this._updateTextarea();
+            this._updateAndFire("selectionStart", index);
         },
         setSelectionEnd: function(index) {
             index = Math.min(index, this.text.length);
-            if (this.selectionEnd !== index) {
-                this.fire("selection:changed");
-                this.canvas && this.canvas.fire("text:selection:changed", {
-                    target: this
-                });
-                this.selectionEnd = index;
+            this._updateAndFire("selectionEnd", index);
+        },
+        _updateAndFire: function(property, index) {
+            if (this[property] !== index) {
+                this._fireSelectionChanged();
+                this[property] = index;
             }
             this._updateTextarea();
+        },
+        _fireSelectionChanged: function() {
+            this.fire("selection:changed");
+            this.canvas && this.canvas.fire("text:selection:changed", {
+                target: this
+            });
         },
         getSelectionStyles: function(startIndex, endIndex) {
             if (arguments.length === 2) {
@@ -10717,8 +10720,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
         },
         selectAll: function() {
-            this.setSelectionStart(0);
-            this.setSelectionEnd(this.text.length);
+            this.selectionStart = 0;
+            this.selectionEnd = this.text.length;
+            this._fireSelectionChanged();
+            this._updateTextarea();
         },
         getSelectedText: function() {
             return this.text.slice(this.selectionStart, this.selectionEnd);
@@ -10788,14 +10793,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             return index;
         },
         selectWord: function(selectionStart) {
+            selectionStart = selectionStart || this.selectionStart;
             var newSelectionStart = this.searchWordBoundary(selectionStart, -1), newSelectionEnd = this.searchWordBoundary(selectionStart, 1);
-            this.setSelectionStart(newSelectionStart);
-            this.setSelectionEnd(newSelectionEnd);
+            this.selectionStart = newSelectionStart;
+            this.selectionEnd = newSelectionEnd;
+            this._fireSelectionChanged();
+            this._updateTextarea();
         },
         selectLine: function(selectionStart) {
+            selectionStart = selectionStart || this.selectionStart;
             var newSelectionStart = this.findLineBoundaryLeft(selectionStart), newSelectionEnd = this.findLineBoundaryRight(selectionStart);
-            this.setSelectionStart(newSelectionStart);
-            this.setSelectionEnd(newSelectionEnd);
+            this.selectionStart = newSelectionStart;
+            this.selectionEnd = newSelectionEnd;
+            this._fireSelectionChanged();
+            this._updateTextarea();
         },
         enterEditing: function(e) {
             if (this.isEditing || !this.editable) {
@@ -10816,10 +10827,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             if (!this.canvas) {
                 return this;
             }
-            this.canvas.renderAll();
             this.canvas.fire("text:editing:entered", {
                 target: this
             });
+            this.canvas.renderAll();
             this.initMouseMoveHandler();
             return this;
         },
@@ -10845,12 +10856,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 return;
             }
             if (newSelectionStart > this.__selectionStartOnMouseDown) {
-                this.setSelectionStart(this.__selectionStartOnMouseDown);
-                this.setSelectionEnd(newSelectionStart);
+                this.selectionStart = this.__selectionStartOnMouseDown;
+                this.selectionEnd = newSelectionStart;
             } else {
-                this.setSelectionStart(newSelectionStart);
-                this.setSelectionEnd(this.__selectionStartOnMouseDown);
+                this.selectionStart = newSelectionStart;
+                this.selectionEnd = this.__selectionStartOnMouseDown;
             }
+            this._fireSelectionChanged();
+            this._updateTextarea();
             this.renderCursorOrSelection();
         },
         _setEditingProps: function() {
@@ -10968,7 +10981,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 this._removeSingleCharAndStyle(start + 1);
                 end--;
             }
-            this.setSelectionStart(start);
+            this.selectionStart = start;
+            this.selectionEnd = start;
         },
         _removeSingleCharAndStyle: function(index) {
             var isBeginningOfLine = this.text[index - 1] === "\n", indexStyle = isBeginningOfLine ? index : index - 1;
@@ -10980,7 +10994,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             var style;
             if (this.selectionEnd - this.selectionStart > 1) {
                 this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-                this.setSelectionEnd(this.selectionStart);
             }
             if (!useCopiedStyle && this.isEmptyStyles()) {
                 this.insertChar(_chars, false);
@@ -11004,12 +11017,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 return;
             }
             this._updateTextarea();
-            this.canvas && this.canvas.renderAll();
             this.setCoords();
+            this._fireSelectionChanged();
             this.fire("changed");
             this.canvas && this.canvas.fire("text:changed", {
                 target: this
             });
+            this.canvas && this.canvas.renderAll();
         },
         insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
             this.shiftLineStyles(lineIndex, +1);
@@ -11201,15 +11215,17 @@ fabric.util.object.extend(fabric.IText.prototype, {
         var newSelectionStart = this.getSelectionStartFromPointer(e);
         if (e.shiftKey) {
             if (newSelectionStart < this.selectionStart) {
-                this.setSelectionEnd(this.selectionStart);
-                this.setSelectionStart(newSelectionStart);
+                this.selectionEnd = this.selectionStart;
+                this.selectionStart = newSelectionStart;
             } else {
-                this.setSelectionEnd(newSelectionStart);
+                this.selectionEnd = newSelectionStart;
             }
         } else {
-            this.setSelectionStart(newSelectionStart);
-            this.setSelectionEnd(newSelectionStart);
+            this.selectionStart = newSelectionStart;
+            this.selectionEnd = newSelectionStart;
         }
+        this._fireSelectionChanged();
+        this._updateTextarea();
     },
     getSelectionStartFromPointer: function(e) {
         var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, newSelectionStart, line;
@@ -11439,41 +11455,36 @@ fabric.util.object.extend(fabric.IText.prototype, {
         return indexOnNextLine;
     },
     moveCursorDown: function(e) {
-        this.abortCursorAnimation();
-        this._currentCursorOpacity = 1;
-        var offset = this.getDownCursorOffset(e, this._selectionDirection === "right");
-        if (e.shiftKey) {
-            this.moveCursorDownWithShift(offset);
-        } else {
-            this.moveCursorDownWithoutShift(offset);
+        if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+            return;
         }
-        this.initDelayedCursor();
+        this._moveCursorUpOrDown("Down", e);
     },
     moveCursorDownWithoutShift: function(offset) {
         this._selectionDirection = "right";
-        this.setSelectionStart(this.selectionStart + offset);
-        this.setSelectionEnd(this.selectionStart);
+        this.selectionStart = this.selectionStart + offset;
+        this.selectionEnd = this.selectionStart;
     },
     swapSelectionPoints: function() {
         var swapSel = this.selectionEnd;
-        this.setSelectionEnd(this.selectionStart);
-        this.setSelectionStart(swapSel);
+        this.selectionEnd = this.selectionStart;
+        this.selectionStart = swapSel;
     },
     moveCursorDownWithShift: function(offset) {
         if (this.selectionEnd === this.selectionStart) {
             this._selectionDirection = "right";
         }
         if (this._selectionDirection === "right") {
-            this.setSelectionEnd(this.selectionEnd + offset);
+            this.selectionEnd += offset;
         } else {
-            this.setSelectionStart(this.selectionStart + offset);
+            this.selectionStart += offset;
         }
         if (this.selectionEnd < this.selectionStart && this._selectionDirection === "left") {
             this.swapSelectionPoints();
             this._selectionDirection = "right";
         }
         if (this.selectionEnd > this.text.length) {
-            this.setSelectionEnd(this.text.length);
+            this.selectionEnd = this.text.length;
         }
     },
     getUpCursorOffset: function(e, isRight) {
@@ -11507,24 +11518,33 @@ fabric.util.object.extend(fabric.IText.prototype, {
         return indexOnPrevLine;
     },
     moveCursorUp: function(e) {
+        if (this.selectionStart === 0 && this.selectionEnd === 0) {
+            return;
+        }
+        this._moveCursorUpOrDown("Up", e);
+    },
+    _moveCursorUpOrDown: function(direction, e) {
         this.abortCursorAnimation();
         this._currentCursorOpacity = 1;
-        var offset = this.getUpCursorOffset(e, this._selectionDirection === "right");
+        var action = "get" + direction + "CursorOffset", moveAction = "moveCursor" + direction, offset = this[action](e, this._selectionDirection === "right");
         if (e.shiftKey) {
-            this.moveCursorUpWithShift(offset);
+            moveAction += "WithShift";
         } else {
-            this.moveCursorUpWithoutShift(offset);
+            moveAction += "WithoutShift";
         }
+        this[moveAction](offset);
         this.initDelayedCursor();
+        this._fireSelectionChanged();
+        this._updateTextarea();
     },
     moveCursorUpWithShift: function(offset) {
         if (this.selectionEnd === this.selectionStart) {
             this._selectionDirection = "left";
         }
         if (this._selectionDirection === "right") {
-            this.setSelectionEnd(this.selectionEnd - offset);
+            this.selectionEnd -= offset;
         } else {
-            this.setSelectionStart(this.selectionStart - offset);
+            this.selectionStart -= offset;
         }
         if (this.selectionEnd < this.selectionStart && this._selectionDirection === "right") {
             this.swapSelectionPoints();
@@ -11532,33 +11552,25 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
     },
     moveCursorUpWithoutShift: function(offset) {
-        if (this.selectionStart === this.selectionEnd) {
-            this.setSelectionStart(this.selectionStart - offset);
-        }
-        this.setSelectionEnd(this.selectionStart);
         this._selectionDirection = "left";
+        if (this.selectionStart === this.selectionEnd) {
+            this.selectionStart -= offset;
+        }
+        this.selectionEnd = this.selectionStart;
     },
     moveCursorLeft: function(e) {
         if (this.selectionStart === 0 && this.selectionEnd === 0) {
             return;
         }
-        this.abortCursorAnimation();
-        this._currentCursorOpacity = 1;
-        if (e.shiftKey) {
-            this.moveCursorLeftWithShift(e);
-        } else {
-            this.moveCursorLeftWithoutShift(e);
-        }
-        this.initDelayedCursor();
+        this._moveCursorLeftOrRight("Left", e);
     },
     _move: function(e, prop, direction) {
-        var propMethod = prop === "selectionStart" ? "setSelectionStart" : "setSelectionEnd";
         if (e.altKey) {
-            this[propMethod](this["findWordBoundary" + direction](this[prop]));
+            this[prop] = this["findWordBoundary" + direction](this[prop]);
         } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
-            this[propMethod](this["findLineBoundary" + direction](this[prop]));
+            this[prop] = this["findLineBoundary" + direction](this[prop]);
         } else {
-            this[propMethod](this[prop] + (direction === "Left" ? -1 : 1));
+            this[prop] += direction === "Left" ? -1 : 1;
         }
     },
     _moveLeft: function(e, prop) {
@@ -11572,7 +11584,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         if (this.selectionEnd === this.selectionStart) {
             this._moveLeft(e, "selectionStart");
         }
-        this.setSelectionEnd(this.selectionStart);
+        this.selectionEnd = this.selectionStart;
     },
     moveCursorLeftWithShift: function(e) {
         if (this._selectionDirection === "right" && this.selectionStart !== this.selectionEnd) {
@@ -11586,14 +11598,21 @@ fabric.util.object.extend(fabric.IText.prototype, {
         if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
             return;
         }
+        this._moveCursorLeftOrRight("Right", e);
+    },
+    _moveCursorLeftOrRight: function(direction, e) {
+        var actionName = "moveCursor" + direction + "With";
         this.abortCursorAnimation();
         this._currentCursorOpacity = 1;
         if (e.shiftKey) {
-            this.moveCursorRightWithShift(e);
+            actionName += "Shift";
         } else {
-            this.moveCursorRightWithoutShift(e);
+            actionName += "outShift";
         }
+        this[actionName](e);
         this.initDelayedCursor();
+        this._fireSelectionChanged();
+        this._updateTextarea();
     },
     moveCursorRightWithShift: function(e) {
         if (this._selectionDirection === "left" && this.selectionStart !== this.selectionEnd) {
@@ -11607,10 +11626,10 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this._selectionDirection = "right";
         if (this.selectionStart === this.selectionEnd) {
             this._moveRight(e, "selectionStart");
-            this.setSelectionEnd(this.selectionStart);
+            this.selectionEnd = this.selectionStart;
         } else {
-            this.setSelectionEnd(this.selectionEnd + this.getNumNewLinesInSelectedText());
-            this.setSelectionStart(this.selectionEnd);
+            this.selectionEnd += this.getNumNewLinesInSelectedText();
+            this.selectionStart = this.selectionEnd;
         }
     },
     removeChars: function(e) {

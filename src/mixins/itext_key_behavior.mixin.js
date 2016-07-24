@@ -539,7 +539,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
-    this.moveCursorLeftOrRight('Left', e);
+    this._moveCursorLeftOrRight('Left', e);
   },
 
   /**
