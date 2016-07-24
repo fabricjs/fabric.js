@@ -2129,7 +2129,11 @@ if (typeof console !== "undefined") {
                         if (_rule === "") {
                             return;
                         }
-                        allRules[_rule] = fabric.util.object.clone(ruleObj);
+                        if (allRules[_rule]) {
+                            fabric.util.object.extend(allRules[_rule], ruleObj);
+                        } else {
+                            allRules[_rule] = fabric.util.object.clone(ruleObj);
+                        }
                     });
                 });
             }
@@ -5071,6 +5075,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 target.isMoving = false;
             }
             this._handleCursorAndEvent(e, target, "up");
+            target && (target.__corner = 0);
             shouldRender && this.renderAll();
         },
         _handleCursorAndEvent: function(e, target, eventType) {
@@ -6220,7 +6225,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     };
     fabric.util.object.extend(fabric.Object.prototype, {
         translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
-            var x = point.x, y = point.y, offsetX = originXOffset[toOriginX] - originXOffset[fromOriginX], offsetY = originYOffset[toOriginY] - originYOffset[fromOriginY], dim;
+            var x = point.x, y = point.y, offsetX, offsetY;
+            if (typeof fromOriginX === "string") {
+                fromOriginX = originXOffset[fromOriginX];
+            } else {
+                fromOriginX -= .5;
+            }
+            if (typeof toOriginX === "string") {
+                toOriginX = originXOffset[toOriginX];
+            } else {
+                toOriginX -= .5;
+            }
+            offsetX = toOriginX - fromOriginX;
+            if (typeof fromOriginY === "string") {
+                fromOriginY = originYOffset[fromOriginY];
+            } else {
+                fromOriginY -= .5;
+            }
+            if (typeof toOriginY === "string") {
+                toOriginY = originYOffset[toOriginY];
+            } else {
+                toOriginY -= .5;
+            }
+            offsetY = toOriginY - fromOriginY;
             if (offsetX || offsetY) {
                 dim = this._getTransformedDimensions();
                 x = point.x + offsetX * dim.x;
@@ -6252,7 +6279,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         },
         toLocalPoint: function(point, originX, originY) {
             var center = this.getCenterPoint(), p, p2;
-            if (originX && originY) {
+            if (typeof originX !== "undefined" && typeof originY !== "undefined") {
                 p = this.translateToGivenOrigin(center, "center", "center", originX, originY);
             } else {
                 p = new fabric.Point(this.left, this.top);
@@ -6269,9 +6296,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.set("top", position.y);
         },
         adjustPosition: function(to) {
-            var angle = degreesToRadians(this.angle), hypotFull = this.getWidth(), xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull;
-            this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
-            this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
+            var angle = degreesToRadians(this.angle), hypotFull = this.getWidth(), xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull, offsetFrom, offsetTo;
+            if (typeof this.originX === "string") {
+                offsetFrom = originXOffset[this.originX];
+            } else {
+                offsetFrom = this.originX - .5;
+            }
+            if (typeof to === "string") {
+                offsetTo = originXOffset[to];
+            } else {
+                offsetTo = to - .5;
+            }
+            this.left += xFull * (offsetTo - offsetFrom);
+            this.top += yFull * (offsetTo - offsetFrom);
             this.setCoords();
             this.originX = to;
         },
@@ -7402,7 +7439,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         parsedAttributes.left = parsedAttributes.left || 0;
         parsedAttributes.top = parsedAttributes.top || 0;
         var rect = new fabric.Rect(extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
-        rect.visible = rect.width > 0 && rect.height > 0;
+        rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
         return rect;
     };
     fabric.Rect.fromObject = function(object) {
@@ -7626,7 +7663,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 y: this.minY + this.height / 2
             };
         },
-        _render: function(ctx) {
+        _renderPathCommands: function(ctx) {
             var current, previous = null, subpathStartX = 0, subpathStartY = 0, x = 0, y = 0, controlX = 0, controlY = 0, tempX, tempY, l = -this.pathOffset.x, t = -this.pathOffset.y;
             if (this.group && this.group.type === "path-group") {
                 l = 0;
@@ -7807,6 +7844,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 }
                 previous = current;
             }
+        },
+        _render: function(ctx) {
+            this._renderPathCommands(ctx);
             this._renderFill(ctx);
             this._renderStroke(ctx);
         },

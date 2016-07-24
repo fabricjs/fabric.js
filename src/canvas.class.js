@@ -264,16 +264,16 @@
           this._setOriginToCenter(t.target);
         }
         else {
-          if (t.originX !== 'center' && t.originX !== 0.5) {
-            if (t.originX === 'right' || t.originX > 0.5) {
+          if (t.originX !== 'center') {
+            if (t.originX === 'right') {
               t.mouseXSign = -1;
             }
             else {
               t.mouseXSign = 1;
             }
           }
-          if (t.originY !== 'center' && t.originY !== 0.5) {
-            if (t.originY === 'bottom' || t.originY > 0.5) {
+          if (t.originY !== 'center') {
+            if (t.originY === 'bottom') {
               t.mouseYSign = -1;
             }
             else {
@@ -756,40 +756,20 @@
      */
     _flipObject: function(transform, by) {
       if (transform.newScaleX < 0 && by !== 'y') {
-        if (transform.originX === 'left' || transform.originX > 0.5) {
-          if (typeof(transform.originX) === 'string') {
-            transform.originX = 'right';
-          }
-          else {
-            transform.originX = 1 - transform.originX;
-          }
+        if (transform.originX === 'left') {
+          transform.originX = 'right';
         }
-        else if (transform.originX === 'right' || transform.originX < 0.5) {
-          if (typeof(transform.originX) === 'string') {
-            transform.originX = 'left';
-          }
-          else {
-            transform.originX = 1 - transform.originX;
-          }
+        else if (transform.originX === 'right') {
+          transform.originX = 'left';
         }
       }
 
       if (transform.newScaleY < 0 && by !== 'x') {
-        if (transform.originY === 'top' || transform.originY < 0.5) {
-          if (typeof(transform.originY) === 'string') {
-            transform.originY = 'bottom';
-          }
-          else {
-            transform.originY = 1 - transform.originY;
-          }
+        if (transform.originY === 'top') {
+          transform.originY = 'bottom';
         }
-        else if (transform.originY === 'bottom' || transform.originY > 0.5) {
-          if (typeof(transform.originY) === 'string') {
-            transform.originY = 'top';
-          }
-          else {
-            transform.originY = 1 - transform.originY;
-          }
+        else if (transform.originY === 'bottom') {
+          transform.originY = 'top';
         }
       }
     },
@@ -800,23 +780,21 @@
     _setLocalMouse: function(localMouse, t) {
       var target = t.target;
 
-      if (t.originX === 'right' || t.originX > 0.5) {
+      if (t.originX === 'right') {
         localMouse.x *= -1;
       }
-      else if (t.originX === 'center' || t.originX === 0.5) {
+      else if (t.originX === 'center') {
         localMouse.x *= t.mouseXSign * 2;
-
         if (localMouse.x < 0) {
           t.mouseXSign = -t.mouseXSign;
         }
       }
 
-      if (t.originY === 'bottom' || t.originY > 0.5) {
+      if (t.originY === 'bottom') {
         localMouse.y *= -1;
       }
-      else if (t.originY === 'center' || t.originY === 0.5) {
+      else if (t.originY === 'center') {
         localMouse.y *= t.mouseYSign * 2;
-
         if (localMouse.y < 0) {
           t.mouseYSign = -t.mouseYSign;
         }

@@ -26,15 +26,16 @@
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
           y = point.y,
+          offsetX, offsetY;
 
-      if (typeof(fromOriginX) === 'string') {
+      if (typeof fromOriginX === 'string') {
         fromOriginX = originXOffset[fromOriginX];
       }
       else {
         fromOriginX -= 0.5;
       }
 
-      if (typeof(toOriginX) === 'string') {
+      if (typeof toOriginX === 'string') {
         toOriginX = originXOffset[toOriginX];
       }
       else {
@@ -43,14 +44,14 @@
 
       offsetX = toOriginX - fromOriginX;
 
-      if (typeof(fromOriginY) === 'string') {
+      if (typeof fromOriginY === 'string') {
         fromOriginY = originYOffset[fromOriginY];
       }
       else {
         fromOriginY -= 0.5;
       }
 
-      if (typeof(toOriginY) === 'string') {
+      if (typeof toOriginY === 'string') {
         toOriginY = originYOffset[toOriginY];
       }
       else {
@@ -138,7 +139,7 @@
       var center = this.getCenterPoint(),
           p, p2;
 
-      if (originX && originY) {
+      if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
       else {
@@ -183,18 +184,24 @@
       var angle = degreesToRadians(this.angle),
           hypotFull = this.getWidth(),
           xFull = Math.cos(angle) * hypotFull,
-          yFull = Math.sin(angle) * hypotFull;
+          yFull = Math.sin(angle) * hypotFull,
+          offsetFrom, offsetTo;
 
       //TODO: this function does not consider mixed situation like top, center.
-      if (typeof(this.originX) === 'number') {
-        this.left += xFull * (originXOffset[to] - (this.originX - 0.5));
-        this.top += yFull * (originXOffset[to] - (this.originX - 0.5));
+      if (typeof this.originX === 'string') {
+        offsetFrom = originXOffset[this.originX];
       }
       else {
-        this.left += xFull * (originXOffset[to] - originXOffset[this.originX]);
-        this.top += yFull * (originXOffset[to] - originXOffset[this.originX]);
+        offsetFrom = this.originX - 0.5;
       }
-
+      if (typeof to === 'string') {
+        offsetTo = originXOffset[to]
+      }
+      else {
+        offsetTo = to - 0.5;
+      }
+      this.left += xFull * (offsetTo - offsetFrom);
+      this.top += yFull * (offsetTo - offsetFrom);
       this.setCoords();
       this.originX = to;
     },
