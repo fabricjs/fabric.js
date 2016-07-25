@@ -50,7 +50,7 @@
       lineHeight: true,
       text: true,
       charSpacing: true,
-      //textAlign: false,
+      textAlign: true,
       //stroke: false,
       //strokeWidth: false,
     },
@@ -801,13 +801,14 @@
      * @return {Number} Line width
      */
     _measureLine: function(ctx, lineIndex) {
-      var width = ctx.measureText(this._textLines[lineIndex]).width,
+      var line = this._textLines[lineIndex],
+          width = ctx.measureText(line).width,
           additionalSpace = 0, charCount;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
-      return width;
+      return width + additionalSpace;
     },
 
     /**

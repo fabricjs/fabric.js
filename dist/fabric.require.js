@@ -9623,7 +9623,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             fontStyle: true,
             lineHeight: true,
             text: true,
-            charSpacing: true
+            charSpacing: true,
+            textAlign: true
         },
         _reNewline: /\r?\n/,
         _reSpacesAndTabs: /[ \t\r]+/g,
@@ -9890,12 +9891,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             return 0;
         },
         _measureLine: function(ctx, lineIndex) {
-            var width = ctx.measureText(this._textLines[lineIndex]).width, additionalSpace = 0, charCount;
+            var line = this._textLines[lineIndex], width = ctx.measureText(line).width, additionalSpace = 0, charCount;
             if (this.charSpacing !== 0) {
                 charCount = line.split("").length;
                 additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
             }
-            return width;
+            return width + additionalSpace;
         },
         _renderTextDecoration: function(ctx) {
             if (!this.textDecoration) {
