@@ -785,7 +785,6 @@
       }
       else if (t.originX === 'center') {
         localMouse.x *= t.mouseXSign * 2;
-
         if (localMouse.x < 0) {
           t.mouseXSign = -t.mouseXSign;
         }
@@ -796,7 +795,6 @@
       }
       else if (t.originY === 'center') {
         localMouse.y *= t.mouseYSign * 2;
-
         if (localMouse.y < 0) {
           t.mouseYSign = -t.mouseYSign;
         }
