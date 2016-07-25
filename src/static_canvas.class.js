@@ -174,10 +174,11 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
+      this._saveOptions(options);
       var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
       this._objects = [];
       this._createLowerCanvas(el);
-      this._initOptions(options);
+      this._initOptions();
       this._setImageSmoothing();
       // only initialize retina scaling once
       if (!this.interactive) {
@@ -475,11 +476,16 @@
      * @private
      * @param {Object} [options] Options object
      */
-    _initOptions: function (options) {
+    _saveOptions: function (options) {
       for (var prop in options) {
         this[prop] = options[prop];
       }
+    },
 
+    /**
+     * @private
+     */
+    _initOptions: function () {
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
 
