@@ -26,7 +26,7 @@
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
           y = point.y,
-          offsetX, offsetY;
+          offsetX, offsetY, dim;
 
       if (typeof fromOriginX === 'string') {
         fromOriginX = originXOffset[fromOriginX];
@@ -195,7 +195,7 @@
         offsetFrom = this.originX - 0.5;
       }
       if (typeof to === 'string') {
-        offsetTo = originXOffset[to]
+        offsetTo = originXOffset[to];
       }
       else {
         offsetTo = to - 0.5;
