@@ -393,8 +393,8 @@
         case 'custom':
           if (this.drawCustomControlShape[control]) {
             this.drawCustomControlShape[control].call(this, ctx, left, top);
-            break;
           }
+          break;
         default:
           isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
           ctx[methodName + 'Rect'](left, top, size, size);
