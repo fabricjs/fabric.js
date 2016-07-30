@@ -5870,6 +5870,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         get: function(property) {
             return this[property];
         },
+        getObjectScaling: function() {
+            var scaleX = this.scaleX, scaleY = this.scaleY;
+            if (this.group) {
+                var scaling = this.group.getObjectScaling();
+                scaleX *= scaling.scaleX;
+                scaleY *= scaling.scaleY;
+            }
+            return {
+                scaleX: scaleX,
+                scaleY: scaleY
+            };
+        },
         _setObject: function(obj) {
             for (var prop in obj) {
                 this._set(prop, obj[prop]);
@@ -6005,15 +6017,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             if (!this.shadow) {
                 return;
             }
-            var multX = this.canvas && this.canvas.viewportTransform[0] || 1, multY = this.canvas && this.canvas.viewportTransform[3] || 1;
+            var multX = this.canvas && this.canvas.viewportTransform[0] || 1, multY = this.canvas && this.canvas.viewportTransform[3] || 1, scaling = this.getObjectScaling();
             if (this.canvas && this.canvas._isRetinaScaling()) {
                 multX *= fabric.devicePixelRatio;
                 multY *= fabric.devicePixelRatio;
             }
             ctx.shadowColor = this.shadow.color;
-            ctx.shadowBlur = this.shadow.blur * (multX + multY) * (this.scaleX + this.scaleY) / 4;
-            ctx.shadowOffsetX = this.shadow.offsetX * multX * this.scaleX;
-            ctx.shadowOffsetY = this.shadow.offsetY * multY * this.scaleY;
+            ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+            ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
+            ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
         },
         _removeShadow: function(ctx) {
             if (!this.shadow) {
@@ -6225,7 +6237,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     };
     fabric.util.object.extend(fabric.Object.prototype, {
         translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
-            var x = point.x, y = point.y, offsetX, offsetY;
+            var x = point.x, y = point.y, offsetX, offsetY, dim;
             if (typeof fromOriginX === "string") {
                 fromOriginX = originXOffset[fromOriginX];
             } else {
