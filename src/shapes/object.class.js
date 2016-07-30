@@ -953,6 +953,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
+     * @return {Object} object with scaleX and scaleY properties
      */
     getObjectScaling: function() {
       var scaleX = this.scaleX, scaleY = this.scaleY;
