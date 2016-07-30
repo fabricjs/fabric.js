@@ -1427,4 +1427,55 @@ test('toDataURL & reference to canvas', function() {
     equal(typeof deserializedObject.clipTo, 'function');
   });
 
+  test('getObjectScale', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var objectScale = object.getObjectScaling();
+    deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
+  });
+
+  test('getObjectScale in group', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.group = group;
+    var objectScale = object.getObjectScaling();
+    console.log(objectScale);
+    deepEqual(objectScale, {
+      scaleX: object.scaleX * group.scaleX,
+      scaleY: object.scaleY * group.scaleY
+    });
+  });
+
+  test('_setShadow', function(){
+    var el = fabric.document.createElement('canvas');
+    el.width = 600; el.height = 600;
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var context = canvas.contextContainer;
+    var object = new fabric.Object({ scaleX: 1, scaleY : 1});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.setShadow({
+      color: 'red',
+      blur: 10,
+      offsetX: 5,
+      offsetY: 15
+    });
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX);
+    equal(context.shadowOffsetY, object.shadow.offsetY);
+    equal(context.shadowBlur, object.shadow.blur);
+    object.scaleX = 2;
+    object.scaleY = 3;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2);
+    object.group = group;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
+  });
 })();
