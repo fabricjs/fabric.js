@@ -296,6 +296,7 @@
       }
 
       this._handleCursorAndEvent(e, target, 'up');
+      target && (target.__corner = 0);
       shouldRender && this.renderAll();
     },
 
