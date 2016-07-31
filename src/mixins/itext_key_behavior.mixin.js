@@ -643,7 +643,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.initDelayedCursor();
       this._fireSelectionChanged();
       this._updateTextarea();
-    };
+    }
   },
 
   /**
@@ -675,7 +675,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     else {
       this.selectionStart = this.selectionEnd;
-      return true
+      return true;
     }
   },
 
