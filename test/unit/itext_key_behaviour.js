@@ -19,7 +19,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.selectWord();
     equal(selection, 1, 'should fire once on selectWord');
     equal(iText.selectionStart, 0, 'should start at word start');
@@ -27,7 +27,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.selectLine();
     equal(selection, 1, 'should fire once on selectLine');
     equal(iText.selectionStart, 0, 'should start at line start');
@@ -35,7 +35,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorLeft({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorLeft');
     equal(iText.selectionStart, 1, 'should be 1 less than 2');
@@ -43,7 +43,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorRight({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorRight');
     equal(iText.selectionStart, 3, 'should be 1 more than 2');
@@ -51,7 +51,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorDown({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorDown');
     equal(iText.selectionStart, 22, 'should be on second line');
@@ -63,7 +63,7 @@
     selection = 0;
 
     iText.selectionStart = 22;
-    iText.selectionEnd = 22
+    iText.selectionEnd = 22;
     iText.moveCursorUp({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorUp');
     equal(iText.selectionStart, 2, 'should be back to first line');
@@ -142,7 +142,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.selectWord();
     equal(selection, 1, 'should fire once on selectWord');
     equal(iText.selectionStart, 0, 'should start at word start');
@@ -150,7 +150,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.selectLine();
     equal(selection, 1, 'should fire once on selectLine');
     equal(iText.selectionStart, 0, 'should start at line start');
@@ -158,7 +158,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorLeft({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorLeft');
     equal(iText.selectionStart, 1, 'should be 1 less than 2');
@@ -166,7 +166,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorRight({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorRight');
     equal(iText.selectionStart, 3, 'should be 1 more than 2');
@@ -174,7 +174,7 @@
     selection = 0;
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2
+    iText.selectionEnd = 2;
     iText.moveCursorDown({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorDown');
     equal(iText.selectionStart, 22, 'should be on second line');
@@ -186,7 +186,7 @@
     selection = 0;
 
     iText.selectionStart = 22;
-    iText.selectionEnd = 22
+    iText.selectionEnd = 22;
     iText.moveCursorUp({ shiftKey: false});
     equal(selection, 1, 'should fire once on moveCursorUp');
     equal(iText.selectionStart, 2, 'should be back to first line');
