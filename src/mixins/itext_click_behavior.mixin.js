@@ -104,9 +104,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.isEditing) {
         this.__selectionStartOnMouseDown = this.selectionStart;
         if (this.selectionStart === this.selectionEnd) {
-          this.abortCursorAnimation()
+          this.abortCursorAnimation();
         }
-        this.renderCursorOrSelection()
+        this.renderCursorOrSelection();
       }
     });
   },
