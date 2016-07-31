@@ -199,7 +199,7 @@
 
     iText.selectionStart = 0;
     iText.selectionEnd = 1;
-    iText._selectionDirection = 'left'
+    iText._selectionDirection = 'left';
     iText.moveCursorLeft({ shiftKey: true});
     equal(selection, 0, 'should not fire with no change');
     equal(iText.selectionStart, 0, 'should not move');
@@ -213,7 +213,7 @@
 
     iText.selectionStart = 30;
     iText.selectionEnd = 31;
-    iText._selectionDirection = 'right'
+    iText._selectionDirection = 'right';
     iText.moveCursorRight({ shiftKey: true});
     equal(selection, 0, 'should not fire with no change');
     equal(iText.selectionStart, 30, 'should not move');
