@@ -1440,7 +1440,6 @@ test('toDataURL & reference to canvas', function() {
     group.scaleY = 2;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    console.log(objectScale);
     deepEqual(objectScale, {
       scaleX: object.scaleX * group.scaleX,
       scaleY: object.scaleY * group.scaleY

@@ -594,7 +594,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
       this._moveLeft(e, 'selectionEnd');
     }
-    else {
+    else if (this.selectionStart !== 0){
       this._selectionDirection = 'left';
       this._moveLeft(e, 'selectionStart');
     }
@@ -641,7 +641,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
       this._moveRight(e, 'selectionStart');
     }
-    else {
+    else if (this.selectionEnd !== this.text.length) {
       this._selectionDirection = 'right';
       this._moveRight(e, 'selectionEnd');
     }
