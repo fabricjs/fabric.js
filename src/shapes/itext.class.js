@@ -322,11 +322,9 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      console.log('rendering', this.selectionStart, this.selectionEnd);
       if (!this.active || !this.isEditing) {
         return;
       }
-
       var chars = this.text.split(''),
           boundaries, ctx;
 

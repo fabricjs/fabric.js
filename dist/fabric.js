@@ -21867,11 +21867,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      console.log('rendering', this.selectionStart, this.selectionEnd);
       if (!this.active || !this.isEditing) {
         return;
       }
-
       var chars = this.text.split(''),
           boundaries, ctx;
 
@@ -24101,8 +24099,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorDownWithoutShift: function(offset) {
     this._selectionDirection = 'right';
-    this.selectionStart = this.selectionStart + offset;
-    this.selectionEnd = this.selectionStart;
+    this.selectionEnd = this.selectionEnd + offset;
+    this.selectionStart = this.selectionEnd;
+    return offset !== 0;
   },
 
   /**
@@ -24135,6 +24134,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd > this.text.length) {
       this.selectionEnd = this.text.length;
     }
+    return offset !== 0;
   },
 
   /**
@@ -24228,8 +24228,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   _moveCursorUpOrDown: function(direction, e) {
-    this.abortCursorAnimation();
-    this._currentCursorOpacity = 1;
     var action = 'get' + direction + 'CursorOffset',
         moveAction = 'moveCursor' + direction,
         offset = this[action](e, this._selectionDirection === 'right');
@@ -24239,10 +24237,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else {
       moveAction += 'WithoutShift';
     }
-    this[moveAction](offset);
-    this.initDelayedCursor();
-    this._fireSelectionChanged();
-    this._updateTextarea();
+    if (this[moveAction](offset)) {
+      this.abortCursorAnimation();
+      this._currentCursorOpacity = 1;
+      this.initDelayedCursor();
+      this._fireSelectionChanged();
+      this._updateTextarea();
+    }
   },
 
   /**
@@ -24263,6 +24264,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.swapSelectionPoints();
       this._selectionDirection = 'left';
     }
+    return offset !== 0;
   },
 
   /**
@@ -24271,10 +24273,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorUpWithoutShift: function(offset) {
     this._selectionDirection = 'left';
-    if (this.selectionStart === this.selectionEnd) {
-      this.selectionStart -= offset;
-    }
+    this.selectionStart -= offset;
     this.selectionEnd = this.selectionStart;
+    return offset !== 0;
   },
 
   /**
@@ -24290,16 +24291,23 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * @private
+   * @return {Boolean} true if a change happened
    */
   _move: function(e, prop, direction) {
+    var newValue;
     if (e.altKey) {
-      this[prop] = this['findWordBoundary' + direction](this[prop]);
+      newValue = this['findWordBoundary' + direction](this[prop]);
     }
     else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      this[prop] = this['findLineBoundary' + direction](this[prop]);
+      newValue = this['findLineBoundary' + direction](this[prop]);
     }
     else {
       this[prop] += direction === 'Left' ? -1 : 1;
+      return true;
+    }
+    if (typeof newValue !== undefined && this[prop] !== newValue) {
+      this[prop] = newValue;
+      return true;
     }
   },
 
@@ -24307,14 +24315,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _moveLeft: function(e, prop) {
-    this._move(e, prop, 'Left');
+    return this._move(e, prop, 'Left');
   },
 
   /**
    * @private
    */
   _moveRight: function(e, prop) {
-    this._move(e, prop, 'Right');
+    return this._move(e, prop, 'Right');
   },
 
   /**
@@ -24322,14 +24330,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e
    */
   moveCursorLeftWithoutShift: function(e) {
+    var change = false;
     this._selectionDirection = 'left';
 
     // only move cursor when there is no selection,
     // otherwise we discard it, and leave cursor on same place
-    if (this.selectionEnd === this.selectionStart) {
-      this._moveLeft(e, 'selectionStart');
+    if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
+      change = this._moveLeft(e, 'selectionStart');
     }
     this.selectionEnd = this.selectionStart;
+    return change;
   },
 
   /**
@@ -24338,11 +24348,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorLeftWithShift: function(e) {
     if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
-      this._moveLeft(e, 'selectionEnd');
+      return this._moveLeft(e, 'selectionEnd');
     }
     else if (this.selectionStart !== 0){
       this._selectionDirection = 'left';
-      this._moveLeft(e, 'selectionStart');
+      return this._moveLeft(e, 'selectionStart');
     }
   },
 
@@ -24364,7 +24374,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _moveCursorLeftOrRight: function(direction, e) {
     var actionName = 'moveCursor' + direction + 'With';
-    this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
 
     if (e.shiftKey) {
@@ -24373,10 +24382,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else {
       actionName += 'outShift';
     }
-    this[actionName](e);
-    this.initDelayedCursor();
-    this._fireSelectionChanged();
-    this._updateTextarea();
+    if (this[actionName](e)) {
+      console.log('will fire');
+      this.abortCursorAnimation();
+      this.initDelayedCursor();
+      this._fireSelectionChanged();
+      this._updateTextarea();
+    };
   },
 
   /**
@@ -24385,11 +24397,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorRightWithShift: function(e) {
     if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
-      this._moveRight(e, 'selectionStart');
+      return this._moveRight(e, 'selectionStart');
     }
     else if (this.selectionEnd !== this.text.length) {
       this._selectionDirection = 'right';
-      this._moveRight(e, 'selectionEnd');
+      return this._moveRight(e, 'selectionEnd');
     }
   },
 
@@ -24398,15 +24410,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorRightWithoutShift: function(e) {
+    var changed = false;
     this._selectionDirection = 'right';
 
     if (this.selectionStart === this.selectionEnd) {
-      this._moveRight(e, 'selectionStart');
+      changed = this._moveRight(e, 'selectionStart');
       this.selectionEnd = this.selectionStart;
+      return changed;
     }
     else {
-      this.selectionEnd += this.getNumNewLinesInSelectedText();
       this.selectionStart = this.selectionEnd;
+      return true
     }
   },
 
