@@ -593,9 +593,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // otherwise we discard it, and leave cursor on same place
     if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
       change = this._moveLeft(e, 'selectionStart');
+      this.selectionEnd = this.selectionStart;
+      return change;
     }
-    this.selectionEnd = this.selectionStart;
-    return change;
+    else {
+      this.selectionEnd = this.selectionStart;
+      return true;
+    }
   },
 
   /**
