@@ -93,10 +93,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__mousedownY = pointer.y;
       this.__isMousedown = true;
 
-      if (this.hiddenTextarea && this.canvas) {
-        this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
-      }
-
       if (this.selected) {
         this.setCursorByClick(options.e);
       }
