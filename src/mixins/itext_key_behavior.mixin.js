@@ -586,20 +586,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e
    */
   moveCursorLeftWithoutShift: function(e) {
-    var change = false;
+    var change = true;
     this._selectionDirection = 'left';
 
     // only move cursor when there is no selection,
     // otherwise we discard it, and leave cursor on same place
     if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
       change = this._moveLeft(e, 'selectionStart');
-      this.selectionEnd = this.selectionStart;
-      return change;
+
     }
-    else {
-      this.selectionEnd = this.selectionStart;
-      return true;
-    }
+    this.selectionEnd = this.selectionStart;
+    return change;
   },
 
   /**
@@ -669,18 +666,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorRightWithoutShift: function(e) {
-    var changed = false;
+    var changed = true;
     this._selectionDirection = 'right';
 
     if (this.selectionStart === this.selectionEnd) {
       changed = this._moveRight(e, 'selectionStart');
       this.selectionEnd = this.selectionStart;
-      return changed;
     }
     else {
       this.selectionStart = this.selectionEnd;
-      return true;
     }
+    return changed;
   },
 
   /**
