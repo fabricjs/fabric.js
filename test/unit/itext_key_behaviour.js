@@ -114,6 +114,14 @@
     equal(iText.selectionEnd, 24, 'should move to down line');
     selection = 0;
 
+    iText.selectionStart = 28;
+    iText.selectionEnd = 31;
+    iText.moveCursorLeft({ shiftKey: false});
+    equal(selection, 1, 'should fire');
+    equal(iText.selectionStart, 28, 'should move to selection Start');
+    equal(iText.selectionEnd, 28, 'should move to selection Start');
+    selection = 0;
+
     iText.selectionStart = 0;
     iText.selectionEnd = 0;
     iText.insertChars('hello');
