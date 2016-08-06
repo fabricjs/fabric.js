@@ -299,8 +299,9 @@
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target, point) {
-      var pointer = point || this.getPointer(e, true),
-          xy = this._normalizePointer(target, pointer);
+      var ignoreZoom = true,
+          pointer = point || this.getPointer(e, ignoreZoom),
+          xy;
 
       if (target.group && target.group === this.getActiveGroup()) {
         xy = this._normalizePointer(target.group, pointer);
@@ -317,18 +318,13 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-      var lt, m;
-
-      m = fabric.util.multiplyTransformMatrices(
-            this.viewportTransform,
-            object.calcTransformMatrix());
-
-      m = fabric.util.invertTransform(m);
-      pointer = fabric.util.transformPoint(pointer, m , false);
-      lt = fabric.util.transformPoint(object.getCenterPoint(), m , false);
-      pointer.x -= lt.x;
-      pointer.y -= lt.y;
-      return { x: pointer.x, y: pointer.y };
+      var m = object.calcTransformMatrix(),
+          invertedM = fabric.util.invertTransform(m),
+          vpt = this.viewportTransform,
+          vptPointer = this.restorePointerVpt(pointer),
+          p = fabric.util.transformPoint(vptPointer, invertedM);
+      return fabric.util.transformPoint(p, vpt);
+      //return { x: p.x * vpt[0], y: p.y * vpt[3] };
     },
 
     /**
@@ -933,9 +929,10 @@
         return;
       }
 
-      var pointer = this.getPointer(e, true),
-      activeGroup = this.getActiveGroup(),
-      activeObject = this.getActiveObject();
+      var ignoreZoom = true,
+          pointer = this.getPointer(e, ignoreZoom),
+          activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject();
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -1021,6 +1018,18 @@
     },
 
     /**
+     * Returns pointer coordinates without the effect of the viewport
+     * @param {Object} pointer with "x" and "y" number values
+     * @return {Object} object with "x" and "y" number values
+     */
+    restorePointerVpt: function(pointer) {
+      return fabric.util.transformPoint(
+        pointer,
+        fabric.util.invertTransform(this.viewportTransform)
+      );
+    },
+
+    /**
      * Returns pointer coordinates relative to canvas.
      * @param {Event} e
      * @return {Object} object with "x" and "y" number values
@@ -1049,10 +1058,7 @@
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
       if (!ignoreZoom) {
-        pointer = fabric.util.transformPoint(
-          pointer,
-          fabric.util.invertTransform(this.viewportTransform)
-        );
+        pointer = this.restorePointerVpt(pointer);
       }
 
       if (boundsWidth === 0 || boundsHeight === 0) {

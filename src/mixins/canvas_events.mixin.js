@@ -383,8 +383,7 @@
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      var ivt = fabric.util.invertTransform(this.viewportTransform),
-          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+      var pointer = this.getPointer(e);
       this.freeDrawingBrush.onMouseDown(pointer);
       this._handleEvent(e, 'down');
     },
@@ -395,8 +394,7 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
-        var ivt = fabric.util.invertTransform(this.viewportTransform),
-            pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+        var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.setCursor(this.freeDrawingCursor);

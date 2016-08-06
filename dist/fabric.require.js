@@ -4277,7 +4277,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         containsPoint: function(e, target, point) {
-            var pointer = point || this.getPointer(e, true), xy = this._normalizePointer(target, pointer);
+            var ignoreZoom = true, pointer = point || this.getPointer(e, ignoreZoom), xy;
             if (target.group && target.group === this.getActiveGroup()) {
                 xy = this._normalizePointer(target.group, pointer);
             } else {
@@ -4289,17 +4289,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return target.containsPoint(xy) || target._findTargetCorner(pointer);
         },
         _normalizePointer: function(object, pointer) {
-            var lt, m;
-            m = fabric.util.multiplyTransformMatrices(this.viewportTransform, object.calcTransformMatrix());
-            m = fabric.util.invertTransform(m);
-            pointer = fabric.util.transformPoint(pointer, m, false);
-            lt = fabric.util.transformPoint(object.getCenterPoint(), m, false);
-            pointer.x -= lt.x;
-            pointer.y -= lt.y;
-            return {
-                x: pointer.x,
-                y: pointer.y
-            };
+            var m = object.calcTransformMatrix(), invertedM = fabric.util.invertTransform(m), vpt = this.viewportTransform, vptPointer = this.restorePointerVpt(pointer), p = fabric.util.transformPoint(vptPointer, invertedM);
+            return fabric.util.transformPoint(p, vpt);
         },
         isTargetTransparent: function(target, x, y) {
             var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners, ctx = this.contextCache, originalColor = target.selectionBackgroundColor;
@@ -4634,7 +4625,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this.skipTargetFind) {
                 return;
             }
-            var pointer = this.getPointer(e, true), activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject();
+            var ignoreZoom = true, pointer = this.getPointer(e, ignoreZoom), activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject();
             if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
                 return activeGroup;
             }
@@ -4699,6 +4690,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             return target;
         },
+        restorePointerVpt: function(pointer) {
+            return fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.viewportTransform));
+        },
         getPointer: function(e, ignoreZoom, upperCanvasEl) {
             if (!upperCanvasEl) {
                 upperCanvasEl = this.upperCanvasEl;
@@ -4716,7 +4710,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             pointer.x = pointer.x - this._offset.left;
             pointer.y = pointer.y - this._offset.top;
             if (!ignoreZoom) {
-                pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.viewportTransform));
+                pointer = this.restorePointerVpt(pointer);
             }
             if (boundsWidth === 0 || boundsHeight === 0) {
                 cssScale = {
@@ -5125,13 +5119,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this.clipTo) {
                 fabric.util.clipContext(this, this.contextTop);
             }
-            var ivt = fabric.util.invertTransform(this.viewportTransform), pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+            var pointer = this.getPointer(e);
             this.freeDrawingBrush.onMouseDown(pointer);
             this._handleEvent(e, "down");
         },
         _onMouseMoveInDrawingMode: function(e) {
             if (this._isCurrentlyDrawing) {
-                var ivt = fabric.util.invertTransform(this.viewportTransform), pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+                var pointer = this.getPointer(e);
                 this.freeDrawingBrush.onMouseMove(pointer);
             }
             this.setCursor(this.freeDrawingCursor);
@@ -9662,6 +9656,41 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
 
 (function(global) {
     "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend;
+    fabric.Image.filters.ColorMatrix = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+        type: "ColorMatrix",
+        initialize: function(options) {
+            options || (options = {});
+            this.matrix = options.matrix || [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ];
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, r, g, b, a, m = this.matrix;
+            for (i = 0; i < iLen; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                a = data[i + 3];
+                data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4];
+                data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9];
+                data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14];
+                data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19];
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                type: this.type,
+                matrix: this.matrix
+            });
+        }
+    });
+    fabric.Image.filters.ColorMatrix.fromObject = function(object) {
+        return new fabric.Image.filters.ColorMatrix(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
     var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, supportsLineDash = fabric.StaticCanvas.supports("setLineDash"), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
@@ -11234,9 +11263,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.__mousedownX = pointer.x;
             this.__mousedownY = pointer.y;
             this.__isMousedown = true;
-            if (this.hiddenTextarea && this.canvas) {
-                this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
-            }
             if (this.selected) {
                 this.setCursorByClick(options.e);
             }
@@ -11328,11 +11354,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea.setAttribute("autocapitalize", "off");
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + ";" + " opacity: 0; width: 0px; height: 0px; z-index: -999;";
-        if (this.canvas) {
-            this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
-        } else {
-            fabric.document.body.appendChild(this.hiddenTextarea);
-        }
+        fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "input", this.onInput.bind(this));
@@ -11648,7 +11670,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         return this._move(e, prop, "Right");
     },
     moveCursorLeftWithoutShift: function(e) {
-        var change = false;
+        var change = true;
         this._selectionDirection = "left";
         if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
             change = this._moveLeft(e, "selectionStart");
@@ -11679,7 +11701,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
             actionName += "outShift";
         }
         if (this[actionName](e)) {
-            console.log("will fire");
             this.abortCursorAnimation();
             this.initDelayedCursor();
             this._fireSelectionChanged();
@@ -11695,16 +11716,15 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
     },
     moveCursorRightWithoutShift: function(e) {
-        var changed = false;
+        var changed = true;
         this._selectionDirection = "right";
         if (this.selectionStart === this.selectionEnd) {
             changed = this._moveRight(e, "selectionStart");
             this.selectionEnd = this.selectionStart;
-            return changed;
         } else {
             this.selectionStart = this.selectionEnd;
-            return true;
         }
+        return changed;
     },
     removeChars: function(e) {
         if (this.selectionStart === this.selectionEnd) {

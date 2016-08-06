@@ -793,6 +793,25 @@
     });
   });
 
+  test('normalize pointer', function(){
+    ok(typeof canvas._normalizePointer == 'function');
+    var pointer = { x: 10, y: 20 },
+        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
+        normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
+    equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
+    object.angle = 90;
+    equal(normalizedPointer.x, -15, 'should consider angle');
+    equal(normalizedPointer.y, -25, 'should consider angle');
+    object.scaleX = 2;
+    object.scaleY = 2;
+    equal(normalizedPointer.x, -7.5, 'should consider scale');
+    equal(normalizedPointer.y, -12.5, 'should consider scale');
+    object.skewX = 60;
+    equal(normalizedPointer.x, -7.5, 'should be in top left corner of rect');
+    equal(normalizedPointer.y, -12.5, 'should be in top left corner of rect');
+  });
+
   // asyncTest('loadFromJSON with backgroundImage', function() {
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
   //   var anotherCanvas = new fabric.Canvas();
