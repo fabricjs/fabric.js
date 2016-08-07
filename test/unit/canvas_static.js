@@ -432,16 +432,6 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('preserveObjectStacking', function() {
-    ok(typeof canvas.preserveObjectStacking == 'boolean');
-    ok(!canvas.preserveObjectStacking);
-  });
-
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
-  });
-
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {

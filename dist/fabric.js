@@ -6582,13 +6582,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      */
     zoomToPoint: function (point, value) {
       // TODO: just change the scale, preserve other transformations
-      var before = point, vpt = [];
-      vpt[1] = this.viewportTransform[1];
-      vpt[2] = this.viewportTransform[2];
+      var before = point, vpt = this.viewportTransform.slice(0);
       point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
       vpt[0] = value;
       vpt[3] = value;
-      var after = fabric.util.transformPoint(point, this.viewportTransform);
+      var after = fabric.util.transformPoint(point, vpt);
       vpt[4] += before.x - after.x;
       vpt[5] += before.y - after.y;
       return this.setViewportTransform(vpt);
@@ -6612,13 +6610,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @chainable true
      */
     absolutePan: function (point) {
-      var vpt;
-      vpt[0] = this.viewportTransform[0];
-      vpt[1] = this.viewportTransform[1];
-      vpt[2] = this.viewportTransform[2];
-      vpt[3] = this.viewportTransform[3];
-      this.viewportTransform[4] = -point.x;
-      this.viewportTransform[5] = -point.y;
+      var vpt = this.viewportTransform.slice(0);
+      vpt[4] = -point.x;
+      vpt[5] = -point.y;
       return this.setViewportTransform(vpt);
     },
 

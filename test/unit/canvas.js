@@ -105,6 +105,16 @@
     equal(canvas.item(0), rect, 'should return proper item');
   });
 
+  test('preserveObjectStacking', function() {
+    ok(typeof canvas.preserveObjectStacking == 'boolean');
+    ok(!canvas.preserveObjectStacking);
+  });
+
+  test('renderTop', function() {
+    ok(typeof canvas.renderTop == 'function');
+    equal(canvas, canvas.renderTop());
+  });
+
   test('calcOffset', function() {
     ok(typeof canvas.calcOffset == 'function', 'should respond to `calcOffset`');
     equal(canvas.calcOffset(), canvas, 'should be chainable');
