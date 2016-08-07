@@ -3134,6 +3134,7 @@ fabric.Pattern = fabric.util.createClass({
         onBeforeScaleRotate: function() {},
         enableRetinaScaling: true,
         _initStatic: function(el, options) {
+            var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
             this._objects = [];
             this._createLowerCanvas(el);
             this._initOptions(options);
@@ -3142,16 +3143,16 @@ fabric.Pattern = fabric.util.createClass({
                 this._initRetinaScaling();
             }
             if (options.overlayImage) {
-                this.setOverlayImage(options.overlayImage, this.renderAll.bind(this));
+                this.setOverlayImage(options.overlayImage, cb);
             }
             if (options.backgroundImage) {
-                this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
+                this.setBackgroundImage(options.backgroundImage, cb);
             }
             if (options.backgroundColor) {
-                this.setBackgroundColor(options.backgroundColor, this.renderAll.bind(this));
+                this.setBackgroundColor(options.backgroundColor, cb);
             }
             if (options.overlayColor) {
-                this.setOverlayColor(options.overlayColor, this.renderAll.bind(this));
+                this.setOverlayColor(options.overlayColor, cb);
             }
             this.calcOffset();
         },
