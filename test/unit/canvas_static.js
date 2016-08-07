@@ -81,7 +81,7 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],    
+    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
@@ -160,7 +160,7 @@
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
-      canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
     }
   });
@@ -486,7 +486,7 @@
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(4);
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
-
+    canvas.setZoom(1);
   });
 
   test('centerObjectV', function() {
@@ -511,6 +511,7 @@
     canvas.setZoom(4);
     equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
+    canvas.setZoom(1);
   });
 
   test('viewportCenterObjectH', function() {
@@ -1322,6 +1323,79 @@
       left: 50,
       originX: 'right'
     });
+  });
+
+  test('setViewportTransform', function() {
+    ok(typeof canvas.setViewportTransform == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.viewportTransform, vpt, 'viewport now is the set one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getZoom', function() {
+    ok(typeof canvas.getZoom == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('setZoom', function() {
+    ok(typeof canvas.setZoom == 'function');
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setZoom(2);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('zoomToPoint', function() {
+    ok(typeof canvas.zoomToPoint == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.zoomToPoint(point, 1);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'viewport has no changes if not moving with zoom level');
+    canvas.zoomToPoint(point, 2);
+    deepEqual(canvas.viewportTransform, [2, 0, 0, 2, -50, -50], 'viewport has a translation effect and zoom');
+    canvas.zoomToPoint(point, 3);
+    deepEqual(canvas.viewportTransform, [3, 0, 0, 3, -100, -100], 'viewport has a translation effect and zoom');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('absolutePan', function() {
+    ok(typeof canvas.absolutePan == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has translation effect applied');
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has same translation effect applied');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('relativePan', function() {
+    ok(typeof canvas.relativePan == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(-50, -50);
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -50, -50], 'viewport has translation effect applied');
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -100, -100], 'viewport has translation effect applied on top of old one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getActiveObject', function() {
+    ok(typeof canvas.getActiveObject == 'function');
+    equal(canvas.getActiveObject(), null, 'should return null');
+  });
+
+  test('getActiveGroup', function() {
+    ok(typeof canvas.getActiveGroup == 'function');
+    equal(canvas.getActiveGroup(), null, 'should return null');
   });
 
   //how to test with an exception?

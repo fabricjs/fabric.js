@@ -669,13 +669,13 @@
     setViewportTransform: function (vpt) {
       var activeGroup = this.getActiveGroup();
       this.viewportTransform = vpt;
-      this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
       }
       if (activeGroup) {
         activeGroup.setCoords();
       }
+      this.renderAll();
       return this;
     },
 
@@ -688,18 +688,16 @@
      */
     zoomToPoint: function (point, value) {
       // TODO: just change the scale, preserve other transformations
-      var before = point;
+      var before = point, vpt = [];
+      vpt[1] = this.viewportTransform[1];
+      vpt[2] = this.viewportTransform[2];
       point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
-      this.viewportTransform[0] = value;
-      this.viewportTransform[3] = value;
+      vpt[0] = value;
+      vpt[3] = value;
       var after = fabric.util.transformPoint(point, this.viewportTransform);
-      this.viewportTransform[4] += before.x - after.x;
-      this.viewportTransform[5] += before.y - after.y;
-      this.renderAll();
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
-      }
-      return this;
+      vpt[4] += before.x - after.x;
+      vpt[5] += before.y - after.y;
+      return this.setViewportTransform(vpt);
     },
 
     /**
@@ -720,13 +718,14 @@
      * @chainable true
      */
     absolutePan: function (point) {
+      var vpt;
+      vpt[0] = this.viewportTransform[0];
+      vpt[1] = this.viewportTransform[1];
+      vpt[2] = this.viewportTransform[2];
+      vpt[3] = this.viewportTransform[3];
       this.viewportTransform[4] = -point.x;
       this.viewportTransform[5] = -point.y;
-      this.renderAll();
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
-      }
-      return this;
+      return this.setViewportTransform(vpt);
     },
 
     /**

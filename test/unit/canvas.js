@@ -801,15 +801,32 @@
     equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
     equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
     object.angle = 90;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
     equal(normalizedPointer.x, -15, 'should consider angle');
     equal(normalizedPointer.y, -25, 'should consider angle');
+    object.angle = 0;
     object.scaleX = 2;
     object.scaleY = 2;
-    equal(normalizedPointer.x, -7.5, 'should consider scale');
-    equal(normalizedPointer.y, -12.5, 'should consider scale');
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should consider scale');
+    equal(normalizedPointer.y, -20, 'should consider scale');
     object.skewX = 60;
-    equal(normalizedPointer.x, -7.5, 'should be in top left corner of rect');
-    equal(normalizedPointer.y, -12.5, 'should be in top left corner of rect');
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
+    equal(normalizedPointer.y, -20, 'should not change');
+  });
+
+  test('restorePointerVpt', function(){
+    ok(typeof canvas.restorePointerVpt == 'function');
+    var pointer = { x: 10, y: 20 },
+        restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
+    equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
+    canvas.viewportTransform = [2, 0, 0, 2, 50, -60];
+    restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, -20, 'vpt changes restored');
+    equal(restoredPointer.y, 40, 'vpt changes restored');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   // asyncTest('loadFromJSON with backgroundImage', function() {
@@ -1332,6 +1349,24 @@
 
     rect.set('left', 175).set('top', 175).setCoords();
     ok(canvas.containsPoint(eventStub, rect), 'on rect at (200, 200) should be within area (175, 175, 225, 225)');
+  });
+
+  test('containsPoint in viewport transform', function() {
+    canvas.viewportTransform = [2, 0, 0, 2, 50, 50];
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+
+    var eventStub = {
+      clientX: canvasOffset.left + 250,
+      clientY: canvasOffset.top + 250,
+      target: rect
+    };
+
+    ok(canvas.containsPoint(eventStub, rect), 'point at (250, 250) should be within area (75, 75, 125, 125)');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   asyncTest('fxRemove', function() {
