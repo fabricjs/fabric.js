@@ -102,15 +102,6 @@
     altActionKey:           'shiftKey',
 
     /**
-     * Indicates which key enable last rendered selection independently of stack position
-     * values: altKey, shiftKey, ctrlKey
-     * @since 1.6.3
-     * @type String
-     * @default
-     */
-    lastRenderedKey:        'altKey',
-
-    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
@@ -235,6 +226,13 @@
     isDrawingMode:          false,
 
     /**
+     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * @type Boolean
+     * @default
+     */
+    preserveObjectStacking: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -249,6 +247,73 @@
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
 
       this.calcOffset();
+    },
+
+    /**
+     * Divides objects in two groups, one to render immediately
+     * and one to render as activeGroup.
+     * @return {Array} objects to render immediately and pushes the other in the activeGroup.
+     */
+    _chooseObjectsToRender: function() {
+      var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject(),
+          object, objsToRender = [ ], activeGroupObjects = [ ];
+
+      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
+        for (var i = 0, length = this._objects.length; i < length; i++) {
+          object = this._objects[i];
+          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
+            objsToRender.push(object);
+          }
+          else {
+            activeGroupObjects.push(object);
+          }
+        }
+        if (activeGroup) {
+          activeGroup._set('_objects', activeGroupObjects);
+          objsToRender.push(activeGroup);
+        }
+        activeObject && objsToRender.push(activeObject);
+      }
+      else {
+        objsToRender = this._objects;
+      }
+      return objsToRender;
+    },
+
+    /**
+     * Renders both the top canvas and the secondary container canvas.
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    renderAll: function () {
+      if (this.selection && !this._groupSelector && !this.isDrawingMode) {
+        this.clearContext(this.contextTop);
+      }
+      var canvasToDrawOn = this.contextContainer;
+      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+      return this;
+    },
+
+    /**
+     * Method to render only the top canvas.
+     * Also used to render the group selection box.
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    renderTop: function () {
+      var ctx = this.contextTop;
+      this.clearContext(ctx);
+
+      // we render the top context - last object
+      if (this.selection && this._groupSelector) {
+        this._drawSelection(ctx);
+      }
+
+      this.fire('after:render');
+
+      return this;
     },
 
     /**
@@ -308,8 +373,9 @@
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target, point) {
-      var pointer = point || this.getPointer(e, true),
-          xy = this._normalizePointer(target, pointer);
+      var ignoreZoom = true,
+          pointer = point || this.getPointer(e, ignoreZoom),
+          xy;
 
       if (target.group && target.group === this.getActiveGroup()) {
         xy = this._normalizePointer(target.group, pointer);
@@ -326,18 +392,13 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-      var lt, m;
-
-      m = fabric.util.multiplyTransformMatrices(
-            this.viewportTransform,
-            object.calcTransformMatrix());
-
-      m = fabric.util.invertTransform(m);
-      pointer = fabric.util.transformPoint(pointer, m , false);
-      lt = fabric.util.transformPoint(object.getCenterPoint(), m , false);
-      pointer.x -= lt.x;
-      pointer.y -= lt.y;
-      return { x: pointer.x, y: pointer.y };
+      var m = object.calcTransformMatrix(),
+          invertedM = fabric.util.invertTransform(m),
+          vpt = this.viewportTransform,
+          vptPointer = this.restorePointerVpt(pointer),
+          p = fabric.util.transformPoint(vptPointer, invertedM);
+      return fabric.util.transformPoint(p, vpt);
+      //return { x: p.x * vpt[0], y: p.y * vpt[3] };
     },
 
     /**
@@ -351,15 +412,13 @@
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners,
           ctx = this.contextCache,
-          shouldTransform = target.group && target.group === this.getActiveGroup();
+          originalColor = target.selectionBackgroundColor;
 
       target.hasBorders = target.transparentCorners = false;
+      target.selectionBackgroundColor = '';
 
       ctx.save();
       ctx.transform.apply(ctx, this.viewportTransform);
-      if (shouldTransform) {
-        ctx.transform.apply(ctx, target.group.calcTransformMatrix());
-      }
       target.render(ctx);
       ctx.restore();
 
@@ -367,6 +426,7 @@
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
+      target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
         ctx, x, y, this.targetFindTolerance);
@@ -795,7 +855,6 @@
       }
       else if (t.originX === 'center') {
         localMouse.x *= t.mouseXSign * 2;
-
         if (localMouse.x < 0) {
           t.mouseXSign = -t.mouseXSign;
         }
@@ -806,7 +865,6 @@
       }
       else if (t.originY === 'center') {
         localMouse.y *= t.mouseYSign * 2;
-
         if (localMouse.y < 0) {
           t.mouseYSign = -t.mouseYSign;
         }
@@ -876,6 +934,7 @@
     },
 
     /**
+     * @param {fabric.Object} target to reset transform
      * @private
      */
     _resetObjectTransform: function (target) {
@@ -888,10 +947,10 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx to draw the selection on
      */
-    _drawSelection: function () {
-      var ctx = this.contextTop,
-          groupSelector = this._groupSelector,
+    _drawSelection: function (ctx) {
+      var groupSelector = this._groupSelector,
           left = groupSelector.left,
           top = groupSelector.top,
           aleft = abs(left),
@@ -936,19 +995,6 @@
     },
 
     /**
-     * @private
-     */
-    _isLastRenderedObject: function(pointer, e) {
-      var lastRendered = this.lastRenderedWithControls;
-      return (
-        (this.preserveObjectStacking || e[this.lastRenderedKey]) &&
-        lastRendered &&
-        lastRendered.visible &&
-        (this.containsPoint(null, lastRendered, pointer) ||
-        lastRendered._findTargetCorner(pointer)));
-    },
-
-    /**
      * Method that determines what object we are clicking on
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
@@ -958,8 +1004,10 @@
         return;
       }
 
-      var pointer = this.getPointer(e, true),
-      activeGroup = this.getActiveGroup();
+      var ignoreZoom = true,
+          pointer = this.getPointer(e, ignoreZoom),
+          activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject();
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -968,14 +1016,13 @@
         return activeGroup;
       }
 
-      var objects = this._objects;
-      this.targets = [ ];
-
-      if (this._isLastRenderedObject(pointer, e)) {
-        objects = [this.lastRenderedWithControls];
+      if (activeObject && this._checkTarget(pointer, activeObject)) {
+        return activeObject;
       }
 
-      var target = this._searchPossibleTargets(objects, pointer);
+      this.targets = [ ];
+
+      var target = this._searchPossibleTargets(this._objects, pointer);
       this._fireOverOutEvents(target, e);
       return target;
     },
@@ -1046,6 +1093,18 @@
     },
 
     /**
+     * Returns pointer coordinates without the effect of the viewport
+     * @param {Object} pointer with "x" and "y" number values
+     * @return {Object} object with "x" and "y" number values
+     */
+    restorePointerVpt: function(pointer) {
+      return fabric.util.transformPoint(
+        pointer,
+        fabric.util.invertTransform(this.viewportTransform)
+      );
+    },
+
+    /**
      * Returns pointer coordinates relative to canvas.
      * @param {Event} e
      * @return {Object} object with "x" and "y" number values
@@ -1074,10 +1133,7 @@
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
       if (!ignoreZoom) {
-        pointer = fabric.util.transformPoint(
-          pointer,
-          fabric.util.invertTransform(this.viewportTransform)
-        );
+        pointer = this.restorePointerVpt(pointer);
       }
 
       if (boundsWidth === 0 || boundsHeight === 0) {
@@ -1222,6 +1278,20 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was removed
+     */
+    _onObjectRemoved: function(obj) {
+      // removing active object should fire "selection:cleared" events
+      if (this.getActiveObject() === obj) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared');
+      }
+      this.callSuper('_onObjectRemoved', obj);
+    },
+
+    /**
+     * @private
      */
     _discardActiveObject: function() {
       if (this._activeObject) {
@@ -1349,6 +1419,18 @@
     },
 
     /**
+     * Clears all contexts (background, main, top) of an instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function () {
+      this.discardActiveGroup();
+      this.discardActiveObject();
+      this.clearContext(this.contextTop);
+      return this.callSuper('clear');
+    },
+
+    /**
      * Draws objects' controls (borders/controls)
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
@@ -1372,30 +1454,9 @@
           continue;
         }
         this._objects[i]._renderControls(ctx);
-        this.lastRenderedWithControls = this._objects[i];
       }
     },
 
-    /**
-     * @private
-     * @param {fabric.Object} obj Object that was removed
-     */
-    _onObjectRemoved: function(obj) {
-      if (obj === this.lastRenderedWithControls) {
-        delete this.lastRenderedWithControls;
-      }
-      this.callSuper('_onObjectRemoved', obj);
-    },
-
-    /**
-     * Clears all contexts (background, main, top) of an instance
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    clear: function () {
-      delete this.lastRenderedWithControls;
-      return this.callSuper('clear');
-    }
   });
 
   // copying static properties manually to work around Opera's bug,

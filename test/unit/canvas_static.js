@@ -81,7 +81,7 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],    
+    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
@@ -158,9 +158,7 @@
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.backgroundImage = fabric.StaticCanvas.prototype.backgroundImage;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
-      canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
-      canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
-      canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
     }
   });
@@ -434,16 +432,6 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('preserveObjectStacking', function() {
-    ok(typeof canvas.preserveObjectStacking == 'boolean');
-    ok(!canvas.preserveObjectStacking);
-  });
-
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
-  });
-
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
@@ -486,7 +474,7 @@
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(4);
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
-
+    canvas.setZoom(1);
   });
 
   test('centerObjectV', function() {
@@ -511,6 +499,7 @@
     canvas.setZoom(4);
     equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
+    canvas.setZoom(1);
   });
 
   test('viewportCenterObjectH', function() {
@@ -924,42 +913,6 @@
     });
   });
 
-  test('loadFromJSON with custom properties on Canvas with no async object', function() {
-    var serialized = JSON.parse(PATH_JSON);
-    serialized.controlsAboveOverlay = true;
-    serialized.preserveObjectStacking = true;
-    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
-    canvas.loadFromJSON(serialized, function() {
-      ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(canvas.controlsAboveOverlay, true);
-      equal(canvas.preserveObjectStacking, true);
-    });
-    // if no async object the callback is called syncronously
-    equal(canvas.controlsAboveOverlay, true);
-    equal(canvas.preserveObjectStacking, true);
-  });
-
-  asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
-+ '"background":"green"}';
-    var serialized = JSON.parse(JSON_STRING);
-    serialized.controlsAboveOverlay = true;
-    serialized.preserveObjectStacking = true;
-    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
-    canvas.loadFromJSON(serialized, function() {
-      ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(canvas.controlsAboveOverlay, true);
-      equal(canvas.preserveObjectStacking, true);
-      start();
-    });
-    // before callback the properties are still false.
-    equal(canvas.controlsAboveOverlay, false);
-    equal(canvas.preserveObjectStacking, false);
-  });
-
-
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
@@ -1322,6 +1275,87 @@
       left: 50,
       originX: 'right'
     });
+  });
+
+  test('setViewportTransform', function() {
+    ok(typeof canvas.setViewportTransform == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.viewportTransform, vpt, 'viewport now is the set one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getZoom', function() {
+    ok(typeof canvas.getZoom == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('setZoom', function() {
+    ok(typeof canvas.setZoom == 'function');
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setZoom(2);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('zoomToPoint', function() {
+    ok(typeof canvas.zoomToPoint == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.zoomToPoint(point, 1);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'viewport has no changes if not moving with zoom level');
+    canvas.zoomToPoint(point, 2);
+    deepEqual(canvas.viewportTransform, [2, 0, 0, 2, -50, -50], 'viewport has a translation effect and zoom');
+    canvas.zoomToPoint(point, 3);
+    deepEqual(canvas.viewportTransform, [3, 0, 0, 3, -100, -100], 'viewport has a translation effect and zoom');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('absolutePan', function() {
+    ok(typeof canvas.absolutePan == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has translation effect applied');
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has same translation effect applied');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('relativePan', function() {
+    ok(typeof canvas.relativePan == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(-50, -50);
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -50, -50], 'viewport has translation effect applied');
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -100, -100], 'viewport has translation effect applied on top of old one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getActiveObject', function() {
+    ok(typeof canvas.getActiveObject == 'function');
+    var activeObject = canvas.getActiveObject();
+    equal(activeObject, null, 'should return null');
+  });
+
+  test('getActiveGroup', function() {
+    ok(typeof canvas.getActiveGroup == 'function');
+    var activeGroup = canvas.getActiveGroup();
+    equal(activeGroup, null, 'should return null');
+  });
+
+  test('getContext', function() {
+    ok(typeof canvas.getContext == 'function');
+    var context = canvas.getContext();
+    equal(context, canvas.contextContainer, 'should return the context container');
   });
 
   //how to test with an exception?

@@ -837,7 +837,7 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+      if (this.group && !this.group._transformDone && this.group === this.canvas._activeGroup) {
         this.group.transform(ctx);
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -949,6 +949,20 @@
      */
     get: function(property) {
       return this[property];
+    },
+
+    /**
+     * Return the object scale factor counting also the group scaling
+     * @return {Object} object with scaleX and scaleY properties
+     */
+    getObjectScaling: function() {
+      var scaleX = this.scaleX, scaleY = this.scaleY;
+      if (this.group) {
+        var scaling = this.group.getObjectScaling();
+        scaleX *= scaling.scaleX;
+        scaleY *= scaling.scaleY;
+      }
+      return { scaleX: scaleX, scaleY: scaleY };
     },
 
     /**
@@ -1194,15 +1208,16 @@
       }
 
       var multX = (this.canvas && this.canvas.viewportTransform[0]) || 1,
-          multY = (this.canvas && this.canvas.viewportTransform[3]) || 1;
+          multY = (this.canvas && this.canvas.viewportTransform[3]) || 1,
+          scaling = this.getObjectScaling();
       if (this.canvas && this.canvas._isRetinaScaling()) {
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
       }
       ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (this.scaleX + this.scaleY) / 4;
-      ctx.shadowOffsetX = this.shadow.offsetX * multX * this.scaleX;
-      ctx.shadowOffsetY = this.shadow.offsetY * multY * this.scaleY;
+      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
+      ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
     },
 
     /**

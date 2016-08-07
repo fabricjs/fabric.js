@@ -46,9 +46,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * Creates path
    */
   createPath: function(pathData) {
-    var path = this.callSuper('createPath', pathData);
+    var path = this.callSuper('createPath', pathData),
+        topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+
     path.stroke = new fabric.Pattern({
-      source: this.source || this.getPatternSrcFunction()
+      source: this.source || this.getPatternSrcFunction(),
+      offsetX: -topLeft.x,
+      offsetY: -topLeft.y
     });
     return path;
   }

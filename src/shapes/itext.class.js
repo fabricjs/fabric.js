@@ -213,12 +213,7 @@
      */
     setSelectionStart: function(index) {
       index = Math.max(index, 0);
-      if (this.selectionStart !== index) {
-        this.fire('selection:changed');
-        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
-        this.selectionStart = index;
-      }
-      this._updateTextarea();
+      this._updateAndFire('selectionStart', index);
     },
 
     /**
@@ -227,12 +222,29 @@
      */
     setSelectionEnd: function(index) {
       index = Math.min(index, this.text.length);
-      if (this.selectionEnd !== index) {
-        this.fire('selection:changed');
-        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
-        this.selectionEnd = index;
+      this._updateAndFire('selectionEnd', index);
+    },
+
+    /**
+     * @private
+     * @param {String} property 'selectionStart' or 'selectionEnd'
+     * @param {Number} index new position of property
+     */
+    _updateAndFire: function(property, index) {
+      if (this[property] !== index) {
+        this._fireSelectionChanged();
+        this[property] = index;
       }
       this._updateTextarea();
+    },
+
+    /**
+     * Fires the even of selection changed
+     * @private
+     */
+    _fireSelectionChanged: function() {
+      this.fire('selection:changed');
+      this.canvas && this.canvas.fire('text:selection:changed', { target: this });
     },
 
     /**
@@ -313,7 +325,6 @@
       if (!this.active || !this.isEditing) {
         return;
       }
-
       var chars = this.text.split(''),
           boundaries, ctx;
 
