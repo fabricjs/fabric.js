@@ -48,6 +48,22 @@
                   '"shadow":null,'+
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  }
+
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) return path;
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
+
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
 
@@ -68,6 +84,8 @@
   QUnit.module('fabric.Canvas', {
     setup: function() {
       upperCanvasEl.style.display = '';
+      canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
+      canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
     },
     teardown: function() {
       canvas.clear();
@@ -101,6 +119,83 @@
     ok(typeof canvas.item == 'function', 'should respond to item');
     canvas.add(rect);
     equal(canvas.item(0), rect, 'should return proper item');
+  });
+
+  test('preserveObjectStacking', function() {
+    ok(typeof canvas.preserveObjectStacking == 'boolean');
+    ok(!canvas.preserveObjectStacking, 'default is false');
+  });
+
+  test('uniScaleTransform', function() {
+    ok(typeof canvas.uniScaleTransform == 'boolean');
+    ok(!canvas.uniScaleTransform, 'default is false');
+  });
+
+  test('uniScaleKey', function() {
+    ok(typeof canvas.uniScaleKey == 'string');
+    equal(canvas.uniScaleKey, 'shiftKey', 'default is shift');
+  });
+
+  test('centeredScaling', function() {
+    ok(typeof canvas.centeredScaling == 'boolean');
+    ok(!canvas.centeredScaling, 'default is false');
+  });
+
+  test('centeredRotation', function() {
+    ok(typeof canvas.centeredRotation == 'boolean');
+    ok(!canvas.centeredRotation, 'default is false');
+  });
+
+  test('centeredKey', function() {
+    ok(typeof canvas.centeredKey == 'string');
+    equal(canvas.centeredKey, 'altKey', 'default is alt');
+  });
+
+  test('altActionKey', function() {
+    ok(typeof canvas.altActionKey == 'string');
+    equal(canvas.altActionKey, 'shiftKey', 'default is shift');
+  });
+
+  test('interactive', function() {
+    ok(typeof canvas.interactive == 'boolean');
+    ok(canvas.interactive, 'default is true');
+  });
+
+  test('selection', function() {
+    ok(typeof canvas.selection == 'boolean');
+    ok(canvas.selection, 'default is true');
+  });
+
+  test('_initInteractive', function() {
+    ok(typeof canvas._initInteractive == 'function');
+  });
+
+  test('renderTop', function() {
+    ok(typeof canvas.renderTop == 'function');
+    equal(canvas, canvas.renderTop());
+  });
+
+  test('_chooseObjectsToRender', function() {
+    ok(typeof canvas._chooseObjectsToRender == 'function');
+    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    canvas.add(rect);
+    canvas.add(rect2);
+    canvas.add(rect3);
+    var objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect);
+    equal(objs[1], rect2);
+    equal(objs[2], rect3);
+    canvas.setActiveObject(rect);
+    objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect2);
+    equal(objs[1], rect3);
+    equal(objs[2], rect);
+    canvas.setActiveObject(rect2);
+    canvas.preserveObjectStacking = true;
+    objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect);
+    equal(objs[1], rect2);
+    equal(objs[2], rect3);
   });
 
   test('calcOffset', function() {
@@ -214,9 +309,8 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
+  test('_drawSelection', function() {
+    ok(typeof canvas._drawSelection == 'function');
   });
 
   test('findTarget', function() {
@@ -793,6 +887,78 @@
     });
   });
 
+  test('loadFromJSON with custom properties on Canvas with no async object', function() {
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.controlsAboveOverlay = true;
+    serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(canvas.controlsAboveOverlay, true);
+      equal(canvas.preserveObjectStacking, true);
+    });
+    // if no async object the callback is called syncronously
+    equal(canvas.controlsAboveOverlay, true);
+    equal(canvas.preserveObjectStacking, true);
+  });
+
+  asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
++ '"background":"green"}';
+    var serialized = JSON.parse(JSON_STRING);
+    serialized.controlsAboveOverlay = true;
+    serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(canvas.controlsAboveOverlay, true);
+      equal(canvas.preserveObjectStacking, true);
+      start();
+    });
+    // before callback the properties are still false.
+    equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.preserveObjectStacking, false);
+  });
+
+
+  test('normalize pointer', function(){
+    ok(typeof canvas._normalizePointer == 'function');
+    var pointer = { x: 10, y: 20 },
+        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
+        normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
+    equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
+    object.angle = 90;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -15, 'should consider angle');
+    equal(normalizedPointer.y, -25, 'should consider angle');
+    object.angle = 0;
+    object.scaleX = 2;
+    object.scaleY = 2;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should consider scale');
+    equal(normalizedPointer.y, -20, 'should consider scale');
+    object.skewX = 60;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
+    equal(normalizedPointer.y, -20, 'should not change');
+  });
+
+  test('restorePointerVpt', function(){
+    ok(typeof canvas.restorePointerVpt == 'function');
+    var pointer = { x: 10, y: 20 },
+        restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
+    equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
+    canvas.viewportTransform = [2, 0, 0, 2, 50, -60];
+    restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, -20, 'vpt changes restored');
+    equal(restoredPointer.y, 40, 'vpt changes restored');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+  });
+
   // asyncTest('loadFromJSON with backgroundImage', function() {
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
   //   var anotherCanvas = new fabric.Canvas();
@@ -1313,6 +1479,104 @@
 
     rect.set('left', 175).set('top', 175).setCoords();
     ok(canvas.containsPoint(eventStub, rect), 'on rect at (200, 200) should be within area (175, 175, 225, 225)');
+  });
+
+  test('setupCurrentTransform', function() {
+    ok(typeof canvas._setupCurrentTransform == 'function');
+
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + 100,
+      clientY: canvasOffset.top + 100,
+      target: rect
+    };
+    rect.active = true;
+    canvas._setupCurrentTransform(eventStub, rect);
+    var t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'drag', 'should target inside rect and setup drag');
+    equal(t.corner, 0, 'no corner selected');
+    equal(t.originX, rect.originX, 'no origin change for drag');
+    equal(t.originY, rect.originY, 'no origin change for drag');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
+      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
+      target: rect
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'scale', 'should target a corner and setup scale');
+    equal(t.corner, 'tl', 'tl selected');
+    equal(t.originX, 'right', 'origin in opposite direction');
+    equal(t.originY, 'bottom', 'origin in opposite direction');
+    equal(t.shiftKey, undefined, 'shift was not pressed');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.left - 2,
+      clientY: canvasOffset.top + rect.top + rect.height/2,
+      target: rect,
+      shiftKey: true
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'skewY', 'should target a corner and setup skew');
+    equal(t.shiftKey, true, 'shift was pressed');
+    equal(t.corner, 'ml', 'ml selected');
+    equal(t.originX, 'right', 'origin in opposite direction');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.mtr.x,
+      clientY: canvasOffset.top + rect.oCoords.mtr.y,
+      target: rect,
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'rotate', 'should target a corner and setup rotate');
+    equal(t.corner, 'mtr', 'mtr selected');
+    canvas._currentTransform = false;
+  });
+
+  test('_scaleObject', function() {
+    ok(typeof canvas._scaleObject == 'function');
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
+      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
+      target: rect
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    var scaled = canvas._scaleObject(30, 30, 'equally');
+    equal(scaled, true, 'return true if scaling happened');
+    scaled = canvas._scaleObject(30, 30, 'equally');
+    equal(scaled, false, 'return false if no movement happen');
+  });
+
+  test('containsPoint in viewport transform', function() {
+    canvas.viewportTransform = [2, 0, 0, 2, 50, 50];
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+
+    var eventStub = {
+      clientX: canvasOffset.left + 250,
+      clientY: canvasOffset.top + 250,
+      target: rect
+    };
+
+    ok(canvas.containsPoint(eventStub, rect), 'point at (250, 250) should be within area (75, 75, 125, 125)');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   asyncTest('fxRemove', function() {

@@ -134,13 +134,6 @@
     imageSmoothingEnabled: true,
 
     /**
-     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
-     * @type Boolean
-     * @default
-     */
-    preserveObjectStacking: false,
-
-    /**
      * The transformation (in the format of Canvas transform) which focuses the viewport
      * @type Array
      * @default
@@ -181,6 +174,7 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
+      var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
       this._objects = [];
 
       this._createLowerCanvas(el);
@@ -193,16 +187,16 @@
       }
 
       if (options.overlayImage) {
-        this.setOverlayImage(options.overlayImage, this.renderAll.bind(this));
+        this.setOverlayImage(options.overlayImage, cb);
       }
       if (options.backgroundImage) {
-        this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
+        this.setBackgroundImage(options.backgroundImage, cb);
       }
       if (options.backgroundColor) {
-        this.setBackgroundColor(options.backgroundColor, this.renderAll.bind(this));
+        this.setBackgroundColor(options.backgroundColor, cb);
       }
       if (options.overlayColor) {
-        this.setOverlayColor(options.overlayColor, this.renderAll.bind(this));
+        this.setOverlayColor(options.overlayColor, cb);
       }
       this.calcOffset();
     },
@@ -669,13 +663,13 @@
     setViewportTransform: function (vpt) {
       var activeGroup = this.getActiveGroup();
       this.viewportTransform = vpt;
-      this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
       }
       if (activeGroup) {
         activeGroup.setCoords();
       }
+      this.renderAll();
       return this;
     },
 
@@ -688,18 +682,14 @@
      */
     zoomToPoint: function (point, value) {
       // TODO: just change the scale, preserve other transformations
-      var before = point;
+      var before = point, vpt = this.viewportTransform.slice(0);
       point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
-      this.viewportTransform[0] = value;
-      this.viewportTransform[3] = value;
-      var after = fabric.util.transformPoint(point, this.viewportTransform);
-      this.viewportTransform[4] += before.x - after.x;
-      this.viewportTransform[5] += before.y - after.y;
-      this.renderAll();
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
-      }
-      return this;
+      vpt[0] = value;
+      vpt[3] = value;
+      var after = fabric.util.transformPoint(point, vpt);
+      vpt[4] += before.x - after.x;
+      vpt[5] += before.y - after.y;
+      return this.setViewportTransform(vpt);
     },
 
     /**
@@ -720,13 +710,10 @@
      * @chainable true
      */
     absolutePan: function (point) {
-      this.viewportTransform[4] = -point.x;
-      this.viewportTransform[5] = -point.y;
-      this.renderAll();
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
-      }
-      return this;
+      var vpt = this.viewportTransform.slice(0);
+      vpt[4] = -point.x;
+      vpt[5] = -point.y;
+      return this.setViewportTransform(vpt);
     },
 
     /**
@@ -783,13 +770,6 @@
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
-      // removing active object should fire "selection:cleared" events
-      if (this.getActiveObject() === obj) {
-        this.fire('before:selection:cleared', { target: obj });
-        this._discardActiveObject();
-        this.fire('selection:cleared');
-      }
-
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
     },
@@ -820,95 +800,62 @@
      */
     clear: function () {
       this._objects.length = 0;
-      if (this.discardActiveGroup) {
-        this.discardActiveGroup();
-      }
-      if (this.discardActiveObject) {
-        this.discardActiveObject();
-      }
       this.clearContext(this.contextContainer);
-      if (this.contextTop) {
-        this.clearContext(this.contextTop);
-      }
       this.fire('canvas:cleared');
       this.renderAll();
       return this;
     },
 
     /**
-     * Divides objects in two groups, one to render immediately
-     * and one to render as activeGroup.
-     * return objects to render immediately and pushes the other in the activeGroup.
-     */
-    _chooseObjectsToRender: function() {
-      var activeGroup = this.getActiveGroup(),
-          activeObject = this.getActiveObject(),
-          object, objsToRender = [ ], activeGroupObjects = [ ];
-
-      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
-        for (var i = 0, length = this._objects.length; i < length; i++) {
-          object = this._objects[i];
-          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
-            objsToRender.push(object);
-          }
-          else {
-            activeGroupObjects.push(object);
-          }
-        }
-        activeGroup && activeGroup._set('_objects', activeGroupObjects);
-      }
-      else {
-        objsToRender = this._objects;
-      }
-      return objsToRender;
-    },
-
-    /**
-     * Renders both the top canvas and the secondary container canvas.
-     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
+     * Renders both the canvas.
      * @return {fabric.Canvas} instance
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer, objsToRender;
-
-      if (this.contextTop && this.selection && !this._groupSelector && !this.isDrawingMode) {
-        this.clearContext(this.contextTop);
-      }
-
-      this.clearContext(canvasToDrawOn);
-
-      this.fire('before:render');
-
-      if (this.clipTo) {
-        fabric.util.clipContext(this, canvasToDrawOn);
-      }
-      this._renderBackground(canvasToDrawOn);
-
-      canvasToDrawOn.save();
-      objsToRender = this._chooseObjectsToRender();
-      //apply viewport transform once for all rendering process
-      canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
-      this._renderObjects(canvasToDrawOn, objsToRender);
-      if (!this.preserveObjectStacking) {
-        objsToRender = [this.getActiveGroup(), this.getActiveObject()];
-        this._renderObjects(canvasToDrawOn, objsToRender);
-      }
-      canvasToDrawOn.restore();
-
-      if (!this.controlsAboveOverlay && this.interactive) {
-        this.drawControls(canvasToDrawOn);
-      }
-      if (this.clipTo) {
-        canvasToDrawOn.restore();
-      }
-      this._renderOverlay(canvasToDrawOn);
-      if (this.controlsAboveOverlay && this.interactive) {
-        this.drawControls(canvasToDrawOn);
-      }
-
-      this.fire('after:render');
+      var canvasToDrawOn = this.contextContainer;
+      this.renderCanvas(canvasToDrawOn, this._objects);
       return this;
+    },
+
+    /**
+     * Renders background, objects, overlay and controls.
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {Array} objects to render
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    renderCanvas: function(ctx, objects) {
+      this.clearContext(ctx);
+      this.fire('before:render');
+      if (this.clipTo) {
+        fabric.util.clipContext(this, ctx);
+      }
+      this._renderBackground(ctx);
+
+      ctx.save();
+      //apply viewport transform once for all rendering process
+      ctx.transform.apply(ctx, this.viewportTransform);
+      this._renderObjects(ctx, objects);
+      ctx.restore();
+      if (!this.controlsAboveOverlay && this.interactive) {
+        this.drawControls(ctx);
+      }
+      if (this.clipTo) {
+        ctx.restore();
+      }
+      this._renderOverlay(ctx);
+      if (this.controlsAboveOverlay && this.interactive) {
+        this.drawControls(ctx);
+      }
+      this.fire('after:render');
+    },
+
+    /**
+     * dummy function for organization purpouse.
+     * @private
+     */
+    drawControls: function() {
+      // NOOP
     },
 
     /**
@@ -965,26 +912,6 @@
      */
     _renderOverlay: function(ctx) {
       this._renderBackgroundOrOverlay(ctx, 'overlay');
-    },
-
-    /**
-     * Method to render only the top canvas.
-     * Also used to render the group selection box.
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    renderTop: function () {
-      var ctx = this.contextTop || this.contextContainer;
-      this.clearContext(ctx);
-
-      // we render the top context - last object
-      if (this.selection && this._groupSelector) {
-        this._drawSelection();
-      }
-
-      this.fire('after:render');
-
-      return this;
     },
 
     /**
