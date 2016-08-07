@@ -30,6 +30,8 @@
    * @param {String} url URL to send XMLHttpRequest to
    * @param {Object} [options] Options object
    * @param {String} [options.method="GET"]
+   * @param {String} [options.parameters] parameters to append to url in GET or in body
+   * @param {String} [options.body] body to send with POST or PUT request
    * @param {Function} options.onComplete Callback to invoke when request is completed
    * @return {XMLHttpRequest} request
    */
@@ -40,7 +42,7 @@
     var method = options.method ? options.method.toUpperCase() : 'GET',
         onComplete = options.onComplete || function() { },
         xhr = makeXHR(),
-        body;
+        body = options.body || options.parameters;
 
     /** @ignore */
     xhr.onreadystatechange = function() {
