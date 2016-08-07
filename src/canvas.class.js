@@ -226,6 +226,13 @@
     isDrawingMode:          false,
 
     /**
+     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * @type Boolean
+     * @default
+     */
+    preserveObjectStacking: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -240,6 +247,73 @@
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
 
       this.calcOffset();
+    },
+
+    /**
+     * Divides objects in two groups, one to render immediately
+     * and one to render as activeGroup.
+     * @return {Array} objects to render immediately and pushes the other in the activeGroup.
+     */
+    _chooseObjectsToRender: function() {
+      var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject(),
+          object, objsToRender = [ ], activeGroupObjects = [ ];
+
+      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
+        for (var i = 0, length = this._objects.length; i < length; i++) {
+          object = this._objects[i];
+          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
+            objsToRender.push(object);
+          }
+          else {
+            activeGroupObjects.push(object);
+          }
+        }
+        if (activeGroup) {
+          activeGroup._set('_objects', activeGroupObjects);
+          objsToRender.push(activeGroup);
+        }
+        activeObject && objsToRender.push(activeObject);
+      }
+      else {
+        objsToRender = this._objects;
+      }
+      return objsToRender;
+    },
+
+    /**
+     * Renders both the top canvas and the secondary container canvas.
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    renderAll: function () {
+      if (this.selection && !this._groupSelector && !this.isDrawingMode) {
+        this.clearContext(this.contextTop);
+      }
+      var canvasToDrawOn = this.contextContainer;
+      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+      return this;
+    },
+
+    /**
+     * Method to render only the top canvas.
+     * Also used to render the group selection box.
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    renderTop: function () {
+      var ctx = this.contextTop;
+      this.clearContext(ctx);
+
+      // we render the top context - last object
+      if (this.selection && this._groupSelector) {
+        this._drawSelection();
+      }
+
+      this.fire('after:render');
+
+      return this;
     },
 
     /**
@@ -860,6 +934,7 @@
     },
 
     /**
+     * @param {fabric.Object} target to reset transform
      * @private
      */
     _resetObjectTransform: function (target) {
@@ -872,10 +947,10 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx to draw the selection on
      */
-    _drawSelection: function () {
-      var ctx = this.contextTop,
-          groupSelector = this._groupSelector,
+    _drawSelection: function (ctx) {
+      var groupSelector = this._groupSelector,
           left = groupSelector.left,
           top = groupSelector.top,
           aleft = abs(left),
@@ -1203,6 +1278,20 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was removed
+     */
+    _onObjectRemoved: function(obj) {
+      // removing active object should fire "selection:cleared" events
+      if (this.getActiveObject() === obj) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared');
+      }
+      this.callSuper('_onObjectRemoved', obj);
+    },
+
+    /**
+     * @private
      */
     _discardActiveObject: function() {
       if (this._activeObject) {
@@ -1330,6 +1419,18 @@
     },
 
     /**
+     * Clears all contexts (background, main, top) of an instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function () {
+      this.discardActiveGroup();
+      this.discardActiveObject();
+      this.clearContext(this.contextTop);
+      return this.callSuper('clear');
+    },
+
+    /**
      * Draws objects' controls (borders/controls)
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
@@ -1356,22 +1457,6 @@
       }
     },
 
-    /**
-     * @private
-     * @param {fabric.Object} obj Object that was removed
-     */
-    _onObjectRemoved: function(obj) {
-      this.callSuper('_onObjectRemoved', obj);
-    },
-
-    /**
-     * Clears all contexts (background, main, top) of an instance
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    clear: function () {
-      return this.callSuper('clear');
-    }
   });
 
   // copying static properties manually to work around Opera's bug,

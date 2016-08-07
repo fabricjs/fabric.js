@@ -3128,7 +3128,6 @@ fabric.Pattern = fabric.util.createClass({
         controlsAboveOverlay: false,
         allowTouchScrolling: false,
         imageSmoothingEnabled: true,
-        preserveObjectStacking: false,
         viewportTransform: [ 1, 0, 0, 1, 0, 0 ],
         backgroundVpt: true,
         overlayVpt: true,
@@ -3324,41 +3323,40 @@ fabric.Pattern = fabric.util.createClass({
         setViewportTransform: function(vpt) {
             var activeGroup = this.getActiveGroup();
             this.viewportTransform = vpt;
-            this.renderAll();
             for (var i = 0, len = this._objects.length; i < len; i++) {
                 this._objects[i].setCoords();
             }
             if (activeGroup) {
                 activeGroup.setCoords();
             }
+            this.renderAll();
             return this;
         },
         zoomToPoint: function(point, value) {
-            var before = point;
+            var before = point, vpt = [];
+            vpt[1] = this.viewportTransform[1];
+            vpt[2] = this.viewportTransform[2];
             point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
-            this.viewportTransform[0] = value;
-            this.viewportTransform[3] = value;
+            vpt[0] = value;
+            vpt[3] = value;
             var after = fabric.util.transformPoint(point, this.viewportTransform);
-            this.viewportTransform[4] += before.x - after.x;
-            this.viewportTransform[5] += before.y - after.y;
-            this.renderAll();
-            for (var i = 0, len = this._objects.length; i < len; i++) {
-                this._objects[i].setCoords();
-            }
-            return this;
+            vpt[4] += before.x - after.x;
+            vpt[5] += before.y - after.y;
+            return this.setViewportTransform(vpt);
         },
         setZoom: function(value) {
             this.zoomToPoint(new fabric.Point(0, 0), value);
             return this;
         },
         absolutePan: function(point) {
+            var vpt;
+            vpt[0] = this.viewportTransform[0];
+            vpt[1] = this.viewportTransform[1];
+            vpt[2] = this.viewportTransform[2];
+            vpt[3] = this.viewportTransform[3];
             this.viewportTransform[4] = -point.x;
             this.viewportTransform[5] = -point.y;
-            this.renderAll();
-            for (var i = 0, len = this._objects.length; i < len; i++) {
-                this._objects[i].setCoords();
-            }
-            return this;
+            return this.setViewportTransform(vpt);
         },
         relativePan: function(point) {
             return this.absolutePan(new fabric.Point(-point.x - this.viewportTransform[4], -point.y - this.viewportTransform[5]));
@@ -3382,13 +3380,6 @@ fabric.Pattern = fabric.util.createClass({
             obj.fire("added");
         },
         _onObjectRemoved: function(obj) {
-            if (this.getActiveObject() === obj) {
-                this.fire("before:selection:cleared", {
-                    target: obj
-                });
-                this._discardActiveObject();
-                this.fire("selection:cleared");
-            }
             this.fire("object:removed", {
                 target: obj
             });
@@ -3403,70 +3394,40 @@ fabric.Pattern = fabric.util.createClass({
         },
         clear: function() {
             this._objects.length = 0;
-            if (this.discardActiveGroup) {
-                this.discardActiveGroup();
-            }
-            if (this.discardActiveObject) {
-                this.discardActiveObject();
-            }
             this.clearContext(this.contextContainer);
-            if (this.contextTop) {
-                this.clearContext(this.contextTop);
-            }
             this.fire("canvas:cleared");
             this.renderAll();
             return this;
         },
-        _chooseObjectsToRender: function() {
-            var activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject(), object, objsToRender = [], activeGroupObjects = [];
-            if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
-                for (var i = 0, length = this._objects.length; i < length; i++) {
-                    object = this._objects[i];
-                    if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
-                        objsToRender.push(object);
-                    } else {
-                        activeGroupObjects.push(object);
-                    }
-                }
-                activeGroup && activeGroup._set("_objects", activeGroupObjects);
-            } else {
-                objsToRender = this._objects;
-            }
-            return objsToRender;
-        },
         renderAll: function() {
-            var canvasToDrawOn = this.contextContainer, objsToRender;
-            if (this.contextTop && this.selection && !this._groupSelector && !this.isDrawingMode) {
-                this.clearContext(this.contextTop);
-            }
-            this.clearContext(canvasToDrawOn);
-            this.fire("before:render");
-            if (this.clipTo) {
-                fabric.util.clipContext(this, canvasToDrawOn);
-            }
-            this._renderBackground(canvasToDrawOn);
-            canvasToDrawOn.save();
-            objsToRender = this._chooseObjectsToRender();
-            canvasToDrawOn.transform.apply(canvasToDrawOn, this.viewportTransform);
-            this._renderObjects(canvasToDrawOn, objsToRender);
-            if (!this.preserveObjectStacking) {
-                objsToRender = [ this.getActiveGroup(), this.getActiveObject() ];
-                this._renderObjects(canvasToDrawOn, objsToRender);
-            }
-            canvasToDrawOn.restore();
-            if (!this.controlsAboveOverlay && this.interactive) {
-                this.drawControls(canvasToDrawOn);
-            }
-            if (this.clipTo) {
-                canvasToDrawOn.restore();
-            }
-            this._renderOverlay(canvasToDrawOn);
-            if (this.controlsAboveOverlay && this.interactive) {
-                this.drawControls(canvasToDrawOn);
-            }
-            this.fire("after:render");
+            var canvasToDrawOn = this.contextContainer;
+            this.renderCanvas(canvasToDrawOn, this._objects);
             return this;
         },
+        renderCanvas: function(ctx, objects) {
+            this.clearContext(ctx);
+            this.fire("before:render");
+            if (this.clipTo) {
+                fabric.util.clipContext(this, ctx);
+            }
+            this._renderBackground(ctx);
+            ctx.save();
+            ctx.transform.apply(ctx, this.viewportTransform);
+            this._renderObjects(ctx, objects);
+            ctx.restore();
+            if (!this.controlsAboveOverlay && this.interactive) {
+                this.drawControls(ctx);
+            }
+            if (this.clipTo) {
+                ctx.restore();
+            }
+            this._renderOverlay(ctx);
+            if (this.controlsAboveOverlay && this.interactive) {
+                this.drawControls(ctx);
+            }
+            this.fire("after:render");
+        },
+        drawControls: function() {},
         _renderObjects: function(ctx, objects) {
             for (var i = 0, length = objects.length; i < length; ++i) {
                 objects[i] && objects[i].render(ctx);
@@ -3493,15 +3454,6 @@ fabric.Pattern = fabric.util.createClass({
         },
         _renderOverlay: function(ctx) {
             this._renderBackgroundOrOverlay(ctx, "overlay");
-        },
-        renderTop: function() {
-            var ctx = this.contextTop || this.contextContainer;
-            this.clearContext(ctx);
-            if (this.selection && this._groupSelector) {
-                this._drawSelection();
-            }
-            this.fire("after:render");
-            return this;
         },
         getCenter: function() {
             return {
@@ -4230,6 +4182,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         targetFindTolerance: 0,
         skipTargetFind: false,
         isDrawingMode: false,
+        preserveObjectStacking: false,
         _initInteractive: function() {
             this._currentTransform = null;
             this._groupSelector = null;
@@ -4239,6 +4192,44 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._initRetinaScaling();
             this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
             this.calcOffset();
+        },
+        _chooseObjectsToRender: function() {
+            var activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject(), object, objsToRender = [], activeGroupObjects = [];
+            if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
+                for (var i = 0, length = this._objects.length; i < length; i++) {
+                    object = this._objects[i];
+                    if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
+                        objsToRender.push(object);
+                    } else {
+                        activeGroupObjects.push(object);
+                    }
+                }
+                if (activeGroup) {
+                    activeGroup._set("_objects", activeGroupObjects);
+                    objsToRender.push(activeGroup);
+                }
+                activeObject && objsToRender.push(activeObject);
+            } else {
+                objsToRender = this._objects;
+            }
+            return objsToRender;
+        },
+        renderAll: function() {
+            if (this.selection && !this._groupSelector && !this.isDrawingMode) {
+                this.clearContext(this.contextTop);
+            }
+            var canvasToDrawOn = this.contextContainer;
+            this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+            return this;
+        },
+        renderTop: function() {
+            var ctx = this.contextTop;
+            this.clearContext(ctx);
+            if (this.selection && this._groupSelector) {
+                this._drawSelection();
+            }
+            this.fire("after:render");
+            return this;
         },
         _resetCurrentTransform: function() {
             var t = this._currentTransform;
@@ -4602,8 +4593,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             target.skewY = 0;
             target.setAngle(0);
         },
-        _drawSelection: function() {
-            var ctx = this.contextTop, groupSelector = this._groupSelector, left = groupSelector.left, top = groupSelector.top, aleft = abs(left), atop = abs(top);
+        _drawSelection: function(ctx) {
+            var groupSelector = this._groupSelector, left = groupSelector.left, top = groupSelector.top, aleft = abs(left), atop = abs(top);
             ctx.fillStyle = this.selectionColor;
             ctx.fillRect(groupSelector.ex - (left > 0 ? 0 : -left), groupSelector.ey - (top > 0 ? 0 : -top), aleft, atop);
             ctx.lineWidth = this.selectionLineWidth;
@@ -4798,6 +4789,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         getActiveObject: function() {
             return this._activeObject;
         },
+        _onObjectRemoved: function(obj) {
+            if (this.getActiveObject() === obj) {
+                this.fire("before:selection:cleared", {
+                    target: obj
+                });
+                this._discardActiveObject();
+                this.fire("selection:cleared");
+            }
+            this.callSuper("_onObjectRemoved", obj);
+        },
         _discardActiveObject: function() {
             if (this._activeObject) {
                 this._activeObject.set("active", false);
@@ -4886,6 +4887,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             delete this.wrapperEl;
             return this;
         },
+        clear: function() {
+            this.discardActiveGroup();
+            this.discardActiveObject();
+            this.clearContext(this.contextTop);
+            return this.callSuper("clear");
+        },
         drawControls: function(ctx) {
             var activeGroup = this.getActiveGroup();
             if (activeGroup) {
@@ -4901,12 +4908,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 }
                 this._objects[i]._renderControls(ctx);
             }
-        },
-        _onObjectRemoved: function(obj) {
-            this.callSuper("_onObjectRemoved", obj);
-        },
-        clear: function() {
-            return this.callSuper("clear");
         }
     });
     for (var prop in fabric.StaticCanvas) {
