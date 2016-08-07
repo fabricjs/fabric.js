@@ -308,7 +308,7 @@
 
       // we render the top context - last object
       if (this.selection && this._groupSelector) {
-        this._drawSelection();
+        this._drawSelection(ctx);
       }
 
       this.fire('after:render');

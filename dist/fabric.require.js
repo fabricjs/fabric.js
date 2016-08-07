@@ -4221,7 +4221,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             var ctx = this.contextTop;
             this.clearContext(ctx);
             if (this.selection && this._groupSelector) {
-                this._drawSelection();
+                this._drawSelection(ctx);
             }
             this.fire("after:render");
             return this;

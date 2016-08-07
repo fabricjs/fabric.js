@@ -48,7 +48,21 @@
                   '"shadow":null,'+
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  }
+
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) return path;
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
@@ -295,9 +309,8 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
+  test('_drawSelection', function() {
+    ok(typeof canvas._drawSelection == 'function');
   });
 
   test('findTarget', function() {
@@ -1544,7 +1557,7 @@
     canvas._setupCurrentTransform(eventStub, rect);
     var scaled = canvas._scaleObject(30, 30, 'equally');
     equal(scaled, true, 'return true if scaling happened');
-    var scaled = canvas._scaleObject(30, 30, 'equally');
+    scaled = canvas._scaleObject(30, 30, 'equally');
     equal(scaled, false, 'return false if no movement happen');
   });
 
