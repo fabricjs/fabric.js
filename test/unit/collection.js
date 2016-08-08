@@ -2,6 +2,4 @@
 
   QUnit.module('fabric.Collection');
 
-  
-
 })();
