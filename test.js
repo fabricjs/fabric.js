@@ -39,7 +39,8 @@ testrunner.run({
       './test/unit/itext.js',
       './test/unit/itext_key_behaviour.js',
       './test/unit/collection.js',
-      './test/unit/poit.js',
+      './test/unit/point.js',
+      './test/unit/intersection.js',
     ]
 }, function(err, report) {
   if (err) {
