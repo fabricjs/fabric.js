@@ -580,7 +580,7 @@ test('getBoundingRectWithStroke', function() {
       setTimeout(function() {
         ok(image);
         ok(image instanceof fabric.Image);
-        equal(image.width, 100, 'the image has same dimension of object')
+        equal(image.width, 100, 'the image has same dimension of object');
         start();
       }, 500);
 
