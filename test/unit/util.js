@@ -841,4 +841,119 @@
     equal(fabric.util.resolveNamespace('fabric.Image.filters'), fabric.Image.filters);
   });
 
+  test('clearFabricFontCache', function() {
+    ok(typeof fabric.util.clearFabricFontCache == 'function');
+    fabric.charWidthsCache = { arial : { some: 'cache'}, helvetica : { some: 'cache'} };
+    fabric.util.clearFabricFontCache('arial');
+    equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+    fabric.util.clearFabricFontCache();
+    deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
+  });
+
+  test('parsePreserveAspectRatioAttribute', function() {
+    ok(typeof fabric.util.parsePreserveAspectRatioAttribute == 'function');
+    var parsed;
+    parsed = fabric.util.parsePreserveAspectRatioAttribute("none");
+    equal(parsed.meetOrSlice, 'meet');
+    equal(parsed.alignX, 'none');
+    equal(parsed.alignY, 'none');
+    parsed = fabric.util.parsePreserveAspectRatioAttribute("none slice");
+    equal(parsed.meetOrSlice, 'slice');
+    equal(parsed.alignX, 'none');
+    equal(parsed.alignY, 'none');
+    parsed = fabric.util.parsePreserveAspectRatioAttribute("XmidYmax meet");
+    equal(parsed.meetOrSlice, 'meet');
+    equal(parsed.alignX, 'mid');
+    equal(parsed.alignY, 'max');
+  });
+
+  test('multiplyTransformMatrices', function() {
+    ok(typeof fabric.util.multiplyTransformMatrices == 'function');
+    var m1 = [1, 1, 1, 1, 1, 1], m2 = [1, 1, 1, 1, 1, 1], m3;
+    m3 = fabric.util.multiplyTransformMatrices(m1, m2);
+    deepEqual(m3, [2, 2, 2, 2, 3, 3]);
+    m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
+    deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+  });
+
+  test('customTransformMatrix', function() {
+    ok(typeof fabric.util.customTransformMatrix == 'function');
+    var m1 = fabric.util.customTransformMatrix(5, 4, 45);
+    deepEqual(m1, [5, 0, 4.999999999999999, 4, 0, 0]);
+  });
+
+  test('resetObjectTransform', function() {
+    ok(typeof fabric.util.resetObjectTransform == 'function');
+    var rect = new fabric.Rect({
+      top:1,
+      width: 100,
+      height: 100,
+      angle: 30,
+      scaleX: 2,
+      scaleY: 1,
+      flipX: true,
+      flipY : true,
+      skewX: 30,
+      skewY: 30
+    })
+    equal(rect.skewX, 30);
+    equal(rect.skewY, 30);
+    equal(rect.scaleX, 2);
+    equal(rect.scaleY, 1);
+    equal(rect.flipX, true);
+    equal(rect.flipY, true);
+    equal(rect.angle, 30);
+    fabric.util.resetObjectTransform(rect);
+    equal(rect.skewX, 0);
+    equal(rect.skewY, 0);
+    equal(rect.scaleX, 1);
+    equal(rect.scaleY, 1);
+    equal(rect.flipX, false);
+    equal(rect.flipY, false);
+    equal(rect.angle, 0);
+  });
+
+  test('invertTransform', function() {
+    ok(typeof fabric.util.invertTransform == 'function');
+    var m1 = [1, 2, 3, 4, 5, 6], m3;
+    m3 = fabric.util.invertTransform(m1);
+    deepEqual(m3, [-2, 1, 1.5, -0.5, 1, -2]);
+  });
+
+  test('rotateVector', function() {
+    ok(typeof fabric.util.rotateVector == 'function');
+  });
+
+  test('rotatePoint', function() {
+    ok(typeof fabric.util.rotatePoint == 'function');
+  });
+
+  test('transformPoint', function() {
+    ok(typeof fabric.util.transformPoint == 'function');
+  });
+
+  test('makeBoundingBoxFromPoints', function() {
+    ok(typeof fabric.util.makeBoundingBoxFromPoints == 'function');
+  });
+
+  test('parseUnit', function() {
+    ok(typeof fabric.util.parseUnit == 'function');
+  });
+
+  test('createCanvasElement', function() {
+    ok(typeof fabric.util.createCanvasElement == 'function');
+  });
+
+  test('createImage', function() {
+    ok(typeof fabric.util.createImage == 'function');
+  });
+
+  test('createAccessors', function() {
+    ok(typeof fabric.util.createAccessors == 'function');
+  });
+
+  test('qrDecompose', function() {
+    ok(typeof fabric.util.qrDecompose == 'function');
+  });
 })();
