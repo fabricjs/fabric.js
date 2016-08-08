@@ -1307,7 +1307,7 @@
      * Creates an instance of fabric.Image out of an object
      * @param {Function} callback callback, invoked with an instance as a first argument
      * @param {Object} [options] for clone as image, passed to toDataURL
-     * @param {Boolean} [options.enableRetinaScaling] enable retina scaling for the cloned image 
+     * @param {Boolean} [options.enableRetinaScaling] enable retina scaling for the cloned image
      * @return {fabric.Object} thisArg
      */
     cloneAsImage: function(callback, options) {
