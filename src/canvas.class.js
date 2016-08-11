@@ -1017,7 +1017,7 @@
         return activeGroup;
       }
 
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
+      if (!this.preserveObjectStacking && activeObject && this._checkTarget(pointer, activeObject)) {
         return activeObject;
       }
 
