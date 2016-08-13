@@ -896,7 +896,7 @@
       flipY : true,
       skewX: 30,
       skewY: 30
-    })
+    });
     equal(rect.skewX, 30);
     equal(rect.skewY, 30);
     equal(rect.scaleX, 2);

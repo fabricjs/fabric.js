@@ -410,7 +410,7 @@
   });
 
   test('clone', function() {
-    var x1 = 2, y1 = 3, scalar = 3,
+    var x1 = 2, y1 = 3,
         point = new fabric.Point(x1, y1);
 
     ok(typeof point.clone == 'function');

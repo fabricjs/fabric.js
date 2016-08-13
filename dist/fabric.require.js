@@ -130,15 +130,16 @@ fabric.Collection = {
         return this;
     },
     remove: function() {
-        var objects = this.getObjects(), index;
+        var objects = this.getObjects(), index, somethingRemoved = false;
         for (var i = 0, length = arguments.length; i < length; i++) {
             index = objects.indexOf(arguments[i]);
             if (index !== -1) {
+                somethingRemoved = true;
                 objects.splice(index, 1);
-                this._onObjectRemoved(arguments[i]);
+                this._onObjectRemoved && this._onObjectRemoved(arguments[i]);
             }
         }
-        this.renderOnAddRemove && this.renderAll();
+        this.renderOnAddRemove && somethingRemoved && this.renderAll();
         return this;
     },
     forEachObject: function(callback, context) {
