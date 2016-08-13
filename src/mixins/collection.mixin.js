@@ -3,16 +3,21 @@
  */
 fabric.Collection = {
 
+  _objects: [],
+
   /**
    * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
+   * @chainable
    */
   add: function () {
     this._objects.push.apply(this._objects, arguments);
-    for (var i = 0, length = arguments.length; i < length; i++) {
-      this._onObjectAdded(arguments[i]);
+    if (this._onObjectAdded) {
+      for (var i = 0, length = arguments.length; i < length; i++) {
+        this._onObjectAdded(arguments[i]);
+      }
     }
     this.renderOnAddRemove && this.renderAll();
     return this;
@@ -35,7 +40,7 @@ fabric.Collection = {
     else {
       objects.splice(index, 0, object);
     }
-    this._onObjectAdded(object);
+    this._onObjectAdded && this._onObjectAdded(object);
     this.renderOnAddRemove && this.renderAll();
     return this;
   },

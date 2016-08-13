@@ -10,7 +10,7 @@
     ok(point);
     ok(point instanceof fabric.Point);
     ok(point.constructor === fabric.Point);
-
+    ok(typeof point.constructor == 'function');
     equal(point.type, 'point');
     equal(point.x, undefined, 'no default values for x');
     equal(point.y, undefined, 'no default values for y');
@@ -26,6 +26,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.add == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.add(point2);
@@ -44,6 +45,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.addEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.addEquals(point2);
@@ -59,6 +61,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.scalarAdd == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.scalarAdd(scalar);
@@ -72,6 +75,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.scalarAddEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.scalarAddEquals(scalar);
@@ -86,6 +90,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.subtract == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.subtract(point2);
@@ -104,6 +109,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.subtractEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.subtractEquals(point2);
@@ -119,6 +125,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.scalarSubtract == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.scalarSubtract(scalar);
@@ -132,6 +139,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.scalarSubtractEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.scalarSubtractEquals(scalar);
@@ -145,6 +153,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.multiply == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.multiply(scalar);
@@ -158,6 +167,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.multiplyEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.multiplyEquals(scalar);
@@ -171,6 +181,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.divide == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.divide(scalar);
@@ -184,6 +195,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.divideEquals == 'function');
     equal(point.x, x1, 'constructor pass x value');
     equal(point.y, y1, 'constructor pass y value');
     var returned = point.divideEquals(scalar);
@@ -199,6 +211,7 @@
         point3 = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.eq == 'function');
     ok(!point.eq(point2), 'points are not equals');
     ok(point.eq(point), 'a point should be equal to itself');
     ok(point.eq(point3), 'point constructed from save var are equals');
@@ -209,6 +222,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.lt == 'function');
     ok(point.x < point2.x, 'x1 should be less than x2');
     ok(point.y < point2.y, 'y1 should be less than y2');
     ok(point.lt(point2), 'point should be lt than point 2');
@@ -219,6 +233,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.gt == 'function');
     ok(point2.x > point.x, 'x1 should be gt than x2');
     ok(point2.y > point.y, 'y1 should be gt than y2');
     ok(point2.gt(point), 'point2 should be gt than point');
@@ -230,6 +245,7 @@
         point3 = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.lte == 'function');
     ok(point.x <= point2.x, 'x1 should be less than x2');
     ok(point.y <= point2.y, 'y1 should be less than y2');
     ok(point.lte(point2), 'point should be lt than point 2');
@@ -245,6 +261,7 @@
         point3 = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.gte == 'function');
     ok(point2.x >= point.x, 'x1 should be greater than x2');
     ok(point2.y >= point.y, 'y1 should be greater than y2');
     ok(point2.gte(point), 'point2 should be gte than point');
@@ -259,6 +276,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.lerp == 'function');
     var returned = point.lerp(point2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     notEqual(returned, point, 'not chainable');
@@ -275,6 +293,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.distanceFrom == 'function');
     var returned = point.distanceFrom(point2, 0.5);
     ok(typeof returned === 'number', 'returns a number');
     equal(returned, Math.sqrt(Math.pow(point2.x - point.x, 2) + Math.pow(point2.y - point.y, 2)), 'return the geomentric distance between coords');
@@ -285,6 +304,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.midPointFrom == 'function');
     var returned = point.midPointFrom(point2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     notEqual(returned, point, 'not chainable');
@@ -297,6 +317,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.min == 'function');
     var returned = point.min(point2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     notEqual(returned, point, 'not chainable');
@@ -309,6 +330,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.max == 'function');
     var returned = point.max(point2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     notEqual(returned, point, 'not chainable');
@@ -320,6 +342,7 @@
     var x1 = 2, y1 = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.toString == 'function');
     var returned = point.toString();
     ok(typeof returned === 'string', 'returns a string');
     equal(returned, point.x + ',' + point.y, 'coords concat with ,');
@@ -329,6 +352,7 @@
     var x1 = 2, y1 = 3, x2 = 4, y2 = 8,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.setXY == 'function');
     var returned = point.setXY(x2, y2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     equal(returned, point, 'chainable');
@@ -340,6 +364,7 @@
     var x1 = 2, y1 = 3, x2 = 4,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.setX == 'function');
     var returned = point.setX(x2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     equal(returned, point, 'chainable');
@@ -350,6 +375,7 @@
     var x1 = 2, y1 = 3, y2 = 8,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.setY == 'function');
     var returned = point.setY(y2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     equal(returned, point, 'chainable');
@@ -361,6 +387,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.setFromPoint == 'function');
     var returned = point.setFromPoint(point2);
     ok(returned instanceof fabric.Point, 'returns a point class');
     equal(returned, point, 'chainable');
@@ -373,6 +400,7 @@
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
+    ok(typeof point.swap == 'function');
     var returned = point.swap(point2);
     equal(returned, undefined, 'it does not return anything');
     equal(point.x, x2, 'swapped x');
@@ -385,6 +413,7 @@
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
+    ok(typeof point.clone == 'function');
     var returned = point.clone();
     ok(returned instanceof fabric.Point, 'returns a point class');
     notEqual(returned, point, 'is not chainable');
