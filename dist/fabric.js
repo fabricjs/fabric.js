@@ -4542,20 +4542,28 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
 
   fabric.Intersection.prototype = /** @lends fabric.Intersection.prototype */ {
 
+    constructor: Intersection,
+
     /**
      * Appends a point to intersection
      * @param {fabric.Point} point
+     * @return {fabric.Intersection} thisArg
+     * @chainable
      */
     appendPoint: function (point) {
       this.points.push(point);
+      return this;
     },
 
     /**
      * Appends points to intersection
      * @param {Array} points
+     * @return {fabric.Intersection} thisArg
+     * @chainable
      */
     appendPoints: function (points) {
       this.points = this.points.concat(points);
+      return this;
     }
   };
 
@@ -4578,7 +4586,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
           ub = ubT / uB;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
         result = new Intersection('Intersection');
-        result.points.push(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
+        result.appendPoint(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
       else {
         result = new Intersection();
