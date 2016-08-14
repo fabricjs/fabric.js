@@ -152,7 +152,7 @@
 
     /**
      * Divides this point by a value
-    * TODO: rename in scalarDivideEquals in 2.0
+     * TODO: rename in scalarDivideEquals in 2.0
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      * @chainable
