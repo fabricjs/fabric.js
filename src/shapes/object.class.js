@@ -1183,7 +1183,7 @@
 
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
-      ctx.lineWidth = 1 / this.borderScaleFactor;
+      ctx.lineWidth = 1 * this.borderScaleFactor;
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
 
       if (this.group && this.group === this.canvas.getActiveGroup()) {
@@ -1306,10 +1306,12 @@
     /**
      * Creates an instance of fabric.Image out of an object
      * @param {Function} callback callback, invoked with an instance as a first argument
+     * @param {Object} [options] for clone as image, passed to toDataURL
+     * @param {Boolean} [options.enableRetinaScaling] enable retina scaling for the cloned image
      * @return {fabric.Object} thisArg
      */
-    cloneAsImage: function(callback) {
-      var dataUrl = this.toDataURL();
+    cloneAsImage: function(callback, options) {
+      var dataUrl = this.toDataURL(options);
       fabric.util.loadImage(dataUrl, function(img) {
         if (callback) {
           callback(new fabric.Image(img));
@@ -1328,6 +1330,7 @@
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+     * @param {Boolean} [options.enableRetina] Enable retina scaling for clone image. Introduce in 1.6.4
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
@@ -1340,7 +1343,7 @@
       el.height = boundingRect.height;
 
       fabric.util.wrapElement(el, 'div');
-      var canvas = new fabric.StaticCanvas(el);
+      var canvas = new fabric.StaticCanvas(el, { enableRetinaScaling: options.enableRetinaScaling });
 
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {

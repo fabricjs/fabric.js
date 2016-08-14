@@ -155,7 +155,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
-        _this.insertAt(obj, index, true);
+        // we splice the array just in case some custom classes restored from JSON
+        // will add more object to canvas at canvas init.
+        _this.insertAt(obj, index);
       });
 
       _this.renderOnAddRemove = renderOnAddRemove;

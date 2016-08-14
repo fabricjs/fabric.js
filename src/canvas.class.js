@@ -15,6 +15,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
+   * @fires object:added
    * @fires object:modified
    * @fires object:rotating
    * @fires object:scaling
