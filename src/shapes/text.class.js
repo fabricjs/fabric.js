@@ -484,9 +484,6 @@
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
-          if(char === ' ') {
-            console.log(left, width);
-          }
           left += width;
         }
       }
@@ -539,7 +536,7 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} line
+     * @param {String} word
      */
     _getWidthOfWords: function (ctx, word) {
       var width = ctx.measureText(word).width, charCount, additionalSpace;
@@ -586,7 +583,7 @@
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight,
             lineWidth = this._getLineWidth(ctx, i),
-            leftOffset = this._getLineLeftOffset(lineWidth)
+            leftOffset = this._getLineLeftOffset(lineWidth);
         this._renderTextLine(
           method,
           ctx,
@@ -619,8 +616,6 @@
       if ((!this.stroke || this.strokeWidth === 0) && this.isEmptyStyles()) {
         return;
       }
-
-      var lineHeights = 0;
 
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);

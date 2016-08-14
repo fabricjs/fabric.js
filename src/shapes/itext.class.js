@@ -486,7 +486,7 @@
           - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
       }
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
-        leftOffset -= this._getWidthOfCharSpacing()
+        leftOffset -= this._getWidthOfCharSpacing();
       }
       boundaries = {
         top: topOffset,
@@ -1048,8 +1048,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} line
+     * @param {String} line
      * @param {Number} lineIndex
+     * @param {Number} charOffset
      */
     _getWidthOfWords: function (ctx, line, lineIndex, charOffset) {
       var width = 0;
