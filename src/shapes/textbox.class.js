@@ -94,7 +94,6 @@
 
       // wrap lines
       this._textLines = this._splitTextIntoLines();
-
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
@@ -244,11 +243,9 @@
     _measureText: function(ctx, text, lineIndex, charOffset) {
       var width = 0;
       charOffset = charOffset || 0;
-
       for (var i = 0, len = text.length; i < len; i++) {
         width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
       }
-
       return width;
     },
 
@@ -271,7 +268,8 @@
           wordWidth        = 0,
           infixWidth       = 0,
           largestWordWidth = 0,
-          lineJustStarted = true;
+          lineJustStarted = true,
+          additionalSpace = this._getWidthOfCharSpacing();
 
       for (var i = 0; i < words.length; i++) {
         word = words[i];
@@ -279,7 +277,7 @@
 
         offset += word.length;
 
-        lineWidth += infixWidth + wordWidth;
+        lineWidth += infixWidth + wordWidth - additionalSpace;
 
         if (lineWidth >= this.width && !lineJustStarted) {
           lines.push(line);
@@ -287,13 +285,16 @@
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
+        else {
+          lineWidth += additionalSpace;
+        }
 
         if (!lineJustStarted) {
           line += infix;
         }
         line += word;
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+        infixWidth = this._measureText(ctx, infix, lineIndex, offset) + additionalSpace;
         offset++;
         lineJustStarted = false;
         // keep track of largest word
@@ -305,7 +306,7 @@
       i && lines.push(line);
 
       if (largestWordWidth > this.dynamicMinWidth) {
-        this.dynamicMinWidth = largestWordWidth;
+        this.dynamicMinWidth = largestWordWidth - additionalSpace;
       }
 
       return lines;

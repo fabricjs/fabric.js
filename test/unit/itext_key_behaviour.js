@@ -1,8 +1,11 @@
 (function(){
+  var canvas = fabric.document.createElement('canvas'),
+      ctx = canvas.getContext('2d');
+
   test('event selection:changed firing', function() {
     var iText = new fabric.IText('test need some word\nsecond line'),
         selection = 0;
-
+    iText.ctx = ctx;
     function countSelectionChange() {
       selection++;
     }
@@ -133,7 +136,7 @@
   test('moving cursor with shift', function() {
     var iText = new fabric.IText('test need some word\nsecond line'),
         selection = 0;
-
+    iText.ctx = ctx;
     function countSelectionChange() {
       selection++;
     }
