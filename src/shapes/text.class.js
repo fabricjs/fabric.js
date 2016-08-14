@@ -51,8 +51,8 @@
       text: true,
       charSpacing: true,
       textAlign: true,
-      //stroke: false,
-      //strokeWidth: false,
+      stroke: false,
+      strokeWidth: false,
     },
 
     /**
