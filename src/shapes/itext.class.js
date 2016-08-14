@@ -315,7 +315,10 @@
       this.oldHeight = this.height;
       this.callSuper('_render', ctx);
       this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
+      // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
+      // the correct position but not at every cursor animation.
+      this.cursorOffsetCache = { };
+      this.renderCursorOrSelection();
     },
 
     /**
@@ -327,7 +330,6 @@
       }
       var chars = this.text.split(''),
           boundaries, ctx;
-
       if (this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
@@ -454,13 +456,15 @@
      * @private
      */
     _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-
+      if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+        return this.cursorOffsetCache;
+      }
       var lineLeftOffset = 0,
-
           lineIndex = 0,
           charIndex = 0,
           topOffset = 0,
-          leftOffset = 0;
+          leftOffset = 0,
+          boundaries;
 
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
@@ -481,12 +485,16 @@
         topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight
           - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
       }
-
-      return {
+      if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
+        leftOffset -= this._getWidthOfCharSpacing()
+      }
+      boundaries = {
         top: topOffset,
         left: leftOffset,
         lineLeft: lineLeftOffset
       };
+      this.cursorOffsetCache = boundaries;
+      return this.cursorOffsetCache;
     },
 
     /**
@@ -544,6 +552,9 @@
               lineOffset += this._getWidthOfChar(ctx, line[j], i, j);
             }
           }
+          if (j === line.length) {
+            boxWidth -= this._getWidthOfCharSpacing();
+          }
         }
         else if (i > startLine && i < endLine) {
           boxWidth += this._getLineWidth(ctx, i) || 5;
@@ -551,6 +562,9 @@
         else if (i === endLine) {
           for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
             boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
+          }
+          if (end.charIndex === line.length) {
+            boxWidth -= this._getWidthOfCharSpacing();
           }
         }
         realLineHeight = lineHeight;
