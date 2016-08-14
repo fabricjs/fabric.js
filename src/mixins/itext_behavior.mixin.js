@@ -346,7 +346,8 @@
       if (this.isEditing || !this.editable) {
         return;
       }
-
+      this._originalCaching = this.objectCaching;
+      this.objectCaching = false;
       if (this.canvas) {
         this.exitEditingOnOthers(this.canvas);
       }
@@ -547,7 +548,8 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
-
+      this.objectCaching = this._originalCaching;
+      this.objectCaching && this.refreshCache();
       this.fire('editing:exited');
       isTextChanged && this.fire('modified');
       if (this.canvas) {

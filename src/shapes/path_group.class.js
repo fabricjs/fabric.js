@@ -36,6 +36,13 @@
     fill: '',
 
     /**
+     * Stroke width value, pathgroup has no stroke.
+     * @type Number
+     * @default
+     */
+    strokeWidth: 0,
+
+    /**
      * Constructor
      * @param {Array} paths
      * @param {Object} [options] Options object
@@ -102,21 +109,40 @@
         return;
       }
 
+      if (this.objectCaching && !this._cacheCanvasEl) {
+        this._createCacheCanvas();
+        this._updateCacheCanvas();
+      }
+      if (this.objectCaching && this.isCacheDirty) {
+        this.refreshCache();
+      }
+
       ctx.save();
 
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.transform(ctx);
-
       this._setShadow(ctx);
+
+      if (this.objectCaching) {
+        this._drawCache(ctx);
+      }
+      else {
+        this._draw(ctx, true);
+      }
+
+      ctx.restore();
+    },
+
+    _draw: function(ctx, noTransform) {
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.translate(-this.width/2, -this.height/2);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
+        this.paths[i].objectCaching = false;
         this.paths[i].render(ctx, true);
       }
       this.clipTo && ctx.restore();
-      ctx.restore();
     },
 
     /**
