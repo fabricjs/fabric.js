@@ -327,6 +327,7 @@
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
+
      */
     _resetCurrentTransform: function() {
       var t = this._currentTransform;
@@ -1024,9 +1025,9 @@
       }
 
       if (!(this.selectionCompatibility && this.preserveObjectStacking)) {
-          if (activeObject && this._checkTarget(pointer, activeObject)) {
-            return activeObject;
-          }
+        if (activeObject && this._checkTarget(pointer, activeObject)) {
+          return activeObject;
+        }
       }
 
       this.targets = [ ];
