@@ -1025,7 +1025,7 @@
         return activeGroup;
       }
 
-      if ((this.selectionCompatibility && !this.preserveObjectStacking) && activeObject && this._checkTarget(pointer, activeObject)) {
+      if (!(this.selectionCompatibility && this.preserveObjectStacking) && activeObject && this._checkTarget(pointer, activeObject)) {
         return activeObject;
       }
 
