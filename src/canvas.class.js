@@ -233,6 +233,14 @@
      */
     preserveObjectStacking: false,
 
+
+    /**
+     * Make small object on top of active one selectable with  preserveObjectStacking = true LIKE <= 1.6.2  - https://github.com/kangax/fabric.js/issues/3095
+     * @type Boolean
+     * @default
+     */
+    selectionCompatibility: false,
+
     /**
      * @private
      */
@@ -1017,7 +1025,7 @@
         return activeGroup;
       }
 
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
+      if ((this.selectionCompatibility && !this.preserveObjectStacking) && activeObject && this._checkTarget(pointer, activeObject)) {
         return activeObject;
       }
 
