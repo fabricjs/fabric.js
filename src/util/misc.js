@@ -638,11 +638,14 @@
     /**
      * Clear char widths cache for a font family.
      * @memberOf fabric.util
-     * @param {String} fontFamily
+     * @param {String} [fontFamily] font family to clear
      */
     clearFabricFontCache: function(fontFamily) {
-      if (fabric.charWidthsCache[fontFamily]) {
-        fabric.charWidthsCache[fontFamily] = { };
+      if (!fontFamily) {
+        fabric.charWidthsCache = { };
+      }
+      else if (fabric.charWidthsCache[fontFamily]) {
+        delete fabric.charWidthsCache[fontFamily];
       }
     }
   };

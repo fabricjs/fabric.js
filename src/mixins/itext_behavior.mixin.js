@@ -398,7 +398,9 @@
         return;
       }
 
-      var newSelectionStart = this.getSelectionStartFromPointer(options.e);
+      var newSelectionStart = this.getSelectionStartFromPointer(options.e),
+          currentStart = this.selectionStart,
+          currentEnd = this.selectionEnd;
       if (newSelectionStart === this.__selectionStartOnMouseDown) {
         return;
       }
@@ -410,9 +412,11 @@
         this.selectionStart = newSelectionStart;
         this.selectionEnd = this.__selectionStartOnMouseDown;
       }
-      this._fireSelectionChanged();
-      this._updateTextarea();
-      this.renderCursorOrSelection();
+      if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
+        this._fireSelectionChanged();
+        this._updateTextarea();
+        this.renderCursorOrSelection();
+      }
     },
 
     /**
@@ -438,6 +442,7 @@
       if (!this.hiddenTextarea || this.inCompositionMode) {
         return;
       }
+      this.cursorOffsetCache = { };
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
       this.hiddenTextarea.selectionEnd = this.selectionEnd;
