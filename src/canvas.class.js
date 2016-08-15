@@ -1041,7 +1041,8 @@
         if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
           return activeObject;
         }
-      } else {
+      }
+      else {
         if (activeObject && this._checkTarget(pointer, activeObject)) {
           return activeObject;
         }
