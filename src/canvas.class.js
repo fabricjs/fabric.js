@@ -397,6 +397,19 @@
     },
 
     /**
+     * Checks if point is contained within an corners of given object
+     * @param {Event} e Event object
+     * @param {fabric.Object} target Object to test against
+     * @param {Object} [point] x,y object of point coordinates we want to check.
+     * @return {Boolean} true if point is contained within an corners of given object
+     */
+    containsPointCorner: function (e, target, point) {
+      var ignoreZoom = true,
+          pointer = point || this.getPointer(e, ignoreZoom);
+      return (target._findTargetCorner(pointer));
+    },
+
+    /**
      * @private
      */
     _normalizePointer: function (object, pointer) {
@@ -1023,8 +1036,12 @@
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
-
-      if (!(this.selectionCompatibility && this.preserveObjectStacking)) {
+      
+      if (this.selectionCompatibility && this.preserveObjectStacking) {
+        if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
+          return activeObject;
+        }
+      }else{
         if (activeObject && this._checkTarget(pointer, activeObject)) {
           return activeObject;
         }
@@ -1079,6 +1096,17 @@
       }
     },
 
+    /**
+     * @private
+     */
+    _checkTargetCorner: function(pointer, obj) {
+      if (obj &&
+          obj.visible &&
+          obj.evented &&
+          this.containsPointCorner(null, obj, pointer)){
+        return true;
+      }
+    },
     /**
      * @private
      */
