@@ -9386,7 +9386,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
           return activeObject;
         }
-      } else {
+      }
+      else {
         if (activeObject && this._checkTarget(pointer, activeObject)) {
           return activeObject;
         }
