@@ -292,7 +292,6 @@
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -328,7 +327,6 @@
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
-     * @param {Event} e Event object fired on mousemove
      */
     _resetCurrentTransform: function() {
       var t = this._currentTransform;
@@ -1025,9 +1023,10 @@
         return activeGroup;
       }
 
-      if (!(this.selectionCompatibility && this.preserveObjectStacking)
-          && activeObject && this._checkTarget(pointer, activeObject)) {
-        return activeObject;
+      if (!(this.selectionCompatibility && this.preserveObjectStacking)) {
+          if (activeObject && this._checkTarget(pointer, activeObject)) {
+            return activeObject;
+          }
       }
 
       this.targets = [ ];
