@@ -1036,7 +1036,7 @@
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
-      
+
       if (this.selectionCompatibility && this.preserveObjectStacking) {
         if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
           return activeObject;

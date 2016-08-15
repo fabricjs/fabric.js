@@ -4301,6 +4301,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             return target.containsPoint(xy) || target._findTargetCorner(pointer);
         },
+        containsPointCorner: function(e, target, point) {
+            var ignoreZoom = true, pointer = point || this.getPointer(e, ignoreZoom);
+            return target._findTargetCorner(pointer);
+        },
         _normalizePointer: function(object, pointer) {
             var m = object.calcTransformMatrix(), invertedM = fabric.util.invertTransform(m), vpt = this.viewportTransform, vptPointer = this.restorePointerVpt(pointer), p = fabric.util.transformPoint(vptPointer, invertedM);
             return fabric.util.transformPoint(p, vpt);
@@ -4642,7 +4646,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
                 return activeGroup;
             }
-            if (!(this.selectionCompatibility && this.preserveObjectStacking)) {
+            if (this.selectionCompatibility && this.preserveObjectStacking) {
+                if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
+                    return activeObject;
+                }
+            } else {
                 if (activeObject && this._checkTarget(pointer, activeObject)) {
                     return activeObject;
                 }
@@ -4688,6 +4696,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 } else {
                     return true;
                 }
+            }
+        },
+        _checkTargetCorner: function(pointer, obj) {
+            if (obj && obj.visible && obj.evented && this.containsPointCorner(null, obj, pointer)) {
+                return true;
             }
         },
         _searchPossibleTargets: function(objects, pointer) {
