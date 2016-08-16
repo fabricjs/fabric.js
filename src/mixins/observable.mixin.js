@@ -99,10 +99,13 @@
       return;
     }
 
-    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      // avoiding try/catch for perf. reasons
-      listenersForEvent[i].call(this, options || { });
-    }
+	// Listeners are allowed to add or remove events, including for the event
+	// they were triggered for. Therefore, we need to shallowly clone the listeners
+	// array to avoid it being mutated during iteration.
+	let shallowClonedListeners = Object.assign({}, listenersForEvent);
+	for (var i = 0; i < shallowClonedListeners.length; i++) {
+		shallowClonedListeners[i].call(this, options || {});
+	}
     return this;
   }
 
