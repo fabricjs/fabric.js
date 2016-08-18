@@ -46,6 +46,7 @@
     'skewX':                    0,
     'skewY':                    0,
     'transformMatrix':          null,
+    'charSpacing':              0,
     styles:                     { }
   };
 
