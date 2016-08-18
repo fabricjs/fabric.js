@@ -4204,7 +4204,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         skipTargetFind: false,
         isDrawingMode: false,
         preserveObjectStacking: false,
+<<<<<<< HEAD
         selectionCompatibility: false,
+=======
+>>>>>>> fabricjs/master
         _initInteractive: function() {
             this._currentTransform = null;
             this._groupSelector = null;
@@ -5278,7 +5281,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             transform.reset = false, transform.target.isMoving = true;
             this._beforeScaleTransform(e, transform);
             this._performTransformAction(e, transform, pointer);
-            this.renderAll();
+            transform.actionPerformed && this.renderAll();
         },
         _performTransformAction: function(e, transform, pointer) {
             var x = pointer.x, y = pointer.y, target = transform.target, action = transform.action, actionPerformed = false;
@@ -10085,7 +10088,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 lineHeight: this.lineHeight,
                 textDecoration: this.textDecoration,
                 textAlign: this.textAlign,
-                textBackgroundColor: this.textBackgroundColor
+                textBackgroundColor: this.textBackgroundColor,
+                charSpacing: this.charSpacing
             });
             if (!this.includeDefaultValues) {
                 this._removeDefaultValues(object);

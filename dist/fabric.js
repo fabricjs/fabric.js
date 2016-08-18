@@ -8579,6 +8579,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     preserveObjectStacking: false,
 
     /**
+<<<<<<< HEAD
      * Make small object on top of active one selectable with preserveObjectStacking = true LIKE <= 1.6.2
      * https://github.com/kangax/fabric.js/issues/3095
      * @type Boolean
@@ -8587,6 +8588,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     selectionCompatibility: false,
 
     /**
+=======
+>>>>>>> fabricjs/master
      * @private
      */
     _initInteractive: function() {
@@ -8637,6 +8640,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * Renders both the top canvas and the secondary container canvas.
+<<<<<<< HEAD
+=======
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
+>>>>>>> fabricjs/master
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -10470,7 +10477,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
 
-      this.renderAll();
+      transform.actionPerformed && this.renderAll();
     },
 
     /**
@@ -21473,7 +21480,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         lineHeight:           this.lineHeight,
         textDecoration:       this.textDecoration,
         textAlign:            this.textAlign,
-        textBackgroundColor:  this.textBackgroundColor
+        textBackgroundColor:  this.textBackgroundColor,
+        charSpacing:          this.charSpacing
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
