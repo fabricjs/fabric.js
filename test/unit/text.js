@@ -46,7 +46,8 @@
     'globalCompositeOperation':  'source-over',
     'skewX':                      0,
     'skewY':                      0,
-    'transformMatrix':           null
+    'transformMatrix':            null,
+    'charSpacing':                0
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';

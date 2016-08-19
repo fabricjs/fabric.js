@@ -601,7 +601,7 @@
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
 
-      this.renderAll();
+      transform.actionPerformed && this.renderAll();
     },
 
     /**
