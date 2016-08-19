@@ -234,6 +234,13 @@
     preserveObjectStacking: false,
 
     /**
+     * Make small object on top of active one selectable with  preserveObjectStacking = true LIKE <= 1.6.2  - https://github.com/kangax/fabric.js/issues/3095
+     * @type Boolean
+     * @default
+     */
+    selectionCompatibility: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -387,6 +394,19 @@
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
       return (target.containsPoint(xy) || target._findTargetCorner(pointer));
+    },
+
+    /**
+     * Checks if point is contained within an corners of given object
+     * @param {Event} e Event object
+     * @param {fabric.Object} target Object to test against
+     * @param {Object} [point] x,y object of point coordinates we want to check.
+     * @return {Boolean} true if point is contained within an corners of given object
+     */
+    containsPointCorner: function (e, target, point) {
+      var ignoreZoom = true,
+        pointer = point || this.getPointer(e, ignoreZoom);
+      return (target._findTargetCorner(pointer));
     },
 
     /**
@@ -1017,8 +1037,15 @@
         return activeGroup;
       }
 
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
-        return activeObject;
+      if (this.selectionCompatibility && this.preserveObjectStacking) {
+        if (activeObject && this._checkTargetCorner(pointer, activeObject)) {
+          return activeObject;
+        }
+      }
+      else {
+        if (activeObject && this._checkTarget(pointer, activeObject)) {
+          return activeObject;
+        }
       }
 
       this.targets = [ ];
@@ -1067,6 +1094,18 @@
         else {
           return true;
         }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _checkTargetCorner: function(pointer, obj) {
+      if (obj &&
+        obj.visible &&
+        obj.evented &&
+        this.containsPointCorner(null, obj, pointer)){
+        return true;
       }
     },
 
