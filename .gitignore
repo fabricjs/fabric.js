@@ -4,3 +4,12 @@
 /npm-debug.log
 before_commit
 /coverage/
+.idea/copyright/profiles_settings.xml
+.idea/deployment.xml
+.idea/encodings.xml
+.idea/jsLibraryMappings.xml
+.idea/libraries/fabric_js_node_modules.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
