@@ -4206,11 +4206,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         preserveObjectStacking: false,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         selectionCompatibility: false,
 =======
 >>>>>>> fabricjs/master
 =======
 >>>>>>> 3938c830804fc9afe5de540aa0716c33298570bd
+=======
+        selectionCompatibility: false,
+=======
+>>>>>>> fabricjs/master
+>>>>>>> daf33d5ace5ae3a85cc8b8b3fc410f6a59547130
         _initInteractive: function() {
             this._currentTransform = null;
             this._groupSelector = null;

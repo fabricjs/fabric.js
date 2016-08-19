@@ -8581,6 +8581,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> daf33d5ace5ae3a85cc8b8b3fc410f6a59547130
      * Make small object on top of active one selectable with preserveObjectStacking = true LIKE <= 1.6.2
      * https://github.com/kangax/fabric.js/issues/3095
      * @type Boolean
@@ -8591,8 +8594,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
 =======
 >>>>>>> fabricjs/master
+<<<<<<< HEAD
 =======
 >>>>>>> 3938c830804fc9afe5de540aa0716c33298570bd
+=======
+>>>>>>> daf33d5ace5ae3a85cc8b8b3fc410f6a59547130
      * @private
      */
     _initInteractive: function() {
@@ -8645,12 +8651,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Renders both the top canvas and the secondary container canvas.
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
      * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
 >>>>>>> fabricjs/master
 =======
      * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
 >>>>>>> 3938c830804fc9afe5de540aa0716c33298570bd
+=======
+=======
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
+>>>>>>> fabricjs/master
+>>>>>>> daf33d5ace5ae3a85cc8b8b3fc410f6a59547130
      * @return {fabric.Canvas} instance
      * @chainable
      */
