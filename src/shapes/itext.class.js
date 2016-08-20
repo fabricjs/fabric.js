@@ -585,6 +585,11 @@
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} line
+     * @param {Number} left
+     * @param {Number} top
+     * @param {Number} lineIndex
+     * @param {Number} charOffset
      */
     _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
 
@@ -744,6 +749,9 @@
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} line
+     * @param {Number} left
+     * @param {Number} top
+     * @param {Number} lineIndex
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
@@ -990,6 +998,8 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
      */
     _getHeightOfChar: function(ctx, lineIndex, charIndex) {
       var style = this._getStyleDeclaration(lineIndex, charIndex);

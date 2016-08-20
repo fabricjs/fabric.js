@@ -945,7 +945,7 @@
     /**
      * Basic getter
      * @param {String} property Property name
-     * @return {Any} value of a property
+     * @return {*} value of a property
      */
     get: function(property) {
       return this[property];
@@ -999,7 +999,7 @@
     /**
      * @private
      * @param {String} key
-     * @param {Any} value
+     * @param {*} value
      * @return {fabric.Object} thisArg
      */
     _set: function(key, value) {

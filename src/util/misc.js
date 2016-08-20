@@ -17,7 +17,7 @@
      * @static
      * @memberOf fabric.util
      * @param {Array} array
-     * @param {Any} value
+     * @param {*} value
      * @return {Array} original array
      */
     removeFromArray: function(array, value) {
@@ -255,7 +255,7 @@
      * @memberOf fabric.util
      * @param {String} url URL representing an image
      * @param {Function} callback Callback; invoked with loaded image
-     * @param {Any} [context] Context to invoke callback in
+     * @param {*} [context] Context to invoke callback in
      * @param {Object} [crossOrigin] crossOrigin value to set image element to
      */
     loadImage: function(url, callback, context, crossOrigin) {

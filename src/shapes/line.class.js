@@ -100,7 +100,7 @@
     /**
      * @private
      * @param {String} key
-     * @param {Any} value
+     * @param {*} value
      */
     _set: function(key, value) {
       this.callSuper('_set', key, value);
