@@ -411,7 +411,6 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function() {
@@ -642,7 +641,6 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
     _renderTextBackground: function(ctx) {
       this._renderTextBoxBackground(ctx);

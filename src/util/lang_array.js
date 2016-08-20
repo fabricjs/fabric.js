@@ -8,7 +8,6 @@
     /**
      * Finds index of an element in an array
      * @param {Any} searchElement
-     * @param {Number} [fromIndex]
      * @return {Number}
      */
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
@@ -135,7 +134,6 @@
     /**
      * Returns "folded" (reduced) result of iterating over elements in an array
      * @param {Function} fn Callback to invoke for each element
-     * @param {Object} [initial] Object to use as the first argument to the first call of the callback
      * @return {Any}
      */
     Array.prototype.reduce = function(fn /*, initial*/) {

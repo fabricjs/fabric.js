@@ -238,6 +238,7 @@
     /**
      * Returns an instance of CanvasGradient
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} object
      * @return {CanvasGradient}
      */
     toLive: function(ctx, object) {
