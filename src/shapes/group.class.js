@@ -493,7 +493,7 @@
     /**
      * Returns requested property
      * @param {String} prop Property to get
-     * @return {Any}
+     * @return {*}
      */
     get: function(prop) {
       if (prop in _lockProperties) {

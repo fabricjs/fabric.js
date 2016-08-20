@@ -58,6 +58,8 @@
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Resize.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} scaleX
+     * @param {Number} scaleY
      */
     applyTo: function(canvasEl, scaleX, scaleY) {
 
@@ -85,6 +87,15 @@
       canvasEl.getContext('2d').putImageData(imageData, 0, 0);
     },
 
+    /**
+     * Filter sliceByTwo
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Number} newWidth
+     * @param {Number} newHeight
+     * @returns {ImageData}
+     */
     sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
       var context = canvasEl.getContext('2d'), imageData,
           multW = 0.5, multH = 0.5, signW = 1, signH = 1,
