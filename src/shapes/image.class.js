@@ -338,6 +338,7 @@
      * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @param {Array} filters to be initialized
+     * @param {fabric.Image} imgElement
      * @param {Boolean} forResizing
      * @return {fabric.Image} thisArg
      * @chainable
