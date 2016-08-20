@@ -411,7 +411,6 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function() {
@@ -642,7 +641,6 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
     _renderTextBackground: function(ctx) {
       this._renderTextBoxBackground(ctx);
@@ -1094,7 +1092,7 @@
      * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
      *
      * @private
-     * @param {Any} value
+     * @param {*} value
      * @return {String}
      */
     _getFillAttributes: function(value) {
@@ -1109,7 +1107,7 @@
     /**
      * Sets specified property to a specified value
      * @param {String} key
-     * @param {Any} value
+     * @param {*} value
      * @return {fabric.Text} thisArg
      * @chainable
      */

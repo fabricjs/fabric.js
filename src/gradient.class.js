@@ -162,7 +162,6 @@
     /**
      * Returns SVG representation of an gradient
      * @param {Object} object Object to create a gradient for
-     * @param {Boolean} normalize Whether coords should be normalized
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
@@ -239,6 +238,7 @@
     /**
      * Returns an instance of CanvasGradient
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} object
      * @return {CanvasGradient}
      */
     toLive: function(ctx, object) {

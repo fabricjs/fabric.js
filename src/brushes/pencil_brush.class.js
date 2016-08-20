@@ -134,8 +134,6 @@
     /**
      * Converts points to SVG path
      * @param {Array} points Array of points
-     * @param {Number} minX
-     * @param {Number} minY
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points) {
