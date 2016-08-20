@@ -337,6 +337,9 @@
      * Applies filters assigned to this image (from "filters" array)
      * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
+     * @param {Array} filters to be initialized
+     * @param {fabric.Image} imgElement
+     * @param {Boolean} forResizing
      * @return {fabric.Image} thisArg
      * @chainable
      */
@@ -397,6 +400,7 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
       var x, y, imageMargins = this._findMargins(), elementToDraw;

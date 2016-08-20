@@ -585,7 +585,7 @@
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} line
+     * @param {String} line Content of the line
      * @param {Number} left
      * @param {Number} top
      * @param {Number} lineIndex
