@@ -65,7 +65,7 @@
     /**
      * @private
      * @param {String} key
-     * @param {Any} value
+     * @param {*} value
      * @return {fabric.Circle} thisArg
      */
     _set: function(key, value) {

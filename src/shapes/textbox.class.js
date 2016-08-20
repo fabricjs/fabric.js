@@ -338,7 +338,7 @@
      * the same font-size value would result in different actual size depending
      * on the value of the scale.
      * @param {String} key
-     * @param {Any} value
+     * @param {*} value
      */
     setOnGroup: function(key, value) {
       if (key === 'scaleX') {
