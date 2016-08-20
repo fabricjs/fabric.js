@@ -284,7 +284,6 @@
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -320,7 +319,6 @@
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
-     * @param {Event} e Event object fired on mousemove
      */
     _resetCurrentTransform: function() {
       var t = this._currentTransform;
@@ -1108,6 +1106,7 @@
     /**
      * Returns pointer coordinates relative to canvas.
      * @param {Event} e
+     * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e, ignoreZoom, upperCanvasEl) {
@@ -1327,6 +1326,7 @@
     /**
      * Sets active group to a specified one
      * @param {fabric.Group} group Group to set as a current one
+     * @param {Event} e Event object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */

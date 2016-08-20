@@ -162,7 +162,6 @@
     /**
      * Returns SVG representation of an gradient
      * @param {Object} object Object to create a gradient for
-     * @param {Boolean} normalize Whether coords should be normalized
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
