@@ -145,6 +145,15 @@
       return context.getImageData(0, 0, newWidth, newHeight);
     },
 
+    /**
+     * Filter lanczosResize
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW
+     * @param {Number} oH
+     * @param {Number} dW
+     * @param {Number} dH
+     * @returns {ImageData}
+     */
     lanczosResize: function(canvasEl, oW, oH, dW, dH) {
 
       function lanczosCreate(lobes) {
@@ -226,6 +235,15 @@
       return process(0);
     },
 
+    /**
+     * bilinearFiltering
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} w
+     * @param {Number} h
+     * @param {Number} w2
+     * @param {Number} h2
+     * @returns {ImageData}
+     */
     bilinearFiltering: function(canvasEl, w, h, w2, h2) {
       var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
           color, offset = 0, origPix, ratioX = this.rcpScaleX,
@@ -255,6 +273,15 @@
       return destImage;
     },
 
+    /**
+     * hermiteFastResize
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW
+     * @param {Number} oH
+     * @param {Number} dW
+     * @param {Number} dH
+     * @returns {ImageData}
+     */
     hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
       var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY,
           ratioWHalf = ceil(ratioW / 2),
