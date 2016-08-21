@@ -4757,7 +4757,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _initWrapperElement: function() {
             this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, "div", {
-                "class": this.containerClass
+                class: this.containerClass
             });
             fabric.util.setStyle(this.wrapperEl, {
                 width: this.getWidth() + "px",
