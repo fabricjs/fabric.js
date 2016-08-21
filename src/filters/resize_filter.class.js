@@ -98,10 +98,10 @@
      */
     sliceByTwo: function(canvasEl, oW, oH, dW, dH) {
       var context = canvasEl.getContext('2d'), imageData,
-        multW = 0.5, multH = 0.5, signW = 1, signH = 1,
-        doneW = false, doneH = false, stepW = oW, stepH = oH,
-        tmpCanvas = fabric.util.createCanvasElement(),
-        tmpCtx = tmpCanvas.getContext('2d');
+          multW = 0.5, multH = 0.5, signW = 1, signH = 1,
+          doneW = false, doneH = false, stepW = oW, stepH = oH,
+          tmpCanvas = fabric.util.createCanvasElement(),
+          tmpCtx = tmpCanvas.getContext('2d');
       dW = floor(dW);
       dH = floor(dH);
       tmpCanvas.width = max(dW, oW);
@@ -246,11 +246,11 @@
      */
     bilinearFiltering: function(canvasEl, oW, oH, dW, dH) {
       var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
-        color, offset = 0, origPix, ratioX = this.rcpScaleX,
-        ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
-        w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH),
-        pixels = img.data, destImage = context.getImageData(0, 0, dW, dH),
-        destPixels = destImage.data;
+          color, offset = 0, origPix, ratioX = this.rcpScaleX,
+          ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
+          w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH),
+          pixels = img.data, destImage = context.getImageData(0, 0, dW, dH),
+          destPixels = destImage.data;
       for (i = 0; i < dH; i++) {
         for (j = 0; j < dW; j++) {
           x = floor(ratioX * j);
