@@ -75,7 +75,6 @@ fabric.Collection = {
    * @param {Function} callback
    *                   Callback invoked with current object as first argument,
    *                   index - as second and an array of all objects - as third.
-   *                   Iteration happens in reverse order (for performance reasons).
    *                   Callback is invoked in a context of Global Object (e.g. `window`)
    *                   when no `context` argument is given
    *
@@ -84,9 +83,8 @@ fabric.Collection = {
    * @chainable
    */
   forEachObject: function(callback, context) {
-    var objects = this.getObjects(),
-        i = objects.length;
-    while (i--) {
+    var objects = this.getObjects();
+    for (var i = 0, len = objects.length; i < len; i++) {
       callback.call(context, objects[i], i, objects);
     }
     return this;

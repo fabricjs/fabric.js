@@ -35,7 +35,7 @@
     'flipX':                    false,
     'flipY':                    false,
     'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
+    'src':                      IMG_SRC,
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
@@ -79,6 +79,7 @@
       require('fs').readFile(src, function(err, imgData) {
         if (err) throw err;
         img.src = imgData;
+        img._src = src;
         callback && callback();
       });
     }
@@ -131,7 +132,7 @@
       if (toObject.height === 0) {
         toObject.height = IMG_HEIGHT;
       }
-      deepEqual(toObject, fabric.util.object.extend(REFERENCE_IMG_OBJECT, {src: ''}));
+      deepEqual(toObject, REFERENCE_IMG_OBJECT);
       start();
     });
   });
@@ -212,7 +213,7 @@
   asyncTest('toString', function() {
     createImageObject(function(image) {
       ok(typeof image.toString == 'function');
-      equal(image.toString(), '#<fabric.Image: { src: "' + (fabric.isLikelyNode ? undefined : IMG_SRC) + '" }>');
+      equal(image.toString(), '#<fabric.Image: { src: "' + IMG_SRC + '" }>');
       start();
     });
   });
@@ -220,7 +221,7 @@
   asyncTest('getSrc', function() {
     createImageObject(function(image) {
       ok(typeof image.getSrc == 'function');
-      equal(image.getSrc(), fabric.isLikelyNode ? undefined : IMG_SRC);
+      equal(image.getSrc(), IMG_SRC);
       start();
     });
   });
