@@ -75,7 +75,7 @@
     'flipX':                    false,
     'flipY':                    false,
     'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
+    'src':                      IMG_SRC,
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
@@ -115,6 +115,7 @@
       require('fs').readFile(src, function(err, imgData) {
         if (err) throw err;
         img.src = imgData;
+        img._src = src;
         callback && callback();
       });
     }
