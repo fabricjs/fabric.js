@@ -844,7 +844,8 @@
     },
 
     /**
-     * @private
+     * return font declaration string for canvas context
+     * @returns {String} font declaration formatted for canvas context.
      */
     _getFontDeclaration: function() {
       return [
