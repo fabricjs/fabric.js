@@ -852,7 +852,7 @@
         (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
         (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
+        '"' + this.fontFamily + '"'
       ].join(' ');
     },
 
