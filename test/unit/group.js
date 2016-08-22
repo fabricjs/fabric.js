@@ -368,8 +368,8 @@ test('toObject without default values', function() {
       iteratedObjects.push(groupObject);
     });
 
-    equal(iteratedObjects[1], group.getObjects()[0]);
-    equal(iteratedObjects[0], group.getObjects()[1]);
+    equal(iteratedObjects[0], group.getObjects()[0], 'iteration give back objects in same order');
+    equal(iteratedObjects[1], group.getObjects()[1], 'iteration give back objects in same order');
   });
 
   asyncTest('fromObject', function() {
