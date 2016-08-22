@@ -844,7 +844,8 @@
     },
 
     /**
-     * @private
+     * return font declaration string for canvas context
+     * @returns {String} font declaration formatted for canvas context.
      */
     _getFontDeclaration: function() {
       return [
@@ -852,7 +853,7 @@
         (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
         (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
+        '"' + this.fontFamily + '"'
       ].join(' ');
     },
 
