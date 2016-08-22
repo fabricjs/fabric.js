@@ -1032,9 +1032,9 @@ fabric.Collection = {
     }
     fabric.util.addListener = addListener;
     fabric.util.removeListener = removeListener;
-    function getPointer(event) {
+    function getPointer(event, upperCanvasEl) {
         event || (event = fabric.window.event);
-        var element = event.target || (typeof event.srcElement !== unknown ? event.srcElement : null), scroll = fabric.util.getScrollLeftTop(element);
+        var element = upperCanvasEl || event.target || (typeof event.srcElement !== unknown ? event.srcElement : null), scroll = fabric.util.getScrollLeftTop(element);
         return {
             x: pointerX(event) + scroll.left,
             y: pointerY(event) + scroll.top
@@ -4705,11 +4705,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         restorePointerVpt: function(pointer) {
             return fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.viewportTransform));
         },
-        getPointer: function(e, ignoreZoom, upperCanvasEl) {
-            if (!upperCanvasEl) {
-                upperCanvasEl = this.upperCanvasEl;
-            }
-            var pointer = getPointer(e), bounds = upperCanvasEl.getBoundingClientRect(), boundsWidth = bounds.width || 0, boundsHeight = bounds.height || 0, cssScale;
+        getPointer: function(e, ignoreZoom) {
+            var pointer = getPointer(e, this.upperCanvasEl), bounds = this.upperCanvasEl.getBoundingClientRect(), boundsWidth = bounds.width || 0, boundsHeight = bounds.height || 0, cssScale;
             if (!boundsWidth || !boundsHeight) {
                 if ("top" in bounds && "bottom" in bounds) {
                     boundsHeight = Math.abs(bounds.top - bounds.bottom);
@@ -4731,8 +4728,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 };
             } else {
                 cssScale = {
-                    width: upperCanvasEl.width / boundsWidth,
-                    height: upperCanvasEl.height / boundsHeight
+                    width: this.upperCanvasEl.width / boundsWidth,
+                    height: this.upperCanvasEl.height / boundsHeight
                 };
             }
             return {
@@ -4757,7 +4754,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _initWrapperElement: function() {
             this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, "div", {
-                "class": this.containerClass
+                class: this.containerClass
             });
             fabric.util.setStyle(this.wrapperEl, {
                 width: this.getWidth() + "px",
@@ -8668,7 +8665,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             ctx.restore();
         },
         toObject: function(propertiesToInclude) {
-            var filters = [], resizeFilters = [], element = this._originalElement, scaleX = 1, scaleY = 1;
+            var filters = [], resizeFilters = [], scaleX = 1, scaleY = 1;
             this.filters.forEach(function(filterObj) {
                 if (filterObj) {
                     if (filterObj.type === "Resize") {
@@ -8682,7 +8679,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 filterObj && resizeFilters.push(filterObj.toObject());
             });
             var object = extend(this.callSuper("toObject", propertiesToInclude), {
-                src: element ? element.src || element._src : "",
+                src: this.getSrc(),
                 filters: filters,
                 resizeFilters: resizeFilters,
                 crossOrigin: this.crossOrigin,
@@ -8717,8 +8714,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return reviver ? reviver(markup.join("")) : markup.join("");
         },
         getSrc: function() {
-            if (this.getElement()) {
-                return this.getElement().src || this.getElement()._src;
+            var element = this.getElement();
+            if (element) {
+                return fabric.isLikelyNode ? element._src : element.src;
+            } else {
+                return this.src || "";
             }
         },
         setSrc: function(src, callback, options) {

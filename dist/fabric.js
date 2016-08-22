@@ -1965,11 +1965,12 @@ fabric.Collection = {
    * Cross-browser wrapper for getting event's coordinates
    * @memberOf fabric.util
    * @param {Event} event Event object
+   * @param {HTMLElement} upperCanvasEl &lt;canvas> element on which object selection is drawn
    */
-  function getPointer(event) {
+  function getPointer(event, upperCanvasEl) {
     event || (event = fabric.window.event);
 
-    var element = event.target ||
+    var element = upperCanvasEl || event.target ||
                   (typeof event.srcElement !== unknown ? event.srcElement : null),
 
         scroll = fabric.util.getScrollLeftTop(element);
@@ -9452,15 +9453,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * Returns pointer coordinates relative to canvas.
-     * @param {Event} e
+     * @param {Event} e mouse event
+     * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e, ignoreZoom, upperCanvasEl) {
-      if (!upperCanvasEl) {
-        upperCanvasEl = this.upperCanvasEl;
-      }
-      var pointer = getPointer(e),
-          bounds = upperCanvasEl.getBoundingClientRect(),
+    getPointer: function (e, ignoreZoom) {
+      var pointer = getPointer(e, this.upperCanvasEl),
+          bounds = this.upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
           cssScale;
@@ -9488,8 +9487,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          width: this.upperCanvasEl.width / boundsWidth,
+          height: this.upperCanvasEl.height / boundsHeight
         };
       }
 
@@ -18169,7 +18168,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toObject: function(propertiesToInclude) {
       var filters = [ ], resizeFilters = [ ],
-          element = this._originalElement,
           scaleX = 1, scaleY = 1;
 
       this.filters.forEach(function(filterObj) {
@@ -18187,7 +18185,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
 
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: element ? element.src || element._src : '',
+        src: this.getSrc(),
         filters: filters,
         resizeFilters: resizeFilters,
         crossOrigin: this.crossOrigin,
@@ -18260,8 +18258,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} Source of an image
      */
     getSrc: function() {
-      if (this.getElement()) {
-        return this.getElement().src || this.getElement()._src;
+      var element = this.getElement();
+      if (element) {
+        return fabric.isLikelyNode ? element._src : element.src;
+      }
+      else {
+        return this.src || '';
       }
     },
 
