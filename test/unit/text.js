@@ -76,7 +76,7 @@
     ok(typeof text._getFontDeclaration == 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
     ok(typeof fontDecl == 'string', 'it returns a string');
-    equal(fontDecl, ' normal 40px "Times New Roman"');
+    equal(fontDecl, 'normal  40px "Times New Roman"');
   });
 
   test('toObject', function() {
