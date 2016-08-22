@@ -566,7 +566,7 @@ test('getBoundingRectWithStroke', function() {
   });
 
   asyncTest('cloneAsImage', function() {
-    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red' });
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
 
     ok(typeof cObj.cloneAsImage == 'function');
 
@@ -580,12 +580,37 @@ test('getBoundingRectWithStroke', function() {
       setTimeout(function() {
         ok(image);
         ok(image instanceof fabric.Image);
+        equal(image.width, 100, 'the image has same dimension of object');
         start();
       }, 500);
 
       cObj.cloneAsImage(function(i) {
         image = i;
       });
+    }
+  });
+
+  asyncTest('cloneAsImage with retina scaling enabled', function() {
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
+    fabric.devicePixelRatio = 2;
+    if (!fabric.Canvas.supports('toDataURL')) {
+      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+      start();
+    }
+    else {
+      var image;
+
+      setTimeout(function() {
+        ok(image);
+        ok(image instanceof fabric.Image);
+        equal(image.width, 200, 'the image has been scaled by retina');
+        fabric.devicePixelRatio = 1;
+        start();
+      }, 500);
+
+      cObj.cloneAsImage(function(i) {
+        image = i;
+      }, { enableRetinaScaling: true });
     }
   });
 
@@ -601,7 +626,7 @@ test('getBoundingRectWithStroke', function() {
     //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
     var cObj = new fabric.Rect({
-      width: 100, height: 100, fill: 'red'
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
     });
 
     ok(typeof cObj.toDataURL == 'function');
@@ -1427,4 +1452,54 @@ test('toDataURL & reference to canvas', function() {
     equal(typeof deserializedObject.clipTo, 'function');
   });
 
+  test('getObjectScale', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var objectScale = object.getObjectScaling();
+    deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
+  });
+
+  test('getObjectScale in group', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.group = group;
+    var objectScale = object.getObjectScaling();
+    deepEqual(objectScale, {
+      scaleX: object.scaleX * group.scaleX,
+      scaleY: object.scaleY * group.scaleY
+    });
+  });
+
+  test('_setShadow', function(){
+    var el = fabric.document.createElement('canvas');
+    el.width = 600; el.height = 600;
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var context = canvas.contextContainer;
+    var object = new fabric.Object({ scaleX: 1, scaleY : 1});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.setShadow({
+      color: 'red',
+      blur: 10,
+      offsetX: 5,
+      offsetY: 15
+    });
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX);
+    equal(context.shadowOffsetY, object.shadow.offsetY);
+    equal(context.shadowBlur, object.shadow.blur);
+    object.scaleX = 2;
+    object.scaleY = 3;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2);
+    object.group = group;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
+  });
 })();

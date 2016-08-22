@@ -206,7 +206,6 @@
      */
     toObject: function(propertiesToInclude) {
       var filters = [ ], resizeFilters = [ ],
-          element = this._originalElement,
           scaleX = 1, scaleY = 1;
 
       this.filters.forEach(function(filterObj) {
@@ -224,7 +223,7 @@
       });
 
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: element ? element.src || element._src : '',
+        src: this.getSrc(),
         filters: filters,
         resizeFilters: resizeFilters,
         crossOrigin: this.crossOrigin,
@@ -297,8 +296,12 @@
      * @return {String} Source of an image
      */
     getSrc: function() {
-      if (this.getElement()) {
-        return this.getElement().src || this.getElement()._src;
+      var element = this.getElement();
+      if (element) {
+        return fabric.isLikelyNode ? element._src : element.src;
+      }
+      else {
+        return this.src || '';
       }
     },
 

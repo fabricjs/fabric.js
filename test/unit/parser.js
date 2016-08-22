@@ -559,4 +559,34 @@
     deepEqual(fabric.cssRules[svgUid], expectedStyle);
   });
 
+  test('getCssRule with same selectors', function() {
+
+    ok(fabric.getCSSRules);
+
+    var doc = fabric.document,
+        svgUid = 'uniqueId',
+        styleElement = doc.createElement('style');
+
+    styleElement.textContent = '.cls1,.cls2 { fill: #FF0000;} .cls1 { stroke: #00FF00;} .cls3,.cls1 { stroke-width: 3;}';
+
+    doc.body.appendChild(styleElement);
+
+    var expectedObject = {
+      '.cls1': {
+        'fill': '#FF0000',
+        'stroke': '#00FF00',
+        'strokeWidth': 3
+      },
+      '.cls2': {
+        'fill': '#FF0000'
+      },
+      '.cls3': {
+        'strokeWidth': 3
+      }
+    };
+
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules[svgUid], expectedObject);
+  });
+
 })();

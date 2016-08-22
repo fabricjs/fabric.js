@@ -141,7 +141,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx) {
+    _renderPathCommands: function(ctx) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -446,6 +446,14 @@
         }
         previous = current;
       }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx context to render path on
+     */
+    _render: function(ctx) {
+      this._renderPathCommands(ctx);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },

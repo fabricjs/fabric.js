@@ -332,11 +332,18 @@
        */
 
       var colorStopEls = el.getElementsByTagName('stop'),
-          type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
+          type,
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
           gradientTransform = el.getAttribute('gradientTransform'),
           colorStops = [],
-          coords = { }, ellipseMatrix;
+          coords, ellipseMatrix;
+
+      if (el.nodeName === 'linearGradient' || el.nodeName === 'LINEARGRADIENT') {
+        type = 'linear';
+      }
+      else {
+        type = 'radial';
+      }
 
       if (type === 'linear') {
         coords = getLinearCoords(el);
@@ -386,6 +393,12 @@
   function _convertPercentUnitsToValues(object, options, gradientUnits) {
     var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = '';
     for (var prop in options) {
+      if (options[prop] === 'Infinity') {
+        options[prop] = 1;
+      }
+      else if (options[prop] === '-Infinity') {
+        options[prop] = 0;
+      }
       propValue = parseFloat(options[prop], 10);
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         multFactor = 0.01;
