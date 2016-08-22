@@ -71,6 +71,14 @@
     equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
+  test('_getFontDeclaration', function() {
+    var text = createTextObject();
+    ok(typeof text._getFontDeclaration == 'function', 'has a private method _getFontDeclaration');
+    var fontDecl = text._getFontDeclaration();
+    ok(typeof fontDecl == 'string', 'it returns a string');
+    equal(fontDecl, ' normal 40px "Times New Roman"');
+  });
+
   test('toObject', function() {
     var text = createTextObject();
     ok(typeof text.toObject == 'function');
