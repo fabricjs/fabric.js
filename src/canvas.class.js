@@ -1398,8 +1398,8 @@
      * @chainable
      */
     deactivateAllWithDispatch: function (e) {
-      var activeGroup = this.getActiveGroup();
-      var activeObject = this.getActiveObject();
+      var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject();
       if (activeObject || activeGroup) {
         this.fire('before:selection:cleared', { target: activeObject || activeGroup, e: e });
       }
