@@ -50,6 +50,8 @@
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
+      addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
+
       if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
         eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
         eventjs.add(this.upperCanvasEl, 'drag', this._onDrag);
@@ -74,6 +76,7 @@
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
       this._onMouseOut = this._onMouseOut.bind(this);
+      this._onDoubleClick = this._onDoubleClick.bind(this);
     },
 
     /**
@@ -89,6 +92,8 @@
 
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+      removeListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
 
       if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
         eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
@@ -220,6 +225,19 @@
     _onMouseMove: function (e) {
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on dblclick
+     */
+    _onDoubleClick: function (e) {
+      var target = this.findTarget(e);
+      this.fire('mouse:dblclick', { target: target, e: e });
+
+      if (target && !this.isDrawingMode) {
+        target.fire('object:dblclick', { e: e });
+      }
     },
 
     /**
