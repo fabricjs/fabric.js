@@ -50,14 +50,13 @@
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
-      addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-
       if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
         eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
         eventjs.add(this.upperCanvasEl, 'drag', this._onDrag);
         eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.add(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       }
     },
 
@@ -93,14 +92,13 @@
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
-      removeListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-
       if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
         eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
         eventjs.remove(this.upperCanvasEl, 'drag', this._onDrag);
         eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.remove(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       }
     },
 
@@ -230,8 +228,9 @@
     /**
      * @private
      * @param {Event} e Event object fired on dblclick
+     * @param {Event} [self] Inner Event object
      */
-    _onDoubleClick: function (e) {
+    _onDoubleClick: function (e, self) {
       var target = this.findTarget(e);
       this.fire('mouse:dblclick', { target: target, e: e });
 
