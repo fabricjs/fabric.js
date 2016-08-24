@@ -228,9 +228,8 @@
     /**
      * @private
      * @param {Event} e Event object fired on dblclick
-     * @param {Event} [self] Inner Event object
      */
-    _onDoubleClick: function (e, self) {
+    _onDoubleClick: function (e) {
       var target = this.findTarget(e);
       this.fire('mouse:dblclick', { target: target, e: e });
 
