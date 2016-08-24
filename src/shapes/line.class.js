@@ -105,10 +105,6 @@
     _set: function(key, value) {
       this.callSuper('_set', key, value);
       if (typeof coordProps[key] !== 'undefined') {
-        //if we have set x1,x2,y1,y2 then the angle must be
-        //reset, otherwise the next time we calculate x1,x2,y1,y2
-        //we will be rotating the line mistakenly
-        this.angle = 0;
         this._setWidthHeight();
       }
 

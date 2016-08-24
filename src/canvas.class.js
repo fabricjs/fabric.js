@@ -552,7 +552,8 @@
                 ydiff = area.height;
             }
 
-            //setting these directly will also reset the angle of the line
+            // Reset the angle of the line to 0, since we've done all our maths in canvas space
+            target.set("angle", 0);
             if(moveTailEnd) {
                 target.set("x2", constrainedPoint.x);
                 target.set("y2", constrainedPoint.y);
