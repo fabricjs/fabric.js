@@ -43,7 +43,6 @@
       // mouse events
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
 
       // touch events
@@ -56,6 +55,7 @@
         eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.add(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       }
     },
 
@@ -84,7 +84,6 @@
 
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
 
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -96,6 +95,7 @@
         eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.remove(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       }
     },
 
@@ -585,6 +585,17 @@
         this._transformObject(e);
       }
       this._handleEvent(e, 'move', target ? target : null);
+    },
+
+    /**
+     * Method that defines actions when an Event.js Mouse Wheel
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
+     */
+    __onMouseWheel: function(e, self) {
+      this.fire('mouse:wheel', {
+        e: e, self: self
+      });
     },
 
     /**
