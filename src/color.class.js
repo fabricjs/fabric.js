@@ -276,12 +276,12 @@
   fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
 
   /**
-   * Regex matching color in HEX format (ex: #FF5555, 010155, aff)
+   * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
    * @static
    * @field
    * @memberOf fabric.Color
    */
-  fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
+  fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})$/i;
 
   /**
    * Map of the 17 basic color names with HEX code
@@ -348,7 +348,7 @@
   };
 
   /**
-   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
+   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf fabric.Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {Array} source
@@ -390,7 +390,7 @@
   };
 
   /**
-   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
+   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf fabric.Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
@@ -450,25 +450,27 @@
   };
 
   /**
-   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HEX format
+   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
    * @memberOf fabric.Color
-   * @param {String} color ex: FF5555
+   * @param {String} color ex: FF5555 or FF5544CC (RGBa)
    * @return {Array} source
    */
   fabric.Color.sourceFromHex = function(color) {
     if (color.match(Color.reHex)) {
       var value = color.slice(color.indexOf('#') + 1),
           isShortNotation = (value.length === 3),
+          isRGBa = (value.length === 8),
           r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
           g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
-          b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6);
+          b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6),
+          a = isRGBa ? value.substring(6, 8) : 'FF';
 
       return [
         parseInt(r, 16),
         parseInt(g, 16),
         parseInt(b, 16),
-        1
+        parseFloat((parseInt(a, 16) / 255).toFixed(2))
       ];
     }
   };
