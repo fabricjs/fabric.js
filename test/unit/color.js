@@ -289,13 +289,16 @@
     deepEqual(fabric.Color.sourceFromHex('#FFF'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('FFFFFFFF'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('FFFFFF00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFFCC'), [255,255,255,0.8]);
 
     // lowercase
     deepEqual(fabric.Color.sourceFromHex('#ffffff'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('#fff'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('ffffff'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('fff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('ffffffff'), [255,255,255,1]);
     deepEqual(fabric.Color.sourceFromHex('ffffff00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('ffffffcc'), [255,255,255,0.8]);
   });
 
   test('fromSource', function() {
