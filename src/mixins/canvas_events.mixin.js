@@ -121,7 +121,7 @@
      * @private
      * @param {Event} [e] Event object fired on wheel event
      */
-    _onMouseWheel: function(e, self) {
+    _onMouseWheel: function(e) {
       this.__onMouseWheel(e);
     },
 
