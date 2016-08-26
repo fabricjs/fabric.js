@@ -459,12 +459,12 @@
   fabric.Color.sourceFromHex = function(color) {
     if (color.match(Color.reHex)) {
       var value = color.slice(color.indexOf('#') + 1),
-          isShortNotation = (value.length === 3),
-          isRGBa = (value.length === 8),
+          isShortNotation = (value.length === 3 || value.length === 4),
+          isRGBa = (value.length === 8 || value.length === 4),
           r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
           g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
           b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6),
-          a = isRGBa ? value.substring(6, 8) : 'FF';
+          a = isRGBa ? (isShortNotation ? (value.charAt(3) + value.charAt(3)) : value.substring(6, 8)) : 'FF';
 
       return [
         parseInt(r, 16),
