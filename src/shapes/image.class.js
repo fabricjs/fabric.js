@@ -94,12 +94,12 @@
      * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      */
-    initialize: function(element, options) {
+    initialize: function(element, options, callback) {
       options || (options = { });
       this.filters = [ ];
       this.resizeFilters = [ ];
       this.callSuper('initialize', options);
-      this._initElement(element, options);
+      this._initElement(element, options, callback);
     },
 
     /**
@@ -129,7 +129,7 @@
         this.applyFilters(callback);
       }
       else if (callback) {
-        callback();
+        callback(this);
       }
 
       return this;
@@ -366,7 +366,7 @@
 
       if (filters.length === 0) {
         this._element = imgElement;
-        callback && callback();
+        callback && callback(this);
         return canvasEl;
       }
       filters.forEach(function(filter) {
@@ -386,13 +386,13 @@
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         !forResizing && (_this._filteredEl = replacement);
-        callback && callback();
+        callback && callback(this);
       }
       else {
         replacement.onload = function() {
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
-          callback && callback();
+          callback && callback(this);
           replacement.onload = canvasEl = imgEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
@@ -494,8 +494,8 @@
      * @param {HTMLImageElement|String} element The element representing the image
      * @param {Object} [options] Options object
      */
-    _initElement: function(element, options) {
-      this.setElement(fabric.util.getById(element), null, options);
+    _initElement: function(element, options, callback) {
+      this.setElement(fabric.util.getById(element), callback, options);
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
 
