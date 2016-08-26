@@ -213,13 +213,13 @@
      * Returns new point which is the result of linear interpolation with this one and another one
      * @param {fabric.Point} that
      * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
-     * TODO: lock t between 0 and 1 in fabric 2.0
      * @return {fabric.Point}
      */
     lerp: function (that, t) {
       if (typeof t === 'undefined') {
         t = 0.5;
       }
+      t = Math.max(Math.min(1, t), 0);
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
 
