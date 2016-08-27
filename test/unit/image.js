@@ -177,8 +177,8 @@
           ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
           equal(filterFromObj.scaleY, 0.5);
           equal(filterFromObj.scaleX, 0.5);
-          //equal(imageFromObject.width, width, 'on image reload width is halved again');
-          //equal(imageFromObject.height, height, 'on image reload width is halved again');
+          equal(imageFromObject.width, width, 'on image reload width is halved again');
+          equal(imageFromObject.height, height, 'on image reload width is halved again');
           start();
         });
       });
@@ -276,22 +276,19 @@
     });
   });
 
-  // asyncTest('clone', function() {
-  //   createImageObject(function(image) {
-  //     ok(typeof image.clone == 'function');
-
-  //     var imageClone = null;
-  //     image.clone(function(clone) {
-  //       imageClone = clone;
-  //     });
-
-  //     setTimeout(function() {
-  //       ok(imageClone instanceof fabric.Image);
-  //       deepEqual(imageClone.toObject(), image.toObject());
-  //       start();
-  //     }, 1000);
-  //   });
-  // });
+  asyncTest('clone', function() {
+    createImageObject(function(image) {
+      ok(typeof image.clone == 'function', 'has clone method');
+      var imageClone = null;
+      image.clone(function(clone) {
+        imageClone = clone;
+        ok(imageClone instanceof fabric.Image, 'returns a new image');
+        deepEqual(imageClone.toObject(), image.toObject(), 'return an identical image');
+        notEqual(imageClone, image, 'return a new image');
+        start();
+      });
+    });
+  });
 
   // asyncTest('cloneWidthHeight', function() {
   //   var image = createSmallImageObject();
