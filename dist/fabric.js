@@ -282,6 +282,7 @@ fabric.Collection = {
    * @param {Function} callback
    *                   Callback invoked with current object as first argument,
    *                   index - as second and an array of all objects - as third.
+   *                   Iteration happens in reverse order (for performance reasons).
    *                   Callback is invoked in a context of Global Object (e.g. `window`)
    *                   when no `context` argument is given
    *
@@ -290,8 +291,9 @@ fabric.Collection = {
    * @chainable
    */
   forEachObject: function(callback, context) {
-    var objects = this.getObjects();
-    for (var i = 0, len = objects.length; i < len; i++) {
+    var objects = this.getObjects(),
+        i = objects.length;
+    while (i--) {
       callback.call(context, objects[i], i, objects);
     }
     return this;
@@ -378,7 +380,7 @@ fabric.Collection = {
      * @static
      * @memberOf fabric.util
      * @param {Array} array
-     * @param {*} value
+     * @param {Any} value
      * @return {Array} original array
      */
     removeFromArray: function(array, value) {
@@ -534,7 +536,6 @@ fabric.Collection = {
      * Converts from attribute value to pixel value if applicable.
      * Returns converted pixels or original value not converted.
      * @param {Number|String} value number to operate on
-     * @param {Number} fontSize
      * @return {Number|String}
      */
     parseUnit: function(value, fontSize) {
@@ -617,7 +618,7 @@ fabric.Collection = {
      * @memberOf fabric.util
      * @param {String} url URL representing an image
      * @param {Function} callback Callback; invoked with loaded image
-     * @param {*} [context] Context to invoke callback in
+     * @param {Any} [context] Context to invoke callback in
      * @param {Object} [crossOrigin] crossOrigin value to set image element to
      */
     loadImage: function(url, callback, context, crossOrigin) {
@@ -710,7 +711,6 @@ fabric.Collection = {
      * @memberOf fabric.util
      * @param {Array} elements SVG elements to group
      * @param {Object} [options] Options object
-     * @param {String} path Value to set sourcePath to
      * @return {fabric.Object|fabric.PathGroup}
      */
     groupSVGElements: function(elements, options, path) {
@@ -1291,7 +1291,8 @@ fabric.Collection = {
   if (!Array.prototype.indexOf) {
     /**
      * Finds index of an element in an array
-     * @param {*} searchElement
+     * @param {Any} searchElement
+     * @param {Number} [fromIndex]
      * @return {Number}
      */
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
@@ -1418,7 +1419,8 @@ fabric.Collection = {
     /**
      * Returns "folded" (reduced) result of iterating over elements in an array
      * @param {Function} fn Callback to invoke for each element
-     * @return {*}
+     * @param {Object} [initial] Object to use as the first argument to the first call of the callback
+     * @return {Any}
      */
     Array.prototype.reduce = function(fn /*, initial*/) {
       var len = this.length >>> 0,
@@ -1472,7 +1474,7 @@ fabric.Collection = {
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
    * @param {String} byProperty
-   * @return {*}
+   * @return {Any}
    */
   function max(array, byProperty) {
     return find(array, byProperty, function(value1, value2) {
@@ -1485,7 +1487,7 @@ fabric.Collection = {
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
    * @param {String} byProperty
-   * @return {*}
+   * @return {Any}
    */
   function min(array, byProperty) {
     return find(array, byProperty, function(value1, value2) {
@@ -2465,13 +2467,13 @@ fabric.Collection = {
 
 /**
  * Wrapper around `console.log` (when available)
- * @param {*} [values] Values to log
+ * @param {Any} [values] Values to log
  */
 fabric.log = function() { };
 
 /**
  * Wrapper around `console.warn` (when available)
- * @param {*} [values] Values to log as a warning
+ * @param {Any} [values] Values to log as a warning
  */
 fabric.warn = function() { };
 
@@ -4389,13 +4391,13 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * Returns new point which is the result of linear interpolation with this one and another one
      * @param {fabric.Point} that
      * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
+     * TODO: lock t between 0 and 1 in fabric 2.0
      * @return {fabric.Point}
      */
     lerp: function (that, t) {
       if (typeof t === 'undefined') {
         t = 0.5;
       }
-      t = Math.max(Math.min(1, t), 0);
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
 
@@ -4965,12 +4967,12 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
 
   /**
-   * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
+   * Regex matching color in HEX format (ex: #FF5555, 010155, aff)
    * @static
    * @field
    * @memberOf fabric.Color
    */
-  fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
+  fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
 
   /**
    * Map of the 17 basic color names with HEX code
@@ -5037,7 +5039,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   };
 
   /**
-   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
+   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf fabric.Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {Array} source
@@ -5079,7 +5081,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   };
 
   /**
-   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
+   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf fabric.Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
@@ -5139,27 +5141,25 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   };
 
   /**
-   * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
+   * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
    * @memberOf fabric.Color
-   * @param {String} color ex: FF5555 or FF5544CC (RGBa)
+   * @param {String} color ex: FF5555
    * @return {Array} source
    */
   fabric.Color.sourceFromHex = function(color) {
     if (color.match(Color.reHex)) {
       var value = color.slice(color.indexOf('#') + 1),
-          isShortNotation = (value.length === 3 || value.length === 4),
-          isRGBa = (value.length === 8 || value.length === 4),
+          isShortNotation = (value.length === 3),
           r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
           g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
-          b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6),
-          a = isRGBa ? (isShortNotation ? (value.charAt(3) + value.charAt(3)) : value.substring(6, 8)) : 'FF';
+          b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6);
 
       return [
         parseInt(r, 16),
         parseInt(g, 16),
         parseInt(b, 16),
-        parseFloat((parseInt(a, 16) / 255).toFixed(2))
+        1
       ];
     }
   };
@@ -5344,6 +5344,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     /**
      * Returns SVG representation of an gradient
      * @param {Object} object Object to create a gradient for
+     * @param {Boolean} normalize Whether coords should be normalized
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
@@ -5420,7 +5421,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     /**
      * Returns an instance of CanvasGradient
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Object} object
      * @return {CanvasGradient}
      */
     toLive: function(ctx, object) {
@@ -7869,6 +7869,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     /**
      * Converts points to SVG path
      * @param {Array} points Array of points
+     * @param {Number} minX
+     * @param {Number} minY
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points) {
@@ -8627,6 +8629,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * Renders both the top canvas and the secondary container canvas.
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -8662,6 +8665,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
+     * @param {Event} e Event object fired on mousemove
      */
     _resetCurrentTransform: function() {
       var t = this._currentTransform;
@@ -9449,7 +9453,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Returns pointer coordinates relative to canvas.
      * @param {Event} e
-     * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e, ignoreZoom, upperCanvasEl) {
@@ -9669,7 +9672,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Sets active group to a specified one
      * @param {fabric.Group} group Group to set as a current one
-     * @param {Event} e Event object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -12192,7 +12194,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Basic getter
      * @param {String} property Property name
-     * @return {*} value of a property
+     * @return {Any} value of a property
      */
     get: function(property) {
       return this[property];
@@ -12246,7 +12248,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * @private
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      * @return {fabric.Object} thisArg
      */
     _set: function(key, value) {
@@ -14683,7 +14685,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      */
     _set: function(key, value) {
       this.callSuper('_set', key, value);
@@ -14732,7 +14734,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
@@ -14983,7 +14984,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      * @return {fabric.Circle} thisArg
      */
     _set: function(key, value) {
@@ -15351,7 +15352,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      * @return {fabric.Ellipse} thisArg
      */
     _set: function(key, value) {
@@ -15591,7 +15592,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
 
@@ -15799,6 +15799,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Constructor
      * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object
+     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
      * @example
      * var poly = new fabric.Polyline([
@@ -15848,7 +15849,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
       if (!fabric.Polygon.prototype.commonRender.call(this, ctx, noTransform)) {
@@ -16062,7 +16062,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
       if (!this.commonRender(ctx, noTransform)) {
@@ -16078,7 +16077,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     commonRender: function(ctx, noTransform) {
       var point, len = this.points.length;
@@ -17263,7 +17261,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Sets certain property to a certain value
      * @param {String} prop
-     * @param {*} value
+     * @param {Any} value
      * @return {fabric.PathGroup} thisArg
      */
     _set: function(prop, value) {
@@ -17911,7 +17909,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Returns requested property
      * @param {String} prop Property to get
-     * @return {*}
+     * @return {Any}
      */
     get: function(prop) {
       if (prop in _lockProperties) {
@@ -18057,15 +18055,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
-     * @param {function} [callback] callback function to call after eventual filters applied.
      * @return {fabric.Image} thisArg
      */
-    initialize: function(element, options, callback) {
+    initialize: function(element, options) {
       options || (options = { });
       this.filters = [ ];
       this.resizeFilters = [ ];
       this.callSuper('initialize', options);
-      this._initElement(element, options, callback);
+      this._initElement(element, options);
     },
 
     /**
@@ -18095,7 +18092,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.applyFilters(callback);
       }
       else if (callback) {
-        callback(this);
+        callback();
       }
 
       return this;
@@ -18172,6 +18169,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toObject: function(propertiesToInclude) {
       var filters = [ ], resizeFilters = [ ],
+          element = this._originalElement,
           scaleX = 1, scaleY = 1;
 
       this.filters.forEach(function(filterObj) {
@@ -18189,7 +18187,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
 
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: this.getSrc(),
+        src: element ? element.src || element._src : '',
         filters: filters,
         resizeFilters: resizeFilters,
         crossOrigin: this.crossOrigin,
@@ -18262,12 +18260,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} Source of an image
      */
     getSrc: function() {
-      var element = this.getElement();
-      if (element) {
-        return fabric.isLikelyNode ? element._src : element.src;
-      }
-      else {
-        return this.src || '';
+      if (this.getElement()) {
+        return this.getElement().src || this.getElement()._src;
       }
     },
 
@@ -18306,9 +18300,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Applies filters assigned to this image (from "filters" array)
      * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
-     * @param {Array} filters to be initialized
-     * @param {fabric.Image} imgElement
-     * @param {Boolean} forResizing
      * @return {fabric.Image} thisArg
      * @chainable
      */
@@ -18332,7 +18323,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (filters.length === 0) {
         this._element = imgElement;
-        callback && callback(this);
+        callback && callback();
         return canvasEl;
       }
       filters.forEach(function(filter) {
@@ -18352,13 +18343,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         !forResizing && (_this._filteredEl = replacement);
-        callback && callback(_this);
+        callback && callback();
       }
       else {
         replacement.onload = function() {
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
-          callback && callback(_this);
+          callback && callback();
           replacement.onload = canvasEl = imgEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
@@ -18369,7 +18360,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
       var x, y, imageMargins = this._findMargins(), elementToDraw;
@@ -18460,8 +18450,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {HTMLImageElement|String} element The element representing the image
      * @param {Object} [options] Options object
      */
-    _initElement: function(element, options, callback) {
-      this.setElement(fabric.util.getById(element), callback, options);
+    _initElement: function(element, options) {
+      this.setElement(fabric.util.getById(element), null, options);
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
 
@@ -18547,7 +18537,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         object.filters = filters || [ ];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
           object.resizeFilters = resizeFilters || [ ];
-          return new fabric.Image(img, object, callback);
+          var instance = new fabric.Image(img, object);
+          callback && callback(instance);
         });
       });
     }, null, object.crossOrigin);
@@ -20159,8 +20150,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Resize.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
-     * @param {Number} scaleX
-     * @param {Number} scaleY
      */
     applyTo: function(canvasEl, scaleX, scaleY) {
 
@@ -20188,73 +20177,55 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       canvasEl.getContext('2d').putImageData(imageData, 0, 0);
     },
 
-    /**
-     * Filter sliceByTwo
-     * @param {Object} canvasEl Canvas element to apply filter to
-     * @param {Number} oW Original Width
-     * @param {Number} oH Original Height
-     * @param {Number} dW Destination Width
-     * @param {Number} dH Destination Height
-     * @returns {ImageData}
-     */
-    sliceByTwo: function(canvasEl, oW, oH, dW, dH) {
+    sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
       var context = canvasEl.getContext('2d'), imageData,
           multW = 0.5, multH = 0.5, signW = 1, signH = 1,
-          doneW = false, doneH = false, stepW = oW, stepH = oH,
+          doneW = false, doneH = false, stepW = width, stepH = height,
           tmpCanvas = fabric.util.createCanvasElement(),
           tmpCtx = tmpCanvas.getContext('2d');
-      dW = floor(dW);
-      dH = floor(dH);
-      tmpCanvas.width = max(dW, oW);
-      tmpCanvas.height = max(dH, oH);
+      newWidth = floor(newWidth);
+      newHeight = floor(newHeight);
+      tmpCanvas.width = max(newWidth, width);
+      tmpCanvas.height = max(newHeight, height);
 
-      if (dW > oW) {
+      if (newWidth > width) {
         multW = 2;
         signW = -1;
       }
-      if (dH > oH) {
+      if (newHeight > height) {
         multH = 2;
         signH = -1;
       }
-      imageData = context.getImageData(0, 0, oW, oH);
-      canvasEl.width = max(dW, oW);
-      canvasEl.height = max(dH, oH);
+      imageData = context.getImageData(0, 0, width, height);
+      canvasEl.width = max(newWidth, width);
+      canvasEl.height = max(newHeight, height);
       context.putImageData(imageData, 0, 0);
 
       while (!doneW || !doneH) {
-        oW = stepW;
-        oH = stepH;
-        if (dW * signW < floor(stepW * multW * signW)) {
+        width = stepW;
+        height = stepH;
+        if (newWidth * signW < floor(stepW * multW * signW)) {
           stepW = floor(stepW * multW);
         }
         else {
-          stepW = dW;
+          stepW = newWidth;
           doneW = true;
         }
-        if (dH * signH < floor(stepH * multH * signH)) {
+        if (newHeight * signH < floor(stepH * multH * signH)) {
           stepH = floor(stepH * multH);
         }
         else {
-          stepH = dH;
+          stepH = newHeight;
           doneH = true;
         }
-        imageData = context.getImageData(0, 0, oW, oH);
+        imageData = context.getImageData(0, 0, width, height);
         tmpCtx.putImageData(imageData, 0, 0);
         context.clearRect(0, 0, stepW, stepH);
-        context.drawImage(tmpCanvas, 0, 0, oW, oH, 0, 0, stepW, stepH);
+        context.drawImage(tmpCanvas, 0, 0, width, height, 0, 0, stepW, stepH);
       }
-      return context.getImageData(0, 0, dW, dH);
+      return context.getImageData(0, 0, newWidth, newHeight);
     },
 
-    /**
-     * Filter lanczosResize
-     * @param {Object} canvasEl Canvas element to apply filter to
-     * @param {Number} oW Original Width
-     * @param {Number} oH Original Height
-     * @param {Number} dW Destination Width
-     * @param {Number} dH Destination Height
-     * @returns {ImageData}
-     */
     lanczosResize: function(canvasEl, oW, oH, dW, dH) {
 
       function lanczosCreate(lobes) {
@@ -20336,29 +20307,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       return process(0);
     },
 
-    /**
-     * bilinearFiltering
-     * @param {Object} canvasEl Canvas element to apply filter to
-     * @param {Number} oW Original Width
-     * @param {Number} oH Original Height
-     * @param {Number} dW Destination Width
-     * @param {Number} dH Destination Height
-     * @returns {ImageData}
-     */
-    bilinearFiltering: function(canvasEl, oW, oH, dW, dH) {
+    bilinearFiltering: function(canvasEl, w, h, w2, h2) {
       var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
           color, offset = 0, origPix, ratioX = this.rcpScaleX,
           ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
-          w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH),
-          pixels = img.data, destImage = context.getImageData(0, 0, dW, dH),
+          w4 = 4 * (w - 1), img = context.getImageData(0, 0, w, h),
+          pixels = img.data, destImage = context.getImageData(0, 0, w2, h2),
           destPixels = destImage.data;
-      for (i = 0; i < dH; i++) {
-        for (j = 0; j < dW; j++) {
+      for (i = 0; i < h2; i++) {
+        for (j = 0; j < w2; j++) {
           x = floor(ratioX * j);
           y = floor(ratioY * i);
           xDiff = ratioX * j - x;
           yDiff = ratioY * i - y;
-          origPix = 4 * (y * oW + x);
+          origPix = 4 * (y * w + x);
 
           for (chnl = 0; chnl < 4; chnl++) {
             a = pixels[origPix + chnl];
@@ -20374,15 +20336,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       return destImage;
     },
 
-    /**
-     * hermiteFastResize
-     * @param {Object} canvasEl Canvas element to apply filter to
-     * @param {Number} oW Original Width
-     * @param {Number} oH Original Height
-     * @param {Number} dW Destination Width
-     * @param {Number} dH Destination Height
-     * @returns {ImageData}
-     */
     hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
       var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY,
           ratioWHalf = ceil(ratioW / 2),
@@ -20578,6 +20531,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   if (fabric.Text) {
@@ -20982,6 +20936,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function() {
@@ -21130,7 +21085,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} method Method name ("fillText" or "strokeText")
      */
     _renderTextCommon: function(ctx, method) {
 
@@ -21179,7 +21133,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       ctx.save();
-      this._setLineDash(ctx, this.strokedashArray);
+
+      if (this.strokeDashArray) {
+        // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+        if (1 & this.strokeDashArray.length) {
+          this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+        }
+        supportsLineDash && ctx.setLineDash(this.strokeDashArray);
+      }
+
       ctx.beginPath();
       this._renderTextCommon(ctx, 'strokeText');
       ctx.closePath();
@@ -21205,6 +21167,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextBackground: function(ctx) {
       this._renderTextBoxBackground(ctx);
@@ -21407,8 +21370,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
-     * return font declaration string for canvas context
-     * @returns {String} font declaration formatted for canvas context.
+     * @private
      */
     _getFontDeclaration: function() {
       return [
@@ -21416,14 +21378,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
         (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
-        '"' + this.fontFamily + '"'
+        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
     },
 
     /**
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
@@ -21658,7 +21619,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
      *
      * @private
-     * @param {*} value
+     * @param {Any} value
      * @return {String}
      */
     _getFillAttributes: function(value) {
@@ -21673,7 +21634,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * Sets specified property to a specified value
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      * @return {fabric.Text} thisArg
      * @chainable
      */
@@ -22391,11 +22352,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Content of the line
-     * @param {Number} left
-     * @param {Number} top
-     * @param {Number} lineIndex
-     * @param {Number} charOffset
      */
     _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
 
@@ -22555,9 +22511,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} line
-     * @param {Number} left
-     * @param {Number} top
-     * @param {Number} lineIndex
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
@@ -22804,8 +22757,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} lineIndex
-     * @param {Number} charIndex
      */
     _getHeightOfChar: function(ctx, lineIndex, charIndex) {
       var style = this._getStyleDeclaration(lineIndex, charIndex);
@@ -25208,7 +25159,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * the same font-size value would result in different actual size depending
      * on the value of the scale.
      * @param {String} key
-     * @param {*} value
+     * @param {Any} value
      */
     setOnGroup: function(key, value) {
       if (key === 'scaleX') {
