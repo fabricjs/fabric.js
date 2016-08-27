@@ -92,6 +92,7 @@
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
+     * @param {function} [callback] callback function to call after eventual filters applied.
      * @return {fabric.Image} thisArg
      */
     initialize: function(element, options, callback) {
@@ -386,13 +387,13 @@
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         !forResizing && (_this._filteredEl = replacement);
-        callback && callback(this);
+        callback && callback(_this);
       }
       else {
         replacement.onload = function() {
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
-          callback && callback(this);
+          callback && callback(_this);
           replacement.onload = canvasEl = imgEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
@@ -581,8 +582,7 @@
         object.filters = filters || [ ];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
           object.resizeFilters = resizeFilters || [ ];
-          var instance = new fabric.Image(img, object);
-          callback && callback(instance);
+          return new fabric.Image(img, object, callback);
         });
       });
     }, null, object.crossOrigin);
