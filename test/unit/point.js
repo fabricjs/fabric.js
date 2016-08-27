@@ -286,6 +286,10 @@
     deepEqual(returned, point, '0 gives you the original point');
     returned = point.lerp(point2, 1);
     deepEqual(returned, point2, '1 gives you the destination point');
+    returned = point.lerp(point2, -1);
+    deepEqual(returned, point, '-1 < 0 so t = 0 gives you the original point');
+    returned = point.lerp(point2, 2);
+    deepEqual(returned, point2, '2 > 1 so t = 1 gives you the destination point');
   });
 
   test('point distance from', function() {
