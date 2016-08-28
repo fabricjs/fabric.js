@@ -89,6 +89,15 @@
     _lastScaleY: 1,
 
     /**
+     * minimum scale factor under which any resizeFilter is triggered to resize the image
+     * 0 will disable the automatic resize. 1 will trigger automatically always.
+     * number bigger than 1 can be used in case we want to scale with some filter above
+     * the natural image dimensions
+     * @type Number
+     */
+    minimumScaleTrigger: 0.5,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -368,25 +377,32 @@
         return;
       }
 
-      var canvasEl = fabric.util.createCanvasElement(),
-          replacement = fabric.util.createImage(),
+      var replacement = fabric.util.createImage(),
           retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
-          minimumScale = 0.5 / retinaScaling,
+          minimumScale = this.minimumScaleTrigger / retinaScaling,
           _this = this, scaleX, scaleY;
-
-      canvasEl.width = imgElement.width;
-      canvasEl.height = imgElement.height;
-      canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
       if (filters.length === 0) {
         this._element = imgElement;
         callback && callback(this);
         return imgElement;
       }
+
+      var canvasEl = fabric.util.createCanvasElement();
+      canvasEl.width = imgElement.width;
+      canvasEl.height = imgElement.height;
+      canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+
       filters.forEach(function(filter) {
         if (forResizing) {
-          scaleX = _this.scaleX < minimumScale ? _this.scaleX * retinaScaling : 1;
-          scaleY = _this.scaleY < minimumScale ? _this.scaleY * retinaScaling : 1;
+          scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
+          scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
+          if (scaleX * retinaScaling < 1) {
+            scaleX *= retinaScaling;
+          }
+          if (scaleY * retinaScaling < 1) {
+            scaleY *= retinaScaling;
+          }
         }
         else {
           scaleX = filter.scaleX;
@@ -394,8 +410,8 @@
         }
         filter && filter.applyTo(canvasEl, scaleX, scaleY);
         if (!forResizing && filter && filter.type === 'Resize') {
-          this.width *= filter.scaleX;
-          this.height *= filter.scaleY;
+          _this.width *= filter.scaleX;
+          _this.height *= filter.scaleY;
         }
       });
 
@@ -403,14 +419,14 @@
       replacement.width = canvasEl.width;
       replacement.height = canvasEl.height;
 
-      if (fabric.isLikelyNode) {
-        replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
-        // onload doesn't fire in some node versions, so we invoke callback manually
-        _this._element = replacement;
-        !forResizing && (_this._filteredEl = replacement);
-        callback && callback(_this);
-      }
-      else {
+      // if (fabric.isLikelyNode) {
+      //   replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
+      //   // onload doesn't fire in some node versions, so we invoke callback manually
+      //   _this._element = replacement;
+      //   !forResizing && (_this._filteredEl = replacement);
+      //   callback && callback(_this);
+      // }
+      // else {
         replacement.onload = function() {
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
@@ -418,7 +434,7 @@
           replacement.onload = canvasEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
-      }
+      //}
       return canvasEl;
     },
 
