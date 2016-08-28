@@ -1137,9 +1137,12 @@
    * @static
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
+   * @param {function} function invoked with new instance as argument
    * @return {fabric.IText} instance of fabric.IText
    */
-  fabric.IText.fromObject = function(object) {
-    return new fabric.IText(object.text, clone(object));
+  fabric.IText.fromObject = function(object, callback) {
+    var iText = new fabric.IText(object.text, clone(object));
+    callback && callback(iText);
+    return iText;
   };
 })();
