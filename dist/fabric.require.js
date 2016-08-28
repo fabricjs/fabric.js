@@ -143,8 +143,8 @@ fabric.Collection = {
         return this;
     },
     forEachObject: function(callback, context) {
-        var objects = this.getObjects();
-        for (var i = 0, len = objects.length; i < len; i++) {
+        var objects = this.getObjects(), i = objects.length;
+        while (i--) {
             callback.call(context, objects[i], i, objects);
         }
         return this;
@@ -2401,7 +2401,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             if (typeof t === "undefined") {
                 t = .5;
             }
-            t = Math.max(Math.min(1, t), 0);
             return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
         },
         distanceFrom: function(that) {
@@ -2662,7 +2661,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     };
     fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
     fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
-    fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
+    fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
     fabric.Color.colorNameMap = {
         aqua: "#00FFFF",
         black: "#000000",
@@ -2737,8 +2736,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     };
     fabric.Color.sourceFromHex = function(color) {
         if (color.match(Color.reHex)) {
-            var value = color.slice(color.indexOf("#") + 1), isShortNotation = value.length === 3 || value.length === 4, isRGBa = value.length === 8 || value.length === 4, r = isShortNotation ? value.charAt(0) + value.charAt(0) : value.substring(0, 2), g = isShortNotation ? value.charAt(1) + value.charAt(1) : value.substring(2, 4), b = isShortNotation ? value.charAt(2) + value.charAt(2) : value.substring(4, 6), a = isRGBa ? isShortNotation ? value.charAt(3) + value.charAt(3) : value.substring(6, 8) : "FF";
-            return [ parseInt(r, 16), parseInt(g, 16), parseInt(b, 16), parseFloat((parseInt(a, 16) / 255).toFixed(2)) ];
+            var value = color.slice(color.indexOf("#") + 1), isShortNotation = value.length === 3, r = isShortNotation ? value.charAt(0) + value.charAt(0) : value.substring(0, 2), g = isShortNotation ? value.charAt(1) + value.charAt(1) : value.substring(2, 4), b = isShortNotation ? value.charAt(2) + value.charAt(2) : value.substring(4, 6);
+            return [ parseInt(r, 16), parseInt(g, 16), parseInt(b, 16), 1 ];
         }
     };
     fabric.Color.fromSource = function(source) {
@@ -3185,9 +3184,6 @@ fabric.Pattern = fabric.util.createClass({
         },
         _isRetinaScaling: function() {
             return fabric.devicePixelRatio !== 1 && this.enableRetinaScaling;
-        },
-        getRetinaScaling: function() {
-            return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
         },
         _initRetinaScaling: function() {
             if (!this._isRetinaScaling()) {
@@ -8613,33 +8609,24 @@ fabric.util.object.extend(fabric.Object.prototype, {
         strokeWidth: 0,
         _lastScaleX: 1,
         _lastScaleY: 1,
-        initialize: function(element, options, callback) {
+        initialize: function(element, options) {
             options || (options = {});
             this.filters = [];
             this.resizeFilters = [];
             this.callSuper("initialize", options);
-            this._initElement(element, options, callback);
+            this._initElement(element, options);
         },
         getElement: function() {
             return this._element;
         },
         setElement: function(element, callback, options) {
-            var _callback, _this;
             this._element = element;
             this._originalElement = element;
             this._initConfig(options);
-            if (this.resizeFilters.length === 0) {
-                _callback = callback;
-            } else {
-                _this = this;
-                _callback = function() {
-                    _this.applyFilters(callback, _this.resizeFilters, _this._filteredEl || _this._originalElement, true);
-                };
-            }
             if (this.filters.length !== 0) {
-                this.applyFilters(_callback);
-            } else if (_callback) {
-                _callback(this);
+                this.applyFilters(callback);
+            } else if (callback) {
+                callback();
             }
             return this;
         },
@@ -8681,7 +8668,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             ctx.restore();
         },
         toObject: function(propertiesToInclude) {
-            var filters = [], resizeFilters = [], scaleX = 1, scaleY = 1;
+            var filters = [], resizeFilters = [], element = this._originalElement, scaleX = 1, scaleY = 1;
             this.filters.forEach(function(filterObj) {
                 if (filterObj) {
                     if (filterObj.type === "Resize") {
@@ -8695,7 +8682,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 filterObj && resizeFilters.push(filterObj.toObject());
             });
             var object = extend(this.callSuper("toObject", propertiesToInclude), {
-                src: this.getSrc(),
+                src: element ? element.src || element._src : "",
                 filters: filters,
                 resizeFilters: resizeFilters,
                 crossOrigin: this.crossOrigin,
@@ -8730,11 +8717,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return reviver ? reviver(markup.join("")) : markup.join("");
         },
         getSrc: function() {
-            var element = this.getElement();
-            if (element) {
-                return fabric.isLikelyNode ? element._src : element.src;
-            } else {
-                return this.src || "";
+            if (this.getElement()) {
+                return this.getElement().src || this.getElement()._src;
             }
         },
         setSrc: function(src, callback, options) {
@@ -8754,27 +8738,20 @@ fabric.util.object.extend(fabric.Object.prototype, {
             if (!imgElement) {
                 return;
             }
-            var canvasEl = fabric.util.createCanvasElement(), replacement = fabric.util.createImage(), retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio, minimumScale = .5 / retinaScaling, _this = this, scaleX, scaleY;
-            canvasEl.width = imgElement.width;
-            canvasEl.height = imgElement.height;
-            canvasEl.getContext("2d").drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+            var imgEl = imgElement, canvasEl = fabric.util.createCanvasElement(), replacement = fabric.util.createImage(), _this = this;
+            canvasEl.width = imgEl.width;
+            canvasEl.height = imgEl.height;
+            canvasEl.getContext("2d").drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
             if (filters.length === 0) {
                 this._element = imgElement;
-                callback && callback(this);
-                return imgElement;
+                callback && callback();
+                return canvasEl;
             }
             filters.forEach(function(filter) {
-                if (forResizing) {
-                    scaleX = _this.scaleX < minimumScale ? _this.scaleX * retinaScaling : 1;
-                    scaleY = _this.scaleY < minimumScale ? _this.scaleY * retinaScaling : 1;
-                } else {
-                    scaleX = filter.scaleX;
-                    scaleY = filter.scaleY;
-                }
-                filter && filter.applyTo(canvasEl, scaleX, scaleY);
+                filter && filter.applyTo(canvasEl, filter.scaleX || _this.scaleX, filter.scaleY || _this.scaleY);
                 if (!forResizing && filter && filter.type === "Resize") {
-                    this.width *= filter.scaleX;
-                    this.height *= filter.scaleY;
+                    _this.width *= filter.scaleX;
+                    _this.height *= filter.scaleY;
                 }
             });
             replacement.width = canvasEl.width;
@@ -8783,13 +8760,13 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
                 _this._element = replacement;
                 !forResizing && (_this._filteredEl = replacement);
-                callback && callback(_this);
+                callback && callback();
             } else {
                 replacement.onload = function() {
                     _this._element = replacement;
                     !forResizing && (_this._filteredEl = replacement);
-                    callback && callback(_this);
-                    replacement.onload = canvasEl = null;
+                    callback && callback();
+                    replacement.onload = canvasEl = imgEl = null;
                 };
                 replacement.src = canvasEl.toDataURL("image/png");
             }
@@ -8850,8 +8827,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
             this.set("width", element.width);
             this.set("height", element.height);
         },
-        _initElement: function(element, options, callback) {
-            this.setElement(fabric.util.getById(element), callback, options);
+        _initElement: function(element, options) {
+            this.setElement(fabric.util.getById(element), null, options);
             fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
         },
         _initConfig: function(options) {
@@ -8887,7 +8864,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 object.filters = filters || [];
                 fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
                     object.resizeFilters = resizeFilters || [];
-                    return new fabric.Image(img, object, callback);
+                    var instance = new fabric.Image(img, object);
+                    callback && callback(instance);
                 });
             });
         }, null, object.crossOrigin);
@@ -9506,9 +9484,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         scaleY: 0,
         lanczosLobes: 3,
         applyTo: function(canvasEl, scaleX, scaleY) {
-            if (scaleX === 1 && scaleY === 1) {
-                return;
-            }
             this.rcpScaleX = 1 / scaleX;
             this.rcpScaleY = 1 / scaleY;
             var oW = canvasEl.width, oH = canvasEl.height, dW = round(oW * scaleX), dH = round(oH * scaleY), imageData;
@@ -9528,45 +9503,45 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             canvasEl.height = dH;
             canvasEl.getContext("2d").putImageData(imageData, 0, 0);
         },
-        sliceByTwo: function(canvasEl, oW, oH, dW, dH) {
-            var context = canvasEl.getContext("2d"), imageData, multW = .5, multH = .5, signW = 1, signH = 1, doneW = false, doneH = false, stepW = oW, stepH = oH, tmpCanvas = fabric.util.createCanvasElement(), tmpCtx = tmpCanvas.getContext("2d");
-            dW = floor(dW);
-            dH = floor(dH);
-            tmpCanvas.width = max(dW, oW);
-            tmpCanvas.height = max(dH, oH);
-            if (dW > oW) {
+        sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
+            var context = canvasEl.getContext("2d"), imageData, multW = .5, multH = .5, signW = 1, signH = 1, doneW = false, doneH = false, stepW = width, stepH = height, tmpCanvas = fabric.util.createCanvasElement(), tmpCtx = tmpCanvas.getContext("2d");
+            newWidth = floor(newWidth);
+            newHeight = floor(newHeight);
+            tmpCanvas.width = max(newWidth, width);
+            tmpCanvas.height = max(newHeight, height);
+            if (newWidth > width) {
                 multW = 2;
                 signW = -1;
             }
-            if (dH > oH) {
+            if (newHeight > height) {
                 multH = 2;
                 signH = -1;
             }
-            imageData = context.getImageData(0, 0, oW, oH);
-            canvasEl.width = max(dW, oW);
-            canvasEl.height = max(dH, oH);
+            imageData = context.getImageData(0, 0, width, height);
+            canvasEl.width = max(newWidth, width);
+            canvasEl.height = max(newHeight, height);
             context.putImageData(imageData, 0, 0);
             while (!doneW || !doneH) {
-                oW = stepW;
-                oH = stepH;
-                if (dW * signW < floor(stepW * multW * signW)) {
+                width = stepW;
+                height = stepH;
+                if (newWidth * signW < floor(stepW * multW * signW)) {
                     stepW = floor(stepW * multW);
                 } else {
-                    stepW = dW;
+                    stepW = newWidth;
                     doneW = true;
                 }
-                if (dH * signH < floor(stepH * multH * signH)) {
+                if (newHeight * signH < floor(stepH * multH * signH)) {
                     stepH = floor(stepH * multH);
                 } else {
-                    stepH = dH;
+                    stepH = newHeight;
                     doneH = true;
                 }
-                imageData = context.getImageData(0, 0, oW, oH);
+                imageData = context.getImageData(0, 0, width, height);
                 tmpCtx.putImageData(imageData, 0, 0);
                 context.clearRect(0, 0, stepW, stepH);
-                context.drawImage(tmpCanvas, 0, 0, oW, oH, 0, 0, stepW, stepH);
+                context.drawImage(tmpCanvas, 0, 0, width, height, 0, 0, stepW, stepH);
             }
-            return context.getImageData(0, 0, dW, dH);
+            return context.getImageData(0, 0, newWidth, newHeight);
         },
         lanczosResize: function(canvasEl, oW, oH, dW, dH) {
             function lanczosCreate(lobes) {
@@ -9632,15 +9607,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             var context = canvasEl.getContext("2d"), srcImg = context.getImageData(0, 0, oW, oH), destImg = context.getImageData(0, 0, dW, dH), srcData = srcImg.data, destData = destImg.data, lanczos = lanczosCreate(this.lanczosLobes), ratioX = this.rcpScaleX, ratioY = this.rcpScaleY, rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY, range2X = ceil(ratioX * this.lanczosLobes / 2), range2Y = ceil(ratioY * this.lanczosLobes / 2), cacheLanc = {}, center = {}, icenter = {};
             return process(0);
         },
-        bilinearFiltering: function(canvasEl, oW, oH, dW, dH) {
-            var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl, color, offset = 0, origPix, ratioX = this.rcpScaleX, ratioY = this.rcpScaleY, context = canvasEl.getContext("2d"), w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH), pixels = img.data, destImage = context.getImageData(0, 0, dW, dH), destPixels = destImage.data;
-            for (i = 0; i < dH; i++) {
-                for (j = 0; j < dW; j++) {
+        bilinearFiltering: function(canvasEl, w, h, w2, h2) {
+            var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl, color, offset = 0, origPix, ratioX = this.rcpScaleX, ratioY = this.rcpScaleY, context = canvasEl.getContext("2d"), w4 = 4 * (w - 1), img = context.getImageData(0, 0, w, h), pixels = img.data, destImage = context.getImageData(0, 0, w2, h2), destPixels = destImage.data;
+            for (i = 0; i < h2; i++) {
+                for (j = 0; j < w2; j++) {
                     x = floor(ratioX * j);
                     y = floor(ratioY * i);
                     xDiff = ratioX * j - x;
                     yDiff = ratioY * i - y;
-                    origPix = 4 * (y * oW + x);
+                    origPix = 4 * (y * w + x);
                     for (chnl = 0; chnl < 4; chnl++) {
                         a = pixels[origPix + chnl];
                         b = pixels[origPix + 4 + chnl];
@@ -9740,7 +9715,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, supportsLineDash = fabric.StaticCanvas.supports("setLineDash"), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
         return;
@@ -9921,7 +9896,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 this._removeShadow(ctx);
             }
             ctx.save();
-            this._setLineDash(ctx, this.strokedashArray);
+            if (this.strokeDashArray) {
+                if (1 & this.strokeDashArray.length) {
+                    this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+                }
+                supportsLineDash && ctx.setLineDash(this.strokeDashArray);
+            }
             ctx.beginPath();
             this._renderTextCommon(ctx, "strokeText");
             ctx.closePath();
@@ -10052,7 +10032,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
         },
         _getFontDeclaration: function() {
-            return [ fabric.isLikelyNode ? this.fontWeight : this.fontStyle, fabric.isLikelyNode ? this.fontStyle : this.fontWeight, this.fontSize + "px", '"' + this.fontFamily + '"' ].join(" ");
+            return [ fabric.isLikelyNode ? this.fontWeight : this.fontStyle, fabric.isLikelyNode ? this.fontStyle : this.fontWeight, this.fontSize + "px", fabric.isLikelyNode ? '"' + this.fontFamily + '"' : this.fontFamily ].join(" ");
         },
         render: function(ctx, noTransform) {
             if (!this.visible) {
