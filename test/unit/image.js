@@ -185,31 +185,6 @@
     });
   });
 
-
-  // asyncTest('toObject without default values', function() {
-  //   createImageObject(function(image) {
-
-  //     image.includeDefaultValues = false;
-
-  //     var object = image.toObject();
-
-  //     // workaround for node-canvas sometimes producing images with width/height and sometimes not
-  //     if (object.width === 0) {
-  //       object.width = IMG_WIDTH;
-  //     }
-  //     if (object.height === 0) {
-  //       object.height = IMG_HEIGHT;
-  //     }
-  //     deepEqual(object, {
-  //       type: 'image',
-  //       // why the hell deepEqual fail [] == [] check?!
-  //       filters: [],
-  //       crossOrigin: ''
-  //     });
-  //     start();
-  //   });
-  // });
-
   asyncTest('toString', function() {
     createImageObject(function(image) {
       ok(typeof image.toString == 'function');
@@ -276,22 +251,19 @@
     });
   });
 
-  // asyncTest('clone', function() {
-  //   createImageObject(function(image) {
-  //     ok(typeof image.clone == 'function');
+  asyncTest('clone', function() {
+    createImageObject(function(image) {
+      ok(typeof image.clone == 'function');
 
-  //     var imageClone = null;
-  //     image.clone(function(clone) {
-  //       imageClone = clone;
-  //     });
-
-  //     setTimeout(function() {
-  //       ok(imageClone instanceof fabric.Image);
-  //       deepEqual(imageClone.toObject(), image.toObject());
-  //       start();
-  //     }, 1000);
-  //   });
-  // });
+      var imageClone = null;
+      image.clone(function(clone) {
+        imageClone = clone;
+        ok(imageClone instanceof fabric.Image);
+        deepEqual(imageClone.toObject(), image.toObject());
+        start();
+      });
+    });
+  });
 
   // asyncTest('cloneWidthHeight', function() {
   //   var image = createSmallImageObject();

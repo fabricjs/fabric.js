@@ -144,7 +144,7 @@
         _this = this;
         _callback = function() {
           _this.applyFilters(callback, _this.resizeFilters, _this._filteredEl || _this._originalElement, true);
-        }
+        };
       }
 
       if (this.filters.length !== 0) {
