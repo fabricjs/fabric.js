@@ -419,7 +419,6 @@
       /** @ignore */
       replacement.width = canvasEl.width;
       replacement.height = canvasEl.height;
-      dataUrl = canvasEl.toDataURL('image/png');
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
         // onload doesn't fire in some node versions, so we invoke callback manually
@@ -433,7 +432,7 @@
           callback && callback(_this);
           replacement.onload = canvasEl = null;
         };
-        replacement.src = dataUrl
+        replacement.src = canvasEl.toDataURL('image/png');
       }
       return canvasEl;
     },
