@@ -209,6 +209,14 @@
 
     /**
      * @private
+     * @return {Number} retinaScaling if applied, otherwise 1;
+     */
+    getRetinaScaling: function() {
+      return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
+    },
+
+    /**
+     * @private
      */
     _initRetinaScaling: function() {
       if (!this._isRetinaScaling()) {
