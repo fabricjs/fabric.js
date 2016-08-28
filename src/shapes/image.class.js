@@ -122,15 +122,27 @@
      * @chainable
      */
     setElement: function(element, callback, options) {
+
+      var _callback, _this;
+
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
 
-      if (this.filters.length !== 0) {
-        this.applyFilters(callback);
+      if (this.resizeFilters.length === 0) {
+        _callback = callback;
+      } else {
+        _this = this;
+        _callback = function() {
+          _this.applyFilters(callback, _this.resizeFilters, _this._filteredEl || _this._originalElement, true);
+        }
       }
-      else if (callback) {
-        callback(this);
+
+      if (this.filters.length !== 0) {
+        this.applyFilters(_callback);
+      }
+      else if (_callback) {
+        _callback(this);
       }
 
       return this;
@@ -341,10 +353,10 @@
      * Applies filters assigned to this image (from "filters" array)
      * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
-     * @param {Array} filters to be initialized
-     * @param {fabric.Image} imgElement
+     * @param {Array} filters to be applied
+     * @param {fabric.Image} imgElement image to filter ( default to this._element )
      * @param {Boolean} forResizing
-     * @return {fabric.Image} thisArg
+     * @return {CanvasElement} canvasEl to be drawn immediately
      * @chainable
      */
     applyFilters: function(callback, filters, imgElement, forResizing) {
@@ -356,25 +368,34 @@
         return;
       }
 
-      var imgEl = imgElement,
-          canvasEl = fabric.util.createCanvasElement(),
+      var canvasEl = fabric.util.createCanvasElement(),
           replacement = fabric.util.createImage(),
-          _this = this;
+          retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
+          minimumScale = 0.5 / retinaScaling,
+          _this = this, scaleX, scaleY;
 
-      canvasEl.width = imgEl.width;
-      canvasEl.height = imgEl.height;
-      canvasEl.getContext('2d').drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
+      canvasEl.width = imgElement.width;
+      canvasEl.height = imgElement.height;
+      canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
       if (filters.length === 0) {
         this._element = imgElement;
         callback && callback(this);
-        return canvasEl;
+        return imgElement;
       }
       filters.forEach(function(filter) {
-        filter && filter.applyTo(canvasEl, filter.scaleX || _this.scaleX, filter.scaleY || _this.scaleY);
+        if (forResizing) {
+          scaleX = _this.scaleX < minimumScale ? _this.scaleX * retinaScaling : 1;
+          scaleY = _this.scaleY < minimumScale ? _this.scaleY * retinaScaling : 1;
+        }
+        else {
+          scaleX = filter.scaleX;
+          scaleY = filter.scaleY;
+        }
+        filter && filter.applyTo(canvasEl, scaleX, scaleY);
         if (!forResizing && filter && filter.type === 'Resize') {
-          _this.width *= filter.scaleX;
-          _this.height *= filter.scaleY;
+          this.width *= filter.scaleX;
+          this.height *= filter.scaleY;
         }
       });
 
@@ -394,7 +415,7 @@
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
           callback && callback(_this);
-          replacement.onload = canvasEl = imgEl = null;
+          replacement.onload = canvasEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
       }
