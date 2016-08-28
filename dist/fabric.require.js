@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.6.3"
+    version: "1.6.4"
 };
 
 if (typeof exports !== "undefined") {
