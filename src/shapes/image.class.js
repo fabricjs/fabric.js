@@ -422,7 +422,6 @@
       dataUrl = canvasEl.toDataURL('image/png');
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
-        replacement._src = dataUrl;
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;      //   !forResizing && (_this._filteredEl = replacement);
         callback && callback(_this);
