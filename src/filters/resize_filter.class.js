@@ -62,6 +62,9 @@
      * @param {Number} scaleY
      */
     applyTo: function(canvasEl, scaleX, scaleY) {
+      if (scaleX === 1 && scaleY === 1) {
+        return;
+      }
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;

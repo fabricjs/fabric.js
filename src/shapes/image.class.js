@@ -89,17 +89,27 @@
     _lastScaleY: 1,
 
     /**
+     * minimum scale factor under which any resizeFilter is triggered to resize the image
+     * 0 will disable the automatic resize. 1 will trigger automatically always.
+     * number bigger than 1 can be used in case we want to scale with some filter above
+     * the natural image dimensions
+     * @type Number
+     */
+    minimumScaleTrigger: 0.5,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
+     * @param {function} [callback] callback function to call after eventual filters applied.
      * @return {fabric.Image} thisArg
      */
-    initialize: function(element, options) {
+    initialize: function(element, options, callback) {
       options || (options = { });
       this.filters = [ ];
       this.resizeFilters = [ ];
       this.callSuper('initialize', options);
-      this._initElement(element, options);
+      this._initElement(element, options, callback);
     },
 
     /**
@@ -121,15 +131,28 @@
      * @chainable
      */
     setElement: function(element, callback, options) {
+
+      var _callback, _this;
+
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
 
-      if (this.filters.length !== 0) {
-        this.applyFilters(callback);
+      if (this.resizeFilters.length === 0) {
+        _callback = callback;
       }
-      else if (callback) {
-        callback();
+      else {
+        _this = this;
+        _callback = function() {
+          _this.applyFilters(callback, _this.resizeFilters, _this._filteredEl || _this._originalElement, true);
+        };
+      }
+
+      if (this.filters.length !== 0) {
+        this.applyFilters(_callback);
+      }
+      else if (_callback) {
+        _callback(this);
       }
 
       return this;
@@ -296,7 +319,7 @@
      * @return {String} Source of an image
      */
     getSrc: function() {
-      var element = this.getElement();
+      var element = this._originalElement;
       if (element) {
         return fabric.isLikelyNode ? element._src : element.src;
       }
@@ -340,10 +363,10 @@
      * Applies filters assigned to this image (from "filters" array)
      * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
-     * @param {Array} filters to be initialized
-     * @param {fabric.Image} imgElement
+     * @param {Array} filters to be applied
+     * @param {fabric.Image} imgElement image to filter ( default to this._element )
      * @param {Boolean} forResizing
-     * @return {fabric.Image} thisArg
+     * @return {CanvasElement} canvasEl to be drawn immediately
      * @chainable
      */
     applyFilters: function(callback, filters, imgElement, forResizing) {
@@ -355,22 +378,38 @@
         return;
       }
 
-      var imgEl = imgElement,
-          canvasEl = fabric.util.createCanvasElement(),
-          replacement = fabric.util.createImage(),
-          _this = this;
-
-      canvasEl.width = imgEl.width;
-      canvasEl.height = imgEl.height;
-      canvasEl.getContext('2d').drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
+      var replacement = fabric.util.createImage(),
+          retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
+          minimumScale = this.minimumScaleTrigger / retinaScaling,
+          _this = this, scaleX, scaleY;
 
       if (filters.length === 0) {
         this._element = imgElement;
-        callback && callback();
-        return canvasEl;
+        callback && callback(this);
+        return imgElement;
       }
+
+      var canvasEl = fabric.util.createCanvasElement();
+      canvasEl.width = imgElement.width;
+      canvasEl.height = imgElement.height;
+      canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+
       filters.forEach(function(filter) {
-        filter && filter.applyTo(canvasEl, filter.scaleX || _this.scaleX, filter.scaleY || _this.scaleY);
+        if (forResizing) {
+          scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
+          scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
+          if (scaleX * retinaScaling < 1) {
+            scaleX *= retinaScaling;
+          }
+          if (scaleY * retinaScaling < 1) {
+            scaleY *= retinaScaling;
+          }
+        }
+        else {
+          scaleX = filter.scaleX;
+          scaleY = filter.scaleY;
+        }
+        filter && filter.applyTo(canvasEl, scaleX, scaleY);
         if (!forResizing && filter && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
           _this.height *= filter.scaleY;
@@ -380,20 +419,18 @@
       /** @ignore */
       replacement.width = canvasEl.width;
       replacement.height = canvasEl.height;
-
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
         // onload doesn't fire in some node versions, so we invoke callback manually
-        _this._element = replacement;
-        !forResizing && (_this._filteredEl = replacement);
-        callback && callback();
+        _this._element = replacement;      //   !forResizing && (_this._filteredEl = replacement);
+        callback && callback(_this);
       }
       else {
         replacement.onload = function() {
           _this._element = replacement;
           !forResizing && (_this._filteredEl = replacement);
-          callback && callback();
-          replacement.onload = canvasEl = imgEl = null;
+          callback && callback(_this);
+          replacement.onload = canvasEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
       }
@@ -494,8 +531,8 @@
      * @param {HTMLImageElement|String} element The element representing the image
      * @param {Object} [options] Options object
      */
-    _initElement: function(element, options) {
-      this.setElement(fabric.util.getById(element), null, options);
+    _initElement: function(element, options, callback) {
+      this.setElement(fabric.util.getById(element), callback, options);
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
 
@@ -581,8 +618,7 @@
         object.filters = filters || [ ];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
           object.resizeFilters = resizeFilters || [ ];
-          var instance = new fabric.Image(img, object);
-          callback && callback(instance);
+          return new fabric.Image(img, object, callback);
         });
       });
     }, null, object.crossOrigin);
