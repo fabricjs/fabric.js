@@ -918,6 +918,9 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
+      if (!this.ctx) {
+        this.ctx = fabric.util.createCanvasElement().getContext('2d');
+      }
       var markup = this._createBaseSVGMarkup(),
           offsets = this._getSVGLeftTopOffsets(this.ctx),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);

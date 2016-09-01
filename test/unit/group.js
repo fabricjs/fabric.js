@@ -3,7 +3,7 @@
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el);
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
 
   // function _createImageElement() {
   //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
@@ -521,19 +521,19 @@ test('toObject without default values', function() {
         isTransparent = fabric.util.isTransparent,
         ctx = canvas.contextContainer;
     canvas.add(group);
-    equal(canvas.enableRetinaScaling, false);
-    equal(isTransparent(ctx, 0, 0, 0), true);
-    equal(isTransparent(ctx, 1, 1, 0), false);
-    equal(isTransparent(ctx, 2, 2, 0), false);
-    equal(isTransparent(ctx, 3, 3, 0), true);
-    equal(isTransparent(ctx, 4, 4, 0), false);
+    equal(canvas.enableRetinaScaling, false, 'enable retina scaling is off');
+    equal(isTransparent(ctx, 0, 0, 0), true, '0,0 is transparent');
+    equal(isTransparent(ctx, 1, 1, 0), false, '1,1 is opaque');
+    equal(isTransparent(ctx, 2, 2, 0), false, '2,2 is opaque');
+    equal(isTransparent(ctx, 3, 3, 0), true, '3,3 is transparent');
+    equal(isTransparent(ctx, 4, 4, 0), false, '4,4 is opaque');
     group.transformMatrix = [2, 0, 0, 2, 1, 1];
     canvas.renderAll();
-    equal(isTransparent(ctx, 0, 0, 0), true);
-    equal(isTransparent(ctx, 1, 1, 0), true);
-    equal(isTransparent(ctx, 2, 2, 0), true);    
-    equal(isTransparent(ctx, 3, 3, 0), false);
-    equal(isTransparent(ctx, 4, 4, 0), false);
+    equal(isTransparent(ctx, 0, 0, 0), true, '0,0 is transparent');
+    equal(isTransparent(ctx, 1, 1, 0), true, '1,1 is transparent');
+    equal(isTransparent(ctx, 2, 2, 0), true, '2,2 is transparent');
+    equal(isTransparent(ctx, 3, 3, 0), false, '3,3 is opaque');
+    equal(isTransparent(ctx, 4, 4, 0), false, '4,4 is opaque');
   });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),

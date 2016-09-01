@@ -12,8 +12,7 @@
 
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
-      IMG_HEIGHT  = 110,
-      Canvas = require('canvas');
+      IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
     'type':                     'image',
@@ -55,17 +54,24 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new Canvas.Image() : fabric.document.createElement('img');
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback, options) {
     var elImage = _createImageElement();
     setSrc(elImage, IMG_SRC, function() {
       if (width != elImage.width || height != elImage.height) {
-        var canvas = new Canvas(width, height);
-        canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
-        elImage._src = canvas.toDataURL();
-        elImage.src = elImage._src;
+        if (fabric.isLikelyNode) {
+          var Canvas = require('canvas');
+          var canvas = new Canvas(width, height);
+          canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
+          elImage._src = canvas.toDataURL();
+          elImage.src = elImage._src;
+        }
+        else {
+          elImage.width = width;
+          elImage.height = height;
+        }
         return new fabric.Image(elImage, options, callback);
       }
       else {
@@ -275,9 +281,9 @@
   asyncTest('cloneWidthHeight', function() {
     createSmallImageObject(function(image) {
       image.clone(function(clone) {
-        equal(clone.getElement().width, IMG_WIDTH / 2,
+        equal(clone.width, IMG_WIDTH / 2,
           'clone\'s element should have width identical to that of original image');
-        equal(clone.getElement().height, IMG_HEIGHT / 2,
+        equal(clone.height, IMG_HEIGHT / 2,
           'clone\'s element should have height identical to that of original image');
         start();
       });

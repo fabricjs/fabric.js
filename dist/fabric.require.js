@@ -10127,6 +10127,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             return object;
         },
         toSVG: function(reviver) {
+            if (!this.ctx) {
+                this.ctx = fabric.util.createCanvasElement().getContext("2d");
+            }
             var markup = this._createBaseSVGMarkup(), offsets = this._getSVGLeftTopOffsets(this.ctx), textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
             this._wrapSVGTextAndBg(markup, textAndBg);
             return reviver ? reviver(markup.join("")) : markup.join("");
