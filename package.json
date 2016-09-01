@@ -50,7 +50,7 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "uglify-js": "2.6.x",
+    "uglify-js": "2.7.x",
     "jscs": "2.x.x",
     "jshint": "2.9.x",
     "qunit": "0.9.x",
