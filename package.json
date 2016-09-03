@@ -38,8 +38,8 @@
     "build": "node build.js modules=ALL exclude=json,gestures",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
     "test": "node test.js",
-    "lint": "jshint src && jscs src",
-    "lint_tests": "jshint test/unit --config .jshintrc_tests",
+    "lint": "eslint --config .eslintrc.json src",
+    "lint_tests": "eslint test/unit --config .eslintrc_tests",
     "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js",
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
@@ -51,8 +51,7 @@
   },
   "devDependencies": {
     "uglify-js": "2.7.x",
-    "jscs": "2.x.x",
-    "jshint": "2.9.x",
+    "eslint": "3.x.x",
     "qunit": "0.9.x",
     "istanbul": "0.4.x"
   },
