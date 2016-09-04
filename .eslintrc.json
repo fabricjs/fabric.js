@@ -17,9 +17,17 @@
     "eqeqeq": 2,
     "no-eq-null": 2,
     "no-eval": 2,
-    "no-unused-expressions": 2,
+    "no-unused-expressions": [
+      2,
+      {
+        "allowShortCircuit": true
+      }
+    ],
     "guard-for-in": 0,
-    "wrap-iife": 2,
+    "wrap-iife": [
+      2,
+      "inside"
+    ],
     "linebreak-style": [
       2,
       "unix"
@@ -59,7 +67,7 @@
     "space-infix-ops": 2,
     "array-bracket-spacing": [
       2,
-      "always"
+      "never"
     ],
     "comma-style": [
       2,
@@ -94,7 +102,8 @@
       2,
       {
         "beforeColon": false,
-        "afterColon": true
+        "afterColon": true,
+        "mode": "minimum"
       }
     ],
     "space-unary-ops": [
@@ -103,7 +112,9 @@
         "nonwords": true,
         "overrides": {
           "++": false,
-          "--": false
+          "--": false,
+          "!": false,
+          "-": false
         }
       }
     ],
@@ -119,14 +130,20 @@
       2,
       2,
       {
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "VariableDeclarator": 2
       }
     ],
     "consistent-this": [
       2,
       "_this"
     ],
-    "valid-jsdoc": 2,
+    "valid-jsdoc": [
+      0,
+      {
+        "requireReturn": false
+      }
+    ],
     "max-len": [
       2,
       120
