@@ -136,7 +136,7 @@
      * @private
      */
     _collectObjects: function() {
-      var group = [ ],
+      var group = [],
           currentObject,
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,

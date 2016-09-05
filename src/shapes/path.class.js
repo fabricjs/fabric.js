@@ -78,7 +78,7 @@
       this.setOptions(options);
 
       if (!path) {
-        path = [ ];
+        path = [];
       }
 
       var fromArray = _toString.call(path) === '[object Array]';
@@ -544,8 +544,8 @@
      * @private
      */
     _parsePath: function() {
-      var result = [ ],
-          coords = [ ],
+      var result = [],
+          coords = [],
           currentPath,
           parsed,
           re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
@@ -617,33 +617,33 @@
           case 'l': // lineto, relative
             x += current[1];
             y += current[2];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'h': // horizontal lineto, relative
             x += current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'H': // horizontal lineto, absolute
             x = current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'v': // vertical lineto, relative
             y += current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'V': // verical lineto, absolute
             y = current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'm': // moveTo, relative
@@ -651,7 +651,7 @@
             y += current[2];
             subpathStartX = x;
             subpathStartY = y;
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'M': // moveTo, absolute
@@ -659,7 +659,7 @@
             y = current[2];
             subpathStartX = x;
             subpathStartY = y;
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'c': // bezierCurveTo, relative

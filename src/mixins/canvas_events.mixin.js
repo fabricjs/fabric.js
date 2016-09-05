@@ -318,7 +318,7 @@
      */
     _handleEvent: function(e, eventType, targetObj) {
       var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
-          targets = this.targets || [ ],
+          targets = this.targets || [],
           options = { e: e, target: target, subTargets: targets };
 
       this.fire('mouse:' + eventType, options);

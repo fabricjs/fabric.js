@@ -711,8 +711,8 @@
      * @private
      */
     _clearCache: function() {
-      this.__lineWidths = [ ];
-      this.__lineHeights = [ ];
+      this.__lineWidths = [];
+      this.__lineHeights = [];
     },
 
     /**
@@ -975,8 +975,8 @@
      * @return {Object}
      */
     _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
-      var textSpans = [ ],
-          textBgRects = [ ],
+      var textSpans = [],
+          textBgRects = [],
           height = 0;
       // bounding-box background
       this._setSVGBg(textBgRects);

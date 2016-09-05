@@ -321,7 +321,7 @@ test('toObject without default values', function() {
 
     ok(typeof group.setObjectsCoords == 'function');
 
-    var invokedObjects = [ ];
+    var invokedObjects = [];
     group.forEachObject(function(groupObject){
       groupObject.setCoords = function() {
         invokedObjects.push(this);
@@ -363,7 +363,7 @@ test('toObject without default values', function() {
     ok(typeof group.forEachObject == 'function');
     equal(group.forEachObject(function(){}), group, 'should be chainable');
 
-    var iteratedObjects = [ ];
+    var iteratedObjects = [];
     group.forEachObject(function(groupObject) {
       iteratedObjects.push(groupObject);
     });

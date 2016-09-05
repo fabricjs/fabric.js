@@ -98,7 +98,7 @@
         listeners[uid] = { };
       }
       if (!listeners[uid][eventName]) {
-        listeners[uid][eventName] = [ ];
+        listeners[uid][eventName] = [];
 
       }
       var listener = createListener(uid, handler);
@@ -127,7 +127,7 @@
         handlers[uid] = { };
       }
       if (!handlers[uid][eventName]) {
-        handlers[uid][eventName] = [ ];
+        handlers[uid][eventName] = [];
         var existingHandler = element['on' + eventName];
         if (existingHandler) {
           handlers[uid][eventName].push(existingHandler);

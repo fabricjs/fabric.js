@@ -14,7 +14,7 @@
      */
     initialize: function(canvas) {
       this.canvas = canvas;
-      this._points = [ ];
+      this._points = [];
     },
 
     /**

@@ -124,7 +124,7 @@
         sweep = coords[4],
         tx = coords[5],
         ty = coords[6],
-        segs = [[ ], [ ], [ ], [ ]],
+        segs = [[], [], [], []],
         segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
     for (var i = 0, len = segsNorm.length; i < len; i++) {
@@ -152,9 +152,9 @@
    */
   fabric.util.getBoundsOfArc = function(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
 
-    var fromX = 0, fromY = 0, bound = [ ], bounds = [ ],
+    var fromX = 0, fromY = 0, bound = [], bounds = [],
     segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot),
-    boundCopy = [[ ], [ ]];
+    boundCopy = [[], []];
 
     for (var i = 0, len = segs.length; i < len; i++) {
       bound = getBoundsOfCurve(fromX, fromY, segs[i][0], segs[i][1], segs[i][2], segs[i][3], segs[i][4], segs[i][5]);
@@ -190,8 +190,8 @@
 
     var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
-        abs = Math.abs, tvalues = [ ],
-        bounds = [[ ], [ ]],
+        abs = Math.abs, tvalues = [],
+        bounds = [[], []],
         a, b, c, t, t1, t2, b2ac, sqrtb2ac;
 
     b = 6 * x0 - 12 * x1 + 6 * x2;

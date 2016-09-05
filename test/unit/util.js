@@ -387,7 +387,7 @@
   asyncTest('fabric.loadSVGFromString', function() {
     equal("function", typeof fabric.loadSVGFromString);
 
-    var loadedObjects = [ ];
+    var loadedObjects = [];
     fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
       loadedObjects = objects;
     });
@@ -400,7 +400,7 @@
   });
 
   asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
-    var loadedObjects = [ ];
+    var loadedObjects = [];
     fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
       loadedObjects = objects;
     });
@@ -548,7 +548,7 @@
     ok(typeof Array.prototype.forEach === 'function');
 
     var arr = [1,2,3];
-    var result = [ ];
+    var result = [];
 
     arr.forEach(function(val, index, arr) {
       result.push(val, index, arr);
@@ -647,7 +647,7 @@
       arr.reduce(function(memo, val) { return memo + val }), 0);
 
     deepEqual(['1!', '2!', '3!', '4!', '5!'],
-      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, [ ]));
+      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, []));
 
     arr = 'foobar'.split('');
     equal('f0o1o2b3a4r5',

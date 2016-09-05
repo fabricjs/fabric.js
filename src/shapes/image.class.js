@@ -106,8 +106,8 @@
      */
     initialize: function(element, options, callback) {
       options || (options = { });
-      this.filters = [ ];
-      this.resizeFilters = [ ];
+      this.filters = [];
+      this.resizeFilters = [];
       this.callSuper('initialize', options);
       this._initElement(element, options, callback);
     },
@@ -228,7 +228,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var filters = [ ], resizeFilters = [ ],
+      var filters = [], resizeFilters = [],
           scaleX = 1, scaleY = 1;
 
       this.filters.forEach(function(filterObj) {
@@ -615,9 +615,9 @@
   fabric.Image.fromObject = function(object, callback) {
     fabric.util.loadImage(object.src, function(img) {
       fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [ ];
+        object.filters = filters || [];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
-          object.resizeFilters = resizeFilters || [ ];
+          object.resizeFilters = resizeFilters || [];
           return new fabric.Image(img, object, callback);
         });
       });

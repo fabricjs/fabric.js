@@ -65,7 +65,7 @@
       }
     }
 
-    var objects = [ ],
+    var objects = [],
         paths = ["M 100 100 L 300 100 L 200 300 z", "M 200 200 L 100 200 L 400 50 z"],
         numLoadedObjects = 0,
         numTotalObjects = paths.length;

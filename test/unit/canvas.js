@@ -1610,7 +1610,7 @@
   //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
 
   //     deepEqual(canvas.toJSON(), {
-  //       "objects": [ ],
+  //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
   //       "backgroundImage": (fabric.document.location.protocol +
   //                           '//' +

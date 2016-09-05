@@ -131,7 +131,7 @@
    * @private
    */
   function _getMultipleNodes(doc, nodeNames) {
-    var nodeName, nodeArray = [ ], nodeList;
+    var nodeName, nodeArray = [], nodeList;
     for (var i = 0; i < nodeNames.length; i++) {
       nodeName = nodeNames[i];
       nodeList = doc.getElementsByTagName(nodeName);
@@ -246,7 +246,7 @@
 
       // start with identity matrix
       var matrix = iMatrix.concat(),
-          matrices = [ ];
+          matrices = [];
 
       // return if no argument was given or
       // an argument does not match transform attribute regexp
@@ -609,7 +609,7 @@
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
         descendants = doc.selectNodes('//*[name(.)!="svg"]');
-        var arr = [ ];
+        var arr = [];
         for (var i = 0, len = descendants.length; i < len; i++) {
           arr[i] = descendants[i];
         }
@@ -888,7 +888,7 @@
       points = points.replace(/,/g, ' ').trim();
 
       points = points.split(/\s+/);
-      var parsedPoints = [ ], i, len;
+      var parsedPoints = [], i, len;
 
       i = 0;
       len = points.length;
@@ -1104,7 +1104,7 @@
      * @return {String}
      */
     createSVGRefElementsMarkup: function(canvas) {
-      var markup = [ ];
+      var markup = [];
 
       _createSVGPattern(markup, canvas, 'backgroundColor');
       _createSVGPattern(markup, canvas, 'overlayColor');
