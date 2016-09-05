@@ -992,7 +992,7 @@
         width += this._getWidthOfCharSpacing();
       }
       ctx.restore();
-      return width;
+      return width < 0 ? 0 : width;
     },
 
     /**
