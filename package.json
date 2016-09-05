@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "uglify-js": "2.7.x",
-    "eslint": "3.x.x",
+    "eslint": "2.x.x",
     "qunit": "0.9.x",
     "istanbul": "0.4.x"
   },
