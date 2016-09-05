@@ -1,17 +1,17 @@
 (function() {
 
   var cursorOffset = {
-    mt: 0, // n
-    tr: 1, // ne
-    mr: 2, // e
-    br: 3, // se
-    mb: 4, // s
-    bl: 5, // sw
-    ml: 6, // w
-    tl: 7 // nw
-  },
-  addListener = fabric.util.addListener,
-  removeListener = fabric.util.removeListener;
+        mt: 0, // n
+        tr: 1, // ne
+        mr: 2, // e
+        br: 3, // se
+        mb: 4, // s
+        bl: 5, // sw
+        ml: 6, // w
+        tl: 7 // nw
+      },
+      addListener = fabric.util.addListener,
+      removeListener = fabric.util.removeListener;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 

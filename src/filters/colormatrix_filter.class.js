@@ -44,11 +44,11 @@
     initialize: function( options ) {
       options || ( options = {} );
       this.matrix = options.matrix || [
-          1, 0, 0, 0, 0,
-          0, 1, 0, 0, 0,
-          0, 0, 1, 0, 0,
-          0, 0, 0, 1, 0
-        ];
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        0, 0, 0, 1, 0
+      ];
     },
 
     /**
@@ -57,15 +57,15 @@
      */
     applyTo: function( canvasEl ) {
       var context = canvasEl.getContext( '2d' ),
-        imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
-        data = imageData.data,
-        iLen = data.length,
-        i,
-        r,
-        g,
-        b,
-        a,
-        m = this.matrix;
+          imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
+          data = imageData.data,
+          iLen = data.length,
+          i,
+          r,
+          g,
+          b,
+          a,
+          m = this.matrix;
 
       for ( i = 0; i < iLen; i += 4 ) {
         r = data[ i ];

@@ -970,8 +970,8 @@
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft),
-            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
 
         ctx.beginPath();
 

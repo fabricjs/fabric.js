@@ -72,7 +72,7 @@
         //jscs:disable validateIndentation
         '\t\t<rect fill="', styleDecl.textBackgroundColor,
         '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS),
-        '" y="', toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS),
+        '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS),
         '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS),
         '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS),
         '"></rect>\n'
@@ -96,14 +96,14 @@
       return [
         //jscs:disable validateIndentation
         '\t\t\t<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
-          toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS), '" ',
-          (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
-          (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
-          (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
-          (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
-          (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
-          'style="', fillStyles, '">',
-          fabric.util.string.escapeXml(_char),
+        toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" ',
+          (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+          (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : ''),
+          (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : ''),
+          (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : ''),
+          (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : ''),
+        'style="', fillStyles, '">',
+        fabric.util.string.escapeXml(_char),
         '</tspan>\n'
         //jscs:enable validateIndentation
       ].join('');

@@ -562,7 +562,7 @@
           coords.push(match[0]);
         }
 
-        coordsParsed = [ currentPath.charAt(0) ];
+        coordsParsed = [currentPath.charAt(0)];
 
         for (var j = 0, jlen = coords.length; j < jlen; j++) {
           parsed = parseFloat(coords[j]);
@@ -577,7 +577,7 @@
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ command ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
             command = repeatedCommand;
           }
         }

@@ -111,7 +111,7 @@
 
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      ctx.translate(-this.width/2, -this.height/2);
+      ctx.translate(-this.width / 2, -this.height / 2);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }

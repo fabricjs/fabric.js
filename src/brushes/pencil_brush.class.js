@@ -164,15 +164,15 @@
      */
     createPath: function(pathData) {
       var path = new fabric.Path(pathData, {
-                   fill: null,
-                   stroke: this.color,
-                   strokeWidth: this.width,
-                   strokeLineCap: this.strokeLineCap,
-                   strokeLineJoin: this.strokeLineJoin,
-                   strokeDashArray: this.strokeDashArray,
-                   originX: 'center',
-                   originY: 'center'
-                 });
+        fill: null,
+        stroke: this.color,
+        strokeWidth: this.width,
+        strokeLineCap: this.strokeLineCap,
+        strokeLineJoin: this.strokeLineJoin,
+        strokeDashArray: this.strokeDashArray,
+        originX: 'center',
+        originY: 'center'
+      });
 
       if (this.shadow) {
         this.shadow.affectStroke = true;

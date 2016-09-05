@@ -518,7 +518,7 @@
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        boundaries.left + leftOffset - cursorWidth/2,
+        boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);

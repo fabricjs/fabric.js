@@ -109,13 +109,8 @@
     "space-unary-ops": [
       2,
       {
-        "nonwords": true,
-        "overrides": {
-          "++": false,
-          "--": false,
-          "!": false,
-          "-": false
-        }
+        "words": true,
+        "nonwords": false
       }
     ],
     "no-with": 2,

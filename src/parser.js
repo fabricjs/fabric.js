@@ -892,7 +892,7 @@
 
       i = 0;
       len = points.length;
-      for (; i < len; i+=2) {
+      for (; i < len; i += 2) {
         parsedPoints.push({
           x: parseFloat(points[i]),
           y: parseFloat(points[i + 1])
@@ -934,8 +934,8 @@
         rules.forEach(function(rule) {
 
           var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
-          ruleObj = { }, declaration = match[2].trim(),
-          propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+              ruleObj = { }, declaration = match[2].trim(),
+              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
@@ -1076,8 +1076,8 @@
         markup += [
           //jscs:disable validateIndentation
           '\t\t@font-face {\n',
-            '\t\t\tfont-family: \'', j, '\';\n',
-            '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
+          '\t\t\tfont-family: \'', j, '\';\n',
+          '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
           '\t\t}\n'
           //jscs:enable validateIndentation
         ].join('');
@@ -1087,9 +1087,9 @@
         markup = [
           //jscs:disable validateIndentation
           '\t<style type="text/css">',
-            '<![CDATA[\n',
-              markup,
-            ']]>',
+          '<![CDATA[\n',
+          markup,
+          ']]>',
           '</style>\n'
           //jscs:enable validateIndentation
         ].join('');

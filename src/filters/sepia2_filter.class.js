@@ -35,7 +35,7 @@
           data = imageData.data,
           iLen = data.length, i, r, g, b;
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];

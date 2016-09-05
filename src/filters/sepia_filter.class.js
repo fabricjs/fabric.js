@@ -35,7 +35,7 @@
           data = imageData.data,
           iLen = data.length, i, avg;
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         avg = 0.3  * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
         data[i] = avg + 100;
         data[i + 1] = avg + 50;

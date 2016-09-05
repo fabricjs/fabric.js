@@ -319,12 +319,12 @@
 
     return function() {
       switch (this.get(origin)) {
-      case nearest:
-        return Math.min(this.get(axis1), this.get(axis2));
-      case center:
-        return Math.min(this.get(axis1), this.get(axis2)) + (0.5 * this.get(dimension));
-      case farthest:
-        return Math.max(this.get(axis1), this.get(axis2));
+        case nearest:
+          return Math.min(this.get(axis1), this.get(axis2));
+        case center:
+          return Math.min(this.get(axis1), this.get(axis2)) + (0.5 * this.get(dimension));
+        case farthest:
+          return Math.max(this.get(axis1), this.get(axis2));
       }
     };
 
