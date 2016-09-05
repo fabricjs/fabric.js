@@ -69,14 +69,12 @@
      */
     _createTextCharBg: function(styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset) {
       return [
-        //jscs:disable validateIndentation
         '\t\t<rect fill="', styleDecl.textBackgroundColor,
         '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS),
         '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS),
         '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS),
         '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS),
         '"></rect>\n'
-        //jscs:enable validateIndentation
       ].join('');
     },
 
@@ -94,7 +92,6 @@
       }, styleDecl));
 
       return [
-        //jscs:disable validateIndentation
         '\t\t\t<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
         toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" ',
           (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ' : ''),
@@ -105,7 +102,6 @@
         'style="', fillStyles, '">',
         fabric.util.string.escapeXml(_char),
         '</tspan>\n'
-        //jscs:enable validateIndentation
       ].join('');
     }
   });
