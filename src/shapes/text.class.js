@@ -468,7 +468,7 @@
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
-          left += width;
+          left += width > 0 ? width : 0;
         }
       }
       else {
@@ -529,7 +529,7 @@
         additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -779,12 +779,13 @@
     _measureLine: function(ctx, lineIndex) {
       var line = this._textLines[lineIndex],
           width = ctx.measureText(line).width,
-          additionalSpace = 0, charCount;
+          additionalSpace = 0, charCount, finalWidth;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
-      return width + additionalSpace;
+      finalWidth = width + additionalSpace;
+      return finalWidth > 0 ? finalWidth : 0;
     },
 
     /**
