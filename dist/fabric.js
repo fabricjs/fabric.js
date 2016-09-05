@@ -18389,6 +18389,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
       filters.forEach(function(filter) {
+        if (!filter) {
+          return;
+        }
         if (forResizing) {
           scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
           scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
@@ -18403,8 +18406,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           scaleX = filter.scaleX;
           scaleY = filter.scaleY;
         }
-        filter && filter.applyTo(canvasEl, scaleX, scaleY);
-        if (!forResizing && filter && filter.type === 'Resize') {
+        filter.applyTo(canvasEl, scaleX, scaleY);
+        if (!forResizing && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
           _this.height *= filter.scaleY;
         }
@@ -18416,7 +18419,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
         // onload doesn't fire in some node versions, so we invoke callback manually
-        _this._element = replacement;      //   !forResizing && (_this._filteredEl = replacement);
+        _this._element = replacement;
+        !forResizing && (_this._filteredEl = replacement);
         callback && callback(_this);
       }
       else {
@@ -21108,7 +21112,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
-          left += width;
+          left += width > 0 ? width : 0;
         }
       }
       else {
@@ -21169,7 +21173,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -21419,12 +21423,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _measureLine: function(ctx, lineIndex) {
       var line = this._textLines[lineIndex],
           width = ctx.measureText(line).width,
-          additionalSpace = 0, charCount;
+          additionalSpace = 0, charCount, finalWidth;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
-      return width + additionalSpace;
+      finalWidth = width + additionalSpace;
+      return finalWidth > 0 ? finalWidth : 0;
     },
 
     /**
@@ -22367,7 +22372,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
       boundaries = {
         top: topOffset,
-        left: leftOffset,
+        left: leftOffset > 0 ? leftOffset : 0,
         lineLeft: lineLeftOffset
       };
       this.cursorOffsetCache = boundaries;
@@ -22451,7 +22456,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         ctx.fillRect(
           boundaries.left + lineOffset,
           boundaries.top + boundaries.topOffset,
-          boxWidth,
+          boxWidth > 0 ? boxWidth : 0,
           lineHeight);
 
         boundaries.topOffset += realLineHeight;
@@ -22530,7 +22535,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
-          offset, textDecoration, chars;
+          offset, textDecoration, chars, additionalSpace, _charWidth;
 
       if (decl) {
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
@@ -22554,13 +22559,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         this._removeShadow(ctx);
       }
       if (this.charSpacing !== 0) {
+        additionalSpace = this._getWidthOfCharSpacing();
         chars = _char.split('');
         charWidth = 0;
         for (var j = 0, len = chars.length, char; j < len; j++) {
           char = chars[j];
           shouldFill && ctx.fillText(char, left + charWidth, top);
           shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          charWidth += ctx.measureText(char).width + this._getWidthOfCharSpacing();
+          _charWidth = ctx.measureText(char).width + additionalSpace;
+          charWidth += _charWidth > 0 ? _charWidth : 0;
         }
       }
       else {
@@ -22869,7 +22876,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         width += this._getWidthOfCharSpacing();
       }
       ctx.restore();
-      return width;
+      return width > 0 ? width : 0
     },
 
     /**
@@ -22911,7 +22918,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         width -= this._getWidthOfCharSpacing();
       }
       this._isMeasuring = false;
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -25235,7 +25242,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
         line += word;
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset) + additionalSpace;
+        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
         offset++;
         lineJustStarted = false;
         // keep track of largest word
