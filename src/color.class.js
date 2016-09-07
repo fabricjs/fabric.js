@@ -74,6 +74,7 @@
      * @return {Array} Hsl color
      */
     _rgbToHsl: function(r, g, b) {
+      // eslint-disable-next-line
       r /= 255, g /= 255, b /= 255;
 
       var h, s, l,

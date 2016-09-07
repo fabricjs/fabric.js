@@ -159,7 +159,9 @@
      * @return {fabric.Point}
      */
     // toGlobalPoint: function(point) {
-    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
+    //   return fabric.util.rotatePoint(point,
+    //                                  this.getCenterPoint(),
+    //                                  degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
     // },
 
     /**

@@ -317,14 +317,16 @@
     originY:                  'top',
 
     /**
-     * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+     * Top position of an object. Note that by default it's relative to object top.
+     * You can change this by setting originY={top/center/bottom}
      * @type Number
      * @default
      */
     top:                      0,
 
     /**
-     * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
+     * Left position of an object. Note that by default it's relative to object left.
+     * You can change this by setting originX={left/center/right}
      * @type Number
      * @default
      */
@@ -508,7 +510,8 @@
     /**
      * Fill rule used to fill an object
      * accepted values are nonzero, evenodd
-     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
+     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation
+     * until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
      * @type String
      * @default
      */
@@ -612,7 +615,8 @@
     minScaleLimit:            0.01,
 
     /**
-     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
+     * When set to `false`, an object can not be selected for modification
+     * (using either point-click-based or group-based selection).
      * But events still fire on it.
      * @type Boolean
      * @default
@@ -620,7 +624,8 @@
     selectable:               true,
 
     /**
-     * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
+     * When set to `false`, an object can not be a target of events.
+     * All events propagate through it. Introduced in v1.3.4
      * @type Boolean
      * @default
      */
@@ -835,7 +840,8 @@
     /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
-     * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
+     * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner.
+     * This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
       if (this.group && !this.group._transformDone && this.group === this.canvas._activeGroup) {
@@ -976,9 +982,12 @@
     },
 
     /**
-     * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
+     * Sets property to a given value. When changing position/dimension -related properties
+     * (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls.
+     * If you need to update those, call `setCoords()`.
      * @param {String|Object} key Property name or object (if object, iterate over the object properties)
-     * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
+     * @param {Object|Function} value Property value
+     * (if function, the value is passed into it and its return value is used as a new one)
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1332,7 +1341,8 @@
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @param {Boolean} [options.enableRetina] Enable retina scaling for clone image. Introduce in 1.6.4
-     * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+     * @return {String} Returns a data: URL containing a representation of the object
+     * in the format specified by options.format
      */
     toDataURL: function(options) {
       options || (options = { });
@@ -1488,7 +1498,8 @@
      * Sets pattern fill of an object
      * @param {Object} options Options object
      * @param {(String|HTMLImageElement)} options.source Pattern source
-     * @param {String} [options.repeat=repeat] Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
+     * @param {String} [options.repeat=repeat] Repeat property of a pattern
+     * (one of repeat, repeat-x, repeat-y or no-repeat)
      * @param {Number} [options.offsetX=0] Pattern horizontal offset from object's left/top corner
      * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
      * @return {fabric.Object} thisArg
