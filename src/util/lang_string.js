@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 (function() {
 
   /* _ES5_COMPAT_START_ */

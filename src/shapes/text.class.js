@@ -805,7 +805,7 @@
             lineLeftOffset, heightOfLine;
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
-
+          // eslint-disable-next-line
           lineWidth = _this._getLineWidth(ctx, i),
           lineLeftOffset = _this._getLineLeftOffset(lineWidth),
           heightOfLine = _this._getHeightOfLine(ctx, i);

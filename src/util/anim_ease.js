@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 (function() {
 
   function normalize(a, c, p, s) {

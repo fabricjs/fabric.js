@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 (function(global) {
 
   'use strict';

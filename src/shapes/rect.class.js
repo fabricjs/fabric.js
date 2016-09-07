@@ -23,7 +23,8 @@
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
 
     /**
-     * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * List of properties to consider when checking if state of an object is changed
+     * ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
@@ -102,7 +103,8 @@
           x = noTransform ? this.left : -this.width / 2,
           y = noTransform ? this.top : -this.height / 2,
           isRounded = rx !== 0 || ry !== 0,
-          k = 1 - 0.5522847498 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */;
+          k = 1 - 0.5522847498;
+          /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 
       ctx.beginPath();
 
