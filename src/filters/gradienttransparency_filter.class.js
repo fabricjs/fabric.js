@@ -27,7 +27,7 @@
      * @param {String} type
      * @default
      */
-    type: 'GradientTransparency',
+      type: 'GradientTransparency',
 
     /**
      * Constructor
@@ -35,39 +35,39 @@
      * @param {Object} [options] Options object
      * @param {Number} [options.threshold=100] Threshold value
      */
-    initialize: function(options) {
-      options = options || { };
-      this.threshold = options.threshold || 100;
-    },
+      initialize: function(options) {
+        options = options || { };
+        this.threshold = options.threshold || 100;
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          threshold = this.threshold,
-          total = data.length;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            threshold = this.threshold,
+            total = data.length;
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
-        data[i + 3] = threshold + 255 * (total - i) / total;
-      }
+        for (var i = 0, len = data.length; i < len; i += 4) {
+          data[i + 3] = threshold + 255 * (total - i) / total;
+        }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        threshold: this.threshold
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          threshold: this.threshold
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

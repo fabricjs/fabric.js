@@ -23,32 +23,32 @@
      * @param {String} type
      * @default
      */
-    type: 'Grayscale',
+      type: 'Grayscale',
 
     /**
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Grayscale.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          len = imageData.width * imageData.height * 4,
-          index = 0,
-          average;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            len = imageData.width * imageData.height * 4,
+            index = 0,
+            average;
 
-      while (index < len) {
-        average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-        data[index]     = average;
-        data[index + 1] = average;
-        data[index + 2] = average;
-        index += 4;
+        while (index < len) {
+          average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+          data[index]     = average;
+          data[index + 1] = average;
+          data[index + 2] = average;
+          index += 4;
+        }
+
+        context.putImageData(imageData, 0, 0);
       }
-
-      context.putImageData(imageData, 0, 0);
-    }
-  });
+    });
 
   /**
    * Returns filter instance from an object representation

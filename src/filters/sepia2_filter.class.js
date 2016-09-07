@@ -23,32 +23,32 @@
      * @param {String} type
      * @default
      */
-    type: 'Sepia2',
+      type: 'Sepia2',
 
     /**
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Sepia.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, r, g, b;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            iLen = data.length, i, r, g, b;
 
-      for (i = 0; i < iLen; i += 4) {
-        r = data[i];
-        g = data[i + 1];
-        b = data[i + 2];
+        for (i = 0; i < iLen; i += 4) {
+          r = data[i];
+          g = data[i + 1];
+          b = data[i + 2];
 
-        data[i] = (r * 0.393 + g * 0.769 + b * 0.189 ) / 1.351;
-        data[i + 1] = (r * 0.349 + g * 0.686 + b * 0.168 ) / 1.203;
-        data[i + 2] = (r * 0.272 + g * 0.534 + b * 0.131 ) / 2.140;
+          data[i] = (r * 0.393 + g * 0.769 + b * 0.189 ) / 1.351;
+          data[i + 1] = (r * 0.349 + g * 0.686 + b * 0.168 ) / 1.203;
+          data[i + 2] = (r * 0.272 + g * 0.534 + b * 0.131 ) / 2.140;
+        }
+
+        context.putImageData(imageData, 0, 0);
       }
-
-      context.putImageData(imageData, 0, 0);
-    }
-  });
+    });
 
   /**
    * Returns filter instance from an object representation

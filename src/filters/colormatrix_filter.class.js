@@ -34,7 +34,7 @@
      * @param {String} type
      * @default
      */
-    type: 'ColorMatrix',
+      type: 'ColorMatrix',
 
     /**
      * Constructor
@@ -42,58 +42,58 @@
      * @param {Object} [options] Options object
      * @param {Array} [options.matrix] Color Matrix to modify the image data with
      */
-    initialize: function( options ) {
-      options || ( options = {} );
-      this.matrix = options.matrix || [
-        1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, 1, 0
-      ];
-    },
+      initialize: function( options ) {
+        options || ( options = {} );
+        this.matrix = options.matrix || [
+          1, 0, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 0, 1, 0, 0,
+          0, 0, 0, 1, 0
+        ];
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function( canvasEl ) {
-      var context = canvasEl.getContext( '2d' ),
-          imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
-          data = imageData.data,
-          iLen = data.length,
-          i,
-          r,
-          g,
-          b,
-          a,
-          m = this.matrix;
+      applyTo: function( canvasEl ) {
+        var context = canvasEl.getContext( '2d' ),
+            imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
+            data = imageData.data,
+            iLen = data.length,
+            i,
+            r,
+            g,
+            b,
+            a,
+            m = this.matrix;
 
-      for ( i = 0; i < iLen; i += 4 ) {
-        r = data[ i ];
-        g = data[ i + 1 ];
-        b = data[ i + 2 ];
-        a = data[ i + 3 ];
+        for ( i = 0; i < iLen; i += 4 ) {
+          r = data[ i ];
+          g = data[ i + 1 ];
+          b = data[ i + 2 ];
+          a = data[ i + 3 ];
 
-        data[ i ] = r * m[ 0 ] + g * m[ 1 ] + b * m[ 2 ] + a * m[ 3 ] + m[ 4 ];
-        data[ i + 1 ] = r * m[ 5 ] + g * m[ 6 ] + b * m[ 7 ] + a * m[ 8 ] + m[ 9 ];
-        data[ i + 2 ] = r * m[ 10 ] + g * m[ 11 ] + b * m[ 12 ] + a * m[ 13 ] + m[ 14 ];
-        data[ i + 3 ] = r * m[ 15 ] + g * m[ 16 ] + b * m[ 17 ] + a * m[ 18 ] + m[ 19 ];
-      }
+          data[ i ] = r * m[ 0 ] + g * m[ 1 ] + b * m[ 2 ] + a * m[ 3 ] + m[ 4 ];
+          data[ i + 1 ] = r * m[ 5 ] + g * m[ 6 ] + b * m[ 7 ] + a * m[ 8 ] + m[ 9 ];
+          data[ i + 2 ] = r * m[ 10 ] + g * m[ 11 ] + b * m[ 12 ] + a * m[ 13 ] + m[ 14 ];
+          data[ i + 3 ] = r * m[ 15 ] + g * m[ 16 ] + b * m[ 17 ] + a * m[ 18 ] + m[ 19 ];
+        }
 
-      context.putImageData( imageData, 0, 0 );
-    },
+        context.putImageData( imageData, 0, 0 );
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        type: this.type,
-        matrix: this.matrix
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          type: this.type,
+          matrix: this.matrix
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

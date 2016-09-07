@@ -21,7 +21,7 @@
      * @param {String} type
      * @default
      */
-    type: 'Mask',
+      type: 'Mask',
 
     /**
      * Constructor
@@ -30,57 +30,57 @@
      * @param {fabric.Image} [options.mask] Mask image object
      * @param {Number} [options.channel=0] Rgb channel (0, 1, 2 or 3)
      */
-    initialize: function(options) {
-      options = options || { };
+      initialize: function(options) {
+        options = options || { };
 
-      this.mask = options.mask;
-      this.channel = [0, 1, 2, 3].indexOf(options.channel) > -1 ? options.channel : 0;
-    },
+        this.mask = options.mask;
+        this.channel = [0, 1, 2, 3].indexOf(options.channel) > -1 ? options.channel : 0;
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      if (!this.mask) {
-        return;
-      }
+      applyTo: function(canvasEl) {
+        if (!this.mask) {
+          return;
+        }
 
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          maskEl = this.mask.getElement(),
-          maskCanvasEl = fabric.util.createCanvasElement(),
-          channel = this.channel,
-          i,
-          iLen = imageData.width * imageData.height * 4;
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            maskEl = this.mask.getElement(),
+            maskCanvasEl = fabric.util.createCanvasElement(),
+            channel = this.channel,
+            i,
+            iLen = imageData.width * imageData.height * 4;
 
-      maskCanvasEl.width = canvasEl.width;
-      maskCanvasEl.height = canvasEl.height;
+        maskCanvasEl.width = canvasEl.width;
+        maskCanvasEl.height = canvasEl.height;
 
-      maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, canvasEl.width, canvasEl.height);
+        maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, canvasEl.width, canvasEl.height);
 
-      var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, canvasEl.width, canvasEl.height),
-          maskData = maskImageData.data;
+        var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, canvasEl.width, canvasEl.height),
+            maskData = maskImageData.data;
 
-      for (i = 0; i < iLen; i += 4) {
-        data[i + 3] = maskData[i + channel];
-      }
+        for (i = 0; i < iLen; i += 4) {
+          data[i + 3] = maskData[i + channel];
+        }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        mask: this.mask.toObject(),
-        channel: this.channel
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          mask: this.mask.toObject(),
+          channel: this.channel
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation
