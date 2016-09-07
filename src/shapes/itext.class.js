@@ -165,7 +165,7 @@
     /**
      * @private
      */
-    __widthOfSpace: [ ],
+    __widthOfSpace: [],
 
     /**
      * Constructor
@@ -184,7 +184,7 @@
      */
     _clearCache: function() {
       this.callSuper('_clearCache');
-      this.__widthOfSpace = [ ];
+      this.__widthOfSpace = [];
     },
 
     /**
@@ -256,7 +256,7 @@
     getSelectionStyles: function(startIndex, endIndex) {
 
       if (arguments.length === 2) {
-        var styles = [ ];
+        var styles = [];
         for (var i = startIndex; i < endIndex; i++) {
           styles.push(this.getSelectionStyles(i));
         }
@@ -518,7 +518,7 @@
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        boundaries.left + leftOffset - cursorWidth/2,
+        boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);

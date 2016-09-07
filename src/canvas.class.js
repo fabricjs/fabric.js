@@ -137,7 +137,7 @@
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:     [ ],
+    selectionDashArray:     [],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
@@ -258,7 +258,7 @@
     _chooseObjectsToRender: function() {
       var activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
-          object, objsToRender = [ ], activeGroupObjects = [ ];
+          object, objsToRender = [], activeGroupObjects = [];
 
       if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
@@ -970,8 +970,8 @@
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft),
-            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
 
         ctx.beginPath();
 
@@ -1019,7 +1019,7 @@
         return activeObject;
       }
 
-      this.targets = [ ];
+      this.targets = [];
 
       var target = this._searchPossibleTargets(this._objects, pointer);
       this._fireOverOutEvents(target, e);

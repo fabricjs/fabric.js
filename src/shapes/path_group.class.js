@@ -44,7 +44,7 @@
     initialize: function(paths, options) {
 
       options = options || { };
-      this.paths = paths || [ ];
+      this.paths = paths || [];
 
       for (var i = this.paths.length; i--;) {
         this.paths[i].group = this;
@@ -66,7 +66,7 @@
      * Calculate width and height based on paths contained
      */
     parseDimensionsFromPaths: function(options) {
-      var points, p, xC = [ ], yC = [ ], path, height, width,
+      var points, p, xC = [], yC = [], path, height, width,
           m;
       for (var j = this.paths.length; j--;) {
         path = this.paths[j];
@@ -111,7 +111,7 @@
 
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      ctx.translate(-this.width/2, -this.height/2);
+      ctx.translate(-this.width / 2, -this.height / 2);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }

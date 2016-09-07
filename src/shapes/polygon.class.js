@@ -57,7 +57,7 @@
      */
     initialize: function(points, options) {
       options = options || { };
-      this.points = points || [ ];
+      this.points = points || [];
       this.callSuper('initialize', options);
       this._calcDimensions();
       if (!('top' in options)) {

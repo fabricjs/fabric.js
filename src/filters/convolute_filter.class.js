@@ -84,7 +84,7 @@
           pixels = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
 
           side = Math.round(Math.sqrt(weights.length)),
-          halfSide = Math.floor(side/2),
+          halfSide = Math.floor(side / 2),
           src = pixels.data,
           sw = pixels.width,
           sh = pixels.height,

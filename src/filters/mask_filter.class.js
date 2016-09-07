@@ -33,7 +33,7 @@
       options = options || { };
 
       this.mask = options.mask;
-      this.channel = [ 0, 1, 2, 3 ].indexOf(options.channel) > -1 ? options.channel : 0;
+      this.channel = [0, 1, 2, 3].indexOf(options.channel) > -1 ? options.channel : 0;
     },
 
     /**

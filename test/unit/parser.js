@@ -549,7 +549,7 @@
     elPolygon.setAttribute('class', 'cls');
     elPolygon.setAttribute('svgUid', svgUid);
 
-    var style = fabric.parseAttributes(elPolygon, [ ]);
+    var style = fabric.parseAttributes(elPolygon, []);
     deepEqual(style, expectedStyle);
 
     styleElement.textContent = '\t\n';
