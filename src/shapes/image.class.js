@@ -395,6 +395,9 @@
       canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
       filters.forEach(function(filter) {
+        if (!filter) {
+          return;
+        }
         if (forResizing) {
           scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
           scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
@@ -409,8 +412,8 @@
           scaleX = filter.scaleX;
           scaleY = filter.scaleY;
         }
-        filter && filter.applyTo(canvasEl, scaleX, scaleY);
-        if (!forResizing && filter && filter.type === 'Resize') {
+        filter.applyTo(canvasEl, scaleX, scaleY);
+        if (!forResizing && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
           _this.height *= filter.scaleY;
         }
@@ -422,7 +425,8 @@
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
         // onload doesn't fire in some node versions, so we invoke callback manually
-        _this._element = replacement;      //   !forResizing && (_this._filteredEl = replacement);
+        _this._element = replacement;
+        !forResizing && (_this._filteredEl = replacement);
         callback && callback(_this);
       }
       else {
