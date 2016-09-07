@@ -93,7 +93,6 @@
   });
 
 
-
   test('translateToOriginPoint', function(){
     var rect = new fabric.Rect(rectOptions),
         p,
@@ -420,7 +419,6 @@
     p = rect.translateToCenterPoint(point, 1, 1);
     deepEqual(p, new fabric.Point(21.068865352386116, -27.02306745986067));
   });
-
 
 
   test('translateToOriginPoint with numeric origins', function(){

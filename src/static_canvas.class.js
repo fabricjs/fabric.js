@@ -96,8 +96,10 @@
     stateful: true,
 
     /**
-     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
-     * Disabling this option could give a great performance boost when adding/removing a lot of objects to/from canvas at once
+     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt}
+     * and {@link fabric.Collection.remove} should also re-render canvas.
+     * Disabling this option could give a great performance boost
+     * when adding/removing a lot of objects to/from canvas at once
      * (followed by a manual rendering after addition/deletion)
      * @type Boolean
      * @default
@@ -106,7 +108,8 @@
 
     /**
      * Function that determines clipping of entire canvas area
-     * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * Being passed context as first argument. See clipping canvas area
+     * in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
      * @type Function
      * @default
      */
@@ -394,7 +397,7 @@
 
     /**
      * @private
-     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
+     * @see {@link http://goo.gl/IHbAsX|WhatWG Canvas Standard}
      */
     _setImageSmoothing: function() {
       var ctx = this.getContext();
@@ -408,7 +411,8 @@
      * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
-     * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
+     * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image
+     * or null to set background or overlay to
      * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
@@ -569,7 +573,8 @@
     },
 
     /**
-     * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+     * Sets dimensions (width, height) of this canvas instance.
+     * when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
      * @param {Object}        dimensions                    Object with width/height properties
      * @param {Number|String} [dimensions.width]            Width of canvas element
      * @param {Number|String} [dimensions.height]           Height of canvas element
@@ -1192,7 +1197,8 @@
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
      * @param {String} [options.width] desired width of svg with or without units
      * @param {String} [options.height] desired height of svg with or without units
-     * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
+     * @param {Function} [reviver] Method for further parsing of svg elements,
+     * called after each fabric object converted into svg representation.
      * @return {String} SVG string
      * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
      * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
@@ -1213,7 +1219,8 @@
      * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
      * @example <caption>Modify SVG output with reviver function</caption>
      * var svg = canvas.toSVG(null, function(svg) {
-     *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
+     *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ',
+     *                      '');
      * });
      */
     toSVG: function(options, reviver) {
@@ -1650,7 +1657,12 @@
    * @example <caption>JSON without additional properties</caption>
    * var json = canvas.toJSON();
    * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * var json = canvas.toJSON(['lockMovementX',
+   *                           'lockMovementY',
+   *                           'lockRotation',
+   *                           'lockScalingX',
+   *                           'lockScalingY',
+   *                           'lockUniScaling']);
    * @example <caption>JSON without default values</caption>
    * canvas.includeDefaultValues = false;
    * var json = canvas.toJSON();

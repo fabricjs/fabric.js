@@ -103,6 +103,7 @@
         b1, b2, inter;
 
     for (var i = 0; i < length; i++) {
+      // eslint-disable-next-line
       b1 = points[i],
       b2 = points[(i + 1) % length],
       inter = Intersection.intersectLineLine(a1, a2, b1, b2);

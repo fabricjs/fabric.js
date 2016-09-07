@@ -468,7 +468,7 @@
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
-          left += width;
+          left += width > 0 ? width : 0;
         }
       }
       else {
@@ -529,7 +529,7 @@
         additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -779,12 +779,13 @@
     _measureLine: function(ctx, lineIndex) {
       var line = this._textLines[lineIndex],
           width = ctx.measureText(line).width,
-          additionalSpace = 0, charCount;
+          additionalSpace = 0, charCount, finalWidth;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
-      return width + additionalSpace;
+      finalWidth = width + additionalSpace;
+      return finalWidth > 0 ? finalWidth : 0;
     },
 
     /**
@@ -804,7 +805,7 @@
             lineLeftOffset, heightOfLine;
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
-
+          // eslint-disable-next-line
           lineWidth = _this._getLineWidth(ctx, i),
           lineLeftOffset = _this._getLineLeftOffset(lineWidth),
           heightOfLine = _this._getHeightOfLine(ctx, i);
@@ -1212,7 +1213,8 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight /* 0.3 is the old lineHeight */
+      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight
+      /* 0.3 is the old lineHeight */
     });
 
     return text;

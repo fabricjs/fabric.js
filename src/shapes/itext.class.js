@@ -198,10 +198,11 @@
 
       for (var p1 in obj) {
         for (var p2 in obj[p1]) {
-          /*jshint unused:false */
+          /*eslint-disable no-unused-vars*/
           for (var p3 in obj[p1][p2]) {
             return false;
           }
+          /*eslint-enable no-unused-vars*/
         }
       }
       return true;
@@ -490,7 +491,7 @@
       }
       boundaries = {
         top: topOffset,
-        left: leftOffset,
+        left: leftOffset > 0 ? leftOffset : 0,
         lineLeft: lineLeftOffset
       };
       this.cursorOffsetCache = boundaries;
@@ -574,7 +575,7 @@
         ctx.fillRect(
           boundaries.left + lineOffset,
           boundaries.top + boundaries.topOffset,
-          boxWidth,
+          boxWidth > 0 ? boxWidth : 0,
           lineHeight);
 
         boundaries.topOffset += realLineHeight;
@@ -653,7 +654,7 @@
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
-          offset, textDecoration, chars;
+          offset, textDecoration, chars, additionalSpace, _charWidth;
 
       if (decl) {
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
@@ -677,13 +678,15 @@
         this._removeShadow(ctx);
       }
       if (this.charSpacing !== 0) {
+        additionalSpace = this._getWidthOfCharSpacing();
         chars = _char.split('');
         charWidth = 0;
         for (var j = 0, len = chars.length, char; j < len; j++) {
           char = chars[j];
           shouldFill && ctx.fillText(char, left + charWidth, top);
           shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          charWidth += ctx.measureText(char).width + this._getWidthOfCharSpacing();
+          _charWidth = ctx.measureText(char).width + additionalSpace;
+          charWidth += _charWidth > 0 ? _charWidth : 0;
         }
       }
       else {
@@ -992,7 +995,7 @@
         width += this._getWidthOfCharSpacing();
       }
       ctx.restore();
-      return width;
+      return width > 0 ? width : 0
     },
 
     /**
@@ -1034,7 +1037,7 @@
         width -= this._getWidthOfCharSpacing();
       }
       this._isMeasuring = false;
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**

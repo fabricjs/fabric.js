@@ -131,6 +131,7 @@
      * @param {Object} oCoords Coordinates of the object being evaluated
      */
     _findCrossPoints: function(point, oCoords) {
+      // eslint-disable-next-line
       var b1, b2, a1, a2, xi, yi,
           xcount = 0,
           iLine;

@@ -19,14 +19,15 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Pixelate = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Pixelate.prototype */ {
+  fabric.Image.filters.Pixelate = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Pixelate.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Pixelate',
+      type: 'Pixelate',
 
     /**
      * Constructor
@@ -34,32 +35,32 @@
      * @param {Object} [options] Options object
      * @param {Number} [options.blocksize=4] Blocksize for pixelate
      */
-    initialize: function(options) {
-      options = options || { };
-      this.blocksize = options.blocksize || 4;
-    },
+      initialize: function(options) {
+        options = options || { };
+        this.blocksize = options.blocksize || 4;
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = imageData.height,
-          jLen = imageData.width,
-          index, i, j, r, g, b, a;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            iLen = imageData.height,
+            jLen = imageData.width,
+            index, i, j, r, g, b, a;
 
-      for (i = 0; i < iLen; i += this.blocksize) {
-        for (j = 0; j < jLen; j += this.blocksize) {
+        for (i = 0; i < iLen; i += this.blocksize) {
+          for (j = 0; j < jLen; j += this.blocksize) {
 
-          index = (i * 4) * jLen + (j * 4);
+            index = (i * 4) * jLen + (j * 4);
 
-          r = data[index];
-          g = data[index + 1];
-          b = data[index + 2];
-          a = data[index + 3];
+            r = data[index];
+            g = data[index + 1];
+            b = data[index + 2];
+            a = data[index + 3];
 
           /*
            blocksize: 4
@@ -71,31 +72,31 @@
            [1,1,1,1,1]
            */
 
-          for (var _i = i, _ilen = i + this.blocksize; _i < _ilen; _i++) {
-            for (var _j = j, _jlen = j + this.blocksize; _j < _jlen; _j++) {
-              index = (_i * 4) * jLen + (_j * 4);
-              data[index] = r;
-              data[index + 1] = g;
-              data[index + 2] = b;
-              data[index + 3] = a;
+            for (var _i = i, _ilen = i + this.blocksize; _i < _ilen; _i++) {
+              for (var _j = j, _jlen = j + this.blocksize; _j < _jlen; _j++) {
+                index = (_i * 4) * jLen + (_j * 4);
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = a;
+              }
             }
           }
         }
-      }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        blocksize: this.blocksize
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          blocksize: this.blocksize
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

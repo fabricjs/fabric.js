@@ -40,7 +40,8 @@
     /**
      * AlignX value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
      * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element width differs from image width.
+     * This parameter defines how the picture is aligned to its viewport
+     * when image element width differs from image width.
      * @type String
      * @default
      */
@@ -49,7 +50,8 @@
     /**
      * AlignY value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
      * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element height differs from image height.
+     * This parameter defines how the picture is aligned to its viewport
+     * when image element height differs from image height.
      * @type String
      * @default
      */
@@ -123,7 +125,8 @@
     /**
      * Sets image element for this instance to a specified one.
      * If filters defined they are applied to new image.
-     * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
+     * You might need to call `canvas.renderAll` and `object.setCoords`
+     * after replacing, to render new image and update controls area.
      * @param {HTMLImageElement} element
      * @param {Function} [callback] Callback is invoked when all filters have been applied and new image is generated
      * @param {Object} [options] Options object
@@ -287,8 +290,8 @@
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
-            // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-            // so that object's center aligns with container's left/top
+            // by wrapping it in container <g> element with actual transformation, then offsetting object
+            // to the top/left so that object's center aligns with container's left/top
             '" width="', this.width,
             '" height="', this.height,
             '" preserveAspectRatio="', preserveAspectRatio, '"',
@@ -395,6 +398,9 @@
       canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
       filters.forEach(function(filter) {
+        if (!filter) {
+          return;
+        }
         if (forResizing) {
           scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
           scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
@@ -409,8 +415,8 @@
           scaleX = filter.scaleX;
           scaleY = filter.scaleY;
         }
-        filter && filter.applyTo(canvasEl, scaleX, scaleY);
-        if (!forResizing && filter && filter.type === 'Resize') {
+        filter.applyTo(canvasEl, scaleX, scaleY);
+        if (!forResizing && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
           _this.height *= filter.scaleY;
         }
@@ -422,7 +428,8 @@
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
         // onload doesn't fire in some node versions, so we invoke callback manually
-        _this._element = replacement;      //   !forResizing && (_this._filteredEl = replacement);
+        _this._element = replacement;
+        !forResizing && (_this._filteredEl = replacement);
         callback && callback(_this);
       }
       else {
@@ -628,7 +635,8 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
+   * @param {Function} [callback] Callback to invoke when image is created
+   * (newly created image is passed as a first argument)
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {

@@ -27,14 +27,15 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
+  fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Tint.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Tint',
+      type: 'Tint',
 
     /**
      * Constructor
@@ -43,61 +44,61 @@
      * @param {String} [options.color=#000000] Color to tint the image with
      * @param {Number} [options.opacity] Opacity value that controls the tint effect's transparency (0..1)
      */
-    initialize: function(options) {
-      options = options || { };
+      initialize: function(options) {
+        options = options || { };
 
-      this.color = options.color || '#000000';
-      this.opacity = typeof options.opacity !== 'undefined'
+        this.color = options.color || '#000000';
+        this.opacity = typeof options.opacity !== 'undefined'
                       ? options.opacity
                       : new fabric.Color(this.color).getAlpha();
-    },
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i,
-          tintR, tintG, tintB,
-          r, g, b, alpha1,
-          source;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            iLen = data.length, i,
+            tintR, tintG, tintB,
+            r, g, b, alpha1,
+            source;
 
-      source = new fabric.Color(this.color).getSource();
+        source = new fabric.Color(this.color).getSource();
 
-      tintR = source[0] * this.opacity;
-      tintG = source[1] * this.opacity;
-      tintB = source[2] * this.opacity;
+        tintR = source[0] * this.opacity;
+        tintG = source[1] * this.opacity;
+        tintB = source[2] * this.opacity;
 
-      alpha1 = 1 - this.opacity;
+        alpha1 = 1 - this.opacity;
 
-      for (i = 0; i < iLen; i += 4) {
-        r = data[i];
-        g = data[i + 1];
-        b = data[i + 2];
+        for (i = 0; i < iLen; i += 4) {
+          r = data[i];
+          g = data[i + 1];
+          b = data[i + 2];
 
         // alpha compositing
-        data[i] = tintR + r * alpha1;
-        data[i + 1] = tintG + g * alpha1;
-        data[i + 2] = tintB + b * alpha1;
-      }
+          data[i] = tintR + r * alpha1;
+          data[i + 1] = tintG + g * alpha1;
+          data[i + 2] = tintB + b * alpha1;
+        }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        color: this.color,
-        opacity: this.opacity
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          color: this.color,
+          opacity: this.opacity
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

@@ -19,14 +19,15 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Brightness = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
+  fabric.Image.filters.Brightness = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Brightness.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Brightness',
+      type: 'Brightness',
 
     /**
      * Constructor
@@ -34,40 +35,40 @@
      * @param {Object} [options] Options object
      * @param {Number} [options.brightness=0] Value to brighten the image up (0..255)
      */
-    initialize: function(options) {
-      options = options || { };
-      this.brightness = options.brightness || 0;
-    },
+      initialize: function(options) {
+        options = options || { };
+        this.brightness = options.brightness || 0;
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          brightness = this.brightness;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            brightness = this.brightness;
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
-        data[i] += brightness;
-        data[i + 1] += brightness;
-        data[i + 2] += brightness;
-      }
+        for (var i = 0, len = data.length; i < len; i += 4) {
+          data[i] += brightness;
+          data[i + 1] += brightness;
+          data[i + 2] += brightness;
+        }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        brightness: this.brightness
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          brightness: this.brightness
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

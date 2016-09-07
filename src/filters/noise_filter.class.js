@@ -19,14 +19,15 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Noise = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Noise.prototype */ {
+  fabric.Image.filters.Noise = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Noise.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Noise',
+      type: 'Noise',
 
     /**
      * Constructor
@@ -34,43 +35,43 @@
      * @param {Object} [options] Options object
      * @param {Number} [options.noise=0] Noise value
      */
-    initialize: function(options) {
-      options = options || { };
-      this.noise = options.noise || 0;
-    },
+      initialize: function(options) {
+        options = options || { };
+        this.noise = options.noise || 0;
+      },
 
     /**
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          noise = this.noise, rand;
+      applyTo: function(canvasEl) {
+        var context = canvasEl.getContext('2d'),
+            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+            data = imageData.data,
+            noise = this.noise, rand;
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
+        for (var i = 0, len = data.length; i < len; i += 4) {
 
-        rand = (0.5 - Math.random()) * noise;
+          rand = (0.5 - Math.random()) * noise;
 
-        data[i] += rand;
-        data[i + 1] += rand;
-        data[i + 2] += rand;
-      }
+          data[i] += rand;
+          data[i + 1] += rand;
+          data[i + 2] += rand;
+        }
 
-      context.putImageData(imageData, 0, 0);
-    },
+        context.putImageData(imageData, 0, 0);
+      },
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        noise: this.noise
-      });
-    }
-  });
+      toObject: function() {
+        return extend(this.callSuper('toObject'), {
+          noise: this.noise
+        });
+      }
+    });
 
   /**
    * Returns filter instance from an object representation

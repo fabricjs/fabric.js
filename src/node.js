@@ -122,6 +122,7 @@
 
   fabric.util.getScript = function(url, callback) {
     request(url, '', function(body) {
+      // eslint-disable-next-line
       eval(body);
       callback && callback();
     });
