@@ -59,7 +59,7 @@
     ok(polygon instanceof fabric.Object);
 
     equal(polygon.type, 'polygon');
-    deepEqual(polygon.get('points'), [ { x: 10, y: 12 }, { x: 20, y: 22 } ]);
+    deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
   test('complexity', function() {
@@ -110,7 +110,7 @@
 
     var expected = fabric.util.object.extend(
       fabric.util.object.clone(REFERENCE_OBJECT), {
-        points: [ { x: 10, y: 12 }, { x: 20, y: 22 } ]
+        points: [{ x: 10, y: 12 }, { x: 20, y: 22 }]
       });
 
     deepEqual(polygon.toObject(), expected);
@@ -149,10 +149,10 @@
       'points':           expectedPoints,
       'top':              10,
       'left':             10,
-      'transformMatrix':  [ 2, 0, 0, 2, -10, -20 ]
+      'transformMatrix':  [2, 0, 0, 2, -10, -20]
     }));
 
-    deepEqual(polygonWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
+    deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
 
     equal(fabric.Polygon.fromElement(), null);
   });

@@ -687,7 +687,7 @@
       if (maskObj.height === 0) {
         maskObj.height = IMG_HEIGHT;
       }
-      equal(JSON.stringify(object), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+      equal(JSON.stringify(object), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
 
       start();
     });
@@ -708,7 +708,7 @@
       if (maskObj.height === 0) {
         maskObj.height = IMG_HEIGHT;
       }
-      equal(JSON.stringify(json), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+      equal(JSON.stringify(json), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
 
       start();
     });

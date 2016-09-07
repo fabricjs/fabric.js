@@ -33,7 +33,7 @@ var amdUglifyFlags = '';
 if (amdLib === 'requirejs' && minifier !== 'uglifyjs') {
   console.log('[notice]: require.js support requires uglifyjs as minifier; changed minifier to uglifyjs.');
   minifier = 'uglifyjs';
-  amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
+  amdUglifyFlags = ' -r \'require,exports,window,fabric\' -e window:window,undefined ';
 }
 
 // if we want sourceMap support, uglify or google closure compiler are supported
@@ -327,7 +327,7 @@ else {
       // Always build requirejs AMD module in fabric.require.js
       // add necessary requirejs footer code to filesToInclude if we haven't before
       if (amdLib === false) {
-        amdLib = "requirejs";
+        amdLib = 'requirejs';
         filesToInclude[filesToInclude.length] = ifSpecifiedAMDInclude(amdLib);
       }
 
