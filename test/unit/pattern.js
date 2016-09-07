@@ -68,7 +68,7 @@
     });
 
     var object2 = patternWithGetSource.toObject();
-    equal(object2.source, 'function () {return fabric.document.createElement("canvas")}');
+    equal(object2.source, 'function () {return fabric.document.createElement(\'canvas\')}');
     equal(object2.repeat, 'repeat');
   });
 
