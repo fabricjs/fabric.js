@@ -5,7 +5,7 @@
     /**
      * Trims a string (removing whitespace from the beginning and the end)
      * @function external:String#trim
-     * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">String#trim on MDN</a>
+     * @see <a href="http://goo.gl/3kcTrC">String#trim on MDN</a>
      */
     String.prototype.trim = function () {
       // this trim is not fully ES3 or ES5 compliant, but it should cover most cases for now

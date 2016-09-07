@@ -1213,7 +1213,8 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight /* 0.3 is the old lineHeight */
+      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight
+      /* 0.3 is the old lineHeight */
     });
 
     return text;

@@ -8,7 +8,7 @@
   if (!Function.prototype.bind) {
     /**
      * Cross-browser approximation of ES5 Function.prototype.bind (not fully spec conforming)
-     * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">Function#bind on MDN</a>
+     * @see <a href="http://goo.gl/bSW3L">Function#bind on MDN</a>
      * @param {Object} thisArg Object to bind function to
      * @param {Any[]} Values to pass to a bound function
      * @return {Function}
