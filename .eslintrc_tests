@@ -29,6 +29,21 @@
     "strict": 0,
     "dot-notation": 0,
     "no-undef": 2,
-    "no-unused-vars": 2
+    "no-unused-vars": 2,
+    "quote-props": [
+      2,
+      "as-needed",
+      {
+        "keywords": true
+      }
+    ],
+    "max-statements": [
+      2,
+      45
+    ],
+    "curly": [
+      2,
+      "all"
+    ],
   }
 }
