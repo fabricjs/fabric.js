@@ -257,6 +257,7 @@
       attributeValue.replace(reTransform, function(match) {
 
         var m = new RegExp(transform).exec(match).filter(function (match) {
+            // eslint-disable-next-line
               return (match !== '' && match != null);
             }),
             operation = m[1],
@@ -437,6 +438,7 @@
           attr = attrs.item(j);
           el3.setAttribute(attr.nodeName, attr.nodeValue);
         }
+        // eslint-disable-next-line
         while (el2.firstChild != null) {
           el3.appendChild(el2.firstChild);
         }
@@ -556,6 +558,7 @@
 
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
+      // eslint-disable-next-line
       while (element.firstChild != null) {
         el.appendChild(element.firstChild);
       }

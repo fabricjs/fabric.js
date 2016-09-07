@@ -87,6 +87,7 @@
       this.width = (maxX - minX) || 0;
       this.height = (maxY - minY) || 0;
 
+      // eslint-disable-next-line
       this.minX = minX || 0,
       this.minY = minY || 0;
     },
