@@ -13,7 +13,8 @@
    * @extends fabric.Image.filters.BaseFilter
    * @see {@link fabric.Image.filters.Mask#initialize} for constructor definition
    */
-  fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
+  fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Mask.prototype */ {
 
     /**
      * Filter type

@@ -24,7 +24,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Multiply = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Multiply.prototype */ {
+  fabric.Image.filters.Multiply = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Multiply.prototype */ {
 
     /**
      * Filter type

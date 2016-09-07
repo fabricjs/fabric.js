@@ -15,7 +15,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Sepia2 = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Sepia2.prototype */ {
+  fabric.Image.filters.Sepia2 = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Sepia2.prototype */ {
 
     /**
      * Filter type

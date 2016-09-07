@@ -27,7 +27,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
+  fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Tint.prototype */ {
 
     /**
      * Filter type

@@ -15,7 +15,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Invert = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Invert.prototype */ {
+  fabric.Image.filters.Invert = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.Invert.prototype */ {
 
     /**
      * Filter type

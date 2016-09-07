@@ -26,7 +26,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.ColorMatrix = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
+  fabric.Image.filters.ColorMatrix = fabric.util.createClass(fabric.Image.filters.BaseFilter,
+    /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
 
     /**
      * Filter type
