@@ -198,10 +198,11 @@
 
       for (var p1 in obj) {
         for (var p2 in obj[p1]) {
-          /*jshint unused:false */
+          /*eslint-disable no-unused-vars*/
           for (var p3 in obj[p1][p2]) {
             return false;
           }
+          /*eslint-enable no-unused-vars*/
         }
       }
       return true;

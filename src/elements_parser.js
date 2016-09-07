@@ -80,7 +80,7 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
 fabric.ElementsParser.prototype.checkIfDone = function() {
   if (--this.numElements === 0) {
     this.instances = this.instances.filter(function(el) {
-      return el != null;
+      return el !== null;
     });
     this.callback(this.instances);
   }

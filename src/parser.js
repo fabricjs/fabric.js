@@ -257,7 +257,7 @@
       attributeValue.replace(reTransform, function(match) {
 
         var m = new RegExp(transform).exec(match).filter(function (match) {
-              return (match !== '' && match != null);
+              return (match !== '' && match !== null);
             }),
             operation = m[1],
             args = m.slice(2).map(parseFloat);
@@ -437,7 +437,7 @@
           attr = attrs.item(j);
           el3.setAttribute(attr.nodeName, attr.nodeValue);
         }
-        while (el2.firstChild != null) {
+        while (el2.firstChild !== null) {
           el3.appendChild(el2.firstChild);
         }
         el2 = el3;
@@ -556,7 +556,7 @@
 
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
-      while (element.firstChild != null) {
+      while (element.firstChild !== null) {
         el.appendChild(element.firstChild);
       }
       element.appendChild(el);
