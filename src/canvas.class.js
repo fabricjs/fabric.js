@@ -668,6 +668,7 @@
           actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
 
       this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
+      // eslint-disable-next-line
       actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by],
 
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);

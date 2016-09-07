@@ -604,6 +604,7 @@
       var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
+      // eslint-disable-next-line
       transform.reset = false,
       transform.target.isMoving = true;
 

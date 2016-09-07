@@ -182,6 +182,7 @@
           for (v = 0; v < dH; v++) {
             center.y = (v + 0.5) * ratioY;
             icenter.y = floor(center.y);
+            // eslint-disable-next-line
             a = 0, red = 0, green = 0, blue = 0, alpha = 0;
             for (i = icenter.x - range2X; i <= icenter.x + range2X; i++) {
               if (i < 0 || i >= oW) {
@@ -303,29 +304,28 @@
               for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
                 var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
                     w = sqrt(w0 + dx * dx);
-              /*jshint maxdepth:5 */
+                // eslint-disable-next-line
                 if (w > 1 && w < -1) {
                   continue;
                 }
               //hermite filter
                 weight = 2 * w * w * w - 3 * w * w + 1;
+                // eslint-disable-next-line
                 if (weight > 0) {
                   dx = 4 * (xx + yy * oW);
                 //alpha
                   gxA += weight * data[dx + 3];
                   weightsAlpha += weight;
                 //colors
-                /*jshint maxdepth:6 */
+                  // eslint-disable-next-line
                   if (data[dx + 3] < 255) {
                     weight = weight * data[dx + 3] / 250;
                   }
-                /*jshint maxdepth:5 */
                   gxR += weight * data[dx];
                   gxG += weight * data[dx + 1];
                   gxB += weight * data[dx + 2];
                   weights += weight;
                 }
-              /*jshint maxdepth:4 */
               }
             }
             data2[x2] = gxR / weights;

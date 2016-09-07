@@ -7,7 +7,7 @@
 
   /**
    * Multiply filter class
-   * Adapted from <a href="http://www.laurenscorijn.com/articles/colormath-basics">http://www.laurenscorijn.com/articles/colormath-basics</a>
+   * Adapted from <a href="http://goo.gl/EAIub9">http://www.laurenscorijn.com/articles/colormath-basics</a>
    * @class fabric.Image.filters.Multiply
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter

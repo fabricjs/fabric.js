@@ -108,7 +108,7 @@
                 scy = y + cy - halfSide;
                 scx = x + cx - halfSide;
 
-              /* jshint maxdepth:5 */
+                // eslint-disable-next-line
                 if (scy < 0 || scy > sh || scx < 0 || scx > sw) {
                   continue;
                 }
