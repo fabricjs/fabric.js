@@ -210,6 +210,7 @@ var filesToInclude = [
   'src/shapes/circle.class.js',
   'src/shapes/triangle.class.js',
   'src/shapes/ellipse.class.js',
+  'src/shapes/base_rect.class.js',
   'src/shapes/rect.class.js',
   'src/shapes/polyline.class.js',
   'src/shapes/polygon.class.js',
