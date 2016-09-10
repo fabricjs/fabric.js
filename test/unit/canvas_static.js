@@ -23,22 +23,22 @@
                   ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
                   ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-                  '13.99], ["z", null]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
+                  '13.99], ["z", null]]}], "backgroundFill": "#ff5555", "overlayFill":"rgba(0,0,0,0.2)"}';
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}]}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"backgroundFill":"#ff5555","overlayFill":"rgba(0,0,0,0.2)"}';
 
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"padding":123,"foo":"bar","rx":0,"ry":0}]}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -156,17 +156,17 @@
   QUnit.module('fabric.StaticCanvas', {
     setup: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
+      canvas.backgroundFill = fabric.StaticCanvas.prototype.backgroundFill;
       canvas.backgroundObject = fabric.StaticCanvas.prototype.backgroundObject;
-      canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
+      canvas.overlayFill = fabric.StaticCanvas.prototype.overlayFill;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
     }
   });
 
   test('initialProperties', function() {
-    ok('backgroundColor' in canvas);
-    ok('overlayColor' in canvas);
+    ok('backgroundFill' in canvas);
+    ok('overlayFill' in canvas);
     ok('backgroundObject' in canvas);
     ok('overlayObject' in canvas);
     ok('clipTo' in canvas);
@@ -671,8 +671,8 @@
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
-    canvas.setbackgroundObject(imageBG);
-    canvas.setoverlayObject(imageOL);
+    canvas.setBackgroundObject(imageBG);
+    canvas.setOverlayObject(imageOL);
     var reviverCount = 0,
         len = canvas.size() + group.size() + pathGroup.paths.length;
 
@@ -683,8 +683,8 @@
 
     canvas.toSVG(null, reviver);
     equal(reviverCount, len + 2, 'reviver should include background and overlay image');
-    canvas.setbackgroundObject(null);
-    canvas.setoverlayObject(null);
+    canvas.setBackgroundObject(null);
+    canvas.setOverlayObject(null);
     canvas.renderOnAddRemove = true;
   });
 
@@ -725,8 +725,8 @@
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
-    canvas.backgroundColor = '#ff5555';
-    canvas.overlayColor = 'rgba(0,0,0,0.2)';
+    canvas.backgroundFill = '#ff5555';
+    canvas.overlayFill = 'rgba(0,0,0,0.2)';
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
     deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
@@ -793,7 +793,7 @@
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
+      background: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -818,7 +818,7 @@
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
+      background: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -836,7 +836,7 @@
     canvas.foobar = 123;
 
     var expectedObject = {
-      background: canvas.backgroundColor,
+      background: canvas.backgroundFill,
       objects: canvas.getObjects(),
       freeDrawingColor: 'red',
       foobar: 123
@@ -865,7 +865,7 @@
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
-      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      equal(canvas.backgroundFill, '#ff5555', 'backgroundFill is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -893,8 +893,8 @@
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
-      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
-      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
+      equal(canvas.backgroundFill, '#ff5555', 'backgroundFill is populated properly');
+      equal(canvas.overlayFill, 'rgba(0,0,0,0.2)', 'overlayFill is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -917,10 +917,10 @@
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundObject = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
+    serialized.backgroundObject = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundFill":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(canvas.backgroundColor, 'green');
+      equal(canvas.backgroundFill, 'green');
       ok(canvas.backgroundObject instanceof fabric.Image);
       start();
     });
@@ -949,7 +949,7 @@
   });
 
   asyncTest('loadFromJSON with text', function() {
-    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundFill":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json, function() {
 
       canvas.renderAll();
@@ -1266,8 +1266,8 @@
     }, 1000);
   });
 
-  asyncTest('options in setbackgroundObject from URL', function() {
-    canvas.setbackgroundObject(IMG_SRC, function() {
+  asyncTest('options in setBackgroundObject from URL', function() {
+    canvas.setBackgroundObject(IMG_SRC, function() {
       equal(canvas.backgroundObject.left, 50);
       equal(canvas.backgroundObject.originX, 'right');
 
@@ -1360,9 +1360,9 @@
   });
 
   //how to test with an exception?
-  /*asyncTest('options in setbackgroundObject from invalid URL', function() {
+  /*asyncTest('options in setBackgroundObject from invalid URL', function() {
     canvas.backgroundObject = null;
-    canvas.setbackgroundObject(IMG_SRC + '_not_exist', function() {
+    canvas.setBackgroundObject(IMG_SRC + '_not_exist', function() {
       equal(canvas.backgroundObject, null);
       start();
     }, {
@@ -1371,9 +1371,9 @@
     });
   });*/
 
-  asyncTest('options in setbackgroundObject from image instance', function() {
+  asyncTest('options in setBackgroundObject from image instance', function() {
     createImageObject(function(imageInstance) {
-      canvas.setbackgroundObject(imageInstance, function() {
+      canvas.setBackgroundObject(imageInstance, function() {
         equal(canvas.backgroundObject.left, 100);
         equal(canvas.backgroundObject.originX, 'center');
 
@@ -1387,7 +1387,7 @@
 
   // asyncTest('backgroundObject', function() {
   //   deepEqual('', canvas.backgroundObject);
-  //   canvas.setbackgroundObject('../../assets/pug.jpg');
+  //   canvas.setBackgroundObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 
@@ -1398,9 +1398,9 @@
   //   }, 1000);
   // });
 
-  // asyncTest('setoverlayObject', function() {
+  // asyncTest('setOverlayObject', function() {
   //   deepEqual(canvas.overlayObject, undefined);
-  //   canvas.setoverlayObject('../../assets/pug.jpg');
+  //   canvas.setOverlayObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 

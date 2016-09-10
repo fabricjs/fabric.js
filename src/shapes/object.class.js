@@ -1353,7 +1353,7 @@
       }
 
       if (options.format === 'jpeg') {
-        canvas.backgroundColor = '#fff';
+        canvas.backgroundFill = '#fff';
       }
 
       var origParams = {

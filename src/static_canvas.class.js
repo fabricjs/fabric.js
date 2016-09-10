@@ -175,6 +175,7 @@
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
+      this._initWidthHeight();
       this._setImageSmoothing();
 
       // only initialize retina scaling once
@@ -473,6 +474,12 @@
       }
       this._initGradient(options);
       this._initPattern(options);
+    },
+
+    /**
+     * @private
+     */
+    _initWidthHeight: function () {
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
 
@@ -488,7 +495,6 @@
 
       this.viewportTransform = this.viewportTransform.slice();
     },
-
     /**
      * @private
      * @param {Object} [options] Options object
@@ -1150,16 +1156,17 @@
      * @private
      */
     __serializeBgOverlay: function() {
-      var data = {
-        background: (this.backgroundColor && this.backgroundColor.toObject)
-          ? this.backgroundColor.toObject()
-          : this.backgroundColor
-      };
+      var data = { };
 
-      if (this.overlayColor) {
-        data.overlay = this.overlayColor.toObject
-          ? this.overlayColor.toObject()
-          : this.overlayColor;
+      if (this.backgroundFill) {
+        data.backgroundFill = this.backgroundFill.toObject
+          ? this.backgroundFill.toObject()
+          : this.backgroundFill;
+      }
+      if (this.overlayFill) {
+        data.overlayFill = this.overlayFill.toObject
+          ? this.overlayFill.toObject()
+          : this.overlayFill;
       }
       if (this.backgroundObject) {
         data.backgroundObject = this.backgroundObject.toObject();
@@ -1167,7 +1174,6 @@
       if (this.overlayObject) {
         data.overlayObject = this.overlayObject.toObject();
       }
-
       return data;
     },
 
@@ -1286,8 +1292,8 @@
           'version="1.1" ',
           'width="', width, '" ',
           'height="', height, '" ',
-          (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor + '" '
+          (this.backgroundFill && !this.backgroundFill.toLive
+            ? 'style="background-color: ' + this.backgroundFill + '" '
             : null),
           viewBox,
           'xml:space="preserve">\n',
