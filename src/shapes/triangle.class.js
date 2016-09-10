@@ -115,10 +115,13 @@
    * @static
    * @memberOf fabric.Triangle
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when an fabric.Triangle instance is created
    * @return {Object} instance of Canvas.Triangle
    */
-  fabric.Triangle.fromObject = function(object) {
-    return new fabric.Triangle(object);
+  fabric.Triangle.fromObject = function(object, callback) {
+    var triangle = new fabric.Triangle(object);
+    callback && callback(triangle);
+    return triangle;
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
