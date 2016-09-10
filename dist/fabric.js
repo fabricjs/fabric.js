@@ -20737,7 +20737,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       text: true,
       charSpacing: true,
       textAlign: true,
-      stroke: false,
       strokeWidth: false,
     },
 

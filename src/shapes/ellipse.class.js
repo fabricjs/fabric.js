@@ -202,7 +202,7 @@
    * @static
    * @memberOf fabric.Ellipse
    * @param {Object} object Object to create an instance from
-   * @param {function} callback invoked with new instance as first argument
+   * @param {function} [callback] invoked with new instance as first argument
    * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromObject = function(object, callback) {

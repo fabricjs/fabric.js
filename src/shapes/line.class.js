@@ -298,7 +298,7 @@
    * @static
    * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
-   * @param {function} callback invoked with new instance as first argument
+   * @param {function} [callback] invoked with new instance as first argument
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromObject = function(object, callback) {

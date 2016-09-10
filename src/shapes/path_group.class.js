@@ -241,7 +241,7 @@
    * @static
    * @memberOf fabric.PathGroup
    * @param {Object} object Object to create an instance from
-   * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
+   * @param {Function} [callback] Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {
     // remove this pattern from 2.0 accepts only object

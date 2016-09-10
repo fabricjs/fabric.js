@@ -1139,7 +1139,7 @@
    * @static
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
-   * @param {function} function invoked with new instance as argument
+   * @param {function} [callback] invoked with new instance as argument
    * @return {fabric.IText} instance of fabric.IText
    */
   fabric.IText.fromObject = function(object, callback) {

@@ -9816,7 +9816,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             text: true,
             charSpacing: true,
             textAlign: true,
-            stroke: false,
             strokeWidth: false
         },
         _reNewline: /\r?\n/,

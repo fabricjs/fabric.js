@@ -523,7 +523,7 @@
    * @static
    * @memberOf fabric.Group
    * @param {Object} object Object to create a group from
-   * @param {Function} callback Callback to invoke when an group instance is created
+   * @param {Function} [callback] Callback to invoke when an group instance is created
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
