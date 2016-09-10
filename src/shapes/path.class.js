@@ -920,6 +920,7 @@
    * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    */
   fabric.Path.fromObject = function(object, callback) {
+    // remove this pattern rom 2.0, accept just object.
     if (typeof object.path === 'string') {
       fabric.loadSVGFromURL(object.path, function (elements) {
         var pathUrl = object.path;
