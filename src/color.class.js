@@ -74,7 +74,7 @@
      * @return {Array} Hsl color
      */
     _rgbToHsl: function(r, g, b) {
-      r /= 255, g /= 255, b /= 255;
+      r /= 255; g /= 255; b /= 255;
 
       var h, s, l,
           max = fabric.util.array.max([r, g, b]),
@@ -265,6 +265,7 @@
    * @field
    * @memberOf fabric.Color
    */
+   // eslint-disable-next-line max-len
   fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
 
   /**

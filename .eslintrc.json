@@ -140,7 +140,10 @@
     ],
     "max-len": [
       2,
-      120
+      120,
+      {
+        "ignoreComments": true
+      }
     ]
   }
 }
