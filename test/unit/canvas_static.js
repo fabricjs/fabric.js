@@ -1373,15 +1373,13 @@
 
   asyncTest('options in setBackgroundObject from image instance', function() {
     createImageObject(function(imageInstance) {
-      canvas.setBackgroundObject(imageInstance, function() {
-        equal(canvas.backgroundObject.left, 100);
-        equal(canvas.backgroundObject.originX, 'center');
-
-        start();
-      }, {
-        left: 100,
-        originX: 'center'
-      });
+      canvas.setBackgroundObject(imageInstance);
+      equal(canvas.backgroundObject.left, 100);
+      equal(canvas.backgroundObject.originX, 'center');
+      start();
+    }, {
+      left: 100,
+      originX: 'center'
     });
   });
 

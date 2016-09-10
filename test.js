@@ -6,7 +6,7 @@ testrunner.options.log.assertions = false;
 
 testrunner.options.coverage = true;
 testrunner.options.maxBlockDuration = 120000;
-
+testrunner.options.verbose = true;
 testrunner.run({
     deps: "./test/fixtures/test_script.js",
     code: "./dist/fabric.js",
