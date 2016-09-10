@@ -172,7 +172,6 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
-      var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -183,10 +182,10 @@
         this._initRetinaScaling();
       }
       if (options.overlayObject) {
-        this.setOverlay(options.overlayObject, cb);
+        this.setOverlayObject(options.overlayObject);
       }
       if (options.backgroundObject) {
-        this.setBackground(options.backgroundObject, cb);
+        this.setBackgroundObject(options.backgroundObject);
       }
       this.calcOffset();
     },
