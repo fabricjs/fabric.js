@@ -44,42 +44,40 @@
 
     /**
      * Background color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundColor}.
+     * Should be set via {@link fabric.StaticCanvas#setBackgroundFill}.
+     * @since 2.0.0
      * @type {(String|fabric.Pattern)}
      * @default
      */
-    backgroundColor: '',
+    backgroundFill: '',
 
     /**
-     * Background image of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}.
-     * <b>Backwards incompatibility note:</b> The "backgroundImageOpacity"
-     * and "backgroundImageStretch" properties are deprecated since 1.3.9.
+     * Background of canvas instance.
+     * Should be set via {@link fabric.StaticCanvas#setBackground}.
      * Use {@link fabric.Image#opacity}, {@link fabric.Image#width} and {@link fabric.Image#height}.
-     * @type fabric.Image
+     * @since 2.0.0
+     * @type fabric.Object
      * @default
      */
-    backgroundImage: null,
+    backgroundObject: null,
 
     /**
      * Overlay color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setOverlayColor}
-     * @since 1.3.9
+     * Should be set via {@link fabric.StaticCanvas#setOverlayFill}
+     * @since 2.0.0
      * @type {(String|fabric.Pattern)}
      * @default
      */
-    overlayColor: '',
+    overlayFill: '',
 
     /**
      * Overlay image of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setOverlayImage}.
-     * <b>Backwards incompatibility note:</b> The "overlayImageLeft"
-     * and "overlayImageTop" properties are deprecated since 1.3.9.
-     * Use {@link fabric.Image#left} and {@link fabric.Image#top}.
-     * @type fabric.Image
+     * Should be set via {@link fabric.StaticCanvas#setOverlay}.
+     * @since 2.0.0
+     * @type fabric.Object
      * @default
      */
-    overlayImage: null,
+    overlayObject: null,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
@@ -141,7 +139,7 @@
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
-     * if set to false background image is not affected by viewport transform
+     * if set to false background is not affected by viewport transform
      * @since 1.6.3
      * @type Boolean
      * @default
@@ -149,7 +147,7 @@
     backgroundVpt: true,
 
     /**
-     * if set to false overlya image is not affected by viewport transform
+     * if set to false overlay is not affected by viewport transform
      * @since 1.6.3
      * @type Boolean
      * @default
@@ -184,18 +182,11 @@
       if (!this.interactive) {
         this._initRetinaScaling();
       }
-
-      if (options.overlayImage) {
-        this.setOverlayImage(options.overlayImage, cb);
+      if (options.overlayObject) {
+        this.setOverlay(options.overlayObject, cb);
       }
-      if (options.backgroundImage) {
-        this.setBackgroundImage(options.backgroundImage, cb);
-      }
-      if (options.backgroundColor) {
-        this.setBackgroundColor(options.backgroundColor, cb);
-      }
-      if (options.overlayColor) {
-        this.setOverlayColor(options.overlayColor, cb);
+      if (options.backgroundObject) {
+        this.setBackground(options.backgroundObject, cb);
       }
       this.calcOffset();
     },
@@ -241,21 +232,20 @@
     },
 
     /**
-     * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
-     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set overlay to
-     * @param {Function} callback callback to invoke when image is loaded and set as an overlay
+     * Sets {@link fabric.StaticCanvas#overlayObject|overlay image} for this canvas
+     * @param {fabric.Object} image fabric.Object instance or URL of an image to set overlay to
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|overlay image}.
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
-     * @example <caption>Normal overlayImage with left/top = 0</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   // Needed to position overlayImage at 0/0
+     * @example <caption>Normal overlayObject with left/top = 0</caption>
+     * canvas.setoverlayObject('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   // Needed to position overlayObject at 0/0
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>overlayImage with different properties</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>overlayObject with different properties</caption>
+     * canvas.setoverlayObject('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
      *   opacity: 0.5,
      *   angle: 45,
      *   left: 400,
@@ -263,21 +253,21 @@
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
+     * @example <caption>Stretched overlayObject #1 - width/height correspond to canvas width/height</caption>
      * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
-     *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
+     *    canvas.setoverlayObject(img, canvas.renderAll.bind(canvas));
      * });
-     * @example <caption>Stretched overlayImage #2 - width/height correspond to canvas width/height</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>Stretched overlayObject #2 - width/height correspond to canvas width/height</caption>
+     * canvas.setoverlayObject('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
      *   width: canvas.width,
      *   height: canvas.height,
-     *   // Needed to position overlayImage at 0/0
+     *   // Needed to position overlayObject at 0/0
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>overlayImage loaded from cross-origin</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>overlayObject loaded from cross-origin</caption>
+     * canvas.setoverlayObject('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
      *   opacity: 0.5,
      *   angle: 45,
      *   left: 400,
@@ -287,26 +277,25 @@
      *   crossOrigin: 'anonymous'
      * });
      */
-    setOverlayImage: function (image, callback, options) {
-      return this.__setBgOverlayImage('overlayImage', image, callback, options);
+    setOverlayObject: function (object, options) {
+      return this.__setBgoverlayObject('overlayObject', object, options);
     },
 
     /**
-     * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
+     * Sets {@link fabric.StaticCanvas#backgroundObject|background image} for this canvas
      * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|background image}.
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/YH9yD/|jsFiddle demo}
-     * @example <caption>Normal backgroundImage with left/top = 0</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   // Needed to position backgroundImage at 0/0
+     * @example <caption>Normal backgroundObject with left/top = 0</caption>
+     * canvas.setbackgroundObject('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     *   // Needed to position backgroundObject at 0/0
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>backgroundImage with different properties</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>backgroundObject with different properties</caption>
+     * canvas.setbackgroundObject('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
      *   opacity: 0.5,
      *   angle: 45,
      *   left: 400,
@@ -314,21 +303,21 @@
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
+     * @example <caption>Stretched backgroundObject #1 - width/height correspond to canvas width/height</caption>
      * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
-     *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+     *    canvas.setbackgroundObject(img, canvas.renderAll.bind(canvas));
      * });
-     * @example <caption>Stretched backgroundImage #2 - width/height correspond to canvas width/height</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>Stretched backgroundObject #2 - width/height correspond to canvas width/height</caption>
+     * canvas.setbackgroundObject('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
      *   width: canvas.width,
      *   height: canvas.height,
-     *   // Needed to position backgroundImage at 0/0
+     *   // Needed to position backgroundObject at 0/0
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>backgroundImage loaded from cross-origin</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     * @example <caption>backgroundObject loaded from cross-origin</caption>
+     * canvas.setbackgroundObject('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
      *   opacity: 0.5,
      *   angle: 45,
      *   left: 400,
@@ -338,8 +327,8 @@
      *   crossOrigin: 'anonymous'
      * });
      */
-    setBackgroundImage: function (image, callback, options) {
-      return this.__setBgOverlayImage('backgroundImage', image, callback, options);
+    setBackgroundObject: function (object, options) {
+      return this.__setBgoverlayObject('backgroundObject', object, options);
     },
 
     /**
@@ -350,21 +339,21 @@
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/pB55h/|jsFiddle demo}
      * @example <caption>Normal overlayColor - color value</caption>
-     * canvas.setOverlayColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * canvas.setOverlayFill('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
      * @example <caption>fabric.Pattern used as overlayColor</caption>
-     * canvas.setOverlayColor({
+     * canvas.setOverlayFill({
      *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
      * }, canvas.renderAll.bind(canvas));
      * @example <caption>fabric.Pattern used as overlayColor with repeat and offset</caption>
-     * canvas.setOverlayColor({
+     * canvas.setOverlayFill({
      *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
      *   repeat: 'repeat',
      *   offsetX: 200,
      *   offsetY: 100
      * }, canvas.renderAll.bind(canvas));
      */
-    setOverlayColor: function(overlayColor, callback) {
-      return this.__setBgOverlayColor('overlayColor', overlayColor, callback);
+    setOverlayFill: function(overlayColor, callback) {
+      return this.__setBgOverlayFill('overlayFill', overlayColor, callback);
     },
 
     /**
@@ -375,21 +364,21 @@
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
      * @example <caption>Normal backgroundColor - color value</caption>
-     * canvas.setBackgroundColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * canvas.setBackgroundFill('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
      * @example <caption>fabric.Pattern used as backgroundColor</caption>
-     * canvas.setBackgroundColor({
+     * canvas.setBackgroundFill({
      *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
      * }, canvas.renderAll.bind(canvas));
      * @example <caption>fabric.Pattern used as backgroundColor with repeat and offset</caption>
-     * canvas.setBackgroundColor({
+     * canvas.setBackgroundFill({
      *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
      *   repeat: 'repeat',
      *   offsetX: 200,
      *   offsetY: 100
      * }, canvas.renderAll.bind(canvas));
      */
-    setBackgroundColor: function(backgroundColor, callback) {
-      return this.__setBgOverlayColor('backgroundColor', backgroundColor, callback);
+    setBackgroundFill: function(backgroundColor, callback) {
+      return this.__setBgOverlayFill('backgroundFill', backgroundColor, callback);
     },
 
     /**
@@ -406,25 +395,14 @@
 
     /**
      * @private
-     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
-     * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
-     * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
+     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundObject|backgroundObject}
+     * or {@link fabric.StaticCanvas#overlayObject|overlayObject})
+     * @param {fabric.Object} image fabric.Image instance, URL of an image or null to set background or overlay to
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
-    __setBgOverlayImage: function(property, image, callback, options) {
-      if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img) {
-          img && (this[property] = new fabric.Image(img, options));
-          callback && callback(img);
-        }, this, options && options.crossOrigin);
-      }
-      else {
-        options && image.setOptions(options);
-        this[property] = image;
-        callback && callback(image);
-      }
-
+    __setBgoverlayObject: function(property, object, options) {
+      options && object.setOptions(options);
+      this[property] = object;
       return this;
     },
 
@@ -435,8 +413,8 @@
      * @param {(Object|String|null)} color Object with pattern information, color value or null
      * @param {Function} [callback] Callback is invoked when color is set
      */
-    __setBgOverlayColor: function(property, color, callback) {
-      if (color && color.source) {
+    __setBgOverlayFill: function(property, color, callback) {
+      if (color && color.source && !(color instanceof fabric.Pattern)) {
         var _this = this;
         fabric.util.loadImage(color.source, function(img) {
           _this[property] = new fabric.Pattern({
@@ -447,6 +425,9 @@
           });
           callback && callback();
         });
+      }
+      else if (color && color.colorStops && !(color instanceof fabric.Gradient)) {
+        _this[property] = new fabric.Gradient(color);
       }
       else {
         this[property] = color;
@@ -491,7 +472,8 @@
       for (var prop in options) {
         this[prop] = options[prop];
       }
-
+      this._initGradient(options);
+      this._initPattern(options);
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
 
@@ -506,6 +488,26 @@
       this.lowerCanvasEl.style.height = this.height + 'px';
 
       this.viewportTransform = this.viewportTransform.slice();
+    },
+
+    /**
+     * @private
+     * @param {Object} [options] Options object
+     */
+    _initGradient: function(options) {
+      if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
+        this.fill = new fabric.Gradient(options.fill);
+      }
+    },
+
+    /**
+     * @private
+     * @param {Object} [options] Options object
+     */
+    _initPattern: function(options) {
+      if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
+        this.fill = new fabric.Pattern(options.fill);
+      }
     },
 
     /**
@@ -882,7 +884,7 @@
      * @param {string} property 'background' or 'overlay'
      */
     _renderBackgroundOrOverlay: function(ctx, property) {
-      var object = this[property + 'Color'];
+      var object = this[property + 'Fill'];
       if (object) {
         ctx.fillStyle = object.toLive
           ? object.toLive(ctx)
@@ -894,7 +896,7 @@
           this.width,
           this.height);
       }
-      object = this[property + 'Image'];
+      object = this[property + 'Object'];
       if (object) {
         if (this[property + 'Vpt']) {
           ctx.save();
@@ -1160,11 +1162,11 @@
           ? this.overlayColor.toObject()
           : this.overlayColor;
       }
-      if (this.backgroundImage) {
-        data.backgroundImage = this.backgroundImage.toObject();
+      if (this.backgroundObject) {
+        data.backgroundObject = this.backgroundObject.toObject();
       }
-      if (this.overlayImage) {
-        data.overlayImage = this.overlayImage.toObject();
+      if (this.overlayObject) {
+        data.overlayObject = this.overlayObject.toObject();
       }
 
       return data;
@@ -1225,12 +1227,12 @@
       this._setSVGHeader(markup, options);
 
       this._setSVGBgOverlayColor(markup, 'backgroundColor');
-      this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
+      this._setSVGBgoverlayObject(markup, 'backgroundObject', reviver);
 
       this._setSVGObjects(markup, reviver);
 
       this._setSVGBgOverlayColor(markup, 'overlayColor');
-      this._setSVGBgOverlayImage(markup, 'overlayImage', reviver);
+      this._setSVGBgoverlayObject(markup, 'overlayObject', reviver);
 
       markup.push('</svg>');
 
@@ -1319,7 +1321,7 @@
     /**
      * @private
      */
-    _setSVGBgOverlayImage: function(markup, property, reviver) {
+    _setSVGBgoverlayObject: function(markup, property, reviver) {
       if (this[property] && this[property].toSVG) {
         markup.push(this[property].toSVG(reviver));
       }

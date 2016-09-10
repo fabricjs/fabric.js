@@ -157,7 +157,7 @@
     setup: function() {
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
-      canvas.backgroundImage = fabric.StaticCanvas.prototype.backgroundImage;
+      canvas.backgroundObject = fabric.StaticCanvas.prototype.backgroundObject;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
@@ -167,8 +167,8 @@
   test('initialProperties', function() {
     ok('backgroundColor' in canvas);
     ok('overlayColor' in canvas);
-    ok('backgroundImage' in canvas);
-    ok('overlayImage' in canvas);
+    ok('backgroundObject' in canvas);
+    ok('overlayObject' in canvas);
     ok('clipTo' in canvas);
 
     equal(canvas.includeDefaultValues, true);
@@ -671,8 +671,8 @@
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
-    canvas.setBackgroundImage(imageBG);
-    canvas.setOverlayImage(imageOL);
+    canvas.setbackgroundObject(imageBG);
+    canvas.setoverlayObject(imageOL);
     var reviverCount = 0,
         len = canvas.size() + group.size() + pathGroup.paths.length;
 
@@ -683,8 +683,8 @@
 
     canvas.toSVG(null, reviver);
     equal(reviverCount, len + 2, 'reviver should include background and overlay image');
-    canvas.setBackgroundImage(null);
-    canvas.setOverlayImage(null);
+    canvas.setbackgroundObject(null);
+    canvas.setoverlayObject(null);
     canvas.renderOnAddRemove = true;
   });
 
@@ -750,33 +750,33 @@
     ok('bar' in data);
   });
 
-  asyncTest('toJSON backgroundImage', function() {
+  asyncTest('toJSON backgroundObject', function() {
     createImageObject(function(image) {
 
-      canvas.backgroundImage = image;
+      canvas.backgroundObject = image;
 
       var json = canvas.toJSON();
 
-      fixImageDimension(json.backgroundImage);
-      deepEqual(json.backgroundImage, REFERENCE_IMG_OBJECT);
+      fixImageDimension(json.backgroundObject);
+      deepEqual(json.backgroundObject, REFERENCE_IMG_OBJECT);
 
-      canvas.backgroundImage = null;
+      canvas.backgroundObject = null;
 
       start();
     });
   });
 
-  asyncTest('toJSON overlayImage', function() {
+  asyncTest('toJSON overlayObject', function() {
     createImageObject(function(image) {
 
-      canvas.overlayImage = image;
+      canvas.overlayObject = image;
 
       var json = canvas.toJSON();
 
-      fixImageDimension(json.overlayImage);
-      deepEqual(json.overlayImage, REFERENCE_IMG_OBJECT);
+      fixImageDimension(json.overlayObject);
+      deepEqual(json.overlayObject, REFERENCE_IMG_OBJECT);
 
-      canvas.overlayImage = null;
+      canvas.overlayObject = null;
 
       start();
     });
@@ -917,11 +917,11 @@
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
+    serialized.backgroundObject = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.backgroundColor, 'green');
-      ok(canvas.backgroundImage instanceof fabric.Image);
+      ok(canvas.backgroundObject instanceof fabric.Image);
       start();
     });
   });
@@ -1266,10 +1266,10 @@
     }, 1000);
   });
 
-  asyncTest('options in setBackgroundImage from URL', function() {
-    canvas.setBackgroundImage(IMG_SRC, function() {
-      equal(canvas.backgroundImage.left, 50);
-      equal(canvas.backgroundImage.originX, 'right');
+  asyncTest('options in setbackgroundObject from URL', function() {
+    canvas.setbackgroundObject(IMG_SRC, function() {
+      equal(canvas.backgroundObject.left, 50);
+      equal(canvas.backgroundObject.originX, 'right');
 
       start();
     }, {
@@ -1360,10 +1360,10 @@
   });
 
   //how to test with an exception?
-  /*asyncTest('options in setBackgroundImage from invalid URL', function() {
-    canvas.backgroundImage = null;
-    canvas.setBackgroundImage(IMG_SRC + '_not_exist', function() {
-      equal(canvas.backgroundImage, null);
+  /*asyncTest('options in setbackgroundObject from invalid URL', function() {
+    canvas.backgroundObject = null;
+    canvas.setbackgroundObject(IMG_SRC + '_not_exist', function() {
+      equal(canvas.backgroundObject, null);
       start();
     }, {
       left: 50,
@@ -1371,11 +1371,11 @@
     });
   });*/
 
-  asyncTest('options in setBackgroundImage from image instance', function() {
+  asyncTest('options in setbackgroundObject from image instance', function() {
     createImageObject(function(imageInstance) {
-      canvas.setBackgroundImage(imageInstance, function() {
-        equal(canvas.backgroundImage.left, 100);
-        equal(canvas.backgroundImage.originX, 'center');
+      canvas.setbackgroundObject(imageInstance, function() {
+        equal(canvas.backgroundObject.left, 100);
+        equal(canvas.backgroundObject.originX, 'center');
 
         start();
       }, {
@@ -1385,27 +1385,27 @@
     });
   });
 
-  // asyncTest('backgroundImage', function() {
-  //   deepEqual('', canvas.backgroundImage);
-  //   canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('backgroundObject', function() {
+  //   deepEqual('', canvas.backgroundObject);
+  //   canvas.setbackgroundObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 
-  //     ok(typeof canvas.backgroundImage == 'object');
-  //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+  //     ok(typeof canvas.backgroundObject == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.backgroundObject.src));
 
   //     start();
   //   }, 1000);
   // });
 
-  // asyncTest('setOverlayImage', function() {
-  //   deepEqual(canvas.overlayImage, undefined);
-  //   canvas.setOverlayImage('../../assets/pug.jpg');
+  // asyncTest('setoverlayObject', function() {
+  //   deepEqual(canvas.overlayObject, undefined);
+  //   canvas.setoverlayObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 
-  //     ok(typeof canvas.overlayImage == 'object');
-  //     ok(/pug\.jpg$/.test(canvas.overlayImage.src));
+  //     ok(typeof canvas.overlayObject == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.overlayObject.src));
 
   //     start();
   //   }, 1000);

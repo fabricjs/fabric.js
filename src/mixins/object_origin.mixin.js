@@ -61,7 +61,7 @@
       offsetY = toOriginY - fromOriginY;
 
       if (offsetX || offsetY) {
-        dim = this._getTransformedDimensions();
+        dim = this.getTransformedDimensions();
         x = point.x + offsetX * dim.x;
         y = point.y + offsetY * dim.y;
       }

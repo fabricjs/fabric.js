@@ -959,8 +959,8 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
-  // asyncTest('loadFromJSON with backgroundImage', function() {
-  //   canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('loadFromJSON with backgroundObject', function() {
+  //   canvas.setbackgroundObject('../../assets/pug.jpg');
   //   var anotherCanvas = new fabric.Canvas();
 
   //   setTimeout(function() {
@@ -1600,27 +1600,27 @@
     }, 1000);
   });
 
-  // asyncTest('backgroundImage', function() {
-  //   deepEqual('', canvas.backgroundImage);
-  //   canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('backgroundObject', function() {
+  //   deepEqual('', canvas.backgroundObject);
+  //   canvas.setbackgroundObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 
-  //     ok(typeof canvas.backgroundImage == 'object');
-  //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+  //     ok(typeof canvas.backgroundObject == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.backgroundObject.src));
 
   //     deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.document.location.protocol +
+  //       "backgroundObject": (fabric.document.location.protocol +
   //                           '//' +
   //                           fabric.document.location.hostname +
   //                           ((fabric.document.location.port === '' || parseInt(fabric.document.location.port, 10) === 80)
   //                               ? ''
   //                               : (':' + fabric.document.location.port)) +
   //                           '/assets/pug.jpg'),
-  //       "backgroundImageOpacity": 1,
-  //       "backgroundImageStretch": true
+  //       "backgroundObjectOpacity": 1,
+  //       "backgroundObjectStretch": true
   //     });
 
   //     start();

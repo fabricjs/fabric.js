@@ -1,23 +1,6 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Populates canvas with data from the specified dataless JSON.
-   * JSON format must conform to the one of {@link fabric.Canvas#toDatalessJSON}
-   * @deprecated since 1.2.2
-   * @param {String|Object} json JSON string or object
-   * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: {@link fabric.Image})
-   *                            are initialized
-   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
-   * @return {fabric.Canvas} instance
-   * @chainable
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
-   */
-  loadFromDatalessJSON: function (json, callback, reviver) {
-    return this.loadFromJSON(json, callback, reviver);
-  },
-
-  /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
    * @param {String|Object} json JSON string or object
@@ -55,10 +38,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       _this._setBgOverlay(serialized, function () {
         // remove parts i cannot set as options
         delete serialized.objects;
-        delete serialized.backgroundImage;
-        delete serialized.overlayImage;
-        delete serialized.background;
-        delete serialized.overlay;
+        delete serialized.backgroundObject;
+        delete serialized.overlayObject;
+        delete serialized.backgroundFill;
+        delete serialized.overlayFill;
         // this._initOptions does too many things to just
         // call it. Normally loading an Object from JSON
         // create the Object instance. Here the Canvas is
@@ -82,24 +65,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         loaded = {
           backgroundColor: false,
           overlayColor: false,
-          backgroundImage: false,
-          overlayImage: false
+          backgroundObject: false,
+          overlayObject: false
         };
 
-    if (!serialized.backgroundImage && !serialized.overlayImage && !serialized.background && !serialized.overlay) {
+    if (!serialized.backgroundObject && !serialized.overlayObject && !serialized.background && !serialized.overlay) {
       callback && callback();
       return;
     }
 
     var cbIfLoaded = function () {
-      if (loaded.backgroundImage && loaded.overlayImage && loaded.backgroundColor && loaded.overlayColor) {
+      if (loaded.backgroundObject && loaded.overlayObject && loaded.backgroundColor && loaded.overlayColor) {
         _this.renderAll();
         callback && callback();
       }
     };
 
-    this.__setBgOverlay('backgroundImage', serialized.backgroundImage, loaded, cbIfLoaded);
-    this.__setBgOverlay('overlayImage', serialized.overlayImage, loaded, cbIfLoaded);
+    this.__setBgOverlay('backgroundObject', serialized.backgroundObject, loaded, cbIfLoaded);
+    this.__setBgOverlay('overlayObject', serialized.overlayObject, loaded, cbIfLoaded);
     this.__setBgOverlay('backgroundColor', serialized.background, loaded, cbIfLoaded);
     this.__setBgOverlay('overlayColor', serialized.overlay, loaded, cbIfLoaded);
 
@@ -108,7 +91,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * @private
-   * @param {String} property Property to set (backgroundImage, overlayImage, backgroundColor, overlayColor)
+   * @param {String} property Property to set (backgroundObject, overlayObject, backgroundColor, overlayColor)
    * @param {(Object|String)} value Value to set
    * @param {Object} loaded Set loaded property to true if property is set
    * @param {Object} callback Callback function to invoke after property is set
@@ -121,7 +104,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return;
     }
 
-    if (property === 'backgroundImage' || property === 'overlayImage') {
+    if (property === 'backgroundObject' || property === 'overlayObject') {
       fabric.Image.fromObject(value, function(img) {
         _this[property] = img;
         loaded[property] = true;
@@ -216,13 +199,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;
-    if (this.backgroundImage) {
-      clone.setBackgroundImage(this.backgroundImage.src, function() {
+    if (this.backgroundObject) {
+      clone.setbackgroundObject(this.backgroundObject.src, function() {
         clone.renderAll();
         callback && callback(clone);
       });
-      clone.backgroundImageOpacity = this.backgroundImageOpacity;
-      clone.backgroundImageStretch = this.backgroundImageStretch;
+      clone.backgroundObjectOpacity = this.backgroundObjectOpacity;
+      clone.backgroundObjectStretch = this.backgroundObjectStretch;
     }
     else {
       callback && callback(clone);

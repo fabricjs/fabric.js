@@ -137,7 +137,7 @@
     /*
      * @private
      */
-    _getTransformedDimensions: function(skewX, skewY) {
+    getTransformedDimensions: function(skewX, skewY) {
       if (typeof skewX === 'undefined') {
         skewX = this.skewX;
       }
@@ -177,7 +177,7 @@
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
-          dim = this._getTransformedDimensions(),
+          dim = this.getTransformedDimensions(),
           w = dim.x, h = dim.y,
           p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
 

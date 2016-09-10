@@ -665,7 +665,7 @@
       var center = target.getCenterPoint(),
           actualMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center')[by],
           lastMouseByCenter = target.toLocalPoint(new fabric.Point(t.lastX, t.lastY), 'center', 'center')[by],
-          actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
+          actualMouseByOrigin, constraintPosition, dim = target.getTransformedDimensions();
 
       this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
       actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by];
@@ -704,7 +704,7 @@
         skewY = 0;
       }
 
-      dimNoSkew = target._getTransformedDimensions(skewX, skewY);
+      dimNoSkew = target.getTransformedDimensions(skewX, skewY);
       newDimMouse = 2 * Math.abs(localMouse) - dimNoSkew[by];
       if (newDimMouse <= 2) {
         newValue = 0;
@@ -717,7 +717,7 @@
       skewed = target['skew' + _by] !== newValue;
       target.set('skew' + _by, newValue);
       if (target['skew' + _otherBy] !== 0) {
-        newDim = target._getTransformedDimensions();
+        newDim = target.getTransformedDimensions();
         newValue = (_dim[otherBy] / newDim[otherBy]) * target['scale' + _otherBy];
         target.set('scale' + _otherBy, newValue);
       }
@@ -747,7 +747,7 @@
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
           localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY),
-          dim = target._getTransformedDimensions(), scaled = false;
+          dim = target.getTransformedDimensions(), scaled = false;
 
       this._setLocalMouse(localMouse, t);
 
@@ -1483,13 +1483,4 @@
     /** @ignore */
     fabric.Canvas.prototype._setCursorFromEvent = function() { };
   }
-
-  /**
-   * @ignore
-   * @class fabric.Element
-   * @alias fabric.Canvas
-   * @deprecated Use {@link fabric.Canvas} instead.
-   * @constructor
-   */
-  fabric.Element = fabric.Canvas;
 })();
