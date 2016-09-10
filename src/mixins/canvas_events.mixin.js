@@ -604,7 +604,7 @@
       var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
-      transform.reset = false,
+      transform.reset = false;
       transform.target.isMoving = true;
 
       this._beforeScaleTransform(e, transform);

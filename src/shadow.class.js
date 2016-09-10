@@ -178,6 +178,7 @@
    * @field
    * @memberOf fabric.Shadow
    */
+  // eslint-disable-next-line max-len
   fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
 })(typeof exports !== 'undefined' ? exports : this);

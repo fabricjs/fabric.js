@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Tint filter class
@@ -27,7 +29,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
+  filters.Tint = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
 
     /**
      * Filter type

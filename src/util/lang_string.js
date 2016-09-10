@@ -63,4 +63,4 @@
     capitalize: capitalize,
     escapeXml: escapeXml
   };
-}());
+})();

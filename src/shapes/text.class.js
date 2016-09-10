@@ -805,8 +805,8 @@
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          lineWidth = _this._getLineWidth(ctx, i),
-          lineLeftOffset = _this._getLineLeftOffset(lineWidth),
+          lineWidth = _this._getLineWidth(ctx, i);
+          lineLeftOffset = _this._getLineLeftOffset(lineWidth);
           heightOfLine = _this._getHeightOfLine(ctx, i);
 
           for (j = 0, oLen = offsets.length; j < oLen; j++) {

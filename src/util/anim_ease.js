@@ -395,4 +395,4 @@
     easeInOutBounce: easeInOutBounce
   };
 
-}());
+})();
