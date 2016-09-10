@@ -9,7 +9,7 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) { throw err };
         img.src = imgData;
         img._src = src;
         callback && callback();
@@ -64,7 +64,7 @@
     equal(object.offsetY, 0);
 
     var patternWithGetSource = new fabric.Pattern({
-      source: function() {return fabric.document.createElement("canvas")}
+      source: function() {return fabric.document.createElement('canvas')}
     });
 
     var object2 = patternWithGetSource.toObject();

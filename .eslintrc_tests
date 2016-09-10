@@ -18,9 +18,10 @@
       2,
       "any"
     ],
+    "quote-props": 0,
     "linebreak-style": 2,
     "no-loop-func": 2,
-    "no-multi-str": 2,
+    "no-multi-str": 0,
     "new-cap": 2,
     "no-caller": 2,
     "no-empty": 0,
@@ -29,6 +30,16 @@
     "strict": 0,
     "dot-notation": 0,
     "no-undef": 2,
-    "no-unused-vars": 2
+    "no-unused-vars": 2,
+    "max-statements": 0,
+    "camelcase": 0,
+    "consistent-this": 0,
+    "max-len": [
+      0,
+      120,
+      {
+        "ignoreComments": true
+      }
+    ]
   }
 }

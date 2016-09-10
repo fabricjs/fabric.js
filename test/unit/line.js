@@ -137,7 +137,7 @@
   });
 
   test('changing x/y coords should update width/height', function() {
-    var line = new fabric.Line([ 50, 50, 100, 100]);
+    var line = new fabric.Line([50, 50, 100, 100]);
 
     equal(50, line.width);
 
@@ -196,7 +196,7 @@
     },
     { description: 'include offsets for left-top origin',
       givenLineArgs: {
-        points: [0+33, 0+44, 11+33, 22+44],
+        points: [0 + 33, 0 + 44, 11 + 33, 22 + 44],
         options: {
           originX: 'left',
           originY: 'top',
@@ -222,7 +222,7 @@
     },
     { description: 'include offsets for center-center origin',
       givenLineArgs: {
-        points: [0+9.87, 0-4.32, 12.3+9.87, 34.5-4.32],
+        points: [0 + 9.87, 0 - 4.32, 12.3 + 9.87, 34.5 - 4.32],
         options: {
           originX: 'center',
           originY: 'center',
@@ -248,7 +248,7 @@
     },
     { description: 'include offsets for right-bottom origin',
       givenLineArgs: {
-        points: [0-3.14, 0-1.41, 55-3.14, 18-1.41],
+        points: [0 - 3.14, 0 - 1.41, 55 - 3.14, 18 - 1.41],
         options: {
           originX: 'right',
           originY: 'bottom',
@@ -332,7 +332,7 @@
     },
     { description: 'arent changed by strokeWidth for center-center origin',
       givenLineArgs: {
-        points: [0+31, 15+26, 28+31, 0+26],
+        points: [0 + 31, 15 + 26, 28 + 31, 0 + 26],
         options: {
           originX: 'center',
           originY: 'center',
@@ -455,13 +455,13 @@
     },
     { description: 'includes positive offset for left origin',
       givenOrigin: 'left',
-      givenPoints: [0+20, 0, 1+20, 0],
-      expectedLeft: 0+20,
+      givenPoints: [0 + 20, 0, 1 + 20, 0],
+      expectedLeft: 0 + 20,
     },
     { description: 'includes negative offset for left origin',
       givenOrigin: 'left',
-      givenPoints: [0-11, 0, 1-11, 0],
-      expectedLeft: 0-11,
+      givenPoints: [0 - 11, 0, 1 - 11, 0],
+      expectedLeft: 0 - 11,
     },
     { description: 'is half of x1 for center origin and x1 > x2',
       givenOrigin: 'center',
@@ -475,12 +475,12 @@
     },
     { description: 'includes positive offset for center origin',
       givenOrigin: 'center',
-      givenPoints: [0+39, 0, 7+39, 0],
+      givenPoints: [0 + 39, 0, 7 + 39, 0],
       expectedLeft: (0.5 * 7) + 39,
     },
     { description: 'includes negative offset for center origin',
       givenOrigin: 'center',
-      givenPoints: [4-13, 0, 0-13, 0],
+      givenPoints: [4 - 13, 0, 0 - 13, 0],
       expectedLeft: (0.5 * 4) - 13,
     },
     { description: 'is x1 for right origin and x1 > x2',
@@ -495,12 +495,12 @@
     },
     { description: 'includes positive offset for right origin',
       givenOrigin: 'right',
-      givenPoints: [0+47, 0, 6+47, 0],
+      givenPoints: [0 + 47, 0, 6 + 47, 0],
       expectedLeft: 6 + 47,
     },
     { description: 'includes negative offset for right origin',
       givenOrigin: 'right',
-      givenPoints: [9-17, 0, 0-17, 0],
+      givenPoints: [9 - 17, 0, 0 - 17, 0],
       expectedLeft: 9 - 17,
     },
   ];
@@ -529,13 +529,13 @@
     },
     { description: 'includes positive offset for top origin',
       givenOrigin: 'top',
-      givenPoints: [0, 0+20, 0, 1+20],
-      expectedTop: 0+20,
+      givenPoints: [0, 0 + 20, 0, 1 + 20],
+      expectedTop: 0 + 20,
     },
     { description: 'includes negative offset for top origin',
       givenOrigin: 'top',
-      givenPoints: [0, 0-11, 0, 1-11],
-      expectedTop: 0-11,
+      givenPoints: [0, 0 - 11, 0, 1 - 11],
+      expectedTop: 0 - 11,
     },
     { description: 'is half of y1 for center origin and y1 > y2',
       givenOrigin: 'center',
@@ -549,12 +549,12 @@
     },
     { description: 'includes positive offset for center origin',
       givenOrigin: 'center',
-      givenPoints: [0, 0+39, 0, 7+39],
+      givenPoints: [0, 0 + 39, 0, 7 + 39],
       expectedTop: (0.5 * 7) + 39,
     },
     { description: 'includes negative offset for center origin',
       givenOrigin: 'center',
-      givenPoints: [0, 4-13, 0, 0-13],
+      givenPoints: [0, 4 - 13, 0, 0 - 13],
       expectedTop: (0.5 * 4) - 13,
     },
     { description: 'is y1 for bottom origin and y1 > y2',
@@ -569,12 +569,12 @@
     },
     { description: 'includes positive offset for bottom origin',
       givenOrigin: 'bottom',
-      givenPoints: [0, 0+47, 0, 6+47],
+      givenPoints: [0, 0 + 47, 0, 6 + 47],
       expectedTop: 6 + 47,
     },
     { description: 'includes negative offset for bottom origin',
       givenOrigin: 'bottom',
-      givenPoints: [0, 9-17, 0, 0-17],
+      givenPoints: [0, 9 - 17, 0, 0 - 17],
       expectedTop: 9 - 17,
     },
   ];
