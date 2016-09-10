@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Multiply filter class
@@ -24,7 +26,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Multiply = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Multiply.prototype */ {
+  filters.Multiply = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Multiply.prototype */ {
 
     /**
      * Filter type
@@ -58,7 +60,7 @@
 
       source = new fabric.Color(this.color).getSource();
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         data[i] *= source[0] / 255;
         data[i + 1] *= source[1] / 255;
         data[i + 2] *= source[2] / 255;

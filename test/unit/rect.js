@@ -69,8 +69,8 @@
     deepEqual(rect.toObject(), REFERENCE_RECT);
 
     var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-    expectedObject.fill = {"type":"linear","coords":{"x1":0,"y1":0,"x2":200,"y2":0},"colorStops":[{"offset":"0","color":"rgb(255,0,0)","opacity":1},{"offset":"1","color":"rgb(0,0,255)","opacity":1}],"offsetX":0,"offsetY":0};
-    expectedObject.stroke = {"type":"linear","coords":{"x1":0,"y1":0,"x2":200,"y2":0},"colorStops":[{"offset":"0","color":"rgb(255,0,0)","opacity":1},{"offset":"1","color":"rgb(0,0,255)","opacity":1}],"offsetX":0,"offsetY":0};
+    expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+    expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
     rect = fabric.Rect.fromObject(expectedObject);
     ok(rect.fill instanceof fabric.Gradient);
     ok(rect.stroke instanceof fabric.Gradient);

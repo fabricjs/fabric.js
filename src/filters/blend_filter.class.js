@@ -1,7 +1,9 @@
 (function(global) {
   'use strict';
 
-  var fabric = global.fabric;
+  var fabric = global.fabric,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Color Blend filter class
@@ -23,7 +25,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Blend = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */{
+
+  filters.Blend = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */ {
     type: 'Blend',
 
     initialize: function(options) {

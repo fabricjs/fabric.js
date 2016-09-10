@@ -294,7 +294,7 @@
         }
         line += word;
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset) + additionalSpace;
+        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
         offset++;
         lineJustStarted = false;
         // keep track of largest word

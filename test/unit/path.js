@@ -51,7 +51,7 @@
   }
 
   function makePathObject(callback) {
-    getPathObject("M 100 100 L 300 100 L 200 300 z", callback);
+    getPathObject('M 100 100 L 300 100 L 200 300 z', callback);
   }
 
   QUnit.module('fabric.Path');
@@ -69,7 +69,7 @@
       try {
         new fabric.Path();
       }
-      catch(err) {
+      catch (err) {
         error = err;
       }
 
@@ -189,7 +189,7 @@
 
         deepEqual(
           path.get('transformMatrix'),
-          [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ]
+          [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]
         );
         start();
       });

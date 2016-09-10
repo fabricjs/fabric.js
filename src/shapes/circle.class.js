@@ -99,7 +99,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
-      angle = (this.endAngle - this.startAngle) % ( 2 * pi);
+          angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
         if (this.group && this.group.type === 'path-group') {
@@ -126,7 +126,7 @@
         markup.push(
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
-          ' 0 ', + largeFlag + ' 1', ' ' + endX + ' ' + endY,
+          ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(),

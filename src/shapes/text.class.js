@@ -468,7 +468,7 @@
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
-          left += width;
+          left += width > 0 ? width : 0;
         }
       }
       else {
@@ -529,7 +529,7 @@
         additionalSpace = charCount * this._getWidthOfCharSpacing();
         width += additionalSpace;
       }
-      return width;
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -711,8 +711,8 @@
      * @private
      */
     _clearCache: function() {
-      this.__lineWidths = [ ];
-      this.__lineHeights = [ ];
+      this.__lineWidths = [];
+      this.__lineHeights = [];
     },
 
     /**
@@ -779,12 +779,13 @@
     _measureLine: function(ctx, lineIndex) {
       var line = this._textLines[lineIndex],
           width = ctx.measureText(line).width,
-          additionalSpace = 0, charCount;
+          additionalSpace = 0, charCount, finalWidth;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
       }
-      return width + additionalSpace;
+      finalWidth = width + additionalSpace;
+      return finalWidth > 0 ? finalWidth : 0;
     },
 
     /**
@@ -805,8 +806,8 @@
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          lineWidth = _this._getLineWidth(ctx, i),
-          lineLeftOffset = _this._getLineLeftOffset(lineWidth),
+          lineWidth = _this._getLineWidth(ctx, i);
+          lineLeftOffset = _this._getLineLeftOffset(lineWidth);
           heightOfLine = _this._getHeightOfLine(ctx, i);
 
           for (j = 0, oLen = offsets.length; j < oLen; j++) {
@@ -918,6 +919,9 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
+      if (!this.ctx) {
+        this.ctx = fabric.util.createCanvasElement().getContext('2d');
+      }
       var markup = this._createBaseSVGMarkup(),
           offsets = this._getSVGLeftTopOffsets(this.ctx),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
@@ -953,11 +957,11 @@
           style, '>\n',
           textAndBg.textBgRects.join(''),
           '\t\t<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
-            (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
-            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
-            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
-            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+            (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
+            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
+            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
+            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
             'style="', this.getSvgStyles(noShadow), '" >\n',
             textAndBg.textSpans.join(''),
           '\t\t</text>\n',
@@ -972,8 +976,8 @@
      * @return {Object}
      */
     _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
-      var textSpans = [ ],
-          textBgRects = [ ],
+      var textSpans = [],
+          textBgRects = [],
           height = 0;
       // bounding-box background
       this._setSVGBg(textBgRects);

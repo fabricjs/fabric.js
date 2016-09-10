@@ -212,7 +212,7 @@ test('removal of past events inner loop', function() {
         equal(event1Fired, 1, 'Event 1 should fire once');
         equal(event2Fired, 0, 'Event 2 should not be fired yet');
         equal(event3Fired, 0, 'Event 3 should not be fired yet');
-        equal(event4Fired, 0, 'Event 4 should not be fired yet');        
+        equal(event4Fired, 0, 'Event 4 should not be fired yet');
         foo.trigger('bar:baz');
         equal(foo.__eventListeners['bar:baz'].length, 3, 'There should be 3 handlers registered now');
       },

@@ -4,7 +4,9 @@
 
   var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
       sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin,
-      ceil = Math.ceil;
+      ceil = Math.ceil,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Resize image filter class
@@ -17,7 +19,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Resize = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Resize.prototype */ {
+  filters.Resize = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Resize.prototype */ {
 
     /**
      * Filter type
@@ -62,6 +64,9 @@
      * @param {Number} scaleY
      */
     applyTo: function(canvasEl, scaleX, scaleY) {
+      if (scaleX === 1 && scaleY === 1) {
+        return;
+      }
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
@@ -178,7 +183,7 @@
         for (v = 0; v < dH; v++) {
           center.y = (v + 0.5) * ratioY;
           icenter.y = floor(center.y);
-          a = 0, red = 0, green = 0, blue = 0, alpha = 0;
+          a = 0; red = 0; green = 0; blue = 0; alpha = 0;
           for (i = icenter.x - range2X; i <= icenter.x + range2X; i++) {
             if (i < 0 || i >= oW) {
               continue;
@@ -299,7 +304,7 @@
             for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
               var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
                   w = sqrt(w0 + dx * dx);
-              /*jshint maxdepth:5 */
+              /* eslint-disable max-depth */
               if (w > 1 && w < -1) {
                 continue;
               }
@@ -311,17 +316,15 @@
                 gxA += weight * data[dx + 3];
                 weightsAlpha += weight;
                 //colors
-                /*jshint maxdepth:6 */
                 if (data[dx + 3] < 255) {
                   weight = weight * data[dx + 3] / 250;
                 }
-                /*jshint maxdepth:5 */
                 gxR += weight * data[dx];
                 gxG += weight * data[dx + 1];
                 gxB += weight * data[dx + 2];
                 weights += weight;
               }
-              /*jshint maxdepth:4 */
+              /* eslint-enable max-depth */
             }
           }
           data2[x2] = gxR / weights;

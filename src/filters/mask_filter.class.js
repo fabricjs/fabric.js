@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Mask filter class
@@ -13,7 +15,7 @@
    * @extends fabric.Image.filters.BaseFilter
    * @see {@link fabric.Image.filters.Mask#initialize} for constructor definition
    */
-  fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
+  filters.Mask = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
 
     /**
      * Filter type
@@ -33,7 +35,7 @@
       options = options || { };
 
       this.mask = options.mask;
-      this.channel = [ 0, 1, 2, 3 ].indexOf(options.channel) > -1 ? options.channel : 0;
+      this.channel = [0, 1, 2, 3].indexOf(options.channel) > -1 ? options.channel : 0;
     },
 
     /**

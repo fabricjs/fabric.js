@@ -209,6 +209,14 @@
 
     /**
      * @private
+     * @return {Number} retinaScaling if applied, otherwise 1;
+     */
+    getRetinaScaling: function() {
+      return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
+    },
+
+    /**
+     * @private
      */
     _initRetinaScaling: function() {
       if (!this._isRetinaScaling()) {
@@ -1070,10 +1078,10 @@
      */
     _toObjects: function(methodName, propertiesToInclude) {
       return this.getObjects().filter(function(object) {
-          return !object.excludeFromExport;
-        }).map(function(instance) {
-          return this._toObject(instance, methodName, propertiesToInclude);
-        }, this);
+        return !object.excludeFromExport;
+      }).map(function(instance) {
+        return this._toObject(instance, methodName, propertiesToInclude);
+      }, this);
     },
 
     /**

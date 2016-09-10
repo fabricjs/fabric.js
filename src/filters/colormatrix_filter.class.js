@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Color Matrix filter class
@@ -26,7 +28,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.ColorMatrix = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
+  filters.ColorMatrix = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
 
     /**
      * Filter type
@@ -44,11 +46,11 @@
     initialize: function( options ) {
       options || ( options = {} );
       this.matrix = options.matrix || [
-          1, 0, 0, 0, 0,
-          0, 1, 0, 0, 0,
-          0, 0, 1, 0, 0,
-          0, 0, 0, 1, 0
-        ];
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        0, 0, 0, 1, 0
+      ];
     },
 
     /**
@@ -57,15 +59,15 @@
      */
     applyTo: function( canvasEl ) {
       var context = canvasEl.getContext( '2d' ),
-        imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
-        data = imageData.data,
-        iLen = data.length,
-        i,
-        r,
-        g,
-        b,
-        a,
-        m = this.matrix;
+          imageData = context.getImageData( 0, 0, canvasEl.width, canvasEl.height ),
+          data = imageData.data,
+          iLen = data.length,
+          i,
+          r,
+          g,
+          b,
+          a,
+          m = this.matrix;
 
       for ( i = 0; i < iLen; i += 4 ) {
         r = data[ i ];

@@ -18,7 +18,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    */
   initialize: function(canvas) {
     this.canvas = canvas;
-    this.points = [ ];
+    this.points = [];
   },
 
   /**
@@ -66,7 +66,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    var circles = [ ];
+    var circles = [];
 
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i],

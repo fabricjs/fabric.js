@@ -137,7 +137,7 @@
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:     [ ],
+    selectionDashArray:     [],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
@@ -227,7 +227,8 @@
     isDrawingMode:          false,
 
     /**
-     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * Indicates whether objects should remain in current stack position when selected.
+     * When false objects are brought to top and rendered as part of the selection group
      * @type Boolean
      * @default
      */
@@ -258,7 +259,7 @@
     _chooseObjectsToRender: function() {
       var activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
-          object, objsToRender = [ ], activeGroupObjects = [ ];
+          object, objsToRender = [], activeGroupObjects = [];
 
       if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
@@ -667,8 +668,7 @@
           actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
 
       this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
-      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by],
-
+      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by];
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
       // Actually skew the object
       skewed = this._setObjectSkew(actualMouseByOrigin, t, by, dim);
@@ -970,8 +970,8 @@
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft),
-            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
 
         ctx.beginPath();
 
@@ -1019,7 +1019,7 @@
         return activeObject;
       }
 
-      this.targets = [ ];
+      this.targets = [];
 
       var target = this._searchPossibleTargets(this._objects, pointer);
       this._fireOverOutEvents(target, e);
