@@ -233,10 +233,13 @@
    * @static
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
    * @return {Object} instance of fabric.Rect
    */
-  fabric.Rect.fromObject = function(object) {
-    return new fabric.Rect(object);
+  fabric.Rect.fromObject = function(object, callback) {
+    var rect = new fabric.Rect(object);
+    callback && callback(rect);
+    return rect;
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

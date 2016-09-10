@@ -244,6 +244,7 @@
    * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {
+    // remove this pattern from 2.0 accepts only object
     if (typeof object.paths === 'string') {
       fabric.loadSVGFromURL(object.paths, function (elements) {
 

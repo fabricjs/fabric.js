@@ -167,11 +167,13 @@
    * @static
    * @memberOf fabric.Polyline
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
    * @return {fabric.Polyline} Instance of fabric.Polyline
    */
-  fabric.Polyline.fromObject = function(object) {
-    var points = object.points;
-    return new fabric.Polyline(points, object, true);
+  fabric.Polyline.fromObject = function(object, callback) {
+    var polyline = new fabric.Polyline(object.points, object);
+    callback && callback(polyline);
+    return polyline;
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

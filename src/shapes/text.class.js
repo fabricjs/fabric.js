@@ -50,7 +50,6 @@
       text: true,
       charSpacing: true,
       textAlign: true,
-      stroke: false,
       strokeWidth: false,
     },
 
@@ -1225,10 +1224,13 @@
    * @static
    * @memberOf fabric.Text
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
    * @return {fabric.Text} Instance of fabric.Text
    */
-  fabric.Text.fromObject = function(object) {
-    return new fabric.Text(object.text, clone(object));
+  fabric.Text.fromObject = function(object, callback) {
+    var text = new fabric.Text(object.text, clone(object));
+    callback && callback(text);
+    return text;
   };
 
   fabric.util.createAccessors(fabric.Text);
