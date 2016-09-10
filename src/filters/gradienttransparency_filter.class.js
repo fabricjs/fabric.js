@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * GradientTransparency filter class
@@ -19,7 +21,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.GradientTransparency = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
+   // eslint-disable-next-line max-len
+  filters.GradientTransparency = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
 
     /**
      * Filter type

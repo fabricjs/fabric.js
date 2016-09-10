@@ -4,7 +4,9 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) {
+      return path;
+    }
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -12,8 +14,8 @@
     return src;
   }
 
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_WIDTH   = 276,
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_WIDTH = 276,
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
@@ -32,7 +34,9 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) {
+          throw err;
+        };
         img.src = imgData;
         callback && callback();
       });
@@ -167,16 +171,16 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
+    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",' +
                           '"transformMatrix":null,"skewX":0,"skewY":0}';
 
-    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
-                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
-                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
+    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,' +
+                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
+                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",' +
                         '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var cObj = new fabric.Object();
@@ -308,7 +312,7 @@
       top: 20,
       width: 30,
       height: 40,
-      strokeDashArray: [ 5, 2 ],
+      strokeDashArray: [5, 2],
       strokeLineCap: 'round',
       strokeLineJoin: 'bevil',
       strokeMiterLimit: 5,
@@ -394,7 +398,7 @@
     equal(boundingRect.height, 334);
   });
 
-test('getBoundingRectWithStroke', function() {
+  test('getBoundingRectWithStroke', function() {
     var cObj = new fabric.Object(),
         boundingRect;
     ok(typeof cObj.getBoundingRect == 'function');
@@ -472,7 +476,7 @@ test('getBoundingRectWithStroke', function() {
     ok(typeof cObj.scaleToWidth == 'function');
     equal(cObj.scaleToWidth(100), cObj, 'chainable');
     equal(cObj.getWidth(), 100);
-    equal(cObj.get('scaleX'), 100/560);
+    equal(cObj.get('scaleX'), 100 / 560);
   });
 
   test('scaleToHeight', function() {
@@ -480,7 +484,7 @@ test('getBoundingRectWithStroke', function() {
     ok(typeof cObj.scaleToHeight == 'function');
     equal(cObj.scaleToHeight(100), cObj, 'chainable');
     equal(cObj.getHeight(), 100);
-    equal(cObj.get('scaleY'), 100/560);
+    equal(cObj.get('scaleY'), 100 / 560);
   });
 
   test('scaleToWidth on rotated object', function() {
@@ -527,7 +531,7 @@ test('getBoundingRectWithStroke', function() {
 
     //let excanvas kick in for IE8 and lower
     if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-        G_vmlCanvasManager.initElement(canvas);
+      G_vmlCanvasManager.initElement(canvas);
     }
 
     var dummyContext = canvas.getContext('2d');
@@ -541,7 +545,7 @@ test('getBoundingRectWithStroke', function() {
 
     //let excanvas kick in for IE8 and lower
     if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-        G_vmlCanvasManager.initElement(canvas);
+      G_vmlCanvasManager.initElement(canvas);
     }
     var dummyContext = canvas.getContext('2d');
     ok(typeof cObj.drawControls == 'function');
@@ -643,13 +647,13 @@ test('getBoundingRectWithStroke', function() {
         dataURL = cObj.toDataURL({ format: 'jpeg' });
         equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
       }
-      catch(err) {
+      catch (err) {
         fabric.log('jpeg toDataURL not supported');
       }
     }
   });
 
-test('toDataURL & reference to canvas', function() {
+  test('toDataURL & reference to canvas', function() {
   // var data =
   //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
   //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
@@ -660,21 +664,21 @@ test('toDataURL & reference to canvas', function() {
   //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
   //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
-  var cObj = new fabric.Rect({
-    width: 100, height: 100, fill: 'red'
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red'
+    });
+    canvas.add(cObj);
+
+    if (!fabric.Canvas.supports('toDataURL')) {
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var objCanvas = cObj.canvas;
+      cObj.toDataURL();
+
+      equal(objCanvas, cObj.canvas);
+    }
   });
-  canvas.add(cObj);
-
-  if (!fabric.Canvas.supports('toDataURL')) {
-    window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-  }
-  else {
-    var objCanvas = cObj.canvas;
-    cObj.toDataURL();
-
-    equal(objCanvas, cObj.canvas);
-  }
-});
 
   test('hasStateChanged', function() {
     var cObj = new fabric.Object();
@@ -1453,13 +1457,13 @@ test('toDataURL & reference to canvas', function() {
   });
 
   test('getObjectScale', function() {
-    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var objectScale = object.getObjectScaling();
     deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
   });
 
   test('getObjectScale in group', function() {
-    var object = new fabric.Object({ scaleX: 3, scaleY : 2});
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var group = new fabric.Group();
     group.scaleX = 2;
     group.scaleY = 2;
@@ -1476,7 +1480,7 @@ test('toDataURL & reference to canvas', function() {
     el.width = 600; el.height = 600;
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
     var context = canvas.contextContainer;
-    var object = new fabric.Object({ scaleX: 1, scaleY : 1});
+    var object = new fabric.Object({ scaleX: 1, scaleY: 1});
     var group = new fabric.Group();
     group.scaleX = 2;
     group.scaleY = 2;

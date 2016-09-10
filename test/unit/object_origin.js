@@ -93,7 +93,6 @@
   });
 
 
-
   test('translateToOriginPoint', function(){
     var rect = new fabric.Rect(rectOptions),
         p,
@@ -237,115 +236,113 @@
 
 
   test('adjustPosition', function(){
-    var rect = new fabric.Rect(rectOptions),
-        p;
+    var rect = new fabric.Rect(rectOptions);
 
     rect.strokeWidth = 0;
     rect.originX = 'left';
     rect.originY = 'top';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 35);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'right');
 
     rect.originX = 'center';
     rect.originY = 'center';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 95);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'right');
 
     rect.originX = 'right';
     rect.originY = 'bottom';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 95);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'right');
   });
 
   test('adjustPositionRotated', function(){
-    var rect = new fabric.Rect(rectOptions),
-        p;
+    var rect = new fabric.Rect(rectOptions);
 
     rect.angle = 35;
     rect.strokeWidth = 0;
     rect.originX = 'left';
     rect.originY = 'top';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 35);
     deepEqual(rect.top, 45);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.471528727020925);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 'right');
 
     rect.originX = 'center';
     rect.originY = 'center';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.471528727020925);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 84.1491226573395);
     deepEqual(rect.top, 79.41458618106277);
     equal(rect.originX, 'right');
 
     rect.originX = 'right';
     rect.originY = 'bottom';
-    p = rect.adjustPosition('left');
+    rect.adjustPosition('left');
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.47152872702093);
     equal(rect.originX, 'left');
 
-    p = rect.adjustPosition('center');
+    rect.adjustPosition('center');
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 'center');
 
-    p = rect.adjustPosition('right');
+    rect.adjustPosition('right');
     deepEqual(rect.left, 84.1491226573395);
     deepEqual(rect.top, 79.41458618106277);
     equal(rect.originX, 'right');
@@ -420,7 +417,6 @@
     p = rect.translateToCenterPoint(point, 1, 1);
     deepEqual(p, new fabric.Point(21.068865352386116, -27.02306745986067));
   });
-
 
 
   test('translateToOriginPoint with numeric origins', function(){
@@ -566,115 +562,113 @@
 
 
   test('adjustPosition with numeric origins', function(){
-    var rect = new fabric.Rect(rectOptions),
-        p;
+    var rect = new fabric.Rect(rectOptions);
 
     rect.strokeWidth = 0;
     rect.originX = 'left';
     rect.originY = 'top';
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 35);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 1);
 
     rect.originX = 0.5;
     rect.originY = 0.5;
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 95);
     deepEqual(rect.top, 45);
     equal(rect.originX, 1);
 
     rect.originX = 1;
     rect.originY = 1;
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 55);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 75);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 95);
     deepEqual(rect.top, 45);
     equal(rect.originX, 1);
   });
 
   test('adjustPositionRotated with numeric origins', function(){
-    var rect = new fabric.Rect(rectOptions),
-        p;
+    var rect = new fabric.Rect(rectOptions);
 
     rect.angle = 35;
     rect.strokeWidth = 0;
     rect.originX = 0;
     rect.originY = 0;
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 35);
     deepEqual(rect.top, 45);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.471528727020925);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 1);
 
     rect.originX = 0.5;
     rect.originY = 0.5;
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.471528727020925);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 84.1491226573395);
     deepEqual(rect.top, 79.41458618106277);
     equal(rect.originX, 1);
 
     rect.originX = 1;
     rect.originY = 1;
-    p = rect.adjustPosition(0);
+    rect.adjustPosition(0);
     deepEqual(rect.left, 51.383040885779835);
     deepEqual(rect.top, 56.47152872702093);
     equal(rect.originX, 0);
 
-    p = rect.adjustPosition(0.5);
+    rect.adjustPosition(0.5);
     deepEqual(rect.left, 67.76608177155967);
     deepEqual(rect.top, 67.94305745404185);
     equal(rect.originX, 0.5);
 
-    p = rect.adjustPosition(1);
+    rect.adjustPosition(1);
     deepEqual(rect.left, 84.1491226573395);
     deepEqual(rect.top, 79.41458618106277);
     equal(rect.originX, 1);

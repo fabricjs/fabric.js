@@ -100,8 +100,8 @@
       var objects = this.getObjects(),
           isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
           groupObjects = isActiveLower
-            ? [ this._activeObject, target ]
-            : [ target, this._activeObject ];
+            ? [this._activeObject, target]
+            : [target, this._activeObject];
       this._activeObject.isEditing && this._activeObject.exitEditing();
       return new fabric.Group(groupObjects, {
         canvas: this
@@ -136,7 +136,7 @@
      * @private
      */
     _collectObjects: function() {
-      var group = [ ],
+      var group = [],
           currentObject,
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,

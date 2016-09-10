@@ -12,7 +12,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) { return path };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -21,7 +21,7 @@
   }
 
   var IMG_URL = fabric.isLikelyNode
-    ? require("path").join(__dirname, '../fixtures/', 'very_large_image.jpg')
+    ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
@@ -374,7 +374,7 @@
   });
 
   test('fabric.loadSVGFromURL', function() {
-    equal("function", typeof fabric.loadSVGFromURL);
+    equal('function', typeof fabric.loadSVGFromURL);
   });
 
   var SVG_DOC_AS_STRING = '<?xml version="1.0"?>\
@@ -385,9 +385,9 @@
     </svg>';
 
   asyncTest('fabric.loadSVGFromString', function() {
-    equal("function", typeof fabric.loadSVGFromString);
+    equal('function', typeof fabric.loadSVGFromString);
 
-    var loadedObjects = [ ];
+    var loadedObjects = [];
     fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
       loadedObjects = objects;
     });
@@ -400,7 +400,7 @@
   });
 
   asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
-    var loadedObjects = [ ];
+    var loadedObjects = [];
     fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
       loadedObjects = objects;
     });
@@ -536,19 +536,19 @@
     var undef;
     var array = [1, 2, 3, 4, 5, undef, 6, 7, 1, 2, 3];
 
-    equal(2, array.indexOf(3, -47), "large negative value for fromIndex");
+    equal(2, array.indexOf(3, -47), 'large negative value for fromIndex');
     equal(10, array.indexOf(3, 4));
     equal(10, array.indexOf(3, -5));
-    equal(2, array.indexOf(3, {}), "nonsensical value for fromIndex");
-    equal(2, array.indexOf(3, ""), "nonsensical value for fromIndex");
-    equal(-1, array.indexOf(3, 41), "fromIndex value larger than the length of the array");
+    equal(2, array.indexOf(3, {}), 'nonsensical value for fromIndex');
+    equal(2, array.indexOf(3, ''), 'nonsensical value for fromIndex');
+    equal(-1, array.indexOf(3, 41), 'fromIndex value larger than the length of the array');
   });
 
   test('Array.prototype.forEach', function() {
     ok(typeof Array.prototype.forEach === 'function');
 
     var arr = [1,2,3];
-    var result = [ ];
+    var result = [];
 
     arr.forEach(function(val, index, arr) {
       result.push(val, index, arr);
@@ -647,7 +647,7 @@
       arr.reduce(function(memo, val) { return memo + val }), 0);
 
     deepEqual(['1!', '2!', '3!', '4!', '5!'],
-      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, [ ]));
+      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, []));
 
     arr = 'foobar'.split('');
     equal('f0o1o2b3a4r5',
@@ -749,7 +749,7 @@
     var obj3 = { toString: function(){ return 'obj3' } };
 
     deepEqual(['obj1', 'obj2', 'obj3'],
-      fabric.util.array.invoke([ obj1, obj2, obj3 ], 'toString'));
+      fabric.util.array.invoke([obj1, obj2, obj3], 'toString'));
 
     deepEqual(['f', 'b', 'b'],
       fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 0));
@@ -770,7 +770,7 @@
     var obj2 = { valueOf: function(){ return 2 } };
     var obj3 = { valueOf: function(){ return 3 } };
 
-    equal(obj1, fabric.util.array.min([ obj1, obj3, obj2 ]));
+    equal(obj1, fabric.util.array.min([obj1, obj3, obj2]));
   });
 
   test('fabric.util.array.max', function() {
@@ -785,18 +785,18 @@
     var obj2 = { valueOf: function(){ return 2 } };
     var obj3 = { valueOf: function(){ return 3 } };
 
-    equal(obj3, fabric.util.array.max([ obj1, obj3, obj2 ]));
+    equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
   });
 
   test('fabric.util.populateWithProperties', function() {
     ok(typeof fabric.util.populateWithProperties == 'function');
 
     var source = {
-      foo: 'bar',
-      baz: 123,
-      qux: function() { }
-    },
-    destination = { };
+          foo: 'bar',
+          baz: 123,
+          qux: function() { }
+        },
+        destination = { };
 
     fabric.util.populateWithProperties(source, destination);
     ok(typeof destination.foo === 'undefined');
@@ -843,7 +843,7 @@
 
   test('clearFabricFontCache', function() {
     ok(typeof fabric.util.clearFabricFontCache == 'function');
-    fabric.charWidthsCache = { arial : { some: 'cache'}, helvetica : { some: 'cache'} };
+    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
     fabric.util.clearFabricFontCache('arial');
     equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
     equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
@@ -854,15 +854,15 @@
   test('parsePreserveAspectRatioAttribute', function() {
     ok(typeof fabric.util.parsePreserveAspectRatioAttribute == 'function');
     var parsed;
-    parsed = fabric.util.parsePreserveAspectRatioAttribute("none");
+    parsed = fabric.util.parsePreserveAspectRatioAttribute('none');
     equal(parsed.meetOrSlice, 'meet');
     equal(parsed.alignX, 'none');
     equal(parsed.alignY, 'none');
-    parsed = fabric.util.parsePreserveAspectRatioAttribute("none slice");
+    parsed = fabric.util.parsePreserveAspectRatioAttribute('none slice');
     equal(parsed.meetOrSlice, 'slice');
     equal(parsed.alignX, 'none');
     equal(parsed.alignY, 'none');
-    parsed = fabric.util.parsePreserveAspectRatioAttribute("XmidYmax meet");
+    parsed = fabric.util.parsePreserveAspectRatioAttribute('XmidYmax meet');
     equal(parsed.meetOrSlice, 'meet');
     equal(parsed.alignX, 'mid');
     equal(parsed.alignY, 'max');
@@ -886,14 +886,14 @@
   test('resetObjectTransform', function() {
     ok(typeof fabric.util.resetObjectTransform == 'function');
     var rect = new fabric.Rect({
-      top:1,
+      top: 1,
       width: 100,
       height: 100,
       angle: 30,
       scaleX: 2,
       scaleY: 1,
       flipX: true,
-      flipY : true,
+      flipY: true,
       skewX: 30,
       skewY: 30
     });

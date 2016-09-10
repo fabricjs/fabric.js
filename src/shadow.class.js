@@ -84,7 +84,7 @@
      */
     _parseShadow: function(shadow) {
       var shadowStr = shadow.trim(),
-          offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [ ],
+          offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [],
           color = shadowStr.replace(fabric.Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
 
       return {
@@ -178,6 +178,7 @@
    * @field
    * @memberOf fabric.Shadow
    */
+  // eslint-disable-next-line max-len
   fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
 })(typeof exports !== 'undefined' ? exports : this);

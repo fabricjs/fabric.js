@@ -131,7 +131,7 @@
    * @private
    */
   function _getMultipleNodes(doc, nodeNames) {
-    var nodeName, nodeArray = [ ], nodeList;
+    var nodeName, nodeArray = [], nodeList;
     for (var i = 0; i < nodeNames.length; i++) {
       nodeName = nodeNames[i];
       nodeList = doc.getElementsByTagName(nodeName);
@@ -246,7 +246,7 @@
 
       // start with identity matrix
       var matrix = iMatrix.concat(),
-          matrices = [ ];
+          matrices = [];
 
       // return if no argument was given or
       // an argument does not match transform attribute regexp
@@ -257,7 +257,8 @@
       attributeValue.replace(reTransform, function(match) {
 
         var m = new RegExp(transform).exec(match).filter(function (match) {
-              return (match !== '' && match != null);
+              // match !== '' && match != null
+              return (!!match);
             }),
             operation = m[1],
             args = m.slice(2).map(parseFloat);
@@ -437,7 +438,8 @@
           attr = attrs.item(j);
           el3.setAttribute(attr.nodeName, attr.nodeValue);
         }
-        while (el2.firstChild != null) {
+        // el2.firstChild != null
+        while (el2.firstChild) {
           el3.appendChild(el2.firstChild);
         }
         el2 = el3;
@@ -516,9 +518,9 @@
       return parsedDim;
     }
 
-    minX = -parseFloat(viewBoxAttr[1]),
-    minY = -parseFloat(viewBoxAttr[2]),
-    viewBoxWidth = parseFloat(viewBoxAttr[3]),
+    minX = -parseFloat(viewBoxAttr[1]);
+    minY = -parseFloat(viewBoxAttr[2]);
+    viewBoxWidth = parseFloat(viewBoxAttr[3]);
     viewBoxHeight = parseFloat(viewBoxAttr[4]);
 
     if (!missingDimAttr) {
@@ -556,7 +558,8 @@
 
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
-      while (element.firstChild != null) {
+      // element.firstChild != null
+      while (element.firstChild) {
         el.appendChild(element.firstChild);
       }
       element.appendChild(el);
@@ -576,7 +579,8 @@
    * @function
    * @memberOf fabric
    * @param {SVGDocument} doc SVG document to parse
-   * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
+   * @param {Function} callback Callback to call when parsing is finished;
+   * It's being passed an array of elements (parsed from a document).
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   fabric.parseSVGDocument = (function() {
@@ -609,7 +613,7 @@
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
         descendants = doc.selectNodes('//*[name(.)!="svg"]');
-        var arr = [ ];
+        var arr = [];
         for (var i = 0, len = descendants.length; i < len; i++) {
           arr[i] = descendants[i];
         }
@@ -888,11 +892,11 @@
       points = points.replace(/,/g, ' ').trim();
 
       points = points.split(/\s+/);
-      var parsedPoints = [ ], i, len;
+      var parsedPoints = [], i, len;
 
       i = 0;
       len = points.length;
-      for (; i < len; i+=2) {
+      for (; i < len; i += 2) {
         parsedPoints.push({
           x: parseFloat(points[i]),
           y: parseFloat(points[i + 1])
@@ -934,8 +938,8 @@
         rules.forEach(function(rule) {
 
           var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
-          ruleObj = { }, declaration = match[2].trim(),
-          propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+              ruleObj = { }, declaration = match[2].trim(),
+              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
@@ -962,7 +966,8 @@
     },
 
     /**
-     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
+     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
+     * Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
      * @memberOf fabric
      * @param {String} url
      * @param {Function} callback
@@ -1074,24 +1079,20 @@
 
       for (var j in fontList) {
         markup += [
-          //jscs:disable validateIndentation
           '\t\t@font-face {\n',
-            '\t\t\tfont-family: \'', j, '\';\n',
-            '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
+          '\t\t\tfont-family: \'', j, '\';\n',
+          '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
           '\t\t}\n'
-          //jscs:enable validateIndentation
         ].join('');
       }
 
       if (markup) {
         markup = [
-          //jscs:disable validateIndentation
           '\t<style type="text/css">',
-            '<![CDATA[\n',
-              markup,
-            ']]>',
+          '<![CDATA[\n',
+          markup,
+          ']]>',
           '</style>\n'
-          //jscs:enable validateIndentation
         ].join('');
       }
 
@@ -1104,7 +1105,7 @@
      * @return {String}
      */
     createSVGRefElementsMarkup: function(canvas) {
-      var markup = [ ];
+      var markup = [];
 
       _createSVGPattern(markup, canvas, 'backgroundColor');
       _createSVGPattern(markup, canvas, 'overlayColor');

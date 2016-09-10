@@ -76,7 +76,7 @@
     }
 
     klass.superclass = parent;
-    klass.subclasses = [ ];
+    klass.subclasses = [];
 
     if (parent) {
       Subclass.prototype = parent.prototype;

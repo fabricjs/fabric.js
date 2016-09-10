@@ -711,8 +711,8 @@
      * @private
      */
     _clearCache: function() {
-      this.__lineWidths = [ ];
-      this.__lineHeights = [ ];
+      this.__lineWidths = [];
+      this.__lineHeights = [];
     },
 
     /**
@@ -806,8 +806,8 @@
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          lineWidth = _this._getLineWidth(ctx, i),
-          lineLeftOffset = _this._getLineLeftOffset(lineWidth),
+          lineWidth = _this._getLineWidth(ctx, i);
+          lineLeftOffset = _this._getLineLeftOffset(lineWidth);
           heightOfLine = _this._getHeightOfLine(ctx, i);
 
           for (j = 0, oLen = offsets.length; j < oLen; j++) {
@@ -957,11 +957,11 @@
           style, '>\n',
           textAndBg.textBgRects.join(''),
           '\t\t<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
-            (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
-            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
-            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
-            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+            (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
+            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
+            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
+            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
             'style="', this.getSvgStyles(noShadow), '" >\n',
             textAndBg.textSpans.join(''),
           '\t\t</text>\n',
@@ -976,8 +976,8 @@
      * @return {Object}
      */
     _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
-      var textSpans = [ ],
-          textBgRects = [ ],
+      var textSpans = [],
+          textBgRects = [],
           height = 0;
       // bounding-box background
       this._setSVGBg(textBgRects);

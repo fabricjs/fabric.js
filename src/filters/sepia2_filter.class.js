@@ -2,7 +2,9 @@
 
   'use strict';
 
-  var fabric  = global.fabric || (global.fabric = { });
+  var fabric  = global.fabric || (global.fabric = { }),
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Sepia2 filter class
@@ -15,7 +17,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Sepia2 = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Sepia2.prototype */ {
+  filters.Sepia2 = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Sepia2.prototype */ {
 
     /**
      * Filter type
@@ -35,7 +37,7 @@
           data = imageData.data,
           iLen = data.length, i, r, g, b;
 
-      for (i = 0; i < iLen; i+=4) {
+      for (i = 0; i < iLen; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];

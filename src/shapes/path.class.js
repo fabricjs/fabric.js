@@ -78,7 +78,7 @@
       this.setOptions(options);
 
       if (!path) {
-        path = [ ];
+        path = [];
       }
 
       var fromArray = _toString.call(path) === '[object Array]';
@@ -518,14 +518,12 @@
         addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       }
       markup.push(
-        //jscs:disable validateIndentation
         '<path ', this.getSvgId(),
           'd="', path,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(), addTransform,
           this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
         '/>\n'
-        //jscs:enable validateIndentation
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
@@ -544,8 +542,8 @@
      * @private
      */
     _parsePath: function() {
-      var result = [ ],
-          coords = [ ],
+      var result = [],
+          coords = [],
           currentPath,
           parsed,
           re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
@@ -562,7 +560,7 @@
           coords.push(match[0]);
         }
 
-        coordsParsed = [ currentPath.charAt(0) ];
+        coordsParsed = [currentPath.charAt(0)];
 
         for (var j = 0, jlen = coords.length; j < jlen; j++) {
           parsed = parseFloat(coords[j]);
@@ -577,7 +575,7 @@
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ command ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
             command = repeatedCommand;
           }
         }
@@ -617,33 +615,33 @@
           case 'l': // lineto, relative
             x += current[1];
             y += current[2];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'h': // horizontal lineto, relative
             x += current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'H': // horizontal lineto, absolute
             x = current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'v': // vertical lineto, relative
             y += current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'V': // verical lineto, absolute
             y = current[1];
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'm': // moveTo, relative
@@ -651,7 +649,7 @@
             y += current[2];
             subpathStartX = x;
             subpathStartY = y;
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'M': // moveTo, absolute
@@ -659,7 +657,7 @@
             y = current[2];
             subpathStartX = x;
             subpathStartY = y;
-            bounds = [ ];
+            bounds = [];
             break;
 
           case 'c': // bezierCurveTo, relative

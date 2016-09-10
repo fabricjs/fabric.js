@@ -130,8 +130,9 @@
      * @param {fabric.Point} point Point to check
      * @param {Object} oCoords Coordinates of the object being evaluated
      */
+     // remove yi, not used but left code here just in case.
     _findCrossPoints: function(point, oCoords) {
-      var b1, b2, a1, a2, xi, yi,
+      var b1, b2, a1, a2, xi, // yi,
           xcount = 0,
           iLine;
 
@@ -148,7 +149,7 @@
         // optimisation 3: vertical line case
         if ((iLine.o.x === iLine.d.x) && (iLine.o.x >= point.x)) {
           xi = iLine.o.x;
-          yi = point.y;
+          // yi = point.y;
         }
         // calculate the intersection point
         else {
@@ -157,8 +158,8 @@
           a1 = point.y - b1 * point.x;
           a2 = iLine.o.y - b2 * iLine.o.x;
 
-          xi = - (a1 - a2) / (b1 - b2);
-          yi = a1 + b1 * xi;
+          xi = -(a1 - a2) / (b1 - b2);
+          // yi = a1 + b1 * xi;
         }
         // dont count xi < point.x cases
         if (xi >= point.x) {
@@ -314,10 +315,10 @@
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
           br  = new fabric.Point(coords.x + offsetX, coords.y + offsetY),
-          ml  = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
-          mt  = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
-          mr  = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
-          mb  = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
+          ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
+          mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
+          mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
+          mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
           mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
       // debugging
 

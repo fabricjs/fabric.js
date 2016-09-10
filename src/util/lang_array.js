@@ -65,7 +65,7 @@
      * @return {Array}
      */
     Array.prototype.map = function(fn, context) {
-      var result = [ ];
+      var result = [];
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
           result[i] = fn.call(context, this[i], i, this);
@@ -117,7 +117,7 @@
      * @return {Array}
      */
     Array.prototype.filter = function(fn, context) {
-      var result = [ ], val;
+      var result = [], val;
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
           val = this[i]; // in case fn mutates this
@@ -176,7 +176,7 @@
    * @return {Array}
    */
   function invoke(array, method) {
-    var args = slice.call(arguments, 2), result = [ ];
+    var args = slice.call(arguments, 2), result = [];
     for (var i = 0, len = array.length; i < len; i++) {
       result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
     }
