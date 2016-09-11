@@ -223,9 +223,9 @@
     var circle = new fabric.Circle({ radius: 10, strokeWidth: 0});
     circle.scale(2);
 
-    var clone = circle.clone();
-    width = clone.getTransformedDimensions().x;
-    height = clone.getTransformedDimensions().y;
+    var clone = circle.clone(),
+        width = clone.getTransformedDimensions().x,
+        height = clone.getTransformedDimensions().y;
     equal(width, 40);
     equal(height, 40);
     equal(clone.radius, 10);
