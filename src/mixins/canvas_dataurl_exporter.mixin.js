@@ -171,22 +171,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   },
 
   /**
-   * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-   * @deprecated since 1.0.13
-   * @param {String} format (png|jpeg)
-   * @param {Number} multiplier
-   * @param {Number} quality (0..1)
-   * @return {String}
-   */
-  toDataURLWithMultiplier: function (format, multiplier, quality) {
-    return this.toDataURL({
-      format: format,
-      multiplier: multiplier,
-      quality: quality
-    });
-  },
-
-  /**
    * @private
    */
   _tempRemoveBordersControlsFromGroup: function(group) {

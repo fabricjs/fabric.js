@@ -134,7 +134,7 @@
       target._scaling = true;
 
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          dim = target._getTransformedDimensions();
+          dim = target.getTransformedDimensions();
 
       this._setObjectScale(new fabric.Point(t.scaleX * dim.x * s / target.scaleX, t.scaleY * dim.y * s / target.scaleY),
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'), dim);

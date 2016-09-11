@@ -111,7 +111,7 @@
      * Calculate object dimensions from its properties
      * @private
      */
-    _getNonTransformedDimensions: function() {
+    getNonTransformedDimensions: function() {
       var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
@@ -137,14 +137,14 @@
     /*
      * @private
      */
-    _getTransformedDimensions: function(skewX, skewY) {
+    getTransformedDimensions: function(skewX, skewY) {
       if (typeof skewX === 'undefined') {
         skewX = this.skewX;
       }
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions = this._getNonTransformedDimensions(),
+      var dimensions = this.getNonTransformedDimensions(),
           dimX = dimensions.x / 2, dimY = dimensions.y / 2,
           points = [
             {
@@ -177,7 +177,7 @@
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
-          dim = this._getTransformedDimensions(),
+          dim = this.getTransformedDimensions(),
           w = dim.x, h = dim.y,
           p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
 
@@ -267,7 +267,7 @@
         return this;
       }
 
-      var p = this._getNonTransformedDimensions(),
+      var p = this.getNonTransformedDimensions(),
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
           strokeWidth = 1 / this.borderScaleFactor,

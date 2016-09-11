@@ -194,90 +194,90 @@
     equal(dim.y.toFixed(0), 78, 'height should change');
   });
 
-  test('_getTransformedDimensions', function(){
+  test('getTransformedDimensions', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
-    ok(typeof cObj._getTransformedDimensions == 'function', '_getTransformedDimensions should exist');
+    ok(typeof cObj.getTransformedDimensions == 'function', 'getTransformedDimensions should exist');
 
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x, 10);
     equal(dim.y, 15);
 
     cObj.strokeWidth = 2;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x, 12, 'strokeWidth should be added to dimension');
     equal(dim.y, 17, 'strokeWidth should be added to dimension');
 
     cObj.scaleX = 2;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x, 24, 'width should be doubled');
     equal(dim.y, 17, 'height should not change');
 
     cObj.scaleY = 2;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x, 24, 'width should not change');
     equal(dim.y, 34, 'height should be doubled');
 
     cObj.angle = 45;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x, 24, 'width should not change');
     equal(dim.y, 34, 'height should not change');
 
     cObj.skewX = 45;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x.toFixed(0), 58, 'width should change');
     equal(dim.y.toFixed(0), 34, 'height should not change');
 
     cObj.skewY = 45;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x.toFixed(0), 82, 'width should not change');
     equal(dim.y.toFixed(0), 58, 'height should change');
 
     cObj.padding = 10;
-    dim = cObj._getTransformedDimensions();
+    dim = cObj.getTransformedDimensions();
     equal(dim.x.toFixed(0), 82, 'width should not change');
     equal(dim.y.toFixed(0), 58, 'height should not change');
   });
 
-  test('_getNonTransformedDimensions', function(){
+  test('getNonTransformedDimensions', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
-    ok(typeof cObj._getNonTransformedDimensions == 'function', '_getNonTransformedDimensions should exist');
+    ok(typeof cObj.getNonTransformedDimensions == 'function', 'getNonTransformedDimensions should exist');
 
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 10);
     equal(dim.y, 15);
 
     cObj.strokeWidth = 2;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'strokeWidth should be added to dimension');
     equal(dim.y, 17, 'strokeWidth should be added to dimension');
 
     cObj.scaleX = 2;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
 
     cObj.scaleY = 2;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
 
     cObj.angle = 45;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
 
     cObj.skewX = 45;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
 
     cObj.skewY = 45;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
 
     cObj.padding = 10;
-    dim = cObj._getNonTransformedDimensions();
+    dim = cObj.getNonTransformedDimensions();
     equal(dim.x, 12, 'width should not change');
     equal(dim.y, 17, 'height should not change');
   });

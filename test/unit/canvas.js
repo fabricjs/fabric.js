@@ -1,6 +1,6 @@
 (function() {
 
-  var EMPTY_JSON = '{"objects":[],"background":""}';
+  var EMPTY_JSON = '{"objects":[]}';
 
   // var emptyImageCanvasData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAH7ElEQVR4nO3VMQ0AMAzAsPInvYHoMS2yEeTLHADge/M6AADYM3QACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIuMjH4b7osLFBAAAAAElFTkSuQmCC";
 
@@ -19,7 +19,7 @@
                   ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
                   ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-                  '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
+                  '13.99], ["z", null]]}], "backgroundFill": "#ff5555","overlayFill": "rgba(0,0,0,0.2)"}';
 
   var PATH_OBJ_JSON = '{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
                       ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
@@ -41,12 +41,12 @@
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}]}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
-                  '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+                  '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"backgroundFill":"#ff5555","overlayFill":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
     return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
@@ -90,15 +90,15 @@
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
-      canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
+      canvas.backgroundFill = fabric.Canvas.prototype.backgroundFill;
+      canvas.overlayFill = fabric.Canvas.prototype.overlayFill;
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
     }
   });
 
   test('initialProperties', function() {
-    ok('backgroundColor' in canvas);
+    ok('backgroundFill' in canvas);
     equal(canvas.includeDefaultValues, true);
   });
 
@@ -633,9 +633,9 @@
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
-    canvas.backgroundColor = '#ff5555';
-    canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
+    canvas.backgroundFill = '#ff5555';
+    canvas.overlayFill = 'rgba(0,0,0,0.2)';
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"backgroundFill":"#ff5555","overlayFill":"rgba(0,0,0,0.2)"}', '`background` and `overlayFill` value should be reflected in json');
     canvas.add(makeRect());
     deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
   });
@@ -662,8 +662,9 @@
 
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
+    canvas.backgroundFill = 'red';
     var expectedObject = {
-      background: canvas.backgroundColor,
+      backgroundFill: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -676,8 +677,9 @@
 
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
+    canvas.backgroundFill = 'blue';
     var expectedObject = {
-      background: canvas.backgroundColor,
+      backgroundFill: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -704,8 +706,8 @@
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
-      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
-      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
+      equal(canvas.backgroundFill, '#ff5555', 'backgroundFill is populated properly');
+      equal(canvas.overlayFill, 'rgba(0,0,0,0.2)', 'overlayFill is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -732,8 +734,8 @@
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
-      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
-      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
+      equal(canvas.backgroundFill, '#ff5555', 'backgroundFill is populated properly');
+      equal(canvas.overlayFill, 'rgba(0,0,0,0.2)', 'overlayFill is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -768,8 +770,8 @@
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
-      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
-      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
+      equal(canvas.backgroundFill, '#ff5555', 'backgroundFill is populated properly');
+      equal(canvas.overlayFill, 'rgba(0,0,0,0.2)', 'overlayFill is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -790,8 +792,8 @@
   });
 
   test('loadFromJSON with no objects', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
+    var c1 = new fabric.Canvas('c1', { backgroundFill: 'green', overlayFill: 'yellow' }),
+        c2 = new fabric.Canvas('c2', { backgroundFill: 'red', overlayFill: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -799,15 +801,15 @@
       fired = true;
 
       ok(fired, 'Callback should be fired even if no objects');
-      equal(c2.backgroundColor, 'green', 'Color should be set properly');
-      equal(c2.overlayColor, 'yellow', 'Color should be set properly');
+      equal(c2.backgroundFill, 'green', 'Color should be set properly');
+      equal(c2.overlayFill, 'yellow', 'Color should be set properly');
 
     });
   });
 
   test('loadFromJSON without "objects" property', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
+    var c1 = new fabric.Canvas('c1', { backgroundFill: 'green', overlayFill: 'yellow' }),
+        c2 = new fabric.Canvas('c2', { backgroundFill: 'red', overlayFill: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -818,8 +820,8 @@
       fired = true;
 
       ok(fired, 'Callback should be fired even if no "objects" property exists');
-      equal(c2.backgroundColor, 'green', 'Color should be set properly');
-      equal(c2.overlayColor, 'yellow', 'Color should be set properly');
+      equal(c2.backgroundFill, 'green', 'Color should be set properly');
+      equal(c2.overlayFill, 'yellow', 'Color should be set properly');
 
     });
   });
@@ -862,7 +864,7 @@
     });
   });
 
-  asyncTest('loadFromDatalessJSON with async content', function() {
+  asyncTest('loadFromJSON with async content', function() {
 
     var circ1 = new fabric.Circle({ radius: 30, fill: '#55f', top: 0, left: 0 });
     var circ2 = new fabric.Circle({ radius: 30, fill: '#f55', top: 50, left: 50 });
@@ -876,13 +878,11 @@
     canvas.renderAll();
 
     canvas.deactivateAll();
-    var json = JSON.stringify( canvas.toDatalessJSON() );
+    var json = JSON.stringify(canvas.toDatalessJSON());
     canvas.clear();
-    canvas.loadFromDatalessJSON(json, function() {
-
+    canvas.loadFromJSON(json, function() {
       equal(2, canvas.getObjects().length);
       equal('group', canvas.getObjects()[1].type);
-
       start();
     });
   });
@@ -904,8 +904,8 @@
   });
 
   asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
-+ '"background":"green"}';
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundFill":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
++ '"backgroundFill":"green"}';
     var serialized = JSON.parse(JSON_STRING);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
@@ -959,8 +959,8 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
-  // asyncTest('loadFromJSON with backgroundImage', function() {
-  //   canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('loadFromJSON with backgroundObject', function() {
+  //   canvas.setbackgroundObject('../../assets/pug.jpg');
   //   var anotherCanvas = new fabric.Canvas();
 
   //   setTimeout(function() {
@@ -1600,27 +1600,27 @@
     }, 1000);
   });
 
-  // asyncTest('backgroundImage', function() {
-  //   deepEqual('', canvas.backgroundImage);
-  //   canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('backgroundObject', function() {
+  //   deepEqual('', canvas.backgroundObject);
+  //   canvas.setbackgroundObject('../../assets/pug.jpg');
 
   //   setTimeout(function() {
 
-  //     ok(typeof canvas.backgroundImage == 'object');
-  //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+  //     ok(typeof canvas.backgroundObject == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.backgroundObject.src));
 
   //     deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.document.location.protocol +
+  //       "backgroundObject": (fabric.document.location.protocol +
   //                           '//' +
   //                           fabric.document.location.hostname +
   //                           ((fabric.document.location.port === '' || parseInt(fabric.document.location.port, 10) === 80)
   //                               ? ''
   //                               : (':' + fabric.document.location.port)) +
   //                           '/assets/pug.jpg'),
-  //       "backgroundImageOpacity": 1,
-  //       "backgroundImageStretch": true
+  //       "backgroundObjectOpacity": 1,
+  //       "backgroundObjectStretch": true
   //     });
 
   //     start();

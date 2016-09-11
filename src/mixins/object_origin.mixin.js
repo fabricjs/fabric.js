@@ -61,7 +61,7 @@
       offsetY = toOriginY - fromOriginY;
 
       if (offsetX || offsetY) {
-        dim = this._getTransformedDimensions();
+        dim = this.getTransformedDimensions();
         x = point.x + offsetX * dim.x;
         y = point.y + offsetY * dim.y;
       }
@@ -178,16 +178,16 @@
     },
 
     /**
+     * movex X position of an object.
      * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
-          hypotFull = this.getWidth(),
+          hypotFull = this.getTransformedDimensions().x,
           xFull = Math.cos(angle) * hypotFull,
           yFull = Math.sin(angle) * hypotFull,
           offsetFrom, offsetTo;
 
-      //TODO: this function does not consider mixed situation like top, center.
       if (typeof this.originX === 'string') {
         offsetFrom = originXOffset[this.originX];
       }
@@ -204,6 +204,7 @@
       this.top += yFull * (offsetTo - offsetFrom);
       this.setCoords();
       this.originX = to;
+      return this;
     },
 
     /**

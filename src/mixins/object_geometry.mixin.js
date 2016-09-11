@@ -174,24 +174,6 @@
     },
 
     /**
-     * Returns width of an object's bounding rectangle
-     * @deprecated since 1.0.4
-     * @return {Number} width value
-     */
-    getBoundingRectWidth: function() {
-      return this.getBoundingRect().width;
-    },
-
-    /**
-     * Returns height of an object's bounding rectangle
-     * @deprecated since 1.0.4
-     * @return {Number} height value
-     */
-    getBoundingRectHeight: function() {
-      return this.getBoundingRect().height;
-    },
-
-    /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
      * @return {Object} Object with left, top, width, height properties
      */
@@ -203,23 +185,6 @@
         this.oCoords.br,
         this.oCoords.bl
       ]);
-    },
-
-    /**
-     * Returns width of an object bounding box counting transformations
-     * @return {Number} width value
-     */
-    getWidth: function() {
-      return this._getTransformedDimensions().x;
-    },
-
-    /**
-     * Returns height of an object bounding box counting transformations
-     * to be renamed in 2.0
-     * @return {Number} height value
-     */
-    getHeight: function() {
-      return this._getTransformedDimensions().y;
     },
 
     /**
@@ -269,7 +234,7 @@
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getTransformedDimensions().x;
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -281,7 +246,7 @@
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getTransformedDimensions().y;
       return this.scale(value / this.height / boundingRectFactor);
     },
 
