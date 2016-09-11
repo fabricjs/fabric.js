@@ -118,12 +118,22 @@
 
     /**
      * Indicates which key enable multiple click selection
-     * values: altKey, shiftKey, ctrlKey
+     * values: altKey, shiftKey, ctrlKey, cmdKey
      * @since 1.6.2
      * @type String
      * @default
      */
     selectionKey:           'shiftKey',
+
+    /**
+     * Indicates which key enable alternative selection
+     * in case of target overlapping with active object
+     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * @since 1.6.5
+     * @type null|String
+     * @default
+     */
+    altSelectionKey:           null,
 
     /**
      * Color of selection
@@ -398,7 +408,6 @@
           vptPointer = this.restorePointerVpt(pointer),
           p = fabric.util.transformPoint(vptPointer, invertedM);
       return fabric.util.transformPoint(p, vpt);
-      //return { x: p.x * vpt[0], y: p.y * vpt[3] };
     },
 
     /**
@@ -1006,7 +1015,8 @@
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
           activeGroup = this.getActiveGroup(),
-          activeObject = this.getActiveObject();
+          activeObject = this.getActiveObject(),
+          activeTarget;
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -1014,14 +1024,25 @@
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
-
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
+      // if we hit the corner of an activeObject, let's return that.
+      if (activeObject && activeObject._findTargetCorner(pointer)) {
         return activeObject;
+      }
+      if (activeObject && this._checkTarget(pointer, activeObject)) {
+        if (!this.preserveObjectStacking) {
+          return activeObject;
+        }
+        else {
+          activeTarget = activeObject;
+        }
       }
 
       this.targets = [];
 
       var target = this._searchPossibleTargets(this._objects, pointer);
+      if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
+        target = activeTarget;
+      }
       this._fireOverOutEvents(target, e);
       return target;
     },

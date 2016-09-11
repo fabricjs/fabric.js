@@ -804,6 +804,7 @@
     });
   });
 
+<<<<<<< HEAD
   asyncTest('toJSON overlayObject with custom props', function() {
     createImageObject(function(image) {
       canvas.overlayObject = image;
