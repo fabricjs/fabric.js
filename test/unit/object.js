@@ -1338,10 +1338,10 @@
   });
 
   test('isContainedWithinObject', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 230 }),
-        object1 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50 }),
-        object2 = new fabric.Object({ left: 20, top: 30, width: 60, height: 30, angle: 10 }),
-        object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0 });
+    var object = new fabric.Object({ left: 0, top: 0, width: 40, height: 40, angle: 0 }),
+        object1 = new fabric.Object({ left: 1, top: 1, width: 40, height: 40, angle: 0 }),
+        object2 = new fabric.Object({ left: 20, top: 20, width: 40, height: 40, angle: 0 }),
+        object3 = new fabric.Object({ left: 50, top: 50, width: 40, height: 40, angle: 0 });
 
     object.set({ originX: 'center', originY: 'center' }).setCoords();
     object1.set({ originX: 'center', originY: 'center' }).setCoords();
