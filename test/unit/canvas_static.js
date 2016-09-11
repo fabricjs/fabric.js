@@ -766,6 +766,17 @@
     });
   });
 
+  asyncTest('toJSON backgroundImage with custom props', function() {
+    createImageObject(function(image) {
+      canvas.backgroundObject = image;
+      image.custom = 'yes';
+      var json = canvas.toJSON(['custom']);
+      equal(json.backgroundObject.custom, 'yes');
+      canvas.backgroundObject = null;
+      start();
+    });
+  });
+
   asyncTest('toJSON overlayObject', function() {
     createImageObject(function(image) {
 
@@ -778,6 +789,17 @@
 
       canvas.overlayObject = null;
 
+      start();
+    });
+  });
+
+  asyncTest('toJSON backgroundImage with custom props', function() {
+    createImageObject(function(image) {
+      canvas.overlayObject = image;
+      image.custom = 'yes';
+      var json = canvas.toJSON(['custom']);
+      equal(json.overlayObject.custom, 'yes');
+      canvas.overlayObject = null;
       start();
     });
   });

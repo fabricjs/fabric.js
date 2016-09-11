@@ -1073,7 +1073,7 @@
         objects: this._toObjects(methodName, propertiesToInclude)
       };
 
-      extend(data, this.__serializeBgOverlay());
+      extend(data, this.__serializeBgOverlay(propertiesToInclude));
 
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
 
@@ -1155,24 +1155,24 @@
     /**
      * @private
      */
-    __serializeBgOverlay: function() {
+    __serializeBgOverlay: function(propertiesToInclude) {
       var data = { };
 
       if (this.backgroundFill) {
         data.backgroundFill = this.backgroundFill.toObject
-          ? this.backgroundFill.toObject()
+          ? this.backgroundFill.toObject(propertiesToInclude)
           : this.backgroundFill;
       }
       if (this.overlayFill) {
         data.overlayFill = this.overlayFill.toObject
-          ? this.overlayFill.toObject()
+          ? this.overlayFill.toObject(propertiesToInclude)
           : this.overlayFill;
       }
       if (this.backgroundObject) {
-        data.backgroundObject = this.backgroundObject.toObject();
+        data.backgroundObject = this.backgroundObject.toObject(propertiesToInclude);
       }
       if (this.overlayObject) {
-        data.overlayObject = this.overlayObject.toObject();
+        data.overlayObject = this.overlayObject.toObject(propertiesToInclude);
       }
       return data;
     },
