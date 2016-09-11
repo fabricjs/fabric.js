@@ -719,17 +719,22 @@
   test('intersectsWithObject', function() {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
-    ok(typeof cObj.intersectsWithObject == 'function');
+    ok(typeof cObj.intersectsWithObject == 'function', 'has intersectsWithObject method');
 
     var cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
     cObj2.setCoords();
-    ok(cObj.intersectsWithObject(cObj2));
-    ok(cObj2.intersectsWithObject(cObj));
+    ok(cObj.intersectsWithObject(cObj2), 'cobj2 does intersect with cobj');
+    ok(cObj2.intersectsWithObject(cObj), 'cobj2 does intersect with cobj');
 
     var cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
     cObj3.setCoords();
-    ok(!cObj.intersectsWithObject(cObj3));
-    ok(!cObj3.intersectsWithObject(cObj));
+    ok(!cObj.intersectsWithObject(cObj3), 'cobj3 does not intersect with cobj (external)');
+    ok(!cObj3.intersectsWithObject(cObj), 'cobj3 does not intersect with cobj (external)');
+
+    var cObj4 = new fabric.Object({ left: 0, top: 0, width: 200, height: 200 });
+    cObj4.setCoords();
+    ok(cObj4.intersectsWithObject(cObj), 'overlapping objects are considered intersecting');
+    ok(cObj.intersectsWithObject(cObj4), 'overlapping objects are considered intersecting');
   });
 
   test('isContainedWithinRect', function() {
@@ -1329,31 +1334,46 @@
     object2.set({ originX: 'center', originY: 'center' }).setCoords();
     object3.set({ originX: 'center', originY: 'center' }).setCoords();
 
-    // object and object1 intersects
-    equal(object.intersectsWithObject(object1), true);
-    // object2 is contained in object (no intersection)
-    equal(object.intersectsWithObject(object2), false);
-    // object3 is outside of object (no intersection)
-    equal(object.intersectsWithObject(object3), false);
+    equal(object.intersectsWithObject(object1), true, 'object and object1 intersects');
+    equal(object.intersectsWithObject(object2), true, 'object2 is contained in object');
+    equal(object.intersectsWithObject(object3), false, 'object3 is outside of object (no intersection)');
   });
 
   test('isContainedWithinObject', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 230 }),
-        object1 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50 }),
-        object2 = new fabric.Object({ left: 20, top: 30, width: 60, height: 30, angle: 10 }),
-        object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0 });
+    var object = new fabric.Object({ left: 0, top: 0, width: 40, height: 40, angle: 0 }),
+        object1 = new fabric.Object({ left: 1, top: 1, width: 38, height: 38, angle: 0 }),
+        object2 = new fabric.Object({ left: 20, top: 20, width: 40, height: 40, angle: 0 }),
+        object3 = new fabric.Object({ left: 50, top: 50, width: 40, height: 40, angle: 0 });
 
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-    object1.set({ originX: 'center', originY: 'center' }).setCoords();
-    object2.set({ originX: 'center', originY: 'center' }).setCoords();
-    object3.set({ originX: 'center', originY: 'center' }).setCoords();
+    object.setCoords();
+    object1.setCoords();
+    object2.setCoords();
+    object3.setCoords();
 
-    // object1 is fully contained within object
-    equal(object1.isContainedWithinObject(object), true);
-    // object2 intersects object (not fully contained)
-    equal(object2.isContainedWithinObject(object), false);
-    // object3 is outside of object (not fully contained)
-    equal(object3.isContainedWithinObject(object), false);
+    equal(object1.isContainedWithinObject(object), true, 'object1 is fully contained within object');
+    equal(object2.isContainedWithinObject(object), false, 'object2 intersects object (not fully contained)');
+    equal(object3.isContainedWithinObject(object), false, 'object3 is outside of object (not fully contained)');
+    object1.angle = 45;
+    object1.setCoords();
+    equal(object1.isContainedWithinObject(object), false, 'object1 rotated is not contained within object');
+
+    var rect1 = new fabric.Rect({
+      width: 50,
+      height: 50,
+      left: 50,
+      top: 50
+    });
+
+    var rect2 = new fabric.Rect({
+      width: 100,
+      height: 100,
+      left: 100,
+      top: 0,
+      angle: 45,
+    });
+    rect1.setCoords();
+    rect2.setCoords();
+    equal(rect1.isContainedWithinObject(rect2), false, 'rect1 rotated is not contained within rect2');
   });
 
   test('isContainedWithinRect', function() {
