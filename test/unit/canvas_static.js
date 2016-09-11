@@ -170,12 +170,23 @@
     ok('backgroundObject' in canvas);
     ok('overlayObject' in canvas);
     ok('clipTo' in canvas);
+    ok('includeDefaultValues' in canvas);
+    ok('stateful' in canvas);
+    ok('automaticRender' in canvas);
+    ok('controlsAboveOverlay' in canvas);
+    ok('allowTouchScrolling' in canvas);
+    ok('imageSmoothingEnabled' in canvas);
+    ok('backgroundVpt' in canvas);
+    ok('overlayVpt' in canvas);
 
     equal(canvas.includeDefaultValues, true);
     equal(canvas.stateful, true);
     equal(canvas.automaticRender, true);
     equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.allowTouchScrolling, false);
     equal(canvas.imageSmoothingEnabled, true);
+    equal(canvas.backgroundVpt, true);
+    equal(canvas.overlayVpt, true);
 
     notStrictEqual(canvas.viewportTransform, canvas2.viewportTransform);
   });
@@ -766,7 +777,7 @@
     });
   });
 
-  asyncTest('toJSON backgroundImage with custom props', function() {
+  asyncTest('toJSON backgroundObject with custom props', function() {
     createImageObject(function(image) {
       canvas.backgroundObject = image;
       image.custom = 'yes';
@@ -793,7 +804,7 @@
     });
   });
 
-  asyncTest('toJSON backgroundImage with custom props', function() {
+  asyncTest('toJSON overlayObject with custom props', function() {
     createImageObject(function(image) {
       canvas.overlayObject = image;
       image.custom = 'yes';
