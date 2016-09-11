@@ -172,7 +172,7 @@
     ok('clipTo' in canvas);
     ok('includeDefaultValues' in canvas);
     ok('stateful' in canvas);
-    ok('renderOnAddRemove' in canvas);
+    ok('automaticRender' in canvas);
     ok('controlsAboveOverlay' in canvas);
     ok('allowTouchScrolling' in canvas);
     ok('imageSmoothingEnabled' in canvas);
