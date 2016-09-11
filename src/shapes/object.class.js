@@ -1097,18 +1097,42 @@
       if (!noTransform) {
         this.transform(ctx);
       }
+      this._setOpacity(ctx);
+      this._setShadow(ctx);
+      this._renderBackground(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
 
       ctx.restore();
+    },
+
+    /**
+     * Draws a background for the object big as its width and height;
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderBackground: function(ctx) {
+      if (!this.backgroundColor) {
+        return;
+      }
+
+      ctx.fillStyle = this.backgroundColor;
+
+      ctx.fillRect(
+        -this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height
+      );
+      // if there is background color no other shadows
+      // should be casted
+      this._removeShadow(ctx);
     },
 
     /**

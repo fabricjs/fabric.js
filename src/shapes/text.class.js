@@ -634,30 +634,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextBackground: function(ctx) {
-      this._renderTextBoxBackground(ctx);
+      this._renderBackground(ctx);
       this._renderTextLinesBackground(ctx);
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderTextBoxBackground: function(ctx) {
-      if (!this.backgroundColor) {
-        return;
-      }
-
-      ctx.fillStyle = this.backgroundColor;
-
-      ctx.fillRect(
-        this._getLeftOffset(),
-        this._getTopOffset(),
-        this.width,
-        this.height
-      );
-      // if there is background color no other shadows
-      // should be casted
-      this._removeShadow(ctx);
     },
 
     /**
