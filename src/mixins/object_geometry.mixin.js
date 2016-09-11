@@ -234,7 +234,7 @@
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getTransformedDimensions().x;
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -246,7 +246,7 @@
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getTransformedDimensions().y;
       return this.scale(value / this.height / boundingRectFactor);
     },
 

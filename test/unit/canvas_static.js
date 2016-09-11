@@ -724,10 +724,10 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[]}', 'empty background does not get exported');
     canvas.backgroundFill = '#ff5555';
     canvas.overlayFill = 'rgba(0,0,0,0.2)';
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"backgroundFill":"#ff5555","overlayFill":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
     deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
   });
@@ -792,8 +792,9 @@
 
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
+    canvas.backgroundFill = 'yellow';
     var expectedObject = {
-      background: canvas.backgroundFill,
+      backgroundFill: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -817,8 +818,9 @@
 
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
+    canvas.backgroundFill = 'purple';
     var expectedObject = {
-      background: canvas.backgroundFill,
+      backgroundFill: canvas.backgroundFill,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -836,7 +838,6 @@
     canvas.foobar = 123;
 
     var expectedObject = {
-      background: canvas.backgroundFill,
       objects: canvas.getObjects(),
       freeDrawingColor: 'red',
       foobar: 123
@@ -916,7 +917,7 @@
 
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
-    serialized.background = 'green';
+    serialized.backgroundFill = 'green';
     serialized.backgroundObject = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundFill":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -1266,17 +1267,18 @@
     }, 1000);
   });
 
-  asyncTest('options in setBackgroundObject from URL', function() {
-    canvas.setBackgroundObject(IMG_SRC, function() {
-      equal(canvas.backgroundObject.left, 50);
-      equal(canvas.backgroundObject.originX, 'right');
-
-      start();
-    }, {
-      left: 50,
-      originX: 'right'
-    });
-  });
+  // remove or change with another test
+  // asyncTest('options in setBackgroundObject from URL', function() {
+  //   canvas.setBackgroundObject(IMG_SRC, function() {
+  //     equal(canvas.backgroundObject.left, 50);
+  //     equal(canvas.backgroundObject.originX, 'right');
+  //
+  //     start();
+  //   }, {
+  //     left: 50,
+  //     originX: 'right'
+  //   });
+  // });
 
   test('setViewportTransform', function() {
     ok(typeof canvas.setViewportTransform == 'function');
@@ -1373,13 +1375,13 @@
 
   asyncTest('options in setBackgroundObject from image instance', function() {
     createImageObject(function(imageInstance) {
-      canvas.setBackgroundObject(imageInstance);
+      canvas.setBackgroundObject(imageInstance, {
+        left: 100,
+        originX: 'center'
+      });
       equal(canvas.backgroundObject.left, 100);
       equal(canvas.backgroundObject.originX, 'center');
       start();
-    }, {
-      left: 100,
-      originX: 'center'
     });
   });
 

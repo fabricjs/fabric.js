@@ -106,10 +106,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    */
   toSVG: function(object) {
     var patternSource = typeof this.source === 'function' ? this.source() : this.source,
-        patternWidth = patternSource.width / object.getWidth(),
-        patternHeight = patternSource.height / object.getHeight(),
-        patternOffsetX = this.offsetX / object.getWidth(),
-        patternOffsetY = this.offsetY / object.getHeight(),
+        objectWidth = this.getTransformedDimensions.x,
+        objectHeight = this.getTransformedDimensions.y,
+        patternWidth = patternSource.width / objectWidth,
+        patternHeight = patternSource.height / objectHeight,
+        patternOffsetX = this.offsetX / objectWidth,
+        patternOffsetY = this.offsetY / objectHeight,
         patternImgSrc = '';
     if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
       patternHeight = 1;

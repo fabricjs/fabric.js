@@ -1194,10 +1194,11 @@
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        textHeightScaleFactor = text.getHeight() / text.height,
+        textHeight = text.getTransformedDimensions().y,
+        textHeightScaleFactor = textHeight / text.height,
         lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
         scaledDiff = lineHeightDiff * textHeightScaleFactor,
-        textHeight = text.getHeight() + scaledDiff,
+        textHeight = textHeight + scaledDiff,
         offX = 0;
     /*
       Adjust positioning:
@@ -1205,10 +1206,10 @@
         top/left properties in Fabric correspond to center point of text bounding box
     */
     if (text.originX === 'left') {
-      offX = text.getWidth() / 2;
+      offX = text.getTransformedDimensions().x / 2;
     }
     if (text.originX === 'right') {
-      offX = -text.getWidth() / 2;
+      offX = -text.getTransformedDimensions().x / 2;
     }
     text.set({
       left: text.getLeft() + offX,

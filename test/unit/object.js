@@ -432,24 +432,19 @@
     equal(boundingRect.height.toFixed(2), 336);
   });
 
-  test('getWidth', function() {
+  test('getTransformedDimensions', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.getWidth == 'function');
-    equal(cObj.getWidth(), 0 + cObj.strokeWidth);
+    equal(cObj.getTransformedDimensions().x, 0 + cObj.strokeWidth);
     cObj.set('width', 123);
-    equal(cObj.getWidth(), 123 + cObj.strokeWidth);
+    equal(cObj.getTransformedDimensions().x, 123 + cObj.strokeWidth);
     cObj.set('scaleX', 2);
-    equal(cObj.getWidth(), 246 + cObj.strokeWidth * 2);
-  });
-
-  test('getHeight', function() {
-    var cObj = new fabric.Object({strokeWidth: 0});
-    ok(typeof cObj.getHeight == 'function');
-    equal(cObj.getHeight(), 0);
+    equal(cObj.getTransformedDimensions().x, 246 + cObj.strokeWidth * 2);
+    equal(cObj.getTransformedDimensions().y, 0 + cObj.strokeWidth);
     cObj.set('height', 123);
-    equal(cObj.getHeight(), 123);
+    equal(cObj.getTransformedDimensions().y, 123 + cObj.strokeWidth);
     cObj.set('scaleY', 2);
-    equal(cObj.getHeight(), 246);
+    equal(cObj.getTransformedDimensions().y, 246 + cObj.strokeWidth * 2);
   });
 
   test('rotate', function() {
@@ -475,7 +470,7 @@
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
     ok(typeof cObj.scaleToWidth == 'function');
     equal(cObj.scaleToWidth(100), cObj, 'chainable');
-    equal(cObj.getWidth(), 100);
+    equal(cObj.getTransformedDimensions().x, 100);
     equal(cObj.get('scaleX'), 100 / 560);
   });
 
@@ -483,7 +478,7 @@
     var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
     ok(typeof cObj.scaleToHeight == 'function');
     equal(cObj.scaleToHeight(100), cObj, 'chainable');
-    equal(cObj.getHeight(), 100);
+    equal(cObj.getTransformedDimensions().y, 100);
     equal(cObj.get('scaleY'), 100 / 560);
   });
 

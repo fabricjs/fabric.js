@@ -182,7 +182,7 @@
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
-          hypotFull = this.getWidth(),
+          hypotFull = this.getTransformedDimensions().x,
           xFull = Math.cos(angle) * hypotFull,
           yFull = Math.sin(angle) * hypotFull,
           offsetFrom, offsetTo;
