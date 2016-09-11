@@ -1155,7 +1155,7 @@
     /**
      * @private
      */
-    __serializeBgOverlay: function() {
+    __serializeBgOverlay: function(propertiesToInclude) {
       var data = { };
 
       if (this.backgroundFill) {
