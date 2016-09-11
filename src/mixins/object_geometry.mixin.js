@@ -49,8 +49,8 @@
           );
 
       return intersection.status === 'Intersection'
-        && !other.isContainedWithinObject(this)
-        && !this.isContainedWithinObject(other);
+        || other.isContainedWithinObject(this)
+        || this.isContainedWithinObject(other);
     },
 
     /**
