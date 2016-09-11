@@ -346,17 +346,23 @@
   test('findTarget preserveObjectStacking true', function() {
     ok(typeof canvas.findTarget == 'function');
     canvas.preserveObjectStacking = true;
-    var rect = makeRect({ left: 0, top: 0 }),
-        rectOver = makeRect({ left: 0, top: 0 }),
+    var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
+        rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 5, clientY: 5 };
+        pointer = { clientX: 15, clientY: 15, 'shiftKey': true },
+        pointer2 = { clientX: 4, clientY: 4 };
     canvas.add(rect);
     canvas.add(rectOver);
     target = canvas.findTarget(pointer);
     equal(target, rectOver, 'Should return the rectOver, rect is not considered');
     canvas.setActiveObject(rect);
     target = canvas.findTarget(pointer);
-    equal(target, rect, 'Should return the rect, because it is active');
+    equal(target, rectOver, 'Should still return rectOver because is above active object');
+    target = canvas.findTarget(pointer2);
+    equal(target, rect, 'Should rect because a corner of the activeObject has been hit');
+    canvas.altSelectionKey = 'shiftKey';
+    target = canvas.findTarget(pointer);
+    equal(target, rect, 'Should rect because active and altSelectionKey is pressed');
     canvas.preserveObjectStacking = false;
   });
 
