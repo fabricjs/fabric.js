@@ -355,6 +355,10 @@
       return this;
     },
 
+    /*
+     * calculate rotation matrix of an object
+     * @return {Array} rotation matrix for the object
+     */
     _calcRotateMatrix: function() {
       if (this.angle) {
         var theta = degreesToRadians(this.angle), cos = Math.cos(theta), sin = Math.sin(theta);
