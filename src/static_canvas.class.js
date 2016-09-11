@@ -1066,7 +1066,7 @@
         objects: this._toObjects(methodName, propertiesToInclude)
       };
 
-      extend(data, this.__serializeBgOverlay());
+      extend(data, this.__serializeBgOverlay(propertiesToInclude));
 
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
 
@@ -1148,23 +1148,23 @@
     /**
      * @private
      */
-    __serializeBgOverlay: function() {
+    __serializeBgOverlay: function(propertiesToInclude) {
       var data = {
         background: (this.backgroundColor && this.backgroundColor.toObject)
-          ? this.backgroundColor.toObject()
+          ? this.backgroundColor.toObject(propertiesToInclude)
           : this.backgroundColor
       };
 
       if (this.overlayColor) {
         data.overlay = this.overlayColor.toObject
-          ? this.overlayColor.toObject()
+          ? this.overlayColor.toObject(propertiesToInclude)
           : this.overlayColor;
       }
       if (this.backgroundImage) {
-        data.backgroundImage = this.backgroundImage.toObject();
+        data.backgroundImage = this.backgroundImage.toObject(propertiesToInclude);
       }
       if (this.overlayImage) {
-        data.overlayImage = this.overlayImage.toObject();
+        data.overlayImage = this.overlayImage.toObject(propertiesToInclude);
       }
 
       return data;
