@@ -48,7 +48,9 @@
             getCoords(other.oCoords)
           );
 
-      return intersection.status === 'Intersection';
+      return intersection.status === 'Intersection'
+        || other.isContainedWithinObject(this)
+        || this.isContainedWithinObject(other);
     },
 
     /**
@@ -57,11 +59,14 @@
      * @return {Boolean} true if object is fully contained within area of another object
      */
     isContainedWithinObject: function(other) {
-      var boundingRect = other.getBoundingRect(),
-          point1 = new fabric.Point(boundingRect.left, boundingRect.top),
-          point2 = new fabric.Point(boundingRect.left + boundingRect.width, boundingRect.top + boundingRect.height);
-
-      return this.isContainedWithinRect(point1, point2);
+      var points = getCoords(this.oCoords),
+          i = 0;
+      for (; i < 4; i++) {
+        if (!other.containsPoint(points[i])) {
+          return false;
+        }
+      }
+      return true;
     },
 
     /**
