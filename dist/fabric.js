@@ -5724,10 +5724,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    */
   toSVG: function(object) {
     var patternSource = typeof this.source === 'function' ? this.source() : this.source,
-        patternWidth = patternSource.width / object.getWidth(),
-        patternHeight = patternSource.height / object.getHeight(),
-        patternOffsetX = this.offsetX / object.getWidth(),
-        patternOffsetY = this.offsetY / object.getHeight(),
+        objectWidth = this.getTransformedDimensions.x,
+        objectHeight = this.getTransformedDimensions.y,
+        patternWidth = patternSource.width / objectWidth,
+        patternHeight = patternSource.height / objectHeight,
+        patternOffsetX = this.offsetX / objectWidth,
+        patternOffsetY = this.offsetY / objectHeight,
         patternImgSrc = '';
     if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
       patternHeight = 1;
@@ -13070,16 +13072,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * movex X position of an object.
      * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
-          hypotFull = this.getWidth(),
+          hypotFull = this.getTransformedDimensions().x,
           xFull = Math.cos(angle) * hypotFull,
           yFull = Math.sin(angle) * hypotFull,
           offsetFrom, offsetTo;
 
-      //TODO: this function does not consider mixed situation like top, center.
       if (typeof this.originX === 'string') {
         offsetFrom = originXOffset[this.originX];
       }
@@ -13096,6 +13098,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.top += yFull * (offsetTo - offsetFrom);
       this.setCoords();
       this.originX = to;
+      return this;
     },
 
     /**
@@ -13384,7 +13387,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getTransformedDimensions().x;
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -13396,7 +13399,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getTransformedDimensions().y;
       return this.scale(value / this.height / boundingRectFactor);
     },
 
@@ -13899,7 +13902,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Calculate object dimensions from its properties
      * @private
      */
-    _getNonTransformedDimensions: function() {
+    getNonTransformedDimensions: function() {
       var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
@@ -13932,7 +13935,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions = this._getNonTransformedDimensions(),
+      var dimensions = this.getNonTransformedDimensions(),
           dimX = dimensions.x / 2, dimY = dimensions.y / 2,
           points = [
             {
@@ -14055,7 +14058,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return this;
       }
 
-      var p = this._getNonTransformedDimensions(),
+      var p = this.getNonTransformedDimensions(),
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
           strokeWidth = 1 / this.borderScaleFactor,
@@ -20998,7 +21001,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @override
      * @private
      */
-    _getNonTransformedDimensions: function() {
+    getNonTransformedDimensions: function() {
       return { x: this.width, y: this.height };
     },
 
@@ -21755,10 +21758,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        textHeightScaleFactor = text.getHeight() / text.height,
+        textHeight = text.getTransformedDimensions().y,
+        textHeightScaleFactor = textHeight / text.height,
         lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
         scaledDiff = lineHeightDiff * textHeightScaleFactor,
-        textHeight = text.getHeight() + scaledDiff,
+        textHeight = textHeight + scaledDiff,
         offX = 0;
     /*
       Adjust positioning:
@@ -21766,10 +21770,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         top/left properties in Fabric correspond to center point of text bounding box
     */
     if (text.originX === 'left') {
-      offX = text.getWidth() / 2;
+      offX = text.getTransformedDimensions().x / 2;
     }
     if (text.originX === 'right') {
-      offX = -text.getWidth() / 2;
+      offX = -text.getTransformedDimensions().x / 2;
     }
     text.set({
       left: text.getLeft() + offX,

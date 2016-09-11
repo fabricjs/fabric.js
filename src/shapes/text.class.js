@@ -437,7 +437,7 @@
      * @override
      * @private
      */
-    _getNonTransformedDimensions: function() {
+    getNonTransformedDimensions: function() {
       return { x: this.width, y: this.height };
     },
 

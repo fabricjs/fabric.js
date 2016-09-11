@@ -3036,7 +3036,7 @@ fabric.Pattern = fabric.util.createClass({
         };
     },
     toSVG: function(object) {
-        var patternSource = typeof this.source === "function" ? this.source() : this.source, patternWidth = patternSource.width / object.getWidth(), patternHeight = patternSource.height / object.getHeight(), patternOffsetX = this.offsetX / object.getWidth(), patternOffsetY = this.offsetY / object.getHeight(), patternImgSrc = "";
+        var patternSource = typeof this.source === "function" ? this.source() : this.source, objectWidth = this.getTransformedDimensions.x, objectHeight = this.getTransformedDimensions.y, patternWidth = patternSource.width / objectWidth, patternHeight = patternSource.height / objectHeight, patternOffsetX = this.offsetX / objectWidth, patternOffsetY = this.offsetY / objectHeight, patternImgSrc = "";
         if (this.repeat === "repeat-x" || this.repeat === "no-repeat") {
             patternHeight = 1;
         }
@@ -6317,7 +6317,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.set("top", position.y);
         },
         adjustPosition: function(to) {
-            var angle = degreesToRadians(this.angle), hypotFull = this.getWidth(), xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull, offsetFrom, offsetTo;
+            var angle = degreesToRadians(this.angle), hypotFull = this.getTransformedDimensions().x, xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull, offsetFrom, offsetTo;
             if (typeof this.originX === "string") {
                 offsetFrom = originXOffset[this.originX];
             } else {
@@ -6332,6 +6332,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.top += yFull * (offsetTo - offsetFrom);
             this.setCoords();
             this.originX = to;
+            return this;
         },
         _setOriginToCenter: function() {
             this._originalOriginX = this.originX;
@@ -6462,11 +6463,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return this;
         },
         scaleToWidth: function(value) {
-            var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+            var boundingRectFactor = this.getBoundingRect().width / this.getTransformedDimensions().x;
             return this.scale(value / this.width / boundingRectFactor);
         },
         scaleToHeight: function(value) {
-            var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+            var boundingRectFactor = this.getBoundingRect().height / this.getTransformedDimensions().y;
             return this.scale(value / this.height / boundingRectFactor);
         },
         setCoords: function() {
@@ -6687,7 +6688,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 };
             }
         },
-        _getNonTransformedDimensions: function() {
+        getNonTransformedDimensions: function() {
             var strokeWidth = this.strokeWidth, w = this.width, h = this.height, addStrokeToW = true, addStrokeToH = true;
             if (this.type === "line" && this.strokeLineCap === "butt") {
                 addStrokeToH = w;
@@ -6711,7 +6712,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             if (typeof skewY === "undefined") {
                 skewY = this.skewY;
             }
-            var dimensions = this._getNonTransformedDimensions(), dimX = dimensions.x / 2, dimY = dimensions.y / 2, points = [ {
+            var dimensions = this.getNonTransformedDimensions(), dimX = dimensions.x / 2, dimY = dimensions.y / 2, points = [ {
                 x: -dimX,
                 y: -dimY
             }, {
@@ -6775,7 +6776,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             if (!this.hasBorders) {
                 return this;
             }
-            var p = this._getNonTransformedDimensions(), matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX), wh = fabric.util.transformPoint(p, matrix), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth + 2 * this.padding, height = wh.y + strokeWidth + 2 * this.padding;
+            var p = this.getNonTransformedDimensions(), matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX), wh = fabric.util.transformPoint(p, matrix), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth + 2 * this.padding, height = wh.y + strokeWidth + 2 * this.padding;
             ctx.save();
             this._setLineDash(ctx, this.borderDashArray, null);
             ctx.strokeStyle = this.borderColor;
@@ -9835,7 +9836,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
             return maxWidth;
         },
-        _getNonTransformedDimensions: function() {
+        getNonTransformedDimensions: function() {
             return {
                 x: this.width,
                 y: this.height
@@ -10213,12 +10214,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             textContent = element.textContent;
         }
         textContent = textContent.replace(/^\s+|\s+$|\n+/g, "").replace(/\s+/g, " ");
-        var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.getHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getHeight() + scaledDiff, offX = 0;
+        var text = new fabric.Text(textContent, options), textHeight = text.getTransformedDimensions().y, textHeightScaleFactor = textHeight / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = textHeight + scaledDiff, offX = 0;
         if (text.originX === "left") {
-            offX = text.getWidth() / 2;
+            offX = text.getTransformedDimensions().x / 2;
         }
         if (text.originX === "right") {
-            offX = -text.getWidth() / 2;
+            offX = -text.getTransformedDimensions().x / 2;
         }
         text.set({
             left: text.getLeft() + offX,
