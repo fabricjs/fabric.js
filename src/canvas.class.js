@@ -1262,7 +1262,7 @@
      */
     setActiveObject: function (object, e) {
       this._setActiveObject(object);
-      this.renderAll();
+      this.automaticRender && this.renderAll();
       this.fire('object:selected', { target: object, e: e });
       object.fire('selected', { e: e });
       return this;

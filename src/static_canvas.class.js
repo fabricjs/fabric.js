@@ -100,7 +100,7 @@
      * @type Boolean
      * @default
      */
-    renderOnAddRemove: true,
+    automaticRender: true,
 
     /**
      * Function that determines clipping of entire canvas area
@@ -683,7 +683,7 @@
       if (activeGroup) {
         activeGroup.setCoords();
       }
-      this.renderAll();
+      this.automaticRender && this.renderAll();
       return this;
     },
 
@@ -1565,7 +1565,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      return this.automaticRender && this.renderAll && this.renderAll();
     },
 
     /**

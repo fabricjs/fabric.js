@@ -6,7 +6,7 @@ fabric.Collection = {
   _objects: [],
 
   /**
-   * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Adds objects to collection, then renders canvas (if `automaticRender` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
@@ -19,12 +19,12 @@ fabric.Collection = {
         this._onObjectAdded(arguments[i]);
       }
     }
-    this.renderOnAddRemove && this.renderAll();
+    this.automaticRender && this.renderAll();
     return this;
   },
 
   /**
-   * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Inserts an object into collection at specified index, then renders canvas (if `automaticRender` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
    * @param {Object} object Object to insert
    * @param {Number} index Index to insert object at
@@ -41,12 +41,12 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.renderAll();
+    this.automaticRender && this.renderAll();
     return this;
   },
 
   /**
-   * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Removes objects from a collection, then renders canvas (if `automaticRender` is not `false`)
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
    * @chainable
@@ -66,7 +66,7 @@ fabric.Collection = {
       }
     }
 
-    this.renderOnAddRemove && somethingRemoved && this.renderAll();
+    this.automaticRender && somethingRemoved && this.renderAll();
     return this;
   },
 

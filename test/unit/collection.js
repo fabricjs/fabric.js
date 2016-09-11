@@ -6,7 +6,7 @@
     setup: function() {
       collection.rendered = 0;
       collection._objects = [];
-      delete collection.renderOnAddRemove;
+      delete collection.automaticRender;
       delete collection._onObjectAdded;
       delete collection._onObjectRemoved;
     }
@@ -31,7 +31,7 @@
     collection.add(obj);
     equal(collection._objects[1], obj, 'add object in the array');
     equal(fired, 1, 'fired is incremented if there is a _onObjectAddded');
-    collection.renderOnAddRemove = true;
+    collection.automaticRender = true;
     equal(collection.rendered, 0, 'this.renderAll has not been called');
     collection.add(obj);
     equal(collection.rendered, 1, 'this.renderAll has been called');
@@ -71,7 +71,7 @@
     };
     collection.insertAt(obj, 1);
     equal(fired, 1, 'fired is incremented if there is a _onObjectAddded');
-    collection.renderOnAddRemove = true;
+    collection.automaticRender = true;
     collection.insertAt(obj, 1);
     equal(collection.rendered, 1, 'this.renderAll has been called');
   });
@@ -96,7 +96,7 @@
 
     collection.add(obj2);
     collection.add(obj);
-    collection.renderOnAddRemove = true;
+    collection.automaticRender = true;
     equal(collection.rendered, 0, 'this.renderAll has not been called');
     collection.remove(obj2);
     equal(collection.rendered, 1, 'this.renderAll has been called');

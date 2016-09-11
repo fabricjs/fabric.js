@@ -27,12 +27,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
 
     // serialize if it wasn't already
-    var renderOnAddRemove = this.renderOnAddRemove,
+    var automaticRender = this.automaticRender,
         serialized = (typeof json === 'string')
           ? JSON.parse(json)
           : fabric.util.object.clone(json);
 
-    this.renderOnAddRemove = false;
+    this.automaticRender = false;
     this.clear();
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
@@ -42,7 +42,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         delete serialized.backgroundObject;
         delete serialized.overlayObject;
         _this._initOptions(serialized);
-        _this.renderOnAddRemove = renderOnAddRemove;
+        _this.automaticRender = automaticRender;
         callback && callback();
       }, reviver);
     }, reviver);

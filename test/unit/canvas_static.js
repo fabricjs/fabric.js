@@ -173,7 +173,7 @@
 
     equal(canvas.includeDefaultValues, true);
     equal(canvas.stateful, true);
-    equal(canvas.renderOnAddRemove, true);
+    equal(canvas.automaticRender, true);
     equal(canvas.controlsAboveOverlay, false);
     equal(canvas.imageSmoothingEnabled, true);
 
@@ -235,7 +235,7 @@
     strictEqual(canvas.item(3), rect4);
   });
 
-  test('add renderOnAddRemove disabled', function() {
+  test('add automaticRender disabled', function() {
     var rect = makeRect(),
         originalRenderOnAddition,
         renderAllCount = 0;
@@ -244,8 +244,8 @@
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
+    originalRenderOnAddition = canvas.automaticRender;
+    canvas.automaticRender = false;
 
     canvas.on('after:render', countRenderAll);
 
@@ -262,7 +262,7 @@
     equal(renderAllCount, 1);
 
     canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
+    canvas.automaticRender = originalRenderOnAddition;
   });
 
   test('object:added', function() {
@@ -307,7 +307,7 @@
     equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
   });
 
-  test('insertAt renderOnAddRemove disabled', function() {
+  test('insertAt automaticRender disabled', function() {
     var rect1 = makeRect(),
         rect2 = makeRect(),
         originalRenderOnAddition,
@@ -317,8 +317,8 @@
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
+    originalRenderOnAddition = canvas.automaticRender;
+    canvas.automaticRender = false;
 
     canvas.on('after:render', countRenderAll);
 
@@ -338,7 +338,7 @@
     equal(renderAllCount, 1);
 
     canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
+    canvas.automaticRender = originalRenderOnAddition;
   });
 
   test('remove', function() {
@@ -360,7 +360,7 @@
     equal(canvas.isEmpty(), true, 'canvas should be empty');
   });
 
-  test('remove renderOnAddRemove disabled', function() {
+  test('remove automaticRender disabled', function() {
     var rect1 = makeRect(),
         rect2 = makeRect(),
         originalRenderOnAddition,
@@ -370,8 +370,8 @@
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
+    originalRenderOnAddition = canvas.automaticRender;
+    canvas.automaticRender = false;
 
     canvas.on('after:render', countRenderAll);
 
@@ -386,7 +386,7 @@
     equal(renderAllCount, 1);
 
     canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
+    canvas.automaticRender = originalRenderOnAddition;
   });
 
   test('object:removed', function() {
@@ -631,7 +631,7 @@
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.PathGroup([path2, path3]);
 
-    canvas.renderOnAddRemove = false;
+    canvas.automaticRender = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
 
     var reviverCount = 0,
@@ -645,7 +645,7 @@
     canvas.toSVG(null, reviver);
     equal(reviverCount, len);
 
-    canvas.renderOnAddRemove = true;
+    canvas.automaticRender = true;
   });
 
   test('toSVG with reviver', function() {
@@ -669,7 +669,7 @@
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.PathGroup([path2, path3]);
 
-    canvas.renderOnAddRemove = false;
+    canvas.automaticRender = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
     canvas.setBackgroundObject(imageBG);
     canvas.setOverlayObject(imageOL);
@@ -685,7 +685,7 @@
     equal(reviverCount, len + 2, 'reviver should include background and overlay image');
     canvas.setBackgroundObject(null);
     canvas.setOverlayObject(null);
-    canvas.renderOnAddRemove = true;
+    canvas.automaticRender = true;
   });
 
   test('toSVG with exclude from export', function() {
@@ -707,7 +707,7 @@
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.PathGroup([path2, path3]);
 
-    canvas.renderOnAddRemove = false;
+    canvas.automaticRender = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
     var reviverCount = 0,
         len = canvas.size() + group.size() + pathGroup.paths.length;
@@ -719,7 +719,7 @@
 
     canvas.toSVG(null, reviver);
     equal(reviverCount, len - 2, 'reviver should not include objects with excludeFromExport');
-    canvas.renderOnAddRemove = true;
+    canvas.automaticRender = true;
   });
 
   test('toJSON', function() {
