@@ -754,8 +754,8 @@
       parser = new DOMParser();
     }
     var svgString = canvas.toSVG(),
-        doc = parser.parseFromString(svgString, "image/svg+xml"),
+        doc = parser.parseFromString(svgString, 'image/svg+xml'),
         style = doc.getElementsByTagName('style')[0].firstChild.data;
-        equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
+    equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
   });
 })();

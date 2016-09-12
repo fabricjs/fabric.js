@@ -118,12 +118,22 @@
 
     /**
      * Indicates which key enable multiple click selection
-     * values: altKey, shiftKey, ctrlKey
+     * values: altKey, shiftKey, ctrlKey, cmdKey
      * @since 1.6.2
      * @type String
      * @default
      */
     selectionKey:           'shiftKey',
+
+    /**
+     * Indicates which key enable alternative selection
+     * in case of target overlapping with active object
+     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * @since 1.6.5
+     * @type null|String
+     * @default
+     */
+    altSelectionKey:           null,
 
     /**
      * Color of selection
@@ -137,7 +147,7 @@
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:     [ ],
+    selectionDashArray:     [],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
@@ -227,7 +237,8 @@
     isDrawingMode:          false,
 
     /**
-     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * Indicates whether objects should remain in current stack position when selected.
+     * When false objects are brought to top and rendered as part of the selection group
      * @type Boolean
      * @default
      */
@@ -258,7 +269,7 @@
     _chooseObjectsToRender: function() {
       var activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
-          object, objsToRender = [ ], activeGroupObjects = [ ];
+          object, objsToRender = [], activeGroupObjects = [];
 
       if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
@@ -397,7 +408,6 @@
           vptPointer = this.restorePointerVpt(pointer),
           p = fabric.util.transformPoint(vptPointer, invertedM);
       return fabric.util.transformPoint(p, vpt);
-      //return { x: p.x * vpt[0], y: p.y * vpt[3] };
     },
 
     /**
@@ -667,8 +677,7 @@
           actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
 
       this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
-      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by],
-
+      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by];
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
       // Actually skew the object
       skewed = this._setObjectSkew(actualMouseByOrigin, t, by, dim);
@@ -970,8 +979,8 @@
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft),
-            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
 
         ctx.beginPath();
 
@@ -1006,7 +1015,8 @@
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
           activeGroup = this.getActiveGroup(),
-          activeObject = this.getActiveObject();
+          activeObject = this.getActiveObject(),
+          activeTarget;
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -1014,14 +1024,25 @@
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
         return activeGroup;
       }
-
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
+      // if we hit the corner of an activeObject, let's return that.
+      if (activeObject && activeObject._findTargetCorner(pointer)) {
         return activeObject;
       }
+      if (activeObject && this._checkTarget(pointer, activeObject)) {
+        if (!this.preserveObjectStacking) {
+          return activeObject;
+        }
+        else {
+          activeTarget = activeObject;
+        }
+      }
 
-      this.targets = [ ];
+      this.targets = [];
 
       var target = this._searchPossibleTargets(this._objects, pointer);
+      if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
+        target = activeTarget;
+      }
       this._fireOverOutEvents(target, e);
       return target;
     },

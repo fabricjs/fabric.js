@@ -16,9 +16,9 @@ fabric.ElementsParser.prototype.parse = function() {
 fabric.ElementsParser.prototype.createObjects = function() {
   for (var i = 0, len = this.elements.length; i < len; i++) {
     this.elements[i].setAttribute('svgUid', this.svgUid);
-    (function(_this, i) {
+    (function(_obj, i) {
       setTimeout(function() {
-        _this.createObject(_this.elements[i], i);
+        _obj.createObject(_obj.elements[i], i);
       }, 0);
     })(this, i);
   }
@@ -80,6 +80,7 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
 fabric.ElementsParser.prototype.checkIfDone = function() {
   if (--this.numElements === 0) {
     this.instances = this.instances.filter(function(el) {
+      // eslint-disable-next-line no-eq-null, eqeqeq
       return el != null;
     });
     this.callback(this.instances);

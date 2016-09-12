@@ -176,7 +176,7 @@
     try {
       fabric.Circle.fromElement(elFaultyCircle);
     }
-    catch(err) {
+    catch (err) {
       error = err;
     }
     ok(error, 'negative attribute should throw');
@@ -187,7 +187,7 @@
     try {
       fabric.Circle.fromElement(elFaultyCircle);
     }
-    catch(err) {
+    catch (err) {
       error = err;
     }
 

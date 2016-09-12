@@ -59,7 +59,7 @@
     ok(polyline instanceof fabric.Object);
 
     equal(polyline.type, 'polyline');
-    deepEqual(polyline.get('points'), [ { x: 10, y: 12 }, { x: 20, y: 22 } ]);
+    deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
   test('complexity', function() {
@@ -137,11 +137,11 @@
       'points': expectedPoints,
       'left': 10,
       'top': 10,
-      'transformMatrix' : [ 2, 0, 0, 2, -10, -20 ]
+      'transformMatrix': [2, 0, 0, 2, -10, -20]
     }));
 
-    deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
+    deepEqual(polylineWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
 
-    equal(fabric.Polyline.fromElement(), null);    
+    equal(fabric.Polyline.fromElement(), null);
   });
 })();

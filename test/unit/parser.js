@@ -94,11 +94,11 @@
     element.setAttribute('x', '100');
     parent.setAttribute('y', '200');
     grandParent.setAttribute('width', '600');
-  	grandParent.setAttribute('height', '600');
+    grandParent.setAttribute('height', '600');
 
     deepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
       { left: 100, top: 200, width: 600, height: 600 });
- });
+  });
 
   asyncTest('parseElements', function() {
     ok(fabric.parseElements);
@@ -122,7 +122,7 @@
         parsedElements = instances;
       });
     }
-    catch(err) {
+    catch (err) {
       error = err;
     }
     ok(error === undefined, 'No error is raised');
@@ -531,7 +531,7 @@
         'strokeWidth': 0.25
       },
       'polygon.cls': {
-        'fill' : '',
+        'fill': '',
         'stroke': '#0000FF'
       }
     };
@@ -541,7 +541,7 @@
 
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
-          'fill' : '',
+          'fill': '',
           'stroke': '#0000FF'
         };
 
@@ -549,7 +549,7 @@
     elPolygon.setAttribute('class', 'cls');
     elPolygon.setAttribute('svgUid', svgUid);
 
-    var style = fabric.parseAttributes(elPolygon, [ ]);
+    var style = fabric.parseAttributes(elPolygon, []);
     deepEqual(style, expectedStyle);
 
     styleElement.textContent = '\t\n';

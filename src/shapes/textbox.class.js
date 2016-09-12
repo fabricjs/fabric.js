@@ -443,10 +443,13 @@
    * @static
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when an fabric.Textbox instance is created
    * @return {fabric.Textbox} instance of fabric.Textbox
    */
-  fabric.Textbox.fromObject = function(object) {
-    return new fabric.Textbox(object.text, clone(object));
+  fabric.Textbox.fromObject = function(object, callback) {
+    var textbox = new fabric.Textbox(object.text, clone(object));
+    callback && callback(textbox);
+    return textbox;
   };
   /**
    * Returns the default controls visibility required for Textboxes.

@@ -10,7 +10,7 @@
 (function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
-          radiansToDegrees = fabric.util.radiansToDegrees;
+      radiansToDegrees = fabric.util.radiansToDegrees;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
     /**
@@ -48,8 +48,8 @@
       }
 
       var self = this.__gesturesParams.self,
-              t = this._currentTransform,
-              e = this.__gesturesParams.e;
+          t = this._currentTransform,
+          e = this.__gesturesParams.e;
 
       t.action = 'scale';
       t.originX = t.originY = 'center';
@@ -123,9 +123,9 @@
      */
     _scaleObjectBy: function(s, e) {
       var t = this._currentTransform,
-              target = t.target,
-              lockScalingX = target.get('lockScalingX'),
-              lockScalingY = target.get('lockScalingY');
+          target = t.target,
+          lockScalingX = target.get('lockScalingX'),
+          lockScalingY = target.get('lockScalingY');
 
       if (lockScalingX && lockScalingY) {
         return;

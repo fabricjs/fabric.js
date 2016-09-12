@@ -3,7 +3,9 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -46,7 +48,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Convolute = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Convolute.prototype */ {
+  filters.Convolute = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Convolute.prototype */ {
 
     /**
      * Filter type
@@ -84,7 +86,7 @@
           pixels = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
 
           side = Math.round(Math.sqrt(weights.length)),
-          halfSide = Math.floor(side/2),
+          halfSide = Math.floor(side / 2),
           src = pixels.data,
           sw = pixels.width,
           sh = pixels.height,
@@ -107,7 +109,7 @@
               scy = y + cy - halfSide;
               scx = x + cx - halfSide;
 
-              /* jshint maxdepth:5 */
+              // eslint-disable-next-line max-depth
               if (scy < 0 || scy > sh || scx < 0 || scx > sw) {
                 continue;
               }

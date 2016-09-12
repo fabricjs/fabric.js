@@ -1236,7 +1236,7 @@ QUnit.jsDump = (function() {
 			nodelist: array,
 			arguments: array,
 			object:function( map ) {
-				var ret = [ ];
+				var ret = [];
 				QUnit.jsDump.up();
 				for ( var key in map )
 					ret.push( QUnit.jsDump.parse(key,'key') + ': ' + QUnit.jsDump.parse(map[key]) );
