@@ -41,6 +41,7 @@ testrunner.run({
       './test/unit/collection.js',
       './test/unit/point.js',
       './test/unit/intersection.js',
+      './test/unit/stateful.js'
     ]
 }, function(err, report) {
   if (err) {

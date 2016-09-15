@@ -675,28 +675,6 @@
     }
   });
 
-  test('hasStateChanged', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.hasStateChanged == 'function');
-    cObj.setupState();
-    ok(!cObj.hasStateChanged());
-    cObj.saveState();
-    cObj.set('left', 123).set('top', 456);
-    ok(cObj.hasStateChanged());
-  });
-
-  test('saveState', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.saveState == 'function');
-    cObj.setupState();
-    equal(cObj.saveState(), cObj, 'chainable');
-    cObj.set('left', 123).set('top', 456);
-    cObj.saveState();
-    cObj.set('left', 223).set('top', 556);
-    equal(cObj.originalState.left, 123);
-    equal(cObj.originalState.top, 456);
-  });
-
   test('intersectsWithRectangle', function() {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
