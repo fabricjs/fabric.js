@@ -14,22 +14,20 @@
   }
 
   function _isEqual(origValue, currentValue) {
-    if (currentValue instanceof Array) {
+    if (origValue instanceof Array) {
       if (origValue.length !== currentValue.length) {
         return false
       }
       var _currentValue = currentValue.concat().sort(),
           _origValue = origValue.concat().sort();
-      return !_currentValue.some(function(v, i) {
-        return !_isEqual(_origValue[i], v);
+      return !_origValue.some(function(v, i) {
+        return !_isEqual(_currentValue[i], v);
       });
     }
-    else if (currentValue instanceof Object) {
-      for (var key in currentValue) {
-        if (currentValue.hasOwnProperty(key)) {
-          if (!_isEqual(origValue[key], currentValue[key])) {
-            return false;
-          }
+    else if (origValue instanceof Object) {
+      for (var key in origValue) {
+        if (!_isEqual(origValue[key], currentValue[key])) {
+          return false;
         }
       }
       return true;
@@ -60,7 +58,6 @@
       if (options && options.stateProperties) {
         saveProps(this, 'originalState', options.stateProperties);
       }
-
       return this;
     },
 
