@@ -13,6 +13,13 @@
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'alignX',
+    'alignY',
+    'meetOrSlice'
+  );
+
   /**
    * Image class
    * @class fabric.Image
@@ -96,6 +103,14 @@
      * @type Number
      */
     minimumScaleTrigger: 0.5,
+
+    /**
+     * List of properties to consider when checking if
+     * state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * as well as for history (undo/redo) purposes
+     * @type Array
+     */
+    stateProperties: stateProperties,
 
     /**
      * Constructor

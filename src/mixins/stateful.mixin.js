@@ -1,16 +1,16 @@
 (function() {
 
-  var clone = fabric.util.object.clone;
+  var extend = fabric.util.object.extend;
+
   /*
     Depends on `stateProperties`
   */
-
   function saveProps(origin, destination, props) {
     var tmpObj = { }, deep = true;
     props.forEach(function(prop) {
       tmpObj[prop] = origin[prop];
     });
-    origin[destination] = clone(tmpObj, deep);
+    extend(origin[destination], tmpObj, deep);
   }
 
   function _isEqual(origValue, currentValue) {
@@ -47,9 +47,7 @@
      * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
      */
     hasStateChanged: function() {
-      return this.stateProperties.some(function(prop) {
-        return !_isEqual(this.originalState[prop], this[prop]);
-      }, this);
+      return !_isEqual(this.originalState, this);
     },
 
     /**
@@ -68,11 +66,12 @@
 
     /**
      * Setups state of an object
+     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      */
-    setupState: function() {
+    setupState: function(options) {
       this.originalState = { };
-      this.saveState();
+      this.saveState(options);
       return this;
     }
   });

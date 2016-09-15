@@ -23,6 +23,7 @@
         }
       }
       else {
+        // this sounds odd for an extend but is ok for recursive use
         destination = source;
       }
     }
