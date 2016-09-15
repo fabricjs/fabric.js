@@ -1,23 +1,16 @@
 (function() {
 
-  var clone = fabric.util.clone;
+  var clone = fabric.util.object.clone;
   /*
     Depends on `stateProperties`
   */
 
   function saveProps(origin, destination, props) {
+    var tmpObj = { }, deep = true;
     props.forEach(function(prop) {
-      var value = origin[prop];
-      if (value instanceof Array) {
-        destination[prop] = value.concat();
-      }
-      else if (value instanceof Object) {
-        destination[prop] = clone(value);
-      }
-      else {
-        destination[prop] = value;
-      }
+      tmpObj[prop] = origin[prop];
     });
+    origin[destination] = clone(tmpObj, deep);
   }
 
   function _isEqual(origValue, currentValue) {
@@ -28,7 +21,7 @@
       var _currentValue = currentValue.concat().sort(),
           _origValue = origValue.concat().sort();
       return !_currentValue.some(function(v, i) {
-        return v !== _origValue[i];
+        return !_isEqual(_origValue[i], v);
       });
     }
     else if (currentValue instanceof Object) {
@@ -65,9 +58,9 @@
      * @return {fabric.Object} thisArg
      */
     saveState: function(options) {
-      saveProps(this, this.originalState, this.stateProperties);
+      saveProps(this, 'originalState', this.stateProperties);
       if (options && options.stateProperties) {
-        saveProps(this, this.originalState, options.stateProperties);
+        saveProps(this, 'originalState', options.stateProperties);
       }
 
       return this;

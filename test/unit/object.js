@@ -680,53 +680,6 @@
     }
   });
 
-  test('hasStateChanged', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.hasStateChanged == 'function');
-    cObj.setupState();
-    ok(!cObj.hasStateChanged(), 'state should not be changed');
-    cObj.saveState();
-    cObj.set('left', 123).set('top', 456);
-    ok(cObj.hasStateChanged());
-  });
-
-  test('saveState', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.saveState == 'function');
-    cObj.setupState();
-    equal(cObj.saveState(), cObj, 'chainable');
-    cObj.set('left', 123).set('top', 456);
-    cObj.saveState();
-    cObj.set('left', 223).set('top', 556);
-    equal(cObj.originalState.left, 123);
-    equal(cObj.originalState.top, 456);
-  });
-
-  test('saveState with array', function() {
-    var cObj = new fabric.Text('Hello');
-    cObj.set('textDecoration', ['underline']);
-    cObj.setupState();
-    deepEqual(cObj.textDecoration, cObj.originalState.textDecoration, 'textDecoration in state is deepEqual');
-    notEqual(cObj.textDecoration, cObj.originalState.textDecoration, 'textDecoration in not same Object');
-    cObj.textDecoration[0] = 'overline';
-    ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
-
-    cObj.set('textDecoration', ['overline', 'underline']);
-    cObj.saveState();
-    cObj.set('textDecoration', ['underline', 'overline']);
-    ok(!cObj.hasStateChanged(), 'order does no matter');
-
-    cObj.set('textDecoration', ['underline']);
-    cObj.saveState();
-    cObj.set('textDecoration', ['underline', 'overline']);
-    ok(cObj.hasStateChanged(), 'more properties added');
-
-    cObj.set('textDecoration', ['underline', 'overline']);
-    cObj.saveState();
-    cObj.set('textDecoration', ['overline']);
-    ok(cObj.hasStateChanged(), 'less properties');
-  });
-
   test('intersectsWithRectangle', function() {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
