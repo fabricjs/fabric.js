@@ -306,6 +306,7 @@
       markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
       if (this.fill) {
         var origStroke = this.stroke;
+        var origShadow = this.shadow;
         this.stroke = null;
         markup.push(
           '<rect ',
@@ -314,7 +315,6 @@
             '" style="', this.getSvgStyles(),
           '"/>\n'
         );
-        this.stroke = origStroke;
       }
       markup.push(
         '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
@@ -338,11 +338,11 @@
             '" style="', this.getSvgStyles(),
           '"/>\n'
         );
-        this.fill = origFill;
       }
-
       markup.push('</g>\n');
-
+      origFill && (this.fill = origFill);
+      origStroke && (this.stroke = origStroke);
+      origShadow && (this.shadow = origShadow);
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
