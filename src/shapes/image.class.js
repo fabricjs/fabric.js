@@ -315,6 +315,7 @@
             '" style="', this.getSvgStyles(),
           '"/>\n'
         );
+        this.shadow = null;
       }
       markup.push(
         '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
