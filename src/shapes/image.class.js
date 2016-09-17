@@ -72,6 +72,13 @@
     meetOrSlice: 'meet',
 
     /**
+     * Color of image fill
+     * @type String
+     * @default
+     */
+    fill: '',
+
+    /**
      * Width of a stroke.
      * For image quality a stroke multiple of 2 gives better results.
      * @type Number
@@ -202,7 +209,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {
-      if (!this.stroke || this.strokeWidth === 0) {
+      if ((!this.stroke || this.strokeWidth === 0) && !this.fill) {
         return;
       }
       var w = this.width / 2, h = this.height / 2;
@@ -296,21 +303,33 @@
       if (this.alignX !== 'none' && this.alignY !== 'none') {
         preserveAspectRatio = 'x' + this.alignX + 'Y' + this.alignY + ' ' + this.meetOrSlice;
       }
-      markup.push(
-        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
-          '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
-            '" x="', x, '" y="', y,
+      markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
+      if (this.fill) {
+        var origStroke = this.stroke;
+        var origShadow = this.shadow;
+        this.stroke = null;
+        markup.push(
+          '<rect ',
+            'x="', x, '" y="', y,
+            '" width="', this.width, '" height="', this.height,
             '" style="', this.getSvgStyles(),
-            // we're essentially moving origin of transformation from top/left corner to the center of the shape
-            // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-            // so that object's center aligns with container's left/top
-            '" width="', this.width,
-            '" height="', this.height,
-            '" preserveAspectRatio="', preserveAspectRatio, '"',
-          '></image>\n'
+          '"/>\n'
+        );
+        this.shadow = null;
+      }
+      markup.push(
+        '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
+          '" x="', x, '" y="', y,
+          '" style="', this.getSvgStyles(),
+          // we're essentially moving origin of transformation from top/left corner to the center of the shape
+          // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+          // so that object's center aligns with container's left/top
+          '" width="', this.width,
+          '" height="', this.height,
+          '" preserveAspectRatio="', preserveAspectRatio, '"',
+        '></image>\n'
       );
-
-      if (this.stroke || this.strokeDashArray) {
+      if (this.stroke) {
         var origFill = this.fill;
         this.fill = null;
         markup.push(
@@ -320,11 +339,11 @@
             '" style="', this.getSvgStyles(),
           '"/>\n'
         );
-        this.fill = origFill;
       }
-
       markup.push('</g>\n');
-
+      origFill && (this.fill = origFill);
+      origStroke && (this.stroke = origStroke);
+      origShadow && (this.shadow = origShadow);
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
@@ -472,6 +491,12 @@
       else {
         elementToDraw = this._element;
       }
+      this._stroke(ctx);
+      this._renderFill(ctx);
+      if (this.fill) {
+        // if renderedFill remove shadow for image
+        this._removeShadow(ctx);
+      }
       elementToDraw && ctx.drawImage(elementToDraw,
                                      x + imageMargins.marginX,
                                      y + imageMargins.marginY,
@@ -479,7 +504,6 @@
                                      imageMargins.height
                                     );
 
-      this._stroke(ctx);
       this._renderStroke(ctx);
     },
 
