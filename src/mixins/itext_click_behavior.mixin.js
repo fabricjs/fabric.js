@@ -145,20 +145,42 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   setCursorByClick: function(e) {
-    var newSelectionStart = this.getSelectionStartFromPointer(e);
-
+    var newSelection = this.getSelectionStartFromPointer(e),
+        start = this.selectionStart, end = this.selectionEnd;
     if (e.shiftKey) {
-      if (newSelectionStart < this.selectionStart) {
-        this.selectionEnd = this.selectionStart;
-        this.selectionStart = newSelectionStart;
+      if (newSelection < start) {
+        if (end === start) {
+          this._selectionDirection = 'left';
+        }
+        else if (this._selectionDirection === 'right') {
+          this._selectionDirection = 'left';
+          this.selectionEnd = start;
+        }
+        this.selectionStart = newSelection;
+      }
+      else if (newSelection > start && newSelection < end) {
+        if (this._selectionDirection === 'right') {
+          this.selectionEnd = newSelection;
+        }
+        else {
+          this.selectionStart = newSelection;
+        }
       }
       else {
-        this.selectionEnd = newSelectionStart;
+        // newSelection is > selection start and end
+        if (end === start) {
+          this._selectionDirection = 'right';
+        }
+        else if (this._selectionDirection === 'left') {
+          this._selectionDirection = 'right';
+          this.selectionStart = end;
+        }
+        this.selectionEnd = newSelection;
       }
     }
     else {
-      this.selectionStart = newSelectionStart;
-      this.selectionEnd = newSelectionStart;
+      this.selectionStart = newSelection;
+      this.selectionEnd = newSelection;
     }
     this._fireSelectionChanged();
     this._updateTextarea();
