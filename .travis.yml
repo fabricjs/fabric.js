@@ -3,9 +3,6 @@ node_js:
   - "6"
   - "5"
   - "4"
-  - "0.12"
-  - "0.11"
-  - "0.10"
 env:
   - CXX=g++-4.8
 addons:
@@ -13,7 +10,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8  
+      - g++-4.8
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
