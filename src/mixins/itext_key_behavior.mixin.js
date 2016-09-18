@@ -255,7 +255,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     return (e && e.clipboardData) || fabric.window.clipboardData;
   },
 
-
+  /**
+   * Finds the width in pixels before the cursor on the same line
+   * @private
+   * @param {Number} lineIndex
+   * @param {Number} charIndex
+   * @return {Number} widthBeforeCursor width before cursor
+   */
   _getWidthBeforeCursor: function(lineIndex, charIndex) {
     var textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
         widthOfLine = this._getLineWidth(this.ctx, lineIndex),
@@ -275,15 +281,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @return {Number}
    */
   getDownCursorOffset: function(e, isRight) {
-    var selectionProp, cursorLocation, lineIndex;
-    if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
-      selectionProp = this.selectionEnd;
-    }
-    else {
-      selectionProp = this.selectionStart;
-    }
-    cursorLocation = this.get2DCursorLocation(selectionProp);
-    lineIndex = cursorLocation.lineIndex;
+    var selectionProp = this._getSelectionForOffset(e, isRight),
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        lineIndex = cursorLocation.lineIndex;
     // if on last line, down cursor goes to end of line
     if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
       // move to the end of a text
@@ -291,10 +291,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     var charIndex = cursorLocation.charIndex,
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
-        indexOnNextLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
+        indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
         textAfterCursor = this._textLines[lineIndex].slice(charIndex);
 
-    return textAfterCursor.length + indexOnNextLine + 2;
+    return textAfterCursor.length + indexOnOtherLine + 2;
+  },
+
+  /**
+   * private
+   * Helps finding if the offset should be counted from Start or End
+   * @param {Event} e Event object
+   * @param {Boolean} isRight
+   * @return {Number}
+   */
+  _getSelectionForOffset: function(e, isRight) {
+    if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
+      return this.selectionEnd;
+    }
+    else {
+      return this.selectionStart;
+    }
   },
 
   /**
@@ -303,17 +319,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @return {Number}
    */
   getUpCursorOffset: function(e, isRight) {
-    var selectionProp, cursorLocation, lineIndex;
-    if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
-      selectionProp = this.selectionEnd;
-    }
-    else {
-      selectionProp = this.selectionStart;
-    }
-    cursorLocation = this.get2DCursorLocation(selectionProp);
-    lineIndex = cursorLocation.lineIndex;
-    // if on first line, up cursor goes to start of line
+    var selectionProp = this._getSelectionForOffset(e, isRight),
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        lineIndex = cursorLocation.lineIndex;
     if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+      // if on first line, up cursor goes to start of line
       return selectionProp;
     }
     var charIndex = cursorLocation.charIndex,
@@ -325,9 +335,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * find for a given width it founds the matching character.
    * @private
    */
-  _getIndexOnLine: function(lineIndex, widthOfCharsOnSameLineBeforeCursor) {
+  _getIndexOnLine: function(lineIndex, width) {
 
     var widthOfLine = this._getLineWidth(this.ctx, lineIndex),
         textOnLine = this._textLines[lineIndex],
@@ -343,14 +354,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       widthOfCharsOnLine += widthOfChar;
 
-      if (widthOfCharsOnLine > widthOfCharsOnSameLineBeforeCursor) {
+      if (widthOfCharsOnLine > width) {
 
         foundMatch = true;
 
         var leftEdge = widthOfCharsOnLine - widthOfChar,
             rightEdge = widthOfCharsOnLine,
-            offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor),
-            offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
+            offsetFromLeftEdge = Math.abs(leftEdge - width),
+            offsetFromRightEdge = Math.abs(rightEdge - width);
 
         indexOnLine = offsetFromRightEdge < offsetFromLeftEdge ? j : (j - 1);
 
@@ -387,15 +398,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.selectionEnd = this.selectionEnd + offset;
     this.selectionStart = this.selectionEnd;
     return offset !== 0;
-  },
-
-  /**
-   * private
-   */
-  swapSelectionPoints: function() {
-    var swapSel = this.selectionEnd;
-    this.selectionEnd = this.selectionStart;
-    this.selectionStart = swapSel;
   },
 
   /**
