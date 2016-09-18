@@ -826,11 +826,11 @@
       this.insertChars('\n');
     },
 
-    setSelectionStartEndWithShift: function(start, end, offset) {
-      var newSelection = this._selectionDirection === 'left'
-            ? this.selectionStart + offset
-            : this.selectionEnd + offset;
-
+    /**
+     * Set the selectionStart and selectionEnd according to the ne postion of cursor
+     * mimic the key - mouse navigation when shift is pressed.
+     */
+    setSelectionStartEndWithShift: function(start, end, newSelection) {
       if (newSelection <= start) {
         if (end === start) {
           this._selectionDirection = 'left';

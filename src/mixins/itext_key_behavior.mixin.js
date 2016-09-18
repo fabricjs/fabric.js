@@ -405,7 +405,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorDownWithShift: function(offset) {
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, offset);
+    var newSelection = this._selectionDirection === 'left'
+    ? this.selectionStart + offset
+    : this.selectionEnd + offset;
+    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
     return offset !== 0;
   },
 
@@ -456,7 +459,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorUpWithShift: function(offset) {
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, offset);
+    var newSelection = this._selectionDirection === 'left'
+    ? this.selectionStart - offset
+    : this.selectionEnd - offset;
+    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
     return offset !== 0;
   },
 
