@@ -826,7 +826,11 @@
       this.insertChars('\n');
     },
 
-    setSelectionStartEndWithShift: function(start, end, newSelection) {
+    setSelectionStartEndWithShift: function(start, end, offset) {
+      var newSelection = this._selectionDirection === 'left'
+            ? this.selectionStart + offset
+            : this.selectionEnd + offset;
+
       if (newSelection <= start) {
         if (end === start) {
           this._selectionDirection = 'left';

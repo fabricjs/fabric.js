@@ -330,8 +330,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
         indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
         textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex);
-
-    return this._textLines[lineIndex - 1].length - indexOnOtherLine + textBeforeCursor.length;
+    // return a negative offset
+    return -this._textLines[lineIndex - 1].length + indexOnOtherLine - textBeforeCursor.length;
   },
 
   /**
@@ -405,10 +405,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorDownWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart + offset
-    : this.selectionEnd + offset;
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
+    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, offset);
     return offset !== 0;
   },
 
@@ -459,10 +456,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorUpWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart - offset
-    : this.selectionEnd - offset;
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
+    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, offset);
     return offset !== 0;
   },
 
