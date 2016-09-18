@@ -390,29 +390,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor down without keeping selection
-   * @param {Number} offset
-   */
-  moveCursorDownWithoutShift: function(offset) {
-    this._selectionDirection = 'right';
-    this.selectionEnd = this.selectionEnd + offset;
-    this.selectionStart = this.selectionEnd;
-    return offset !== 0;
-  },
-
-  /**
-   * Moves cursor down while keeping selection
-   * @param {Number} offset
-   */
-  moveCursorDownWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart + offset
-    : this.selectionEnd + offset;
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
-    return offset !== 0;
-  },
-
-  /**
    * Moves cursor up
    * @param {Event} e Event object
    */
@@ -432,19 +409,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // getUpCursorOffset
     // getDownCursorOffset
     var action = 'get' + direction + 'CursorOffset',
-        moveAction = 'moveCursor' + direction,
-        // moveCursorUpWithShift
-        // moveCursorUpWithoutShift
-        // moveCursorDownWithShift
-        // moveCursorDownWithoutShift
+        result,
+        // moveCursorWithShift
+        // moveCursorWithoutShift
         offset = this[action](e, this._selectionDirection === 'right');
     if (e.shiftKey) {
-      moveAction += 'WithShift';
+      result = this.moveCursorWithShift(offset);
     }
     else {
-      moveAction += 'WithoutShift';
+      result = this.moveCursorWithoutShift(offset);
     }
-    if (this[moveAction](offset)) {
+    if (result) {
       this.setSelectionInBoundaries();
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
@@ -455,13 +430,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor up with shift
+   * Moves cursor with shift
    * @param {Number} offset
    */
-  moveCursorUpWithShift: function(offset) {
+  moveCursorWithShift: function(offset) {
     var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart - offset
-    : this.selectionEnd - offset;
+    ? this.selectionStart + offset
+    : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
     return offset !== 0;
   },
@@ -470,9 +445,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor up without shift
    * @param {Number} offset
    */
-  moveCursorUpWithoutShift: function(offset) {
-    this._selectionDirection = 'left';
-    this.selectionStart -= offset;
+  moveCursorWithoutShift: function(offset) {
+    this.selectionStart += offset;
     this.selectionEnd = this.selectionStart;
     return offset !== 0;
   },
