@@ -824,6 +824,58 @@
      */
     insertNewline: function() {
       this.insertChars('\n');
+    },
+
+    /**
+     * Set the selectionStart and selectionEnd according to the ne postion of cursor
+     * mimic the key - mouse navigation when shift is pressed.
+     */
+    setSelectionStartEndWithShift: function(start, end, newSelection) {
+      if (newSelection <= start) {
+        if (end === start) {
+          this._selectionDirection = 'left';
+        }
+        else if (this._selectionDirection === 'right') {
+          this._selectionDirection = 'left';
+          this.selectionEnd = start;
+        }
+        this.selectionStart = newSelection;
+      }
+      else if (newSelection > start && newSelection < end) {
+        if (this._selectionDirection === 'right') {
+          this.selectionEnd = newSelection;
+        }
+        else {
+          this.selectionStart = newSelection;
+        }
+      }
+      else {
+        // newSelection is > selection start and end
+        if (end === start) {
+          this._selectionDirection = 'right';
+        }
+        else if (this._selectionDirection === 'left') {
+          this._selectionDirection = 'right';
+          this.selectionStart = end;
+        }
+        this.selectionEnd = newSelection;
+      }
+    },
+
+    setSelectionInBoundaries: function() {
+      var length = this.text.length;
+      if (this.selectionStart > length) {
+        this.selectionStart = length;
+      }
+      else if (this.selectionStart < 0) {
+        this.selectionStart = 0;
+      }
+      if (this.selectionEnd > length) {
+        this.selectionEnd = length;
+      }
+      else if (this.selectionEnd < 0) {
+        this.selectionEnd = 0;
+      }
     }
   });
 })();
