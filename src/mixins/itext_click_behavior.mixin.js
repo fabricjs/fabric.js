@@ -148,35 +148,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var newSelection = this.getSelectionStartFromPointer(e),
         start = this.selectionStart, end = this.selectionEnd;
     if (e.shiftKey) {
-      if (newSelection < start) {
-        if (end === start) {
-          this._selectionDirection = 'left';
-        }
-        else if (this._selectionDirection === 'right') {
-          this._selectionDirection = 'left';
-          this.selectionEnd = start;
-        }
-        this.selectionStart = newSelection;
-      }
-      else if (newSelection > start && newSelection < end) {
-        if (this._selectionDirection === 'right') {
-          this.selectionEnd = newSelection;
-        }
-        else {
-          this.selectionStart = newSelection;
-        }
-      }
-      else {
-        // newSelection is > selection start and end
-        if (end === start) {
-          this._selectionDirection = 'right';
-        }
-        else if (this._selectionDirection === 'left') {
-          this._selectionDirection = 'right';
-          this.selectionStart = end;
-        }
-        this.selectionEnd = newSelection;
-      }
+      this.setSelectionStartEndWithShift(start, end, newSelection);
     }
     else {
       this.selectionStart = newSelection;
