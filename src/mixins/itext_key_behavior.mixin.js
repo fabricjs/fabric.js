@@ -324,7 +324,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         lineIndex = cursorLocation.lineIndex;
     if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
       // if on first line, up cursor goes to start of line
-      return selectionProp;
+      return -selectionProp;
     }
     var charIndex = cursorLocation.charIndex,
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
@@ -390,29 +390,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor down without keeping selection
-   * @param {Number} offset
-   */
-  moveCursorDownWithoutShift: function(offset) {
-    this._selectionDirection = 'right';
-    this.selectionEnd = this.selectionEnd + offset;
-    this.selectionStart = this.selectionEnd;
-    return offset !== 0;
-  },
-
-  /**
-   * Moves cursor down while keeping selection
-   * @param {Number} offset
-   */
-  moveCursorDownWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart + offset
-    : this.selectionEnd + offset;
-    this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
-    return offset !== 0;
-  },
-
-  /**
    * Moves cursor up
    * @param {Event} e Event object
    */
@@ -432,19 +409,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // getUpCursorOffset
     // getDownCursorOffset
     var action = 'get' + direction + 'CursorOffset',
-        moveAction = 'moveCursor' + direction,
-        // moveCursorUpWithShift
-        // moveCursorUpWithoutShift
-        // moveCursorDownWithShift
-        // moveCursorDownWithoutShift
         offset = this[action](e, this._selectionDirection === 'right');
     if (e.shiftKey) {
-      moveAction += 'WithShift';
+      this.moveCursorWithShift(offset);
     }
     else {
-      moveAction += 'WithoutShift';
+      this.moveCursorWithoutShift(offset);
     }
-    if (this[moveAction](offset)) {
+    if (offset !== 0) {
       this.setSelectionInBoundaries();
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
@@ -455,10 +427,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor up with shift
+   * Moves cursor with shift
    * @param {Number} offset
    */
-  moveCursorUpWithShift: function(offset) {
+  moveCursorWithShift: function(offset) {
     var newSelection = this._selectionDirection === 'left'
     ? this.selectionStart + offset
     : this.selectionEnd + offset;
@@ -470,10 +442,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor up without shift
    * @param {Number} offset
    */
-  moveCursorUpWithoutShift: function(offset) {
-    this._selectionDirection = 'left';
-    this.selectionStart -= offset;
-    this.selectionEnd = this.selectionStart;
+  moveCursorWithoutShift: function(offset) {
+    if (offset < 0) {
+      this.selectionStart += offset;
+      this.selectionEnd = this.selectionStart;
+    }
+    else {
+      this.selectionEnd += offset;
+      this.selectionStart = this.selectionEnd;
+    }
     return offset !== 0;
   },
 
