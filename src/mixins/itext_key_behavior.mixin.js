@@ -460,8 +460,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorUpWithShift: function(offset) {
     var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart - offset
-    : this.selectionEnd - offset;
+    ? this.selectionStart + offset
+    : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
     return offset !== 0;
   },
