@@ -6,7 +6,6 @@
   },
   "globals": {
     "fabric": true,
-    "G_vmlCanvasManager": true
   },
   "rules": {
     "eqeqeq": 0,

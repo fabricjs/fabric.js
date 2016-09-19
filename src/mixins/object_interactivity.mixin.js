@@ -1,9 +1,7 @@
 (function() {
 
-  var degreesToRadians = fabric.util.degreesToRadians,
-      /* eslint-disable camelcase */
-      isVML = function() { return typeof G_vmlCanvasManager !== 'undefined'; };
-      /* eslint-enable camelcase */
+  var degreesToRadians = fabric.util.degreesToRadians;
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
@@ -390,7 +388,7 @@
           }
           break;
         default:
-          isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
+          this.transparentCorners || ctx.clearRect(left, top, size, size);
           ctx[methodName + 'Rect'](left, top, size, size);
           if (stroke) {
             ctx.strokeRect(left, top, size, size);

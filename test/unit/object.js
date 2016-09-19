@@ -524,11 +524,6 @@
   test('drawBorders', function() {
     var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
 
-    //let excanvas kick in for IE8 and lower
-    if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-      G_vmlCanvasManager.initElement(canvas);
-    }
-
     var dummyContext = canvas.getContext('2d');
 
     ok(typeof cObj.drawBorders == 'function');
@@ -537,11 +532,6 @@
 
   test('drawControls', function() {
     var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
-
-    //let excanvas kick in for IE8 and lower
-    if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-      G_vmlCanvasManager.initElement(canvas);
-    }
     var dummyContext = canvas.getContext('2d');
     ok(typeof cObj.drawControls == 'function');
     equal(cObj.drawControls(dummyContext), cObj, 'chainable');
