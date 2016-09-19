@@ -80,7 +80,7 @@
       equal(fontDecl, 'normal  40px "Times New Roman"');
     }
     else {
-      equal(fontDecl, ' normal 40px "Times New Roman"');
+      equal(fontDecl, ' normal 40px Times New Roman');
     }
 
   });
