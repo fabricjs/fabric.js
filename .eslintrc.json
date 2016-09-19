@@ -8,7 +8,6 @@
     "eventjs": true,
     "exports": true,
     "fabric": true,
-    "G_vmlCanvasManager": true,
     "require": true,
     "Buffer": true,
     "process": true
