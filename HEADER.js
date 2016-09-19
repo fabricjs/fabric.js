@@ -14,7 +14,11 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
 else {
   // assume we're running under node.js when document/window are not present
   fabric.document = require("jsdom")
-    .jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
+    .jsdom("<!DOCTYPE html><html><head></head><body></body></html>", {
+      features: {
+        FetchExternalResources: ['img']
+      }
+    });
 
   fabric.window = fabric.document.defaultView;
 }
