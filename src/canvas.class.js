@@ -1022,14 +1022,17 @@
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
+        this._fireOverOutEvents(activeGroup, e);
         return activeGroup;
       }
       // if we hit the corner of an activeObject, let's return that.
       if (activeObject && activeObject._findTargetCorner(pointer)) {
+        this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
       if (activeObject && this._checkTarget(pointer, activeObject)) {
         if (!this.preserveObjectStacking) {
+          this._fireOverOutEvents(activeObject, e);
           return activeObject;
         }
         else {
