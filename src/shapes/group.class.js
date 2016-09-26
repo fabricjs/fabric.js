@@ -127,15 +127,15 @@
 
       var objectLeft = object.getLeft(),
           objectTop = object.getTop(),
-          center = this.getCenterPoint();
+          center = this.getCenterPoint(),
+          ingnoreZoom = true;
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
-      object.setCoords();
+      // the coords of object internal at groups should not be affected by viewport
+      object.setCoords(ingnoreZoom);
     },
 
     /**
@@ -401,8 +401,9 @@
      * @chainable
      */
     setObjectsCoords: function() {
+      var ignoreZoom = true;
       this.forEachObject(function(object) {
-        object.setCoords();
+        object.setCoords(ignoreZoom);
       });
       return this;
     },

@@ -261,26 +261,20 @@
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setCoords: function() {
+    setCoords: function(ignoreZoom) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = this._calculateCurrentDimensions(),
-          currentWidth = dim.x, currentHeight = dim.y;
-
-      // If width is negative, make postive. Fixes path selection issue
-      if (currentWidth < 0) {
-        currentWidth = Math.abs(currentWidth);
-      }
-
-      var sinTh = Math.sin(theta),
+          dim = ignoreZoom ? this.getTransformedDimensions() : this._calculateCurrentDimensions(),
+          currentWidth = dim.x, currentHeight = dim.y,
+          sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
           _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
-
+          center = this.getCenterPoint(),
           // offset added for rotate and scale actions
-          coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+          coords = ignoreZoom ? center : fabric.util.transformPoint(center, vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
@@ -315,7 +309,7 @@
       };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this._setCornerCoords && this._setCornerCoords();
+      ignoreZoom || this._setCornerCoords && this._setCornerCoords();
 
       return this;
     },

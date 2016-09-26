@@ -404,10 +404,9 @@
     _normalizePointer: function (object, pointer) {
       var m = object.calcTransformMatrix(),
           invertedM = fabric.util.invertTransform(m),
-          vpt = this.viewportTransform,
           vptPointer = this.restorePointerVpt(pointer),
           p = fabric.util.transformPoint(vptPointer, invertedM);
-      return fabric.util.transformPoint(p, vpt);
+      return p;
     },
 
     /**
@@ -1102,6 +1101,7 @@
         if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
           if (target.type === 'group' && target.subTargetCheck) {
+
             normalizedPointer = this._normalizePointer(target, pointer);
             subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
             subTarget && this.targets.push(subTarget);
