@@ -56,6 +56,7 @@
         eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.add(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       }
     },
 
@@ -74,6 +75,7 @@
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
       this._onMouseOut = this._onMouseOut.bind(this);
+      this._onDoubleClick = this._onDoubleClick.bind(this);
     },
 
     /**
@@ -96,6 +98,7 @@
         eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
         eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs.remove(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       }
     },
 
@@ -219,6 +222,19 @@
     _onMouseMove: function (e) {
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on dblclick
+     */
+    _onDoubleClick: function (e) {
+      var target = this.findTarget(e);
+      this.fire('mouse:dblclick', { target: target, e: e });
+
+      if (target && !this.isDrawingMode) {
+        target.fire('object:dblclick', { e: e });
+      }
     },
 
     /**
