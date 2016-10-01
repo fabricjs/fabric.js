@@ -807,6 +807,10 @@
      */
     clear: function () {
       this._objects.length = 0;
+      this.backgroundImage = null;
+      this.overlayImage = null;
+      this.backgroundColor = '';
+      this.overlayColor = ''
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
       this.renderAll();
