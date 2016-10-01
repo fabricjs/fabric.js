@@ -45,6 +45,7 @@
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
       addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
+      addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
 
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -74,6 +75,7 @@
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
       this._onMouseOut = this._onMouseOut.bind(this);
+      this._onContextMenu = this._onContextMenu.bind(this);
     },
 
     /**
@@ -86,6 +88,7 @@
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
       removeListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
+      removeListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
 
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
@@ -161,6 +164,18 @@
      */
     _onLongPress: function(e, self) {
       this.__onLongPress && this.__onLongPress(e, self);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
+    _onContextMenu: function (e) {
+      if (this.stopContextMenu) {
+        e.stopPropagation()
+        e.preventDefault();
+      }
+      return false;
     },
 
     /**
@@ -423,9 +438,12 @@
      */
     __onMouseDown: function (e) {
 
-      // accept only left clicks
-      var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 0;
-      if (!isLeftClick && !fabric.isTouchSupported) {
+      // if right click just fire events
+      var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
+      if (isRightClick) {
+        if (this.fireRightClick) {
+          this._handleEvent(e, 'down', target ? target : null);
+        }
         return;
       }
 
@@ -468,7 +486,7 @@
         }
       }
       this._handleEvent(e, 'down', target ? target : null);
-      // we must renderAll so that active image is placed on the top canvas
+      // we must renderAll so that we update the visuals
       shouldRender && this.renderAll();
     },
 
