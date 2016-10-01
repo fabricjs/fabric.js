@@ -777,6 +777,7 @@
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
+      delete obj.canvas;
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
     },
