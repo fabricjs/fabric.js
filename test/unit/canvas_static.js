@@ -442,7 +442,7 @@
     equal(canvas.clear(), canvas, 'should be chainable');
     equal(canvas.getObjects().length, 0, 'clear remove all objects');
     equal(canvas.backgroundColor, '', 'clear remove background color');
-    equal(canvas.overlaydColor, '', 'clear remove overlay color');
+    equal(canvas.overlayColor, '', 'clear remove overlay color');
     equal(canvas.backgroundImage, null, 'clear remove bg image');
     equal(canvas.overlayImage, null, 'clear remove overlay image');
     
