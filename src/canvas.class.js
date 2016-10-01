@@ -245,6 +245,22 @@
     preserveObjectStacking: false,
 
     /**
+     * Indicates if the right click on canvas can output the context menu or not
+     * @type Boolean
+     * @since 1.6.5
+     * @default
+     */
+    stopContextMenu: false,
+
+    /**
+     * Indicates if the canvas can fire right click events
+     * @type Boolean
+     * @since 1.6.5
+     * @default
+     */
+    fireRightClick: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
