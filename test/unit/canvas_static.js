@@ -445,7 +445,6 @@
     equal(canvas.overlayColor, '', 'clear remove overlay color');
     equal(canvas.backgroundImage, null, 'clear remove bg image');
     equal(canvas.overlayImage, null, 'clear remove overlay image');
-    
   });
 
   test('renderAll', function() {
