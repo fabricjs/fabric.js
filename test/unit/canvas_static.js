@@ -434,9 +434,17 @@
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
-
+    var bg = new fabric.Rect({ width: 10, height: 20 });
+    canvas.backgroundFill = '#FF0000';
+    canvas.overlayFill = '#FF0000';
+    canvas.backgroundObject = bg;
+    canvas.overlayObject = bg;
     equal(canvas.clear(), canvas, 'should be chainable');
-    equal(canvas.getObjects().length, 0);
+    equal(canvas.getObjects().length, 0, 'clear remove all objects');
+    equal(canvas.backgroundFill, '', 'clear remove background color');
+    equal(canvas.overlayFill, '', 'clear remove overlay color');
+    equal(canvas.backgroundObject, null, 'clear remove bg image');
+    equal(canvas.overlayObject, null, 'clear remove overlay image');
   });
 
   test('renderAll', function() {

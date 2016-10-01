@@ -814,6 +814,10 @@
      */
     clear: function () {
       this._objects.length = 0;
+      this.backgroundObject = null;
+      this.overlayObject = null;
+      this.backgroundFill = '';
+      this.overlayFill = ''
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
       this.renderAll();

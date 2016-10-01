@@ -118,7 +118,7 @@
           map               = {};
 
       for (var i = 0; i < this._textLines.length; i++) {
-        if (this.text[charCount] === '\n') {
+        if (this.text[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
