@@ -434,7 +434,7 @@
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
-    var bg = new fabric.Rect({ width: 10, height: 20 }),
+    var bg = new fabric.Rect({ width: 10, height: 20 });
     canvas.backgroundColor = '#FF0000';
     canvas.overlayColor = '#FF0000';
     canvas.backgroundImage = bg;
