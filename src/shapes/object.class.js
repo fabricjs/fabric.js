@@ -1369,7 +1369,6 @@
       el.height = boundingRect.height;
       fabric.util.wrapElement(el, 'div');
       var canvas = new fabric.StaticCanvas(el, { enableRetinaScaling: options.enableRetinaScaling });
-//console.log(options.enableRetinaScaling, fabric.devicePixelRatio, canvas.lowerCanvasEl.width, canvas.lowerCanvasEl.height)
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {
         options.format = 'jpeg';
