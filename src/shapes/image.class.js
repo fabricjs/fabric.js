@@ -288,7 +288,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
-          preserveAspectRatio = 'none';
+          preserveAspectRatio = 'none', filtered = true;
       if (this.group && this.group.type === 'path-group') {
         x = this.left;
         y = this.top;
@@ -298,7 +298,7 @@
       }
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
-          '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
+          '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(filtered),
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -331,10 +331,11 @@
 
     /**
      * Returns source of an image
+     * @param {Boolean} filtered indicates if the src is needed for svg
      * @return {String} Source of an image
      */
-    getSrc: function() {
-      var element = this._originalElement;
+    getSrc: function(filtered) {
+      var element = filtered ? this._element : this._originalElement;
       if (element) {
         return fabric.isLikelyNode ? element._src : element.src;
       }
