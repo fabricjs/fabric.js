@@ -798,8 +798,10 @@
   });
 
   test('loadFromJSON with no objects', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundFill: 'green', overlayFill: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundFill: 'red', overlayFill: 'orange' });
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1, { backgroundFill: 'green', overlayFill: 'yellow' }),
+        c2 = new fabric.Canvas(canvas2, { backgroundFill: 'red', overlayFill: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -814,8 +816,10 @@
   });
 
   test('loadFromJSON without "objects" property', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundFill: 'green', overlayFill: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundFill: 'red', overlayFill: 'orange' });
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1, { backgroundFill: 'green', overlayFill: 'yellow' }),
+        c2 = new fabric.Canvas(canvas2, { backgroundFill: 'red', overlayFill: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -833,8 +837,10 @@
   });
 
   test('loadFromJSON with empty fabric.Group', function() {
-    var c1 = new fabric.Canvas('c1'),
-        c2 = new fabric.Canvas('c2'),
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1),
+        c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
 
     c1.add(group);

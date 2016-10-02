@@ -177,7 +177,6 @@
       this._initOptions(options);
       this._initWidthHeight();
       this._setImageSmoothing();
-
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
@@ -213,7 +212,6 @@
       if (!this._isRetinaScaling()) {
         return;
       }
-
       this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
       this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
 
@@ -440,28 +438,18 @@
     /**
      * @private
      */
-    _createCanvasElement: function() {
-      var element = fabric.document.createElement('canvas');
+    _createCanvasElement: function(canvasEl) {
+      var element = fabric.util.createCanvasElement(canvasEl)
       if (!element.style) {
         element.style = { };
       }
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
-      this._initCanvasElement(element);
-      return element;
-    },
-
-    /**
-     * @private
-     * @param {HTMLElement} element
-     */
-    _initCanvasElement: function(element) {
-      fabric.util.createCanvasElement(element);
-
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
       }
+      return element;
     },
 
     /**
@@ -521,8 +509,7 @@
      * @param {HTMLElement} [canvasEl]
      */
     _createLowerCanvas: function (canvasEl) {
-      this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
-      this._initCanvasElement(this.lowerCanvasEl);
+      this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement(canvasEl);
 
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
 
@@ -841,14 +828,14 @@
       ctx.transform.apply(ctx, this.viewportTransform);
       this._renderObjects(ctx, objects);
       ctx.restore();
-      if (!this.controlsAboveOverlay && this.drawControls) {
+      if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
       }
       if (this.clipTo) {
         ctx.restore();
       }
       this._renderOverlay(ctx);
-      if (this.controlsAboveOverlay && this.drawControls) {
+      if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
       }
       this.fire('after:render');
