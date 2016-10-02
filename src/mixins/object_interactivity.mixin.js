@@ -193,8 +193,7 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || this.group
-        || this !== this.canvas.getActiveObject()) {
+      if (!this.selectionBackgroundColor || this.group || !this.active) {
         return this;
       }
       ctx.save();

@@ -1382,18 +1382,6 @@
     canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
   });
 
-  test('getActiveObject', function() {
-    ok(typeof canvas.getActiveObject == 'function');
-    var activeObject = canvas.getActiveObject();
-    equal(activeObject, null, 'should return null');
-  });
-
-  test('getActiveGroup', function() {
-    ok(typeof canvas.getActiveGroup == 'function');
-    var activeGroup = canvas.getActiveGroup();
-    equal(activeGroup, null, 'should return null');
-  });
-
   test('getContext', function() {
     ok(typeof canvas.getContext == 'function');
     var context = canvas.getContext();

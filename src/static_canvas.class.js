@@ -668,10 +668,11 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeGroup = this.getActiveGroup();
+      var activeGroup = this._activeGroup, object;
       this.viewportTransform = vpt;
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
+        object = this._objects[i];
+        object.group || object.setCoords();
       }
       if (activeGroup) {
         activeGroup.setCoords();
@@ -742,22 +743,6 @@
      */
     getElement: function () {
       return this.lowerCanvasEl;
-    },
-
-    /**
-     * Returns currently selected object, if any
-     * @return {fabric.Object}
-     */
-    getActiveObject: function() {
-      return null;
-    },
-
-    /**
-     * Returns currently selected group of object, if any
-     * @return {fabric.Group}
-     */
-    getActiveGroup: function() {
-      return null;
     },
 
     /**
@@ -849,25 +834,17 @@
       ctx.transform.apply(ctx, this.viewportTransform);
       this._renderObjects(ctx, objects);
       ctx.restore();
-      if (!this.controlsAboveOverlay && this.interactive) {
+      if (!this.controlsAboveOverlay && this.drawControls) {
         this.drawControls(ctx);
       }
       if (this.clipTo) {
         ctx.restore();
       }
       this._renderOverlay(ctx);
-      if (this.controlsAboveOverlay && this.interactive) {
+      if (this.controlsAboveOverlay && this.drawControls) {
         this.drawControls(ctx);
       }
       this.fire('after:render');
-    },
-
-    /**
-     * dummy function for organization purpouse.
-     * @private
-     */
-    drawControls: function() {
-      // NOOP
     },
 
     /**
@@ -1100,54 +1077,11 @@
         instance.includeDefaultValues = false;
       }
 
-      //If the object is part of the current selection group, it should
-      //be transformed appropriately
-      //i.e. it should be serialised as it would appear if the selection group
-      //were to be destroyed.
-      var originalProperties = this._realizeGroupTransformOnObject(instance),
-          object = instance[methodName](propertiesToInclude);
+      var object = instance[methodName](propertiesToInclude);
       if (!this.includeDefaultValues) {
         instance.includeDefaultValues = originalValue;
       }
-
-      //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties);
-
       return object;
-    },
-
-    /**
-     * Realises an object's group transformation on it
-     * @private
-     * @param {fabric.Object} [instance] the object to transform (gets mutated)
-     * @returns the original values of instance which were changed
-     */
-    _realizeGroupTransformOnObject: function(instance) {
-      var layoutProps = ['angle', 'flipX', 'flipY', 'height', 'left', 'scaleX', 'scaleY', 'top', 'width'];
-      if (instance.group && instance.group === this.getActiveGroup()) {
-        //Copy all the positionally relevant properties across now
-        var originalValues = {};
-        layoutProps.forEach(function(prop) {
-          originalValues[prop] = instance[prop];
-        });
-        this.getActiveGroup().realizeTransform(instance);
-        return originalValues;
-      }
-      else {
-        return null;
-      }
-    },
-
-    /**
-     * Restores the changed properties of instance
-     * @private
-     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
-     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
-     */
-    _unwindGroupTransformOnObject: function(instance, originalValues) {
-      if (originalValues) {
-        instance.set(originalValues);
-      }
     },
 
     /**
@@ -1307,18 +1241,22 @@
      * @private
      */
     _setSVGObjects: function(markup, reviver) {
-      var instance, originalProperties;
+      var instance;
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         instance = objects[i];
         if (instance.excludeFromExport) {
           continue;
         }
-        //If the object is in a selection group, simulate what would happen to that
-        //object when the group is deselected
-        originalProperties = this._realizeGroupTransformOnObject(instance);
-        markup.push(instance.toSVG(reviver));
-        this._unwindGroupTransformOnObject(instance, originalProperties);
+        this._setSVGObject(markup, instance, reviver);
       }
+    },
+
+    /**
+     * push single object svg representation in the markup
+     * @private
+     */
+    _setSVGObject: function(markup, instance, reviver) {
+      markup.push(instance.toSVG(reviver));
     },
 
     /**
@@ -1372,7 +1310,7 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+      var activeGroup = this._activeGroup,
           i, obj, objs;
       if (object === activeGroup) {
         objs = activeGroup._objects;
@@ -1400,7 +1338,7 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+      var activeGroup = this._activeGroup,
           i, obj, objs;
       if (object === activeGroup) {
         objs = activeGroup._objects;
@@ -1428,7 +1366,7 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+      var activeGroup = this._activeGroup,
           i, obj, idx, newIdx, objs;
 
       if (object === activeGroup) {
@@ -1496,7 +1434,7 @@
       if (!object) {
         return this;
       }
-      var activeGroup = this.getActiveGroup ? this.getActiveGroup() : null,
+      var activeGroup = this._activeGroup,
           i, obj, idx, newIdx, objs;
 
       if (object === activeGroup) {
