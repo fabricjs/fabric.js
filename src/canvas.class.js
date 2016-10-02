@@ -5,6 +5,7 @@
       radiansToDegrees = fabric.util.radiansToDegrees,
       atan2 = Math.atan2,
       abs = Math.abs,
+      supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
 
       STROKE_OFFSET = 0.5;
 
@@ -978,8 +979,7 @@
           left = groupSelector.left,
           top = groupSelector.top,
           aleft = abs(left),
-          atop = abs(top),
-          supportLineDash = fabric.StaticCanvas.supports('setLineDash');
+          atop = abs(top);
 
       if (this.selectionColor) {
         ctx.fillStyle = this.selectionColor;
