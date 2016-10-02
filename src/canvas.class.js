@@ -5,6 +5,7 @@
       radiansToDegrees = fabric.util.radiansToDegrees,
       atan2 = Math.atan2,
       abs = Math.abs,
+      supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
 
       STROKE_OFFSET = 0.5;
 
@@ -980,20 +981,25 @@
           aleft = abs(left),
           atop = abs(top);
 
-      ctx.fillStyle = this.selectionColor;
+      if (this.selectionColor) {
+        ctx.fillStyle = this.selectionColor;
 
-      ctx.fillRect(
-        groupSelector.ex - ((left > 0) ? 0 : -left),
-        groupSelector.ey - ((top > 0) ? 0 : -top),
-        aleft,
-        atop
-      );
+        ctx.fillRect(
+          groupSelector.ex - ((left > 0) ? 0 : -left),
+          groupSelector.ey - ((top > 0) ? 0 : -top),
+          aleft,
+          atop
+        );
+      }
 
+      if (!this.selectionLineWidth || !this.selectionBorderColor) {
+        return;
+      }
       ctx.lineWidth = this.selectionLineWidth;
       ctx.strokeStyle = this.selectionBorderColor;
 
       // selection border
-      if (this.selectionDashArray.length > 1) {
+      if (this.selectionDashArray.length > 1 && !supportLineDash) {
 
         var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
             py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
@@ -1009,6 +1015,7 @@
         ctx.stroke();
       }
       else {
+        fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
         ctx.strokeRect(
           groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
           groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
