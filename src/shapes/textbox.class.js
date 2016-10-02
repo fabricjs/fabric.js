@@ -34,10 +34,12 @@
 
     /**
      * Minimum calculated width of a textbox, in pixels.
+     * fixed to 2 so that an empty textbox cannot go to 0
+     * and is still selectable without text.
      * @type Number
      * @default
      */
-    dynamicMinWidth: 0,
+    dynamicMinWidth: 2,
 
     /**
      * Cached array of text wrapping.
