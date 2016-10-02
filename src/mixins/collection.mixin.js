@@ -6,7 +6,9 @@ fabric.Collection = {
   _objects: [],
 
   /**
-   * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Adds objects to collection, Canvas or Group, then renders canvas
+   * (if `renderOnAddRemove` is not `false`).
+   * in case of Group no changes to bounding box are made.
    * Objects should be instances of (or inherit from) fabric.Object
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
