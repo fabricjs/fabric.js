@@ -151,6 +151,11 @@
     equal(iText.selectionEnd, 0);
   });
 
+  test('empty itext', function() {
+    var iText = new fabric.IText('');
+    equal(iText.width, iText.cursorWidth);
+  })
+
   test('setSelectionEnd', function() {
     var iText = new fabric.IText('test');
 
