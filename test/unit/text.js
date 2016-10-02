@@ -270,6 +270,11 @@
     equal(text.width, CHAR_WIDTH * 2);
   });
 
+  test('dimensions without text', function() {
+    var text = new fabric.Text('');
+    equal(text.width, 2);
+  });
+
   test('setting fontFamily', function() {
     var text = new fabric.Text('x');
     text.path = 'foobar.js';
