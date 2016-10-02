@@ -152,18 +152,29 @@
 
     canvasEl.width = nodeCanvas.width;
     canvasEl.height = nodeCanvas.height;
-
+    options = options || { };
+    options.nodeCanvas = nodeCanvas;
+    options.nodeCacheCanvas = nodeCacheCanvas;
     var FabricCanvas = fabric.Canvas || fabric.StaticCanvas,
         fabricCanvas = new FabricCanvas(canvasEl, options);
-
-    fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
-    fabricCanvas.contextCache = nodeCacheCanvas.getContext('2d');
     fabricCanvas.nodeCacheCanvas = nodeCacheCanvas;
+    fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
+    fabricCanvas.contextCache = nodeCacheCanvas.getContext('2d');
     fabricCanvas.Font = Canvas.Font;
-
     return fabricCanvas;
   };
+
+  var originaInitStatic = fabric.StaticCanvas.prototype._initStatic;
+  fabric.StaticCanvas.prototype._initStatic = function(el, options) {
+    el = el || fabric.document.createElement('canvas');
+    this.nodeCanvas = new Canvas(el.width, el.height);
+    this.nodeCacheCanvas = new Canvas(el.width, el.height);
+    originaInitStatic.call(this, el, options);
+    this.contextContainer = this.nodeCanvas.getContext('2d');
+    this.contextCache = this.nodeCacheCanvas.getContext('2d');
+    this.Font = Canvas.Font;
+  }
 
   /** @ignore */
   fabric.StaticCanvas.prototype.createPNGStream = function() {
@@ -174,24 +185,30 @@
     return this.nodeCanvas.createJPEGStream(opts);
   };
 
-  var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
-  fabric.StaticCanvas.prototype.setWidth = function(width, options) {
-    origSetWidth.call(this, width, options);
-    this.nodeCanvas.width = width;
+  fabric.StaticCanvas.prototype._initRetinaScaling = function() {
+    if (!this._isRetinaScaling()) {
+      return;
+    }
+
+    this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
+    this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
+    this.nodeCanvas.width = this.width * fabric.devicePixelRatio;
+    this.nodeCanvas.height = this.height * fabric.devicePixelRatio;
+    this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
     return this;
   };
   if (fabric.Canvas) {
-    fabric.Canvas.prototype.setWidth = fabric.StaticCanvas.prototype.setWidth;
+    fabric.Canvas.prototype._initRetinaScaling = fabric.StaticCanvas.prototype._initRetinaScaling;
   }
 
-  var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
-  fabric.StaticCanvas.prototype.setHeight = function(height, options) {
-    origSetHeight.call(this, height, options);
-    this.nodeCanvas.height = height;
+  var origSetBackstoreDimension = fabric.StaticCanvas.prototype._setBackstoreDimension;
+  fabric.StaticCanvas.prototype._setBackstoreDimension = function(prop, value) {
+    origSetBackstoreDimension.call(this, prop, value);
+    this.nodeCanvas[prop] = value;
     return this;
   };
   if (fabric.Canvas) {
-    fabric.Canvas.prototype.setHeight = fabric.StaticCanvas.prototype.setHeight;
+    fabric.Canvas.prototype._setBackstoreDimension = fabric.StaticCanvas.prototype._setBackstoreDimension;
   }
 
 })();
