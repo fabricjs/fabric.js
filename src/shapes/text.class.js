@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
-      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      MIN_TEXT_WIDTH = 2;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -359,7 +360,7 @@
       }
       this._textLines = this._splitTextIntoLines();
       this._clearCache();
-      this.width = this._getTextWidth(ctx);
+      this.width = this._getTextWidth(ctx) || this.cursorWidth || MIN_TEXT_WIDTH;
       this.height = this._getTextHeight(ctx);
     },
 
