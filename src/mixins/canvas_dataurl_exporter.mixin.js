@@ -117,8 +117,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         origHeight = this.getHeight(),
         scaledWidth = origWidth * multiplier,
         scaledHeight = origHeight * multiplier,
-        activeObject = this.getActiveObject(),
-        activeGroup = this.getActiveGroup(),
+        activeObject = this._activeObject,
+        activeGroup = this._activeGroup,
         zoom = this.getZoom(),
         newZoom = zoom * multiplier / fabric.devicePixelRatio;
 
