@@ -206,6 +206,23 @@
       return extend(this.callSuper('toObject', propertiesToInclude), this.calcLinePoints());
     },
 
+    /*
+     * Calculate object dimensions from its properties
+     * @private
+     */
+    _getNonTransformedDimensions: function() {
+      var dim = this.callSuper('_getNonTransformedDimensions');
+      if (this.strokeLineCap === 'butt') {
+        if (dim.x === 0) {
+          dim.y -= this.strokeWidth;
+        }
+        if (dim.y === 0) {
+          dim.x -= this.strokeWidth;
+        }
+      }
+      return dim;
+    },
+
     /**
      * Recalculates line points given width and height
      * @private

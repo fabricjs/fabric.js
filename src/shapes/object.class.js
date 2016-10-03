@@ -1153,7 +1153,6 @@
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
-
       ctx.save();
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
@@ -1203,7 +1202,26 @@
     },
 
     /**
-     * Draws a background for the object big as its width and height;
+     * Check if cache is dirty
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    cacheIsDirty: function() {
+      if (this._updateCacheCanvas()) {
+        // in this case the context is already cleared.
+        return true;
+      }
+      else {
+        if (this.hasStateChanged('cacheProperties')) {
+          var dim = this._getNonTransformedDimensions();
+          this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
+     * Draws a background for the object big as its untrasformed dimensions
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -1211,14 +1229,14 @@
       if (!this.backgroundColor) {
         return;
       }
-
+      var dim = this._getNonTransformedDimensions();
       ctx.fillStyle = this.backgroundColor;
 
       ctx.fillRect(
-        -this.width / 2,
-        -this.height / 2,
-        this.width,
-        this.height
+        -dim.x / 2,
+        -dim.y / 2,
+        dim.x,
+        dim.y
       );
       // if there is background color no other shadows
       // should be casted
