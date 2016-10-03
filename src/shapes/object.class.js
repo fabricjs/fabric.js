@@ -743,7 +743,6 @@
      * @type Boolean
      * @default
      */
-
     lockScalingFlip:          false,
 
     /**
@@ -752,8 +751,25 @@
      * @type Boolean
      * @default
      */
+    excludeFromExport:        false,
 
-    excludeFromExport:          false,
+    /**
+     * When `true`, object is cached on an additional canvas.
+     * default to true
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    objectCaching:                  true,
+
+    /**
+     * When `true`, object cache is invalid and get recreated
+     * default to true
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    dirty:                  false,
 
     /**
      * List of properties to consider when checking if state
@@ -761,11 +777,20 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties:  (
+    stateProperties: (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor ' +
       'skewX skewY'
+    ).split(' '),
+
+    /**
+     * List of properties to consider when checking if cache needs refresh
+     * @type Array
+     */
+    cacheProperties: (
+      'dirty fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray' +
+      ' strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor '
     ).split(' '),
 
     /**
@@ -776,6 +801,46 @@
       if (options) {
         this.setOptions(options);
       }
+      this.objectCaching && this._createCacheCanvas();
+    },
+
+    /**
+     * Create a the canvas used to keep the cached copy of the object
+     * @private
+     */
+    _createCacheCanvas: function() {
+      this._cacheCanvas = fabric.document.createElement('canvas');
+      this._cacheContext = this._cacheCanvas.getContext('2d');
+      this._updateCacheCanvas();
+    },
+
+    /**
+     * Update width and height of the canvas for cache
+     * returns true or false if canvas needed resize.
+     * @private
+     * @return {Boolean} true if the canvas has been resized
+     */
+    _updateCacheCanvas: function() {
+      var zoom = this.getViewportTransform()[0],
+          objectScale = this.getObjectScaling(),
+          dim = this._getNonTransformedDimensions(),
+          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+          zoomX = objectScale.scaleX * zoom * retina,
+          zoomY = objectScale.scaleY * zoom * retina;
+      if (zoomX !== this.zoomX || zoomY !== this.zoomY) {
+        var width = dim.x * zoomX,
+            height = dim.y * zoomY;
+        this._cacheCanvas.width = width;
+        this._cacheCanvas.width = height;
+        this._cacheContext.scale(zoomX, zoomY);
+        this._cacheContext.translate(width / 2, height / 2);
+        this.cacheWidth = width;
+        this.cacheHeight = height;
+        this.zoomX = zoomX;
+        this.zoomY = zoomY;
+        return true
+      }
+      return false
     },
 
     /**
@@ -1090,7 +1155,6 @@
       }
 
       ctx.save();
-
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
       this.drawSelectionBackground(ctx);
@@ -1099,17 +1163,43 @@
       }
       this._setOpacity(ctx);
       this._setShadow(ctx);
-      this._renderBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx, noTransform);
+      if (this.objectCaching) {
+        if (this.cacheIsDirty()) {
+          this.drawObject(this._cacheContext);
+        }
+        this.drawCacheOnCanvas(ctx);
+      }
+      else {
+        this.drawObject(ctx, noTransform);
+      }
       this.clipTo && ctx.restore();
 
       ctx.restore();
+    },
+
+    /**
+     * Execute the drawing operation for an object on a specified context
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    drawObject: function(ctx, noTransform) {
+      this._renderBackground(ctx);
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
+      this._render(ctx, noTransform);
+    },
+
+    /**
+     * Paint the cached copy of the object on the target context.
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawCacheOnCanvas: function(ctx) {
+      ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+      ctx.drawImage(this._cacheCanvas, -this.cacheWidth / 2, -this.cacheHeight / 2);
     },
 
     /**
