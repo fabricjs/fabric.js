@@ -18478,6 +18478,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           scaleX = filter.scaleX;
           scaleY = filter.scaleY;
         }
+
+        if ('Tint' === filter.type) {
+          filter = fabric.Image.filters.Tint.fromObject(filter);
+        }
+
         filter.applyTo(canvasEl, scaleX, scaleY);
         if (!forResizing && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
