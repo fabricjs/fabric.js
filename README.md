@@ -164,8 +164,15 @@ To install Fabric.js using npm, you must first manually [install Cairo](http://c
 
 4. Run test suite
 
-        $ npm test
+Make sure testem is installed
 
+        $ npm install -g testem
+
+Run tests Chrome and Node (by default):
+
+        $ testem
+
+See testem docs for more info: https://github.com/testem/testem
 
 ### Demos
 

@@ -14,7 +14,7 @@
     return src;
   }
 
-  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('test/fixtures/test_image.gif'),
       IMG_WIDTH = 276,
       IMG_HEIGHT  = 110;
 
