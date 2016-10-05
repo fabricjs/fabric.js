@@ -60,6 +60,7 @@
     "uglify-js": "3.1.x",
     "eslint": "4.7.x",
     "qunit": "1.x.x",
+    "qunitjs": "^1.23.1",
     "istanbul": "0.4.x",
     "onchange": "^3.x.x"
   },
