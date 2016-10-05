@@ -22,7 +22,7 @@
 
   var IMG_URL = fabric.isLikelyNode
     ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
-    : getAbsolutePath('../fixtures/very_large_image.jpg');
+    : getAbsolutePath('test/fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
