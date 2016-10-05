@@ -1,5 +1,5 @@
 var testrunner = require('qunit');
-
+console.log(testrunner);
 testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;

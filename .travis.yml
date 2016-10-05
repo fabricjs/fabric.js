@@ -9,11 +9,14 @@ node_js:
 env:
   - CXX=g++-4.8
 addons:
+  sauce_connect:
+    username: "asturur"
+    access_key: "4b11810c-8fdf-4c80-b5a5-2a7c08daa934"
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8  
+      - g++-4.8
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
