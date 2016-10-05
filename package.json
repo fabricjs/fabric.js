@@ -20,11 +20,11 @@
     "HTML5",
     "object model"
   ],
-  "browser" : {
-    "canvas" : false,
-    "fs":      false,
-    "jsdom":   false,
-    "xmldom":  false
+  "browser": {
+    "canvas": false,
+    "fs": false,
+    "jsdom": false,
+    "xmldom": false
   },
   "repository": {
     "type": "git",
@@ -50,10 +50,11 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "uglify-js": "2.7.x",
     "eslint": "2.x.x",
+    "istanbul": "0.4.x",
     "qunit": "0.9.x",
-    "istanbul": "0.4.x"
+    "qunitjs": "^1.23.1",
+    "uglify-js": "2.7.x"
   },
   "engines": {
     "node": ">=0.4.0"
