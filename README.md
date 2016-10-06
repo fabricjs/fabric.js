@@ -7,8 +7,11 @@
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/asturur.svg)](https://saucelabs.com/u/asturur)
 
 <!-- npm, bower versions, downloads -->
 

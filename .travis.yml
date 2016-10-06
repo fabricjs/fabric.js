@@ -1,20 +1,47 @@
 language: node_js
 node_js:
   - "6"
-  - "5"
-  - "4"
-  - "0.12"
-  - "0.11"
-  - "0.10"
+
 env:
-  - CXX=g++-4.8
+  global:
+    - LAUNCHER=Node
+    - CXX=g++-4.8
+    - SAUCE_USERNAME=asturur
+    - SAUCE_ACCESS_KEY=4b11810c-8fdf-4c80-b5a5-2a7c08daa934
+
+matrix:
+  include:
+    - env: LAUNCHER=SL_Chrome
+    - env: LAUNCHER=SL_Firefox
+    - env: LAUNCHER=SL_Safari
+    - env: LAUNCHER=SL_MS_Edge
+    - env: LAUNCHER=SL_IE_11
+    - env: LAUNCHER=SL_IE_10
+    - env: LAUNCHER=SL_IE_9
+    - node_js: "6"
+    - node_js: "5"
+    - node_js: "4"
+    - node_js: "0.12"
+    - env: LAUNCHER=PhantomJS
+  # TODO: fix issues and remove allowed failures
+  allow_failures:
+    - env: LAUNCHER=SL_Firefox
+    - env: LAUNCHER=SL_Safari
+    - env: LAUNCHER=SL_MS_Edge
+    - env: LAUNCHER=SL_IE_11
+    - env: LAUNCHER=SL_IE_10
+    - env: LAUNCHER=SL_IE_9
+    - env: LAUNCHER=PhantomJS
+
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8  
+      - g++-4.8
+
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
-script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
+  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get update -qq; fi
+  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev; fi
+
+script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f ci/testem.json -l $LAUNCHER'

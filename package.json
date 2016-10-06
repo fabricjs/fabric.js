@@ -54,6 +54,8 @@
     "istanbul": "0.4.x",
     "qunit": "0.9.x",
     "qunitjs": "^1.23.1",
+    "saucie": "^1.4.1",
+    "testem": "^1.12.0",
     "uglify-js": "2.7.x"
   },
   "engines": {
