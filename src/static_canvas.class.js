@@ -790,7 +790,14 @@
       this.backgroundObject = null;
       this.overlayObject = null;
       this.backgroundFill = '';
-      this.overlayFill = ''
+      this.overlayFill = '';
+      if (this._hasITextHandlers) {
+        this.off('selection:cleared', this._canvasSelectionClearedHanlder);
+        this.off('object:selected', this._canvasSelectionClearedHanlder);
+        this.off('mouse:up', this._mouseUpHandler);
+        this._iTextInstances = null;
+        this._hasITextHandlers = false;
+      }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
       this.renderAll();

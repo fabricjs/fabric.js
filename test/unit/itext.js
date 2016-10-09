@@ -697,6 +697,34 @@
     equal(iText.getCurrentCharFontSize(1, 0), 40);
   });
 
+  test('object removal from canvas', function() {
+    canvas.clear();
+    canvas._iTextInstances = null;
+    var text1 = new fabric.IText('Text Will be here');
+    var text2 = new fabric.IText('Text Will be here');
+    ok(!canvas._iTextInstances, 'canvas has no iText instances');
+    ok(!canvas._hasITextHandlers, 'canvas has no handlers');
+
+    canvas.add(text1);
+    deepEqual(canvas._iTextInstances, [text1], 'canvas has 1 text instance');
+    ok(canvas._hasITextHandlers, 'canvas has handlers');
+    equal(canvas._iTextInstances.length, 1, 'just one itext object should be on canvas');
+
+    canvas.add(text2);
+    deepEqual(canvas._iTextInstances, [text1, text2], 'canvas has 2 text instance');
+    ok(canvas._hasITextHandlers, 'canvas has handlers');
+    equal(canvas._iTextInstances.length, 2, 'just two itext object should be on canvas');
+
+    canvas.remove(text1);
+    deepEqual(canvas._iTextInstances, [text2], 'canvas has 1 text instance');
+    ok(canvas._hasITextHandlers, 'canvas has handlers');
+    equal(canvas._iTextInstances.length, 1, 'just two itext object should be on canvas');
+
+    canvas.remove(text2);
+    deepEqual(canvas._iTextInstances, [], 'canvas has 0 text instance');
+    ok(!canvas._hasITextHandlers, 'canvas has no handlers');
+  });
+
   test('getCurrentCharColor', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
