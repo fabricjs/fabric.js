@@ -700,8 +700,8 @@
   test('object removal from canvas', function() {
     canvas.clear();
     canvas._iTextInstances = null;
-    var text1 = new fabric.IText("Text Will be here");
-    var text2 = new fabric.IText("Text Will be here");
+    var text1 = new fabric.IText('Text Will be here');
+    var text2 = new fabric.IText('Text Will be here');
     ok(!canvas._iTextInstances, 'canvas has no iText instances');
     ok(!canvas._hasITextHandlers, 'canvas has no handlers');
 
