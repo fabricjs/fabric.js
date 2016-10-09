@@ -54,10 +54,14 @@
         this.parseDimensionsFromPaths(options);
         delete options.toBeParsed;
       }
-      this.callSuper('initialize', options);
-
+      this.setOptions(options);
+      this.setCoords();
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
+      }
+      if (this.objectCaching) {
+        this._createCacheCanvas();
+        this.setupState({ propertySet: 'cacheProperties' });
       }
     },
 

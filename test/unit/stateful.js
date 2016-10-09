@@ -20,8 +20,8 @@
     cObj.set('left', 123).set('top', 456);
     cObj.saveState();
     cObj.set('left', 223).set('top', 556);
-    equal(cObj.originalState.left, 123);
-    equal(cObj.originalState.top, 456);
+    equal(cObj._stateProperties.left, 123);
+    equal(cObj._stateProperties.top, 456);
   });
 
   test('saveState with extra props', function() {
@@ -32,19 +32,19 @@
     var extraProps = ['prop1', 'prop2'];
     var options = { stateProperties: extraProps };
     cObj.setupState(options);
-    equal(cObj.originalState.prop1, 'a', 'it saves the extra props');
-    equal(cObj.originalState.prop2, 'b', 'it saves the extra props');
+    equal(cObj._stateProperties.prop1, 'a', 'it saves the extra props');
+    equal(cObj._stateProperties.prop2, 'b', 'it saves the extra props');
     cObj.prop1 = 'c';
     ok(cObj.hasStateChanged(), 'it detects changes in extra props');
-    equal(cObj.originalState.left, 123, 'normal props are still there');
+    equal(cObj._stateProperties.left, 123, 'normal props are still there');
   });
 
   test('saveState with array', function() {
     var cObj = new fabric.Text('Hello');
     cObj.set('textDecoration', ['underline']);
     cObj.setupState();
-    deepEqual(cObj.textDecoration, cObj.originalState.textDecoration, 'textDecoration in state is deepEqual');
-    notEqual(cObj.textDecoration, cObj.originalState.textDecoration, 'textDecoration in not same Object');
+    deepEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in state is deepEqual');
+    notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.textDecoration[0] = 'overline';
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
 
