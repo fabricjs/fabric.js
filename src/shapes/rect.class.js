@@ -62,8 +62,6 @@
      * @return {Object} thisArg
      */
     initialize: function(options) {
-      options = options || { };
-
       this.callSuper('initialize', options);
       this._initRxRy();
 

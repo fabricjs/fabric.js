@@ -337,9 +337,10 @@
       options = options || { };
       this.text = text;
       this.__skipDimension = true;
-      this.setOptions(options);
+      this.callSuper('initialize', options);
       this.__skipDimension = false;
       this._initDimensions();
+      this.setupState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**

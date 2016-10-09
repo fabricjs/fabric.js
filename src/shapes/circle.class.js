@@ -53,13 +53,8 @@
      * @return {fabric.Circle} thisArg
      */
     initialize: function(options) {
-      options = options || { };
-
       this.callSuper('initialize', options);
-      this.set('radius', options.radius || 0);
-
-      this.startAngle = options.startAngle || this.startAngle;
-      this.endAngle = options.endAngle || this.endAngle;
+      this.set('radius', options && options.radius || 0);
     },
 
     /**

@@ -763,15 +763,6 @@
     objectCaching:                  true,
 
     /**
-     * When `true`, object cache is invalid and get recreated
-     * default to true
-     * since 1.7.0
-     * @type Boolean
-     * @default
-     */
-    dirty:                  false,
-
-    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -798,10 +789,14 @@
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
+      options = options || { };
       if (options) {
         this.setOptions(options);
       }
-      this.objectCaching && this._createCacheCanvas();
+      if (this.objectCaching) {
+        this._createCacheCanvas();
+        this.setupState({ propertySet: 'cacheProperties' });
+      }
     },
 
     /**
@@ -831,7 +826,7 @@
         var width = dim.x * zoomX,
             height = dim.y * zoomY;
         this._cacheCanvas.width = width;
-        this._cacheCanvas.width = height;
+        this._cacheCanvas.height = height;
         this._cacheContext.scale(zoomX, zoomY);
         this._cacheContext.translate(width / 2, height / 2);
         this.cacheWidth = width;

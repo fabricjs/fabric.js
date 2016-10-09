@@ -54,8 +54,7 @@
         this.parseDimensionsFromPaths(options);
         delete options.toBeParsed;
       }
-      this.setOptions(options);
-      this.setCoords();
+      this.callSuper('initialize', options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);

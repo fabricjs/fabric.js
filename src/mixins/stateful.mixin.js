@@ -1,7 +1,7 @@
 (function() {
 
   var extend = fabric.util.object.extend,
-      originalSet = 'originalState';
+      originalSet = 'stateProperties';
 
   /*
     Depends on `stateProperties`
@@ -57,10 +57,11 @@
      * @return {fabric.Object} thisArg
      */
     saveState: function(options) {
-      var propertySet = options.propertySet || originalSet;
-      saveProps(this, propertySet, this.stateProperties);
+      var propertySet = options && options.propertySet || originalSet,
+          destination = '_' + propertySet;
+      saveProps(this, destination, this[propertySet]);
       if (options && options.stateProperties) {
-        saveProps(this, propertySet, options.stateProperties);
+        saveProps(this, destination, options.stateProperties);
       }
       return this;
     },
@@ -71,8 +72,10 @@
      * @return {fabric.Object} thisArg
      */
     setupState: function(options) {
-      options.propertySet = options.propertySet || originalSet;
-      this.originalState = { };
+      options = options || { };
+      var propertySet = options.propertySet || originalSet;
+      options.propertySet = propertySet;
+      this['_' + propertySet] = { };
       this.saveState(options);
       return this;
     }
