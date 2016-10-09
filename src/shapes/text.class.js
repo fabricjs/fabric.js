@@ -24,7 +24,8 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'textBackgroundColor'
+    'textBackgroundColor',
+    'charSpacing'
   );
 
   /**
@@ -42,17 +43,16 @@
      * @type Object
      * @private
      */
-    _dimensionAffectingProps: {
-      fontSize: true,
-      fontWeight: true,
-      fontFamily: true,
-      fontStyle: true,
-      lineHeight: true,
-      text: true,
-      charSpacing: true,
-      textAlign: true,
-      strokeWidth: false,
-    },
+    _dimensionAffectingProps: [
+      'fontSize',
+      'fontWeight',
+      'fontFamily',
+      'fontStyle',
+      'lineHeight',
+      'text',
+      'charSpacing',
+      'textAlign'
+    ],
 
     /**
      * @private
@@ -685,17 +685,15 @@
     /**
      * @private
      */
-    _shouldClearCache: function() {
+    _shouldClearDimensionCache: function() {
       var shouldClear = false;
       if (this._forceClearCache) {
         this._forceClearCache = false;
         return true;
       }
-      for (var prop in this._dimensionAffectingProps) {
-        if (this['__' + prop] !== this[prop]) {
-          this['__' + prop] = this[prop];
-          shouldClear = true;
-        }
+      shouldClear = this.hasStateChanged('_dimensionAffectingProps');
+      if (shouldClear) {
+        this.saveState({ propertySet: '_dimensionAffectingProps' });
       }
       return shouldClear;
     },
@@ -826,33 +824,10 @@
       if (!this.visible) {
         return;
       }
-
-      ctx.save();
-      if (this._shouldClearCache()) {
+      if (this._shouldClearDimensionCache()) {
         this._initDimensions(ctx);
       }
-      this._setupCompositeOperation(ctx);
-      this.drawSelectionBackground(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching) {
-        if (this.cacheIsDirty()) {
-          this.drawObject(this._cacheContext);
-        }
-        this.drawCacheOnCanvas(ctx);
-      }
-      else {
-        this.drawObject(ctx, noTransform);
-      }
-      this.clipTo && ctx.restore();
-      ctx.restore();
+      this.callSuper('render', ctx, noTransform);
     },
 
     /**

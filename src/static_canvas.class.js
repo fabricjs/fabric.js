@@ -93,7 +93,7 @@
      * @type Boolean
      * @default
      */
-    stateful: true,
+    stateful: false,
 
     /**
      * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
