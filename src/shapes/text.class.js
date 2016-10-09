@@ -378,16 +378,13 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      this._setupCompositeOperation(ctx);
-      this._renderTextBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
+      this._setTextStyles(ctx);
+      if (this.group && this.group.type === 'path-group') {
+        ctx.translate(this.left, this.top);
+      }
+      this._renderTextLinesBackground(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
-      this.clipTo && ctx.restore();
     },
 
     /**
@@ -634,21 +631,12 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderTextBackground: function(ctx) {
-      this._renderBackground(ctx);
-      this._renderTextLinesBackground(ctx);
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
     _renderTextLinesBackground: function(ctx) {
       if (!this.textBackgroundColor) {
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset;
+          lineWidth, lineLeftOffset, originalFill = ctx.fillStye;
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -665,6 +653,7 @@
         }
         lineTopOffset += heightOfLine;
       }
+      ctx.fillStyle = originalFill;
       // if there is text background color no
       // other shadows should be casted
       this._removeShadow(ctx);
@@ -839,22 +828,30 @@
       }
 
       ctx.save();
-      this._setTextStyles(ctx);
-
       if (this._shouldClearCache()) {
         this._initDimensions(ctx);
       }
+      this._setupCompositeOperation(ctx);
       this.drawSelectionBackground(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
+      this._setOpacity(ctx);
+      this._setShadow(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(this.left, this.top);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+      if (this.objectCaching) {
+        if (this.cacheIsDirty()) {
+          this.drawObject(this._cacheContext);
+        }
+        this.drawCacheOnCanvas(ctx);
       }
-      this._render(ctx);
+      else {
+        this.drawObject(ctx, noTransform);
+      }
+      this.clipTo && ctx.restore();
       ctx.restore();
     },
 

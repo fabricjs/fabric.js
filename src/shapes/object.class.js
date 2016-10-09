@@ -1176,7 +1176,6 @@
         this.drawObject(ctx, noTransform);
       }
       this.clipTo && ctx.restore();
-
       ctx.restore();
     },
 
