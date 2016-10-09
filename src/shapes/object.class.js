@@ -790,7 +790,7 @@
      */
     cacheProperties: (
       'dirty fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray' +
-      ' strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor '
+      ' strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor'
     ).split(' '),
 
     /**

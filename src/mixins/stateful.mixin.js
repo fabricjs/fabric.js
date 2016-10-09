@@ -1,6 +1,7 @@
 (function() {
 
-  var extend = fabric.util.object.extend;
+  var extend = fabric.util.object.extend,
+      originalSet = 'originalState';
 
   /*
     Depends on `stateProperties`
@@ -42,10 +43,12 @@
 
     /**
      * Returns true if object state (one of its state properties) was changed
+     * @param {String} [propertySet] optional name for the set of property we want to save
      * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
      */
-    hasStateChanged: function() {
-      return !_isEqual(this.originalState, this);
+    hasStateChanged: function(propertySet) {
+      propertySet = propertySet || originalSet;
+      return !_isEqual(this[propertySet], this);
     },
 
     /**
@@ -54,9 +57,10 @@
      * @return {fabric.Object} thisArg
      */
     saveState: function(options) {
-      saveProps(this, 'originalState', this.stateProperties);
+      var propertySet = options.propertySet || originalSet;
+      saveProps(this, propertySet, this.stateProperties);
       if (options && options.stateProperties) {
-        saveProps(this, 'originalState', options.stateProperties);
+        saveProps(this, propertySet, options.stateProperties);
       }
       return this;
     },
@@ -67,6 +71,7 @@
      * @return {fabric.Object} thisArg
      */
     setupState: function(options) {
+      options.propertySet = options.propertySet || originalSet;
       this.originalState = { };
       this.saveState(options);
       return this;
