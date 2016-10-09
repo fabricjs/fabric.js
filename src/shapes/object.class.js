@@ -1167,7 +1167,7 @@
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching) {
-        if (this.cacheIsDirty()) {
+        if (this.isCacheDirty()) {
           this.drawObject(this._cacheContext);
         }
         this.drawCacheOnCanvas(ctx);
@@ -1204,13 +1204,14 @@
      * Check if cache is dirty
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    cacheIsDirty: function() {
+    isCacheDirty: function() {
       if (this._updateCacheCanvas()) {
         // in this case the context is already cleared.
         return true;
       }
       else {
         if (this.hasStateChanged('cacheProperties')) {
+          this.saveState({ propertySet: 'cacheProperties' });
           var dim = this._getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           return true;
