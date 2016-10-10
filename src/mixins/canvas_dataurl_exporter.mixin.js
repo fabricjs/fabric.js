@@ -58,7 +58,7 @@
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
           scaledWidth = (cropping.width || this.getWidth()) * multiplier,
-          scaledHeight = (cropping.width || this.getHeight()) * multiplier,
+          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
