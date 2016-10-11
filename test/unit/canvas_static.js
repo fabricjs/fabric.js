@@ -486,6 +486,23 @@
     }
   });
 
+  test('toDataURL cropping', function() {
+    ok(typeof canvas.toDataURL == 'function');
+    if (!fabric.Canvas.supports('toDataURL')) {
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var croppingWidth = 75,
+          croppingHeight = 50,
+          dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
+
+      fabric.Image.fromURL(dataURL, function (img) {
+        equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
+        equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
+      });
+    }
+  });
+
   test('centerObjectH', function() {
     ok(typeof canvas.centerObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 });
