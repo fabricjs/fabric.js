@@ -2,11 +2,12 @@
   "serve_files": [
     "test/fixtures/test_script.js",
     "dist/fabric.js",
+    "test/lib/*.js",
     "test/unit/*.js"
   ],
   "test_page": "tests.mustache?hidepassed",
   "launch_in_dev": [
-    "Chrome", "Node"
+    "Chrome", "Node", "Firefox", "Safari"
   ],
   "launchers": {
     "Node": {
