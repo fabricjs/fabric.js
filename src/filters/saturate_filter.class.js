@@ -16,7 +16,7 @@
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Saturate({
-   *   saturate: 200
+   *   saturate: 100
    * });
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
@@ -39,6 +39,7 @@
     initialize: function(options) {
       options = options || { };
       this.saturate = options.saturate || 0;
+      this.loadProgram();
     },
 
     /**
@@ -49,8 +50,7 @@
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
           data = imageData.data,
-          max, adjust = this.saturate * 0.01;
-
+          max, adjust = -this.saturate * 0.01;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
         max = Math.max(data[i], data[i + 1], data[i + 2]);
