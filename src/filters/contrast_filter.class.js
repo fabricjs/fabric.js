@@ -15,30 +15,30 @@
    * @see {@link fabric.Image.filters.Brightness#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
-   * var filter = new fabric.Image.filters.Brightness({
-   *   brightness: 200
+   * var filter = new fabric.Image.Contrast.Brightness({
+   *   contrast: 40
    * });
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  filters.Brightness = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
+  filters.Contrast = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Brightness',
+    type: 'Contrast',
 
     /**
      * Constructor
      * @memberOf fabric.Image.filters.Brightness.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.brightness=0] Value to brighten the image up (-255..255)
+     * @param {Number} [options.contrast=0] Value to contrast the image up (-255...255)
      */
     initialize: function(options) {
       options = options || { };
-      this.brightness = options.brightness || 0;
+      this.contrast = options.contrast || 0;
     },
 
     /**
@@ -49,12 +49,12 @@
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
           data = imageData.data,
-          brightness = this.brightness;
+          constrastF = 259 * (this.contrast + 255) / (255 * (259 - this.contrast));
 
       for (var i = 0, len = data.length; i < len; i += 4) {
-        data[i] += brightness;
-        data[i + 1] += brightness;
-        data[i + 2] += brightness;
+        data[i] = constrastF * (data[i] - 128) + 128;
+        data[i + 1] = constrastF * (data[i + 1] - 128) + 128;
+        data[i + 2] = constrastF * (data[i + 2] - 128) + 128;
       }
 
       context.putImageData(imageData, 0, 0);
@@ -66,7 +66,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        brightness: this.brightness
+        contrast: this.contrast
       });
     }
   });
@@ -75,10 +75,10 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.Brightness} Instance of fabric.Image.filters.Brightness
+   * @return {fabric.Image.filters.Contrast} Instance of fabric.Image.filters.Contrast
    */
-  fabric.Image.filters.Brightness.fromObject = function(object) {
-    return new fabric.Image.filters.Brightness(object);
+  fabric.Image.filters.Contrast.fromObject = function(object) {
+    return new fabric.Image.filters.Contrast(object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
