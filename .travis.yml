@@ -22,6 +22,8 @@ matrix:
     - node_js: "5"
     - node_js: "4"
     - node_js: "0.12"
+    - node_js: "0.11"
+    - node_js: "0.10"
     - env: LAUNCHER=PhantomJS
   # TODO: fix issues and remove allowed failures
   allow_failures:
