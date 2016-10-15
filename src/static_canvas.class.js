@@ -785,7 +785,6 @@
       this.backgroundColor = '';
       this.overlayColor = ''
       if (this._hasITextHandlers) {
-        console.log(this._canvasITextSelectionClearedHanlder, this._mouseUpITextHandler)
         this.off('selection:cleared', this._canvasITextSelectionClearedHanlder);
         this.off('object:selected', this._canvasITextSelectionClearedHanlder);
         this.off('mouse:up', this._mouseUpITextHandler);
