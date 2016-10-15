@@ -162,7 +162,6 @@
       fromX = segs[i][4];
       fromY = segs[i][5];
     }
-    console.log(boundsOfCurveCache);
     return bounds;
   };
 
