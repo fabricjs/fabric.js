@@ -792,9 +792,9 @@
       this.backgroundFill = '';
       this.overlayFill = '';
       if (this._hasITextHandlers) {
-        this.off('selection:cleared', this._canvasSelectionClearedHanlder);
-        this.off('object:selected', this._canvasSelectionClearedHanlder);
-        this.off('mouse:up', this._mouseUpHandler);
+        this.off('selection:cleared', this._canvasITextSelectionClearedHanlder);
+        this.off('object:selected', this._canvasITextSelectionClearedHanlder);
+        this.off('mouse:up', this._mouseUpITextHandler);
         this._iTextInstances = null;
         this._hasITextHandlers = false;
       }

@@ -75,9 +75,9 @@
           });
         }
       }).bind(this);
-      canvas.on('selection:cleared', canvas._canvasSelectionClearedHanlder);
-      canvas.on('object:selected', canvas._canvasSelectionClearedHanlder);
-      canvas.on('mouse:up', canvas._mouseUpHandler);
+      canvas.on('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
+      canvas.on('object:selected', canvas._canvasITextSelectionClearedHanlder);
+      canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 
     /**
@@ -85,9 +85,9 @@
      * @private
      */
     _removeCanvasHandlers: function(canvas) {
-      canvas.off('selection:cleared', canvas._canvasSelectionClearedHanlder);
-      canvas.off('object:selected', canvas._canvasSelectionClearedHanlder);
-      canvas.off('mouse:up', canvas._mouseUpHandler);
+      canvas.off('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
+      canvas.off('object:selected', canvas._canvasITextSelectionClearedHanlder);
+      canvas.off('mouse:up', canvas._mouseUpITextHandler);
     },
 
     /**
