@@ -8,11 +8,11 @@
       createClass = fabric.util.createClass;
 
   /**
-   * Brightness filter class
-   * @class fabric.Image.filters.Brightness
+   * Saturate filter class
+   * @class fabric.Image.filters.Saturate
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.Brightness#initialize} for constructor definition
+   * @see {@link fabric.Image.filters.Saturate#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Saturate({
@@ -21,7 +21,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  filters.Saturate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
+  filters.Saturate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Saturate.prototype */ {
 
     /**
      * Filter type
