@@ -8,37 +8,38 @@
       createClass = fabric.util.createClass;
 
   /**
-   * Brightness filter class
-   * @class fabric.Image.filters.Brightness
+   * Saturate filter class
+   * @class fabric.Image.filters.Saturate
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.Brightness#initialize} for constructor definition
+   * @see {@link fabric.Image.filters.Saturate#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
-   * var filter = new fabric.Image.filters.Brightness({
-   *   brightness: 200
+   * var filter = new fabric.Image.filters.Saturate({
+   *   saturate: 100
    * });
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  filters.Brightness = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
+  filters.Saturate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Saturate.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Brightness',
+    type: 'Saturate',
 
     /**
      * Constructor
-     * @memberOf fabric.Image.filters.Brightness.prototype
+     * @memberOf fabric.Image.filters.Saturate.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.brightness=0] Value to brighten the image up (-255..255)
+     * @param {Number} [options.contrast=0] Value to saturate the image (-255...255)
      */
     initialize: function(options) {
       options = options || { };
-      this.brightness = options.brightness || 0;
+      this.saturate = options.saturate || 0;
+      this.loadProgram();
     },
 
     /**
@@ -49,12 +50,13 @@
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
           data = imageData.data,
-          brightness = this.brightness;
+          max, adjust = -this.saturate * 0.01;
 
       for (var i = 0, len = data.length; i < len; i += 4) {
-        data[i] += brightness;
-        data[i + 1] += brightness;
-        data[i + 2] += brightness;
+        max = Math.max(data[i], data[i + 1], data[i + 2]);
+        data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
+        data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
+        data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
       }
 
       context.putImageData(imageData, 0, 0);
@@ -66,7 +68,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        brightness: this.brightness
+        saturate: this.saturate
       });
     }
   });
@@ -75,10 +77,10 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.Brightness} Instance of fabric.Image.filters.Brightness
+   * @return {fabric.Image.filters.Saturate} Instance of fabric.Image.filters.Saturate
    */
-  fabric.Image.filters.Brightness.fromObject = function(object) {
-    return new fabric.Image.filters.Brightness(object);
+  fabric.Image.filters.Saturate.fromObject = function(object) {
+    return new fabric.Image.filters.Saturate(object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
