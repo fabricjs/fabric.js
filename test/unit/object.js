@@ -375,7 +375,6 @@
     equal(boundingRect.top, 0);
     equal(boundingRect.width, 0);
     equal(boundingRect.height, 0);
-
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
     equal(boundingRect.left, 0);
@@ -803,19 +802,14 @@
     var onChange = function(){ onChangeFired = true; };
 
     var callbacks = { onComplete: onComplete, onChange: onChange };
-
     ok(typeof object.fxStraighten == 'function');
     equal(object.fxStraighten(callbacks), object, 'should be chainable');
-
     equal(fabric.util.toFixed(object.get('angle'), 0), 43);
-
     setTimeout(function(){
       ok(onCompleteFired);
       ok(onChangeFired);
-
       equal(object.get('angle'), 0, 'angle should be set to 0 by the end of animation');
       equal(object.fxStraighten(), object, 'should work without callbacks');
-
       start();
     }, 1000);
   });
