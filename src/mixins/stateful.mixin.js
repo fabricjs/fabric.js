@@ -14,7 +14,11 @@
   }
 
   function _isEqual(origValue, currentValue) {
-    if (origValue instanceof Array) {
+    if (!fabric.isLikelyNode && origValue instanceof Element) {
+      // avoid checking deep html elements
+      return origValue === currentValue;
+    }
+    else if (origValue instanceof Array) {
       if (origValue.length !== currentValue.length) {
         return false
       }

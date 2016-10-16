@@ -797,7 +797,9 @@ fabric.Collection = {
 (function() {
     function extend(destination, source, deep) {
         if (deep) {
-            if (source instanceof Array) {
+            if (!fabric.isLikelyNode && source instanceof Element) {
+                destination = source;
+            } else if (source instanceof Array) {
                 destination = source.map(function(v) {
                     return clone(v, deep);
                 });
@@ -6689,7 +6691,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
         extend(origin[destination], tmpObj, deep);
     }
     function _isEqual(origValue, currentValue) {
-        if (origValue instanceof Array) {
+        if (!fabric.isLikelyNode && origValue instanceof Element) {
+            return origValue === currentValue;
+        } else if (origValue instanceof Array) {
             if (origValue.length !== currentValue.length) {
                 return false;
             }

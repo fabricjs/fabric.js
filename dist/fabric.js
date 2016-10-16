@@ -1544,7 +1544,6 @@ fabric.Collection = {
 
 
 (function() {
-
   /**
    * Copies all enumerable properties of one object to another
    * @memberOf fabric.util.object
@@ -1552,12 +1551,17 @@ fabric.Collection = {
    * @param {Object} source Where to copy from
    * @return {Object}
    */
+
   function extend(destination, source, deep) {
     // JScript DontEnum bug is not taken care of
     // the deep clone is for internal use, is not meant to avoid
     // javascript traps or cloning html element or self referenced objects.
     if (deep) {
-      if (source instanceof Array) {
+      if (!fabric.isLikelyNode && source instanceof Element) {
+        // avoid cloning deep images, canvases,
+        destination = source;
+      }
+      else if (source instanceof Array) {
         destination = source.map(function(v) {
           return clone(v, deep)
         })
@@ -13899,7 +13903,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   }
 
   function _isEqual(origValue, currentValue) {
-    if (origValue instanceof Array) {
+    if (!fabric.isLikelyNode && origValue instanceof Element) {
+      // avoid checking deep html elements
+      return origValue === currentValue;
+    }
+    else if (origValue instanceof Array) {
       if (origValue.length !== currentValue.length) {
         return false
       }
