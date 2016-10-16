@@ -1174,18 +1174,13 @@ fabric.Collection = {
    */
   fabric.util.getBoundsOfArc = function(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
 
-    var fromX = 0, fromY = 0, bound = [], bounds = [],
-        segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot),
-        boundCopy = [[], []];
+    var fromX = 0, fromY = 0, bound, bounds = [],
+        segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
     for (var i = 0, len = segs.length; i < len; i++) {
       bound = getBoundsOfCurve(fromX, fromY, segs[i][0], segs[i][1], segs[i][2], segs[i][3], segs[i][4], segs[i][5]);
-      boundCopy[0].x = bound[0].x + fx;
-      boundCopy[0].y = bound[0].y + fy;
-      boundCopy[1].x = bound[1].x + fx;
-      boundCopy[1].y = bound[1].y + fy;
-      bounds.push(boundCopy[0]);
-      bounds.push(boundCopy[1]);
+      bounds.push({ x: bound[0].x + fx, y: bound[0].y + fy });
+      bounds.push({ x: bound[1].x + fx, y: bound[1].y + fy });
       fromX = segs[i][4];
       fromY = segs[i][5];
     }
@@ -6779,6 +6774,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this.overlayImage = null;
       this.backgroundColor = '';
       this.overlayColor = ''
+      if (this._hasITextHandlers) {
+        this.off('selection:cleared', this._canvasITextSelectionClearedHanlder);
+        this.off('object:selected', this._canvasITextSelectionClearedHanlder);
+        this.off('mouse:up', this._mouseUpITextHandler);
+        this._iTextInstances = null;
+        this._hasITextHandlers = false;
+      }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
       this.renderAll();
@@ -10958,7 +10960,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
           scaledWidth = (cropping.width || this.getWidth()) * multiplier,
-          scaledHeight = (cropping.width || this.getHeight()) * multiplier,
+          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
@@ -18944,7 +18946,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Constructor
      * @memberOf fabric.Image.filters.Brightness.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.brightness=0] Value to brighten the image up (0..255)
+     * @param {Number} [options.brightness=0] Value to brighten the image up (-255..255)
      */
     initialize: function(options) {
       options = options || { };
@@ -20741,6 +20743,180 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   fabric.Image.filters.ColorMatrix.fromObject = function( object ) {
     return new fabric.Image.filters.ColorMatrix( object );
+  };
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  'use strict';
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
+
+  /**
+   * Contrast filter class
+   * @class fabric.Image.filters.Contrast
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Contrast#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Contrast({
+   *   contrast: 40
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   */
+  filters.Contrast = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Contrast.prototype */ {
+
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Contrast',
+
+    /**
+     * Constructor
+     * @memberOf fabric.Image.filters.Contrast.prototype
+     * @param {Object} [options] Options object
+     * @param {Number} [options.contrast=0] Value to contrast the image up (-255...255)
+     */
+    initialize: function(options) {
+      options = options || { };
+      this.contrast = options.contrast || 0;
+    },
+
+    /**
+     * Applies filter to canvas element
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          contrastF = 259 * (this.contrast + 255) / (255 * (259 - this.contrast));
+
+      for (var i = 0, len = data.length; i < len; i += 4) {
+        data[i] = contrastF * (data[i] - 128) + 128;
+        data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
+        data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
+      }
+
+      context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        contrast: this.contrast
+      });
+    }
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Image.filters.Contrast} Instance of fabric.Image.filters.Contrast
+   */
+  fabric.Image.filters.Contrast.fromObject = function(object) {
+    return new fabric.Image.filters.Contrast(object);
+  };
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  'use strict';
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
+
+  /**
+   * Saturate filter class
+   * @class fabric.Image.filters.Saturate
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Saturate#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Saturate({
+   *   saturate: 100
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   */
+  filters.Saturate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Saturate.prototype */ {
+
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Saturate',
+
+    /**
+     * Constructor
+     * @memberOf fabric.Image.filters.Saturate.prototype
+     * @param {Object} [options] Options object
+     * @param {Number} [options.contrast=0] Value to saturate the image (-255...255)
+     */
+    initialize: function(options) {
+      options = options || { };
+      this.saturate = options.saturate || 0;
+      this.loadProgram();
+    },
+
+    /**
+     * Applies filter to canvas element
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          max, adjust = -this.saturate * 0.01;
+
+      for (var i = 0, len = data.length; i < len; i += 4) {
+        max = Math.max(data[i], data[i + 1], data[i + 2]);
+        data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
+        data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
+        data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+      }
+
+      context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        saturate: this.saturate
+      });
+    }
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Image.filters.Saturate} Instance of fabric.Image.filters.Saturate
+   */
+  fabric.Image.filters.Saturate.fromObject = function(object) {
+    return new fabric.Image.filters.Saturate(object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -23132,6 +23308,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.initRemovedHandler();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
+      this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
     /**
@@ -23153,18 +23330,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     initAddedHandler: function() {
       var _this = this;
       this.on('added', function() {
-        if (this.canvas && !this.canvas._hasITextHandlers) {
-          this.canvas._hasITextHandlers = true;
-          this._initCanvasHandlers();
-        }
-
-        // Track IText instances per-canvas. Only register in this array once added
-        // to a canvas; we don't want to leak a reference to the instance forever
-        // simply because it existed at some point.
-        // (Might be added to a collection, but not on a canvas.)
-        if (_this.canvas) {
-          _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
-          _this.canvas._iTextInstances.push(_this);
+        var canvas = _this.canvas;
+        if (canvas) {
+          if (!canvas._hasITextHandlers) {
+            canvas._hasITextHandlers = true;
+            _this._initCanvasHandlers(canvas);
+          }
+          canvas._iTextInstances = canvas._iTextInstances || [];
+          canvas._iTextInstances.push(_this);
         }
       });
     },
@@ -23172,35 +23345,46 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     initRemovedHandler: function() {
       var _this = this;
       this.on('removed', function() {
-        // (Might be removed from a collection, but not on a canvas.)
-        if (_this.canvas) {
-          _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
-          fabric.util.removeFromArray(_this.canvas._iTextInstances, _this);
+        var canvas = _this.canvas;
+        if (canvas) {
+          canvas._iTextInstances = canvas._iTextInstances || [];
+          fabric.util.removeFromArray(canvas._iTextInstances, _this);
+          if (canvas._iTextInstances.length === 0) {
+            canvas._hasITextHandlers = false;
+            _this._removeCanvasHandlers(canvas);
+          }
         }
       });
     },
 
     /**
+     * register canvas event to manage exiting on other instances
      * @private
      */
-    _initCanvasHandlers: function() {
-      var _this = this;
-
-      this.canvas.on('selection:cleared', function() {
-        fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
-      });
-
-      this.canvas.on('mouse:up', function() {
-        if (_this.canvas._iTextInstances) {
-          _this.canvas._iTextInstances.forEach(function(obj) {
+    _initCanvasHandlers: function(canvas) {
+      canvas._canvasITextSelectionClearedHanlder = (function() {
+        fabric.IText.prototype.exitEditingOnOthers(canvas);
+      }).bind(this);
+      canvas._mouseUpITextHandler = (function() {
+        if (canvas._iTextInstances) {
+          canvas._iTextInstances.forEach(function(obj) {
             obj.__isMousedown = false;
           });
         }
-      });
+      }).bind(this);
+      canvas.on('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
+      canvas.on('object:selected', canvas._canvasITextSelectionClearedHanlder);
+      canvas.on('mouse:up', canvas._mouseUpITextHandler);
+    },
 
-      this.canvas.on('object:selected', function() {
-        fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
-      });
+    /**
+     * remove canvas event to manage exiting on other instances
+     * @private
+     */
+    _removeCanvasHandlers: function(canvas) {
+      canvas.off('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
+      canvas.off('object:selected', canvas._canvasITextSelectionClearedHanlder);
+      canvas.off('mouse:up', canvas._mouseUpITextHandler);
     },
 
     /**
@@ -23487,8 +23671,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         return this;
       }
       this.canvas.fire('text:editing:entered', { target: this });
-      this.canvas.renderAll();
       this.initMouseMoveHandler();
+      this.canvas.renderAll();
       return this;
     },
 
@@ -23507,7 +23691,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Initializes "mousemove" event handler
      */
     initMouseMoveHandler: function() {
-      this.canvas.on('mouse:move', this.mouseMoveHandler.bind(this));
+      this.canvas.on('mouse:move', this.mouseMoveHandler);
     },
 
     /**

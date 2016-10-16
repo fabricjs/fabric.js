@@ -551,15 +551,17 @@ fabric.Collection = {
         }
     };
     fabric.util.getBoundsOfArc = function(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
-        var fromX = 0, fromY = 0, bound = [], bounds = [], segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot), boundCopy = [ [], [] ];
+        var fromX = 0, fromY = 0, bound, bounds = [], segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
         for (var i = 0, len = segs.length; i < len; i++) {
             bound = getBoundsOfCurve(fromX, fromY, segs[i][0], segs[i][1], segs[i][2], segs[i][3], segs[i][4], segs[i][5]);
-            boundCopy[0].x = bound[0].x + fx;
-            boundCopy[0].y = bound[0].y + fy;
-            boundCopy[1].x = bound[1].x + fx;
-            boundCopy[1].y = bound[1].y + fy;
-            bounds.push(boundCopy[0]);
-            bounds.push(boundCopy[1]);
+            bounds.push({
+                x: bound[0].x + fx,
+                y: bound[0].y + fy
+            });
+            bounds.push({
+                x: bound[1].x + fx,
+                y: bound[1].y + fy
+            });
             fromX = segs[i][4];
             fromY = segs[i][5];
         }
@@ -3437,6 +3439,13 @@ fabric.Pattern = fabric.util.createClass({
             this.overlayImage = null;
             this.backgroundColor = "";
             this.overlayColor = "";
+            if (this._hasITextHandlers) {
+                this.off("selection:cleared", this._canvasITextSelectionClearedHanlder);
+                this.off("object:selected", this._canvasITextSelectionClearedHanlder);
+                this.off("mouse:up", this._mouseUpITextHandler);
+                this._iTextInstances = null;
+                this._hasITextHandlers = false;
+            }
             this.clearContext(this.contextContainer);
             this.fire("canvas:cleared");
             this.renderAll();
@@ -5577,7 +5586,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
         },
         __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
-            var origWidth = this.getWidth(), origHeight = this.getHeight(), scaledWidth = (cropping.width || this.getWidth()) * multiplier, scaledHeight = (cropping.width || this.getHeight()) * multiplier, zoom = this.getZoom(), newZoom = zoom * multiplier, vp = this.viewportTransform, translateX = (vp[4] - cropping.left) * multiplier, translateY = (vp[5] - cropping.top) * multiplier, newVp = [ newZoom, 0, 0, newZoom, translateX, translateY ], originalInteractive = this.interactive;
+            var origWidth = this.getWidth(), origHeight = this.getHeight(), scaledWidth = (cropping.width || this.getWidth()) * multiplier, scaledHeight = (cropping.height || this.getHeight()) * multiplier, zoom = this.getZoom(), newZoom = zoom * multiplier, vp = this.viewportTransform, translateX = (vp[4] - cropping.left) * multiplier, translateY = (vp[5] - cropping.top) * multiplier, newVp = [ newZoom, 0, 0, newZoom, translateX, translateY ], originalInteractive = this.interactive;
             this.viewportTransform = newVp;
             this.interactive && (this.interactive = false);
             if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
@@ -9835,6 +9844,66 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
 
 (function(global) {
     "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, filters = fabric.Image.filters, createClass = fabric.util.createClass;
+    filters.Contrast = createClass(filters.BaseFilter, {
+        type: "Contrast",
+        initialize: function(options) {
+            options = options || {};
+            this.contrast = options.contrast || 0;
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, contrastF = 259 * (this.contrast + 255) / (255 * (259 - this.contrast));
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                data[i] = contrastF * (data[i] - 128) + 128;
+                data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
+                data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                contrast: this.contrast
+            });
+        }
+    });
+    fabric.Image.filters.Contrast.fromObject = function(object) {
+        return new fabric.Image.filters.Contrast(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, filters = fabric.Image.filters, createClass = fabric.util.createClass;
+    filters.Saturate = createClass(filters.BaseFilter, {
+        type: "Saturate",
+        initialize: function(options) {
+            options = options || {};
+            this.saturate = options.saturate || 0;
+            this.loadProgram();
+        },
+        applyTo: function(canvasEl) {
+            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, max, adjust = -this.saturate * .01;
+            for (var i = 0, len = data.length; i < len; i += 4) {
+                max = Math.max(data[i], data[i + 1], data[i + 2]);
+                data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
+                data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
+                data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+            }
+            context.putImageData(imageData, 0, 0);
+        },
+        toObject: function() {
+            return extend(this.callSuper("toObject"), {
+                saturate: this.saturate
+            });
+        }
+    });
+    fabric.Image.filters.Saturate.fromObject = function(object) {
+        return new fabric.Image.filters.Saturate(object);
+    };
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
     var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, MIN_TEXT_WIDTH = 2;
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
@@ -10875,6 +10944,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.initRemovedHandler();
             this.initCursorSelectionHandlers();
             this.initDoubleClickSimulation();
+            this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
         },
         initSelectedHandler: function() {
             this.on("selected", function() {
@@ -10887,40 +10957,50 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         initAddedHandler: function() {
             var _this = this;
             this.on("added", function() {
-                if (this.canvas && !this.canvas._hasITextHandlers) {
-                    this.canvas._hasITextHandlers = true;
-                    this._initCanvasHandlers();
-                }
-                if (_this.canvas) {
-                    _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
-                    _this.canvas._iTextInstances.push(_this);
+                var canvas = _this.canvas;
+                if (canvas) {
+                    if (!canvas._hasITextHandlers) {
+                        canvas._hasITextHandlers = true;
+                        _this._initCanvasHandlers(canvas);
+                    }
+                    canvas._iTextInstances = canvas._iTextInstances || [];
+                    canvas._iTextInstances.push(_this);
                 }
             });
         },
         initRemovedHandler: function() {
             var _this = this;
             this.on("removed", function() {
-                if (_this.canvas) {
-                    _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
-                    fabric.util.removeFromArray(_this.canvas._iTextInstances, _this);
+                var canvas = _this.canvas;
+                if (canvas) {
+                    canvas._iTextInstances = canvas._iTextInstances || [];
+                    fabric.util.removeFromArray(canvas._iTextInstances, _this);
+                    if (canvas._iTextInstances.length === 0) {
+                        canvas._hasITextHandlers = false;
+                        _this._removeCanvasHandlers(canvas);
+                    }
                 }
             });
         },
-        _initCanvasHandlers: function() {
-            var _this = this;
-            this.canvas.on("selection:cleared", function() {
-                fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
-            });
-            this.canvas.on("mouse:up", function() {
-                if (_this.canvas._iTextInstances) {
-                    _this.canvas._iTextInstances.forEach(function(obj) {
+        _initCanvasHandlers: function(canvas) {
+            canvas._canvasITextSelectionClearedHanlder = function() {
+                fabric.IText.prototype.exitEditingOnOthers(canvas);
+            }.bind(this);
+            canvas._mouseUpITextHandler = function() {
+                if (canvas._iTextInstances) {
+                    canvas._iTextInstances.forEach(function(obj) {
                         obj.__isMousedown = false;
                     });
                 }
-            });
-            this.canvas.on("object:selected", function() {
-                fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
-            });
+            }.bind(this);
+            canvas.on("selection:cleared", canvas._canvasITextSelectionClearedHanlder);
+            canvas.on("object:selected", canvas._canvasITextSelectionClearedHanlder);
+            canvas.on("mouse:up", canvas._mouseUpITextHandler);
+        },
+        _removeCanvasHandlers: function(canvas) {
+            canvas.off("selection:cleared", canvas._canvasITextSelectionClearedHanlder);
+            canvas.off("object:selected", canvas._canvasITextSelectionClearedHanlder);
+            canvas.off("mouse:up", canvas._mouseUpITextHandler);
         },
         _tick: function() {
             this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, "_onTickComplete");
@@ -11091,8 +11171,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.canvas.fire("text:editing:entered", {
                 target: this
             });
-            this.canvas.renderAll();
             this.initMouseMoveHandler();
+            this.canvas.renderAll();
             return this;
         },
         exitEditingOnOthers: function(canvas) {
@@ -11106,7 +11186,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
         },
         initMouseMoveHandler: function() {
-            this.canvas.on("mouse:move", this.mouseMoveHandler.bind(this));
+            this.canvas.on("mouse:move", this.mouseMoveHandler);
         },
         mouseMoveHandler: function(options) {
             if (!this.__isMousedown || !this.isEditing) {
