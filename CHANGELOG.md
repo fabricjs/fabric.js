@@ -1,3 +1,10 @@
+**Version 1.6.6**
+
+- Add: Contrast and Saturate filters [#3341](https://github.com/kangax/fabric.js/pull/3341)
+- Fix: Correct registering and removal of events to handle iText objects. [#3349](https://github.com/kangax/fabric.js/pull/3349)
+- Fix: Corrected 2 regression of 1.6.5 (dataurl export and itext clicks)
+- Fix: Corrected path boundaries calculation for Arcs ( a and A ) [#3347](https://github.com/kangax/fabric.js/pull/3347)
+
 **Version 1.6.5**
 
 - Fix: charspacing, do not get subzero with charwidth.
