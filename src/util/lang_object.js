@@ -12,7 +12,11 @@
     // the deep clone is for internal use, is not meant to avoid
     // javascript traps or cloning html element or self referenced objects.
     if (deep) {
-      if (source instanceof Array) {
+      if (!fabric.isLikelyNode && source instanceof Element) {
+        // avoid cloning deep images, canvases,
+        destination = source;
+      }
+      else if (source instanceof Array) {
         destination = source.map(function(v) {
           return clone(v, deep)
         })

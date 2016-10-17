@@ -14,7 +14,11 @@
   }
 
   function _isEqual(origValue, currentValue) {
-    if (origValue instanceof Array) {
+    if (!fabric.isLikelyNode && origValue instanceof Element) {
+      // avoid cloning deep images, canvases,
+      return origValue === currentValue;
+    }
+    else if (origValue instanceof Array) {
       if (origValue.length !== currentValue.length) {
         return false
       }
@@ -36,7 +40,6 @@
       return origValue === currentValue;
     }
   }
-
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
