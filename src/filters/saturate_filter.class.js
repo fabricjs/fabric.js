@@ -34,12 +34,11 @@
      * Constructor
      * @memberOf fabric.Image.filters.Saturate.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.contrast=0] Value to saturate the image (-255...255)
+     * @param {Number} [options.saturate=0] Value to saturate the image (-100...100)
      */
     initialize: function(options) {
       options = options || { };
       this.saturate = options.saturate || 0;
-      this.loadProgram();
     },
 
     /**
