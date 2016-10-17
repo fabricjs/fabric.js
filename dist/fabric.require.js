@@ -10369,7 +10369,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         },
         _set: function(key, value) {
             this.callSuper("_set", key, value);
-            if (key in this._dimensionAffectingProps) {
+            if (this._dimensionAffectingProps.indexOf(key) > -1) {
                 this._initDimensions();
                 this.setCoords();
             }

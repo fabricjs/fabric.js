@@ -375,18 +375,6 @@
     },
 
     /**
-     * Renders an object on a specified context
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
-     */
-    render: function(ctx, noTransform) {
-      if (this._shouldClearCache()) {
-        this._initDimensions(ctx);
-      }
-      this.callSuper('render', ctx, noTransform);
-    },
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -1075,7 +1063,7 @@
     _set: function(key, value) {
       this.callSuper('_set', key, value);
 
-      if (key in this._dimensionAffectingProps) {
+      if (this._dimensionAffectingProps.indexOf(key) > -1) {
         this._initDimensions();
         this.setCoords();
       }
