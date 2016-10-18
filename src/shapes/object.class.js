@@ -7,7 +7,8 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
-      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
+      objectCaching = !fabric.isLikelyNode;
 
   if (fabric.Object) {
     return;
@@ -760,7 +761,7 @@
      * @type Boolean
      * @default
      */
-    objectCaching:                  true,
+    objectCaching:            objectCaching,
 
     /**
      * List of properties to consider when checking if state

@@ -52,6 +52,7 @@
      */
     hasStateChanged: function(propertySet) {
       propertySet = propertySet || originalSet;
+      propertySet = '_' + propertySet;
       return !_isEqual(this[propertySet], this);
     },
 
