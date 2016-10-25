@@ -60,7 +60,9 @@
 
     /**
      * Indicates which key enable unproportional scaling
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -87,7 +89,9 @@
 
     /**
      * Indicates which key enable centered Transfrom
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -96,7 +100,9 @@
 
     /**
      * Indicates which key enable alternate action on corner
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -119,7 +125,9 @@
 
     /**
      * Indicates which key enable multiple click selection
-     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -129,7 +137,9 @@
     /**
      * Indicates which key enable alternative selection
      * in case of target overlapping with active object
-     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.5
      * @type null|String
      * @default
