@@ -828,8 +828,8 @@
             height = dim.y * zoomY;
         this._cacheCanvas.width = width;
         this._cacheCanvas.height = height;
-        this._cacheContext.scale(zoomX, zoomY);
         this._cacheContext.translate(width / 2, height / 2);
+        this._cacheContext.scale(zoomX, zoomY);
         this.cacheWidth = width;
         this.cacheHeight = height;
         this.zoomX = zoomX;
@@ -1164,7 +1164,7 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching) {
         if (this.isCacheDirty()) {
-          this.drawObject(this._cacheContext);
+          this.drawObject(this._cacheContext, noTransform);
         }
         this.drawCacheOnCanvas(ctx);
       }
