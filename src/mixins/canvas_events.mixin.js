@@ -438,6 +438,9 @@
      */
     __onMouseDown: function (e) {
 
+      var target = this.findTarget(e),
+          pointer = this.getPointer(e, true);
+
       // if right click just fire events
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
       if (isRightClick) {
@@ -456,9 +459,6 @@
       if (this._currentTransform) {
         return;
       }
-
-      var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
