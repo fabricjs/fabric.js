@@ -971,17 +971,18 @@
       if (angle < 0) {
         angle = 360 + angle;
       }
-      
+
       angle %= 360
 
-      var snapAngle  = t.target.snapAngle;
-      var snapThreshold  = t.target.snapThreshold || snapAngle;
-      var rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle;
-      var leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
-  
+      var snapAngle  = t.target.snapAngle,
+          snapThreshold  = t.target.snapThreshold || snapAngle,
+          rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
+          leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
+
       if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
         angle = leftAngleLocked;
-      } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
+      }
+      else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
         angle = rightAngleLocked;
       }
 
