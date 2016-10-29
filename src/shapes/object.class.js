@@ -781,7 +781,7 @@
      * @type Array
      */
     cacheProperties: (
-      'dirty fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray' +
+      'fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray' +
       ' strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor'
     ).split(' '),
 
@@ -1164,7 +1164,9 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching) {
         if (this.isCacheDirty()) {
+          this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
+          this.dirty = false;
         }
         this.drawCacheOnCanvas(ctx);
       }
@@ -1198,7 +1200,6 @@
 
     /**
      * Check if cache is dirty
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     isCacheDirty: function() {
       if (this._updateCacheCanvas()) {
@@ -1206,8 +1207,7 @@
         return true;
       }
       else {
-        if (this.hasStateChanged('cacheProperties')) {
-          this.saveState({ propertySet: 'cacheProperties' });
+        if (this.dirty || this.hasStateChanged('cacheProperties')) {
           var dim = this._getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           return true;
@@ -1244,9 +1244,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setOpacity: function(ctx) {
-      if (this.group) {
-        this.group._setOpacity(ctx);
-      }
       ctx.globalAlpha *= this.opacity;
     },
 
