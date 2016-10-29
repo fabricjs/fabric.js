@@ -256,6 +256,23 @@
     preserveObjectStacking: false,
 
     /**
+     * Indicates the angle that an object will lock to while rotating.
+     * @type Number
+     * @since 1.6.7
+     * @default
+     */
+    snapAngle: 0,
+
+    /**
+     * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
+     * When `null`, the snapThreshold will default to the snapAngle.
+     * @type null|Number
+     * @since 1.6.7
+     * @default
+     */
+    snapThreshold: null,
+
+    /**
      * Indicates if the right click on canvas can output the context menu or not
      * @type Boolean
      * @since 1.6.5
@@ -948,15 +965,36 @@
 
       var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
           curAngle = atan2(y - t.top, x - t.left),
-          angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+          angle = radiansToDegrees(curAngle - lastAngle + t.theta),
+          hasRoated = true;
 
       // normalize angle to positive value
       if (angle < 0) {
         angle = 360 + angle;
       }
 
-      t.target.angle = angle % 360;
-      return true;
+      angle %= 360
+
+      if (t.target.snapAngle > 0) {
+        var snapAngle  = t.target.snapAngle,
+            snapThreshold  = t.target.snapThreshold || snapAngle,
+            rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
+            leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
+
+        if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
+          angle = leftAngleLocked;
+        }
+        else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
+          angle = rightAngleLocked;
+        }
+
+        if (t.target.angle === angle) {
+          hasRoated = false
+        }
+      }
+
+      t.target.angle = angle;
+      return hasRoated;
     },
 
     /**
