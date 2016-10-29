@@ -786,7 +786,7 @@
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           line, _char, style;
-
+      ctx.save();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this._getHeightOfLine(ctx, i);
         line = this._textLines[i];
@@ -817,6 +817,7 @@
         }
         lineTopOffset += heightOfLine;
       }
+      ctx.restore();
     },
 
     /**

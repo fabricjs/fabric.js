@@ -198,9 +198,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     fabric.copiedText = selectedText;
-    fabric.copiedTextStyle = this.getSelectionStyles(
-                          this.selectionStart,
-                          this.selectionEnd);
+    fabric.copiedTextStyle = fabric.util.object.clone(
+      this.getSelectionStyles(
+        this.selectionStart,
+        this.selectionEnd
+      )
+    );
     e.stopImmediatePropagation();
     e.preventDefault();
     this._copyDone = true;
