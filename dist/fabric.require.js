@@ -4219,8 +4219,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         skipTargetFind: false,
         isDrawingMode: false,
         preserveObjectStacking: false,
-        snapAngle: 0,
-        snapThreshold: null,
         stopContextMenu: false,
         fireRightClick: false,
         _initInteractive: function() {
@@ -4255,9 +4253,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return objsToRender;
         },
         renderAll: function() {
-            if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+            if (this.selection && !this._groupSelector && !this.isDrawingMode) {
                 this.clearContext(this.contextTop);
-                this.contextTopDirty = false;
             }
             var canvasToDrawOn = this.contextContainer;
             this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
@@ -4270,7 +4267,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 this._drawSelection(ctx);
             }
             this.fire("after:render");
-            this.contextTopDirty = true;
             return this;
         },
         _resetCurrentTransform: function() {
@@ -4618,24 +4614,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (t.target.get("lockRotation")) {
                 return false;
             }
-            var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta), hasRoated = true;
+            var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta);
             if (angle < 0) {
                 angle = 360 + angle;
             }
-            angle %= 360;
-            if (t.target.snapAngle > 0) {
-                var snapAngle = t.target.snapAngle, snapThreshold = t.target.snapThreshold || snapAngle, rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle, leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
-                if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
-                    angle = leftAngleLocked;
-                } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
-                    angle = rightAngleLocked;
-                }
-                if (t.target.angle === angle) {
-                    hasRoated = false;
-                }
-            }
-            t.target.angle = angle;
-            return hasRoated;
+            t.target.angle = angle % 360;
+            return true;
         },
         setCursor: function(value) {
             this.upperCanvasEl.style.cursor = value;
@@ -9899,6 +9883,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         initialize: function(options) {
             options = options || {};
             this.saturate = options.saturate || 0;
+            this.loadProgram();
         },
         applyTo: function(canvasEl) {
             var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, max, adjust = -this.saturate * .01;
@@ -10504,36 +10489,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
             fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
         },
-        render: function(ctx, noTransform) {
-            this.clearContextTop();
-            this.callSuper("render", ctx, noTransform);
-        },
         _render: function(ctx) {
+            this.oldWidth = this.width;
+            this.oldHeight = this.height;
             this.callSuper("_render", ctx);
             this.ctx = ctx;
             this.cursorOffsetCache = {};
             this.renderCursorOrSelection();
-        },
-        clearContextTop: function() {
-            if (!this.active || !this.isEditing) {
-                return;
-            }
-            if (this.canvas && this.canvas.contextTop) {
-                var ctx = this.canvas.contextTop;
-                ctx.save();
-                ctx.transform.apply(ctx, this.canvas.viewportTransform);
-                this.transform(ctx);
-                this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-                this._clearTextArea(ctx);
-                ctx.restore();
-            }
         },
         renderCursorOrSelection: function() {
             if (!this.active || !this.isEditing) {
                 return;
             }
             var chars = this.text.split(""), boundaries, ctx;
-            if (this.canvas && this.canvas.contextTop) {
+            if (this.canvas.contextTop) {
                 ctx = this.canvas.contextTop;
                 ctx.save();
                 ctx.transform.apply(ctx, this.canvas.viewportTransform);
@@ -10554,7 +10523,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             ctx.restore();
         },
         _clearTextArea: function(ctx) {
-            var width = this.width + 4, height = this.height + 4;
+            var width = this.oldWidth + 4, height = this.oldHeight + 4;
             ctx.clearRect(-width / 2, -height / 2, width, height);
         },
         get2DCursorLocation: function(selectionStart) {
@@ -10796,7 +10765,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                     }
                     _char = line[j];
                     ctx.fillStyle = style.textBackgroundColor;
-                    ctx.fillRect(leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), topOffset + lineTopOffset, this._getWidthOfChar(ctx, _char, i, j), heightOfLine / this.lineHeight);
+                    ctx.fillRect(leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), topOffset + lineTopOffset, this._getWidthOfChar(ctx, _char, i, j) + 1, heightOfLine / this.lineHeight);
                 }
                 lineTopOffset += heightOfLine;
             }
