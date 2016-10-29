@@ -343,8 +343,9 @@
      * @chainable
      */
     renderAll: function () {
-      if (this.selection && !this._groupSelector && !this.isDrawingMode) {
+      if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
+        this.contextTopDirty = false;
       }
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
@@ -367,7 +368,7 @@
       }
 
       this.fire('after:render');
-
+      this.contextTopDirty = true;
       return this;
     },
 

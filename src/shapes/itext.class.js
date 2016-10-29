@@ -309,16 +309,42 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} noTransform
+     */
+    render: function(ctx, noTransform) {
+      this.clearContextTop();
+      this.callSuper('render', ctx, noTransform);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.oldWidth = this.width;
-      this.oldHeight = this.height;
       this.callSuper('_render', ctx);
       this.ctx = ctx;
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
       this.cursorOffsetCache = { };
       this.renderCursorOrSelection();
+    },
+
+    /**
+     * Prepare and clean the contextTop
+     */
+    clearContextTop: function() {
+      if (!this.active || !this.isEditing) {
+        return;
+      }
+      if (this.canvas && this.canvas.contextTop) {
+        var ctx = this.canvas.contextTop;
+        ctx.save();
+        ctx.transform.apply(ctx, this.canvas.viewportTransform);
+        this.transform(ctx);
+        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+        this._clearTextArea(ctx);
+        ctx.restore();
+      }
     },
 
     /**
@@ -330,7 +356,7 @@
       }
       var chars = this.text.split(''),
           boundaries, ctx;
-      if (this.canvas.contextTop) {
+      if (this.canvas && this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
         ctx.transform.apply(ctx, this.canvas.viewportTransform);
@@ -350,13 +376,12 @@
         boundaries = this._getCursorBoundaries(chars, 'selection');
         this.renderSelection(chars, boundaries, ctx);
       }
-
       ctx.restore();
     },
 
     _clearTextArea: function(ctx) {
       // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.oldWidth + 4, height = this.oldHeight + 4;
+      var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
     },
     /**
@@ -811,7 +836,7 @@
           ctx.fillRect(
             leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
             topOffset + lineTopOffset,
-            this._getWidthOfChar(ctx, _char, i, j) + 1,
+            this._getWidthOfChar(ctx, _char, i, j),
             heightOfLine / this.lineHeight
           );
         }
