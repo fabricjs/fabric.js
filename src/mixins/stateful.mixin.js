@@ -30,7 +30,7 @@
       });
     }
     else if (origValue instanceof Object) {
-      if (Object.keys(origValue) !== Object.keys(currentValue)) {
+      if (Object.keys(origValue).length !== Object.keys(currentValue).length) {
         return false;
       }
       for (var key in origValue) {
