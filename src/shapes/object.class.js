@@ -1162,8 +1162,8 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching) {
-        if (this.isCacheDirty()) {
+      if (this.objectCaching && !noTransform) {
+        if (this.isCacheDirty(noTransform)) {
           this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
           this.dirty = false;
@@ -1172,6 +1172,7 @@
       }
       else {
         this.drawObject(ctx, noTransform);
+        noTransform && this.saveState({ propertySet: 'cacheProperties' });
       }
       this.clipTo && ctx.restore();
       ctx.restore();
@@ -1201,8 +1202,8 @@
     /**
      * Check if cache is dirty
      */
-    isCacheDirty: function() {
-      if (this._updateCacheCanvas()) {
+    isCacheDirty: function(skipCanvas) {
+      if (!skipCanvas && this._updateCacheCanvas()) {
         // in this case the context is already cleared.
         return true;
       }

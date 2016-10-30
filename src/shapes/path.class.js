@@ -75,7 +75,9 @@
     initialize: function(path, options) {
       options = options || { };
 
-      this.callSuper('initialize', options);
+      if (options) {
+        this.setOptions(options);
+      }
 
       if (!path) {
         path = [];
@@ -100,6 +102,10 @@
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
+      }
+      if (this.objectCaching) {
+        this._createCacheCanvas();
+        this.setupState({ propertySet: 'cacheProperties' });
       }
     },
 

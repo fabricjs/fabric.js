@@ -23,7 +23,9 @@
       }
       else if (source instanceof Object) {
         for (var property in source) {
-          destination[property] = clone(source[property], deep)
+          if (source.hasOwnProperty(property)) {
+            destination[property] = clone(source[property], deep)
+          }
         }
       }
       else {

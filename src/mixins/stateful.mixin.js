@@ -14,7 +14,7 @@
     extend(origin[destination], tmpObj, deep);
   }
 
-  function _isEqual(origValue, currentValue) {
+  function _isEqual(origValue, currentValue, firstPass) {
     if (!fabric.isLikelyNode && origValue instanceof Element) {
       // avoid checking deep html elements
       return origValue === currentValue;
@@ -30,8 +30,11 @@
       });
     }
     else if (origValue instanceof Object) {
-      if (Object.keys(origValue).length !== Object.keys(currentValue).length) {
+      if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
         return false;
+      }
+      if (!origValue[key] && !currentValue[key]) {
+        return true;
       }
       for (var key in origValue) {
         if (!_isEqual(origValue[key], currentValue[key])) {
@@ -56,7 +59,7 @@
     hasStateChanged: function(propertySet) {
       propertySet = propertySet || originalSet;
       propertySet = '_' + propertySet;
-      return !_isEqual(this[propertySet], this);
+      return !_isEqual(this[propertySet], this, true);
     },
 
     /**
