@@ -258,6 +258,16 @@
           fabric.log('Error loading ' + img.src);
           callback && callback.call(context, null, true);
           img = img.onload = img.onerror = null;
+
+          // Try sending a log to Stile's error handling if it's defined.
+          // This will ultimately end up in Rollbar.
+          if (!!fabric.stileLog) {
+              fabric.stileLog.info('Failed to load image after retries', {
+                  src: imgSrc,
+                  fabricSketchpad: true,
+              });
+          }
+
           return;
         }
 
