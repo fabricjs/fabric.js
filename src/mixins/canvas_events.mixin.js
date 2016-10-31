@@ -147,10 +147,12 @@
      * @param {Event} e Event object fired on mouseenter
      */
     _onMouseEnter: function(e) {
-      var target = this._hoveredTarget;
-      this.fire('mouse:over', { target: target, e: e });
-      this._hoveredTarget = null;
-      target && target.fire('mouseenter', { e: e });
+      if (!this.findTarget(e)) {
+        var target = this._hoveredTarget || null;
+        this.fire('mouse:over', { target: target, e: e });
+        this._hoveredTarget = null;
+        target && target.fire('mouseenter', { e: e });
+      }
     },
 
     /**
