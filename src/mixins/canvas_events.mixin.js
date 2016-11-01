@@ -148,10 +148,8 @@
      */
     _onMouseEnter: function(e) {
       if (!this.findTarget(e)) {
-        var target = this._hoveredTarget || null;
-        this.fire('mouse:over', { target: target, e: e });
+        this.fire('mouse:over', { target: null, e: e });
         this._hoveredTarget = null;
-        target && target.fire('mouseenter', { e: e });
       }
     },
 
