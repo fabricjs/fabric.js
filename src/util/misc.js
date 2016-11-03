@@ -239,7 +239,7 @@
       // Copypasta from loadImageRetry/index.module.js - will retry loading
       // the image a few times before bailing
       img.onerror = function(event) {
-        const imgEl = this;
+        var imgEl = this;
 
         // If we haven't initialised the load attempt counter, then this call
         // is in response to the first failure.
@@ -248,11 +248,11 @@
         //
         // REVISIT: send to some kind of local failure stats to be batched up and
         // eventually sent to Rollbar?
-        const loadAttemptsAttr = imgEl.getAttribute('data-load-attempts');
-        const loadAttempts = loadAttemptsAttr && parseInt(loadAttemptsAttr, 10) || 1;
-        const getImageElementSource = require('imageLoadRetry/libs/getImageElementSource');
-        const imgSrc = getImageElementSource(imgEl);
-        if (loadAttempts === 3) {
+        var loadAttemptsAttr = imgEl.getAttribute('data-load-attempts');
+        var loadAttempts = loadAttemptsAttr && parseInt(loadAttemptsAttr, 10) || 1;
+        var getImageElementSource = require('imageLoadRetry/libs/getImageElementSource');
+        var imgSrc = getImageElementSource(imgEl);
+        if (loadAttempts === 4) {
           // Ok, the image probably isn't going to load;
           // Put the original fabric failure case code in here.
           fabric.log('Error loading ' + img.src);
@@ -271,9 +271,12 @@
           return;
         }
 
-        // Try loading the image again.
-        imgEl.setAttribute('data-load-attempts', loadAttempts + 1);
-        imgEl.setAttribute('src', imgSrc);
+        // Try loading the image again, with some backoff
+        var backoff = loadAttempts * 1000;
+        setTimeout(function(){
+          imgEl.setAttribute('data-load-attempts', loadAttempts + 1);
+          imgEl.setAttribute('src', imgSrc);
+        }, backoff);
       }
 
       // data-urls appear to be buggy with crossOrigin
