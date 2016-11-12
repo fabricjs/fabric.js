@@ -499,7 +499,7 @@
       // stretch the line
       var words = line.split(/\s+/),
           charOffset = 0,
-          wordsWidth = this._getWidthOfWords(ctx, words.join(''), lineIndex, 0),
+          wordsWidth = this._getWidthOfWords(ctx, words.join(' '), lineIndex, 0),
           widthDiff = this.width - wordsWidth,
           numSpaces = words.length - 1,
           spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
