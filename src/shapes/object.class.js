@@ -1374,7 +1374,7 @@
       }
 
       if (options.format === 'jpeg') {
-        canvas.backgroundFill = '#fff';
+        canvas.backgroundColor = '#fff';
       }
 
       var origParams = {
