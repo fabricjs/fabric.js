@@ -259,23 +259,18 @@
       this.resizeFilters.forEach(function(filterObj) {
         filterObj && resizeFilters.push(filterObj.toObject());
       });
-
-      var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: this.getSrc(),
-        filters: filters,
-        resizeFilters: resizeFilters,
-        crossOrigin: this.crossOrigin,
-        alignX: this.alignX,
-        alignY: this.alignY,
-        meetOrSlice: this.meetOrSlice
-      });
+      var object = extend(
+        this.callSuper(
+          'toObject',
+          ['crossOrigin', 'alignX', 'alignY', 'meetOrSlice'].concat(propertiesToInclude)
+        ), {
+          src: this.getSrc(),
+          filters: filters,
+          resizeFilters: resizeFilters,
+        });
 
       object.width /= scaleX;
       object.height /= scaleY;
-
-      if (!this.includeDefaultValues) {
-        this._removeDefaultValues(object);
-      }
 
       return object;
     },

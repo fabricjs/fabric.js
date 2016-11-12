@@ -143,12 +143,9 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var o = extend(parentToObject.call(this, propertiesToInclude), {
+      var o = extend(parentToObject.call(this, ['sourcePath'].concat(propertiesToInclude)), {
         paths: invoke(this.getObjects(), 'toObject', propertiesToInclude)
       });
-      if (this.sourcePath) {
-        o.sourcePath = this.sourcePath;
-      }
       return o;
     },
 
