@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
