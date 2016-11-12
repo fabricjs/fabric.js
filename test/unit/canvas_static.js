@@ -863,6 +863,16 @@
     equal(canvas.toObject().objects[0].type, rect.type);
   });
 
+  test('toObject non includeDefaultValues', function() {
+    canvas.includeDefaultValues = false;
+    var rect = makeRect();
+    canvas.add(rect);
+    var cObject = canvas.toObject();
+    var expectedRect = { type: 'rect', width: 10, height: 10 };
+    deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
+    canvas.includeDefaultValues = true;
+  });
+
   test('toObject excludeFromExport', function() {
     var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
     canvas.clear();
