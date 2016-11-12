@@ -3562,7 +3562,7 @@ fabric.Pattern = fabric.util.createClass({
             var data = {
                 objects: this._toObjects(methodName, propertiesToInclude)
             };
-            extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
+            extend(data, this.__serializeBgOverlay(propertiesToInclude));
             fabric.util.populateWithProperties(this, data, propertiesToInclude);
             return data;
         },
@@ -3585,7 +3585,7 @@ fabric.Pattern = fabric.util.createClass({
             }
             return object;
         },
-        __serializeBgOverlay: function(methodName, propertiesToInclude) {
+        __serializeBgOverlay: function(propertiesToInclude) {
             var data = {
                 background: this.backgroundColor && this.backgroundColor.toObject ? this.backgroundColor.toObject(propertiesToInclude) : this.backgroundColor
             };
@@ -3593,10 +3593,10 @@ fabric.Pattern = fabric.util.createClass({
                 data.overlay = this.overlayColor.toObject ? this.overlayColor.toObject(propertiesToInclude) : this.overlayColor;
             }
             if (this.backgroundImage) {
-                data.backgroundImage = this._toObject(this.backgroundImage, methodName, propertiesToInclude);
+                data.backgroundImage = this.backgroundImage.toObject(propertiesToInclude);
             }
             if (this.overlayImage) {
-                data.overlayImage = this._toObject(this.overlayImage, methodName, propertiesToInclude);
+                data.overlayImage = this.overlayImage.toObject(propertiesToInclude);
             }
             return data;
         },
@@ -4219,8 +4219,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         skipTargetFind: false,
         isDrawingMode: false,
         preserveObjectStacking: false,
-        snapAngle: 0,
-        snapThreshold: null,
         stopContextMenu: false,
         fireRightClick: false,
         _initInteractive: function() {
@@ -4255,9 +4253,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return objsToRender;
         },
         renderAll: function() {
-            if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+            if (this.selection && !this._groupSelector && !this.isDrawingMode) {
                 this.clearContext(this.contextTop);
-                this.contextTopDirty = false;
             }
             var canvasToDrawOn = this.contextContainer;
             this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
@@ -4270,7 +4267,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 this._drawSelection(ctx);
             }
             this.fire("after:render");
-            this.contextTopDirty = true;
             return this;
         },
         _resetCurrentTransform: function() {
@@ -4618,24 +4614,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (t.target.get("lockRotation")) {
                 return false;
             }
-            var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta), hasRoated = true;
+            var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta);
             if (angle < 0) {
                 angle = 360 + angle;
             }
-            angle %= 360;
-            if (t.target.snapAngle > 0) {
-                var snapAngle = t.target.snapAngle, snapThreshold = t.target.snapThreshold || snapAngle, rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle, leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
-                if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
-                    angle = leftAngleLocked;
-                } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
-                    angle = rightAngleLocked;
-                }
-                if (t.target.angle === angle) {
-                    hasRoated = false;
-                }
-            }
-            t.target.angle = angle;
-            return hasRoated;
+            t.target.angle = angle % 360;
+            return true;
         },
         setCursor: function(value) {
             this.upperCanvasEl.style.cursor = value;
@@ -5059,7 +5043,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             addListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
             addListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
             addListener(this.upperCanvasEl, "mouseout", this._onMouseOut);
-            addListener(this.upperCanvasEl, "mouseenter", this._onMouseEnter);
             addListener(this.upperCanvasEl, "wheel", this._onMouseWheel);
             addListener(this.upperCanvasEl, "contextmenu", this._onContextMenu);
             addListener(this.upperCanvasEl, "touchstart", this._onMouseDown);
@@ -5084,7 +5067,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._onOrientationChange = this._onOrientationChange.bind(this);
             this._onMouseWheel = this._onMouseWheel.bind(this);
             this._onMouseOut = this._onMouseOut.bind(this);
-            this._onMouseEnter = this._onMouseEnter.bind(this);
             this._onContextMenu = this._onContextMenu.bind(this);
         },
         removeListeners: function() {
@@ -5092,7 +5074,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             removeListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
             removeListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
             removeListener(this.upperCanvasEl, "mouseout", this._onMouseOut);
-            removeListener(this.upperCanvasEl, "mouseenter", this._onMouseEnter);
             removeListener(this.upperCanvasEl, "wheel", this._onMouseWheel);
             removeListener(this.upperCanvasEl, "contextmenu", this._onContextMenu);
             removeListener(this.upperCanvasEl, "touchstart", this._onMouseDown);
@@ -5124,15 +5105,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             target && target.fire("mouseout", {
                 e: e
             });
-        },
-        _onMouseEnter: function(e) {
-            if (!this.findTarget(e)) {
-                this.fire("mouse:over", {
-                    target: null,
-                    e: e
-                });
-                this._hoveredTarget = null;
-            }
         },
         _onOrientationChange: function(e, self) {
             this.__onOrientationChange && this.__onOrientationChange(e, self);
@@ -5282,7 +5254,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._handleEvent(e, "up");
         },
         __onMouseDown: function(e) {
-            var target = this.findTarget(e), pointer = this.getPointer(e, true);
             var isRightClick = "which" in e ? e.which === 3 : e.button === 2;
             if (isRightClick) {
                 if (this.fireRightClick) {
@@ -5297,6 +5268,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this._currentTransform) {
                 return;
             }
+            var target = this.findTarget(e), pointer = this.getPointer(e, true);
             this._previousPointer = pointer;
             var shouldRender = this._shouldRender(target, pointer), shouldGroup = this._shouldGroup(e, target);
             if (this._shouldClearSelection(e, target)) {
@@ -5939,7 +5911,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         },
         _removeDefaultValues: function(object) {
             var prototype = fabric.util.getKlass(object.type).prototype, stateProperties = prototype.stateProperties;
-            console.log(prototype);
             stateProperties.forEach(function(prop) {
                 if (object[prop] === prototype[prop]) {
                     delete object[prop];
@@ -6196,7 +6167,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 options.format = "jpeg";
             }
             if (options.format === "jpeg") {
-                canvas.backgroundFill = "#fff";
+                canvas.backgroundColor = "#fff";
             }
             var origParams = {
                 active: this.get("active"),
@@ -9912,6 +9883,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         initialize: function(options) {
             options = options || {};
             this.saturate = options.saturate || 0;
+            this.loadProgram();
         },
         applyTo: function(canvasEl) {
             var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, max, adjust = -this.saturate * .01;
@@ -10517,36 +10489,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
             fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
         },
-        render: function(ctx, noTransform) {
-            this.clearContextTop();
-            this.callSuper("render", ctx, noTransform);
-        },
         _render: function(ctx) {
+            this.oldWidth = this.width;
+            this.oldHeight = this.height;
             this.callSuper("_render", ctx);
             this.ctx = ctx;
             this.cursorOffsetCache = {};
             this.renderCursorOrSelection();
-        },
-        clearContextTop: function() {
-            if (!this.active || !this.isEditing) {
-                return;
-            }
-            if (this.canvas && this.canvas.contextTop) {
-                var ctx = this.canvas.contextTop;
-                ctx.save();
-                ctx.transform.apply(ctx, this.canvas.viewportTransform);
-                this.transform(ctx);
-                this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-                this._clearTextArea(ctx);
-                ctx.restore();
-            }
         },
         renderCursorOrSelection: function() {
             if (!this.active || !this.isEditing) {
                 return;
             }
             var chars = this.text.split(""), boundaries, ctx;
-            if (this.canvas && this.canvas.contextTop) {
+            if (this.canvas.contextTop) {
                 ctx = this.canvas.contextTop;
                 ctx.save();
                 ctx.transform.apply(ctx, this.canvas.viewportTransform);
@@ -10567,7 +10523,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             ctx.restore();
         },
         _clearTextArea: function(ctx) {
-            var width = this.width + 4, height = this.height + 4;
+            var width = this.oldWidth + 4, height = this.oldHeight + 4;
             ctx.clearRect(-width / 2, -height / 2, width, height);
         },
         get2DCursorLocation: function(selectionStart) {
@@ -10809,7 +10765,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                     }
                     _char = line[j];
                     ctx.fillStyle = style.textBackgroundColor;
-                    ctx.fillRect(leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), topOffset + lineTopOffset, this._getWidthOfChar(ctx, _char, i, j), heightOfLine / this.lineHeight);
+                    ctx.fillRect(leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), topOffset + lineTopOffset, this._getWidthOfChar(ctx, _char, i, j) + 1, heightOfLine / this.lineHeight);
                 }
                 lineTopOffset += heightOfLine;
             }
