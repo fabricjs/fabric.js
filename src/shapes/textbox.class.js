@@ -435,9 +435,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        minWidth: this.minWidth
-      });
+      return this.callSuper('toObject', ['minWidth'].concat(propertiesToInclude));
     }
   });
   /**
