@@ -793,7 +793,7 @@
   });
 
   test('measuring width of words', function () {
-    var ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext('2d');
     var text = 'test foo bar';
     var iText = new fabric.IText(text, {
       styles: {
