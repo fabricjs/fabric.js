@@ -884,9 +884,7 @@
         textBackgroundColor:  this.textBackgroundColor,
         charSpacing:          this.charSpacing
       });
-      if (!this.includeDefaultValues) {
-        this._removeDefaultValues(object);
-      }
+
       return object;
     },
 

@@ -154,9 +154,7 @@
         rx: this.get('rx') || 0,
         ry: this.get('ry') || 0
       });
-      if (!this.includeDefaultValues) {
-        this._removeDefaultValues(object);
-      }
+
       return object;
     },
 

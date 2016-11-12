@@ -273,10 +273,6 @@
       object.width /= scaleX;
       object.height /= scaleY;
 
-      if (!this.includeDefaultValues) {
-        this._removeDefaultValues(object);
-      }
-
       return object;
     },
 
