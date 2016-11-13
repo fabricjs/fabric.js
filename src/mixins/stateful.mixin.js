@@ -33,9 +33,6 @@
       if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
         return false;
       }
-      if (!origValue[key] && !currentValue[key]) {
-        return true;
-      }
       for (var key in origValue) {
         if (!_isEqual(origValue[key], currentValue[key])) {
           return false;
