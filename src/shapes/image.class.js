@@ -113,6 +113,15 @@
     stateProperties: stateProperties,
 
     /**
+     * When `true`, object is cached on an additional canvas.
+     * default to false for images
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    objectCaching: false,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object

@@ -23,9 +23,24 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'textBackgroundColor'
+    'textBackgroundColor',
+    'charSpacing'
   );
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'text',
+    'textDecoration',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'textBackgroundColor',
+    'charSpacing',
+    'styles'
+  );
   /**
    * Text class
    * @class fabric.Text
@@ -41,17 +56,16 @@
      * @type Object
      * @private
      */
-    _dimensionAffectingProps: {
-      fontSize: true,
-      fontWeight: true,
-      fontFamily: true,
-      fontStyle: true,
-      lineHeight: true,
-      text: true,
-      charSpacing: true,
-      textAlign: true,
-      strokeWidth: false,
-    },
+    _dimensionAffectingProps: [
+      'fontSize',
+      'fontWeight',
+      'fontFamily',
+      'fontStyle',
+      'lineHeight',
+      'text',
+      'charSpacing',
+      'textAlign'
+    ],
 
     /**
      * @private
@@ -291,6 +305,12 @@
     stateProperties:      stateProperties,
 
     /**
+     * List of properties to consider when checking if cache needs refresh
+     * @type Array
+     */
+    cacheProperties:      cacheProperties,
+
+    /**
      * When defined, an object is rendered via stroke and this property specifies its color.
      * <b>Backwards incompatibility note:</b> This property was named "strokeStyle" until v1.1.6
      * @type String
@@ -336,9 +356,10 @@
       options = options || { };
       this.text = text;
       this.__skipDimension = true;
-      this.setOptions(options);
+      this.callSuper('initialize', options);
       this.__skipDimension = false;
       this._initDimensions();
+      this.setupState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**
@@ -377,16 +398,13 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      this._setupCompositeOperation(ctx);
-      this._renderTextBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
+      this._setTextStyles(ctx);
+      if (this.group && this.group.type === 'path-group') {
+        ctx.translate(this.left, this.top);
+      }
+      this._renderTextLinesBackground(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
-      this.clipTo && ctx.restore();
     },
 
     /**
@@ -633,21 +651,12 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderTextBackground: function(ctx) {
-      this._renderBackground(ctx);
-      this._renderTextLinesBackground(ctx);
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
     _renderTextLinesBackground: function(ctx) {
       if (!this.textBackgroundColor) {
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset;
+          lineWidth, lineLeftOffset, originalFill = ctx.fillStye;
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -664,6 +673,7 @@
         }
         lineTopOffset += heightOfLine;
       }
+      ctx.fillStyle = originalFill;
       // if there is text background color no
       // other shadows should be casted
       this._removeShadow(ctx);
@@ -695,17 +705,15 @@
     /**
      * @private
      */
-    _shouldClearCache: function() {
+    _shouldClearDimensionCache: function() {
       var shouldClear = false;
       if (this._forceClearCache) {
         this._forceClearCache = false;
         return true;
       }
-      for (var prop in this._dimensionAffectingProps) {
-        if (this['__' + prop] !== this[prop]) {
-          this['__' + prop] = this[prop];
-          shouldClear = true;
-        }
+      shouldClear = this.hasStateChanged('_dimensionAffectingProps');
+      if (shouldClear) {
+        this.saveState({ propertySet: '_dimensionAffectingProps' });
       }
       return shouldClear;
     },
@@ -836,25 +844,10 @@
       if (!this.visible) {
         return;
       }
-
-      ctx.save();
-      this._setTextStyles(ctx);
-
-      if (this._shouldClearCache()) {
+      if (this._shouldClearDimensionCache()) {
         this._initDimensions(ctx);
       }
-      this.drawSelectionBackground(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(this.left, this.top);
-      }
-      this._render(ctx);
-      ctx.restore();
+      this.callSuper('render', ctx, noTransform);
     },
 
     /**
@@ -1086,7 +1079,7 @@
     _set: function(key, value) {
       this.callSuper('_set', key, value);
 
-      if (key in this._dimensionAffectingProps) {
+      if (this._dimensionAffectingProps.indexOf(key) > -1) {
         this._initDimensions();
         this.setCoords();
       }

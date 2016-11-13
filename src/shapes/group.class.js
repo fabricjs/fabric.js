@@ -164,6 +164,7 @@
       this.forEachObject(this._setObjectActive, this);
       this._calcBounds();
       this._updateObjectsCoords();
+      this.dirty = true;
       return this;
     },
 
@@ -190,7 +191,7 @@
       this.remove(object);
       this._calcBounds();
       this._updateObjectsCoords();
-
+      this.dirty = true;
       return this;
     },
 
@@ -198,6 +199,7 @@
      * @private
      */
     _onObjectAdded: function(object) {
+      this.dirty = true;
       object.group = this;
       object._set('canvas', this.canvas);
     },
@@ -206,6 +208,7 @@
      * @private
      */
     _onObjectRemoved: function(object) {
+      this.dirty = true;
       delete object.group;
       object.set('active', false);
     },
@@ -264,27 +267,40 @@
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
     render: function(ctx) {
-      // do not render if object is not visible
-      if (!this.visible) {
-        return;
-      }
-
-      ctx.save();
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      this.transform(ctx);
-      this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
       this._transformDone = true;
-      // the array is now sorted in order of highest first, so start from end
+      this.callSuper('render', ctx);
+      this._transformDone = false;
+    },
+
+    /**
+     * Execute the drawing operation for an object on a specified context
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    drawObject: function(ctx) {
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);
       }
+    },
 
-      this.clipTo && ctx.restore();
-      ctx.restore();
-      this._transformDone = false;
+    /**
+     * Check if cache is dirty
+     */
+    isCacheDirty: function() {
+      if (this.callSuper('isCacheDirty')) {
+        return true
+      }
+      if (!this.statefullCache) {
+        return false;
+      }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        if (this._objects[i].isCacheDirty(true)) {
+          var dim = this._getNonTransformedDimensions();
+          this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+          return true
+        }
+      }
+      return false;
     },
 
     /**

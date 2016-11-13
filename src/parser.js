@@ -69,9 +69,14 @@
       value = '';
     }
     else if (attr === 'strokeDashArray') {
-      value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
-        return parseFloat(n);
-      });
+      if (value === 'none') {
+        value = null;
+      }
+      else {
+        value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
+          return parseFloat(n);
+        });
+      }
     }
     else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {

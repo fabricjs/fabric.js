@@ -56,7 +56,7 @@
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options) {
-      options = options || { };
+      options = options || {};
       this.points = points || [];
       this.callSuper('initialize', options);
       this._calcDimensions();

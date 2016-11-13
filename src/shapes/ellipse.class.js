@@ -47,12 +47,9 @@
      * @return {fabric.Ellipse} thisArg
      */
     initialize: function(options) {
-      options = options || { };
-
       this.callSuper('initialize', options);
-
-      this.set('rx', options.rx || 0);
-      this.set('ry', options.ry || 0);
+      this.set('rx', options && options.rx || 0);
+      this.set('ry', options && options.ry || 0);
     },
 
     /**

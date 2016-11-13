@@ -113,24 +113,8 @@
      */
     _getNonTransformedDimensions: function() {
       var strokeWidth = this.strokeWidth,
-          w = this.width,
-          h = this.height,
-          addStrokeToW = true,
-          addStrokeToH = true;
-
-      if (this.type === 'line' && this.strokeLineCap === 'butt') {
-        addStrokeToH = w;
-        addStrokeToW = h;
-      }
-
-      if (addStrokeToH) {
-        h += h < 0 ? -strokeWidth : strokeWidth;
-      }
-
-      if (addStrokeToW) {
-        w += w < 0 ? -strokeWidth : strokeWidth;
-      }
-
+          w = this.width + strokeWidth,
+          h = this.height + strokeWidth;
       return { x: w, y: h };
     },
 
