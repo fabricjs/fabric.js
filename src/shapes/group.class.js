@@ -96,7 +96,6 @@
         this._updateObjectsCoords();
         this.callSuper('initialize', options);
       }
-
       this.setCoords();
       this.saveCoords();
     },
@@ -106,17 +105,19 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsCoords: function(skipCoordsChange) {
+      var center = this.getCenterPoint();
       for (var i = this._objects.length; i--; ){
-        this._updateObjectCoords(this._objects[i], skipCoordsChange);
+        this._updateObjectCoords(this._objects[i], center, skipCoordsChange);
       }
     },
 
     /**
      * @private
      * @param {Object} object
+     * @param {fabric.Point} center if true, coordinates of object dose not change
      * @param {Boolean} [skipCoordsChange] if true, coordinates of object dose not change
      */
-    _updateObjectCoords: function(object, skipCoordsChange) {
+    _updateObjectCoords: function(object, center, skipCoordsChange) {
       // do not display corners of objects enclosed in a group
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
@@ -127,15 +128,14 @@
 
       var objectLeft = object.getLeft(),
           objectTop = object.getTop(),
-          center = this.getCenterPoint();
+          ingnoreZoom = true;
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
-      object.setCoords();
+      // the coords of object internal at groups should not be affected by viewport
+      object.setCoords(ingnoreZoom);
     },
 
     /**
@@ -309,10 +309,13 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
+      ctx.save();
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       this.callSuper('_renderControls', ctx, noTransform);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx);
       }
+      ctx.restore();
     },
 
     /**
@@ -417,8 +420,9 @@
      * @chainable
      */
     setObjectsCoords: function() {
+      var ignoreZoom = true;
       this.forEachObject(function(object) {
-        object.setCoords();
+        object.setCoords(ignoreZoom);
       });
       return this;
     },
@@ -432,11 +436,12 @@
           o, prop,
           props = ['tr', 'br', 'bl', 'tl'],
           i = 0, iLen = this._objects.length,
-          j, jLen = props.length;
+          j, jLen = props.length,
+          ignoreZoom = true;
 
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
-        o.setCoords();
+        o.setCoords(ignoreZoom);
         for (j = 0; j < jLen; j++) {
           prop = props[j];
           aX.push(o.oCoords[prop].x);
@@ -451,9 +456,8 @@
      * @private
      */
     _getBounds: function(aX, aY, onlyWidthHeight) {
-      var ivt = fabric.util.invertTransform(this.getViewportTransform()),
-          minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
-          maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
+      var minXY = new fabric.Point(min(aX), min(aY)),
+          maxXY = new fabric.Point(max(aX), max(aY)),
           obj = {
             width: (maxXY.x - minXY.x) || 0,
             height: (maxXY.y - minXY.y) || 0
