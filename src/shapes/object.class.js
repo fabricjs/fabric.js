@@ -764,6 +764,29 @@
     objectCaching:            objectCaching,
 
     /**
+     * When `true`, object properties are checked for cache invalidation. In some particular
+     * situation you may want this to be disabled ( spray brush, very big pathgroups, groups)
+     * or if your application does not allow you to modify properties for groups child you want
+     * to disable it for groups.
+     * default to true
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    statefullCache:            false,
+
+    /**
+     * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
+     * too much and will be redrawn with correct details at the end of scaling.
+     * this setting is performance and application dependant.
+     * default to false
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    noScaleCache:              true,
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -817,6 +840,12 @@
      * @return {Boolean} true if the canvas has been resized
      */
     _updateCacheCanvas: function() {
+      if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
+        var action = this.canvas._currentTransform.action;
+        if (action.slice(0, 5) === 'scale') {
+          return false;
+        }
+      }
       var zoom = this.getViewportTransform()[0],
           objectScale = this.getObjectScaling(),
           dim = this._getNonTransformedDimensions(),
@@ -1162,7 +1191,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching && !noTransform) {
+      if (this.objectCaching && !this.group) {
         if (this.isCacheDirty(noTransform)) {
           this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
@@ -1208,7 +1237,7 @@
         return true;
       }
       else {
-        if (this.dirty || this.hasStateChanged('cacheProperties')) {
+        if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
           var dim = this._getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           return true;

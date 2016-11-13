@@ -290,6 +290,9 @@
       if (this.callSuper('isCacheDirty')) {
         return true
       }
+      if (!this.statefullCache) {
+        return false;
+      }
       for (var i = 0, len = this._objects.length; i < len; i++) {
         if (this._objects[i].isCacheDirty()) {
           var dim = this._getNonTransformedDimensions();
