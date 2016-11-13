@@ -1230,6 +1230,8 @@
 
     /**
      * Check if cache is dirty
+     * @param {Boolean} skipCanvas skip canvas checks because this object is painted
+     * on parent canvas.
      */
     isCacheDirty: function(skipCanvas) {
       if (!skipCanvas && this._updateCacheCanvas()) {
@@ -1238,8 +1240,10 @@
       }
       else {
         if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
-          var dim = this._getNonTransformedDimensions();
-          this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+          if (!skipCanvas) {
+            var dim = this._getNonTransformedDimensions();
+            this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+          }
           return true;
         }
       }

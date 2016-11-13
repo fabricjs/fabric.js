@@ -294,7 +294,7 @@
         return false;
       }
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        if (this._objects[i].isCacheDirty()) {
+        if (this._objects[i].isCacheDirty(true)) {
           var dim = this._getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           return true
