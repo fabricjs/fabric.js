@@ -1,6 +1,7 @@
 (function() {
 
-  var extend = fabric.util.object.extend;
+  var extend = fabric.util.object.extend,
+      originalSet = 'stateProperties';
 
   /*
     Depends on `stateProperties`
@@ -13,7 +14,7 @@
     extend(origin[destination], tmpObj, deep);
   }
 
-  function _isEqual(origValue, currentValue) {
+  function _isEqual(origValue, currentValue, firstPass) {
     if (!fabric.isLikelyNode && origValue instanceof Element) {
       // avoid cloning deep images, canvases,
       return origValue === currentValue;
@@ -29,6 +30,9 @@
       });
     }
     else if (origValue instanceof Object) {
+      if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
+        return false;
+      }
       for (var key in origValue) {
         if (!_isEqual(origValue[key], currentValue[key])) {
           return false;
@@ -45,10 +49,13 @@
 
     /**
      * Returns true if object state (one of its state properties) was changed
+     * @param {String} [propertySet] optional name for the set of property we want to save
      * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
      */
-    hasStateChanged: function() {
-      return !_isEqual(this.originalState, this);
+    hasStateChanged: function(propertySet) {
+      propertySet = propertySet || originalSet;
+      propertySet = '_' + propertySet;
+      return !_isEqual(this[propertySet], this, true);
     },
 
     /**
@@ -57,9 +64,11 @@
      * @return {fabric.Object} thisArg
      */
     saveState: function(options) {
-      saveProps(this, 'originalState', this.stateProperties);
+      var propertySet = options && options.propertySet || originalSet,
+          destination = '_' + propertySet;
+      saveProps(this, destination, this[propertySet]);
       if (options && options.stateProperties) {
-        saveProps(this, 'originalState', options.stateProperties);
+        saveProps(this, destination, options.stateProperties);
       }
       return this;
     },
@@ -70,7 +79,10 @@
      * @return {fabric.Object} thisArg
      */
     setupState: function(options) {
-      this.originalState = { };
+      options = options || { };
+      var propertySet = options.propertySet || originalSet;
+      options.propertySet = propertySet;
+      this['_' + propertySet] = { };
       this.saveState(options);
       return this;
     }

@@ -66,12 +66,12 @@
      * @return {fabric.Textbox} thisArg
      */
     initialize: function(text, options) {
-      this.ctx = fabric.util.createCanvasElement().getContext('2d');
+
       this.callSuper('initialize', text, options);
       this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
-
+      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
       // add width to this list of props that effect line wrapping.
-      this._dimensionAffectingProps.width = true;
+      this._dimensionAffectingProps.push('width');
     },
 
     /**

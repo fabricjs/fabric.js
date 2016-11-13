@@ -142,7 +142,8 @@
   var Canvas = fabric.Canvas;
   fabric.Canvas = null;
   var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
+  el.width = 600;
+  el.height = 600;
 
   var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el),
       canvas2 = this.canvas2 = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
@@ -182,7 +183,7 @@
     ok('overlayVpt' in canvas);
 
     equal(canvas.includeDefaultValues, true);
-    equal(canvas.stateful, true);
+    equal(canvas.stateful, false);
     equal(canvas.automaticRender, true);
     equal(canvas.controlsAboveOverlay, false);
     equal(canvas.allowTouchScrolling, false);
