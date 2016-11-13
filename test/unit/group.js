@@ -516,31 +516,35 @@
 
   test('test group transformMatrix', function() {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
-        rect2 = new fabric.Rect({ top: 4, left: 4, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
         group = new fabric.Group([rect1, rect2], {opacity: 1, fill: 'blue', strokeWidth: 0}),
         isTransparent = fabric.util.isTransparent,
         ctx = canvas.contextContainer;
-    group.top = 1;
-    group.left = 1;
     canvas.add(group);
-    console.log(group.width, group.height);
     equal(canvas.enableRetinaScaling, false, 'enable retina scaling is off');
     equal(isTransparent(ctx, 0, 0, 0), true, '0,0 is transparent');
     equal(isTransparent(ctx, 1, 1, 0), false, '1,1 is opaque');
     equal(isTransparent(ctx, 2, 2, 0), false, '2,2 is opaque');
     equal(isTransparent(ctx, 3, 3, 0), true, '3,3 is transparent');
-    equal(isTransparent(ctx, 4, 4, 0), false, '4,4 is opaque');
+    equal(isTransparent(ctx, 4, 4, 0), true, '4,4 is transparent');
     equal(isTransparent(ctx, 5, 5, 0), false, '5,5 is opaque');
-    equal(isTransparent(ctx, 6, 6, 0), true, '6,6 is transparent');
-    group.transformMatrix = [2, 0, 0, 2, 1, 1];
+    equal(isTransparent(ctx, 6, 6, 0), false, '6,6 is opaque');
+    equal(isTransparent(ctx, 7, 7, 0), true, '7,7 is transparent');
+    group.transformMatrix = [2, 0, 0, 2, 2, 2];
     canvas.renderAll();
-    var imageData = ctx.getImageData(0,0,10,10);
-    console.log(imageData);
-    equal(isTransparent(ctx, 0, 0, 0), true, '0,0 is transparent');
-    equal(isTransparent(ctx, 1, 1, 0), true, '1,1 is transparent');
-    equal(isTransparent(ctx, 2, 2, 0), true, '2,2 is transparent');
+    equal(isTransparent(ctx, 0, 0, 0), false, '0,0 is opaque');
+    equal(isTransparent(ctx, 1, 1, 0), false, '1,1 is opaque');
+    equal(isTransparent(ctx, 2, 2, 0), false, '2,2 is opaque');
     equal(isTransparent(ctx, 3, 3, 0), false, '3,3 is opaque');
-    equal(isTransparent(ctx, 4, 4, 0), false, '4,4 is opaque');
+    equal(isTransparent(ctx, 4, 4, 0), true, '4,4 is transparent');
+    equal(isTransparent(ctx, 5, 5, 0), true, '5,5 is transparent');
+    equal(isTransparent(ctx, 6, 6, 0), true, '6,6 is transparent');
+    equal(isTransparent(ctx, 7, 7, 0), true, '7,7 is transparent');
+    equal(isTransparent(ctx, 8, 8, 0), false, '8,8 is opaque');
+    equal(isTransparent(ctx, 9, 9, 0), false, '9,9 is opaque');
+    equal(isTransparent(ctx, 10, 10, 0), false, '10,10 is opaque');
+    equal(isTransparent(ctx, 11, 11, 0), false, '11,11 is opaque');
+    equal(isTransparent(ctx, 12, 12, 0), true, '12,12 is transparent');
   });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
