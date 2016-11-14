@@ -198,15 +198,17 @@
 
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
+     * the box is intented as aligned to axis of canvas.
+     * @param {Boolean} ignoreVpt bounding box will not be affected by viewportTransform
      * @return {Object} Object with left, top, width, height properties
      */
-    getBoundingRect: function() {
-      this.oCoords || this.setCoords();
+    getBoundingRect: function(ignoreVpt) {
+      var coords = this.calcCoords(ignoreVpt);
       return fabric.util.makeBoundingBoxFromPoints([
-        this.oCoords.tl,
-        this.oCoords.tr,
-        this.oCoords.br,
-        this.oCoords.bl
+        coords.tl,
+        coords.tr,
+        coords.br,
+        coords.bl
       ]);
     },
 
@@ -262,8 +264,7 @@
 
       this.scaleX = value;
       this.scaleY = value;
-      this.setCoords();
-      return this;
+      return this.setCoords();
     },
 
     /**
@@ -295,10 +296,10 @@
      * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
      */
-    calcCoords: function(ignoreZoom) {
+    calcCoords: function(ignoreVpt) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = ignoreZoom ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
+          dim = ignoreVpt ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
@@ -308,7 +309,7 @@
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
           center = this.getCenterPoint(),
           // offset added for rotate and scale actions
-          coords = ignoreZoom ? center : fabric.util.transformPoint(center, vpt),
+          coords = ignoreVpt ? center : fabric.util.transformPoint(center, vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
