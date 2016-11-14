@@ -256,12 +256,11 @@
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height
-     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
-     * @return {fabric.Object} thisArg
+     * Calculate and returns the .coords of an object.
+     * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
      */
-    setCoords: function(ignoreZoom) {
+    calcCoords: function(ignoreZoom) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           dim = ignoreZoom ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
@@ -299,7 +298,7 @@
          canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
        }, 50); */
 
-      this.oCoords = {
+      return {
         // corners
         tl: tl, tr: tr, br: br, bl: bl,
         // middle
@@ -307,6 +306,16 @@
         // rotating point
         mtr: mtr
       };
+    },
+
+    /**
+     * Sets corner position coordinates based on current angle, width and height
+     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setCoords: function(ignoreZoom) {
+      this.oCoords = this.calcCoords(ignoreZoom);
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       ignoreZoom || this._setCornerCoords && this._setCornerCoords();
