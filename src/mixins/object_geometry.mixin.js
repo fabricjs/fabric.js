@@ -299,7 +299,7 @@
     setCoords: function(ignoreZoom) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = ignoreZoom ? this.getTransformedDimensions() : this._calculateCurrentDimensions(),
+          dim = ignoreZoom ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
