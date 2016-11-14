@@ -160,9 +160,7 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this.getTransformedDimensions(),
-          w = dim.x, h = dim.y,
-          p = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
-
+          p = fabric.util.transformPoint(dim, vpt, true);
       return p.scalarAdd(2 * this.padding);
     },
 
@@ -252,8 +250,8 @@
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
           strokeWidth = 1 / this.borderScaleFactor,
-          width = wh.x + strokeWidth + 2 * this.padding,
-          height = wh.y + strokeWidth + 2 * this.padding;
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth;
 
       ctx.save();
       this._setLineDash(ctx, this.borderDashArray, null);

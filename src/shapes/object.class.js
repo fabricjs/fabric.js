@@ -1343,8 +1343,9 @@
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-
+      if (!this.group) {
+        ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
         this.drawBordersInGroup(ctx, options);
