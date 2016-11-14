@@ -198,15 +198,17 @@
 
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
+     * the box is intented as aligned to axis of canvas.
+     * @param {Boolean} ignoreVpt bounding box will not be affected by viewportTransform
      * @return {Object} Object with left, top, width, height properties
      */
-    getBoundingRect: function() {
-      this.oCoords || this.setCoords();
+    getBoundingRect: function(ignoreVpt) {
+      var coords = this.calcCoords(ignoreVpt);
       return fabric.util.makeBoundingBoxFromPoints([
-        this.oCoords.tl,
-        this.oCoords.tr,
-        this.oCoords.br,
-        this.oCoords.bl
+        coords.tl,
+        coords.tr,
+        coords.br,
+        coords.bl
       ]);
     },
 
@@ -262,8 +264,7 @@
 
       this.scaleX = value;
       this.scaleY = value;
-      this.setCoords();
-      return this;
+      return this.setCoords();
     },
 
     /**
@@ -291,31 +292,24 @@
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height
-     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
-     * @return {fabric.Object} thisArg
+     * Calculate and returns the .coords of an object.
+     * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
      */
-    setCoords: function() {
+    calcCoords: function(ignoreVpt) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = this._calculateCurrentDimensions(),
-          currentWidth = dim.x, currentHeight = dim.y;
-
-      // If width is negative, make postive. Fixes path selection issue
-      if (currentWidth < 0) {
-        currentWidth = Math.abs(currentWidth);
-      }
-
-      var sinTh = Math.sin(theta),
+          dim = ignoreVpt ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
+          currentWidth = dim.x, currentHeight = dim.y,
+          sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
           _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
-
+          center = this.getCenterPoint(),
           // offset added for rotate and scale actions
-          coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+          coords = ignoreVpt ? center : fabric.util.transformPoint(center, vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
@@ -340,7 +334,7 @@
          canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
        }, 50); */
 
-      this.oCoords = {
+      return {
         // corners
         tl: tl, tr: tr, br: br, bl: bl,
         // middle
@@ -348,9 +342,19 @@
         // rotating point
         mtr: mtr
       };
+    },
+
+    /**
+     * Sets corner position coordinates based on current angle, width and height
+     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setCoords: function(ignoreZoom) {
+      this.oCoords = this.calcCoords(ignoreZoom);
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this._setCornerCoords && this._setCornerCoords();
+      ignoreZoom || this._setCornerCoords && this._setCornerCoords();
 
       return this;
     },
