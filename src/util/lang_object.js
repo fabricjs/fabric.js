@@ -1,7 +1,8 @@
 (function() {
 
   /**
-   * Copies all enumerable properties of one object to another
+   * Copies all enumerable properties of one js object to another
+   * Does not clone or extend fabric.Object subclasses.
    * @memberOf fabric.util.object
    * @param {Object} destination Where to copy to
    * @param {Object} source Where to copy from
