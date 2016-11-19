@@ -18,14 +18,15 @@
         destination = source;
       }
       else if (source instanceof Array) {
-        destination = source.map(function(v) {
-          return clone(v, deep)
-        })
+        destination = [];
+        for (var i = 0, len = source.length; i < len; i++) {
+          destination[i] = extend({ }, source[i], deep);
+        }
       }
-      else if (source instanceof Object) {
+      else if (source && typeof source === 'object') {
         for (var property in source) {
           if (source.hasOwnProperty(property)) {
-            destination[property] = clone(source[property], deep)
+            destination[property] = extend({ }, source[property], deep);
           }
         }
       }

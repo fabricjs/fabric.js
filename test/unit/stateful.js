@@ -48,11 +48,6 @@
     cObj.textDecoration[0] = 'overline';
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
 
-    cObj.set('textDecoration', ['overline', 'underline']);
-    cObj.saveState();
-    cObj.set('textDecoration', ['underline', 'overline']);
-    ok(!cObj.hasStateChanged(), 'order does no matter');
-
     cObj.set('textDecoration', ['underline']);
     cObj.saveState();
     cObj.set('textDecoration', ['underline', 'overline']);
