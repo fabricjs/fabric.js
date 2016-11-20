@@ -12105,12 +12105,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * situation you may want this to be disabled ( spray brush, very big pathgroups, groups)
      * or if your application does not allow you to modify properties for groups child you want
      * to disable it for groups.
-     * default to true
+     * default to false
      * since 1.7.0
      * @type Boolean
      * @default
      */
-    statefullCache:            true,
+    statefullCache:            false,
 
     /**
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
@@ -12448,6 +12448,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       this[key] = value;
+
+      if (this.cacheProperties.indexOf(key) > -1) {
+        this.dirty = true;
+      }
 
       if (key === 'width' || key === 'height') {
         this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));

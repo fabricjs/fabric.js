@@ -5855,7 +5855,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         lockScalingFlip: false,
         excludeFromExport: false,
         objectCaching: objectCaching,
-        statefullCache: true,
+        statefullCache: false,
         noScaleCache: true,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
@@ -6045,6 +6045,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 value = new fabric.Shadow(value);
             }
             this[key] = value;
+            if (this.cacheProperties.indexOf(key) > -1) {
+                this.dirty = true;
+            }
             if (key === "width" || key === "height") {
                 this.minScaleLimit = Math.min(.1, 1 / Math.max(this.width, this.height));
             }
