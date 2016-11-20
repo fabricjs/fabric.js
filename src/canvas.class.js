@@ -1477,9 +1477,11 @@
     deactivateAll: function () {
       var allObjects = this.getObjects(),
           i = 0,
-          len = allObjects.length;
+          len = allObjects.length,
+          obj;
       for ( ; i < len; i++) {
-        allObjects[i].set('active', false);
+        obj = allObjects[i];
+        obj && obj.set('active', false);
       }
       this._discardActiveGroup();
       this._discardActiveObject();
