@@ -89,6 +89,7 @@
       if (!ctx) {
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
+        this.clearContextTop();
       }
 
       // clear dynamicMinWidth as it will be different after we re-wrap line

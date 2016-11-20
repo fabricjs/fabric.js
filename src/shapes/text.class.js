@@ -450,15 +450,6 @@
       return maxWidth;
     },
 
-    /*
-     * Calculate object dimensions from its properties
-     * @override
-     * @private
-     */
-    _getNonTransformedDimensions: function() {
-      return { x: this.width, y: this.height };
-    },
-
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
@@ -624,7 +615,7 @@
       }
 
       ctx.save();
-      this._setLineDash(ctx, this.strokedashArray);
+      this._setLineDash(ctx, this.strokeDashArray);
       ctx.beginPath();
       this._renderTextCommon(ctx, 'strokeText');
       ctx.closePath();
@@ -709,11 +700,13 @@
       var shouldClear = false;
       if (this._forceClearCache) {
         this._forceClearCache = false;
+        this.dirty = true;
         return true;
       }
       shouldClear = this.hasStateChanged('_dimensionAffectingProps');
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
+        this.dirty = true;
       }
       return shouldClear;
     },

@@ -1196,7 +1196,7 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching && !this.group) {
         if (this.isCacheDirty(noTransform)) {
-          this.saveState({ propertySet: 'cacheProperties' });
+          this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
           this.dirty = false;
         }
@@ -1204,7 +1204,9 @@
       }
       else {
         this.drawObject(ctx, noTransform);
-        noTransform && this.saveState({ propertySet: 'cacheProperties' });
+        if (noTransform && this.objectCaching && this.statefullCache) {
+          this.saveState({ propertySet: 'cacheProperties' });
+        }
       }
       this.clipTo && ctx.restore();
       ctx.restore();

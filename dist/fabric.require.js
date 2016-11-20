@@ -6089,7 +6089,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.clipTo && fabric.util.clipContext(this, ctx);
             if (this.objectCaching && !this.group) {
                 if (this.isCacheDirty(noTransform)) {
-                    this.saveState({
+                    this.statefullCache && this.saveState({
                         propertySet: "cacheProperties"
                     });
                     this.drawObject(this._cacheContext, noTransform);
@@ -6098,9 +6098,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 this.drawCacheOnCanvas(ctx);
             } else {
                 this.drawObject(ctx, noTransform);
-                noTransform && this.saveState({
-                    propertySet: "cacheProperties"
-                });
+                if (noTransform && this.objectCaching && this.statefullCache) {
+                    this.saveState({
+                        propertySet: "cacheProperties"
+                    });
+                }
             }
             this.clipTo && ctx.restore();
             ctx.restore();
@@ -10114,12 +10116,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
             return maxWidth;
         },
-        _getNonTransformedDimensions: function() {
-            return {
-                x: this.width,
-                y: this.height
-            };
-        },
         _renderChars: function(method, ctx, chars, left, top) {
             var shortM = method.slice(0, -4), char, width;
             if (this[shortM].toLive) {
@@ -10201,7 +10197,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 this._removeShadow(ctx);
             }
             ctx.save();
-            this._setLineDash(ctx, this.strokedashArray);
+            this._setLineDash(ctx, this.strokeDashArray);
             ctx.beginPath();
             this._renderTextCommon(ctx, "strokeText");
             ctx.closePath();
@@ -10248,6 +10244,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             var shouldClear = false;
             if (this._forceClearCache) {
                 this._forceClearCache = false;
+                this.dirty = true;
                 return true;
             }
             shouldClear = this.hasStateChanged("_dimensionAffectingProps");
@@ -10255,6 +10252,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 this.saveState({
                     propertySet: "_dimensionAffectingProps"
                 });
+                this.dirty = true;
             }
             return shouldClear;
         },
@@ -12185,6 +12183,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             if (!ctx) {
                 ctx = fabric.util.createCanvasElement().getContext("2d");
                 this._setTextStyles(ctx);
+                this.clearContextTop();
             }
             this.dynamicMinWidth = 0;
             this._textLines = this._splitTextIntoLines();

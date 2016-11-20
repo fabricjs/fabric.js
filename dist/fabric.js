@@ -12533,7 +12533,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching && !this.group) {
         if (this.isCacheDirty(noTransform)) {
-          this.saveState({ propertySet: 'cacheProperties' });
+          this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
           this.dirty = false;
         }
@@ -12541,7 +12541,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       else {
         this.drawObject(ctx, noTransform);
-        noTransform && this.saveState({ propertySet: 'cacheProperties' });
+        if (noTransform && this.objectCaching && this.statefullCache) {
+          this.saveState({ propertySet: 'cacheProperties' });
+        }
       }
       this.clipTo && ctx.restore();
       ctx.restore();
@@ -21612,15 +21614,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       return maxWidth;
     },
 
-    /*
-     * Calculate object dimensions from its properties
-     * @override
-     * @private
-     */
-    _getNonTransformedDimensions: function() {
-      return { x: this.width, y: this.height };
-    },
-
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
@@ -21786,7 +21779,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       ctx.save();
-      this._setLineDash(ctx, this.strokedashArray);
+      this._setLineDash(ctx, this.strokeDashArray);
       ctx.beginPath();
       this._renderTextCommon(ctx, 'strokeText');
       ctx.closePath();
@@ -21871,11 +21864,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       var shouldClear = false;
       if (this._forceClearCache) {
         this._forceClearCache = false;
+        this.dirty = true;
         return true;
       }
       shouldClear = this.hasStateChanged('_dimensionAffectingProps');
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
+        this.dirty = true;
       }
       return shouldClear;
     },
@@ -25544,6 +25539,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (!ctx) {
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
+        this.clearContextTop();
       }
 
       // clear dynamicMinWidth as it will be different after we re-wrap line
