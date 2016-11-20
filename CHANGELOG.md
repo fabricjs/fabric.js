@@ -1,4 +1,12 @@
-**Version 1.6.7** 
+**Version 1.7.0** 
+
+- Add: Object Caching [#3417](https://github.com/kangax/fabric.js/pull/3417)
+- Improvement: group internal objects have coords not affected by canvas zoom [#3420](https://github.com/kangax/fabric.js/pull/3420)
+- Fix: itext cursor trails on initDimension [#3436](https://github.com/kangax/fabric.js/pull/3436)
+- Fix: null check on .setActive [#3435](https://github.com/kangax/fabric.js/pull/3435)
+- Fix: function error in clone deep. [#3434](https://github.com/kangax/fabric.js/pull/3434)
+
+**Version 1.6.7**
 
 - Add: Snap rotation added to objects. two parameter introduced, snapAngle and snapTreshold. [#3383](https://github.com/kangax/fabric.js/pull/3383)
 - Fix: Pass target to right click event. [#3381](https://github.com/kangax/fabric.js/pull/3381)
