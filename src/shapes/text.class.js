@@ -377,6 +377,7 @@
       if (!ctx) {
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
+        this.clearContextTop();
       }
       this._textLines = this._splitTextIntoLines();
       this._clearCache();
