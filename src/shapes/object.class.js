@@ -773,7 +773,7 @@
      * @type Boolean
      * @default
      */
-    statefullCache:            false,
+    statefullCache:            true,
 
     /**
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
@@ -851,10 +851,10 @@
           dim = this._getNonTransformedDimensions(),
           retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           zoomX = objectScale.scaleX * zoom * retina,
-          zoomY = objectScale.scaleY * zoom * retina;
-      if (zoomX !== this.zoomX || zoomY !== this.zoomY) {
-        var width = dim.x * zoomX,
-            height = dim.y * zoomY;
+          zoomY = objectScale.scaleY * zoom * retina,
+          width = dim.x * zoomX,
+          height = dim.y * zoomY;
+      if (width !== this.cacheWidth || height !== this.cacheHeight) {
         this._cacheCanvas.width = width;
         this._cacheCanvas.height = height;
         this._cacheContext.translate(width / 2, height / 2);
