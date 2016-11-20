@@ -48,11 +48,6 @@
     cObj.textDecoration[0] = 'overline';
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
 
-    cObj.set('textDecoration', ['overline', 'underline']);
-    cObj.saveState();
-    cObj.set('textDecoration', ['underline', 'overline']);
-    ok(!cObj.hasStateChanged(), 'order does no matter');
-
     cObj.set('textDecoration', ['underline']);
     cObj.saveState();
     cObj.set('textDecoration', ['underline', 'overline']);
@@ -93,6 +88,22 @@
     cObj.saveState();
     gradient.colorStops[0].color = 'blue';
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on third level of nesting');
+  });
+
+  test('savestate with custom property set', function() {
+    var cObj = new fabric.Object();
+    cObj.myProperties = ['a', 'b'];
+    cObj.a = 1;
+    cObj.b = 3;
+    cObj.setupState();
+    ok(!cObj._myProperties, 'custom properties set does not exist');
+    cObj.setupState({ propertySet: 'myProperties' });
+    ok(cObj._myProperties.a, 'a has been added in the custom property set');
+    cObj.left = 33;
+    ok(cObj.hasStateChanged(), 'state has changed');
+    ok(!cObj.hasStateChanged('myProperties'), 'custom state has not changed');
+    cObj.a = 2;
+    ok(cObj.hasStateChanged('myProperties'), 'custom state has changed');
   });
 
 })();

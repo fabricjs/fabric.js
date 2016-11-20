@@ -23,13 +23,14 @@
       if (origValue.length !== currentValue.length) {
         return false
       }
-      var _currentValue = currentValue.concat().sort(),
-          _origValue = origValue.concat().sort();
-      return !_origValue.some(function(v, i) {
-        return !_isEqual(_currentValue[i], v);
-      });
+      for (var i = 0, len = origValue.length; i < len; i++) {
+        if (origValue[i] !== currentValue[i]) {
+          return false;
+        }
+      }
+      return true
     }
-    else if (origValue instanceof Object) {
+    else if (origValue && typeof origValue === 'object') {
       if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
         return false;
       }
