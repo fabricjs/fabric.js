@@ -432,6 +432,16 @@
     equal(boundingRect.height.toFixed(2), 336);
   });
 
+  test('getBoundingRectWithAngle', function() {
+    var cObj = new fabric.Object({ width: 50, height: 100, left: 10, top: 10, angle: 90, strokeWidth: 0 }),
+        boundingRect = cObj.getBoundingRect();
+
+    equal(boundingRect.left.toFixed(2), 10);
+    equal(boundingRect.top.toFixed(2), 10);
+    equal(boundingRect.width.toFixed(2), 100);
+    equal(boundingRect.height.toFixed(2), 50);
+  });
+
   test('getTransformedDimensions', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.getWidth == 'function');

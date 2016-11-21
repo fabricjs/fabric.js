@@ -181,11 +181,19 @@
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
      * the box is intented as aligned to axis of canvas.
-     * @param {Boolean} ignoreVpt bounding box will not be affected by viewportTransform
+     * @param {Boolean} useVpt bounding box will be affected by viewportTransform and padding
+     * as it was in before 2.0 release.
      * @return {Object} Object with left, top, width, height properties
      */
-    getBoundingRect: function(ignoreVpt) {
-      var coords = this.calcCoords(ignoreVpt);
+    getBoundingRect: function(useVpt) {
+      var coords = this.calcCoords(!useVpt);
+      if (!vpt && this.group) {
+        var m = group.calcTransformMatrix();
+        coords.tl = fabric.util.transformPoint(coords.tl, m);
+        coords.tr = fabric.util.transformPoint(coords.tr, m);
+        coords.br = fabric.util.transformPoint(coords.br, m);
+        coords.bl = fabric.util.transformPoint(coords.bl, m);
+      }
       return fabric.util.makeBoundingBoxFromPoints([
         coords.tl,
         coords.tr,

@@ -23,6 +23,7 @@
    * @fires object:moving
    * @fires object:selected
    *
+   * selection:cleared is object:deselected
    * @fires before:selection:cleared
    * @fires selection:cleared
    * @fires selection:created
@@ -1003,18 +1004,6 @@
      */
     setCursor: function (value) {
       this.upperCanvasEl.style.cursor = value;
-    },
-
-    /**
-     * @param {fabric.Object} target to reset transform
-     * @private
-     */
-    _resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.skewX = 0;
-      target.skewY = 0;
-      target.setAngle(0);
     },
 
     /**
