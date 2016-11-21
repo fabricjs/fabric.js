@@ -22002,6 +22002,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         return;
       }
       if (this._shouldClearDimensionCache()) {
+        this._setTextStyles(ctx);
         this._initDimensions(ctx);
       }
       this.callSuper('render', ctx, noTransform);
