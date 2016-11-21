@@ -450,15 +450,6 @@
       return maxWidth;
     },
 
-    /*
-     * Calculate object dimensions from its properties
-     * @override
-     * @private
-     */
-    _getNonTransformedDimensions: function() {
-      return { x: this.width, y: this.height };
-    },
-
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
@@ -624,7 +615,7 @@
       }
 
       ctx.save();
-      this._setLineDash(ctx, this.strokedashArray);
+      this._setLineDash(ctx, this.strokeDashArray);
       ctx.beginPath();
       this._renderTextCommon(ctx, 'strokeText');
       ctx.closePath();
@@ -656,7 +647,7 @@
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset, originalFill = ctx.fillStye;
+          lineWidth, lineLeftOffset, originalFill = ctx.fillStyle;
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -709,11 +700,13 @@
       var shouldClear = false;
       if (this._forceClearCache) {
         this._forceClearCache = false;
+        this.dirty = true;
         return true;
       }
       shouldClear = this.hasStateChanged('_dimensionAffectingProps');
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
+        this.dirty = true;
       }
       return shouldClear;
     },
@@ -845,6 +838,7 @@
         return;
       }
       if (this._shouldClearDimensionCache()) {
+        this._setTextStyles(ctx);
         this._initDimensions(ctx);
       }
       this.callSuper('render', ctx, noTransform);
