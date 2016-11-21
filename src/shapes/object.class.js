@@ -773,7 +773,7 @@
      * @type Boolean
      * @default
      */
-    statefullCache:            true,
+    statefullCache:            false,
 
     /**
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
@@ -1110,6 +1110,10 @@
         value = new fabric.Shadow(value);
       }
 
+      if (this.cacheProperties.indexOf(key) > -1) {
+        this.dirty = true;
+      }
+
       this[key] = value;
 
       if (key === 'width' || key === 'height') {
@@ -1192,7 +1196,7 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching && !this.group) {
         if (this.isCacheDirty(noTransform)) {
-          this.saveState({ propertySet: 'cacheProperties' });
+          this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
           this.dirty = false;
         }
@@ -1200,7 +1204,9 @@
       }
       else {
         this.drawObject(ctx, noTransform);
-        noTransform && this.saveState({ propertySet: 'cacheProperties' });
+        if (noTransform && this.objectCaching && this.statefullCache) {
+          this.saveState({ propertySet: 'cacheProperties' });
+        }
       }
       this.clipTo && ctx.restore();
       ctx.restore();
