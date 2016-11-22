@@ -436,10 +436,10 @@
     var cObj = new fabric.Object({ width: 50, height: 100, left: 10, top: 10, angle: 90, strokeWidth: 0 }),
         boundingRect = cObj.getBoundingRect();
 
-    equal(boundingRect.left.toFixed(2), 10);
-    equal(boundingRect.top.toFixed(2), 10);
-    equal(boundingRect.width.toFixed(2), 100);
-    equal(boundingRect.height.toFixed(2), 50);
+    equal(boundingRect.left.toFixed(2), -90, 'left is - 90');
+    equal(boundingRect.top.toFixed(2), 10, 'top is 10');
+    equal(boundingRect.width.toFixed(2), 100, 'width is 100');
+    equal(boundingRect.height.toFixed(2), 50, 'height is 50');
   });
 
   test('getTransformedDimensions', function() {
