@@ -755,7 +755,7 @@
     canvas.add(object);
     object.strokeDashArray = [3, 2, 1];
     equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
-    canvas.renderAll();
+    object._setLineDash(canvas.contextContainer, object.strokeDashArray);
     equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
   });
 
