@@ -208,8 +208,8 @@
      * Calculate object dimensions from its properties
      * @private
      */
-    _getNonTransformedDimensions: function() {
-      var dim = this.callSuper('_getNonTransformedDimensions');
+    getNonTransformedDimensions: function() {
+      var dim = this.callSuper('getNonTransformedDimensions');
       if (this.strokeLineCap === 'butt') {
         if (dim.x === 0) {
           dim.y -= this.strokeWidth;

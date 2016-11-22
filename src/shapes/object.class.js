@@ -848,7 +848,7 @@
       }
       var zoom = this.getViewportTransform()[0],
           objectScale = this.getObjectScaling(),
-          dim = this._getNonTransformedDimensions(),
+          dim = this.getNonTransformedDimensions(),
           retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
@@ -1246,7 +1246,7 @@
       else {
         if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
           if (!skipCanvas) {
-            var dim = this._getNonTransformedDimensions();
+            var dim = this.getNonTransformedDimensions();
             this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           }
           return true;
@@ -1264,7 +1264,7 @@
       if (!this.backgroundColor) {
         return;
       }
-      var dim = this._getNonTransformedDimensions();
+      var dim = this.getNonTransformedDimensions();
       ctx.fillStyle = this.backgroundColor;
 
       ctx.fillRect(

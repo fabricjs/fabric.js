@@ -121,7 +121,7 @@
       }
       for (var i = 0, len = this.paths.length; i < len; i++) {
         if (this.paths[i].isCacheDirty(true)) {
-          var dim = this._getNonTransformedDimensions();
+          var dim = this.getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
           return true
         }
