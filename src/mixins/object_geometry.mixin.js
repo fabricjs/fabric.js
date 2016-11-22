@@ -187,7 +187,7 @@
      */
     getBoundingRect: function(useVpt) {
       var coords = this.calcCoords(!useVpt);
-      if (!vpt && this.group) {
+      if (!useVpt && this.group) {
         var m = group.calcTransformMatrix();
         coords.tl = fabric.util.transformPoint(coords.tl, m);
         coords.tr = fabric.util.transformPoint(coords.tr, m);
