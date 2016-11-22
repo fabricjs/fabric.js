@@ -272,7 +272,7 @@
     calcCoords: function(ignoreVpt) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = ignoreVpt ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
+          dim = ignoreVpt ? this.getTransformedDimensions() : this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
