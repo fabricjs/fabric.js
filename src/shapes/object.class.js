@@ -771,7 +771,7 @@
      * default to true
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default false
      */
     statefullCache:            false,
 
@@ -782,10 +782,17 @@
      * default to false
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default true
      */
     noScaleCache:              true,
 
+    /**
+     * When set to `true`, object's cache will be rerendered next render call.
+     * @type Boolean
+     * @default false
+     */
+    dirty:                false,
+ 
     /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
