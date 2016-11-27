@@ -5857,6 +5857,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         objectCaching: objectCaching,
         statefullCache: false,
         noScaleCache: true,
+        dirty: false,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
         initialize: function(options) {
@@ -12171,6 +12172,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         __cachedLines: null,
         lockScalingY: true,
         lockScalingFlip: true,
+        noScaleCache: false,
         initialize: function(text, options) {
             this.callSuper("initialize", text, options);
             this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
@@ -12187,7 +12189,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 this.clearContextTop();
             }
             this.dynamicMinWidth = 0;
-            this._textLines = this._splitTextIntoLines();
+            this._textLines = this._splitTextIntoLines(ctx);
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
@@ -12296,14 +12298,14 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return lines;
         },
-        _splitTextIntoLines: function() {
+        _splitTextIntoLines: function(ctx) {
             var originalAlign = this.textAlign;
-            this.ctx.save();
-            this._setTextStyles(this.ctx);
+            ctx.save();
+            this._setTextStyles(ctx);
             this.textAlign = "left";
-            var lines = this._wrapText(this.ctx, this.text);
+            var lines = this._wrapText(ctx, this.text);
             this.textAlign = originalAlign;
-            this.ctx.restore();
+            ctx.restore();
             this._textLines = lines;
             this._styleMap = this._generateStyleMap();
             return lines;

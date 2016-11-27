@@ -12108,7 +12108,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * default to false
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default false
      */
     statefullCache:            false,
 
@@ -12119,9 +12119,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * default to false
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default true
      */
     noScaleCache:              true,
+
+    /**
+     * When set to `true`, object's cache will be rerendered next render call.
+     * @type Boolean
+     * @default false
+     */
+    dirty:                false,
 
     /**
      * List of properties to consider when checking if state
@@ -25509,6 +25516,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     lockScalingFlip: true,
 
     /**
+     * Override standard Object class values
+     * Textbox needs this on false
+     */
+    noScaleCache: false,
+
+    /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
      * made available.
@@ -25547,7 +25560,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.dynamicMinWidth = 0;
 
       // wrap lines
-      this._textLines = this._splitTextIntoLines();
+      this._textLines = this._splitTextIntoLines(ctx);
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
@@ -25771,14 +25784,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @returns {Array} Array of lines in the Textbox.
      * @override
      */
-    _splitTextIntoLines: function() {
+    _splitTextIntoLines: function(ctx) {
       var originalAlign = this.textAlign;
-      this.ctx.save();
-      this._setTextStyles(this.ctx);
+      ctx.save();
+      this._setTextStyles(ctx);
       this.textAlign = 'left';
-      var lines = this._wrapText(this.ctx, this.text);
+      var lines = this._wrapText(ctx, this.text);
       this.textAlign = originalAlign;
-      this.ctx.restore();
+      ctx.restore();
       this._textLines = lines;
       this._styleMap = this._generateStyleMap();
       return lines;
