@@ -327,6 +327,7 @@
      * @override
      */
     _splitTextIntoLines: function(ctx) {
+      ctx = ctx || this.ctx;
       var originalAlign = this.textAlign;
       ctx.save();
       this._setTextStyles(ctx);
