@@ -638,6 +638,8 @@
 
       transform.reset = false;
       transform.target.isMoving = true;
+      transform.shiftKey = e.shiftKey;
+      transform.altKey = e[this.centeredKey];
 
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
