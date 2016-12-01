@@ -107,6 +107,13 @@
     equal(object.colorStops, gradient.colorStops);
   });
 
+  test('toObject with custom props', function() {
+    var gradient = createLinearGradient();
+    gradient.id = 'myId';
+    var object = gradient.toObject(['id']);
+    equal(object.id, 'myId');
+  });
+
   test('toObject radialGradient', function() {
     var gradient = createRadialGradient();
 
