@@ -72,6 +72,13 @@
     equal(object2.repeat, 'repeat');
   });
 
+  test('toObject with custom props', function() {
+    var pattern = createPattern();
+    pattern.id = 'myId';
+    var object = pattern.toObject(['id']);
+    equal(object.id, 'myId');
+  });
+
   test('toLive', function() {
     var pattern = createPattern();
 
