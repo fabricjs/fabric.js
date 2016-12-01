@@ -1,4 +1,12 @@
-**Version 1.7.0** 
+**Version 1.7.1**
+
+- Add: Gradients/Patterns support customAttributes in toObject method [#3477](https://github.com/kangax/fabric.js/pull/3477)
+- Fix: IText/Textbox not blurring keyboard on ios 10 [#3476](https://github.com/kangax/fabric.js/pull/3476)
+- Fix: Shadow on freedrawing and zoomed canvas [#3475](https://github.com/kangax/fabric.js/pull/3475)
+- Fix: Fix for group returning negative scales [#3474](https://github.com/kangax/fabric.js/pull/3474)
+- Fix: hotfix for textbox [#3441](https://github.com/kangax/fabric.js/pull/3441)[#3473](https://github.com/kangax/fabric.js/pull/3473)
+
+**Version 1.7.0**
 
 - Add: Object Caching [#3417](https://github.com/kangax/fabric.js/pull/3417)
 - Improvement: group internal objects have coords not affected by canvas zoom [#3420](https://github.com/kangax/fabric.js/pull/3420)
@@ -44,7 +52,6 @@
 - Fix: Stop text to go on zero dimensions [#3312](https://github.com/kangax/fabric.js/pull/3312)
 - Fix: Error in dataURL with multiplier was outputting very big canvas with retina [#3314](https://github.com/kangax/fabric.js/pull/3314)
 - Fix: Error in style map was not respecting style if textbox started with space [#3315](https://github.com/kangax/fabric.js/pull/3315)
-
 
 **Version 1.6.4**
 

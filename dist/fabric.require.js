@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.0"
+    version: "1.7.1"
 };
 
 if (typeof exports !== "undefined") {
@@ -2872,8 +2872,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             }
             return this;
         },
-        toObject: function() {
-            return {
+        toObject: function(propertiesToInclude) {
+            var object = {
                 type: this.type,
                 coords: this.coords,
                 colorStops: this.colorStops,
@@ -2881,6 +2881,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 offsetY: this.offsetY,
                 gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
             };
+            fabric.util.populateWithProperties(this, object, propertiesToInclude);
+            return object;
         },
         toSVG: function(object) {
             var coords = fabric.util.object.clone(this.coords), markup, commonAttributes;
@@ -3044,8 +3046,8 @@ fabric.Pattern = fabric.util.createClass({
             this.offsetY = options.offsetY;
         }
     },
-    toObject: function() {
-        var source;
+    toObject: function(propertiesToInclude) {
+        var source, object;
         if (typeof this.source === "function") {
             source = String(this.source);
         } else if (typeof this.source.src === "string") {
@@ -3053,12 +3055,14 @@ fabric.Pattern = fabric.util.createClass({
         } else if (typeof this.source === "object" && this.source.toDataURL) {
             source = this.source.toDataURL();
         }
-        return {
+        object = {
             source: source,
             repeat: this.repeat,
             offsetX: this.offsetX,
             offsetY: this.offsetY
         };
+        fabric.util.populateWithProperties(this, object, propertiesToInclude);
+        return object;
     },
     toSVG: function(object) {
         var patternSource = typeof this.source === "function" ? this.source() : this.source, patternWidth = patternSource.width / object.getWidth(), patternHeight = patternSource.height / object.getHeight(), patternOffsetX = this.offsetX / object.getWidth(), patternOffsetY = this.offsetY / object.getHeight(), patternImgSrc = "";
@@ -3863,11 +3867,11 @@ fabric.BaseBrush = fabric.util.createClass({
         if (!this.shadow) {
             return;
         }
-        var ctx = this.canvas.contextTop;
+        var ctx = this.canvas.contextTop, zoom = this.canvas.getZoom();
         ctx.shadowColor = this.shadow.color;
-        ctx.shadowBlur = this.shadow.blur;
-        ctx.shadowOffsetX = this.shadow.offsetX;
-        ctx.shadowOffsetY = this.shadow.offsetY;
+        ctx.shadowBlur = this.shadow.blur * zoom;
+        ctx.shadowOffsetX = this.shadow.offsetX * zoom;
+        ctx.shadowOffsetY = this.shadow.offsetY * zoom;
     },
     _resetShadow: function() {
         var ctx = this.canvas.contextTop;
@@ -8706,13 +8710,13 @@ fabric.util.object.extend(fabric.Object.prototype, {
         },
         realizeTransform: function(object) {
             var matrix = object.calcTransformMatrix(), options = fabric.util.qrDecompose(matrix), center = new fabric.Point(options.translateX, options.translateY);
-            object.scaleX = options.scaleX;
-            object.scaleY = options.scaleY;
+            object.flipX = false;
+            object.flipY = false;
+            object.set("scaleX", options.scaleX);
+            object.set("scaleY", options.scaleY);
             object.skewX = options.skewX;
             object.skewY = options.skewY;
             object.angle = options.angle;
-            object.flipX = false;
-            object.flipY = false;
             object.setPositionByOrigin(center, "center", "center");
             return object;
         },
@@ -11400,6 +11404,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.isEditing = false;
             this.selectable = true;
             this.selectionEnd = this.selectionStart;
+            this.hiddenTextarea.blur && this.hiddenTextarea.blur();
             this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
             this.hiddenTextarea = null;
             this.abortCursorAnimation();
@@ -12299,6 +12304,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             return lines;
         },
         _splitTextIntoLines: function(ctx) {
+            ctx = ctx || this.ctx;
             var originalAlign = this.textAlign;
             ctx.save();
             this._setTextStyles(ctx);
