@@ -180,7 +180,9 @@
 
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
-     * the box is intented as aligned to axis of canvas.
+     * the box is intented as aligned to axis of canvas and in absolute coordinates.
+     * no group internal coordinate, not affected by zoom.
+     * For who really needs the old behaviour, there is a boolean param.
      * @param {Boolean} useVpt bounding box will be affected by viewportTransform and padding
      * as it was in before 2.0 release.
      * @return {Object} Object with left, top, width, height properties
