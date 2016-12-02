@@ -259,8 +259,16 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      // `hasControls` in _objects is always false by `_updateObjectCoords`.
+      // To restore original `hasControls` at `_restoreObjectState`,
+      // we need to save `__origHasControls` property.
+      var objectsPropertiesToInclude = (propertiesToInclude || []).slice();
+      if (objectsPropertiesToInclude.indexOf('__origHasControls') === -1) {
+        objectsPropertiesToInclude.push('__origHasControls');
+      }
+
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this._objects, 'toObject', propertiesToInclude)
+        objects: invoke(this._objects, 'toObject', objectsPropertiesToInclude)
       });
     },
 

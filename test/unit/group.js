@@ -398,6 +398,23 @@
     });
   });
 
+  asyncTest('fromObject with destroy', function() {
+    var group = makeGroupWith2Objects();
+    var object0 = group._objects[0];
+    var groupObject = group.toObject( ['hasControls'] );
+
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+      var newGroupObject0 = newGroupFromObject._objects[0];
+
+      group.destroy();
+      newGroupFromObject.destroy();
+
+      equal(object0.hasControls, newGroupObject0.hasControls);
+
+      start();
+    });
+  });
+
   test('toSVG', function() {
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
