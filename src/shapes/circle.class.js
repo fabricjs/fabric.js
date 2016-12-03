@@ -11,6 +11,11 @@
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'radius'
+  );
+
   /**
    * Circle class
    * @class fabric.Circle
@@ -46,6 +51,8 @@
      * @default 2Pi
      */
     endAngle: pi * 2,
+
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor

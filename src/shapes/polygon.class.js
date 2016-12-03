@@ -13,6 +13,9 @@
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('points');
+
   /**
    * Polygon class
    * @class fabric.Polygon
@@ -48,6 +51,8 @@
      * @default
      */
     minY: 0,
+
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -158,7 +163,7 @@
         // NaN comes from parseFloat of a empty string in parser
         return false;
       }
-
+      ctx.save()
       noTransform || ctx.translate(-this.pathOffset.x, -this.pathOffset.y);
       ctx.beginPath();
       ctx.moveTo(this.points[0].x, this.points[0].y);
@@ -166,6 +171,7 @@
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
+      ctx.restore();
       return true;
     },
 
