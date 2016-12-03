@@ -17,8 +17,9 @@
 
       reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i,
       reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
-      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i,
+      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clipPath)$/i,
       reAllowedParents = /^(symbol|g|a|svg)$/i,
+      reClipPath = /^clipPath$/i,
 
       attributesMap = {
         cx:                   'left',
@@ -626,16 +627,24 @@
       }
 
       var elements = descendants.filter(function(el) {
-        applyViewboxTransform(el);
         return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
               !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+      });
+      elements.forEach(function(el) {
+        applyViewboxTransform(el);
       });
 
       if (!elements || (elements && !elements.length)) {
         callback && callback([], {});
         return;
       }
-
+      var clipPaths = { };
+      descendants.filter(function(el) {
+        return reClipPath.test(el.nodeName.replace('svg:', ''))
+      }).forEach(function(el) {
+        clipPaths[el.id] = el.childNodes;
+      });
+      console.log(clipPaths);
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
