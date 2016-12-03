@@ -41,7 +41,7 @@
     "test": "node test.js",
     "lint": "eslint --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests",
-    "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js",
+    "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js && cp -r src HEADER.js lib ../fabricjs.com/build/files/",
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
