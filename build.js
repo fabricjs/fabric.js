@@ -161,6 +161,7 @@ var filesToInclude = [
   'src/log.js',
 
   ifSpecifiedInclude('animation', 'src/util/animate.js'),
+  ifSpecifiedInclude('animation', 'src/util/animate_color.js'),
   //'src/util/animate.js',
   ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
