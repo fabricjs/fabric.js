@@ -29,6 +29,9 @@
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('path');
+
   /**
    * Path class
    * @class fabric.Path
@@ -65,6 +68,8 @@
      * @default
      */
     minY: 0,
+
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
