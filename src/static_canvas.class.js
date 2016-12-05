@@ -1082,11 +1082,13 @@
      * @private
      */
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
-      var data = {
-        background: (this.backgroundColor && this.backgroundColor.toObject)
+      var data = { }
+
+      if (this.backgroundColor) {
+        data.background = this.backgroundColor.toObject
           ? this.backgroundColor.toObject(propertiesToInclude)
           : this.backgroundColor
-      };
+      }
 
       if (this.overlayColor) {
         data.overlay = this.overlayColor.toObject
