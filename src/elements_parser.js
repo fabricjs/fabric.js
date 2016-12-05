@@ -16,11 +16,7 @@ fabric.ElementsParser.prototype.parse = function() {
 fabric.ElementsParser.prototype.createObjects = function() {
   for (var i = 0, len = this.elements.length; i < len; i++) {
     this.elements[i].setAttribute('svgUid', this.svgUid);
-    (function(_obj, i) {
-      setTimeout(function() {
-        _obj.createObject(_obj.elements[i], i);
-      }, 0);
-    })(this, i);
+    this.createObject(this.elements[i], i);
   }
 };
 
@@ -47,6 +43,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     var obj = klass.fromElement(el, this.options);
     this.resolveGradient(obj, 'fill');
     this.resolveGradient(obj, 'stroke');
+    this.resolveClipPath(obj);
     this.reviver && this.reviver(el, obj);
     this.instances[index] = obj;
     this.checkIfDone();
@@ -58,22 +55,39 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
   return function(obj) {
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
+    _this.resolveClipPath(obj);
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();
   };
 };
 
-fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
-
-  var instanceFillValue = obj.get(property);
-  if (!(/^url\(/).test(instanceFillValue)) {
-    return;
+fabric.ElementsParser.prototype.extractPropertyDefinition = function(obj, property, storage) {
+  var value = obj.get(property);
+  if (!(/^url\(/).test(value)) {
+    return false;
   }
-  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-  if (fabric.gradientDefs[this.svgUid][gradientId]) {
-    obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+  var id = value.slice(5, value.length - 1);
+  return fabric[storage][this.svgUid][id];
+};
+
+fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+  var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
+  if (gradientDef) {
+    obj.set(property, fabric.Gradient.fromElement(gradientDef, obj));
+  }
+};
+
+fabric.ElementsParser.prototype.resolveClipPath = function(obj) {
+  var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths');
+  if (clipPath) {
+    obj.clipPath = [];
+    for (var i = 0; i < clipPath.length; i++) {
+      // from clip-path specs, element from clip-path are all parsed syncronously
+      var klass = fabric[fabric.util.string.capitalize(clipPath[i].tagName.replace('svg:', ''))];
+      var _clipPath = klass.fromElement(clipPath[i], this.options);
+      obj.clipPath.push(_clipPath);
+    }
   }
 };
 

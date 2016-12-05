@@ -788,10 +788,20 @@
 
     /**
      * When set to `true`, object's cache will be rerendered next render call.
+     * since 1.7.0
      * @type Boolean
      * @default false
      */
-    dirty:                false,
+    dirty:                     false,
+
+    /**
+     * an array of fabric shapes that will be used as a clip-path for the object.
+     * every shape will be mixed with a logical OR operation.
+     * since 1.7.2
+     * @type Boolean
+     * @default false
+     */
+    clipPath:                   [],
 
     /**
      * List of properties to consider when checking if state
@@ -1228,6 +1238,7 @@
       this._renderBackground(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
+      this._prepareClippingMask(ctx);
       this._render(ctx, noTransform);
     },
 

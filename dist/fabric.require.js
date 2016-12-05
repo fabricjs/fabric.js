@@ -1637,7 +1637,7 @@ if (typeof console !== "undefined") {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, capitalize = fabric.util.string.capitalize, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, parseUnit = fabric.util.parseUnit, multiplyTransformMatrices = fabric.util.multiplyTransformMatrices, reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i, reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i, reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clipPath)$/i, reAllowedParents = /^(symbol|g|a|svg)$/i, reClipPath = /^clipPath$/i, attributesMap = {
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, capitalize = fabric.util.string.capitalize, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, parseUnit = fabric.util.parseUnit, multiplyTransformMatrices = fabric.util.multiplyTransformMatrices, reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i, reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i, reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i, reAllowedParents = /^(symbol|g|a|svg)$/i, attributesMap = {
         cx: "left",
         x: "left",
         r: "radius",
@@ -1998,22 +1998,13 @@ if (typeof console !== "undefined") {
                 descendants = arr;
             }
             var elements = descendants.filter(function(el) {
-                return reAllowedSVGTagNames.test(el.nodeName.replace("svg:", "")) && !hasAncestorWithNodeName(el, reNotAllowedAncestors);
-            });
-            elements.forEach(function(el) {
                 applyViewboxTransform(el);
+                return reAllowedSVGTagNames.test(el.nodeName.replace("svg:", "")) && !hasAncestorWithNodeName(el, reNotAllowedAncestors);
             });
             if (!elements || elements && !elements.length) {
                 callback && callback([], {});
                 return;
             }
-            var clipPaths = {};
-            descendants.filter(function(el) {
-                return reClipPath.test(el.nodeName.replace("svg:", ""));
-            }).forEach(function(el) {
-                clipPaths[el.id] = el.childNodes;
-            });
-            console.log(clipPaths);
             fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
             fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
             fabric.parseElements(elements, function(instances) {

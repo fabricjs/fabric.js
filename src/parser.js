@@ -43,7 +43,8 @@
         'stroke-opacity':     'strokeOpacity',
         'stroke-width':       'strokeWidth',
         'text-decoration':    'textDecoration',
-        'text-anchor':        'originX'
+        'text-anchor':        'originX',
+        'clip-path':          'clipPath'
       },
 
       colorAttributes = {
@@ -53,6 +54,7 @@
 
   fabric.cssRules = { };
   fabric.gradientDefs = { };
+  fabric.clipPaths = { };
 
   function normalizeAttr(attr) {
     // transform attribute names
@@ -627,11 +629,9 @@
       }
 
       var elements = descendants.filter(function(el) {
+        applyViewboxTransform(el);
         return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
               !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
-      });
-      elements.forEach(function(el) {
-        applyViewboxTransform(el);
       });
 
       if (!elements || (elements && !elements.length)) {
@@ -642,16 +642,19 @@
       descendants.filter(function(el) {
         return reClipPath.test(el.nodeName.replace('svg:', ''))
       }).forEach(function(el) {
-        clipPaths[el.id] = el.childNodes;
+        clipPaths[el.id] = el.getElementsByTagName('*');
       });
-      console.log(clipPaths);
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+      fabric.clipPaths[svgUid] = clipPaths;
       // Precedence of rules:   style > class > attribute
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
           callback(instances, options);
+          delete fabric.gradientDefs[svgUid];
+          delete fabric.cssRules[svgUid];
+          delete fabric.clipPaths[svgUid];
         }
       }, clone(options), reviver);
     };
