@@ -207,16 +207,26 @@
     var group = makeGroupWith2Objects();
     group.includeDefaultValues = false;
     var clone = group.toObject();
-
+    var objects = [ { type: 'rect',
+    left: 10,
+    top: -30,
+    width: 30,
+    height: 10,
+    strokeWidth: 0 },
+  { type: 'rect',
+    left: -40,
+    top: -10,
+    width: 10,
+    height: 40,
+    strokeWidth: 0 } ];
     var expectedObject = {
       'type':               'group',
       'left':               50,
       'top':                100,
       'width':              80,
       'height':             60,
-      'objects':            clone.objects
+      'objects':            objects
     };
-
     deepEqual(clone, expectedObject);
   });
 
