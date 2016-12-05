@@ -214,8 +214,7 @@
       width: 30,
       height: 10,
       strokeWidth: 0
-    },
-    {
+    }, {
       type: 'rect',
       left: -40,
       top: -10,
