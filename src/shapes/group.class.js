@@ -5,8 +5,7 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke;
+      max = fabric.util.array.max;
 
   if (fabric.Group) {
     return;
