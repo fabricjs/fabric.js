@@ -1474,8 +1474,8 @@
       if (this.constructor.fromObject instanceof Function) {
         return this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
       }
-      var cloned = new fabric.Object(this.toObject(propertiesToInclude)); 
-      if(!(callback instanceof Function)) {
+      var cloned = new fabric.Object(this.toObject(propertiesToInclude));
+      if (!(callback instanceof Function)) {
         return cloned;
       }
       setTimeout(callback.bind(null, cloned), 0);
