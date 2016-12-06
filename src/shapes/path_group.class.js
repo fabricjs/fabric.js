@@ -103,8 +103,17 @@
     drawObject: function(ctx) {
       ctx.save();
       ctx.translate(-this.width / 2, -this.height / 2);
+      var hasClipPath = this.clipPath.length, clipCanvas, clipContext;
+      if (this.objectCaching) {
+        // i need to create a new canvas for the clipPath
+        clipCanvas = document.createElement('canvas');
+        clipContext = clipCanvas.getContext('2d');
+        clipCanvas.width = this.cacheWidth;
+        clipCanvas.height = this.cacheHeight;
+        clipContext.scale(this.zoomX, this.zoomY);
+      }
       for (var i = 0, l = this.paths.length; i < l; ++i) {
-        this.paths[i].render(ctx, true);
+        this.paths[i].render(ctx, true, clipContext);
       }
       ctx.restore();
     },

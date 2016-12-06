@@ -863,6 +863,23 @@
           return false;
         }
       }
+      var pixelDim = this.getObjectPixelDimensions(),
+          width = pixelDim.width, height = pixelDim.height;
+      if (width !== this.cacheWidth || height !== this.cacheHeight) {
+        this._cacheCanvas.width = width;
+        this._cacheCanvas.height = height;
+        this._cacheContext.translate(width / 2, height / 2);
+        this._cacheContext.scale(pixelDim.zoomX, pixelDim.zoomY);
+        this.cacheWidth = width;
+        this.cacheHeight = height;
+        this.zoomX = pixelDim.zoomX;
+        this.zoomY = pixelDim.zoomY;
+        return true
+      }
+      return false
+    },
+
+    getObjectPixelDimensions: function() {
       var zoom = this.getViewportTransform()[0],
           objectScale = this.getObjectScaling(),
           dim = this._getNonTransformedDimensions(),
@@ -871,18 +888,12 @@
           zoomY = objectScale.scaleY * zoom * retina,
           width = dim.x * zoomX,
           height = dim.y * zoomY;
-      if (width !== this.cacheWidth || height !== this.cacheHeight) {
-        this._cacheCanvas.width = width;
-        this._cacheCanvas.height = height;
-        this._cacheContext.translate(width / 2, height / 2);
-        this._cacheContext.scale(zoomX, zoomY);
-        this.cacheWidth = width;
-        this.cacheHeight = height;
-        this.zoomX = zoomX;
-        this.zoomY = zoomY;
-        return true
-      }
-      return false
+      return {
+        zoomX: zoomX,
+        zoomY: zoomY,
+        width: width,
+        height: height
+      };
     },
 
     /**
@@ -1193,11 +1204,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx, noTransform, clipContext) {
       // do not render if width/height are zeros or object is not visible
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
+      var hasClipPath = this.clipPath.length;
       ctx.save();
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
@@ -1207,9 +1219,6 @@
       }
       this._setOpacity(ctx);
       this._setShadow(ctx);
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching && !this.group) {
         if (this.isCacheDirty(noTransform)) {
@@ -1220,13 +1229,50 @@
         this.drawCacheOnCanvas(ctx);
       }
       else {
-        this.drawObject(ctx, noTransform);
+        if (hasClipPath) {
+          clipContext.save();
+          this.renderClipPath(clipContext, noTransform);
+          window.open(clipContext.canvas.toDataURL())
+          if (this.transformMatrix) {
+            clipContext.transform.apply(clipContext, this.transformMatrix);
+          }
+          clipContext.globalCompositeOperation = 'source-in';
+          this.drawObject(clipContext, noTransform);
+          ctx.drawImage(clipContext.canvas, 0, 0);
+          clipContext.restore();
+        }
+        else {
+          if (this.transformMatrix) {
+            ctx.transform.apply(ctx, this.transformMatrix);
+          }
+          this.drawObject(ctx, noTransform);
+        }
         if (noTransform && this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
         }
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    /**
+     * Execute the drawing operation for an the clipPath of an object.
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    renderClipPath: function(ctx, noTransform) {
+      var clipPath;
+      for (var i = 0; i < this.clipPath.length; i++) {
+        clipPath = this.clipPath[i];
+        ctx.save();
+        clipPath.fill = 'rgb(0,0,0)';
+        clipPath.stroke = null;
+        if (clipPath.transformMatrix) {
+          ctx.transform.apply(ctx, clipPath.transformMatrix);
+        }
+        clipPath._render(ctx, noTransform);
+        ctx.restore();
+      }
     },
 
     /**
@@ -1238,7 +1284,6 @@
       this._renderBackground(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      this._prepareClippingMask(ctx);
       this._render(ctx, noTransform);
     },
 
