@@ -202,7 +202,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd
-      )
+      ),
+      // deep clone
+      true
     );
     e.stopImmediatePropagation();
     e.preventDefault();
