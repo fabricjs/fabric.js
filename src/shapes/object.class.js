@@ -1471,10 +1471,15 @@
      * @return {fabric.Object} clone of an instance
      */
     clone: function(callback, propertiesToInclude) {
-      if (this.constructor.fromObject) {
+      if (this.constructor.fromObject instanceof Function) {
         return this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
       }
-      return new fabric.Object(this.toObject(propertiesToInclude));
+      var cloned = new fabric.Object(this.toObject(propertiesToInclude)); 
+      if(!(callback instanceof Function)) {
+        return cloned;
+      }
+      setTimeout(callback.bind(null, cloned), 0);
+      return cloned;
     },
 
     /**
