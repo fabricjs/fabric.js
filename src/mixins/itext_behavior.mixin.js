@@ -628,7 +628,7 @@
       }
       for (var i = 0, len = _chars.length; i < len; i++) {
         if (useCopiedStyle) {
-          style = fabric.copiedTextStyle[i];
+          style = fabric.util.object.clone(fabric.copiedTextStyle[i], true);
         }
         this.insertChar(_chars[i], i < len - 1, style);
       }
