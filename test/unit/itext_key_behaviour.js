@@ -235,5 +235,22 @@
     equal(iText.selectionEnd, 31, 'should not move');
     selection = 0;
   });
-
+  test('copy and paste', function() {
+    var event = { stopImmediatePropagation: function(){}, preventDefault: function(){} };
+    var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.selectionStart = 0;
+    iText.selectionEnd = 2;
+    iText.copy(event);
+    equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
+    equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
+    iText.selectionStart = 0;
+    iText.selectionEnd = 0;
+    iText.paste(event);
+    equal(iText.text, 'tetest', 'text has been copied');
+    notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
+    notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
+    deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
+    deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
+  });
 })();
