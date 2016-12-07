@@ -652,8 +652,8 @@
           target = transform.target,
           newLeft = x - transform.offsetX,
           newTop = y - transform.offsetY,
-          moveX = !target.get('lockMovementX') && target.left !== newLeft,
-          moveY = !target.get('lockMovementY') && target.top !== newTop;
+          moveX = !target.get('lockMovementX') && transform.offsetX !== newLeft,
+          moveY = !target.get('lockMovementY') && transform.offsetY !== newTop;
 
       moveX && target.set('left', newLeft);
       moveY && target.set('top', newTop);
@@ -804,7 +804,8 @@
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      scaled = this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
+      scaled = t.top != target.top || t.left != target.left;
+      scaled = this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim) || scaled;
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
