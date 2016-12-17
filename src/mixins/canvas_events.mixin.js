@@ -687,7 +687,7 @@
           this.setCursor(target.moveCursor || this.moveCursor);
         }
       }
-      transform.actionPerformed = actionPerformed;
+      transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
 
     /**
