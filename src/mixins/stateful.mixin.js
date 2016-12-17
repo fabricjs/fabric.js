@@ -68,6 +68,9 @@
     saveState: function(options) {
       var propertySet = options && options.propertySet || originalSet,
           destination = '_' + propertySet;
+      if (!this.destination) {
+        return this.setupState(options);
+      }
       saveProps(this, destination, this[propertySet]);
       if (options && options.stateProperties) {
         saveProps(this, destination, options.stateProperties);
