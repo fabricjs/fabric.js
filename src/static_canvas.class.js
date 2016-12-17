@@ -655,14 +655,14 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeGroup = this._activeGroup, object;
+      var activeGroup = this._activeGroup, object, ingoreVpt = false, skipAbsolute = true;
       this.viewportTransform = vpt;
       for (var i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords();
+        object.group || object.setCoords(ingoreVpt, skipAbsolute);
       }
       if (activeGroup) {
-        activeGroup.setCoords();
+        activeGroup.setCoords(ingoreVpt, skipAbsolute);
       }
       this.renderAll();
       return this;
