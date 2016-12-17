@@ -153,7 +153,7 @@
     toObject: function(propertiesToInclude) {
       var pathsToObject = this.paths.map(function(path) {
         var originalDefaults = path.includeDefaultValues;
-        path.includeDefaultValues = false;
+        path.includeDefaultValues = this.includeDefaultValues;
         var obj = path.toObject(propertiesToInclude);
         path.includeDefaultValues = originalDefaults;
         return obj;
