@@ -260,7 +260,7 @@
     toObject: function(propertiesToInclude) {
       var objsToObject = this.getObjects().map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = this.includeDefaultValues;
+        obj.includeDefaultValues = obj.group.includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
         return _obj;
