@@ -759,7 +759,7 @@
      * default to true
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default true
      */
     objectCaching:            objectCaching,
 
@@ -779,7 +779,7 @@
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
      * too much and will be redrawn with correct details at the end of scaling.
      * this setting is performance and application dependant.
-     * default to false
+     * default to true
      * since 1.7.0
      * @type Boolean
      * @default true
@@ -788,6 +788,7 @@
 
     /**
      * When set to `true`, object's cache will be rerendered next render call.
+     * since 1.7.0
      * @type Boolean
      * @default false
      */
