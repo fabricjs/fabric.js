@@ -842,6 +842,32 @@
     },
 
     /**
+     * Return the dimension and the zoom level needed to create a cache canvas
+     * big enough to host the object to be cached.
+     * @private
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     */
+    _getCacheCanvasDimensions: function() {
+      var zoom = this.canvas && this.canvas.getZoom() || 1,
+          objectScale = this.getObjectScaling(),
+          dim = this._getNonTransformedDimensions(),
+          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+          zoomX = objectScale.scaleX * zoom * retina,
+          zoomY = objectScale.scaleY * zoom * retina,
+          width = dim.x * zoomX,
+          height = dim.y * zoomY;
+      return {
+        width: width,
+        height: height,
+        zoomX: zoomX,
+        zoomY: zoomY
+      };
+    },
+
+    /**
      * Update width and height of the canvas for cache
      * returns true or false if canvas needed resize.
      * @private
@@ -854,14 +880,10 @@
           return false;
         }
       }
-      var zoom = this.getViewportTransform()[0],
-          objectScale = this.getObjectScaling(),
-          dim = this._getNonTransformedDimensions(),
-          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
-          zoomX = objectScale.scaleX * zoom * retina,
-          zoomY = objectScale.scaleY * zoom * retina,
-          width = dim.x * zoomX,
-          height = dim.y * zoomY;
+      var dims = this._getCacheCanvasDimensions(),
+          width = dims.width, height = dims.height,
+          zoomX = dims.zoomX, zoomY = dims.zoomY;
+
       if (width !== this.cacheWidth || height !== this.cacheHeight) {
         this._cacheCanvas.width = width;
         this._cacheCanvas.height = height;

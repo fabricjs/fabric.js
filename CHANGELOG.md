@@ -1,3 +1,15 @@
+**Version 1.7.2**
+
+- Fix: Textbox do not use stylemap for line wrapping [#3546](https://github.com/kangax/fabric.js/pull/3546)
+- Fix: Fix for firing object:modfied in macOS sierra [#3539](https://github.com/kangax/fabric.js/pull/3539)
+- Fix: Itext with object caching was not refreshing selection correctly. [#3538](https://github.com/kangax/fabric.js/pull/3538)
+- Fix: stateful now works again with activeGroup and dinamyc swap between stateful false/true. [#3537](https://github.com/kangax/fabric.js/pull/3537)
+- Fix: includeDefaultValues was not applied to child objects of groups and path-groups. [#3497](https://github.com/kangax/fabric.js/pull/3497)
+- Fix: Itext style is cloned on paste action now, allow copie of styles to be independent. [#3502](https://github.com/kangax/fabric.js/pull/3502)
+- Fix: Add subclasses properties to cacheProperties. [#3490](https://github.com/kangax/fabric.js/pull/3490)
+- Add: Shift and Alt key used for transformations are now dinamic. [#3479](https://github.com/kangax/fabric.js/pull/3479)
+- Fix: fix to polygon and cache. Added cacheProperties for all classes [#3490](https://github.com/kangax/fabric.js/pull/3490)
+
 **Version 1.7.1**
 
 - Add: Gradients/Patterns support customAttributes in toObject method [#3477](https://github.com/kangax/fabric.js/pull/3477)

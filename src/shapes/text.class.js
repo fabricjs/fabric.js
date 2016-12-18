@@ -394,6 +394,22 @@
     },
 
     /**
+     * Return the dimension and the zoom level needed to create a cache canvas
+     * big enough to host the object to be cached.
+     * @private
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     */
+    _getCacheCanvasDimensions: function() {
+      var dim = this.callSuper('_getCacheCanvasDimensions');
+      dim.width += 2 * this.fontSize;
+      dim.height += 2 * this.fontSize;
+      return dim;
+    },
+
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
