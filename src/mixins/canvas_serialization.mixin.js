@@ -123,7 +123,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     if (property === 'backgroundImage' || property === 'overlayImage') {
       fabric.util.enlivenObjects([value], function(enlivedObject){
-        _this[property] = enlivedObject;
+        _this[property] = enlivedObject[0];
         loaded[property] = true;
         callback && callback();
       })
