@@ -59,10 +59,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   _setBgOverlay: function(objects, callback, reviver) {
     var _this = this;
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
-      enlivenedObjects.forEach(function(obj, index) {
-        index === 0 && (_this.backgroundObject = obj);
-        index === 1 && (_this.overlayObject = obj);
-      });
+      _this.backgroundObject = enlivenedObjects[0];
+      _this.overlayObject = enlivenedObjects[1];
       callback && callback();
     }, null, reviver);
   },
