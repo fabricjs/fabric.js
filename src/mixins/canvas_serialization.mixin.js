@@ -122,11 +122,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
 
     if (property === 'backgroundImage' || property === 'overlayImage') {
-      fabric.Image.fromObject(value, function(img) {
-        _this[property] = img;
+      fabric.util.enlivenObjects([value], function(enlivedObject){
+        _this[property] = enlivedObject;
         loaded[property] = true;
         callback && callback();
-      });
+      })
     }
     else {
       this['set' + fabric.util.string.capitalize(property, true)](value, function() {
