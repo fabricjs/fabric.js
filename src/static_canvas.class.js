@@ -655,14 +655,14 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeGroup = this._activeGroup, object;
+      var activeGroup = this._activeGroup, object, ingoreVpt = false, skipAbsolute = true;
       this.viewportTransform = vpt;
       for (var i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords();
+        object.group || object.setCoords(ingoreVpt, skipAbsolute);
       }
       if (activeGroup) {
-        activeGroup.setCoords();
+        activeGroup.setCoords(ingoreVpt, skipAbsolute);
       }
       this.renderAll();
       return this;
@@ -1082,11 +1082,13 @@
      * @private
      */
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
-      var data = {
-        background: (this.backgroundColor && this.backgroundColor.toObject)
+      var data = { }
+
+      if (this.backgroundColor) {
+        data.background = this.backgroundColor.toObject
           ? this.backgroundColor.toObject(propertiesToInclude)
           : this.backgroundColor
-      };
+      }
 
       if (this.overlayColor) {
         data.overlay = this.overlayColor.toObject

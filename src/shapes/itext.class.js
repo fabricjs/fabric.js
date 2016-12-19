@@ -329,6 +329,10 @@
     render: function(ctx, noTransform) {
       this.clearContextTop();
       this.callSuper('render', ctx, noTransform);
+      // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
+      // the correct position but not at every cursor animation.
+      this.cursorOffsetCache = { };
+      this.renderCursorOrSelection();
     },
 
     /**
@@ -338,10 +342,6 @@
     _render: function(ctx) {
       this.callSuper('_render', ctx);
       this.ctx = ctx;
-      // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
-      // the correct position but not at every cursor animation.
-      this.cursorOffsetCache = { };
-      this.renderCursorOrSelection();
     },
 
     /**

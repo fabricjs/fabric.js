@@ -329,6 +329,7 @@
     _splitTextIntoLines: function(ctx) {
       ctx = ctx || this.ctx;
       var originalAlign = this.textAlign;
+      this._styleMap = null;
       ctx.save();
       this._setTextStyles(ctx);
       this.textAlign = 'left';

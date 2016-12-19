@@ -5,8 +5,7 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke;
+      max = fabric.util.array.max;
 
   if (fabric.Group) {
     return;
@@ -259,8 +258,15 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var objsToObject = this.getObjects().map(function(obj) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        var _obj = obj.toObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        return _obj;
+      });
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this._objects, 'toObject', propertiesToInclude)
+        objects: objsToObject
       });
     },
 

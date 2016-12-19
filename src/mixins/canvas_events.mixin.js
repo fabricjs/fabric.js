@@ -266,6 +266,11 @@
     _shouldRender: function(target, pointer) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
 
+      if (activeObject && activeObject.isEditing) {
+        // if we mouse up/down over a editing textbox a cursor change,
+        // there is no need to re render
+        return false;
+      }
       return !!(
         (target && (
           target.isMoving ||
@@ -638,6 +643,8 @@
 
       transform.reset = false;
       transform.target.isMoving = true;
+      transform.shiftKey = e.shiftKey;
+      transform.altKey = e[this.centeredKey];
 
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
@@ -680,7 +687,7 @@
           this.setCursor(target.moveCursor || this.moveCursor);
         }
       }
-      transform.actionPerformed = actionPerformed;
+      transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
 
     /**

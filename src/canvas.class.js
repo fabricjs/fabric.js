@@ -972,7 +972,7 @@
         angle = 360 + angle;
       }
 
-      angle %= 360
+      angle %= 360;
 
       if (t.target.snapAngle > 0) {
         var snapAngle  = t.target.snapAngle,
@@ -988,7 +988,7 @@
         }
 
         if (t.target.angle === angle) {
-          hasRoated = false
+          hasRoated = false;
         }
       }
 

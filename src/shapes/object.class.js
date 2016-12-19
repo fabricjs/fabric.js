@@ -759,7 +759,7 @@
      * default to true
      * since 1.7.0
      * @type Boolean
-     * @default
+     * @default true
      */
     objectCaching:            objectCaching,
 
@@ -779,7 +779,7 @@
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
      * too much and will be redrawn with correct details at the end of scaling.
      * this setting is performance and application dependant.
-     * default to false
+     * default to true
      * since 1.7.0
      * @type Boolean
      * @default true
@@ -797,7 +797,7 @@
     /**
      * an array of fabric shapes that will be used as a clip-path for the object.
      * every shape will be mixed with a logical OR operation.
-     * since 1.7.2
+     * since 1.7.3
      * @type Boolean
      * @default false
      */
@@ -851,6 +851,32 @@
     },
 
     /**
+     * Return the dimension and the zoom level needed to create a cache canvas
+     * big enough to host the object to be cached.
+     * @private
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     */
+    _getCacheCanvasDimensions: function() {
+      var zoom = this.canvas && this.canvas.getZoom() || 1,
+          objectScale = this.getObjectScaling(),
+          dim = this._getNonTransformedDimensions(),
+          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+          zoomX = objectScale.scaleX * zoom * retina,
+          zoomY = objectScale.scaleY * zoom * retina,
+          width = dim.x * zoomX,
+          height = dim.y * zoomY;
+      return {
+        width: width,
+        height: height,
+        zoomX: zoomX,
+        zoomY: zoomY
+      };
+    },
+
+    /**
      * Update width and height of the canvas for cache
      * returns true or false if canvas needed resize.
      * @private
@@ -863,37 +889,21 @@
           return false;
         }
       }
-      var pixelDim = this.getObjectPixelDimensions(),
-          width = pixelDim.width, height = pixelDim.height;
+      var dims = this._getCacheCanvasDimensions(),
+          width = dims.width, height = dims.height,
+          zoomX = dims.zoomX, zoomY = dims.zoomY;
       if (width !== this.cacheWidth || height !== this.cacheHeight) {
         this._cacheCanvas.width = width;
         this._cacheCanvas.height = height;
         this._cacheContext.translate(width / 2, height / 2);
-        this._cacheContext.scale(pixelDim.zoomX, pixelDim.zoomY);
+        this._cacheContext.scale(zoomX, zoomY);
         this.cacheWidth = width;
         this.cacheHeight = height;
-        this.zoomX = pixelDim.zoomX;
-        this.zoomY = pixelDim.zoomY;
+        this.zoomX = zoomX;
+        this.zoomY = zoomY;
         return true
       }
       return false
-    },
-
-    getObjectPixelDimensions: function() {
-      var zoom = this.getViewportTransform()[0],
-          objectScale = this.getObjectScaling(),
-          dim = this._getNonTransformedDimensions(),
-          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
-          zoomX = objectScale.scaleX * zoom * retina,
-          zoomY = objectScale.scaleY * zoom * retina,
-          width = dim.x * zoomX,
-          height = dim.y * zoomY;
-      return {
-        zoomX: zoomX,
-        zoomY: zoomY,
-        width: width,
-        height: height
-      };
     },
 
     /**

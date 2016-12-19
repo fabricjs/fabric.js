@@ -28,7 +28,7 @@
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"pathOffset":{"x":200,"y":200},"path":"http://example.com/"}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"pathOffset":{"x":200,"y":200},"path":"http://example.com/"}]}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
@@ -38,7 +38,7 @@
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -761,7 +761,7 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[]}');
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
@@ -852,7 +852,6 @@
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -887,7 +886,6 @@
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -905,7 +903,6 @@
     canvas.foobar = 123;
 
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects(),
       freeDrawingColor: 'red',
       foobar: 123
