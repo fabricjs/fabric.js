@@ -820,10 +820,10 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function(options, patternCallback) {
       options = options || { };
       if (options) {
-        this.setOptions(options);
+        this.setOptions(options, patternCallback);
       }
       if (this.objectCaching) {
         this._createCacheCanvas();
@@ -915,12 +915,28 @@
      * @private
      * @param {Object} [options] Options object
      */
-    _initPattern: function(options) {
+    _initPattern: function(options, patternCallback) {
+      var patternLoaded = 0, _this = this;
+      function patternLoading() {
+        if (patternLoaded === 1) {
+          _this.dirty = true;
+          patternCallback && patternCallback();
+        }
+        else {
+          patternLoaded++;
+        }
+      }
       if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
-        this.set('fill', new fabric.Pattern(options.fill));
+        this.set('fill', new fabric.Pattern(options.fill, patternLoading));
+      }
+      else {
+        patternLoading();
       }
       if (options.stroke && options.stroke.source && !(options.stroke instanceof fabric.Pattern)) {
-        this.set('stroke', new fabric.Pattern(options.stroke));
+        this.set('stroke', new fabric.Pattern(options.stroke, patternLoading));
+      }
+      else {
+        patternLoading();
       }
     },
 
@@ -943,13 +959,13 @@
      * Sets object's properties from options
      * @param {Object} [options] Options object
      */
-    setOptions: function(options) {
+    setOptions: function(options, patternCallback) {
       for (var prop in options) {
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
-      this._initPattern(options);
       this._initClipping(options);
+      this._initPattern(options, patternCallback);
     },
 
     /**

@@ -29,43 +29,60 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   offsetY: 0,
 
   /**
+   * Pattern rotation angle, relative to center of object where the pattern is applied
+   * @type Number
+   * @default
+   */
+  angle: 0,
+
+  /**
+   * Pattern scale factor on X axis
+   * @type Number
+   * @default
+   */
+  scaleX: 1,
+
+  /**
+   * Pattern scale factor on Y axis
+   * @type Number
+   * @default
+   */
+  scaleY: 1,
+
+  /**
+   * Determines if a pattern scale with object container
+   * @type Number
+   * @default
+   */
+  scaleWithContainer: true,
+
+  /**
    * Constructor
    * @param {Object} [options] Options object
    * @return {fabric.Pattern} thisArg
    */
-  initialize: function(options) {
+  initialize: function(options, callback) {
     options || (options = { });
 
     this.id = fabric.Object.__uid++;
-
-    if (options.source) {
-      if (typeof options.source === 'string') {
-        // function string
-        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
-          this.source = new Function(fabric.util.getFunctionBody(options.source));
-        }
-        else {
-          // img src string
-          var _this = this;
-          this.source = fabric.util.createImage();
-          fabric.util.loadImage(options.source, function(img) {
-            _this.source = img;
-          });
-        }
-      }
-      else {
-        // img element
-        this.source = options.source;
-      }
+    this.setOptions(options);
+    if (!options.source || (options.source && options.source !== 'string')) {
+      callback && callback();
+      return;
     }
-    if (options.repeat) {
-      this.repeat = options.repeat;
+    // function string
+    if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
+      this.source = new Function(fabric.util.getFunctionBody(options.source));
+      callback && callback();
     }
-    if (options.offsetX) {
-      this.offsetX = options.offsetX;
-    }
-    if (options.offsetY) {
-      this.offsetY = options.offsetY;
+    else {
+      // img src string
+      var _this = this;
+      this.source = fabric.util.createImage();
+      fabric.util.loadImage(options.source, function(img) {
+        _this.source = img;
+        callback && callback();
+      });
     }
   },
 
@@ -95,7 +112,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       source: source,
       repeat: this.repeat,
       offsetX: this.offsetX,
-      offsetY: this.offsetY
+      offsetY: this.offsetY,
+      angle: this.angle,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      scaleWithContainer: this.scaleWithContainer
     };
     fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
@@ -141,6 +162,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
            '</pattern>\n';
   },
   /* _TO_SVG_END_ */
+
+  setOptions: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
 
   /**
    * Returns an instance of CanvasPattern

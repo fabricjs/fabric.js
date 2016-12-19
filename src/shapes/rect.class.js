@@ -61,10 +61,9 @@
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    initialize: function(options) {
-      this.callSuper('initialize', options);
+    initialize: function(options, patternCallback) {
+      this.callSuper('initialize', options, patternCallback);
       this._initRxRy();
-
     },
 
     /**
@@ -225,6 +224,7 @@
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
+   * @param {Function} [patternCallback] Callback to invoke when an eventual pattern is ready to render
    * @return {Object} instance of fabric.Rect
    */
   fabric.Rect.fromObject = function(object, callback) {
