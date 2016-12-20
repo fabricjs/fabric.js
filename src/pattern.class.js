@@ -59,6 +59,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /**
    * Constructor
    * @param {Object} [options] Options object
+   * @param {Function} [callback] function to invoke after callback init.
    * @return {fabric.Pattern} thisArg
    */
   initialize: function(options, callback) {
@@ -67,13 +68,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     this.id = fabric.Object.__uid++;
     this.setOptions(options);
     if (!options.source || (options.source && options.source !== 'string')) {
-      callback && callback();
+      callback && callback(this);
       return;
     }
     // function string
     if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
       this.source = new Function(fabric.util.getFunctionBody(options.source));
-      callback && callback();
+      callback && callback(this);
     }
     else {
       // img src string
@@ -81,7 +82,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this.source = fabric.util.createImage();
       fabric.util.loadImage(options.source, function(img) {
         _this.source = img;
-        callback && callback();
+        callback && callback(_this);
       });
     }
   },
@@ -109,6 +110,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     }
 
     object = {
+      type: 'pattern',
       source: source,
       repeat: this.repeat,
       offsetX: this.offsetX,

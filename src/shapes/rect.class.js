@@ -224,13 +224,23 @@
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
-   * @param {Function} [patternCallback] Callback to invoke when an eventual pattern is ready to render
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {Object} instance of fabric.Rect
    */
-  fabric.Rect.fromObject = function(object, callback) {
-    var rect = new fabric.Rect(object);
-    callback && callback(rect);
-    return rect;
+  fabric.Rect.fromObject = function(object, callback, forceAsync) {
+    if (forceAsync) {
+      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+        object.fill = patterns[0];
+        object.stroke = patterns[1];
+        var rect = new fabric.Rect(object);
+        callback && callback(rect);
+      });
+    }
+    else {
+      var rect = new fabric.Rect(object);
+      callback && callback(rect);
+      return rect;
+    }
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

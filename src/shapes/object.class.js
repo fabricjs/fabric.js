@@ -820,10 +820,10 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options, patternCallback) {
+    initialize: function(options) {
       options = options || { };
       if (options) {
-        this.setOptions(options, patternCallback);
+        this.setOptions(options);
       }
       if (this.objectCaching) {
         this._createCacheCanvas();
@@ -915,28 +915,12 @@
      * @private
      * @param {Object} [options] Options object
      */
-    _initPattern: function(options, patternCallback) {
-      var patternLoaded = 0, _this = this;
-      function patternLoading() {
-        if (patternLoaded === 1) {
-          _this.dirty = true;
-          patternCallback && patternCallback();
-        }
-        else {
-          patternLoaded++;
-        }
-      }
+    _initPattern: function(options) {
       if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
-        this.set('fill', new fabric.Pattern(options.fill, patternLoading));
-      }
-      else {
-        patternLoading();
+        this.set('fill', new fabric.Pattern(options.fill));
       }
       if (options.stroke && options.stroke.source && !(options.stroke instanceof fabric.Pattern)) {
-        this.set('stroke', new fabric.Pattern(options.stroke, patternLoading));
-      }
-      else {
-        patternLoading();
+        this.set('stroke', new fabric.Pattern(options.stroke));
       }
     },
 
