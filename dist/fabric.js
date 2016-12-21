@@ -677,7 +677,8 @@ fabric.Collection = {
 
       var enlivenedObjects = [],
           numLoadedObjects = 0,
-          numTotalObjects = objects.length;
+          numTotalObjects = objects.length,
+          forceAsync = true;
 
       if (!numTotalObjects) {
         callback && callback(enlivenedObjects);
@@ -691,18 +692,53 @@ fabric.Collection = {
           return;
         }
         var klass = fabric.util.getKlass(o.type, namespace);
-        if (klass.async) {
-          klass.fromObject(o, function (obj, error) {
-            if (!error) {
-              enlivenedObjects[index] = obj;
-              reviver && reviver(o, enlivenedObjects[index]);
-            }
+        klass.fromObject(o, function (obj, error) {
+          if (!error) {
+            enlivenedObjects[index] = obj;
+            reviver && reviver(o, obj);
+          }
+          onLoaded();
+        }, forceAsync);
+      });
+    },
+
+    /**
+     * Create and wait for loading of patterns
+     * @static
+     * @memberOf fabric.util
+     * @param {Array} objects Objects to enliven
+     * @param {Function} callback Callback to invoke when all objects are created
+     * @param {String} namespace Namespace to get klass "Class" object from
+     * @param {Function} reviver Method for further parsing of object elements,
+     * called after each fabric object created.
+     */
+    enlivenPatterns: function(patterns, callback) {
+      patterns = patterns || [];
+
+      function onLoaded() {
+        if (++numLoadedPatterns === numPatterns) {
+          callback && callback(enlivenedPatterns);
+        }
+      }
+
+      var enlivenedPatterns = [],
+          numLoadedPatterns = 0,
+          numPatterns = patterns.length;
+
+      if (!numPatterns) {
+        callback && callback(enlivenedPatterns);
+        return;
+      }
+
+      patterns.forEach(function (p, index) {
+        if (p && p.source) {
+          new fabric.Pattern(p, function(pattern) {
+            enlivenedPatterns[index] = pattern;
             onLoaded();
           });
         }
         else {
-          enlivenedObjects[index] = klass.fromObject(o);
-          reviver && reviver(o, enlivenedObjects[index]);
+          enlivenedPatterns[index] = p;
           onLoaded();
         }
       });
@@ -5734,43 +5770,61 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   offsetY: 0,
 
   /**
+   * Pattern rotation angle, relative to center of object where the pattern is applied
+   * @type Number
+   * @default
+   */
+  angle: 0,
+
+  /**
+   * Pattern scale factor on X axis
+   * @type Number
+   * @default
+   */
+  scaleX: 1,
+
+  /**
+   * Pattern scale factor on Y axis
+   * @type Number
+   * @default
+   */
+  scaleY: 1,
+
+  /**
+   * Determines if a pattern scale with object container
+   * @type Number
+   * @default
+   */
+  scaleWithContainer: true,
+
+  /**
    * Constructor
    * @param {Object} [options] Options object
+   * @param {Function} [callback] function to invoke after callback init.
    * @return {fabric.Pattern} thisArg
    */
-  initialize: function(options) {
+  initialize: function(options, callback) {
     options || (options = { });
 
     this.id = fabric.Object.__uid++;
-
-    if (options.source) {
-      if (typeof options.source === 'string') {
-        // function string
-        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
-          this.source = new Function(fabric.util.getFunctionBody(options.source));
-        }
-        else {
-          // img src string
-          var _this = this;
-          this.source = fabric.util.createImage();
-          fabric.util.loadImage(options.source, function(img) {
-            _this.source = img;
-          });
-        }
-      }
-      else {
-        // img element
-        this.source = options.source;
-      }
+    this.setOptions(options);
+    if (!options.source || (options.source && options.source !== 'string')) {
+      callback && callback(this);
+      return;
     }
-    if (options.repeat) {
-      this.repeat = options.repeat;
+    // function string
+    if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
+      this.source = new Function(fabric.util.getFunctionBody(options.source));
+      callback && callback(this);
     }
-    if (options.offsetX) {
-      this.offsetX = options.offsetX;
-    }
-    if (options.offsetY) {
-      this.offsetY = options.offsetY;
+    else {
+      // img src string
+      var _this = this;
+      this.source = fabric.util.createImage();
+      fabric.util.loadImage(options.source, function(img) {
+        _this.source = img;
+        callback && callback(_this);
+      });
     }
   },
 
@@ -5797,10 +5851,15 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     }
 
     object = {
+      type: 'pattern',
       source: source,
       repeat: this.repeat,
       offsetX: this.offsetX,
-      offsetY: this.offsetY
+      offsetY: this.offsetY,
+      angle: this.angle,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      scaleWithContainer: this.scaleWithContainer
     };
     fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
@@ -5846,6 +5905,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
            '</pattern>\n';
   },
   /* _TO_SVG_END_ */
+
+  setOptions: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
 
   /**
    * Returns an instance of CanvasPattern
@@ -11297,11 +11362,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
 
     if (property === 'backgroundImage' || property === 'overlayImage') {
-      fabric.Image.fromObject(value, function(img) {
-        _this[property] = img;
+      fabric.util.enlivenObjects([value], function(enlivedObject){
+        _this[property] = enlivedObject[0];
         loaded[property] = true;
         callback && callback();
-      });
+      })
     }
     else {
       this['set' + fabric.util.string.capitalize(property, true)](value, function() {
@@ -12356,8 +12421,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
-      this._initPattern(options);
       this._initClipping(options);
+      this._initPattern(options);
     },
 
     /**
@@ -16017,7 +16082,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(options) {
       this.callSuper('initialize', options);
       this._initRxRy();
-
     },
 
     /**
@@ -16178,12 +16242,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {Object} instance of fabric.Rect
    */
-  fabric.Rect.fromObject = function(object, callback) {
-    var rect = new fabric.Rect(object);
-    callback && callback(rect);
-    return rect;
+  fabric.Rect.fromObject = function(object, callback, forceAsync) {
+    if (forceAsync) {
+      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+        object.fill = patterns[0];
+        object.stroke = patterns[1];
+        var rect = new fabric.Rect(object);
+        callback && callback(rect);
+      });
+    }
+    else {
+      var rect = new fabric.Rect(object);
+      callback && callback(rect);
+      return rect;
+    }
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
