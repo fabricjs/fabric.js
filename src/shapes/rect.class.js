@@ -61,8 +61,8 @@
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    initialize: function(options, patternCallback) {
-      this.callSuper('initialize', options, patternCallback);
+    initialize: function(options) {
+      this.callSuper('initialize', options);
       this._initRxRy();
     },
 

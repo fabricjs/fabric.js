@@ -943,13 +943,13 @@
      * Sets object's properties from options
      * @param {Object} [options] Options object
      */
-    setOptions: function(options, patternCallback) {
+    setOptions: function(options) {
       for (var prop in options) {
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
       this._initClipping(options);
-      this._initPattern(options, patternCallback);
+      this._initPattern(options);
     },
 
     /**
