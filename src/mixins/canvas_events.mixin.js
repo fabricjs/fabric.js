@@ -186,7 +186,7 @@
      */
     _onContextMenu: function (e) {
       if (this.stopContextMenu) {
-        e.stopPropagation()
+        e.stopPropagation();
         e.preventDefault();
       }
       return false;
