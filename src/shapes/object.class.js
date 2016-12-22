@@ -1895,6 +1895,22 @@
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
+  fabric.Object._fromObject = function(className, object, callback, forceAsync) {
+    if (forceAsync) {
+      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+        object.fill = patterns[0];
+        object.stroke = patterns[1];
+        var instance = new fabric[className](object);
+        callback && callback(instance);
+      });
+    }
+    else {
+      var instance = new fabric[className](object);
+      callback && callback(instance);
+      return instance;
+    }
+  };
+
   /**
    * Unique id used internally when creating SVG elements
    * @static

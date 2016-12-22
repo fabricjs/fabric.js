@@ -228,19 +228,7 @@
    * @return {Object} instance of fabric.Rect
    */
   fabric.Rect.fromObject = function(object, callback, forceAsync) {
-    if (forceAsync) {
-      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
-        object.fill = patterns[0];
-        object.stroke = patterns[1];
-        var rect = new fabric.Rect(object);
-        callback && callback(rect);
-      });
-    }
-    else {
-      var rect = new fabric.Rect(object);
-      callback && callback(rect);
-      return rect;
-    }
+    return fabric.Object._fromObject('Rect', object, callback, forceAsync);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
