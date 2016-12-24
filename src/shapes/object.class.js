@@ -1434,21 +1434,26 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} filler fabric.Pattern or fabric.Gradient
      */
-    _applyFillStrokeTransform: function(ctx, filler) {
-      var transform = this.gradientTransform || this.patternTransform;
+    _applyPatternGradientTransform: function(ctx, filler) {
+      var transform = filler.gradientTransform || filler.patternTransform;
       if (transform) {
         ctx.transform.apply(ctx, transform);
       }
-      if (this.fill.toLive) {
-        ctx.translate(
-          -this.width / 2 + filler.offsetX || 0,
-          -this.height / 2 + filler.offsetY || 0);
+      var offsetX = -this.width / 2 + filler.offsetX || 0,
+          offsetY = -this.height / 2 + filler.offsetY || 0;
+      if (filler.toLive) {
+        console.log(filler)
+        ctx.translate(offsetX, offsetY);
         filler.angle && ctx.rotate(degreesToRadians(filler.angle));
         if (!filler.scaleWithObject) {
           ctx.scale(1 / this.scaleX, 1 / this.scaleY);
         }
         ctx.scale(filler.scaleX, filler.scaleY);
       }
+      return {
+        top: offsetY,
+        left: offsetX
+      };
     },
 
     /**
@@ -1461,7 +1466,7 @@
       }
 
       ctx.save();
-      this._applyFillStrokeTransform(ctx, this.fill);
+      this._applyPatternGradientTransform(ctx, this.fill);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1487,7 +1492,7 @@
       ctx.save();
 
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      this._applyFillerTransform(ctx, this.stroke);
+      this._applyPatternGradientTransform(ctx, this.stroke);
       ctx.stroke();
       ctx.restore();
     },
