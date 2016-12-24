@@ -1,4 +1,4 @@
-(function(global) {
+(function() {
 
   'use strict';
 
@@ -214,5 +214,4 @@
       return ctx.createPattern(source, this.repeat);
     }
   });
-
-})(typeof exports !== 'undefined' ? exports : this);
+})();

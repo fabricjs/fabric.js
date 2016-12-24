@@ -700,7 +700,7 @@
     ok(!canvas.isEmpty());
   });
 
-  test('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(PATH_JSON, function(){
@@ -725,10 +725,11 @@
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with json object', function() {
+  asyncTest('loadFromJSON with json object', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
@@ -753,10 +754,11 @@
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with reviver function', function() {
+  asyncTest('loadFromJSON with reviver function', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     function reviver(obj, instance) {
@@ -790,10 +792,11 @@
       equal(obj.get('opacity'), 1);
       equal(obj.get('customID'), 'fabric_1');
       ok(obj.get('path').length > 0);
+      start();
     }, reviver);
   });
 
-  test('loadFromJSON with no objects', function() {
+  asyncTest('loadFromJSON with no objects', function() {
     var canvas1 = fabric.document.createElement('canvas'),
         canvas2 = fabric.document.createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
@@ -807,11 +810,11 @@
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-
+      start();
     });
   });
 
-  test('loadFromJSON without "objects" property', function() {
+  asyncTest('loadFromJSON without "objects" property', function() {
     var canvas1 = fabric.document.createElement('canvas'),
         canvas2 = fabric.document.createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
@@ -828,11 +831,11 @@
       ok(fired, 'Callback should be fired even if no "objects" property exists');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-
+      start();
     });
   });
 
-  test('loadFromJSON with empty fabric.Group', function() {
+  asyncTest('loadFromJSON with empty fabric.Group', function() {
     var canvas1 = fabric.document.createElement('canvas'),
         canvas2 = fabric.document.createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
@@ -848,6 +851,7 @@
       fired = true;
 
       ok(fired, 'Callback should be fired even if empty fabric.Group exists');
+      start();
     });
   });
 
@@ -897,7 +901,7 @@
     });
   });
 
-  test('loadFromJSON with custom properties on Canvas with no async object', function() {
+  asyncTest('loadFromJSON with custom properties on Canvas with no async object', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
@@ -907,10 +911,8 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.controlsAboveOverlay, true);
       equal(canvas.preserveObjectStacking, true);
+      start();
     });
-    // if no async object the callback is called syncronously
-    equal(canvas.controlsAboveOverlay, true);
-    equal(canvas.preserveObjectStacking, true);
   });
 
   asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
