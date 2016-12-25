@@ -476,10 +476,11 @@
      */
     _renderChars: function(method, ctx, chars, left, top) {
       // remove Text word from method var
-      var shortM = method.slice(0, -4), char, width;
-      if (this[shortM].toLive) {
-        var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
-            offsetY = -this.height / 2 + this[shortM].offsetY || 0;
+      var shortM = method.slice(0, -4), char, width,
+          filler = this[shortM], needTranslation = filler.toLive && filler.angle;
+      if (needTranslation) {
+        var offsetX = -this.width / 2 + filler.offsetX || 0,
+            offsetY = -this.height / 2 + filler.offsetY || 0;
         ctx.save();
         ctx.translate(offsetX, offsetY);
         left -= offsetX;
@@ -498,7 +499,7 @@
       else {
         ctx[method](chars, left, top);
       }
-      this[shortM].toLive && ctx.restore();
+      needTranslation && ctx.restore();
     },
 
     /**

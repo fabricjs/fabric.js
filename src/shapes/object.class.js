@@ -1323,7 +1323,7 @@
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
         ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx, this)
+          ? this.stroke.toLive(ctx, this, this instanceof fabric.Text)
           : this.stroke;
       }
     },
@@ -1331,7 +1331,7 @@
     _setFillStyles: function(ctx) {
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx, this)
+          ? this.fill.toLive(ctx, this, this instanceof fabric.Text)
           : this.fill;
       }
     },
@@ -1435,25 +1435,23 @@
      * @param {Object} filler fabric.Pattern or fabric.Gradient
      */
     _applyPatternGradientTransform: function(ctx, filler) {
+      if (!filler.toLive) {
+        return;
+      }
       var transform = filler.gradientTransform || filler.patternTransform;
       if (transform) {
         ctx.transform.apply(ctx, transform);
       }
       var offsetX = -this.width / 2 + filler.offsetX || 0,
           offsetY = -this.height / 2 + filler.offsetY || 0;
-      if (filler.toLive) {
-        console.log(filler)
-        ctx.translate(offsetX, offsetY);
-        filler.angle && ctx.rotate(degreesToRadians(filler.angle));
-        if (!filler.scaleWithObject) {
-          ctx.scale(1 / this.scaleX, 1 / this.scaleY);
-        }
-        ctx.scale(filler.scaleX, filler.scaleY);
+      ctx.translate(offsetX, offsetY);
+      if (!filler.scaleWithObject) {
+        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
-      return {
-        top: offsetY,
-        left: offsetX
-      };
+      ctx.scale(filler.scaleX, filler.scaleY);
+      if (filler.angle) {
+        ctx.rotate(degreesToRadians(filler.angle));
+      }
     },
 
     /**

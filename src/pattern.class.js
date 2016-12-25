@@ -190,12 +190,12 @@
     /**
      * Returns an instance of CanvasPattern
      * @param {CanvasRenderingContext2D} ctx Context to create pattern
+     * @param {Object} object for wich the pattern is created for
+     * @param {Boolean} enforceTransform enforce transform on the pattern source ( used for fillText )
      * @return {CanvasPattern}
      */
-    toLive: function(ctx) {
-      var source = typeof this.source === 'function'
-        ? this.source()
-        : this.source;
+    toLive: function(ctx, object, enforceTransform) {
+      var source = typeof this.source === 'function' ? this.source() : this.source;
 
       // if the image failed to load, return, and allow rest to continue loading
       if (!source) {
@@ -211,7 +211,45 @@
           return '';
         }
       }
-      return ctx.createPattern(source, this.repeat);
+      if (!enforceTransform) {
+        return ctx.createPattern(source, this.repeat);
+      }
+
+      var width = source.width, height = source.height, options,
+          scaleX = this.scaleX, scaleY = this.scaleY,
+          canvas = fabric.util.createCanvasElement(),
+          ctx = canvas.getContext('2d');
+      if (this.angle) {
+        canvas.width = object.width;
+        canvas.height = object.height;
+      }
+      else {
+        if (this.patternTransform) {
+          var options = fabric.util.qrDecompose(this.patternTransform);
+          scaleX *= Math.abs(options.scaleX);
+          scaleY *= Math.abs(options.scaleY);
+        }
+        if (!this.scaleWithObject) {
+          scaleX /= object.scaleX;
+          scaleY /= object.scaleY;
+        }
+        canvas.width = width * scaleX;
+        canvas.height = height * scaleY;
+      }
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(canvas.width, 0);
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.lineTo(0, 0);
+      if (this.angle) {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+      }
+      fabric.Object.prototype._applyPatternGradientTransform.call(object, ctx, this);
+      ctx.fillStyle = ctx.createPattern(source, this.repeat);
+      ctx.fill();
+      this.usedPattern = canvas;
+      return ctx.createPattern(canvas, this.repeat);
     }
   });
 })();
