@@ -17,8 +17,9 @@
 
       reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i,
       reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
-      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i,
+      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clippath)$/i,
       reAllowedParents = /^(symbol|g|a|svg)$/i,
+      rePattern = /^pattern/i,
 
       attributesMap = {
         cx:                   'left',
@@ -52,6 +53,7 @@
 
   fabric.cssRules = { };
   fabric.gradientDefs = { };
+  fabric.patternsDefs = { };
 
   function normalizeAttr(attr) {
     // transform attribute names
@@ -636,13 +638,25 @@
         return;
       }
 
+      var patterns = { };
+      descendants.filter(function(el) {
+        return rePattern.test(el.nodeName.replace('svg:', ''))
+      }).forEach(function(el) {
+        // verify if something else other than this can be used.
+        patterns[el.id] = el.getElementsByTagName('*');
+      });
+
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+      fabric.patterns[svgUid] = patterns;
       // Precedence of rules:   style > class > attribute
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
           callback(instances, options);
+          delete fabric.gradientDefs[svgUid];
+          delete fabric.cssRules[svgUid];
+          delete fabric.patterns[svgUid];
         }
       }, clone(options), reviver);
     };
