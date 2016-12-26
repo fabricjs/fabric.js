@@ -643,7 +643,11 @@
    * @param {Function} callback Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
-    fabric.util.loadImage(object.src, function(img) {
+    fabric.util.loadImage(object.src, function(img, error) {
+      if (error) {
+        callback && callback(null, error);
+        return;
+      }
       fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
         object.filters = filters || [];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
