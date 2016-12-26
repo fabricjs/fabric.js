@@ -219,37 +219,61 @@
           scaleX = this.scaleX, scaleY = this.scaleY,
           canvas = fabric.util.createCanvasElement(),
           ctx = canvas.getContext('2d');
-      if (this.angle) {
-        canvas.width = object.width;
-        canvas.height = object.height;
+      if (this.patternTransform) {
+        var options = fabric.util.qrDecompose(this.patternTransform);
+        scaleX *= Math.abs(options.scaleX);
+        scaleY *= Math.abs(options.scaleY);
       }
-      else {
-        if (this.patternTransform) {
-          var options = fabric.util.qrDecompose(this.patternTransform);
-          scaleX *= Math.abs(options.scaleX);
-          scaleY *= Math.abs(options.scaleY);
-        }
-        if (!this.scaleWithObject) {
-          scaleX /= object.scaleX;
-          scaleY /= object.scaleY;
-        }
-        canvas.width = width * scaleX;
-        canvas.height = height * scaleY;
+      if (!this.scaleWithObject) {
+        scaleX /= object.scaleX;
+        scaleY /= object.scaleY;
       }
+      canvas.width = this.angle ? object.width : Math.min(width * scaleX, object.width);
+      canvas.height = this.angle ? object.height : Math.min(height * scaleY, object.height);
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(canvas.width, 0);
       ctx.lineTo(canvas.width, canvas.height);
       ctx.lineTo(0, canvas.height);
       ctx.lineTo(0, 0);
-      if (this.angle) {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-      }
+      ctx.translate(object.width / 2, object.height / 2);
       fabric.Object.prototype._applyPatternGradientTransform.call(object, ctx, this);
       ctx.fillStyle = ctx.createPattern(source, this.repeat);
       ctx.fill();
+      ctx.fillStyle = 'red';
+      ctx.fillRect(0,0,2,2)
       this.usedPattern = canvas;
       return ctx.createPattern(canvas, this.repeat);
     }
+  });
+
+  fabric.util.object.extend(fabric.Pattern, {
+
+    /* _FROM_SVG_START_ */
+    /**
+     * Returns {@link fabric.Pattern} instance from an SVG element
+     * @static
+     * @memberOf fabric.Pattern
+     * @param {SVGPatternElement} el SVG pattern element with childnodes
+     * @param {fabric.Object} instance object that is stroked/filled with pattern
+     * @param {function} callback to invoke when the pattern is loaded
+     * @see http://www.w3.org/TR/SVG/pservers.html#PatternElement
+     */
+    fromElement: function(el, instance, callback) {
+
+      /**
+       *  @example:
+       *
+       *  <linearGradient id="linearGrad1">
+       *    <stop offset="0%" stop-color="white"/>
+       *    <stop offset="100%" stop-color="black"/>
+       *  </linearGradient>
+       *
+       *  OR
+       */
+
+      var pattern = new fabric.Pattern({ }, callback);
+    }
+    /* _FROM_SVG_END_ */
   });
 })();

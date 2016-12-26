@@ -19,7 +19,6 @@
       reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
       reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clippath)$/i,
       reAllowedParents = /^(symbol|g|a|svg)$/i,
-      rePattern = /^pattern/i,
 
       attributesMap = {
         cx:                   'left',
@@ -53,7 +52,7 @@
 
   fabric.cssRules = { };
   fabric.gradientDefs = { };
-  fabric.patternsDefs = { };
+  fabric.patternDefs = { };
 
   function normalizeAttr(attr) {
     // transform attribute names
@@ -638,17 +637,12 @@
         return;
       }
 
-      var patterns = { };
-      descendants.filter(function(el) {
-        return rePattern.test(el.nodeName.replace('svg:', ''))
-      }).forEach(function(el) {
-        // verify if something else other than this can be used.
-        patterns[el.id] = el.getElementsByTagName('*');
-      });
+      var gradientTags = ['linearGradient', 'radialGradient', 'svg:linearGradient', 'svg:radialGradient'];
+      var patternTags = ['pattern', 'svg:pattern'];
 
-      fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
+      fabric.gradientDefs[svgUid] = fabric.getFillerDefs(doc, gradientTags);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-      fabric.patterns[svgUid] = patterns;
+      fabric.patternDefs[svgUid] = fabric.getFillerDefs(doc, patternTags);
       // Precedence of rules:   style > class > attribute
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
@@ -766,22 +760,17 @@
     },
 
     /**
-     * Parses an SVG document, returning all of the gradient declarations found in it
+     * Parses an SVG document, returning all of the gradient or patterns declarations found in it
      * @static
      * @function
      * @memberOf fabric
      * @param {SVGDocument} doc SVG document to parse
-     * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
+     * @return {Object} Gradient or Patterns definitions; key corresponds to element id, value -- to gradient definition element
      */
-    getGradientDefs: function(doc) {
-      var tagArray = [
-            'linearGradient',
-            'radialGradient',
-            'svg:linearGradient',
-            'svg:radialGradient'],
-          elList = _getMultipleNodes(doc, tagArray),
+    getFillerDefs: function(doc, tagArray) {
+      var elList = _getMultipleNodes(doc, tagArray),
           el, j = 0, id, xlink,
-          gradientDefs = { }, idsToXlinkMap = { };
+          defs = { }, idsToXlinkMap = { };
 
       j = elList.length;
 
@@ -792,17 +781,17 @@
         if (xlink) {
           idsToXlinkMap[id] = xlink.substr(1);
         }
-        gradientDefs[id] = el;
+        defs[id] = el;
       }
 
       for (id in idsToXlinkMap) {
-        var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
-        el = gradientDefs[id];
+        var el2 = defs[idsToXlinkMap[id]].cloneNode(true);
+        el = defs[id];
         while (el2.firstChild) {
           el.appendChild(el2.firstChild);
         }
       }
-      return gradientDefs;
+      return defs;
     },
 
     /**
