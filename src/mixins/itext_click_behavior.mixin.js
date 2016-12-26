@@ -145,20 +145,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   setCursorByClick: function(e) {
-    var newSelectionStart = this.getSelectionStartFromPointer(e);
-
+    var newSelection = this.getSelectionStartFromPointer(e),
+        start = this.selectionStart, end = this.selectionEnd;
     if (e.shiftKey) {
-      if (newSelectionStart < this.selectionStart) {
-        this.selectionEnd = this.selectionStart;
-        this.selectionStart = newSelectionStart;
-      }
-      else {
-        this.selectionEnd = newSelectionStart;
-      }
+      this.setSelectionStartEndWithShift(start, end, newSelection);
     }
     else {
-      this.selectionStart = newSelectionStart;
-      this.selectionEnd = newSelectionStart;
+      this.selectionStart = newSelection;
+      this.selectionEnd = newSelection;
     }
     this._fireSelectionChanged();
     this._updateTextarea();

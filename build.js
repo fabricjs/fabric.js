@@ -161,6 +161,7 @@ var filesToInclude = [
   'src/log.js',
 
   ifSpecifiedInclude('animation', 'src/util/animate.js'),
+  ifSpecifiedInclude('animation', 'src/util/animate_color.js'),
   //'src/util/animate.js',
   ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
@@ -236,6 +237,8 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/blend_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/colormatrix_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
 

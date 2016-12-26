@@ -13,6 +13,13 @@
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'alignX',
+    'alignY',
+    'meetOrSlice'
+  );
+
   /**
    * Image class
    * @class fabric.Image
@@ -96,6 +103,23 @@
      * @type Number
      */
     minimumScaleTrigger: 0.5,
+
+    /**
+     * List of properties to consider when checking if
+     * state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * as well as for history (undo/redo) purposes
+     * @type Array
+     */
+    stateProperties: stateProperties,
+
+    /**
+     * When `true`, object is cached on an additional canvas.
+     * default to false for images
+     * since 1.7.0
+     * @type Boolean
+     * @default
+     */
+    objectCaching: false,
 
     /**
      * Constructor
@@ -244,23 +268,18 @@
       this.resizeFilters.forEach(function(filterObj) {
         filterObj && resizeFilters.push(filterObj.toObject());
       });
-
-      var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        src: this.getSrc(),
-        filters: filters,
-        resizeFilters: resizeFilters,
-        crossOrigin: this.crossOrigin,
-        alignX: this.alignX,
-        alignY: this.alignY,
-        meetOrSlice: this.meetOrSlice
-      });
+      var object = extend(
+        this.callSuper(
+          'toObject',
+          ['crossOrigin', 'alignX', 'alignY', 'meetOrSlice'].concat(propertiesToInclude)
+        ), {
+          src: this.getSrc(),
+          filters: filters,
+          resizeFilters: resizeFilters,
+        });
 
       object.width /= scaleX;
       object.height /= scaleY;
-
-      if (!this.includeDefaultValues) {
-        this._removeDefaultValues(object);
-      }
 
       return object;
     },
@@ -273,7 +292,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
-          preserveAspectRatio = 'none';
+          preserveAspectRatio = 'none', filtered = true;
       if (this.group && this.group.type === 'path-group') {
         x = this.left;
         y = this.top;
@@ -283,7 +302,7 @@
       }
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
-          '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(),
+          '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(filtered),
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -316,10 +335,11 @@
 
     /**
      * Returns source of an image
+     * @param {Boolean} filtered indicates if the src is needed for svg
      * @return {String} Source of an image
      */
-    getSrc: function() {
-      var element = this._originalElement;
+    getSrc: function(filtered) {
+      var element = filtered ? this._element : this._originalElement;
       if (element) {
         return fabric.isLikelyNode ? element._src : element.src;
       }

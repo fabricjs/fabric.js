@@ -22,7 +22,7 @@
 
   var IMG_URL = fabric.isLikelyNode
     ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
-    : getAbsolutePath('../fixtures/very_large_image.jpg');
+    : getAbsolutePath('test/fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
@@ -187,6 +187,22 @@
 
     equal(destination.x, 2);
     equal(source.x, 2);
+  });
+
+  test('fabric.util.object.extend deep', function() {
+    var extend = fabric.util.object.extend;
+    var d = function() { };
+    var destination = { x: 1 },
+        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
+
+    extend(destination, source, true);
+
+    equal(destination.x, 1, 'x is still in destination');
+    equal(destination.y, 2, 'y has been added');
+    deepEqual(destination.a, source.a, 'a has been copied deeply');
+    notEqual(destination.a, source.a, 'is not the same object');
+    ok(typeof source.a.c[3] === 'function', 'is a function');
+    equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
   });
 
   test('fabric.util.object.clone', function() {

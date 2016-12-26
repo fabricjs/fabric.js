@@ -12,6 +12,14 @@
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'x1',
+    'x2',
+    'y1',
+    'y2'
+  );
+
   /**
    * Line class
    * @class fabric.Line
@@ -55,6 +63,8 @@
      */
     y2: 0,
 
+    cacheProperties: cacheProperties,
+
     /**
      * Constructor
      * @param {Array} [points] Array of points
@@ -62,8 +72,6 @@
      * @return {fabric.Line} thisArg
      */
     initialize: function(points, options) {
-      options = options || { };
-
       if (!points) {
         points = [0, 0, 0, 0];
       }
@@ -204,6 +212,23 @@
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), this.calcLinePoints());
+    },
+
+    /*
+     * Calculate object dimensions from its properties
+     * @private
+     */
+    _getNonTransformedDimensions: function() {
+      var dim = this.callSuper('_getNonTransformedDimensions');
+      if (this.strokeLineCap === 'butt') {
+        if (dim.x === 0) {
+          dim.y -= this.strokeWidth;
+        }
+        if (dim.y === 0) {
+          dim.x -= this.strokeWidth;
+        }
+      }
+      return dim;
     },
 
     /**

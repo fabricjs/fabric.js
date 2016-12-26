@@ -13,6 +13,9 @@
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('points');
+
   /**
    * Polygon class
    * @class fabric.Polygon
@@ -49,6 +52,8 @@
      */
     minY: 0,
 
+    cacheProperties: cacheProperties,
+
     /**
      * Constructor
      * @param {Array} points Array of points
@@ -56,7 +61,7 @@
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options) {
-      options = options || { };
+      options = options || {};
       this.points = points || [];
       this.callSuper('initialize', options);
       this._calcDimensions();
@@ -151,20 +156,20 @@
      * @param {Boolean} noTransform
      */
     commonRender: function(ctx, noTransform) {
-      var point, len = this.points.length;
+      var point, len = this.points.length,
+          x = noTransform ? 0 : this.pathOffset.x,
+          y = noTransform ? 0 : this.pathOffset.y;
 
       if (!len || isNaN(this.points[len - 1].y)) {
         // do not draw if no points or odd points
         // NaN comes from parseFloat of a empty string in parser
         return false;
       }
-
-      noTransform || ctx.translate(-this.pathOffset.x, -this.pathOffset.y);
       ctx.beginPath();
-      ctx.moveTo(this.points[0].x, this.points[0].y);
+      ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
       for (var i = 0; i < len; i++) {
         point = this.points[i];
-        ctx.lineTo(point.x, point.y);
+        ctx.lineTo(point.x - x, point.y - y);
       }
       return true;
     },

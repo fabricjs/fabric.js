@@ -103,7 +103,7 @@
 
     iText.selectionStart = 28;
     iText.selectionEnd = 31;
-    iText.moveCursorUp({ shiftKey: false});
+    iText.moveCursorUp({ shiftKey: false });
     equal(selection, 1, 'should fire');
     equal(iText.selectionStart, 9, 'should move to upper line');
     equal(iText.selectionEnd, 9, 'should move to upper line');
@@ -111,7 +111,7 @@
 
     iText.selectionStart = 1;
     iText.selectionEnd = 4;
-    iText.moveCursorDown({ shiftKey: false});
+    iText.moveCursorDown({ shiftKey: false });
     equal(selection, 1, 'should fire');
     equal(iText.selectionStart, 24, 'should move to down line');
     equal(iText.selectionEnd, 24, 'should move to down line');
@@ -119,7 +119,7 @@
 
     iText.selectionStart = 28;
     iText.selectionEnd = 31;
-    iText.moveCursorLeft({ shiftKey: false});
+    iText.moveCursorLeft({ shiftKey: false });
     equal(selection, 1, 'should fire');
     equal(iText.selectionStart, 28, 'should move to selection Start');
     equal(iText.selectionEnd, 28, 'should move to selection Start');
@@ -235,5 +235,22 @@
     equal(iText.selectionEnd, 31, 'should not move');
     selection = 0;
   });
-
+  test('copy and paste', function() {
+    var event = { stopImmediatePropagation: function(){}, preventDefault: function(){} };
+    var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.selectionStart = 0;
+    iText.selectionEnd = 2;
+    iText.copy(event);
+    equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
+    equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
+    iText.selectionStart = 0;
+    iText.selectionEnd = 0;
+    iText.paste(event);
+    equal(iText.text, 'tetest', 'text has been copied');
+    notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
+    notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
+    deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
+    deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
+  });
 })();

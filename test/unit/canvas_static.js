@@ -28,7 +28,7 @@
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"pathOffset":{"x":200,"y":200},"path":"http://example.com/"}]}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
@@ -38,7 +38,7 @@
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -50,7 +50,7 @@
     return src;
   }
 
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('test/fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
@@ -140,7 +140,8 @@
   var Canvas = fabric.Canvas;
   fabric.Canvas = null;
   var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
+  el.width = 600;
+  el.height = 600;
 
   var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el),
       canvas2 = this.canvas2 = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
@@ -180,7 +181,7 @@
     ok('overlayVpt' in canvas);
 
     equal(canvas.includeDefaultValues, true);
-    equal(canvas.stateful, true);
+    equal(canvas.stateful, false);
     equal(canvas.renderOnAddRemove, true);
     equal(canvas.controlsAboveOverlay, false);
     equal(canvas.allowTouchScrolling, false);
@@ -434,9 +435,17 @@
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
-
+    var bg = new fabric.Rect({ width: 10, height: 20 });
+    canvas.backgroundColor = '#FF0000';
+    canvas.overlayColor = '#FF0000';
+    canvas.backgroundImage = bg;
+    canvas.overlayImage = bg;
     equal(canvas.clear(), canvas, 'should be chainable');
-    equal(canvas.getObjects().length, 0);
+    equal(canvas.getObjects().length, 0, 'clear remove all objects');
+    equal(canvas.backgroundColor, '', 'clear remove background color');
+    equal(canvas.overlayColor, '', 'clear remove overlay color');
+    equal(canvas.backgroundImage, null, 'clear remove bg image');
+    equal(canvas.overlayImage, null, 'clear remove overlay image');
   });
 
   test('renderAll', function() {
@@ -475,6 +484,23 @@
       catch (err) {
         ok(true);
       }
+    }
+  });
+
+  test('toDataURL cropping', function() {
+    ok(typeof canvas.toDataURL == 'function');
+    if (!fabric.Canvas.supports('toDataURL')) {
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var croppingWidth = 75,
+          croppingHeight = 50,
+          dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
+
+      fabric.Image.fromURL(dataURL, function (img) {
+        equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
+        equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
+      });
     }
   });
 
@@ -735,7 +761,7 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[]}');
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
@@ -826,7 +852,6 @@
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -835,6 +860,16 @@
     canvas.add(rect);
 
     equal(canvas.toObject().objects[0].type, rect.type);
+  });
+
+  test('toObject non includeDefaultValues', function() {
+    canvas.includeDefaultValues = false;
+    var rect = makeRect();
+    canvas.add(rect);
+    var cObject = canvas.toObject();
+    var expectedRect = { type: 'rect', width: 10, height: 10 };
+    deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
+    canvas.includeDefaultValues = true;
   });
 
   test('toObject excludeFromExport', function() {
@@ -851,7 +886,6 @@
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -869,7 +903,6 @@
     canvas.foobar = 123;
 
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects(),
       freeDrawingColor: 'red',
       foobar: 123
@@ -1372,18 +1405,6 @@
     canvas.relativePan(point);
     deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -100, -100], 'viewport has translation effect applied on top of old one');
     canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
-  });
-
-  test('getActiveObject', function() {
-    ok(typeof canvas.getActiveObject == 'function');
-    var activeObject = canvas.getActiveObject();
-    equal(activeObject, null, 'should return null');
-  });
-
-  test('getActiveGroup', function() {
-    ok(typeof canvas.getActiveGroup == 'function');
-    var activeGroup = canvas.getActiveGroup();
-    equal(activeGroup, null, 'should return null');
   });
 
   test('getContext', function() {

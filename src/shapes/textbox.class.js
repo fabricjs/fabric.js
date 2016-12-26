@@ -34,10 +34,12 @@
 
     /**
      * Minimum calculated width of a textbox, in pixels.
+     * fixed to 2 so that an empty textbox cannot go to 0
+     * and is still selectable without text.
      * @type Number
      * @default
      */
-    dynamicMinWidth: 0,
+    dynamicMinWidth: 2,
 
     /**
      * Cached array of text wrapping.
@@ -56,6 +58,12 @@
     lockScalingFlip: true,
 
     /**
+     * Override standard Object class values
+     * Textbox needs this on false
+     */
+    noScaleCache: false,
+
+    /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
      * made available.
@@ -64,12 +72,12 @@
      * @return {fabric.Textbox} thisArg
      */
     initialize: function(text, options) {
-      this.ctx = fabric.util.createCanvasElement().getContext('2d');
+
       this.callSuper('initialize', text, options);
       this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
-
+      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
       // add width to this list of props that effect line wrapping.
-      this._dimensionAffectingProps.width = true;
+      this._dimensionAffectingProps.push('width');
     },
 
     /**
@@ -87,13 +95,14 @@
       if (!ctx) {
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
+        this.clearContextTop();
       }
 
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
 
       // wrap lines
-      this._textLines = this._splitTextIntoLines();
+      this._textLines = this._splitTextIntoLines(ctx);
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
@@ -118,12 +127,12 @@
           map               = {};
 
       for (var i = 0; i < this._textLines.length; i++) {
-        if (this.text[charCount] === '\n') {
+        if (this.text[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this.text[charCount] === ' ') {
+        else if (this.text[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -317,14 +326,16 @@
      * @returns {Array} Array of lines in the Textbox.
      * @override
      */
-    _splitTextIntoLines: function() {
+    _splitTextIntoLines: function(ctx) {
+      ctx = ctx || this.ctx;
       var originalAlign = this.textAlign;
-      this.ctx.save();
-      this._setTextStyles(this.ctx);
+      this._styleMap = null;
+      ctx.save();
+      this._setTextStyles(ctx);
       this.textAlign = 'left';
-      var lines = this._wrapText(this.ctx, this.text);
+      var lines = this._wrapText(ctx, this.text);
       this.textAlign = originalAlign;
-      this.ctx.restore();
+      ctx.restore();
       this._textLines = lines;
       this._styleMap = this._generateStyleMap();
       return lines;
@@ -433,9 +444,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        minWidth: this.minWidth
-      });
+      return this.callSuper('toObject', ['minWidth'].concat(propertiesToInclude));
     }
   });
   /**

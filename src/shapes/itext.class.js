@@ -307,18 +307,59 @@
     },
 
     /**
+     * Initialize text dimensions. Render all text on given context
+     * or on a offscreen canvas to get the text width with measureText.
+     * Updates this.width and this.height with the proper values.
+     * Does not return dimensions.
+     * @param {CanvasRenderingContext2D} [ctx] Context to render on
+     * @private
+     */
+    _initDimensions: function(ctx) {
+      if (!ctx) {
+        this.clearContextTop();
+      }
+      this.callSuper('_initDimensions', ctx);
+    },
+
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} noTransform
      */
-    _render: function(ctx) {
-      this.oldWidth = this.width;
-      this.oldHeight = this.height;
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
+    render: function(ctx, noTransform) {
+      this.clearContextTop();
+      this.callSuper('render', ctx, noTransform);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
       this.cursorOffsetCache = { };
       this.renderCursorOrSelection();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+      this.ctx = ctx;
+    },
+
+    /**
+     * Prepare and clean the contextTop
+     */
+    clearContextTop: function() {
+      if (!this.active || !this.isEditing) {
+        return;
+      }
+      if (this.canvas && this.canvas.contextTop) {
+        var ctx = this.canvas.contextTop;
+        ctx.save();
+        ctx.transform.apply(ctx, this.canvas.viewportTransform);
+        this.transform(ctx);
+        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+        this._clearTextArea(ctx);
+        ctx.restore();
+      }
     },
 
     /**
@@ -330,7 +371,7 @@
       }
       var chars = this.text.split(''),
           boundaries, ctx;
-      if (this.canvas.contextTop) {
+      if (this.canvas && this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
         ctx.transform.apply(ctx, this.canvas.viewportTransform);
@@ -350,13 +391,12 @@
         boundaries = this._getCursorBoundaries(chars, 'selection');
         this.renderSelection(chars, boundaries, ctx);
       }
-
       ctx.restore();
     },
 
     _clearTextArea: function(ctx) {
       // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.oldWidth + 4, height = this.oldHeight + 4;
+      var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
     },
     /**
@@ -786,7 +826,7 @@
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           line, _char, style;
-
+      ctx.save();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this._getHeightOfLine(ctx, i);
         line = this._textLines[i];
@@ -811,12 +851,13 @@
           ctx.fillRect(
             leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
             topOffset + lineTopOffset,
-            this._getWidthOfChar(ctx, _char, i, j) + 1,
+            this._getWidthOfChar(ctx, _char, i, j),
             heightOfLine / this.lineHeight
           );
         }
         lineTopOffset += heightOfLine;
       }
+      ctx.restore();
     },
 
     /**
@@ -888,6 +929,7 @@
         styleDeclaration.scaleX = this.scaleX;
         styleDeclaration.scaleY = this.scaleY;
         styleDeclaration.canvas = this.canvas;
+        styleDeclaration.getObjectScaling = this.getObjectScaling;
         this._setShadow.call(styleDeclaration, ctx);
       }
 
@@ -1120,16 +1162,8 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var clonedStyles = { }, i, j, row;
-      for (i in this.styles) {
-        row = this.styles[i];
-        clonedStyles[i] = { };
-        for (j in row) {
-          clonedStyles[i][j] = clone(row[j]);
-        }
-      }
       return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        styles: clonedStyles
+        styles: clone(this.styles, true)
       });
     }
   });

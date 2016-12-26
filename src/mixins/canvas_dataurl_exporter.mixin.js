@@ -1,217 +1,124 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+(function () {
 
-  /**
-   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-   * @param {Object} [options] Options object
-   * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
-   * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
-   * @param {Number} [options.multiplier=1] Multiplier to scale by
-   * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
-   * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
-   * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
-   * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
-   * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
-   * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
-   * @example <caption>Generate jpeg dataURL with lower quality</caption>
-   * var dataURL = canvas.toDataURL({
-   *   format: 'jpeg',
-   *   quality: 0.8
-   * });
-   * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
-   * var dataURL = canvas.toDataURL({
-   *   format: 'png',
-   *   left: 100,
-   *   top: 100,
-   *   width: 200,
-   *   height: 200
-   * });
-   * @example <caption>Generate double scaled png dataURL</caption>
-   * var dataURL = canvas.toDataURL({
-   *   format: 'png',
-   *   multiplier: 2
-   * });
-   */
-  toDataURL: function (options) {
-    options || (options = { });
+  var supportQuality = fabric.StaticCanvas.supports('toDataURLWithQuality');
 
-    var format = options.format || 'png',
-        quality = options.quality || 1,
-        multiplier = options.multiplier || 1,
-        cropping = {
-          left: options.left,
-          top: options.top,
-          width: options.width,
-          height: options.height
-        };
+  fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
-    if (this._isRetinaScaling()) {
-      multiplier *= fabric.devicePixelRatio;
-    }
+    /**
+     * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+     * @param {Object} [options] Options object
+     * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+     * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+     * @param {Number} [options.multiplier=1] Multiplier to scale by
+     * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+     * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+     * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+     * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+     * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+     * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
+     * @example <caption>Generate jpeg dataURL with lower quality</caption>
+     * var dataURL = canvas.toDataURL({
+     *   format: 'jpeg',
+     *   quality: 0.8
+     * });
+     * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
+     * var dataURL = canvas.toDataURL({
+     *   format: 'png',
+     *   left: 100,
+     *   top: 100,
+     *   width: 200,
+     *   height: 200
+     * });
+     * @example <caption>Generate double scaled png dataURL</caption>
+     * var dataURL = canvas.toDataURL({
+     *   format: 'png',
+     *   multiplier: 2
+     * });
+     */
+    toDataURL: function (options) {
+      options || (options = { });
 
-    if (multiplier !== 1) {
+      var format = options.format || 'png',
+          quality = options.quality || 1,
+          multiplier = options.multiplier || 1,
+          cropping = {
+            left: options.left || 0,
+            top: options.top || 0,
+            width: options.width || 0,
+            height: options.height || 0,
+          };
       return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
-    }
-    else {
-      return this.__toDataURL(format, quality, cropping);
-    }
-  },
+    },
 
-  /**
-   * @private
-   */
-  __toDataURL: function(format, quality, cropping) {
+    /**
+     * @private
+     */
+    __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
-    this.renderAll();
+      var origWidth = this.getWidth(),
+          origHeight = this.getHeight(),
+          scaledWidth = (cropping.width || this.getWidth()) * multiplier,
+          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
+          zoom = this.getZoom(),
+          newZoom = zoom * multiplier,
+          vp = this.viewportTransform,
+          translateX = (vp[4] - cropping.left) * multiplier,
+          translateY = (vp[5] - cropping.top) * multiplier,
+          newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
+          originalInteractive = this.interactive;
 
-    var canvasEl = this.contextContainer.canvas,
-        croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
+      this.viewportTransform = newVp;
+      // setting interactive to false avoid exporting controls
+      this.interactive && (this.interactive = false);
+      if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
+        // this.setDimensions is going to renderAll also;
+        this.setDimensions({ width: scaledWidth, height: scaledHeight });
+      }
+      else {
+        this.renderAll();
+      }
+      var data = this.__toDataURL(format, quality, cropping);
+      originalInteractive && (this.interactive = originalInteractive);
+      this.viewportTransform = vp;
+      //setDimensions with no option object is taking care of:
+      //this.width, this.height, this.renderAll()
+      this.setDimensions({ width: origWidth, height: origHeight });
+      return data;
+    },
 
-    // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
-    if (format === 'jpg') {
-      format = 'jpeg';
-    }
+    /**
+     * @private
+     */
+    __toDataURL: function(format, quality) {
 
-    var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
-              ? (croppedCanvasEl || canvasEl).toDataURL('image/' + format, quality)
-              : (croppedCanvasEl || canvasEl).toDataURL('image/' + format);
+      var canvasEl = this.contextContainer.canvas;
+      // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
+      if (format === 'jpg') {
+        format = 'jpeg';
+      }
 
-    if (croppedCanvasEl) {
-      croppedCanvasEl = null;
-    }
+      var data = supportQuality
+                ? canvasEl.toDataURL('image/' + format, quality)
+                : canvasEl.toDataURL('image/' + format);
 
-    return data;
-  },
+      return data;
+    },
 
-  /**
-   * @private
-   */
-  __getCroppedCanvas: function(canvasEl, cropping) {
+    /**
+     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
+     * @deprecated since 1.0.13
+     * @param {String} format (png|jpeg)
+     * @param {Number} multiplier
+     * @param {Number} quality (0..1)
+     * @return {String}
+     */
+    toDataURLWithMultiplier: function (format, multiplier, quality) {
+      return this.toDataURL({
+        format: format,
+        multiplier: multiplier,
+        quality: quality
+      });
+    },
+  });
 
-    var croppedCanvasEl,
-        croppedCtx,
-        shouldCrop = 'left' in cropping ||
-                     'top' in cropping ||
-                     'width' in cropping ||
-                     'height' in cropping;
-
-    if (shouldCrop) {
-
-      croppedCanvasEl = fabric.util.createCanvasElement();
-      croppedCtx = croppedCanvasEl.getContext('2d');
-
-      croppedCanvasEl.width = cropping.width || this.width;
-      croppedCanvasEl.height = cropping.height || this.height;
-
-      croppedCtx.drawImage(canvasEl, -cropping.left || 0, -cropping.top || 0);
-    }
-
-    return croppedCanvasEl;
-  },
-
-  /**
-   * @private
-   */
-  __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
-
-    var origWidth = this.getWidth(),
-        origHeight = this.getHeight(),
-        scaledWidth = origWidth * multiplier,
-        scaledHeight = origHeight * multiplier,
-        activeObject = this.getActiveObject(),
-        activeGroup = this.getActiveGroup(),
-        zoom = this.getZoom(),
-        newZoom = zoom * multiplier / fabric.devicePixelRatio;
-
-    if (multiplier > 1) {
-      this.setDimensions({ width: scaledWidth, height: scaledHeight });
-    }
-
-    this.setZoom(newZoom);
-
-    if (cropping.left) {
-      cropping.left *= multiplier;
-    }
-    if (cropping.top) {
-      cropping.top *= multiplier;
-    }
-    if (cropping.width) {
-      cropping.width *= multiplier;
-    }
-    else if (multiplier < 1) {
-      cropping.width = scaledWidth;
-    }
-    if (cropping.height) {
-      cropping.height *= multiplier;
-    }
-    else if (multiplier < 1) {
-      cropping.height = scaledHeight;
-    }
-
-    if (activeGroup) {
-      // not removing group due to complications with restoring it with correct state afterwords
-      this._tempRemoveBordersControlsFromGroup(activeGroup);
-    }
-    else if (activeObject && this.deactivateAll) {
-      this.deactivateAll();
-    }
-
-    var data = this.__toDataURL(format, quality, cropping);
-    if (activeGroup) {
-      this._restoreBordersControlsOnGroup(activeGroup);
-    }
-    else if (activeObject && this.setActiveObject) {
-      this.setActiveObject(activeObject);
-    }
-    this.setZoom(zoom);
-    //setDimensions with no option object is taking care of:
-    //this.width, this.height, this.renderAll()
-    this.setDimensions({ width: origWidth, height: origHeight });
-
-    return data;
-  },
-
-  /**
-   * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-   * @deprecated since 1.0.13
-   * @param {String} format (png|jpeg)
-   * @param {Number} multiplier
-   * @param {Number} quality (0..1)
-   * @return {String}
-   */
-  toDataURLWithMultiplier: function (format, multiplier, quality) {
-    return this.toDataURL({
-      format: format,
-      multiplier: multiplier,
-      quality: quality
-    });
-  },
-
-  /**
-   * @private
-   */
-  _tempRemoveBordersControlsFromGroup: function(group) {
-    group.origHasControls = group.hasControls;
-    group.origBorderColor = group.borderColor;
-
-    group.hasControls = true;
-    group.borderColor = 'rgba(0,0,0,0)';
-
-    group.forEachObject(function(o) {
-      o.origBorderColor = o.borderColor;
-      o.borderColor = 'rgba(0,0,0,0)';
-    });
-  },
-
-  /**
-   * @private
-   */
-  _restoreBordersControlsOnGroup: function(group) {
-    group.hideControls = group.origHideControls;
-    group.borderColor = group.origBorderColor;
-
-    group.forEachObject(function(o) {
-      o.borderColor = o.origBorderColor;
-      delete o.origBorderColor;
-    });
-  }
-});
+})();

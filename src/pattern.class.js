@@ -71,11 +71,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   /**
    * Returns object representation of a pattern
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of a pattern instance
    */
-  toObject: function() {
+  toObject: function(propertiesToInclude) {
 
-    var source;
+    var source, object;
 
     // callback
     if (typeof this.source === 'function') {
@@ -90,12 +91,15 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       source = this.source.toDataURL();
     }
 
-    return {
+    object = {
       source: source,
       repeat: this.repeat,
       offsetX: this.offsetX,
       offsetY: this.offsetY
     };
+    fabric.util.populateWithProperties(this, object, propertiesToInclude);
+
+    return object;
   },
 
   /* _TO_SVG_START_ */

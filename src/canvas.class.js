@@ -5,6 +5,7 @@
       radiansToDegrees = fabric.util.radiansToDegrees,
       atan2 = Math.atan2,
       abs = Math.abs,
+      supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
 
       STROKE_OFFSET = 0.5;
 
@@ -59,7 +60,9 @@
 
     /**
      * Indicates which key enable unproportional scaling
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -86,7 +89,9 @@
 
     /**
      * Indicates which key enable centered Transfrom
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -95,7 +100,9 @@
 
     /**
      * Indicates which key enable alternate action on corner
-     * values: altKey, shiftKey, ctrlKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -118,7 +125,9 @@
 
     /**
      * Indicates which key enable multiple click selection
-     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.2
      * @type String
      * @default
@@ -128,7 +137,9 @@
     /**
      * Indicates which key enable alternative selection
      * in case of target overlapping with active object
-     * values: altKey, shiftKey, ctrlKey, cmdKey
+     * values: 'altKey', 'shiftKey', 'ctrlKey'.
+     * If `null` or 'none' or any other string that is not a modifier key
+     * feature is disabled feature disabled.
      * @since 1.6.5
      * @type null|String
      * @default
@@ -245,6 +256,39 @@
     preserveObjectStacking: false,
 
     /**
+     * Indicates the angle that an object will lock to while rotating.
+     * @type Number
+     * @since 1.6.7
+     * @default
+     */
+    snapAngle: 0,
+
+    /**
+     * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
+     * When `null`, the snapThreshold will default to the snapAngle.
+     * @type null|Number
+     * @since 1.6.7
+     * @default
+     */
+    snapThreshold: null,
+
+    /**
+     * Indicates if the right click on canvas can output the context menu or not
+     * @type Boolean
+     * @since 1.6.5
+     * @default
+     */
+    stopContextMenu: false,
+
+    /**
+     * Indicates if the canvas can fire right click events
+     * @type Boolean
+     * @since 1.6.5
+     * @default
+     */
+    fireRightClick: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -299,8 +343,9 @@
      * @chainable
      */
     renderAll: function () {
-      if (this.selection && !this._groupSelector && !this.isDrawingMode) {
+      if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
+        this.contextTopDirty = false;
       }
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
@@ -323,7 +368,7 @@
       }
 
       this.fire('after:render');
-
+      this.contextTopDirty = true;
       return this;
     },
 
@@ -404,10 +449,8 @@
     _normalizePointer: function (object, pointer) {
       var m = object.calcTransformMatrix(),
           invertedM = fabric.util.invertTransform(m),
-          vpt = this.viewportTransform,
-          vptPointer = this.restorePointerVpt(pointer),
-          p = fabric.util.transformPoint(vptPointer, invertedM);
-      return fabric.util.transformPoint(p, vpt);
+          vptPointer = this.restorePointerVpt(pointer);
+      return fabric.util.transformPoint(vptPointer, invertedM);
     },
 
     /**
@@ -921,15 +964,36 @@
 
       var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
           curAngle = atan2(y - t.top, x - t.left),
-          angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+          angle = radiansToDegrees(curAngle - lastAngle + t.theta),
+          hasRoated = true;
 
       // normalize angle to positive value
       if (angle < 0) {
         angle = 360 + angle;
       }
 
-      t.target.angle = angle % 360;
-      return true;
+      angle %= 360;
+
+      if (t.target.snapAngle > 0) {
+        var snapAngle  = t.target.snapAngle,
+            snapThreshold  = t.target.snapThreshold || snapAngle,
+            rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
+            leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
+
+        if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
+          angle = leftAngleLocked;
+        }
+        else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
+          angle = rightAngleLocked;
+        }
+
+        if (t.target.angle === angle) {
+          hasRoated = false;
+        }
+      }
+
+      t.target.angle = angle;
+      return hasRoated;
     },
 
     /**
@@ -964,20 +1028,25 @@
           aleft = abs(left),
           atop = abs(top);
 
-      ctx.fillStyle = this.selectionColor;
+      if (this.selectionColor) {
+        ctx.fillStyle = this.selectionColor;
 
-      ctx.fillRect(
-        groupSelector.ex - ((left > 0) ? 0 : -left),
-        groupSelector.ey - ((top > 0) ? 0 : -top),
-        aleft,
-        atop
-      );
+        ctx.fillRect(
+          groupSelector.ex - ((left > 0) ? 0 : -left),
+          groupSelector.ey - ((top > 0) ? 0 : -top),
+          aleft,
+          atop
+        );
+      }
 
+      if (!this.selectionLineWidth || !this.selectionBorderColor) {
+        return;
+      }
       ctx.lineWidth = this.selectionLineWidth;
       ctx.strokeStyle = this.selectionBorderColor;
 
       // selection border
-      if (this.selectionDashArray.length > 1) {
+      if (this.selectionDashArray.length > 1 && !supportLineDash) {
 
         var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
             py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
@@ -993,6 +1062,7 @@
         ctx.stroke();
       }
       else {
+        fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
         ctx.strokeRect(
           groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
           groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
@@ -1022,14 +1092,17 @@
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
+        this._fireOverOutEvents(activeGroup, e);
         return activeGroup;
       }
       // if we hit the corner of an activeObject, let's return that.
       if (activeObject && activeObject._findTargetCorner(pointer)) {
+        this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
       if (activeObject && this._checkTarget(pointer, activeObject)) {
         if (!this.preserveObjectStacking) {
+          this._fireOverOutEvents(activeObject, e);
           return activeObject;
         }
         else {
@@ -1404,9 +1477,11 @@
     deactivateAll: function () {
       var allObjects = this.getObjects(),
           i = 0,
-          len = allObjects.length;
+          len = allObjects.length,
+          obj;
       for ( ; i < len; i++) {
-        allObjects[i].set('active', false);
+        obj = allObjects[i];
+        obj && obj.set('active', false);
       }
       this._discardActiveGroup();
       this._discardActiveObject();
@@ -1490,6 +1565,66 @@
       }
     },
 
+    /**
+     * @private
+     */
+    _toObject: function(instance, methodName, propertiesToInclude) {
+      //If the object is part of the current selection group, it should
+      //be transformed appropriately
+      //i.e. it should be serialised as it would appear if the selection group
+      //were to be destroyed.
+      var originalProperties = this._realizeGroupTransformOnObject(instance),
+          object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
+      //Undo the damage we did by changing all of its properties
+      this._unwindGroupTransformOnObject(instance, originalProperties);
+      return object;
+    },
+
+    /**
+     * Realises an object's group transformation on it
+     * @private
+     * @param {fabric.Object} [instance] the object to transform (gets mutated)
+     * @returns the original values of instance which were changed
+     */
+    _realizeGroupTransformOnObject: function(instance) {
+      var layoutProps = ['angle', 'flipX', 'flipY', 'height', 'left', 'scaleX', 'scaleY', 'top', 'width'];
+      if (instance.group && instance.group === this.getActiveGroup()) {
+        //Copy all the positionally relevant properties across now
+        var originalValues = {};
+        layoutProps.forEach(function(prop) {
+          originalValues[prop] = instance[prop];
+        });
+        this.getActiveGroup().realizeTransform(instance);
+        return originalValues;
+      }
+      else {
+        return null;
+      }
+    },
+
+    /**
+     * Restores the changed properties of instance
+     * @private
+     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
+     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
+     */
+    _unwindGroupTransformOnObject: function(instance, originalValues) {
+      if (originalValues) {
+        instance.set(originalValues);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _setSVGObject: function(markup, instance, reviver) {
+      var originalProperties;
+      //If the object is in a selection group, simulate what would happen to that
+      //object when the group is deselected
+      originalProperties = this._realizeGroupTransformOnObject(instance);
+      this.callSuper('_setSVGObject', markup, instance, reviver);
+      this._unwindGroupTransformOnObject(instance, originalProperties);
+    },
   });
 
   // copying static properties manually to work around Opera's bug,
