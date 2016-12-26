@@ -228,6 +228,8 @@
         scaleX /= object.scaleX;
         scaleY /= object.scaleY;
       }
+      // in case of pattern rotation we create a pattern as big as the object
+      // because we cannot really find a repetable pattern after rotating the original pattern
       canvas.width = this.angle ? object.width : Math.min(width * scaleX, object.width);
       canvas.height = this.angle ? object.height : Math.min(height * scaleY, object.height);
       ctx.beginPath();
@@ -240,9 +242,6 @@
       fabric.Object.prototype._applyPatternGradientTransform.call(object, ctx, this);
       ctx.fillStyle = ctx.createPattern(source, this.repeat);
       ctx.fill();
-      ctx.fillStyle = 'red';
-      ctx.fillRect(0,0,2,2)
-      this.usedPattern = canvas;
       return ctx.createPattern(canvas, this.repeat);
     }
   });
