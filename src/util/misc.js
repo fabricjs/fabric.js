@@ -329,7 +329,7 @@
         if (klass.async) {
           klass.fromObject(o, function (obj, error) {
             error || (enlivenedObjects[index] = obj);
-            reviver && reviver(o, enlivenedObjects[index], error);
+            reviver && reviver(o, obj, error);
             onLoaded();
           });
         }
