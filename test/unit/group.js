@@ -534,7 +534,7 @@
     obj.dirty = false;
     equal(g1.dirty, false, 'Group has no dirty flag set');
     obj.set('fill', 'red');
-    equal(obj.dirty, true, 'Obj has dirty flag set')
+    equal(obj.dirty, true, 'Obj has dirty flag set');
     equal(g1.dirty, true, 'Group has dirty flag set');
   });
 

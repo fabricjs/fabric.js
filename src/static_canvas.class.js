@@ -458,7 +458,7 @@
      * @private
      */
     _createCanvasElement: function(canvasEl) {
-      var element = fabric.util.createCanvasElement(canvasEl)
+      var element = fabric.util.createCanvasElement(canvasEl);
       if (!element.style) {
         element.style = { };
       }
@@ -783,7 +783,7 @@
       this.backgroundImage = null;
       this.overlayImage = null;
       this.backgroundColor = '';
-      this.overlayColor = ''
+      this.overlayColor = '';
       if (this._hasITextHandlers) {
         this.off('selection:cleared', this._canvasITextSelectionClearedHanlder);
         this.off('object:selected', this._canvasITextSelectionClearedHanlder);
@@ -1082,12 +1082,12 @@
      * @private
      */
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
-      var data = { }
+      var data = { };
 
       if (this.backgroundColor) {
         data.background = this.backgroundColor.toObject
           ? this.backgroundColor.toObject(propertiesToInclude)
-          : this.backgroundColor
+          : this.backgroundColor;
       }
 
       if (this.overlayColor) {
