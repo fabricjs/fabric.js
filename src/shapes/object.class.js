@@ -893,9 +893,9 @@
         this.cacheHeight = height;
         this.zoomX = zoomX;
         this.zoomY = zoomY;
-        return true
+        return true;
       }
-      return false
+      return false;
     },
 
     /**

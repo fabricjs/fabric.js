@@ -21,14 +21,14 @@
     }
     else if (origValue instanceof Array) {
       if (origValue.length !== currentValue.length) {
-        return false
+        return false;
       }
       for (var i = 0, len = origValue.length; i < len; i++) {
         if (origValue[i] !== currentValue[i]) {
           return false;
         }
       }
-      return true
+      return true;
     }
     else if (origValue && typeof origValue === 'object') {
       if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {

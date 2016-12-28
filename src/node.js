@@ -171,7 +171,7 @@
     this.contextContainer = this.nodeCanvas.getContext('2d');
     this.contextCache = this.nodeCacheCanvas.getContext('2d');
     this.Font = Canvas.Font;
-  }
+  };
 
   /** @ignore */
   fabric.StaticCanvas.prototype.createPNGStream = function() {

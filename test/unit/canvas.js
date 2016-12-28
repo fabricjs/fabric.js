@@ -54,7 +54,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path };
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -258,7 +258,7 @@
 
   test('before:selection:cleared', function() {
     var isFired = false;
-    canvas.on('before:selection:cleared', function() { isFired = true });
+    canvas.on('before:selection:cleared', function() { isFired = true; });
 
     canvas.add(new fabric.Rect());
     canvas.remove(canvas.item(0));
@@ -274,7 +274,7 @@
 
   test('selection:cleared', function() {
     var isFired = false;
-    canvas.on('selection:cleared', function() { isFired = true });
+    canvas.on('selection:cleared', function() { isFired = true; });
 
     canvas.add(new fabric.Rect());
     canvas.remove(canvas.item(0));
