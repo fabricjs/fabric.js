@@ -1439,7 +1439,7 @@
       top: 40,
       width: 40,
       height: 50,
-      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false) }
+      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false); }
     });
 
     equal(typeof object.clipTo, 'function');
