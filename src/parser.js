@@ -652,38 +652,95 @@
    * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
    * @namespace
    */
-  var svgCache = {
+  var svgCache = (function() {
+    var cache = {},
+        requesting = {};
 
-    /**
-     * @param {String} name
-     * @param {Function} callback
-     */
-    has: function (name, callback) {
-      callback(false);
-    },
+    return {
 
-    get: function () {
-      /* NOOP */
-    },
+      /**
+       * @param {String} name
+       * @param {Function} callback
+       */
+      has: function (name, callback) {
+        callback(name in cache || name in requesting);
+      },
 
-    set: function () {
-      /* NOOP */
-    }
-  };
+      /**
+       * @param {String} name
+       * @param {Function} callback
+       */
+      get: function (name, callback) {
+        if (name in cache) {
+          callback(cache[name]);
+        }
+        else {
+          requesting[name].push(callback);
+        }
+      },
+
+      /**
+       * @param {String} name
+       * @param {Object} objToCache
+       */
+      set: function (name, objToCache) {
+        cache[name] = objToCache;
+
+        if (name in requesting && requesting[name].length > 0) {
+          requesting[name].forEach(function(cb) {
+            cb.call(this, objToCache);
+          });
+        }
+      },
+
+      /**
+       * @param {String} name
+       */
+      setRequesting: function(name) {
+        if (!(name in requesting)) {
+          requesting[name] = [];
+        }
+      }
+
+    };
+  })();
 
   /**
    * @private
    */
-  function _enlivenCachedObject(cachedObject) {
+  function _enlivenCachedObject(cachedObject, callback) {
 
     var objects = cachedObject.objects,
-        options = cachedObject.options;
+        options = cachedObject.options,
+        objectsLength = objects.length,
+        builtObjects = {};
 
-    objects = objects.map(function (o) {
-      return fabric[capitalize(o.type)].fromObject(o);
+    objects.forEach(function(o, i) {
+      var eachObjCallback = function(builtObj) {
+            addBuiltObject(builtObj, i);
+          },
+          result = fabric[capitalize(o.type)].fromObject(o, eachObjCallback);
+
+      if (result instanceof fabric.constructor) {
+        eachObjCallback(result);
+      }
     });
 
-    return ({ objects: objects, options: options });
+    function addBuiltObject(builtObj, objectIndex) {
+      builtObjects[objectIndex] = builtObj;
+
+      var builtObjectsLength = Object.keys(builtObjects).length;
+
+      if (builtObjectsLength === objectsLength) {
+        var builtObjectsArr = [];
+
+        for (var i = 0; i < builtObjectsLength; i++) {
+          builtObjectsArr.push(builtObjects[i]);
+        }
+
+        callback(builtObjectsArr, options);
+      }
+    }
   }
 
   /**
@@ -984,11 +1041,14 @@
       svgCache.has(url, function (hasUrl) {
         if (hasUrl) {
           svgCache.get(url, function (value) {
-            var enlivedRecord = _enlivenCachedObject(value);
-            callback(enlivedRecord.objects, enlivedRecord.options);
+            setTimeout(function() {
+              _enlivenCachedObject(value, callback);
+            }, 0);
           });
         }
         else {
+          svgCache.setRequesting(url);
+
           new fabric.util.request(url, {
             method: 'get',
             onComplete: onComplete
