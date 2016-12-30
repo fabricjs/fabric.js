@@ -4,7 +4,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.options = options;
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
-  this.fillers = ['fill', 'stroke'];
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -41,55 +40,41 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
 };
 
 fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
-  var callback = this.createCallback(index, el);
   if (klass.async) {
-    klass.fromElement(el, callback, this.options);
+    klass.fromElement(el, this.createCallback(index, el), this.options);
   }
   else {
     var obj = klass.fromElement(el, this.options);
-    callback(obj);
+    this.resolveGradient(obj, 'fill');
+    this.resolveGradient(obj, 'stroke');
+    this.reviver && this.reviver(el, obj);
+    this.instances[index] = obj;
+    this.checkIfDone();
   }
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
-    _this.resolveFillers(obj, function(_obj) {
-      _this.reviver && _this.reviver(el, _obj);
-      _this.instances[index] = _obj;
-      _this.checkIfDone();
-    });
+    _this.resolveGradient(obj, 'fill');
+    _this.resolveGradient(obj, 'stroke');
+    _this.reviver && _this.reviver(el, obj);
+    _this.instances[index] = obj;
+    _this.checkIfDone();
   };
 };
 
-fabric.ElementsParser.prototype.resolveFillers = function(obj, callback) {
-  var counter,
-      _callback = function(_obj) {
-        counter++;
-        if (counter === 2) {
-          callback(_obj);
-        }
-      };
-  this.fillers.forEach(function(filler) {
-    var instanceFillValue = obj.get(filler);
-    if (!(/^url\(/).test(instanceFillValue)) {
-      if (counter) {
-        _callback(obj);
-        return;
-      }
-    }
-    var fillerId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-    if (fabric.gradientDefs[this.svgUid][fillerId]) {
-      obj.set(filler, fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][fillerId], obj));
-      _callback(obj);
-    }
-    else if (fabric.patternDefs[this.svgUid][fillerId]) {
-      fabric.Pattern.fromElement(fabric.patternDefs[this.svgUid][fillerId], obj, function(_pattern) {
-        obj.set(filler, _pattern);
-        _callback(obj);
-      });
-    }
-  });
+fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+
+  var instanceFillValue = obj.get(property);
+  if (!(/^url\(/).test(instanceFillValue)) {
+    return;
+  }
+  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+  if (fabric.gradientDefs[this.svgUid][gradientId]) {
+    obj.set(property,
+      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+  }
 };
 
 fabric.ElementsParser.prototype.checkIfDone = function() {

@@ -404,8 +404,9 @@
      */
     _getCacheCanvasDimensions: function() {
       var dim = this.callSuper('_getCacheCanvasDimensions');
-      dim.width += 2 * this.fontSize;
-      dim.height += 2 * this.fontSize;
+      var fontSize = Math.ceil(this.fontSize) * 2;
+      dim.width += fontSize;
+      dim.height += fontSize;
       return dim;
     },
 
@@ -476,11 +477,10 @@
      */
     _renderChars: function(method, ctx, chars, left, top) {
       // remove Text word from method var
-      var shortM = method.slice(0, -4), char, width,
-          filler = this[shortM];
-      if (filler.toLive) {
-        var offsetX = -this.width / 2 + filler.offsetX || 0,
-            offsetY = -this.height / 2 + filler.offsetY || 0;
+      var shortM = method.slice(0, -4), char, width;
+      if (this[shortM].toLive) {
+        var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
+            offsetY = -this.height / 2 + this[shortM].offsetY || 0;
         ctx.save();
         ctx.translate(offsetX, offsetY);
         left -= offsetX;
@@ -499,7 +499,7 @@
       else {
         ctx[method](chars, left, top);
       }
-      filler.toLive && ctx.restore();
+      this[shortM].toLive && ctx.restore();
     },
 
     /**
@@ -714,13 +714,8 @@
      * @private
      */
     _shouldClearDimensionCache: function() {
-      var shouldClear = false;
-      if (this._forceClearCache) {
-        this._forceClearCache = false;
-        this.dirty = true;
-        return true;
-      }
-      shouldClear = this.hasStateChanged('_dimensionAffectingProps');
+      var shouldClear = this._forceClearCache;
+      shouldClear || (shouldClear = this.hasStateChanged('_dimensionAffectingProps'));
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
         this.dirty = true;
