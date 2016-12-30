@@ -34,9 +34,18 @@
 
   test('constructor', function() {
     ok(fabric.Pattern);
-
     var pattern = createPattern();
     ok(pattern instanceof fabric.Pattern, 'should inherit from fabric.Pattern');
+  });
+
+  asyncTest('constructor with source string and with callback', function() {
+    function callback(pattern) {
+      equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
+      start();
+    }
+    new fabric.Pattern({
+      source: IMG_SRC
+    }, callback);
   });
 
   test('properties', function() {

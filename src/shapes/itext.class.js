@@ -1173,11 +1173,10 @@
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as argument
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {fabric.IText} instance of fabric.IText
    */
-  fabric.IText.fromObject = function(object, callback) {
-    var iText = new fabric.IText(object.text, clone(object));
-    callback && callback(iText);
-    return iText;
+  fabric.IText.fromObject = function(object, callback, forceAsync) {
+    return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
   };
 })();

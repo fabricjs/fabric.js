@@ -787,17 +787,10 @@
      */
     clear: function () {
       this._objects.length = 0;
-<<<<<<< HEAD
       this.backgroundObject = null;
       this.overlayObject = null;
       this.backgroundFill = '';
       this.overlayFill = '';
-=======
-      this.backgroundImage = null;
-      this.overlayImage = null;
-      this.backgroundColor = '';
-      this.overlayColor = '';
->>>>>>> 3c0fe81... be more strict on when not to re render (#3594)
       if (this._hasITextHandlers) {
         this.off('selection:cleared', this._canvasITextSelectionClearedHanlder);
         this.off('object:selected', this._canvasITextSelectionClearedHanlder);
@@ -1098,17 +1091,10 @@
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
       var data = { };
 
-<<<<<<< HEAD
       if (this.backgroundFill) {
         data.backgroundFill = this.backgroundFill.toObject
          ? this.backgroundFill.toObject(propertiesToInclude)
          : this.backgroundFill;
-=======
-      if (this.backgroundColor) {
-        data.background = this.backgroundColor.toObject
-          ? this.backgroundColor.toObject(propertiesToInclude)
-          : this.backgroundColor;
->>>>>>> 3c0fe81... be more strict on when not to re render (#3594)
       }
       if (this.overlayFill) {
         data.overlayFill = this.overlayFill.toObject
