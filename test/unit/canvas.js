@@ -670,7 +670,8 @@
     ok(typeof canvas.toObject == 'function');
     canvas.backgroundFill = 'red';
     var expectedObject = {
-      objects: canvas.getObjects()
+      objects: canvas.getObjects(),
+      backgroundFill: 'red'
     };
     deepEqual(expectedObject, canvas.toObject());
 
@@ -684,7 +685,8 @@
     ok(typeof canvas.toDatalessObject == 'function');
     canvas.backgroundFill = 'blue';
     var expectedObject = {
-      objects: canvas.getObjects()
+      objects: canvas.getObjects(),
+      backgroundFill: 'blue'
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
 
@@ -812,6 +814,7 @@
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundFill, 'green', 'Color should be set properly');
       equal(c2.overlayFill, 'yellow', 'Color should be set properly');
+      start();
     });
   });
 
@@ -832,6 +835,7 @@
       ok(fired, 'Callback should be fired even if no "objects" property exists');
       equal(c2.backgroundFill, 'green', 'Color should be set properly');
       equal(c2.overlayFill, 'yellow', 'Color should be set properly');
+      start();
     });
   });
 
