@@ -523,7 +523,7 @@
     globalCompositeOperation: 'source-over',
 
     /**
-     * Background color of an object. Only works with text objects at the moment.
+     * Background color of an object.
      * @type String
      * @default
      */
@@ -860,8 +860,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
-        width: width,
-        height: height,
+        width: Math.ceil(width) + 2,
+        height: Math.ceil(height) + 2,
         zoomX: zoomX,
         zoomY: zoomY
       };
@@ -893,9 +893,9 @@
         this.cacheHeight = height;
         this.zoomX = zoomX;
         this.zoomY = zoomY;
-        return true
+        return true;
       }
-      return false
+      return false;
     },
 
     /**
@@ -1139,10 +1139,16 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
+      else if (key === 'dirty' && this.group) {
+        this.group.set('dirty', value);
+      }
 
       this[key] = value;
 
       if (this.cacheProperties.indexOf(key) > -1) {
+        if (this.group) {
+          this.group.set('dirty', true);
+        }
         this.dirty = true;
       }
 

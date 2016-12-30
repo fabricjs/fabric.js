@@ -328,10 +328,8 @@
         }
         var klass = fabric.util.getKlass(o.type, namespace);
         klass.fromObject(o, function (obj, error) {
-          if (!error) {
-            enlivenedObjects[index] = obj;
-            reviver && reviver(o, obj);
-          }
+          error || (enlivenedObjects[index] = obj);
+          reviver && reviver(o, obj, error);
           onLoaded();
         }, forceAsync);
       });

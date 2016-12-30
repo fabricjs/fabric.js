@@ -485,7 +485,7 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', ['sourcePath', 'pathOffset'].concat(propertiesToInclude)), {
-        path: this.path.map(function(item) { return item.slice() })
+        path: this.path.map(function(item) { return item.slice(); })
       });
       return o;
     },
