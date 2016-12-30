@@ -1896,17 +1896,18 @@
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
-  fabric.Object._fromObject = function(className, object, callback, forceAsync) {
+  fabric.Object._fromObject = function(className, object, callback, forceAsync, extraParam) {
+    var klass = fabric[className];
     if (forceAsync) {
       fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
         object.fill = patterns[0];
         object.stroke = patterns[1];
-        var instance = new fabric[className](object);
+        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
         callback && callback(instance);
       });
     }
     else {
-      var instance = new fabric[className](object);
+      var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
       callback && callback(instance);
       return instance;
     }

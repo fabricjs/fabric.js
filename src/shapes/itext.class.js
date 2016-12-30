@@ -1178,6 +1178,6 @@
    * @return {fabric.IText} instance of fabric.IText
    */
   fabric.IText.fromObject = function(object, callback, forceAsync) {
-    return fabric.Text._fromObject('IText', object.text, object, callback, forceAsync);
+    return fabric.Object._fromObject('IText', object.text, object, callback, forceAsync, 'text');
   };
 })();

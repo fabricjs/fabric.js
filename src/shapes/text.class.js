@@ -1203,23 +1203,7 @@
    * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromObject = function(object, callback, forceAsync) {
-    return fabric.Text._fromObject('Text', object.text, object, callback, forceAsync);
-  };
-
-  fabric.Text._fromObject = function(className, text, options, callback, forceAsync) {
-    if (forceAsync) {
-      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
-        object.fill = patterns[0];
-        object.stroke = patterns[1];
-        var instance = new fabric[className](text, clone(options));
-        callback && callback(instance);
-      });
-    }
-    else {
-      var instance = new fabric[className](text, clone(options));
-      callback && callback(instance);
-      return instance;
-    }
+    return fabric.Object._fromObject('Text', object.text, object, callback, forceAsync, 'text');
   };
 
   fabric.util.createAccessors(fabric.Text);
