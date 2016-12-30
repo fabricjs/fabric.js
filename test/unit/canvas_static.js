@@ -854,7 +854,8 @@
     ok(typeof canvas.toObject == 'function');
     canvas.backgroundFill = 'yellow';
     var expectedObject = {
-      objects: canvas.getObjects()
+      objects: canvas.getObjects(),
+      backgroundFill: 'yellow'
     };
     deepEqual(expectedObject, canvas.toObject());
 
@@ -889,7 +890,8 @@
     ok(typeof canvas.toDatalessObject == 'function');
     canvas.backgroundFill = 'purple';
     var expectedObject = {
-      objects: canvas.getObjects()
+      objects: canvas.getObjects(),
+      backgroundFill: 'purple'
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
 
