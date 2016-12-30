@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
-      clone  = fabric.util.object.clone;
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
