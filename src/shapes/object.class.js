@@ -1329,7 +1329,7 @@
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
         ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx, this, this instanceof fabric.Text)
+          ? this.stroke.toLive(ctx, this)
           : this.stroke;
       }
     },
@@ -1337,7 +1337,7 @@
     _setFillStyles: function(ctx) {
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx, this, this instanceof fabric.Text)
+          ? this.fill.toLive(ctx, this)
           : this.fill;
       }
     },
@@ -1451,13 +1451,6 @@
       var offsetX = -this.width / 2 + filler.offsetX || 0,
           offsetY = -this.height / 2 + filler.offsetY || 0;
       ctx.translate(offsetX, offsetY);
-      if (!filler.scaleWithObject) {
-        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
-      }
-      ctx.scale(filler.scaleX, filler.scaleY);
-      if (filler.angle) {
-        ctx.rotate(degreesToRadians(filler.angle));
-      }
     },
 
     /**
@@ -1494,7 +1487,6 @@
       }
 
       ctx.save();
-
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
       this._applyPatternGradientTransform(ctx, this.stroke);
       ctx.stroke();

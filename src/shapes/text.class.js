@@ -1199,12 +1199,27 @@
    * @memberOf fabric.Text
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {fabric.Text} Instance of fabric.Text
    */
-  fabric.Text.fromObject = function(object, callback) {
-    var text = new fabric.Text(object.text, clone(object));
-    callback && callback(text);
-    return text;
+  fabric.Text.fromObject = function(object, callback, forceAsync) {
+    return fabric.Text._fromObject('Text', object.text, object, callback, forceAsync);
+  };
+
+  fabric.Text._fromObject = function(className, text, options, callback, forceAsync) {
+    if (forceAsync) {
+      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+        object.fill = patterns[0];
+        object.stroke = patterns[1];
+        var instance = new fabric[className](text, clone(options));
+        callback && callback(instance);
+      });
+    }
+    else {
+      var instance = new fabric[className](text, clone(options));
+      callback && callback(instance);
+      return instance;
+    }
   };
 
   fabric.util.createAccessors(fabric.Text);
