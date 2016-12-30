@@ -233,7 +233,7 @@
    * @return {fabric.Polygon} Instance of fabric.Polygon
    */
   fabric.Polygon.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Polygon', object.text, object, callback, forceAsync, 'points');
+    return fabric.Object._fromObject('Polygon', object, callback, forceAsync, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

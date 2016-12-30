@@ -940,7 +940,7 @@
       });
     }
     else {
-      return fabric.Object._fromObject('Path', object.text, object, callback, forceAsync, 'path');
+      return fabric.Object._fromObject('Path', object, callback, forceAsync, 'path');
     }
   };
 

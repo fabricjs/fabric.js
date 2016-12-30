@@ -177,7 +177,7 @@
    * @return {fabric.Polyline} Instance of fabric.Polyline
    */
   fabric.Polyline.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Polyline', object.text, object, callback, forceAsync, 'points');
+    return fabric.Object._fromObject('Polyline', object, callback, forceAsync, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

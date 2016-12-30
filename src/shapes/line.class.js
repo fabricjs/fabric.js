@@ -330,7 +330,7 @@
   fabric.Line.fromObject = function(object, callback, forceAsync) {
     var points = [object.x1, object.y1, object.x2, object.y2];
     object.points = points;
-    return fabric.Object._fromObject('Line', object.text, object, callback, forceAsync, 'points');
+    return fabric.Object._fromObject('Line', object, callback, forceAsync, 'points');
   };
 
   /**

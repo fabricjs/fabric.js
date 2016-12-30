@@ -458,7 +458,7 @@
    * @return {fabric.Textbox} instance of fabric.Textbox
    */
   fabric.Textbox.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Textbox', object.text, object, callback, forceAsync, 'text');
+    return fabric.Object._fromObject('Textbox', object, callback, forceAsync, 'text');
   };
 
   /**
