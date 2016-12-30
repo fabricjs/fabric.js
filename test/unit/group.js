@@ -544,7 +544,7 @@
     var dims = obj._getCacheCanvasDimensions();
     g1.scaleX = 2;
     var dims2 = obj._getCacheCanvasDimensions();
-    equal(dims2.width, dims.width * g1.scaleX, 'width of cache has increased with group scale');
+    equal((dims2.width - 2), (dims.width - 2) * g1.scaleX, 'width of cache has increased with group scale');
   });
 
   test('test group transformMatrix', function() {

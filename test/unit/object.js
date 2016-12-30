@@ -1506,29 +1506,29 @@
   test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function() {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 10, height: 10, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
     object.strokeWidth = 2;
     dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 24, height: 36, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+    deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
   });
 
   test('_updateCacheCanvas check if cache canvas should be updated', function() {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     object._createCacheCanvas();
-    equal(object.cacheWidth, 10, 'current cache dimensions are saved');
-    equal(object.cacheHeight, 10, 'current cache dimensions are saved');
+    equal(object.cacheWidth, 12, 'current cache dimensions are saved');
+    equal(object.cacheHeight, 12, 'current cache dimensions are saved');
     equal(object._updateCacheCanvas(), false, 'second execution of cache canvas return false');
     object.scaleX = 2;
     equal(object._updateCacheCanvas(), true, 'if scale change, it returns true');
-    equal(object.cacheWidth, 20, 'current cache dimensions is updated');
+    equal(object.cacheWidth, 22, 'current cache dimensions is updated');
     equal(object.zoomX, 2, 'current scale level is saved');
     object.width = 2;
     equal(object._updateCacheCanvas(), true, 'if dimension change, it returns true');
-    equal(object.cacheWidth, 4, 'current cache dimensions is updated');
+    equal(object.cacheWidth, 6, 'current cache dimensions is updated');
     object.strokeWidth = 2;
     equal(object._updateCacheCanvas(), true, 'if strokeWidth change, it returns true');
   });
