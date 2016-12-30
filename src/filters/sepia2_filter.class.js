@@ -54,10 +54,14 @@
   /**
    * Returns filter instance from an object representation
    * @static
+   * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Sepia2} Instance of fabric.Image.filters.Sepia2
    */
-  fabric.Image.filters.Sepia2.fromObject = function() {
-    return new fabric.Image.filters.Sepia2();
+  fabric.Image.filters.Sepia2.fromObject = function(object, callback) {
+    object = object || { };
+    object.type = 'Sepia2';
+    return new fabric.Image.filters.BaseFilter.fromObject(object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

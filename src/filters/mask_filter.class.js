@@ -92,7 +92,7 @@
   fabric.Image.filters.Mask.fromObject = function(object, callback) {
     fabric.util.loadImage(object.mask.src, function(img) {
       object.mask = new fabric.Image(img, object.mask);
-      callback && callback(new fabric.Image.filters.Mask(object));
+      return fabric.Image.filters.BaseFilter.fromObject(object, callback);
     });
   };
 

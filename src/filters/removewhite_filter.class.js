@@ -93,10 +93,9 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.RemoveWhite} Instance of fabric.Image.filters.RemoveWhite
    */
-  fabric.Image.filters.RemoveWhite.fromObject = function(object) {
-    return new fabric.Image.filters.RemoveWhite(object);
-  };
+  fabric.Image.filters.RemoveWhite.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

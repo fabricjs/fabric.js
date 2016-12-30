@@ -4,6 +4,7 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
       coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 },
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
@@ -328,9 +329,17 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromObject = function(object, callback, forceAsync) {
-    var points = [object.x1, object.y1, object.x2, object.y2];
-    object.points = points;
-    return fabric.Object._fromObject('Line', object, callback, forceAsync, 'points');
+    function _callback(instance) {
+      delete instance.points;
+      callback && callback(instance);
+    };
+    var options = clone(object, true);
+    options.points = [object.x1, object.y1, object.x2, object.y2];
+    var line = fabric.Object._fromObject('Line', options, _callback, forceAsync, 'points');
+    if (line) {
+      delete line.points;
+    }
+    return line;
   };
 
   /**

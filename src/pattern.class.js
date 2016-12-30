@@ -47,7 +47,7 @@
 
       this.id = fabric.Object.__uid++;
       this.setOptions(options);
-      if (!options.source || (options.source && options.source !== 'string')) {
+      if (!options.source || (options.source && typeof options.source !== 'string')) {
         callback && callback(this);
         return;
       }

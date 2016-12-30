@@ -149,10 +149,9 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Convolute} Instance of fabric.Image.filters.Convolute
    */
-  fabric.Image.filters.Convolute.fromObject = function(object) {
-    return new fabric.Image.filters.Convolute(object);
-  };
+  fabric.Image.filters.Convolute.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

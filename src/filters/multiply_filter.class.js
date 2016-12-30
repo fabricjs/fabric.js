@@ -84,10 +84,9 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Multiply} Instance of fabric.Image.filters.Multiply
    */
-  fabric.Image.filters.Multiply.fromObject = function(object) {
-    return new fabric.Image.filters.Multiply(object);
-  };
+  fabric.Image.filters.Multiply.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);
