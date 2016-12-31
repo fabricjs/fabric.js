@@ -296,7 +296,7 @@
      */
     isCacheDirty: function() {
       if (this.callSuper('isCacheDirty')) {
-        return true
+        return true;
       }
       if (!this.statefullCache) {
         return false;
@@ -305,7 +305,7 @@
         if (this._objects[i].isCacheDirty(true)) {
           var dim = this._getNonTransformedDimensions();
           this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
-          return true
+          return true;
         }
       }
       return false;

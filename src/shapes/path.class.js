@@ -485,7 +485,7 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', ['sourcePath', 'pathOffset'].concat(propertiesToInclude)), {
-        path: this.path.map(function(item) { return item.slice() })
+        path: this.path.map(function(item) { return item.slice(); })
       });
       return o;
     },
@@ -922,8 +922,9 @@
    * @memberOf fabric.Path
    * @param {Object} object
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    */
-  fabric.Path.fromObject = function(object, callback) {
+  fabric.Path.fromObject = function(object, callback, forceAsync) {
     // remove this pattern rom 2.0, accept just object.
     var path;
     if (typeof object.path === 'string') {
@@ -939,9 +940,7 @@
       });
     }
     else {
-      path = new fabric.Path(object.path, object);
-      callback && callback(path);
-      return path;
+      return fabric.Object._fromObject('Path', object, callback, forceAsync, 'path');
     }
   };
 

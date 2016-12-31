@@ -527,6 +527,26 @@
     equal(rect1.canvas, canvas);
   });
 
+  test('dirty flag propagation from children up', function() {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    g1.dirty = false;
+    obj.dirty = false;
+    equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('fill', 'red');
+    equal(obj.dirty, true, 'Obj has dirty flag set');
+    equal(g1.dirty, true, 'Group has dirty flag set');
+  });
+
+  test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by group', function() {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    var dims = obj._getCacheCanvasDimensions();
+    g1.scaleX = 2;
+    var dims2 = obj._getCacheCanvasDimensions();
+    equal((dims2.width - 2), (dims.width - 2) * g1.scaleX, 'width of cache has increased with group scale');
+  });
+
   test('test group transformMatrix', function() {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1}),

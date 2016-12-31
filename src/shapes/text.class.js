@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
       MIN_TEXT_WIDTH = 2;
@@ -404,8 +403,9 @@
      */
     _getCacheCanvasDimensions: function() {
       var dim = this.callSuper('_getCacheCanvasDimensions');
-      dim.width += 2 * this.fontSize;
-      dim.height += 2 * this.fontSize;
+      var fontSize = Math.ceil(this.fontSize) * 2;
+      dim.width += fontSize;
+      dim.height += fontSize;
       return dim;
     },
 
@@ -713,13 +713,8 @@
      * @private
      */
     _shouldClearDimensionCache: function() {
-      var shouldClear = false;
-      if (this._forceClearCache) {
-        this._forceClearCache = false;
-        this.dirty = true;
-        return true;
-      }
-      shouldClear = this.hasStateChanged('_dimensionAffectingProps');
+      var shouldClear = this._forceClearCache;
+      shouldClear || (shouldClear = this.hasStateChanged('_dimensionAffectingProps'));
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
         this.dirty = true;
@@ -1203,12 +1198,11 @@
    * @memberOf fabric.Text
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
+   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {fabric.Text} Instance of fabric.Text
    */
-  fabric.Text.fromObject = function(object, callback) {
-    var text = new fabric.Text(object.text, clone(object));
-    callback && callback(text);
-    return text;
+  fabric.Text.fromObject = function(object, callback, forceAsync) {
+    return fabric.Object._fromObject('Text', object, callback, forceAsync, 'text');
   };
 
   fabric.util.createAccessors(fabric.Text);

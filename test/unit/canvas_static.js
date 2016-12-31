@@ -42,7 +42,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path };
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -113,7 +113,7 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) { throw err };
+        if (err) { throw err; };
         img.src = imgData;
         img._src = src;
         callback && callback();
@@ -923,7 +923,7 @@
     ok(!canvas.isEmpty());
   });
 
-  test('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(PATH_JSON, function(){
@@ -946,12 +946,12 @@
       equal(obj.get('flipX'), false);
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
-
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with json object', function() {
+  asyncTest('loadFromJSON with json object', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
@@ -977,6 +977,7 @@
       equal(obj.get('opacity'), 1);
 
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
@@ -992,7 +993,7 @@
     });
   });
 
-  test('loadFromJSON custom properties', function() {
+  asyncTest('loadFromJSON custom properties', function() {
     var rect = new fabric.Rect({ width: 10, height: 20 });
     rect.padding = 123;
     rect.foo = 'bar';
@@ -1011,6 +1012,7 @@
 
       equal(obj.padding, 123, 'padding on object is set properly');
       equal(obj.foo, 'bar', '"foo" property on object is set properly');
+      start();
     });
   });
 

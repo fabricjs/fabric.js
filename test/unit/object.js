@@ -1439,7 +1439,7 @@
       top: 40,
       width: 40,
       height: 50,
-      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false) }
+      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false); }
     });
 
     equal(typeof object.clipTo, 'function');
@@ -1465,6 +1465,71 @@
       scaleX: object.scaleX * group.scaleX,
       scaleY: object.scaleY * group.scaleY
     });
+  });
+
+  test('dirty flag on set property', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    equal(object.dirty, false, 'object starts with dirty flag disabled');
+    object.set('propC', '3');
+    equal(object.dirty, false, 'after setting a property out of cache, dirty flag is still false');
+    object.set('propA', '2');
+    equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
+  });
+
+  test('isCacheDirty statefullCache disabled', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    object.statefullCache = false;
+    object._createCacheCanvas();
+    equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
+    object.dirty = true;
+    equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
+  });
+
+  test('isCacheDirty statefullCache enabled', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    object.statefullCache = true;
+    object.propA = 'A';
+    object.setupState({ propertySet: 'cacheProperties' });
+    object._createCacheCanvas();
+    equal(object.isCacheDirty(), false, 'object is not dirty');
+    object.propA = 'B';
+    equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');
+  });
+
+  test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function() {
+    var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    object.strokeWidth = 2;
+    dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    object.scaleX = 2;
+    object.scaleY = 3;
+    dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+  });
+
+  test('_updateCacheCanvas check if cache canvas should be updated', function() {
+    var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
+    object._createCacheCanvas();
+    equal(object.cacheWidth, 12, 'current cache dimensions are saved');
+    equal(object.cacheHeight, 12, 'current cache dimensions are saved');
+    equal(object._updateCacheCanvas(), false, 'second execution of cache canvas return false');
+    object.scaleX = 2;
+    equal(object._updateCacheCanvas(), true, 'if scale change, it returns true');
+    equal(object.cacheWidth, 22, 'current cache dimensions is updated');
+    equal(object.zoomX, 2, 'current scale level is saved');
+    object.width = 2;
+    equal(object._updateCacheCanvas(), true, 'if dimension change, it returns true');
+    equal(object.cacheWidth, 6, 'current cache dimensions is updated');
+    object.strokeWidth = 2;
+    equal(object._updateCacheCanvas(), true, 'if strokeWidth change, it returns true');
   });
 
   test('_setShadow', function(){

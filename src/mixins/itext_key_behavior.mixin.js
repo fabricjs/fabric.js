@@ -616,6 +616,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
     }
 
+    this.set('dirty', true);
     this.setSelectionEnd(this.selectionStart);
 
     this._removeExtraneousStyles();

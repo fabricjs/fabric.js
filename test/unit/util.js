@@ -2,7 +2,7 @@
 
   QUnit.module('fabric.util');
 
-  function K (x) { return x }
+  function K (x) { return x; }
 
   function _createImageElement() {
     return fabric.isLikelyNode
@@ -12,7 +12,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path };
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -267,7 +267,7 @@
     ok(typeof fabric.util.toArray == 'function');
 
     deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    deepEqual([1, 3], fabric.util.toArray((function(){ return arguments })(1, 3)));
+    deepEqual([1, 3], fabric.util.toArray((function(){ return arguments; })(1, 3)));
 
     var nodelist = fabric.document.getElementsByTagName('div'),
         converted = fabric.util.toArray(nodelist);
@@ -650,9 +650,9 @@
     ok(typeof Array.prototype.filter === 'function');
 
     var arr = [1,2,3,4,5];
-    deepEqual([3,4,5], arr.filter(function(val){ return val > 2 }));
-    deepEqual([], arr.filter(function(val){ return val > 5 }));
-    deepEqual([1,2], arr.filter(function(val){ return val <= 2 }));
+    deepEqual([3,4,5], arr.filter(function(val){ return val > 2; }));
+    deepEqual([], arr.filter(function(val){ return val > 5; }));
+    deepEqual([1,2], arr.filter(function(val){ return val <= 2; }));
   });
 
   test('Array.prototype.reduce', function() {
@@ -660,14 +660,14 @@
 
     var arr = [1,2,3,4,5];
     equal(15,
-      arr.reduce(function(memo, val) { return memo + val }), 0);
+      arr.reduce(function(memo, val) { return memo + val; }), 0);
 
     deepEqual(['1!', '2!', '3!', '4!', '5!'],
-      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, []));
+      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo; }, []));
 
     arr = 'foobar'.split('');
     equal('f0o1o2b3a4r5',
-      arr.reduce(function(memo, val, index) { return memo + val + index }, ''));
+      arr.reduce(function(memo, val, index) { return memo + val + index; }, ''));
   });
 
   test('fabric.util.createClass', function() {
@@ -760,9 +760,9 @@
   test('fabric.util.array.invoke', function() {
     ok(typeof fabric.util.array.invoke === 'function');
 
-    var obj1 = { toString: function(){ return 'obj1' } };
-    var obj2 = { toString: function(){ return 'obj2' } };
-    var obj3 = { toString: function(){ return 'obj3' } };
+    var obj1 = { toString: function(){ return 'obj1'; } };
+    var obj2 = { toString: function(){ return 'obj2'; } };
+    var obj3 = { toString: function(){ return 'obj3'; } };
 
     deepEqual(['obj1', 'obj2', 'obj3'],
       fabric.util.array.invoke([obj1, obj2, obj3], 'toString'));
@@ -782,9 +782,9 @@
     equal(-3, fabric.util.array.min([-1, -2, -3]));
     equal('a', fabric.util.array.min(['a', 'c', 'b']));
 
-    var obj1 = { valueOf: function(){ return 1 } };
-    var obj2 = { valueOf: function(){ return 2 } };
-    var obj3 = { valueOf: function(){ return 3 } };
+    var obj1 = { valueOf: function(){ return 1; } };
+    var obj2 = { valueOf: function(){ return 2; } };
+    var obj3 = { valueOf: function(){ return 3; } };
 
     equal(obj1, fabric.util.array.min([obj1, obj3, obj2]));
   });
@@ -797,9 +797,9 @@
     equal(-1, fabric.util.array.max([-1, -2, -3]));
     equal('c', fabric.util.array.max(['a', 'c', 'b']));
 
-    var obj1 = { valueOf: function(){ return 1 } };
-    var obj2 = { valueOf: function(){ return 2 } };
-    var obj3 = { valueOf: function(){ return 3 } };
+    var obj1 = { valueOf: function(){ return 1; } };
+    var obj2 = { valueOf: function(){ return 2; } };
+    var obj3 = { valueOf: function(){ return 3; } };
 
     equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
   });

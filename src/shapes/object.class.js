@@ -4,6 +4,7 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
@@ -523,7 +524,7 @@
     globalCompositeOperation: 'source-over',
 
     /**
-     * Background color of an object. Only works with text objects at the moment.
+     * Background color of an object.
      * @type String
      * @default
      */
@@ -860,8 +861,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
-        width: width,
-        height: height,
+        width: Math.ceil(width) + 2,
+        height: Math.ceil(height) + 2,
         zoomX: zoomX,
         zoomY: zoomY
       };
@@ -893,9 +894,9 @@
         this.cacheHeight = height;
         this.zoomX = zoomX;
         this.zoomY = zoomY;
-        return true
+        return true;
       }
-      return false
+      return false;
     },
 
     /**
@@ -948,8 +949,8 @@
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
-      this._initPattern(options);
       this._initClipping(options);
+      this._initPattern(options);
     },
 
     /**
@@ -1007,7 +1008,7 @@
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
             globalCompositeOperation: this.globalCompositeOperation,
-            transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : this.transformMatrix,
+            transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : null,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
           };
@@ -1139,10 +1140,16 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
+      else if (key === 'dirty' && this.group) {
+        this.group.set('dirty', value);
+      }
 
       this[key] = value;
 
       if (this.cacheProperties.indexOf(key) > -1) {
+        if (this.group) {
+          this.group.set('dirty', true);
+        }
         this.dirty = true;
       }
 
@@ -1432,6 +1439,24 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} filler fabric.Pattern or fabric.Gradient
+     */
+    _applyPatternGradientTransform: function(ctx, filler) {
+      if (!filler.toLive) {
+        return;
+      }
+      var transform = filler.gradientTransform || filler.patternTransform;
+      if (transform) {
+        ctx.transform.apply(ctx, transform);
+      }
+      var offsetX = -this.width / 2 + filler.offsetX || 0,
+          offsetY = -this.height / 2 + filler.offsetY || 0;
+      ctx.translate(offsetX, offsetY);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
       if (!this.fill) {
@@ -1439,15 +1464,7 @@
       }
 
       ctx.save();
-      if (this.fill.gradientTransform) {
-        var g = this.fill.gradientTransform;
-        ctx.transform.apply(ctx, g);
-      }
-      if (this.fill.toLive) {
-        ctx.translate(
-          -this.width / 2 + this.fill.offsetX || 0,
-          -this.height / 2 + this.fill.offsetY || 0);
-      }
+      this._applyPatternGradientTransform(ctx, this.fill);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1471,17 +1488,8 @@
       }
 
       ctx.save();
-
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      if (this.stroke.gradientTransform) {
-        var g = this.stroke.gradientTransform;
-        ctx.transform.apply(ctx, g);
-      }
-      if (this.stroke.toLive) {
-        ctx.translate(
-          -this.width / 2 + this.stroke.offsetX || 0,
-          -this.height / 2 + this.stroke.offsetY || 0);
-      }
+      this._applyPatternGradientTransform(ctx, this.stroke);
       ctx.stroke();
       ctx.restore();
     },
@@ -1848,7 +1856,7 @@
           objectLeftTop = this._getLeftTopCoords();
       if (this.angle) {
         pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, fabric.util.degreesToRadians(-this.angle));
+          pClicked, objectLeftTop, degreesToRadians(-this.angle));
       }
       return {
         x: pClicked.x - objectLeftTop.x,
@@ -1888,6 +1896,24 @@
    * @type Number
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
+
+  fabric.Object._fromObject = function(className, object, callback, forceAsync, extraParam) {
+    var klass = fabric[className];
+    object = clone(object, true);
+    if (forceAsync) {
+      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+        object.fill = patterns[0];
+        object.stroke = patterns[1];
+        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
+        callback && callback(instance);
+      });
+    }
+    else {
+      var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
+      callback && callback(instance);
+      return instance;
+    }
+  };
 
   /**
    * Unique id used internally when creating SVG elements
