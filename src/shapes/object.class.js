@@ -37,7 +37,7 @@
    * @fires mouseover
    * @fires mouseout
    */
-  fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
+  fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
 
     /**
      * Retrieves object's {@link fabric.Object#clipTo|clipping function}
@@ -1783,7 +1783,6 @@
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
 
   extend(fabric.Object.prototype, fabric.Observable);
-  extend(fabric.Object.prototype, fabric.CommonMethods);
 
   /**
    * Defines the number of fraction digits to use when serializing object values.

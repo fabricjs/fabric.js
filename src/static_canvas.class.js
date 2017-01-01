@@ -28,7 +28,7 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass( /** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -436,7 +436,8 @@
     __setBgOverlayColor: function(property, color, callback) {
       this[property] = color;
       this._initGradient(color, property);
-      this._initPattern(color, property, callback);
+      this._initPattern(color, property);
+      callback && callback();
       return this;
     },
 
@@ -1579,7 +1580,6 @@
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
   extend(fabric.StaticCanvas.prototype, fabric.Collection);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
-  extend(fabric.StaticCanvas.prototype, fabric.CommonMethods);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
 

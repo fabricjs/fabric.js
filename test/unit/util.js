@@ -12,7 +12,8 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path; };
+    var isLocalHost = /^localhost:/.test(path);
+    if (isAbsolute && !isLocalHost) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -22,7 +23,7 @@
 
   var IMG_URL = fabric.isLikelyNode
     ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
-    : getAbsolutePath('test/fixtures/very_large_image.jpg');
+    : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
