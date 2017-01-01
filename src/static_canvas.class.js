@@ -28,7 +28,7 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -412,26 +412,10 @@
      * @param {Function} [callback] Callback is invoked when color is set
      */
     __setBgOverlayFill: function(property, color, callback) {
-      if (color && color.source && !(color instanceof fabric.Pattern)) {
-        var _this = this;
-        fabric.util.loadImage(color.source, function(img) {
-          _this[property] = new fabric.Pattern({
-            source: img,
-            repeat: color.repeat,
-            offsetX: color.offsetX,
-            offsetY: color.offsetY
-          });
-          callback && callback();
-        });
-      }
-      else if (color && color.colorStops && !(color instanceof fabric.Gradient)) {
-        _this[property] = new fabric.Gradient(color);
-      }
-      else {
-        this[property] = color;
-        callback && callback();
-      }
-
+      this[property] = color;
+      this._initGradient(color, property);
+      this._initPattern(color, property);
+      callback && callback();
       return this;
     },
 
@@ -457,11 +441,11 @@
      * @param {Object} [options] Options object
      */
     _initOptions: function (options) {
-      for (var prop in options) {
-        this[prop] = options[prop];
-      }
-      this._initGradient(options);
-      this._initPattern(options);
+      this._setOptions(options);
+      this._initGradient(options.backgroundFill, 'backgroundFill');
+      this._initGradient(options.overlayFill, 'overlayFill');
+      this._initPattern(options.backgroundFill, 'backgroundFill');
+      this._initPattern(options.overlayFill, 'overlayFill');
     },
 
     /**
@@ -482,25 +466,6 @@
       this.lowerCanvasEl.style.height = this.height + 'px';
 
       this.viewportTransform = this.viewportTransform.slice();
-    },
-    /**
-     * @private
-     * @param {Object} [options] Options object
-     */
-    _initGradient: function(options) {
-      if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
-        this.fill = new fabric.Gradient(options.fill);
-      }
-    },
-
-    /**
-     * @private
-     * @param {Object} [options] Options object
-     */
-    _initPattern: function(options) {
-      if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
-        this.fill = new fabric.Pattern(options.fill);
-      }
     },
 
     /**

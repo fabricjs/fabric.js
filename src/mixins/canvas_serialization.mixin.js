@@ -41,7 +41,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         delete serialized.objects;
         delete serialized.backgroundObject;
         delete serialized.overlayObject;
-        _this._initOptions(serialized);
+        _this._setOptions(serialized);
         _this.automaticRender = automaticRender;
         callback && callback();
       }, reviver);

@@ -707,7 +707,7 @@
   asyncTest('loadFromJSON with json string', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
-    canvas.loadFromJSON(PATH_JSON, function(){
+    canvas.loadFromJSON(PATH_JSON, function() {
       var obj = canvas.item(0);
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
