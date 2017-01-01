@@ -12,8 +12,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    var isLocalHost = /^localhost:/.test(path);
-    if (isAbsolute && !isLocalHost) { return path; };
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
