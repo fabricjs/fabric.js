@@ -1238,11 +1238,11 @@
      * @return {String}
      */
     createSVGRefElementsMarkup: function() {
-      var canvasObj = { width: this.getWidth(), height: this.getHeight() },
+      var _this = this,
           markup = ['backgroundColor', 'overlayColor'].map(function(prop) {
-            var fill = this[prop];
+            var fill = _this[prop];
             if (fill && fill.toLive) {
-              return fill.toSVG(canvasObj, false);
+              return fill.toSVG(_this, false);
             }
           });
       return markup.join('');
