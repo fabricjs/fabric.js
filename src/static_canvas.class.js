@@ -861,7 +861,7 @@
       var object = this[property + 'Color'];
       if (object) {
         ctx.fillStyle = object.toLive
-          ? object.toLive(ctx)
+          ? object.toLive(ctx, this)
           : object;
 
         ctx.fillRect(
@@ -1226,7 +1226,7 @@
           viewBox,
           'xml:space="preserve">\n',
         '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
-        '<defs>',
+        '<defs>\n',
           this.createSVGFontFacesMarkup(),
           this.createSVGRefElementsMarkup(),
         '</defs>\n'
