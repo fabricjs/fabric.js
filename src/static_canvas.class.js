@@ -436,8 +436,7 @@
     __setBgOverlayColor: function(property, color, callback) {
       this[property] = color;
       this._initGradient(color, property);
-      this._initPattern(color, property);
-      callback && callback();
+      this._initPattern(color, property, callback);
       return this;
     },
 
