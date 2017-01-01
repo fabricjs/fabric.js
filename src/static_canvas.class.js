@@ -1227,10 +1227,82 @@
           'xml:space="preserve">\n',
         '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
         '<defs>',
-          fabric.createSVGFontFacesMarkup(this.getObjects()),
-          fabric.createSVGRefElementsMarkup(this),
+          this.createSVGFontFacesMarkup(),
+          this.createSVGRefElementsMarkup(),
         '</defs>\n'
       );
+    },
+
+    /**
+     * Creates markup containing SVG referenced elements like patterns, gradients etc.
+     * @return {String}
+     */
+    createSVGRefElementsMarkup: function() {
+      var canvasObj = { width: this.getWidth(), height: this.getHeight() },
+          markup = ['backgroundColor', 'overlayColor'].map(function(prop) {
+            var fill = this[prop];
+            if (fill && fill.toLive) {
+              return fill.toSVG(canvasObj, false);
+            }
+          });
+      return markup.join('');
+    },
+
+    /**
+     * Creates markup containing SVG font faces,
+     * font URLs for font faces must be collected by developers
+     * and are not extracted from the DOM by fabricjs
+     * @param {Array} objects Array of fabric objects
+     * @return {String}
+     */
+    createSVGFontFacesMarkup: function() {
+      var markup = '', fontList = { }, obj, fontFamily,
+          style, row, rowIndex, _char, charIndex,
+          fontPaths = fabric.fontPaths, objects = this.getObjects();
+
+      for (var i = 0, len = objects.length; i < len; i++) {
+        obj = objects[i];
+        fontFamily = obj.fontFamily;
+        if (obj.type.indexOf('text') === -1 || fontList[fontFamily] || !fontPaths[fontFamily]) {
+          continue;
+        }
+        fontList[fontFamily] = true;
+        if (!obj.styles) {
+          continue;
+        }
+        style = obj.styles;
+        for (rowIndex in style) {
+          row = style[rowIndex];
+          for (charIndex in row) {
+            _char = row[charIndex];
+            fontFamily = _char.fontFamily;
+            if (!fontList[fontFamily] && fontPaths[fontFamily]) {
+              fontList[fontFamily] = true;
+            }
+          }
+        }
+      }
+
+      for (var j in fontList) {
+        markup += [
+          '\t\t@font-face {\n',
+          '\t\t\tfont-family: \'', j, '\';\n',
+          '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
+          '\t\t}\n'
+        ].join('');
+      }
+
+      if (markup) {
+        markup = [
+          '\t<style type="text/css">',
+          '<![CDATA[\n',
+          markup,
+          ']]>',
+          '</style>\n'
+        ].join('');
+      }
+
+      return markup;
     },
 
     /**
