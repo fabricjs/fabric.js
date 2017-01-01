@@ -145,7 +145,7 @@ var filesToInclude = [
 
   'src/mixins/observable.mixin.js',
   'src/mixins/collection.mixin.js',
-
+  'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
   'src/util/arc.js',
   'src/util/lang_array.js',

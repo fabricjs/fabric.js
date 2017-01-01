@@ -28,7 +28,7 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass( /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -434,23 +434,9 @@
      * @param {Function} [callback] Callback is invoked when color is set
      */
     __setBgOverlayColor: function(property, color, callback) {
-      if (color && color.source) {
-        var _this = this;
-        fabric.util.loadImage(color.source, function(img) {
-          _this[property] = new fabric.Pattern({
-            source: img,
-            repeat: color.repeat,
-            offsetX: color.offsetX,
-            offsetY: color.offsetY
-          });
-          callback && callback();
-        });
-      }
-      else {
-        this[property] = color;
-        callback && callback();
-      }
-
+      this[property] = color;
+      this._initGradient(color, property);
+      this._initPattern(color, property, callback);
       return this;
     },
 
@@ -476,9 +462,7 @@
      * @param {Object} [options] Options object
      */
     _initOptions: function (options) {
-      for (var prop in options) {
-        this[prop] = options[prop];
-      }
+      this._setOptions(options);
 
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
@@ -1595,6 +1579,7 @@
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
   extend(fabric.StaticCanvas.prototype, fabric.Collection);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
+  extend(fabric.StaticCanvas.prototype, fabric.CommonMethods);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
 
