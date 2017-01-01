@@ -1351,7 +1351,7 @@
               (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
                 ? this[property].source.height
                 : this.height),
-            '" fill="url(#' + property + 'Pattern)"',
+            '" fill="url(#' + property.id + ')"',
           '></rect>\n'
         );
       }
