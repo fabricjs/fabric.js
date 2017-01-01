@@ -1164,12 +1164,12 @@
       this._setSVGPreamble(markup, options);
       this._setSVGHeader(markup, options);
 
-      this._setSVGBgOverlayColor(markup, 'backgroundColor');
+      this._setSVGBgOverlayColor(markup, 'backgroundFill');
       this._setSVGBgoverlayObject(markup, 'backgroundObject', reviver);
 
       this._setSVGObjects(markup, reviver);
 
-      this._setSVGBgOverlayColor(markup, 'overlayColor');
+      this._setSVGBgOverlayColor(markup, 'overlayFill');
       this._setSVGBgoverlayObject(markup, 'overlayObject', reviver);
 
       markup.push('</svg>');
@@ -1244,7 +1244,7 @@
      */
     createSVGRefElementsMarkup: function() {
       var _this = this,
-          markup = ['backgroundColor', 'overlayColor'].map(function(prop) {
+          markup = ['backgroundFill', 'overlayFill'].map(function(prop) {
             var fill = _this[prop];
             if (fill && fill.toLive) {
               return fill.toSVG(_this, false);
