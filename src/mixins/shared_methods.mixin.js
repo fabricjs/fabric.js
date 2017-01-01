@@ -34,6 +34,9 @@ fabric.CommonMethods = {
     if (filler && filler.source && !(filler instanceof fabric.Pattern)) {
       this.set(property, new fabric.Pattern(filler, callback));
     }
+    else {
+      callback && callback();
+    }
   },
 
   /**
