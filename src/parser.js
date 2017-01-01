@@ -9,7 +9,6 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       parseUnit = fabric.util.parseUnit,
@@ -17,7 +16,7 @@
 
       reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i,
       reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
-      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i,
+      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clipPath|mask)$/i,
       reAllowedParents = /^(symbol|g|a|svg)$/i,
 
       attributesMap = {
@@ -155,16 +154,19 @@
    */
   fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
-      var angle = args[0],
-          x = (args.length === 3) ? args[1] : 0,
-          y = (args.length === 3) ? args[2] : 0;
+      var cos = Math.cos(args[0]), sin = Math.sin(args[0]),
+          x = 0, y = 0;
+      if (args.length === 3) {
+        x = args[1];
+        y = args[2];
+      }
 
-      matrix[0] = Math.cos(angle);
-      matrix[1] = Math.sin(angle);
-      matrix[2] = -Math.sin(angle);
-      matrix[3] = Math.cos(angle);
-      matrix[4] = x - (matrix[0] * x + matrix[2] * y);
-      matrix[5] = y - (matrix[1] * x + matrix[3] * y);
+      matrix[0] = cos;
+      matrix[1] = sin;
+      matrix[2] = -sin;
+      matrix[3] = cos;
+      matrix[4] = x - (cos * x - sin * y);
+      matrix[5] = y - (sin * x + cos * y);
     }
 
     function scaleMatrix(matrix, args) {
@@ -175,12 +177,8 @@
       matrix[3] = multiplierY;
     }
 
-    function skewXMatrix(matrix, args) {
-      matrix[2] = Math.tan(fabric.util.degreesToRadians(args[0]));
-    }
-
-    function skewYMatrix(matrix, args) {
-      matrix[1] = Math.tan(fabric.util.degreesToRadians(args[0]));
+    function skewMatrix(matrix, args, pos) {
+      matrix[pos] = Math.tan(fabric.util.degreesToRadians(args[0]));
     }
 
     function translateMatrix(matrix, args) {
@@ -280,10 +278,10 @@
             scaleMatrix(matrix, args);
             break;
           case 'skewX':
-            skewXMatrix(matrix, args);
+            skewMatrix(matrix, args, 2);
             break;
           case 'skewY':
-            skewYMatrix(matrix, args);
+            skewMatrix(matrix, args, 1);
             break;
           case 'matrix':
             matrix = args;
@@ -578,6 +576,16 @@
     return parsedDim;
   }
 
+  function hasAncestorWithNodeName(element, nodeName) {
+    while (element && (element = element.parentNode)) {
+      if (element.nodeName && nodeName.test(element.nodeName.replace('svg:', ''))
+        && !element.getAttribute('instantiated_by_use')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
@@ -588,122 +596,50 @@
    * It's being passed an array of elements (parsed from a document).
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
-  fabric.parseSVGDocument = (function() {
-
-    function hasAncestorWithNodeName(element, nodeName) {
-      while (element && (element = element.parentNode)) {
-        if (element.nodeName && nodeName.test(element.nodeName.replace('svg:', ''))
-          && !element.getAttribute('instantiated_by_use')) {
-          return true;
-        }
-      }
-      return false;
+  fabric.parseSVGDocument = function(doc, callback, reviver) {
+    if (!doc) {
+      return;
     }
 
-    return function(doc, callback, reviver) {
-      if (!doc) {
-        return;
+    parseUseDirectives(doc);
+
+    var svgUid =  fabric.Object.__uid++,
+        options = applyViewboxTransform(doc),
+        descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+
+    options.svgUid = svgUid;
+
+    if (descendants.length === 0 && fabric.isLikelyNode) {
+      // we're likely in node, where "o3-xml" library fails to gEBTN("*")
+      // https://github.com/ajaxorg/node-o3-xml/issues/21
+      descendants = doc.selectNodes('//*[name(.)!="svg"]');
+      var arr = [];
+      for (var i = 0, len = descendants.length; i < len; i++) {
+        arr[i] = descendants[i];
       }
-
-      parseUseDirectives(doc);
-
-      var startTime = new Date(),
-          svgUid =  fabric.Object.__uid++,
-          options = applyViewboxTransform(doc),
-          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
-
-      options.svgUid = svgUid;
-
-      if (descendants.length === 0 && fabric.isLikelyNode) {
-        // we're likely in node, where "o3-xml" library fails to gEBTN("*")
-        // https://github.com/ajaxorg/node-o3-xml/issues/21
-        descendants = doc.selectNodes('//*[name(.)!="svg"]');
-        var arr = [];
-        for (var i = 0, len = descendants.length; i < len; i++) {
-          arr[i] = descendants[i];
-        }
-        descendants = arr;
-      }
-
-      var elements = descendants.filter(function(el) {
-        applyViewboxTransform(el);
-        return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
-              !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
-      });
-
-      if (!elements || (elements && !elements.length)) {
-        callback && callback([], {});
-        return;
-      }
-
-      fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
-      fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-      // Precedence of rules:   style > class > attribute
-      fabric.parseElements(elements, function(instances) {
-        fabric.documentParsingTime = new Date() - startTime;
-        if (callback) {
-          callback(instances, options);
-        }
-      }, clone(options), reviver);
-    };
-  })();
-
-  /**
-   * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-   * @namespace
-   */
-  var svgCache = {
-
-    /**
-     * @param {String} name
-     * @param {Function} callback
-     */
-    has: function (name, callback) {
-      callback(false);
-    },
-
-    get: function () {
-      /* NOOP */
-    },
-
-    set: function () {
-      /* NOOP */
+      descendants = arr;
     }
-  };
 
-  /**
-   * @private
-   */
-  function _enlivenCachedObject(cachedObject) {
-
-    var objects = cachedObject.objects,
-        options = cachedObject.options;
-
-    objects = objects.map(function (o) {
-      return fabric[capitalize(o.type)].fromObject(o);
+    var elements = descendants.filter(function(el) {
+      applyViewboxTransform(el);
+      return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
+            !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
     });
 
-    return ({ objects: objects, options: options });
-  }
-
-  /**
-   * @private
-   */
-  function _createSVGPattern(markup, canvas, property) {
-    if (canvas[property] && canvas[property].toSVG) {
-      markup.push(
-        '\t<pattern x="0" y="0" id="', property, 'Pattern" ',
-          'width="', canvas[property].source.width,
-          '" height="', canvas[property].source.height,
-          '" patternUnits="userSpaceOnUse">\n',
-        '\t\t<image x="0" y="0" ',
-        'width="', canvas[property].source.width,
-        '" height="', canvas[property].source.height,
-        '" xlink:href="', canvas[property].source.src,
-        '"></image>\n\t</pattern>\n'
-      );
+    if (!elements || (elements && !elements.length)) {
+      callback && callback([], {});
+      return;
     }
-  }
+
+    fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+    // Precedence of rules:   style > class > attribute
+    fabric.parseElements(elements, function(instances) {
+      if (callback) {
+        callback(instances, options);
+      }
+    }, clone(options), reviver);
+  };
 
   var reFontDeclaration = new RegExp(
     '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
@@ -981,19 +917,9 @@
     loadSVGFromURL: function(url, callback, reviver) {
 
       url = url.replace(/^\n\s*/, '').trim();
-      svgCache.has(url, function (hasUrl) {
-        if (hasUrl) {
-          svgCache.get(url, function (value) {
-            var enlivedRecord = _enlivenCachedObject(value);
-            callback(enlivedRecord.objects, enlivedRecord.options);
-          });
-        }
-        else {
-          new fabric.util.request(url, {
-            method: 'get',
-            onComplete: onComplete
-          });
-        }
+      new fabric.util.request(url, {
+        method: 'get',
+        onComplete: onComplete
       });
 
       function onComplete(r) {
@@ -1010,10 +936,6 @@
         }
 
         fabric.parseSVGDocument(xml.documentElement, function (results, options) {
-          svgCache.set(url, {
-            objects: fabric.util.array.invoke(results, 'toObject'),
-            options: options
-          });
           callback && callback(results, options);
         }, reviver);
       }
@@ -1045,77 +967,6 @@
       fabric.parseSVGDocument(doc.documentElement, function (results, options) {
         callback(results, options);
       }, reviver);
-    },
-
-    /**
-     * Creates markup containing SVG font faces,
-     * font URLs for font faces must be collected by developers
-     * and are not extracted from the DOM by fabricjs
-     * @param {Array} objects Array of fabric objects
-     * @return {String}
-     */
-    createSVGFontFacesMarkup: function(objects) {
-      var markup = '', fontList = { }, obj, fontFamily,
-          style, row, rowIndex, _char, charIndex,
-          fontPaths = fabric.fontPaths;
-
-      for (var i = 0, len = objects.length; i < len; i++) {
-        obj = objects[i];
-        fontFamily = obj.fontFamily;
-        if (obj.type.indexOf('text') === -1 || fontList[fontFamily] || !fontPaths[fontFamily]) {
-          continue;
-        }
-        fontList[fontFamily] = true;
-        if (!obj.styles) {
-          continue;
-        }
-        style = obj.styles;
-        for (rowIndex in style) {
-          row = style[rowIndex];
-          for (charIndex in row) {
-            _char = row[charIndex];
-            fontFamily = _char.fontFamily;
-            if (!fontList[fontFamily] && fontPaths[fontFamily]) {
-              fontList[fontFamily] = true;
-            }
-          }
-        }
-      }
-
-      for (var j in fontList) {
-        markup += [
-          '\t\t@font-face {\n',
-          '\t\t\tfont-family: \'', j, '\';\n',
-          '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
-          '\t\t}\n'
-        ].join('');
-      }
-
-      if (markup) {
-        markup = [
-          '\t<style type="text/css">',
-          '<![CDATA[\n',
-          markup,
-          ']]>',
-          '</style>\n'
-        ].join('');
-      }
-
-      return markup;
-    },
-
-    /**
-     * Creates markup containing SVG referenced elements like patterns, gradients etc.
-     * @param {fabric.Canvas} canvas instance of fabric.Canvas
-     * @return {String}
-     */
-    createSVGRefElementsMarkup: function(canvas) {
-      var markup = [];
-
-      _createSVGPattern(markup, canvas, 'backgroundColor');
-      _createSVGPattern(markup, canvas, 'overlayColor');
-
-      return markup.join('');
     }
   });
 

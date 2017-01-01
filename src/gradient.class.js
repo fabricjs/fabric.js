@@ -131,9 +131,9 @@
      * @param {Object} colorStop Object with offset and color
      * @return {fabric.Gradient} thisArg
      */
-    addColorStop: function(colorStop) {
-      for (var position in colorStop) {
-        var color = new fabric.Color(colorStop[position]);
+    addColorStop: function(colorStops) {
+      for (var position in colorStops) {
+        var color = new fabric.Color(colorStops[position]);
         this.colorStops.push({
           offset: position,
           color: color.toRgb(),

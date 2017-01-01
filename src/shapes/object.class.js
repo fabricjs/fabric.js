@@ -1673,16 +1673,8 @@
         gradient.coords.r2 = options.r2;
       }
 
-      options.gradientTransform && (gradient.gradientTransform = options.gradientTransform);
-
-      for (var position in options.colorStops) {
-        var color = new fabric.Color(options.colorStops[position]);
-        gradient.colorStops.push({
-          offset: position,
-          color: color.toRgb(),
-          opacity: color.getAlpha()
-        });
-      }
+      gradient.gradientTransform = options.gradientTransform;
+      fabric.Gradient.prototype.addColorStop.call(gradient, options.colorStops);
 
       return this.set(property, fabric.Gradient.forObject(this, gradient));
     },
