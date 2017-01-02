@@ -1204,9 +1204,6 @@
           'version="1.1" ',
           'width="', width, '" ',
           'height="', height, '" ',
-          (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor + '" '
-            : null),
           viewBox,
           'xml:space="preserve">\n',
         '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
@@ -1343,7 +1340,7 @@
           '></rect>\n'
         );
       }
-      else if (property === 'overlayColor') {
+      else {
         markup.push(
           '<rect x="0" y="0" ',
             'width="', this.width,
