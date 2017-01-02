@@ -109,10 +109,10 @@
      */
     toSVG: function(object) {
       var patternSource = typeof this.source === 'function' ? this.source() : this.source,
-          patternWidth = patternSource.width / object.getWidth(),
-          patternHeight = patternSource.height / object.getHeight(),
-          patternOffsetX = this.offsetX / object.getWidth(),
-          patternOffsetY = this.offsetY / object.getHeight(),
+          patternWidth = patternSource.width / object.width,
+          patternHeight = patternSource.height / object.height,
+          patternOffsetX = this.offsetX / object.width,
+          patternOffsetY = this.offsetY / object.height,
           patternImgSrc = '';
       if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
         patternHeight = 1;
