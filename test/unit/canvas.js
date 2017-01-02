@@ -62,7 +62,7 @@
     return src;
   }
 
-  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('test/fixtures/test_image.gif');
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
@@ -703,7 +703,7 @@
   asyncTest('loadFromJSON with json string', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
-    canvas.loadFromJSON(PATH_JSON, function(){
+    canvas.loadFromJSON(PATH_JSON, function() {
       var obj = canvas.item(0);
 
       ok(!canvas.isEmpty(), 'canvas is not empty');

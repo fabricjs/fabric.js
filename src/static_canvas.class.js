@@ -28,7 +28,7 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -434,23 +434,9 @@
      * @param {Function} [callback] Callback is invoked when color is set
      */
     __setBgOverlayColor: function(property, color, callback) {
-      if (color && color.source) {
-        var _this = this;
-        fabric.util.loadImage(color.source, function(img) {
-          _this[property] = new fabric.Pattern({
-            source: img,
-            repeat: color.repeat,
-            offsetX: color.offsetX,
-            offsetY: color.offsetY
-          });
-          callback && callback();
-        });
-      }
-      else {
-        this[property] = color;
-        callback && callback();
-      }
-
+      this[property] = color;
+      this._initGradient(color, property);
+      this._initPattern(color, property, callback);
       return this;
     },
 
@@ -476,9 +462,7 @@
      * @param {Object} [options] Options object
      */
     _initOptions: function (options) {
-      for (var prop in options) {
-        this[prop] = options[prop];
-      }
+      this._setOptions(options);
 
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
@@ -861,7 +845,7 @@
       var object = this[property + 'Color'];
       if (object) {
         ctx.fillStyle = object.toLive
-          ? object.toLive(ctx)
+          ? object.toLive(ctx, this)
           : object;
 
         ctx.fillRect(
@@ -1220,17 +1204,86 @@
           'version="1.1" ',
           'width="', width, '" ',
           'height="', height, '" ',
-          (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor + '" '
-            : null),
           viewBox,
           'xml:space="preserve">\n',
         '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
-        '<defs>',
-          fabric.createSVGFontFacesMarkup(this.getObjects()),
-          fabric.createSVGRefElementsMarkup(this),
+        '<defs>\n',
+          this.createSVGFontFacesMarkup(),
+          this.createSVGRefElementsMarkup(),
         '</defs>\n'
       );
+    },
+
+    /**
+     * Creates markup containing SVG referenced elements like patterns, gradients etc.
+     * @return {String}
+     */
+    createSVGRefElementsMarkup: function() {
+      var _this = this,
+          markup = ['backgroundColor', 'overlayColor'].map(function(prop) {
+            var fill = _this[prop];
+            if (fill && fill.toLive) {
+              return fill.toSVG(_this, false);
+            }
+          });
+      return markup.join('');
+    },
+
+    /**
+     * Creates markup containing SVG font faces,
+     * font URLs for font faces must be collected by developers
+     * and are not extracted from the DOM by fabricjs
+     * @param {Array} objects Array of fabric objects
+     * @return {String}
+     */
+    createSVGFontFacesMarkup: function() {
+      var markup = '', fontList = { }, obj, fontFamily,
+          style, row, rowIndex, _char, charIndex,
+          fontPaths = fabric.fontPaths, objects = this.getObjects();
+
+      for (var i = 0, len = objects.length; i < len; i++) {
+        obj = objects[i];
+        fontFamily = obj.fontFamily;
+        if (obj.type.indexOf('text') === -1 || fontList[fontFamily] || !fontPaths[fontFamily]) {
+          continue;
+        }
+        fontList[fontFamily] = true;
+        if (!obj.styles) {
+          continue;
+        }
+        style = obj.styles;
+        for (rowIndex in style) {
+          row = style[rowIndex];
+          for (charIndex in row) {
+            _char = row[charIndex];
+            fontFamily = _char.fontFamily;
+            if (!fontList[fontFamily] && fontPaths[fontFamily]) {
+              fontList[fontFamily] = true;
+            }
+          }
+        }
+      }
+
+      for (var j in fontList) {
+        markup += [
+          '\t\t@font-face {\n',
+          '\t\t\tfont-family: \'', j, '\';\n',
+          '\t\t\tsrc: url(\'', fontPaths[j], '\');\n',
+          '\t\t}\n'
+        ].join('');
+      }
+
+      if (markup) {
+        markup = [
+          '\t<style type="text/css">',
+          '<![CDATA[\n',
+          markup,
+          ']]>',
+          '</style>\n'
+        ].join('');
+      }
+
+      return markup;
     },
 
     /**
@@ -1268,22 +1321,28 @@
      * @private
      */
     _setSVGBgOverlayColor: function(markup, property) {
-      if (this[property] && this[property].source) {
+      var filler = this[property];
+      if (!filler) {
+        return;
+      }
+      if (filler.toLive) {
+        var repeat = filler.repeat;
         markup.push(
-          '<rect x="', this[property].offsetX, '" y="', this[property].offsetY, '" ',
+          '<rect transform="translate(', this.width / 2, ',', this.height / 2, ')"',
+            ' x="', filler.offsetX - this.width / 2, '" y="', filler.offsetY - this.height / 2, '" ',
             'width="',
-              (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
-                ? this[property].source.width
+              (repeat === 'repeat-y' || repeat === 'no-repeat'
+                ? filler.source.width
                 : this.width),
             '" height="',
-              (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
-                ? this[property].source.height
+              (repeat === 'repeat-x' || repeat === 'no-repeat'
+                ? filler.source.height
                 : this.height),
-            '" fill="url(#' + property + 'Pattern)"',
+            '" fill="url(#SVGID_' + filler.id + ')"',
           '></rect>\n'
         );
       }
-      else if (this[property] && property === 'overlayColor') {
+      else {
         markup.push(
           '<rect x="0" y="0" ',
             'width="', this.width,
