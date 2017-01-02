@@ -1324,22 +1324,26 @@
      * @private
      */
     _setSVGBgOverlayColor: function(markup, property) {
-      if (this[property] && this[property].source) {
+      var filler = this[property];
+      if (!filler) {
+        return;
+      }
+      if (filler.toLive) {
         markup.push(
-          '<rect x="', this[property].offsetX, '" y="', this[property].offsetY, '" ',
+          '<rect x="', filler.offsetX, '" y="', filler.offsetY, '" ',
             'width="',
-              (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
-                ? this[property].source.width
+              (filler.repeat === 'repeat-y' || filler.repeat === 'no-repeat'
+                ? filler.source.width
                 : this.width),
             '" height="',
-              (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
-                ? this[property].source.height
+              (filler.repeat === 'repeat-x' || filler.repeat === 'no-repeat'
+                ? filler.source.height
                 : this.height),
-            '" fill="url(#' + property.id + ')"',
+            '" fill="url(#SVGID_' + filler.id + ')"',
           '></rect>\n'
         );
       }
-      else if (this[property] && property === 'overlayColor') {
+      else if (property === 'overlayColor') {
         markup.push(
           '<rect x="0" y="0" ',
             'width="', this.width,
