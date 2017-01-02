@@ -1326,14 +1326,16 @@
         return;
       }
       if (filler.toLive) {
+        var repeat = filler.repeat;
         markup.push(
-          '<rect x="', filler.offsetX, '" y="', filler.offsetY, '" ',
+          '<rect transform="translate(', this.width / 2, ',', this.height / 2, ')"',
+            ' x="', filler.offsetX - this.width / 2, '" y="', filler.offsetY - this.height / 2, '" ',
             'width="',
-              (filler.repeat === 'repeat-y' || filler.repeat === 'no-repeat'
+              (repeat === 'repeat-y' || repeat === 'no-repeat'
                 ? filler.source.width
                 : this.width),
             '" height="',
-              (filler.repeat === 'repeat-x' || filler.repeat === 'no-repeat'
+              (repeat === 'repeat-x' || repeat === 'no-repeat'
                 ? filler.source.height
                 : this.height),
             '" fill="url(#SVGID_' + filler.id + ')"',
