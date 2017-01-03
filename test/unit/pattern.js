@@ -40,7 +40,12 @@
 
   asyncTest('constructor with source string and with callback', function() {
     function callback(pattern) {
-      equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
+      if (fabric.isLikelyNode) {
+        equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
+      }
+      else {
+        equal(pattern.source.complete, true, 'pattern source has been loaded');
+      }
       start();
     }
     new fabric.Pattern({

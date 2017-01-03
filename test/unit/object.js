@@ -755,11 +755,9 @@
   test('_setLineDash', function() {
     var object = new fabric.Rect({ left: 100, top: 124, width: 210, height: 66, stroke: 'black', strokeWidth: 2});
     ok(typeof object._setLineDash === 'function');
-
-    canvas.add(object);
     object.strokeDashArray = [3, 2, 1];
     equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
-    canvas.renderAll();
+    object._setLineDash(canvas.contextContainer, object.strokeDashArray, null);
     equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
   });
 
