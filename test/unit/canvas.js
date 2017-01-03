@@ -704,9 +704,8 @@
     ok(!canvas.isEmpty());
   });
 
-  asyncTest('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string Canvas', function() {
     ok(typeof canvas.loadFromJSON == 'function');
-
     canvas.loadFromJSON(PATH_JSON, function() {
       var obj = canvas.item(0);
 
@@ -734,8 +733,6 @@
   });
 
   asyncTest('loadFromJSON with json object', function() {
-    ok(typeof canvas.loadFromJSON == 'function');
-
     canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
       var obj = canvas.item(0);
 
@@ -763,8 +760,6 @@
   });
 
   asyncTest('loadFromJSON with reviver function', function() {
-    ok(typeof canvas.loadFromJSON == 'function');
-
     function reviver(obj, instance) {
       deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
