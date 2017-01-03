@@ -11339,8 +11339,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     this.__setBgOverlay('overlayImage', serialized.overlayImage, loaded, cbIfLoaded);
     this.__setBgOverlay('backgroundColor', serialized.background, loaded, cbIfLoaded);
     this.__setBgOverlay('overlayColor', serialized.overlay, loaded, cbIfLoaded);
-
-    cbIfLoaded();
   },
 
   /**
@@ -11356,6 +11354,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     if (!value) {
       loaded[property] = true;
       callback && callback();
+      return;
     }
 
     if (property === 'backgroundImage' || property === 'overlayImage') {
