@@ -15295,6 +15295,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           parsedAttributes.x2 || 0,
           parsedAttributes.y2 || 0
         ];
+    options.originX = 'left';
+    options.originY = 'top';
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */

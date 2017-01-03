@@ -7395,6 +7395,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
     fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x1 y1 x2 y2".split(" "));
     fabric.Line.fromElement = function(element, options) {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ parsedAttributes.x1 || 0, parsedAttributes.y1 || 0, parsedAttributes.x2 || 0, parsedAttributes.y2 || 0 ];
+        options.originX = "left";
+        options.originY = "top";
         return new fabric.Line(points, extend(parsedAttributes, options));
     };
     fabric.Line.fromObject = function(object, callback, forceAsync) {
