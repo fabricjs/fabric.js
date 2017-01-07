@@ -308,6 +308,7 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
+    options = options || { };
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
           parsedAttributes.x1 || 0,
