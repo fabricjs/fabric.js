@@ -351,10 +351,9 @@
      * @param {fabric.Object} targetObj receiving event
      */
     _handleEvent: function(e, eventType, targetObj) {
-      var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
+      var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
           targets = this.targets || [],
           options = { e: e, target: target, subTargets: targets };
-
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
