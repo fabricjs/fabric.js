@@ -1076,7 +1076,6 @@
           activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
           activeTarget;
-
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
@@ -1100,7 +1099,6 @@
       }
 
       this.targets = [];
-
       var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
