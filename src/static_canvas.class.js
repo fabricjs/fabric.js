@@ -12,6 +12,8 @@
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
       toFixed = fabric.util.toFixed,
+      transformPoint = fabric.util.transformPoint,
+      invertTransform = fabric.util.invertTransform,
 
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
@@ -662,10 +664,10 @@
     zoomToPoint: function (point, value) {
       // TODO: just change the scale, preserve other transformations
       var before = point, vpt = this.viewportTransform.slice(0);
-      point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
+      point = transformPoint(point, invertTransform(this.viewportTransform));
       vpt[0] = value;
       vpt[3] = value;
-      var after = fabric.util.transformPoint(point, vpt);
+      var after = transformPoint(point, vpt);
       vpt[4] += before.x - after.x;
       vpt[5] += before.y - after.y;
       return this.setViewportTransform(vpt);
@@ -782,7 +784,7 @@
     },
 
     /**
-     * Renders both the canvas.
+     * Renders the canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -793,6 +795,24 @@
     },
 
     /**
+     * Calculate the position of the 4 corner of canvas with current viewportTransform.
+     * helps to determinate when an object is in the current rendering viewport using
+     * object absolute coordinates ( aCoords )
+     * @return {Object} points.tl
+     * @chainable
+     */
+    calcViewportBoundaries: function() {
+      var points = { }, width = this.getWidth(), height = this.getHeight(),
+          iVpt = invertTransform(this.viewportTransform);
+      points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
+      points.br = transformPoint({ x: width, y: height }, iVpt);
+      points.tr = { x: points.br.x, y: points.tl.y };
+      points.bl = { x: points.tl.x, y: points.br.y };
+      this.vptCoords = points;
+      return points;
+    },
+
+    /**
      * Renders background, objects, overlay and controls.
      * @param {CanvasRenderingContext2D} ctx
      * @param {Array} objects to render
@@ -800,6 +820,7 @@
      * @chainable
      */
     renderCanvas: function(ctx, objects) {
+      this.calcViewportBoundaries();
       this.clearContext(ctx);
       this.fire('before:render');
       if (this.clipTo) {
@@ -973,8 +994,8 @@
      */
     getVpCenter: function() {
       var center = this.getCenter(),
-          iVpt = fabric.util.invertTransform(this.viewportTransform);
-      return fabric.util.transformPoint({ x: center.left, y: center.top }, iVpt);
+          iVpt = invertTransform(this.viewportTransform);
+      return transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
