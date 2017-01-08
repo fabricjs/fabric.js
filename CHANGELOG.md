@@ -1,5 +1,6 @@
 **Version 1.7.3**
 
+- Improvement: mousewheel event is handled with target and fired also from objects.  [#3612](https://github.com/kangax/fabric.js/pull/3612)
 - Improvement: Pattern loads for canvas background and overlay, corrected svg pattern export [#3601](https://github.com/kangax/fabric.js/pull/3601)
 - Fix: Wait for pattern loading before calling callback [#3598](https://github.com/kangax/fabric.js/pull/3598)
 - Fix: add 2 extra pixels to cache canvases to avoid aliasing cut [#3596](https://github.com/kangax/fabric.js/pull/3596)

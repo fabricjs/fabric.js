@@ -9533,7 +9533,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
           activeTarget;
-
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
@@ -9557,7 +9556,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       this.targets = [];
-
       var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
@@ -10450,10 +10448,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {fabric.Object} targetObj receiving event
      */
     _handleEvent: function(e, eventType, targetObj) {
-      var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
+      var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
           targets = this.targets || [],
           options = { e: e, target: target, subTargets: targets };
-
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
@@ -10556,8 +10553,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __onMouseDown: function (e) {
 
-      var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+      var target = this.findTarget(e);
 
       // if right click just fire events
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
@@ -10579,6 +10575,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       // save pointer for check in __onMouseUp event
+      var pointer = this.getPointer(e, true);
       this._previousPointer = pointer;
 
       var shouldRender = this._shouldRender(target, pointer),
@@ -10727,9 +10724,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
-      this.fire('mouse:wheel', {
-        e: e
-      });
+      this._handleEvent(e, 'wheel');
     },
 
     /**
@@ -11505,6 +11500,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @fires mouseup
    * @fires mouseover
    * @fires mouseout
+   * @fires mousewheel
    */
   fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
 
@@ -15288,6 +15284,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
+    options = options || { };
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
           parsedAttributes.x1 || 0,

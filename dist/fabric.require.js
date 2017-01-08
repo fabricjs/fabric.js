@@ -5293,7 +5293,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._handleEvent(e, eventType, target ? target : null);
         },
         _handleEvent: function(e, eventType, targetObj) {
-            var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj, targets = this.targets || [], options = {
+            var target = typeof targetObj === "undefined" ? this.findTarget(e) : targetObj, targets = this.targets || [], options = {
                 e: e,
                 target: target,
                 subTargets: targets
@@ -5356,7 +5356,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._handleEvent(e, "up");
         },
         __onMouseDown: function(e) {
-            var target = this.findTarget(e), pointer = this.getPointer(e, true);
+            var target = this.findTarget(e);
             var isRightClick = "which" in e ? e.which === 3 : e.button === 2;
             if (isRightClick) {
                 if (this.fireRightClick) {
@@ -5371,6 +5371,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this._currentTransform) {
                 return;
             }
+            var pointer = this.getPointer(e, true);
             this._previousPointer = pointer;
             var shouldRender = this._shouldRender(target, pointer), shouldGroup = this._shouldGroup(e, target);
             if (this._shouldClearSelection(e, target)) {
@@ -5455,9 +5456,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._handleEvent(e, "move", target ? target : null);
         },
         __onMouseWheel: function(e) {
-            this.fire("mouse:wheel", {
-                e: e
-            });
+            this._handleEvent(e, "wheel");
         },
         _transformObject: function(e) {
             var pointer = this.getPointer(e), transform = this._currentTransform;
@@ -7394,6 +7393,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
     });
     fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x1 y1 x2 y2".split(" "));
     fabric.Line.fromElement = function(element, options) {
+        options = options || {};
         var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ parsedAttributes.x1 || 0, parsedAttributes.y1 || 0, parsedAttributes.x2 || 0, parsedAttributes.y2 || 0 ];
         options.originX = "left";
         options.originY = "top";
