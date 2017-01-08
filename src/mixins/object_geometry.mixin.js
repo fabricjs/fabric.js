@@ -98,7 +98,9 @@
      */
     isContainedWithinObject: function(other, absolute, calculate) {
       var points = this.getCoords(absolute, calculate),
-          i = 0, lines = other._getImageLines(other.getCoords(absolute, calculate));
+          i = 0, lines = other._getImageLines(
+            calculate ? other.calcCoords(absolute) : absolute ? other.aCoords : other.oCoords
+          );
       for (; i < 4; i++) {
         if (!other.containsPoint(points[i], lines)) {
           return false;
@@ -135,7 +137,9 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point, lines, absolute, calculate) {
-      var lines = lines || this._getImageLines(this.getCoords(absolute, calculate)),
+      var lines = lines || this._getImageLines(
+        calculate ? this.calcCoords(absolute) : absolute ? this.aCoords : this.oCoords
+      ),
           xPoints = this._findCrossPoints(point, lines);
 
       // if xPoints is odd then point is inside the object
@@ -265,12 +269,7 @@
      */
     getBoundingRect: function(absolute, calculate) {
       var coords = this.getCoords(absolute, calculate);
-      return fabric.util.makeBoundingBoxFromPoints([
-        coords.tl,
-        coords.tr,
-        coords.br,
-        coords.bl
-      ]);
+      return fabric.util.makeBoundingBoxFromPoints(coords);
     },
 
     /**

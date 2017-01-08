@@ -578,17 +578,11 @@
       start();
     }
     else {
-      var image;
-
-      setTimeout(function() {
+      cObj.cloneAsImage(function(image) {
         ok(image);
         ok(image instanceof fabric.Image);
         equal(image.width, 100, 'the image has same dimension of object');
         start();
-      }, 500);
-
-      cObj.cloneAsImage(function(i) {
-        image = i;
       });
     }
   });
@@ -601,18 +595,12 @@
       start();
     }
     else {
-      var image;
-
-      setTimeout(function() {
+      cObj.cloneAsImage(function(image) {
         ok(image);
         ok(image instanceof fabric.Image);
         equal(image.width, 200, 'the image has been scaled by retina');
         fabric.devicePixelRatio = 1;
         start();
-      }, 500);
-
-      cObj.cloneAsImage(function(i) {
-        image = i;
       }, { enableRetinaScaling: true });
     }
   });
