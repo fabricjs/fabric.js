@@ -797,34 +797,6 @@
     dirty:                false,
 
     /**
-     * Describe object's corner position in canvas element coordinates.
-     * properties are tl,mt,tr,ml,mr,bl,mb,br,mtr for the main controls.
-     * each property is an object with x, y and corner.
-     * The `corner` property contains in a similar manner the 4 points of the
-     * interactive area of the corner.
-     * The coordinates depends from this properties: width, height, scaleX, scaleY
-     * skewX, skewY, angle, strokeWidth, viewportTransform, top, left, padding.
-     * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords;
-     * @memberOf fabric.Object.prototype
-     */
-    oCoords: null,
-
-    /**
-     * Describe object's corner position in canvas object absolute coordinates
-     * properties are tl,tr,bl,br and describe the four main corner.
-     * each property is an object with x, y, instance of Fabric.Point.
-     * The coordinates depends from this properties: width, height, scaleX, scaleY
-     * skewX, skewY, angle, strokeWidth, top, left.
-     * Those coordinates are usefull to understand where an object is. They get updated
-     * with oCoords but they do not need to be updated when zoom or panning change.
-     * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords(true);
-     * @memberOf fabric.Object.prototype
-     */
-    aCoords: null,
-
-    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
