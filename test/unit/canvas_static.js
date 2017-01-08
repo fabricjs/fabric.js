@@ -923,7 +923,7 @@
     ok(!canvas.isEmpty());
   });
 
-  asyncTest('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string staticCanvas', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(PATH_JSON, function(){

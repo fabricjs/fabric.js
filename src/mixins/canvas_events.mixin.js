@@ -351,10 +351,9 @@
      * @param {fabric.Object} targetObj receiving event
      */
     _handleEvent: function(e, eventType, targetObj) {
-      var target = typeof targetObj === undefined ? this.findTarget(e) : targetObj,
+      var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
           targets = this.targets || [],
           options = { e: e, target: target, subTargets: targets };
-
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
@@ -457,8 +456,7 @@
      */
     __onMouseDown: function (e) {
 
-      var target = this.findTarget(e),
-          pointer = this.getPointer(e, true);
+      var target = this.findTarget(e);
 
       // if right click just fire events
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
@@ -480,6 +478,7 @@
       }
 
       // save pointer for check in __onMouseUp event
+      var pointer = this.getPointer(e, true);
       this._previousPointer = pointer;
 
       var shouldRender = this._shouldRender(target, pointer),
@@ -628,9 +627,7 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
-      this.fire('mouse:wheel', {
-        e: e
-      });
+      this._handleEvent(e, 'wheel');
     },
 
     /**
