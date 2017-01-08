@@ -362,7 +362,7 @@
     setCoords: function(ignoreZoom, skipAbsolute) {
       this.oCoords = this.calcCoords(ignoreZoom);
       if (!skipAbsolute && !ignoreZoom) {
-        this.absoluteCoords = this.calcCoords(true);
+        this.aCoords = this.calcCoords(true);
       }
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
@@ -380,20 +380,21 @@
         var theta = degreesToRadians(this.angle), cos = Math.cos(theta), sin = Math.sin(theta);
         return [cos, sin, -sin, cos, 0, 0];
       }
-      return [1, 0, 0, 1, 0, 0];
+      return fabric.iMatrix.concat();
     },
 
     /*
      * calculate trasform Matrix that represent current transformation from
      * object properties.
+     * @param {Boolean} [skipGroup] return transformMatrix for object and not go upward with parents
      * @return {Array} matrix Transform Matrix for the object
      */
-    calcTransformMatrix: function() {
+    calcTransformMatrix: function(skipGroup) {
       var center = this.getCenterPoint(),
           translateMatrix = [1, 0, 0, 1, center.x, center.y],
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group ? this.group.calcTransformMatrix() : [1, 0, 0, 1, 0, 0];
+          matrix = this.group && !skipGroup ? this.group.calcTransformMatrix() : fabric.iMatrix.concat();
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);

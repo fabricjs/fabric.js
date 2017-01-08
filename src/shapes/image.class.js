@@ -597,14 +597,6 @@
             ? this.getElement().height || 0
             : 0);
     },
-
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return 1;
-    }
   });
 
   /**

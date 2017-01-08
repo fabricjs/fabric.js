@@ -138,7 +138,7 @@
      * @type Array
      * @default
      */
-    viewportTransform: [1, 0, 0, 1, 0, 0],
+    viewportTransform: fabric.iMatrix.concat(),
 
     /**
      * if set to false background image is not affected by viewport transform
