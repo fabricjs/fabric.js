@@ -308,6 +308,7 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
+    options = options || { };
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
           parsedAttributes.x1 || 0,
@@ -315,6 +316,8 @@
           parsedAttributes.x2 || 0,
           parsedAttributes.y2 || 0
         ];
+    options.originX = 'left';
+    options.originY = 'top';
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
