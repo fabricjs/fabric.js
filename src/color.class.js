@@ -126,7 +126,7 @@
     },
 
     /**
-     * Returns color represenation in RGB format
+     * Returns color representation in RGB format
      * @return {String} ex: rgb(0-255,0-255,0-255)
      */
     toRgb: function() {
@@ -135,7 +135,7 @@
     },
 
     /**
-     * Returns color represenation in RGBA format
+     * Returns color representation in RGBA format
      * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
      */
     toRgba: function() {
@@ -144,7 +144,7 @@
     },
 
     /**
-     * Returns color represenation in HSL format
+     * Returns color representation in HSL format
      * @return {String} ex: hsl(0-360,0%-100%,0%-100%)
      */
     toHsl: function() {
@@ -155,7 +155,7 @@
     },
 
     /**
-     * Returns color represenation in HSLA format
+     * Returns color representation in HSLA format
      * @return {String} ex: hsla(0-360,0%-100%,0%-100%,0-1)
      */
     toHsla: function() {
@@ -166,7 +166,7 @@
     },
 
     /**
-     * Returns color represenation in HEX format
+     * Returns color representation in HEX format
      * @return {String} ex: FF5555
      */
     toHex: function() {
@@ -182,6 +182,29 @@
       b = (b.length === 1) ? ('0' + b) : b;
 
       return r.toUpperCase() + g.toUpperCase() + b.toUpperCase();
+    },
+
+    /**
+     * Returns color representation in HEXA format
+     * @return {String} ex: FF5555CC
+     */
+    toHexa: function() {
+      var source = this.getSource(), r, g, b, a;
+
+      r = source[0].toString(16);
+      r = (r.length === 1) ? ('0' + r) : r;
+
+      g = source[1].toString(16);
+      g = (g.length === 1) ? ('0' + g) : g;
+
+      b = source[2].toString(16);
+      b = (b.length === 1) ? ('0' + b) : b;
+
+      a = source[3] * 255;
+      a = a.toString(16);
+      a = (a.length === 1) ? ('0' + a) : a;
+
+      return r.toUpperCase() + g.toUpperCase() + b.toUpperCase() + a.toUpperCase();
     },
 
     /**
