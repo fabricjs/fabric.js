@@ -189,22 +189,13 @@
      * @return {String} ex: FF5555CC
      */
     toHexa: function() {
-      var source = this.getSource(), r, g, b, a;
-
-      r = source[0].toString(16);
-      r = (r.length === 1) ? ('0' + r) : r;
-
-      g = source[1].toString(16);
-      g = (g.length === 1) ? ('0' + g) : g;
-
-      b = source[2].toString(16);
-      b = (b.length === 1) ? ('0' + b) : b;
+      var source = this.getSource(), a;
 
       a = source[3] * 255;
       a = a.toString(16);
       a = (a.length === 1) ? ('0' + a) : a;
 
-      return r.toUpperCase() + g.toUpperCase() + b.toUpperCase() + a.toUpperCase();
+      return this.toHex() + a.toUpperCase();
     },
 
     /**
