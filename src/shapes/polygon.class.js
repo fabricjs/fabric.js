@@ -67,9 +67,11 @@
       this._calcDimensions();
       if (!('top' in options)) {
         this.top = this.minY;
+        this.top += this.originY === 'center' ? this.height / 2 : this.originY === 'bottom' ? this.height : 0;
       }
       if (!('left' in options)) {
         this.left = this.minX;
+        this.left += this.originX === 'center' ? this.width / 2 : this.originX === 'right' ? this.width : 0;
       }
       this.pathOffset = {
         x: this.minX + this.width / 2,
