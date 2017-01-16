@@ -6,7 +6,8 @@
       toFixed = fabric.util.toFixed,
       clone = fabric.util.object.clone,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-      MIN_TEXT_WIDTH = 2;
+      MIN_TEXT_WIDTH = 2,
+      CACHE_FONT_SIZE = 40;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -89,7 +90,7 @@
     /**
      * Sets object's fontSize
      * Does not update the object .width and .height,
-     * call ._initDimensions() to update the values.
+     * call .initDimensions() to update the values.
      * @method setFontSize
      * @memberOf fabric.Text.prototype
      * @param {Number} fontSize Font size (in pixels)
@@ -107,7 +108,7 @@
     /**
      * Sets object's fontWeight
      * Does not update the object .width and .height,
-     * call ._initDimensions() to update the values.
+     * call .initDimensions() to update the values.
      * @method setFontWeight
      * @memberOf fabric.Text.prototype
      * @param {(Number|String)} fontWeight Font weight
@@ -125,7 +126,7 @@
     /**
      * Sets object's fontFamily
      * Does not update the object .width and .height,
-     * call ._initDimensions() to update the values.
+     * call .initDimensions() to update the values.
      * @method setFontFamily
      * @memberOf fabric.Text.prototype
      * @param {String} fontFamily Font family
@@ -143,7 +144,7 @@
     /**
      * Sets object's text
      * Does not update the object .width and .height,
-     * call ._initDimensions() to update the values.
+     * call .initDimensions() to update the values.
      * @method setText
      * @memberOf fabric.Text.prototype
      * @param {String} text Text
@@ -177,7 +178,7 @@
     /**
      * Sets object's fontStyle
      * Does not update the object .width and .height,
-     * call ._initDimensions() to update the values.
+     * call .initDimensions() to update the values.
      * @method setFontStyle
      * @memberOf fabric.Text.prototype
      * @param {String} fontStyle Font style
@@ -392,19 +393,23 @@
       this.__skipDimension = true;
       this.callSuper('initialize', options);
       this.__skipDimension = false;
-      this._initDimensions();
+      this.initDimensions();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**
-     * Returns true if object has no styling
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex
+     * @return {Boolean}
      */
-    isEmptyStyles: function() {
+    isEmptyStyles: function(lineIndex) {
       if (!this.styles) {
         return true;
       }
-      var obj = this.styles;
-
+      if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
+        return true;
+      }
+      var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
       for (var p1 in obj) {
         for (var p2 in obj[p1]) {
           // eslint-disable-next-line no-unused-vars
@@ -414,6 +419,31 @@
         }
       }
       return true;
+    },
+
+    /**
+     * Returns true if object has a style property or has it ina specified line
+     * @param {Number} lineIndex
+     * @return {Boolean}
+     */
+    styleHas: function(property, lineIndex) {
+      if (!this.styles) {
+        return false;
+      }
+      if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
+        return true;
+      }
+      var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
+      // eslint-disable-next-line
+      for (var p1 in obj) {
+        // eslint-disable-next-line
+        for (var p2 in obj[p1]) {
+          if (typeof obj[p1][p2][property] !== 'undefined') {
+            return true;
+          }
+        }
+      }
+      return false;
     },
 
     /**
@@ -444,8 +474,8 @@
       }
       this._textLines = this._splitTextIntoLines();
       this._clearCache();
-      this.width = this._getTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
-      this.height = this._getTextHeight();
+      this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
+      this.height = this.calcTextHeight();
     },
 
     /**
@@ -518,11 +548,11 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {Number} Maximum width of fabric.Text object
      */
-    _getTextWidth: function() {
-      var maxWidth = this._getLineWidth(0);
+    calcTextWidth: function() {
+      var maxWidth = this.getLineWidth(0);
 
       for (var i = 1, len = this._textLines.length; i < len; i++) {
-        var currentLineWidth = this._getLineWidth(i);
+        var currentLineWidth = this.getLineWidth(i);
         if (currentLineWidth > maxWidth) {
           maxWidth = currentLineWidth;
         }
@@ -579,7 +609,7 @@
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
-      var lineWidth = this._getLineWidth(ctx, lineIndex);
+      var lineWidth = this.getLineWidth(lineIndex);
       if (this.textAlign !== 'justify' || this.width < lineWidth) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
@@ -625,11 +655,12 @@
     // },
 
     /**
+     * Renders the text background for lines, taking care of style
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextLinesBackground: function(ctx) {
-      if (!this.textBackgroundColor) {
+      if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
         return;
       }
       var lineTopOffset = 0, heightOfLine,
@@ -637,8 +668,11 @@
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        heightOfLine = this._getHeightOfLine(ctx, i);
-        lineWidth = this._getLineWidth(ctx, i);
+        if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
+          continue;
+        }
+        heightOfLine = this.getHeightOfLine(i);
+        lineWidth = this.getLineWidth(i);
         if (lineWidth > 0) {
           lineLeftOffset = this._getLineLeftOffset(lineWidth);
           ctx.fillRect(
@@ -662,7 +696,7 @@
           line, _char, style;
       ctx.save();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        heightOfLine = this._getHeightOfLine(ctx, i);
+        heightOfLine = this.getHeightOfLine(i);
         line = this._textLines[i];
 
         if (line === '' || !this.styles || !this._getLineStyle(i)) {
@@ -670,7 +704,7 @@
           continue;
         }
 
-        lineWidth = this._getLineWidth(ctx, i);
+        lineWidth = this.getLineWidth(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         for (var j = 0, jlen = line.length; j < jlen; j++) {
@@ -899,86 +933,98 @@
      * @param {String} [previousChar] previous char
      * @param {Object} [prevCharStyle] style of previous char
      */
-    _measureChar: function(char, charStyle, previousChar, prevCharStyle) {
+    measureChar: function(char, charStyle, previousChar, prevCharStyle) {
+      // first i try to return from cache
+      var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
+          previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
+          stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
+          fontMultiplier = this.fontSize / CACHE_FONT_SIZE;
+      if (fontCache[char]) {
+        width = fontCache[char] * fontMultiplier;
+        coupleWidth = fontCache[couple] * fontMultiplier;
+        previousWidth = previousChar ? fontCache[previousChar] * fontMultiplier : 0;
+        if (!stylesAreEqual) {
+          return width;
+        }
+        else if (coupleWidth && previousWidth) {
+          return coupleWidth - previousWidth;
+        }
+      }
+      // if we did not return we have to measure something.
       if (!this._measuringContext) {
         this._measuringContext = fabric.measuringContext ||
           this.canvas && this.canvas.contextCache ||
           fabric.util.createCanvasElement().getContext('2d');
         fabric.measuringContext || (fabric.measuringContext = this._measuringContext);
       }
-      var fontCache = this.getFontCache(charStyle),
-          ctx = this._measuringContext, fontDeclaration = this._getFontDeclaration(charStyle),
-          previousFontDeclaration = this._getFontDeclaration(prevCharStyle), width, widthPrevious,
-          widthCouple;
+      var ctx = this._measuringContext;
       this._setTextStyles(ctx, charStyle);
-      if (previousChar && fontDeclaration === previousFontDeclaration) {
-        // we can measure the kerning couple and subtract the width of the previous character
-        widthCouple = fontCache[previousChar + char] || ctx.measureText(previousChar + char);
-        widthPrevious = this._measureChar(previousChar, prevCharStyle);
+      if (!width) {
+        width = ctx.measureText(char);
+        fontCache[char] = width / fontMultiplier;
       }
-      width = ctx.measureText(char);
-      return widthCouple ? widthCouple - widthPrevious : width;
+      if (!stylesAreEqual) {
+        return width;
+      }
+      if (!previousWidth && previousChar) {
+        // we can measure the kerning couple and subtract the width of the previous character
+        previousWidth = ctx.measureText(previousChar);
+        fontCache[previousChar] = previousWidth / fontMultiplier;
+      }
+      if (!coupleWidth) {
+        coupleWidth = ctx.measureText(couple);
+        fontCache[couple] = coupleWidth / fontMultiplier;
+      }
+      return coupleWidth - previousWidth;
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} lineIndex
-     * @param {Number} charIndex
+     * return height of char in fontSize for a character at lineIndex, charIndex
+     * @param {Number} l line Index
+     * @param {Number} c char index
+     * @return {Number} fontSize of that character
      */
-    _getHeightOfChar: function(ctx, lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex);
-      return style && style.fontSize ? style.fontSize : this.fontSize;
+    getHeightOfChar: function(l, c) {
+      return this.styles && this.styles[l] && this.styles[l][c] && this.styles[l][c].fontSize ?
+        this.styles[l][c].fontSize : this.fontSize;
     },
 
     /**
      * measure an interval of characters from a given line
-     * @private
      * @param {Number} lineIndex
      * @param {Number} indexStart
-     * @param {Number} length
+     * @return {Object} object.width total width of characters
+     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
      */
-    _getWidthOfCharsAt: function(lineIndex, indexStart, length) {
-      var width = 0, i, _char, line = this._textLines[lineIndex], prevChar;
+    getWidthOfCharsAt: function(lineIndex, indexStart, length) {
+      var width = 0, i, char, line = this._textLines[lineIndex], prevChar, charWidth, widthOfSpaces = 0;
       for (i = indexStart; i < indexStart + length; i++) {
-        _char = line.charAt(i);
-        width += this._getWidthOfChar(_char, lineIndex, i, prevChar);
-        prevChar = _char;
+        char = line.charAt(i);
+        charWidth = this._getWidthOfChar(char, lineIndex, i, prevChar);
+        width += charWidth;
+        if (this._reSpacesAndTabs.test(char)) {
+          widthOfSpaces += charWidth;
+        }
+        prevChar = char;
       }
-      return width;
+      return { width: width, widthOfSpaces: widthOfSpaces };
     },
 
     /**
      * measure a text line measuring all characters.
-     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Number} lineIndex line number
      * @return {Number} Line width
      */
-    _measureLine: function(ctx, lineIndex) {
-      var width = this._getWidthOfCharsAt(lineIndex, 0, this._textLines[lineIndex].length);
+    measureLine: function(ctx, lineIndex) {
+      var lineInfo = this.getWidthOfCharsAt(lineIndex, 0, this._textLines[lineIndex].length);
       if (this.charSpacing !== 0) {
-        width -= this._getWidthOfCharSpacing();
+        lineInfo.width -= this._getWidthOfCharSpacing();
       }
-      return width > 0 ? width : 0;
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} lineIndex
-     */
-    _getWidthOfSpace: function (ctx, lineIndex) {
-      if (this.__widthOfSpace[lineIndex]) {
-        return this.__widthOfSpace[lineIndex];
+      if (lineInfo.width < 0) {
+        lineInfo.width = 0;
       }
-      var line = this._textLines[lineIndex],
-          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
-          widthDiff = this.width - wordsWidth,
-          numSpaces = line.length - line.replace(this._reSpacesAndTabs, '').length,
-          width = Math.max(widthDiff / numSpaces, ctx.measureText(' ').width);
-      this.__widthOfSpace[lineIndex] = width;
-      return width;
+      return lineInfo;
     },
 
     /**
@@ -1003,19 +1049,21 @@
     },
 
     /**
+     * Calculate height of chosen line
+     * height of line is based mainly on fontSize
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex index of the line to calculate
      */
-    _getHeightOfLine: function(ctx, lineIndex) {
+    getHeightOfLine: function(lineIndex) {
       if (this.__lineHeights[lineIndex]) {
         return this.__lineHeights[lineIndex];
       }
 
       var line = this._textLines[lineIndex],
-          maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
+          maxHeight = this.getHeightOfChar(lineIndex, 0);
 
       for (var i = 1, len = line.length; i < len; i++) {
-        var currentCharHeight = this._getHeightOfChar(ctx, lineIndex, i);
+        var currentCharHeight = this.getHeightOfChar(lineIndex, i);
         if (currentCharHeight > maxHeight) {
           maxHeight = currentCharHeight;
         }
@@ -1025,13 +1073,13 @@
     },
 
     /**
+     * calculate text box height
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getTextHeight: function(ctx) {
+    calcTextHeight: function() {
       var lineHeight, height = 0;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        lineHeight = this._getHeightOfLine(ctx, i);
+        lineHeight = this.getHeightOfLine(i);
         height += (i === len - 1 ? lineHeight / this.lineHeight : lineHeight);
       }
       return height;
@@ -1107,9 +1155,9 @@
       var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i),
+        var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
-            lineWidth = this._getLineWidth(ctx, i),
+            lineWidth = this.getLineWidth(i),
             leftOffset = this._getLineLeftOffset(lineWidth);
         this._renderTextLine(
           method,
@@ -1175,7 +1223,7 @@
       charOffset = charOffset || 0;
 
       // set proper line offset
-      var lineHeight = this._getHeightOfLine(ctx, lineIndex),
+      var lineHeight = this.getHeightOfLine(lineIndex),
           prevStyle,
           thisStyle,
           charsToRender = '';
@@ -1231,7 +1279,7 @@
           offset, textDecoration, chars, additionalSpace, _charWidth;
 
       if (decl) {
-        charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
+        charHeight = this.getHeightOfChar(lineIndex, i);
         shouldStroke = decl.stroke;
         shouldFill = decl.fill;
         textDecoration = decl.textDecoration;
@@ -1342,7 +1390,8 @@
     _clearCache: function() {
       this.__lineWidths = [];
       this.__lineHeights = [];
-      this.__widthOfSpace = [];
+      this.__widthOfSpaces = [];
+      this.__wordsCount = [];
     },
 
     /**
@@ -1366,26 +1415,27 @@
      * @param {Number} lineIndex line number
      * @return {Number} Line width
      */
-    _getLineWidth: function(lineIndex) {
+    getLineWidth: function(lineIndex) {
       if (this.__lineWidths[lineIndex]) {
-        return this.__lineWidths[lineIndex] === -1 ? this.width : this.__lineWidths[lineIndex];
+        return this.textAlign === 'justify' && this.__wordsCount[lineIndex] > 1 ?
+          this.width : this.__lineWidths[lineIndex];
       }
 
-      var width, wordCount, line = this._textLines[lineIndex];
+      var width, wordCount, line = this._textLines[lineIndex], lineInfo;
 
       if (line === '') {
         width = 0;
       }
       else {
-        width = this._measureLine(lineIndex);
+        lineInfo = this.measureLine(lineIndex);
+        width = lineInfo.width;
       }
       this.__lineWidths[lineIndex] = width;
+      this.__widthOfSpaces[lineIndex] = lineInfo.widthOfSpaces;
 
-      if (width && this.textAlign === 'justify') {
-        wordCount = line.split(/\s+/);
-        if (wordCount.length > 1) {
-          this.__lineWidths[lineIndex] = -1;
-        }
+      if (width) {
+        wordCount = line.split(this._reSpacesAndTabs);
+        this.__wordsCount[lineIndex] = wordCount.length;
       }
       return width;
     },
@@ -1415,9 +1465,9 @@
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          lineWidth = _this._getLineWidth(ctx, i);
+          lineWidth = _this.getLineWidth(i);
           lineLeftOffset = _this._getLineLeftOffset(lineWidth);
-          heightOfLine = _this._getHeightOfLine(ctx, i);
+          heightOfLine = _this.getHeightOfLine(i);
 
           for (j = 0, oLen = offsets.length; j < oLen; j++) {
             ctx.fillRect(
@@ -1471,7 +1521,7 @@
         return;
       }
       if (this._shouldClearDimensionCache()) {
-        this._initDimensions();
+        this.initDimensions();
       }
       this.callSuper('render', ctx, noTransform);
     },
@@ -1526,8 +1576,8 @@
     /**
      * @private
      */
-    _getSVGLeftTopOffsets: function(ctx) {
-      var lineTop = this._getHeightOfLine(ctx, 0),
+    _getSVGLeftTopOffsets: function() {
+      var lineTop = this.getHeightOfLine(0),
           textLeft = -this.width / 2,
           textTop = 0;
 
@@ -1581,7 +1631,7 @@
           this._setSVGTextLineBg(textBgRects, i, textLeftOffset, textTopOffset, height);
         }
         this._setSVGTextLineText(i, textSpans, height, textLeftOffset, textTopOffset, textBgRects);
-        height += this._getHeightOfLine(this.ctx, i);
+        height += this.getHeightOfLine(i);
       }
 
       return {
@@ -1600,7 +1650,7 @@
       }
       textSpans.push(
         '\t\t\t<tspan x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
           'y="',
           toFixed(yPos, NUM_FRACTION_DIGITS),
           '" ',
@@ -1626,7 +1676,7 @@
           word, attributes = this._getFillAttributes(this.fill),
           len;
 
-      textLeftOffset += this._getLineLeftOffset(this._getLineWidth(ctx, i));
+      textLeftOffset += this._getLineLeftOffset(this.getLineWidth(i));
 
       for (i = 0, len = words.length; i < len; i++) {
         word = words[i];
@@ -1651,13 +1701,13 @@
         '\t\t<rect ',
           this._getFillAttributes(this.textBackgroundColor),
           ' x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
           '" y="',
           toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',
-          toFixed(this._getLineWidth(this.ctx, i), NUM_FRACTION_DIGITS),
+          toFixed(this.getLineWidth(i), NUM_FRACTION_DIGITS),
           '" height="',
-          toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, NUM_FRACTION_DIGITS),
+          toFixed(this.getHeightOfLine(i) / this.lineHeight, NUM_FRACTION_DIGITS),
         '"></rect>\n');
     },
 
@@ -1706,7 +1756,7 @@
       this.callSuper('_set', key, value);
 
       if (this._dimensionAffectingProps.indexOf(key) > -1) {
-        this._initDimensions();
+        this.initDimensions();
         this.setCoords();
       }
     },
