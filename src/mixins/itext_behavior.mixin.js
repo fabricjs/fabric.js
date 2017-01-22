@@ -409,11 +409,12 @@
       var newSelectionStart = this.getSelectionStartFromPointer(options.e),
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
-      if (currentStart === newSelectionStart && newSelectionStart === this.__selectionStartOnMouseDown) {
+      if (
+        (newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd)
+        &&
+        (currentStart === newSelectionStart || currentEnd === newSelectionStart)
+      ) {
         return;
-      }
-      if (newSelectionStart === this.__selectionStartOnMouseDown) {
-        this.initDelayedCursor();
       }
       if (newSelectionStart > this.__selectionStartOnMouseDown) {
         this.selectionStart = this.__selectionStartOnMouseDown;
@@ -424,7 +425,7 @@
         this.selectionEnd = this.__selectionStartOnMouseDown;
       }
       if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
-        this.abortCursorAnimation();
+        this.restartCursorIfNeeded();
         this._fireSelectionChanged();
         this._updateTextarea();
         this.renderCursorOrSelection();
@@ -672,7 +673,7 @@
       ) {
         this.initDelayedCursor();
       }
-    }
+    },
 
     /**
      * Inserts new style object

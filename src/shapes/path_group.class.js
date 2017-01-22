@@ -61,6 +61,12 @@
         this._createCacheCanvas();
         this.setupState({ propertySet: 'cacheProperties' });
       }
+      if (this.paths) {
+        // we should not receive paths from options.
+        // since deleting it from options may mutate the original object
+        // we take care here.
+        delete this.paths;
+      }
     },
 
     /**
@@ -259,18 +265,13 @@
     // remove this pattern from 2.0 accepts only object
     if (typeof object.paths === 'string') {
       fabric.loadSVGFromURL(object.paths, function (elements) {
-
         var pathUrl = object.paths;
-        delete object.paths;
-
         var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
-
         callback(pathGroup);
       });
     }
     else {
       fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {
-        delete object.paths;
         callback(new fabric.PathGroup(enlivenedObjects, object));
       });
     }
