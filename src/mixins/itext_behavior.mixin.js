@@ -409,8 +409,11 @@
       var newSelectionStart = this.getSelectionStartFromPointer(options.e),
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
-      if (newSelectionStart === this.__selectionStartOnMouseDown) {
+      if (currentStart === newSelectionStart && newSelectionStart === this.__selectionStartOnMouseDown) {
         return;
+      }
+      if (newSelectionStart === this.__selectionStartOnMouseDown) {
+        this.initDelayedCursor();
       }
       if (newSelectionStart > this.__selectionStartOnMouseDown) {
         this.selectionStart = this.__selectionStartOnMouseDown;
@@ -421,6 +424,7 @@
         this.selectionEnd = this.__selectionStartOnMouseDown;
       }
       if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
+        this.abortCursorAnimation()
         this._fireSelectionChanged();
         this._updateTextarea();
         this.renderCursorOrSelection();
