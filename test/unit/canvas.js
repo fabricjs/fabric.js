@@ -255,7 +255,7 @@
     canvas.remove(rect4);
     equal(canvas.isEmpty(), true, 'canvas should be empty');
   });
-  
+
   test('remove actual hovered target', function() {
     var rect1 = makeRect();
     canvas.add(rect1);
