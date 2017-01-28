@@ -563,7 +563,7 @@
       this.selectable = true;
 
       this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea.blur && this.hiddenTextarea.blur();
+      this.hiddenTextarea && this.hiddenTextarea.blur && this.hiddenTextarea.blur();
       this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
       this.hiddenTextarea = null;
 
