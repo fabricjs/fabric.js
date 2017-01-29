@@ -1189,8 +1189,9 @@
       else {
         if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
           if (!skipCanvas) {
-            var dim = this._getNonTransformedDimensions();
-            this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+            var width = this.cacheWidth / this.zoomX;
+            var height = this.cacheHeight / this.zoomY;
+            this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
           }
           return true;
         }

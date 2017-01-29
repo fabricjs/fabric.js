@@ -469,6 +469,72 @@
           scaleMatrix = [scaleX, 0, 0, scaleY],
           m = multiplyMatrices(scaleMatrix, skewMatrixX, true);
       return multiplyMatrices(m, skewMatrixY, true);
-    }
+    },
+
+    /*
+     * Calculate object dimensions from its properties
+     * @private
+     * @return {Object} .x width dimension
+     * @return {Object} .y height dimension
+     */
+    _getNonTransformedDimensions: function() {
+      var strokeWidth = this.strokeWidth,
+          w = this.width + strokeWidth,
+          h = this.height + strokeWidth;
+      return { x: w, y: h };
+    },
+
+    /*
+     * Calculate object bounding boxdimensions from its properties scale, skew.
+     * @private
+     * @return {Object} .x width dimension
+     * @return {Object} .y height dimension
+     */
+    _getTransformedDimensions: function(skewX, skewY) {
+      if (typeof skewX === 'undefined') {
+        skewX = this.skewX;
+      }
+      if (typeof skewY === 'undefined') {
+        skewY = this.skewY;
+      }
+      var dimensions = this._getNonTransformedDimensions(),
+          dimX = dimensions.x / 2, dimY = dimensions.y / 2,
+          points = [
+            {
+              x: -dimX,
+              y: -dimY
+            },
+            {
+              x: dimX,
+              y: -dimY
+            },
+            {
+              x: -dimX,
+              y: dimY
+            },
+            {
+              x: dimX,
+              y: dimY
+            }],
+          i, transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY, false),
+          bbox;
+      for (i = 0; i < points.length; i++) {
+        points[i] = fabric.util.transformPoint(points[i], transformMatrix);
+      }
+      bbox = fabric.util.makeBoundingBoxFromPoints(points);
+      return { x: bbox.width, y: bbox.height };
+    },
+
+    /*
+     * Calculate object dimensions for controls. include padding and canvas zoom
+     * private
+     */
+    _calculateCurrentDimensions: function()  {
+      var vpt = this.getViewportTransform(),
+          dim = this._getTransformedDimensions(),
+          p = fabric.util.transformPoint(dim, vpt, true);
+
+      return p.scalarAdd(2 * this.padding);
+    },
   });
 })();

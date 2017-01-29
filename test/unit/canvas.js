@@ -256,6 +256,14 @@
     equal(canvas.isEmpty(), true, 'canvas should be empty');
   });
 
+  test('remove actual hovered target', function() {
+    var rect1 = makeRect();
+    canvas.add(rect1);
+    canvas._hoveredTarget = rect1;
+    canvas.remove(rect1);
+    equal(canvas._hoveredTarget, null, 'reference to hovered target should be removed');
+  });
+
   test('before:selection:cleared', function() {
     var isFired = false;
     canvas.on('before:selection:cleared', function() { isFired = true; });

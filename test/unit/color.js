@@ -84,12 +84,22 @@
     equal(oColor.toHex(), '000000');
   });
 
+  test('toHexa', function() {
+    var oColor = new fabric.Color('ffffffff');
+    ok(typeof oColor.toHexa == 'function');
+    equal(oColor.toHexa(), 'FFFFFFFF');
+    oColor.setSource([255,255,255,0.8]);
+    equal(oColor.toHexa(), 'FFFFFFCC');
+  });
+
   test('getAlpha', function() {
     var oColor = new fabric.Color('ffffff');
     ok(typeof oColor.getAlpha == 'function');
     equal(oColor.getAlpha(), 1);
     oColor.setSource([10,20,30, 0.456]);
     equal(oColor.getAlpha(), 0.456);
+    oColor = new fabric.Color('ffffffcc');
+    equal(oColor.getAlpha(), 0.8);
   });
 
   test('setAlpha', function() {
