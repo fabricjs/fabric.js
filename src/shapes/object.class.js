@@ -1111,7 +1111,7 @@
       if (this.canvas && this.canvas.viewportTransform) {
         return this.canvas.viewportTransform;
       }
-      return [1, 0, 0, 1, 0, 0];
+      return fabric.iMatrix.concat();
     },
 
     /**
@@ -1497,10 +1497,10 @@
 
     /**
      * Returns complexity of an instance
-     * @return {Number} complexity of this instance
+     * @return {Number} complexity of this instance (is 1 unless subclassed)
      */
     complexity: function() {
-      return 0;
+      return 1;
     },
 
     /**
