@@ -171,6 +171,17 @@
     enableRetinaScaling: true,
 
     /**
+     * Describe canvas element extension over design
+     * properties are tl,tr,bl,br.
+     * if canvas is not zoomed/panned those points are the four corner of canvas
+     * if canvas is viewportTransformed you those points indicate the extension
+     * of canvas element in plain untrasformed coordinates
+     * The coordinates get updated with @method calcViewportBoundaries.
+     * @memberOf fabric.StaticCanvas.prototype
+     */
+    vptCoords: { },
+
+    /**
      * @private
      * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
      * @param {Object} [options] Options object
@@ -650,6 +661,7 @@
       if (activeGroup) {
         activeGroup.setCoords(ingoreVpt, skipAbsolute);
       }
+      this.calcViewportBoundaries();
       this.renderAll();
       return this;
     },
@@ -806,8 +818,8 @@
           iVpt = invertTransform(this.viewportTransform);
       points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
       points.br = transformPoint({ x: width, y: height }, iVpt);
-      points.tr = { x: points.br.x, y: points.tl.y };
-      points.bl = { x: points.tl.x, y: points.br.y };
+      points.tr = new fabric.Point(points.br.x, points.tl.y);
+      points.bl = new fabric.Point(points.tl.x, points.br.y);
       this.vptCoords = points;
       return points;
     },

@@ -147,7 +147,8 @@
     },
 
     /**
-     * Checks if object is fully contained within the canvas with current viewportTransform
+     * Checks if object is contained within the canvas with current viewportTransform
+     * the check is done stopping at first point that appear on screen
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object is fully contained within canvas
      */
@@ -416,17 +417,19 @@
     /**
      * Sets corner position coordinates based on current angle, width and height
      * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
+     * @param {Boolean} [ignoreZoom] set oCoords with or without the viewport transform.
+     * @param {Boolean} [skipAbsolute] skip calculation of aCoords, usefull in setViewportTransform
      * @return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function(ignoreZoom, skipAbsolute) {
       this.oCoords = this.calcCoords(ignoreZoom);
-      if (!skipAbsolute && !ignoreZoom) {
+      if (!skipAbsolute) {
         this.aCoords = this.calcCoords(true);
       }
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      ignoreZoom || this._setCornerCoords && this._setCornerCoords();
+      ignoreZoom || (this._setCornerCoords && this._setCornerCoords());
 
       return this;
     },

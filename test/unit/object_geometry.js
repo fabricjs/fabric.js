@@ -248,6 +248,17 @@
     ok(typeof cObj.setCoords == 'function');
     equal(cObj.setCoords(), cObj, 'chainable');
 
+    equal(cObj.oCoords.tl.x, 150);
+    equal(cObj.oCoords.tl.y, 150);
+    equal(cObj.oCoords.tr.x, 250);
+    equal(cObj.oCoords.tr.y, 150);
+    equal(cObj.oCoords.bl.x, 150);
+    equal(cObj.oCoords.bl.y, 250);
+    equal(cObj.oCoords.br.x, 250);
+    equal(cObj.oCoords.br.y, 250);
+    equal(cObj.oCoords.mtr.x, 200);
+    equal(cObj.oCoords.mtr.y, 110);
+
     cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
@@ -277,6 +288,46 @@
     equal(cObj.oCoords.mtr.x, 300);
     equal(cObj.oCoords.mtr.y, 210);
   });
+
+  test('setCoords and aCoords', function() {
+    var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
+    cObj.canvas = {
+      viewportTransform: [2, 0, 0, 2, 0, 0]
+    };
+    cObj.setCoords();
+
+    equal(cObj.oCoords.tl.x, 300, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.tl.y, 300, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.tr.x, 500, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.tr.y, 300, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.bl.x, 300, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.bl.y, 500, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.br.x, 500, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.br.y, 500, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.mtr.x, 400, 'oCoords are modified by viewportTransform');
+    equal(cObj.oCoords.mtr.y, 260, 'oCoords are modified by viewportTransform');
+
+    equal(cObj.aCoords.tl.x, 150, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.tl.y, 150, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.tr.x, 250, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.tr.y, 150, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.bl.x, 150, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.bl.y, 250, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.br.x, 250, 'aCoords do not interfere with viewportTransform');
+    equal(cObj.aCoords.br.y, 250, 'aCoords do not interfere with viewportTransform');
+  });
+
+  test('isOnScreen', function(){
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    ok(cObj.isOnScreen(), 'object is onScreen');
+    cObj.top = 1000;
+    cObj.setCoords();
+    ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
+    canvas.setZoom(0.2);
+    ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
+  })
 
   test('calcTransformMatrix', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
@@ -312,5 +363,60 @@
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     ok(typeof cObj._constrainScale == 'function', '_constrainScale should exist');
   });
+
+  test('getCoords return coordinate of object in canvas coordinate.', function() {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+    var coords = cObj.getCoords();
+    deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner');
+    deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner');
+    deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner');
+    deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner');
+
+    cObj.left += 5;
+    coords = cObj.getCoords();
+    deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
+    deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
+    deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
+    deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+
+    coords = cObj.getCoords(false, true);
+    deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');
+    deepEqual(coords[1], new fabric.Point(57, 30), 'return top right corner recalculated');
+    deepEqual(coords[2], new fabric.Point(57, 47), 'return bottom right corner recalculated');
+    deepEqual(coords[3], new fabric.Point(45, 47), 'return bottom left corner recalculated');
+  });
+
+  test('getCoords return coordinate of object in zoomed canvas coordinate.', function() {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+    cObj.canvas = {
+      viewportTransform: [2, 0, 0, 2, 35, 35]
+    };
+    var coords = cObj.getCoords();
+    deepEqual(coords[0], new fabric.Point(115, 95), 'return top left corner is influenced by canvas zoom');
+    deepEqual(coords[1], new fabric.Point(139, 95), 'return top right corner is influenced by canvas zoom');
+    deepEqual(coords[2], new fabric.Point(139, 129), 'return bottom right corner is influenced by canvas zoom');
+    deepEqual(coords[3], new fabric.Point(115, 129), 'return bottom left corner is influenced by canvas zoom');
+  });
+
+  test('getCoords return coordinate of object in absolute coordinates and ignore canvas zoom', function() {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+    cObj.canvas = {
+      viewportTransform: [2, 0, 0, 2, 35, 35]
+    };
+    var coords = cObj.getCoords(true);
+    deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
+    deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
+    deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
+    deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+  });
+
+  // test('getCoords return coordinate of object', function() {
+  //   var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+  //   var coords = cObj.getCoords();
+  //   equal(coords[0], { x: 40, y: 30 }, 'return top left corner');
+  //   equal(coords[1], { x: 1, y: 1 }, 'return top right corner');
+  //   equal(coords[2], { x: 1, y: 1 }, 'return bottom right corner');
+  //   equal(coords[3], { x: 1, y: 1 }, 'return bottom left corner');
+  // });
 
 })();
