@@ -128,15 +128,13 @@
 
       var objectLeft = object.getLeft(),
           objectTop = object.getTop(),
-          ignoreZoom = true;
+          ignoreZoom = true, skipAbsolute = true;
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
-      object.setCoords(ignoreZoom);
+      object.setCoords(ignoreZoom, skipAbsolute);
     },
 
     /**
@@ -423,14 +421,14 @@
     },
 
     /**
-     * Sets coordinates of all group objects
+     * Sets coordinates of all objects inside group
      * @return {fabric.Group} thisArg
      * @chainable
      */
     setObjectsCoords: function() {
-      var ignoreZoom = true;
+      var ignoreZoom = true, skipAbsolute = true;
       this.forEachObject(function(object) {
-        object.setCoords(ignoreZoom);
+        object.setCoords(ignoreZoom, skipAbsolute);
       });
       return this;
     },
