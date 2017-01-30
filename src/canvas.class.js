@@ -1197,6 +1197,16 @@
 
     /**
      * Returns pointer coordinates relative to canvas.
+     * Can return coordinates with or without viewportTransform.
+     * ignoreZoom false gives back coordinates that represent
+     * the point clicked on canvas element.
+     * ignoreZoom true gives back coordinates after being processed
+     * by the viewportTransform ( sort of coordinates of what is displayed
+     * on the canvas where you are clicking.
+     * To interact with your shapes top and left you want to use ignoreZoom true
+     * most of the time, while ignoreZoom false will give you coordinates
+     * compatible with the object.oCoords system.
+     * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
