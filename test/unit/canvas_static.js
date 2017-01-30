@@ -1426,7 +1426,7 @@
 
   test('calcViewportBoundaries with zoom', function() {
     ok(typeof canvas.calcViewportBoundaries === 'function');
-    canvas.setViewportTransform([2, 0, 0, 2, 0, 0])
+    canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
     deepEqual(canvas.vptCoords.tl, new fabric.Point(0, 0), 'tl is 0,0');
     deepEqual(canvas.vptCoords.tr, new fabric.Point(canvas.getWidth() / 2, 0), 'tl is 0,0');
     deepEqual(canvas.vptCoords.bl, new fabric.Point(0, canvas.getHeight() / 2), 'tl is 0,0');
@@ -1435,8 +1435,8 @@
 
   test('calcViewportBoundaries with zoom and translation', function() {
     ok(typeof canvas.calcViewportBoundaries === 'function');
-    canvas.setViewportTransform([2, 0, 0, 2, -60, 60])
-    deepEqual(canvas.vptCoords.tl, new fabric.Point(30, - 30), 'tl is 0,0');
+    canvas.setViewportTransform([2, 0, 0, 2, -60, 60]);
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(30, -30), 'tl is 0,0');
     deepEqual(canvas.vptCoords.tr, new fabric.Point(30 + canvas.getWidth() / 2, -30), 'tl is 0,0');
     deepEqual(canvas.vptCoords.bl, new fabric.Point(30, canvas.getHeight() / 2 - 30), 'tl is 0,0');
     deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');

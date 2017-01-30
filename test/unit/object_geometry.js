@@ -327,7 +327,7 @@
     ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.2);
     ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
-  })
+  });
 
   test('calcTransformMatrix', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
