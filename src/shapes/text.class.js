@@ -4,7 +4,6 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed,
-      clone = fabric.util.object.clone,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
       MIN_TEXT_WIDTH = 2,
       CACHE_FONT_SIZE = 40;
@@ -515,7 +514,7 @@
       }
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
-      //this._renderText(ctx);
+      this._renderText(ctx);
       this._renderTextDecoration(ctx, 'overline');
       this._renderTextDecoration(ctx, 'line-through');
     },
@@ -683,7 +682,7 @@
         ctx.fillStyle = this.textBackgroundColor;
         heightOfLine = this.getHeightOfLine(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
-        ctx.fillRect(
+        noTextBackgroundColor || ctx.fillRect(
           leftOffset + lineLeftOffset,
           topOffset + lineTopOffset,
           lineWidth,
@@ -699,7 +698,7 @@
           _char = line[j];
           ctx.fillStyle = style.textBackgroundColor;
           ctx.fillRect(
-            leftOffset + lineLeftOffset + this.getWidthOfCharsAt(i, j),
+            leftOffset + lineLeftOffset + this.getWidthOfCharsAt(i, 0, j).width,
             topOffset + lineTopOffset,
             this._getWidthOfChar(_char, i, j),
             heightOfLine / this.lineHeight
@@ -735,45 +734,24 @@
     },
 
     /**
+     * apply all the character style to canvas for rendering
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} _char
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @param {Object} [decl]
      */
-    _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var charDecl = decl || this._getStyleDeclaration(lineIndex, charIndex),
-          styleDeclaration = clone(charDecl),
-          width, cacheProp, charWidthsCache;
-
-      this._applyFontStyles(styleDeclaration);
-      charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
-      cacheProp = this._getCacheProp(_char, styleDeclaration);
-
-      // short-circuit if no styles for this char
-      // global style from object is always applyed and handled by save and restore
-      if (!charDecl && charWidthsCache[cacheProp] && this.caching) {
-        return charWidthsCache[cacheProp];
-      }
+    _applyCharStyles: function(ctx, lineIndex, charIndex) {
+      var styleDeclaration = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+          fill = styleDeclaration.fill,
+          stroke = styleDeclaration.stroke;
 
       if (typeof styleDeclaration.shadow === 'string') {
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
 
-      var fill = styleDeclaration.fill || this.fill;
-      ctx.fillStyle = fill.toLive
-        ? fill.toLive(ctx, this)
-        : fill;
-
-      if (styleDeclaration.stroke) {
-        ctx.strokeStyle = (styleDeclaration.stroke && styleDeclaration.stroke.toLive)
-          ? styleDeclaration.stroke.toLive(ctx, this)
-          : styleDeclaration.stroke;
-      }
-
-      ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
-      ctx.font = this._getFontDeclaration.call(styleDeclaration);
+      fill && (ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill);
+      stroke && (ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke);
 
       //if we want this._setShadow.call to work with styleDeclarion
       //we have to add those references
@@ -785,13 +763,8 @@
         this._setShadow.call(styleDeclaration, ctx);
       }
 
-      if (!this.caching || !charWidthsCache[cacheProp]) {
-        width = ctx.measureText(_char).width;
-        this.caching && (charWidthsCache[cacheProp] = width);
-        return width;
-      }
-
-      return charWidthsCache[cacheProp];
+      ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+      ctx.font = this._getFontDeclaration(styleDeclaration);
     },
 
     /**
@@ -1139,7 +1112,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextFill: function(ctx) {
-      if (!this.fill && this.isEmptyStyles()) {
+      if (!this.fill && !this.styleHas('fill')) {
         return;
       }
 
@@ -1178,11 +1151,6 @@
      * @param {Number} charOffset
      */
     _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
-
-      if (this.isEmptyStyles()) {
-        return this._renderCharsFast(method, ctx, line, left, top);
-      }
-
       charOffset = charOffset || 0;
 
       // set proper line offset
@@ -1211,24 +1179,6 @@
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Content of the line
-     * @param {Number} left Left coordinate
-     * @param {Number} top Top coordinate
-     */
-    _renderCharsFast: function(method, ctx, line, left, top) {
-
-      if (method === 'fillText' && this.fill) {
-        this.callSuper('_renderChars', method, ctx, line, left, top);
-      }
-      if (method === 'strokeText' && ((this.stroke && this.strokeWidth > 0) || this.skipFillStrokeCheck)) {
-        this.callSuper('_renderChars', method, ctx, line, left, top);
-      }
-    },
-
-    /**
-     * @private
-     * @param {String} method
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Number} lineIndex
      * @param {Number} i
      * @param {String} _char
@@ -1237,7 +1187,6 @@
      * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      return;
       var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
           offset, textDecoration, chars, additionalSpace, _charWidth;
@@ -1257,7 +1206,7 @@
 
       decl && ctx.save();
 
-      charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || null);
+      charWidth = this._applyCharStyles(ctx, lineIndex, i);
       textDecoration = textDecoration || this.textDecoration;
 
       if (decl && decl.textBackgroundColor) {
