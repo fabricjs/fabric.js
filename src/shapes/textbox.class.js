@@ -252,7 +252,7 @@
       var width = 0;
       charOffset = charOffset || 0;
       for (var i = 0, len = text.length; i < len; i++) {
-        width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
+        width += this._getWidthOfChar(text[i], lineIndex, i + charOffset);
       }
       return width;
     },
@@ -409,18 +409,18 @@
           leftOffset     = 0,
           cursorLocation = this.get2DCursorLocation(),
           lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
-          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, cursorLocation.lineIndex));
+          lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorLocation.lineIndex));
 
       for (var i = 0; i < cursorLocation.charIndex; i++) {
-        leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
+        leftOffset += this._getWidthOfChar(lineChars[i], cursorLocation.lineIndex, i);
       }
 
       for (i = 0; i < cursorLocation.lineIndex; i++) {
-        topOffset += this._getHeightOfLine(this.ctx, i);
+        topOffset += this.getHeightOfLine(i);
       }
 
       if (typeOfBoundaries === 'cursor') {
-        topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, cursorLocation.lineIndex)
+        topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(cursorLocation.lineIndex)
           / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
           * (1 - this._fontSizeFraction);
       }

@@ -26,9 +26,9 @@
 
       var chars = this._textLines[lineIndex],
           charOffset = 0,
-          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) - this.width / 2,
+          lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(lineIndex)) - this.width / 2,
           lineOffset = this._getSVGLineTopOffset(lineIndex),
-          heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+          heightOfLine = this.getHeightOfLine(lineIndex);
 
       for (var i = 0, len = chars.length; i < len; i++) {
         var styleDecl = this._getStyleDeclaration(lineIndex, i) || { };
@@ -37,7 +37,7 @@
           this._createTextCharSpan(
             chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
 
-        var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
+        var charWidth = this._getWidthOfChar(chars[i], lineIndex, i);
 
         if (styleDecl.textBackgroundColor) {
           textBgRects.push(
@@ -55,9 +55,9 @@
     _getSVGLineTopOffset: function(lineIndex) {
       var lineTopOffset = 0, lastHeight = 0;
       for (var j = 0; j < lineIndex; j++) {
-        lineTopOffset += this._getHeightOfLine(this.ctx, j);
+        lineTopOffset += this.getHeightOfLine(j);
       }
-      lastHeight = this._getHeightOfLine(this.ctx, j);
+      lastHeight = this.getHeightOfLine(j);
       return {
         lineTop: lineTopOffset,
         offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)

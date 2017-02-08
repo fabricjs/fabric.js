@@ -269,12 +269,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getWidthBeforeCursor: function(lineIndex, charIndex) {
     var textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
-        widthOfLine = this._getLineWidth(this.ctx, lineIndex),
+        widthOfLine = this.getLineWidth(lineIndex),
         widthBeforeCursor = this._getLineLeftOffset(widthOfLine), _char;
 
     for (var i = 0, len = textBeforeCursor.length; i < len; i++) {
       _char = textBeforeCursor[i];
-      widthBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
+      widthBeforeCursor += this._getWidthOfChar(_char, lineIndex, i);
     }
     return widthBeforeCursor;
   },
@@ -345,7 +345,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getIndexOnLine: function(lineIndex, width) {
 
-    var widthOfLine = this._getLineWidth(this.ctx, lineIndex),
+    var widthOfLine = this.getLineWidth(lineIndex),
         textOnLine = this._textLines[lineIndex],
         lineLeftOffset = this._getLineLeftOffset(widthOfLine),
         widthOfCharsOnLine = lineLeftOffset,
@@ -355,7 +355,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     for (var j = 0, jlen = textOnLine.length; j < jlen; j++) {
 
       var _char = textOnLine[j],
-          widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+          widthOfChar = this._getWidthOfChar(_char, lineIndex, j);
 
       widthOfCharsOnLine += widthOfChar;
 

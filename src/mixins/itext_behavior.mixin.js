@@ -477,7 +477,7 @@
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex))
+                    ? this._getLineLeftOffset(this.getLineWidth(lineIndex))
                     : boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {

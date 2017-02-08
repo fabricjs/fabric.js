@@ -410,20 +410,20 @@
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
           leftOffset = 0;
-          topOffset += this._getHeightOfLine(this.ctx, lineIndex);
+          topOffset += this.getHeightOfLine(lineIndex);
 
           lineIndex++;
           charIndex = 0;
         }
         else {
-          leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
+          leftOffset += this._getWidthOfChar(chars[i], lineIndex, charIndex);
           charIndex++;
         }
 
-        lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex));
+        lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(lineIndex));
       }
       if (typeOfBoundaries === 'cursor') {
-        topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight
+        topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
           - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
       }
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
@@ -450,7 +450,7 @@
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
+                    ? this._getLineLeftOffset(this.getLineWidth(lineIndex))
                     : boundaries.leftOffset,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
@@ -480,17 +480,17 @@
           startLine = start.lineIndex,
           endLine = end.lineIndex;
       for (var i = startLine; i <= endLine; i++) {
-        var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0,
-            lineHeight = this._getHeightOfLine(this.ctx, i),
+        var lineOffset = this._getLineLeftOffset(this.getLineWidth(i)) || 0,
+            lineHeight = this.getHeightOfLine(i),
             realLineHeight = 0, boxWidth = 0, line = this._textLines[i];
 
         if (i === startLine) {
           for (var j = 0, len = line.length; j < len; j++) {
             if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
-              boxWidth += this._getWidthOfChar(ctx, line[j], i, j);
+              boxWidth += this._getWidthOfChar(line[j], i, j);
             }
             if (j < start.charIndex) {
-              lineOffset += this._getWidthOfChar(ctx, line[j], i, j);
+              lineOffset += this._getWidthOfChar(line[j], i, j);
             }
           }
           if (j === line.length) {
@@ -498,11 +498,11 @@
           }
         }
         else if (i > startLine && i < endLine) {
-          boxWidth += this._getLineWidth(ctx, i) || 5;
+          boxWidth += this.getLineWidth(i) || 5;
         }
         else if (i === endLine) {
           for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
-            boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
+            boxWidth += this._getWidthOfChar(line[j2], i, j2);
           }
           if (end.charIndex === line.length) {
             boxWidth -= this._getWidthOfCharSpacing();

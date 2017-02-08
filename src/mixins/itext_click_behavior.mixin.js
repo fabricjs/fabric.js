@@ -174,9 +174,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     for (var i = 0, len = this._textLines.length; i < len; i++) {
       line = this._textLines[i];
-      height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
+      height += this.getHeightOfLine(i) * this.scaleY;
 
-      var widthOfLine = this._getLineWidth(this.ctx, i),
+      var widthOfLine = this.getLineWidth(i),
           lineLeftOffset = this._getLineLeftOffset(widthOfLine);
 
       width = lineLeftOffset * this.scaleX;
@@ -185,7 +185,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         prevWidth = width;
 
-        width += this._getWidthOfChar(this.ctx, line[j], i, this.flipX ? jlen - j : j) *
+        width += this._getWidthOfChar(line[j], i, this.flipX ? jlen - j : j) *
                  this.scaleX;
 
         if (height <= mouseOffset.y || width <= mouseOffset.x) {

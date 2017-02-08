@@ -514,8 +514,10 @@
         ctx.translate(this.left, this.top);
       }
       this._renderTextLinesBackground(ctx);
-      this._renderText(ctx);
-      this._renderTextDecoration(ctx);
+      this._renderTextDecoration(ctx, 'underline');
+      //this._renderText(ctx);
+      this._renderTextDecoration(ctx, 'overline');
+      this._renderTextDecoration(ctx, 'line-through');
     },
 
     /**
@@ -664,21 +666,42 @@
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset, originalFill = ctx.fillStyle;
+          lineWidth, lineLeftOffset, originalFill = ctx.fillStyle,
+          noTextBackgroundColor = !this.textBackgroundColor || this.textBackgroundColor === 'transparent',
+          line, style, _char,
+          leftOffset = this._getLeftOffset(),
+          topOffset = this._getTopOffset();
 
-      ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
+        if (noTextBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
           continue;
         }
-        heightOfLine = this.getHeightOfLine(i);
         lineWidth = this.getLineWidth(i);
-        if (lineWidth > 0) {
-          lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        if (lineWidth <= 0) {
+          continue;
+        }
+        ctx.fillStyle = this.textBackgroundColor;
+        heightOfLine = this.getHeightOfLine(i);
+        lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        ctx.fillRect(
+          leftOffset + lineLeftOffset,
+          topOffset + lineTopOffset,
+          lineWidth,
+          heightOfLine / this.lineHeight
+        );
+        // check for single char textbgcolor
+        line = this._textLines[i];
+        for (var j = 0, jlen = line.length; j < jlen; j++) {
+          style = this._getStyleDeclaration(i, j);
+          if (!style || !style.textBackgroundColor) {
+            continue;
+          }
+          _char = line[j];
+          ctx.fillStyle = style.textBackgroundColor;
           ctx.fillRect(
-            this._getLeftOffset() + lineLeftOffset,
-            this._getTopOffset() + lineTopOffset,
-            lineWidth,
+            leftOffset + lineLeftOffset + this.getWidthOfCharsAt(i, j),
+            topOffset + lineTopOffset,
+            this._getWidthOfChar(_char, i, j),
             heightOfLine / this.lineHeight
           );
         }
@@ -688,44 +711,6 @@
       // if there is text background color no
       // other shadows should be casted
       this._removeShadow(ctx);
-
-      var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset,
-          leftOffset = this._getLeftOffset(),
-          topOffset = this._getTopOffset(),
-          line, _char, style;
-      ctx.save();
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
-        heightOfLine = this.getHeightOfLine(i);
-        line = this._textLines[i];
-
-        if (line === '' || !this.styles || !this._getLineStyle(i)) {
-          lineTopOffset += heightOfLine;
-          continue;
-        }
-
-        lineWidth = this.getLineWidth(i);
-        lineLeftOffset = this._getLineLeftOffset(lineWidth);
-
-        for (var j = 0, jlen = line.length; j < jlen; j++) {
-          style = this._getStyleDeclaration(i, j);
-          if (!style || !style.textBackgroundColor) {
-            continue;
-          }
-          _char = line[j];
-
-          ctx.fillStyle = style.textBackgroundColor;
-
-          ctx.fillRect(
-            leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
-            topOffset + lineTopOffset,
-            this._getWidthOfChar(ctx, _char, i, j),
-            heightOfLine / this.lineHeight
-          );
-        }
-        lineTopOffset += heightOfLine;
-      }
-      ctx.restore();
     },
 
     /**
@@ -737,11 +722,12 @@
      * @return {Object} reference to cache
      */
     getFontCache: function(decl) {
-      if (!fabric.charWidthsCache[decl.fontFamily]) {
-        fabric.charWidthsCache[decl.fontFamily] = { };
+      var fontFamily = decl.fontFamily.toLowerCase();
+      if (!fabric.charWidthsCache[fontFamily]) {
+        fabric.charWidthsCache[fontFamily] = { };
       }
-      var cache = fabric.charWidthsCache[decl.fontFamily],
-          cacheProp = decl.fontStyle + '_' + decl.fontWeight;
+      var cache = fabric.charWidthsCache[fontFamily],
+          cacheProp = decl.fontStyle.toLowerCase() + '_' + decl.fontWeight.toLowerCase();
       if (!cache[cacheProp]) {
         cache[cacheProp] = { };
       }
@@ -828,13 +814,13 @@
     },
 
     /**
-     * get the reference, notcloned of the style object for a given character
+     * get the reference, not a clone, of the style object for a given character
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @return {Object} style object
      */
-    getStyleDeclaration: function(lineIndex, charIndex) {
-      var lineStyle = this.styles[lineIndex];
+    _getStyleDeclaration: function(lineIndex, charIndex) {
+      var lineStyle = this.styles && this.styles[lineIndex];
       if (!lineStyle) {
         return null;
       }
@@ -849,7 +835,7 @@
      * @return {Object} style object
      */
     getCompleteStyleDeclaration: function(lineIndex, charIndex) {
-      var style = this.getStyleDeclaration(lineIndex, charIndex),
+      var style = this._getStyleDeclaration(lineIndex, charIndex) || { },
           styleObject = { }, prop;
       for (var i = 0; i < this._styleProperties.length; i++) {
         prop = this._styleProperties[i];
@@ -933,7 +919,7 @@
      * @param {String} [previousChar] previous char
      * @param {Object} [prevCharStyle] style of previous char
      */
-    measureChar: function(char, charStyle, previousChar, prevCharStyle) {
+    _measureChar: function(char, charStyle, previousChar, prevCharStyle) {
       // first i try to return from cache
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
@@ -960,7 +946,7 @@
       var ctx = this._measuringContext;
       this._setTextStyles(ctx, charStyle);
       if (!width) {
-        width = ctx.measureText(char);
+        width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
       }
       if (!stylesAreEqual) {
@@ -968,11 +954,11 @@
       }
       if (!previousWidth && previousChar) {
         // we can measure the kerning couple and subtract the width of the previous character
-        previousWidth = ctx.measureText(previousChar);
+        previousWidth = ctx.measureText(previousChar).width;
         fontCache[previousChar] = previousWidth / fontMultiplier;
       }
       if (!coupleWidth) {
-        coupleWidth = ctx.measureText(couple);
+        coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth / fontMultiplier;
       }
       return coupleWidth - previousWidth;
@@ -1012,11 +998,10 @@
 
     /**
      * measure a text line measuring all characters.
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Number} lineIndex line number
      * @return {Number} Line width
      */
-    measureLine: function(ctx, lineIndex) {
+    measureLine: function(lineIndex) {
       var lineInfo = this.getWidthOfCharsAt(lineIndex, 0, this._textLines[lineIndex].length);
       if (this.charSpacing !== 0) {
         lineInfo.width -= this._getWidthOfCharSpacing();
@@ -1041,7 +1026,7 @@
         var _char = line[charIndex];
 
         if (!_char.match(/\s/)) {
-          width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex + charOffset);
+          width += this._getWidthOfChar(_char, lineIndex, charIndex + charOffset);
         }
       }
 
@@ -1099,28 +1084,6 @@
      */
     _getTopOffset: function() {
       return -this.height / 2;
-    },
-
-    /**
-     * Returns complete style of char at the current cursor
-     * @param {Number} lineIndex Line index
-     * @param {Number} charIndex Char index
-     * @return {Object} Character style
-     */
-    getCurrentCharStyle: function(lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
-
-      return {
-        fontSize: style && style.fontSize || this.fontSize,
-        fill: style && style.fill || this.fill,
-        textBackgroundColor: style && style.textBackgroundColor || this.textBackgroundColor,
-        textDecoration: style && style.textDecoration || this.textDecoration,
-        fontFamily: style && style.fontFamily || this.fontFamily,
-        fontWeight: style && style.fontWeight || this.fontWeight,
-        fontStyle: style && style.fontStyle || this.fontStyle,
-        stroke: style && style.stroke || this.stroke,
-        strokeWidth: style && style.strokeWidth || this.strokeWidth
-      };
     },
 
     /**
@@ -1231,8 +1194,8 @@
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
       for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
-        prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
-        thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+        prevStyle = prevStyle || this.getCompleteStyleDeclaration(lineIndex, i);
+        thisStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
 
         if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
           this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
@@ -1274,6 +1237,7 @@
      * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
+      return;
       var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
           offset, textDecoration, chars, additionalSpace, _charWidth;
@@ -1451,47 +1415,34 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderTextDecoration: function(ctx) {
-      if (!this.textDecoration) {
+    _renderTextDecoration: function(ctx, type) {
+      if (this.textDecoration.indexOf(type) === -1) {
         return;
       }
       var halfOfVerticalBox = this.height / 2,
           _this = this, offsets = [];
 
-      /** @ignore */
-      function renderLinesAtOffset(offsets) {
-        var i, lineHeight = 0, len, j, oLen, lineWidth,
-            lineLeftOffset, heightOfLine;
+      offsets = {
+        underline: 0.85,
+        'line-through': 0.43,
+        overline: -0.12
+      };
 
-        for (i = 0, len = _this._textLines.length; i < len; i++) {
+      var i, lineHeight = 0, len, lineWidth,
+          lineLeftOffset, heightOfLine;
 
-          lineWidth = _this.getLineWidth(i);
-          lineLeftOffset = _this._getLineLeftOffset(lineWidth);
-          heightOfLine = _this.getHeightOfLine(i);
-
-          for (j = 0, oLen = offsets.length; j < oLen; j++) {
-            ctx.fillRect(
-              _this._getLeftOffset() + lineLeftOffset,
-              lineHeight + (_this._fontSizeMult - 1 + offsets[j] ) * _this.fontSize - halfOfVerticalBox,
-              lineWidth,
-              _this.fontSize / 15);
-          }
-          lineHeight += heightOfLine;
-        }
+      for (i = 0, len = _this._textLines.length; i < len; i++) {
+        lineWidth = _this.getLineWidth(i);
+        lineLeftOffset = _this._getLineLeftOffset(lineWidth);
+        heightOfLine = _this.getHeightOfLine(i);
+        ctx.fillRect(
+          _this._getLeftOffset() + lineLeftOffset,
+          lineHeight + (_this._fontSizeMult - 1 + offsets[type]) * _this.fontSize - halfOfVerticalBox,
+          lineWidth,
+          _this.fontSize / 15);
+        lineHeight += heightOfLine;
       }
 
-      if (this.textDecoration.indexOf('underline') > -1) {
-        offsets.push(0.85); // 1 - 3/16
-      }
-      if (this.textDecoration.indexOf('line-through') > -1) {
-        offsets.push(0.43);
-      }
-      if (this.textDecoration.indexOf('overline') > -1) {
-        offsets.push(-0.12);
-      }
-      if (offsets.length > 0) {
-        renderLinesAtOffset(offsets);
-      }
     },
 
     /**
