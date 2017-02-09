@@ -921,10 +921,47 @@ fabric.CommonMethods = {
     function escapeXml(string) {
         return string.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&apos;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
+    function graphemeSplit(textstring) {
+        var i = 0, graphemes = [];
+        for (var i = 0, chr; i < textstring.length; i++) {
+            if ((chr = getWholeChar(textstring, i)) === false) {
+                continue;
+            }
+            graphemes.push(chr);
+        }
+    }
+    function getWholeChar(str, i) {
+        var code = str.charCodeAt(i);
+        if (Number.isNaN(code)) {
+            return "";
+        }
+        if (code < 55296 || code > 57343) {
+            return str.charAt(i);
+        }
+        if (55296 <= code && code <= 56319) {
+            if (str.length <= i + 1) {
+                throw "High surrogate without following low surrogate";
+            }
+            var next = str.charCodeAt(i + 1);
+            if (56320 > next || next > 57343) {
+                throw "High surrogate without following low surrogate";
+            }
+            return str.charAt(i) + str.charAt(i + 1);
+        }
+        if (i === 0) {
+            throw "Low surrogate without preceding high surrogate";
+        }
+        var prev = str.charCodeAt(i - 1);
+        if (55296 > prev || prev > 56319) {
+            throw "Low surrogate without preceding high surrogate";
+        }
+        return false;
+    }
     fabric.util.string = {
         camelize: camelize,
         capitalize: capitalize,
-        escapeXml: escapeXml
+        escapeXml: escapeXml,
+        graphemeSplit: graphemeSplit
     };
 })();
 
