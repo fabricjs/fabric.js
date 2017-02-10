@@ -360,8 +360,8 @@
       target.bubbleThroughGroups(function(g) {
         g.update();
         g.setCoords();
-        this.fire('object:modified', { target: g });
-        g.fire('modified');
+        this.fire('object:modified', { target: g, groupBubbling: true });
+        g.fire('modified', { groupBubbling: true });
       }, this);
     },
 
