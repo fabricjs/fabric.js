@@ -1829,6 +1829,7 @@ fabric.CommonMethods = {
       }
       graphemes.push(chr);
     }
+    return graphemes;
   }
 
   // taken from mdn in the charAt doc page.
@@ -21773,6 +21774,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     ],
 
     /**
+     * contains characters bounding boxes
+     */
+    __charBounds: [],
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -21786,6 +21792,22 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.__skipDimension = false;
       this.initDimensions();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
+    },
+
+    /**
+     * Return a contex for measurement of text string.
+     * if created it gets stored for reuse
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
+     * @return {fabric.Text} thisArg
+     */
+    getMeasuringContext: function() {
+      // if we did not return we have to measure something.
+      if (!fabric._measuringContext) {
+        fabric._measuringContext = this.canvas && this.canvas.contextCache ||
+          fabric.util.createCanvasElement().getContext('2d');
+      }
+      return fabric._measuringContext;
     },
 
     /**
@@ -22255,26 +22277,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     },
 
     /**
-     * return or measure and return the width of a single character.
-     * takes in consideration style, and kerning where possible.
-     * @private
-     * @param {String} _char to be measured
-     * @param {Number} lineIndex index of the line where the char is
-     * @param {Number} charIndex position in the line
-     * @param {String} [previousChar] character preceding the one to be measured
-     */
-    _getWidthOfChar: function(_char, lineIndex, charIndex, previousChar) {
-      var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
-          prevCharStyle = previousChar ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
-          width = this._measureChar(_char, charStyle, previousChar, prevCharStyle);
-      if (this.charSpacing !== 0) {
-        width += this._getWidthOfCharSpacing();
-      }
-      // being charSpacing possibly negative we do not want the width being negative.
-      return width > 0 ? width : 0;
-    },
-
-    /**
      * measure and return the width of a single character.
      * possibly overridden to accomodate differente measure logic or
      * to hook some external lib for character measurement
@@ -22289,44 +22291,34 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
-          fontMultiplier = this.fontSize / CACHE_FONT_SIZE;
+          fontMultiplier = this.fontSize / CACHE_FONT_SIZE, kernedWith;
+
+      if (previousChar && fontCache[previousChar]) {
+        previousWidth = fontCache[previousChar] * fontMultiplier;
+      }
       if (fontCache[char]) {
         width = fontCache[char] * fontMultiplier;
+      }
+      if (stylesAreEqual && fontCache[couple]) {
         coupleWidth = fontCache[couple] * fontMultiplier;
-        previousWidth = previousChar ? fontCache[previousChar] * fontMultiplier : 0;
-        if (!stylesAreEqual) {
-          return width;
-        }
-        else if (coupleWidth && previousWidth) {
-          return coupleWidth - previousWidth;
-        }
       }
-      // if we did not return we have to measure something.
-      if (!this._measuringContext) {
-        this._measuringContext = fabric.measuringContext ||
-          this.canvas && this.canvas.contextCache ||
-          fabric.util.createCanvasElement().getContext('2d');
-        fabric.measuringContext || (fabric.measuringContext = this._measuringContext);
-      }
-      var ctx = this._measuringContext;
+      var ctx = this.getMeasuringContext();
       this._setTextStyles(ctx, charStyle);
       if (!width) {
-        width = ctx.measureText(char).width;
+        kernedWith = width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
       }
-      if (!stylesAreEqual) {
-        return width;
-      }
-      if (!previousWidth && previousChar) {
-        // we can measure the kerning couple and subtract the width of the previous character
+      if (stylesAreEqual && previousChar && !previousWidth) {
         previousWidth = ctx.measureText(previousChar).width;
         fontCache[previousChar] = previousWidth / fontMultiplier;
       }
-      if (!coupleWidth) {
+      if (previousWidth) {
+        // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth / fontMultiplier;
+        kernedWith = coupleWidth - previousWidth;
       }
-      return coupleWidth - previousWidth;
+      return { width: width, kernedWith: kernedWith };
     },
 
     /**
@@ -22350,7 +22342,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     getWidthOfCharsAt: function(lineIndex, indexStart, length) {
       var width = 0, i, char, line = this._textLines[lineIndex], prevChar, charWidth, widthOfSpaces = 0;
       for (i = indexStart; i < indexStart + length; i++) {
-        char = line.charAt(i);
+        char = line[i];
         charWidth = this._getWidthOfChar(char, lineIndex, i, prevChar);
         width += charWidth;
         if (this._reSpacesAndTabs.test(char)) {
@@ -22367,7 +22359,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @return {Number} Line width
      */
     measureLine: function(lineIndex) {
-      var lineInfo = this.getWidthOfCharsAt(lineIndex, 0, this._textLines[lineIndex].length);
+      var lineInfo = this._measureLine(lineIndex, 0, this._textLines[lineIndex].length);
       if (this.charSpacing !== 0) {
         lineInfo.width -= this._getWidthOfCharSpacing();
       }
@@ -22375,6 +22367,80 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         lineInfo.width = 0;
       }
       return lineInfo;
+    },
+
+    /**
+     * measure every grapheme of a line, populating __charBounds
+     * @param {Number} lineIndex
+     * @return {Object} object.width total width of characters
+     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+     */
+    _measureLine: function(lineIndex) {
+      var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
+          graphemeInfo, widthOfSpaces = 0, lineBounds = new Array(line.length);
+
+      this.__charBounds[lineIndex] = lineBounds;
+      for (i = 0; i < line.length; i++) {
+        grapheme = line[i];
+        graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        lineBounds[i] = graphemeInfo;
+        width += graphemeInfo.width;
+        if (this._reSpacesAndTabs.test(grapheme)) {
+          widthOfSpaces += graphemeInfo.width;
+        }
+        prevGrapheme = grapheme;
+      }
+      return { width: width, widthOfSpaces: widthOfSpaces };
+    },
+
+    /**
+     * Measure and return the info of a single grapheme.
+     * needs the the info of previous graphemes already filled
+     * @private
+     * @param {String} grapheme to be measured
+     * @param {Number} lineIndex index of the line where the char is
+     * @param {Number} charIndex position in the line
+     * @param {String} [previousChar] character preceding the one to be measured
+     */
+    _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme) {
+      var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+          prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
+          info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle),
+          width = info.kernedWith;
+      if (this.charSpacing !== 0) {
+        width += this._getWidthOfCharSpacing();
+      }
+      var box = {
+        width: width,
+        left: 0,
+        height: charStyle.fontSize,
+      };
+      if (charIndex > 0) {
+        var previousBox = this.__charBounds[lineIndex][charIndex - 1];
+        box.left = previousBox.left + previousBox.width + info.kernedWith - info.width;
+      }
+      return box;
+    },
+
+    /**
+     * Measure and return the width of a single grapheme.
+     * takes in consideration style, and kerning where possible.
+     * @private
+     * @param {String} _char to be measured
+     * @param {Number} lineIndex index of the line where the char is
+     * @param {Number} charIndex position in the line
+     * @param {String} [previousChar] character preceding the one to be measured
+     */
+    _getWidthOfChar: function(_char, lineIndex, charIndex, previousChar) {
+      var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+          prevCharStyle = previousChar ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
+          width = this._measureChar(_char, charStyle, previousChar, prevCharStyle);
+      if (this.charSpacing !== 0) {
+        width += this._getWidthOfCharSpacing();
+      }
+
+      // being charSpacing possibly negative we do not want the width being negative.
+      return width > 0 ? width : 0;
     },
 
     /**
@@ -22697,6 +22763,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.__lineHeights = [];
       this.__widthOfSpaces = [];
       this.__wordsCount = [];
+      this.__charBounds = [];
     },
 
     /**
@@ -22739,7 +22806,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.__widthOfSpaces[lineIndex] = lineInfo.widthOfSpaces;
 
       if (width) {
-        wordCount = line.split(this._reSpacesAndTabs);
+        wordCount = line.join('').split(this._reSpacesAndTabs);
         this.__wordsCount[lineIndex] = wordCount.length;
       }
       return width;
@@ -22823,7 +22890,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @returns {Array} Lines in the text
      */
     _splitTextIntoLines: function() {
-      return this.text.split(this._reNewline);
+      var lines = this.text.split(this._reNewline);
+      for (var i = 0; i < lines.length; i++) {
+        lines[i] = fabric.util.string.graphemeSplit(lines[i]);
+      }
+      return lines;
     },
 
     /**

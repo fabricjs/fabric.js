@@ -929,6 +929,7 @@ fabric.CommonMethods = {
             }
             graphemes.push(chr);
         }
+        return graphemes;
     }
     function getWholeChar(str, i) {
         var code = str.charCodeAt(i);
@@ -10167,6 +10168,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         styles: null,
         _measuringContext: null,
         _styleProperties: [ "stroke", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "textDecoration", "textBackgroundColor" ],
+        __charBounds: [],
         initialize: function(text, options) {
             options = options || {};
             this.text = text;
@@ -10177,6 +10179,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.setupState({
                 propertySet: "_dimensionAffectingProps"
             });
+        },
+        getMeasuringContext: function() {
+            if (!fabric._measuringContext) {
+                fabric._measuringContext = this.canvas && this.canvas.contextCache || fabric.util.createCanvasElement().getContext("2d");
+            }
+            return fabric._measuringContext;
         },
         isEmptyStyles: function(lineIndex) {
             if (!this.styles) {
@@ -10396,47 +10404,36 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _deleteLineStyle: function(lineIndex) {
             delete this.styles[lineIndex];
         },
-        _getWidthOfChar: function(_char, lineIndex, charIndex, previousChar) {
-            var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevCharStyle = previousChar ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, width = this._measureChar(_char, charStyle, previousChar, prevCharStyle);
-            if (this.charSpacing !== 0) {
-                width += this._getWidthOfCharSpacing();
-            }
-            return width > 0 ? width : 0;
-        },
         _measureChar: function(char, charStyle, previousChar, prevCharStyle) {
-            var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle), previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char, stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth, fontMultiplier = this.fontSize / CACHE_FONT_SIZE;
+            var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle), previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char, stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth, fontMultiplier = this.fontSize / CACHE_FONT_SIZE, kernedWith;
+            if (previousChar && fontCache[previousChar]) {
+                previousWidth = fontCache[previousChar] * fontMultiplier;
+            }
             if (fontCache[char]) {
                 width = fontCache[char] * fontMultiplier;
+            }
+            if (stylesAreEqual && fontCache[couple]) {
                 coupleWidth = fontCache[couple] * fontMultiplier;
-                previousWidth = previousChar ? fontCache[previousChar] * fontMultiplier : 0;
-                if (!stylesAreEqual) {
-                    return width;
-                } else if (coupleWidth && previousWidth) {
-                    return coupleWidth - previousWidth;
-                }
             }
-            if (!this._measuringContext) {
-                this._measuringContext = fabric.measuringContext || this.canvas && this.canvas.contextCache || fabric.util.createCanvasElement().getContext("2d");
-                fabric.measuringContext || (fabric.measuringContext = this._measuringContext);
-            }
-            var ctx = this._measuringContext;
+            var ctx = this.getMeasuringContext();
             this._setTextStyles(ctx, charStyle);
             if (!width) {
-                width = ctx.measureText(char).width;
+                kernedWith = width = ctx.measureText(char).width;
                 fontCache[char] = width / fontMultiplier;
             }
-            if (!stylesAreEqual) {
-                return width;
-            }
-            if (!previousWidth && previousChar) {
+            if (stylesAreEqual && previousChar && !previousWidth) {
                 previousWidth = ctx.measureText(previousChar).width;
                 fontCache[previousChar] = previousWidth / fontMultiplier;
             }
-            if (!coupleWidth) {
+            if (previousWidth) {
                 coupleWidth = ctx.measureText(couple).width;
                 fontCache[couple] = coupleWidth / fontMultiplier;
+                kernedWith = coupleWidth - previousWidth;
             }
-            return coupleWidth - previousWidth;
+            return {
+                width: width,
+                kernedWith: kernedWith
+            };
         },
         getHeightOfChar: function(l, c) {
             return this.styles && this.styles[l] && this.styles[l][c] && this.styles[l][c].fontSize ? this.styles[l][c].fontSize : this.fontSize;
@@ -10444,7 +10441,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         getWidthOfCharsAt: function(lineIndex, indexStart, length) {
             var width = 0, i, char, line = this._textLines[lineIndex], prevChar, charWidth, widthOfSpaces = 0;
             for (i = indexStart; i < indexStart + length; i++) {
-                char = line.charAt(i);
+                char = line[i];
                 charWidth = this._getWidthOfChar(char, lineIndex, i, prevChar);
                 width += charWidth;
                 if (this._reSpacesAndTabs.test(char)) {
@@ -10458,7 +10455,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
         },
         measureLine: function(lineIndex) {
-            var lineInfo = this.getWidthOfCharsAt(lineIndex, 0, this._textLines[lineIndex].length);
+            var lineInfo = this._measureLine(lineIndex, 0, this._textLines[lineIndex].length);
             if (this.charSpacing !== 0) {
                 lineInfo.width -= this._getWidthOfCharSpacing();
             }
@@ -10466,6 +10463,47 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 lineInfo.width = 0;
             }
             return lineInfo;
+        },
+        _measureLine: function(lineIndex) {
+            var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme, graphemeInfo, widthOfSpaces = 0, lineBounds = new Array(line.length);
+            this.__charBounds[lineIndex] = lineBounds;
+            for (i = 0; i < line.length; i++) {
+                grapheme = line[i];
+                graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+                lineBounds[i] = graphemeInfo;
+                width += graphemeInfo.width;
+                if (this._reSpacesAndTabs.test(grapheme)) {
+                    widthOfSpaces += graphemeInfo.width;
+                }
+                prevGrapheme = grapheme;
+            }
+            return {
+                width: width,
+                widthOfSpaces: widthOfSpaces
+            };
+        },
+        _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme) {
+            var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle), width = info.kernedWith;
+            if (this.charSpacing !== 0) {
+                width += this._getWidthOfCharSpacing();
+            }
+            var box = {
+                width: width,
+                left: 0,
+                height: charStyle.fontSize
+            };
+            if (charIndex > 0) {
+                var previousBox = this.__charBounds[lineIndex][charIndex - 1];
+                box.left = previousBox.left + previousBox.width + info.kernedWith - info.width;
+            }
+            return box;
+        },
+        _getWidthOfChar: function(_char, lineIndex, charIndex, previousChar) {
+            var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevCharStyle = previousChar ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, width = this._measureChar(_char, charStyle, previousChar, prevCharStyle);
+            if (this.charSpacing !== 0) {
+                width += this._getWidthOfCharSpacing();
+            }
+            return width > 0 ? width : 0;
         },
         _getWidthOfWords: function(ctx, line, lineIndex, charOffset) {
             var width = 0;
@@ -10631,6 +10669,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.__lineHeights = [];
             this.__widthOfSpaces = [];
             this.__wordsCount = [];
+            this.__charBounds = [];
         },
         _shouldClearDimensionCache: function() {
             var shouldClear = this._forceClearCache;
@@ -10657,7 +10696,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.__lineWidths[lineIndex] = width;
             this.__widthOfSpaces[lineIndex] = lineInfo.widthOfSpaces;
             if (width) {
-                wordCount = line.split(this._reSpacesAndTabs);
+                wordCount = line.join("").split(this._reSpacesAndTabs);
                 this.__wordsCount[lineIndex] = wordCount.length;
             }
             return width;
@@ -10701,7 +10740,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.callSuper("render", ctx, noTransform);
         },
         _splitTextIntoLines: function() {
-            return this.text.split(this._reNewline);
+            var lines = this.text.split(this._reNewline);
+            for (var i = 0; i < lines.length; i++) {
+                lines[i] = fabric.util.string.graphemeSplit(lines[i]);
+            }
+            return lines;
         },
         toObject: function(propertiesToInclude) {
             var additionalProperties = [ "text", "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "textDecoration", "textAlign", "textBackgroundColor", "charSpacing" ].concat(propertiesToInclude);

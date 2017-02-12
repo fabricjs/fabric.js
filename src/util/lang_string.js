@@ -68,6 +68,7 @@
       }
       graphemes.push(chr);
     }
+    return graphemes;
   }
 
   // taken from mdn in the charAt doc page.
