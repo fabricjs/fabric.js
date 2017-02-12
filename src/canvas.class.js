@@ -1075,6 +1075,7 @@
 
     /**
      * Method that determines what object we are clicking on
+     * the skipGroup parameter is for internal use, is needed for shift+click action
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
      */
@@ -1091,7 +1092,7 @@
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
-      if (activeGroup && !skipGroup && this._checkTarget(pointer, activeGroup)) {
+      if (activeGroup && !skipGroup && activeGroup === this._searchPossibleTargets([activeGroup], pointer)) {
         this._fireOverOutEvents(activeGroup, e);
         return activeGroup;
       }
@@ -1100,7 +1101,7 @@
         this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
-      if (activeObject && this._checkTarget(pointer, activeObject)) {
+      if (activeObject && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           this._fireOverOutEvents(activeObject, e);
           return activeObject;
