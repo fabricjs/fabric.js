@@ -1365,6 +1365,10 @@
      * @chainable
      */
     setActiveObject: function (object, e) {
+      var currentActiveObject = this.getActiveObject();
+      if (currentActiveObject !== object) {
+        currentActiveObject.fire('deselected', { e: e });
+      }
       this._setActiveObject(object);
       this.renderAll();
       this.fire('object:selected', { target: object, e: e });
@@ -1409,17 +1413,22 @@
     },
 
     /**
-     * Discards currently active object and fire events
+     * Discards currently active object and fire events. If the function is called by fabric
+     * as a consequence of a mouse event, the event is passed as a parmater and
+     * sent to the fire function for the custom events. When used as a method the
+     * e param does not have any application.
      * @param {event} e
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     discardActiveObject: function (e) {
       var activeObject = this._activeObject;
-      this.fire('before:selection:cleared', { target: activeObject, e: e });
-      this._discardActiveObject();
-      this.fire('selection:cleared', { e: e });
-      activeObject && activeObject.fire('deselected', { e: e });
+      if (activeObject) {
+        this.fire('before:selection:cleared', { target: activeObject, e: e });
+        this._discardActiveObject();
+        this.fire('selection:cleared', { e: e });
+        activeObject.fire('deselected', { e: e });
+      }
       return this;
     },
 
@@ -1435,7 +1444,10 @@
     },
 
     /**
-     * Sets active group to a specified one
+     * Sets active group to a specified one. If the function is called by fabric
+     * as a consequence of a mouse event, the event is passed as a parmater and
+     * sent to the fire function for the custom events. When used as a method the
+     * e param does not have any application.
      * @param {fabric.Group} group Group to set as a current one
      * @param {Event} e Event object
      * @return {fabric.Canvas} thisArg
@@ -1470,15 +1482,20 @@
     },
 
     /**
-     * Discards currently active group and fire events
+     * Discards currently active group and fire events If the function is called by fabric
+     * as a consequence of a mouse event, the event is passed as a parmater and
+     * sent to the fire function for the custom events. When used as a method the
+     * e param does not have any application.
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     discardActiveGroup: function (e) {
       var g = this.getActiveGroup();
-      this.fire('before:selection:cleared', { e: e, target: g });
-      this._discardActiveGroup();
-      this.fire('selection:cleared', { e: e });
+      if (g) {
+        this.fire('before:selection:cleared', { e: e, target: g });
+        this._discardActiveGroup();
+        this.fire('selection:cleared', { e: e });
+      }
       return this;
     },
 
@@ -1502,21 +1519,17 @@
     },
 
     /**
-     * Deactivates all objects and dispatches appropriate events
+     * Deactivates all objects and dispatches appropriate events If the function is called by fabric
+     * as a consequence of a mouse event, the event is passed as a parmater and
+     * sent to the fire function for the custom events. When used as a method the
+     * e param does not have any application.
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     deactivateAllWithDispatch: function (e) {
-      var activeGroup = this.getActiveGroup(),
-          activeObject = this.getActiveObject();
-      if (activeObject || activeGroup) {
-        this.fire('before:selection:cleared', { target: activeObject || activeGroup, e: e });
-      }
+      this.discardActiveGroup(e);
+      this.discardActiveObject(e);
       this.deactivateAll();
-      if (activeObject || activeGroup) {
-        this.fire('selection:cleared', { e: e, target: activeObject });
-        activeObject && activeObject.fire('deselected');
-      }
       return this;
     },
 

@@ -581,7 +581,7 @@
         this.canvas.fire('text:editing:exited', { target: this });
         isTextChanged && this.canvas.fire('object:modified', { target: this });
       }
-
+console.trace()
       return this;
     },
 
