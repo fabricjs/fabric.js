@@ -1366,7 +1366,7 @@
      */
     setActiveObject: function (object, e) {
       var currentActiveObject = this.getActiveObject();
-      if (currentActiveObject !== object) {
+      if (currentActiveObject && currentActiveObject !== object) {
         currentActiveObject.fire('deselected', { e: e });
       }
       this._setActiveObject(object);
