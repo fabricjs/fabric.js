@@ -1353,7 +1353,7 @@
       var obj = this._activeObject;
       if (obj) {
         obj.set('active', false);
-        if (obj.onDeselect && typeof obj.onDeselect === 'function') {
+        if (object !== obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
           obj.onDeselect();
         }
       }
