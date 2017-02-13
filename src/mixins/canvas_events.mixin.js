@@ -49,8 +49,8 @@
       addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
 
       // touch events
-      addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, { passive: false });
+      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, { passive: false });
 
       if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
         eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
@@ -199,7 +199,7 @@
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
 
-      addListener(fabric.document, 'touchend', this._onMouseUp);
+      addListener(fabric.document, 'touchend', this._onMouseUp, { passive: false });
       addListener(fabric.document, 'touchmove', this._onMouseMove, { passive: false });
 
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
@@ -228,8 +228,8 @@
       removeListener(fabric.document, 'mousemove', this._onMouseMove);
       removeListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, { passive: false });
+      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, { passive: false });
 
       if (e.type === 'touchend') {
         // Wait 400ms before rebinding mousedown to prevent double triggers
