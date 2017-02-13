@@ -1350,8 +1350,12 @@
      * @param {Object} object
      */
     _setActiveObject: function(object) {
-      if (this._activeObject) {
-        this._activeObject.set('active', false);
+      var obj = this._activeObject;
+      if (obj) {
+        obj.set('active', false);
+        if (obj.isEditing && typeof obj.exitEditing === 'function') {
+          obj.exitEditing();
+        }
       }
       this._activeObject = object;
       object.set('active', true);
@@ -1406,8 +1410,12 @@
      * @private
      */
     _discardActiveObject: function() {
-      if (this._activeObject) {
-        this._activeObject.set('active', false);
+      var obj = this._activeObject;
+      if (obj) {
+        obj.set('active', false);
+        if (obj.isEditing && typeof obj.exitEditing === 'function') {
+          obj.exitEditing();
+        }
       }
       this._activeObject = null;
     },

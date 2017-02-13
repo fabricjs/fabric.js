@@ -66,9 +66,6 @@
      * @private
      */
     _initCanvasHandlers: function(canvas) {
-      canvas._canvasITextSelectionClearedHanlder = (function() {
-        fabric.IText.prototype.exitEditingOnOthers(canvas);
-      }).bind(this);
       canvas._mouseUpITextHandler = (function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
@@ -76,8 +73,6 @@
           });
         }
       }).bind(this);
-      canvas.on('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
-      canvas.on('object:selected', canvas._canvasITextSelectionClearedHanlder);
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 
@@ -86,8 +81,6 @@
      * @private
      */
     _removeCanvasHandlers: function(canvas) {
-      canvas.off('selection:cleared', canvas._canvasITextSelectionClearedHanlder);
-      canvas.off('object:selected', canvas._canvasITextSelectionClearedHanlder);
       canvas.off('mouse:up', canvas._mouseUpITextHandler);
     },
 
