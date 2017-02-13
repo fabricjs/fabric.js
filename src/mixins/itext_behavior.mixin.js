@@ -15,17 +15,9 @@
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
-    /**
-     * Initializes "selected" event handler
-     */
-    initSelectedHandler: function() {
-      this.on('selected', function() {
-
-        var _this = this;
-        setTimeout(function() {
-          _this.selected = true;
-        }, 100);
-      });
+    onDeselect: function() {
+      this.isEditing && this.exitEditing();
+      this.selected = false;
     },
 
     /**
@@ -574,7 +566,6 @@
         this.canvas.fire('text:editing:exited', { target: this });
         isTextChanged && this.canvas.fire('object:modified', { target: this });
       }
-console.trace()
       return this;
     },
 

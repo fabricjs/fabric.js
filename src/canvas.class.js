@@ -1353,8 +1353,8 @@
       var obj = this._activeObject;
       if (obj) {
         obj.set('active', false);
-        if (obj.isEditing && typeof obj.exitEditing === 'function') {
-          obj.exitEditing();
+        if (obj.onDeselect && typeof obj.onDeselect === 'function') {
+          obj.onDeselect();
         }
       }
       this._activeObject = object;
@@ -1413,8 +1413,8 @@
       var obj = this._activeObject;
       if (obj) {
         obj.set('active', false);
-        if (obj.isEditing && typeof obj.exitEditing === 'function') {
-          obj.exitEditing();
+        if (obj.onDeselect && typeof obj.onDeselect === 'function') {
+          obj.onDeselect();
         }
       }
       this._activeObject = null;
