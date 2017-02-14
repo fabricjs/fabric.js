@@ -319,13 +319,15 @@
 
   test('isOnScreen', function(){
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     cObj.setCoords();
     ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
     cObj.setCoords();
     ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
-    canvas.setZoom(0.2);
+    canvas.setZoom(0.1);
+    cObj.setCoords();
     ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
   });
 
