@@ -1312,7 +1312,8 @@
         width: width + 'px',
         height: height + 'px',
         left: 0,
-        top: 0
+        top: 0,
+        'touch-action': 'none'
       });
       element.width = width;
       element.height = height;
