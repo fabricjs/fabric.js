@@ -1000,7 +1000,7 @@
       var prototype = fabric.util.getKlass(object.type).prototype,
           stateProperties = prototype.stateProperties;
       stateProperties.forEach(function(prop) {
-        if (object[prop] === prototype[prop]) {
+        if (object[prop] === prototype[prop] && (prop !== 'top' && prop !== 'left')) {
           delete object[prop];
         }
         var isArray = Object.prototype.toString.call(object[prop]) === '[object Array]' &&
