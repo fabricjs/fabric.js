@@ -343,7 +343,6 @@
     deepEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
     notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
-
   });
 
   test('toDatalessObject', function() {
