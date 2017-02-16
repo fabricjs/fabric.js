@@ -156,7 +156,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.isEditing) {
       this._fireSelectionChanged();
       this._updateTextarea();
-    }     
+    }
   },
 
   /**
