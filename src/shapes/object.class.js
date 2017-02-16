@@ -797,6 +797,16 @@
     dirty:                false,
 
     /**
+     * When set to `true`, force the object to have its own cache, even if it is inside a group
+     * it may be needed when your object behave in a particular way on the cache and always needs
+     * its own isolated canvas to render correctly.
+     * since 1.7.5
+     * @type Boolean
+     * @default false
+     */
+    needsItsOwnCache: false,
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -1137,7 +1147,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching && !this.group) {
+      if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
         if (this.isCacheDirty(noTransform)) {
           this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
