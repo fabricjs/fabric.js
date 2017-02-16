@@ -1,3 +1,10 @@
+**Version 1.7.5**
+
+- Improvement: draw textbackgroundColor in one single pass when possible @stefanhayden [#3698](https://github.com/kangax/fabric.js/pull/3698)
+- Improvement: fire selection changed event just if text is editing [#3702](https://github.com/kangax/fabric.js/pull/3702)
+- Improvement: Add object property 'needsItsOwnCache' [#3703](https://github.com/kangax/fabric.js/pull/3703)
+- Improvement: Skip unnecessary transform if they can be detected with a single if [#3704](https://github.com/kangax/fabric.js/pull/3704)
+
 **Version 1.7.4**
 
 - Fix: Moved all the touch event to passive false so that they behave as before chrome changes [#3690](https://github.com/kangax/fabric.js/pull/3690)
