@@ -825,7 +825,9 @@
           lineWidth, lineLeftOffset,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
-          line, _char, style;
+          colorCache = '',
+          line, _char, style, leftCache,
+          topCache, widthCache, heightCache;
       ctx.save();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this._getHeightOfLine(ctx, i);
@@ -838,22 +840,40 @@
 
         lineWidth = this._getLineWidth(ctx, i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
-
+        leftCache = topCache = widthCache = heightCache = 0;
         for (var j = 0, jlen = line.length; j < jlen; j++) {
-          style = this._getStyleDeclaration(i, j);
-          if (!style || !style.textBackgroundColor) {
+          style = this._getStyleDeclaration(i, j) || {};
+
+          if (colorCache !== style.textBackgroundColor) {
+            if (heightCache && widthCache) {
+              ctx.fillStyle = colorCache;
+              ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+            }
+            leftCache = topCache = widthCache = heightCache = 0;
+            colorCache = style.textBackgroundColor || '';
+          }
+
+          if (!style.textBackgroundColor) {
+            colorCache = '';
             continue;
           }
           _char = line[j];
 
-          ctx.fillStyle = style.textBackgroundColor;
-
-          ctx.fillRect(
-            leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
-            topOffset + lineTopOffset,
-            this._getWidthOfChar(ctx, _char, i, j),
-            heightOfLine / this.lineHeight
-          );
+          if (colorCache === style.textBackgroundColor) {
+            colorCache = style.textBackgroundColor;
+            if (!leftCache) {
+              leftCache = leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j);
+            }
+            topCache = topOffset + lineTopOffset;
+            widthCache += this._getWidthOfChar(ctx, _char, i, j);
+            heightCache = heightOfLine / this.lineHeight;
+          }
+        }
+        // if a textBackgroundColor ends on the last character of a line
+        if (heightCache && widthCache) {
+          ctx.fillStyle = colorCache;
+          ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+          leftCache = topCache = widthCache = heightCache = 0;
         }
         lineTopOffset += heightOfLine;
       }
