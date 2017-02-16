@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.5"
+    version: "1.7.6"
 };
 
 if (typeof exports !== "undefined") {
@@ -6157,6 +6157,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             this.clipTo && fabric.util.clipContext(this, ctx);
             if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
+                if (!this._cacheCanvas) {
+                    this._createCacheCanvas();
+                }
                 if (this.isCacheDirty(noTransform)) {
                     this.statefullCache && this.saveState({
                         propertySet: "cacheProperties"
