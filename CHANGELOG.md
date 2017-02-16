@@ -1,3 +1,7 @@
+**Version 1.7.6**
+
+- Fix: make the cacheCanvas created on the fly if not available [#3705](https://github.com/kangax/fabric.js/pull/3705)
+
 **Version 1.7.5**
 
 - Improvement: draw textbackgroundColor in one single pass when possible @stefanhayden [#3698](https://github.com/kangax/fabric.js/pull/3698)
