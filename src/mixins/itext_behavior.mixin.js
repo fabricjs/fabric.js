@@ -355,7 +355,7 @@
 
       this._tick();
       this.fire('editing:entered');
-
+      this._fireSelectionChanged();
       if (!this.canvas) {
         return this;
       }
