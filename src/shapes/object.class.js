@@ -1148,6 +1148,9 @@
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
+        if (!this._cacheCanvas) {
+          this._createCacheCanvas();
+        }
         if (this.isCacheDirty(noTransform)) {
           this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
           this.drawObject(this._cacheContext, noTransform);
