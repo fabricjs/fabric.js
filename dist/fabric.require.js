@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.4"
+    version: "1.7.5"
 };
 
 if (typeof exports !== "undefined") {
@@ -5963,6 +5963,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         statefullCache: false,
         noScaleCache: true,
         dirty: false,
+        needsItsOwnCache: false,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
         initialize: function(options) {
@@ -6026,10 +6027,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
             ctx.translate(center.x, center.y);
-            ctx.rotate(degreesToRadians(this.angle));
+            this.angle && ctx.rotate(degreesToRadians(this.angle));
             ctx.scale(this.scaleX * (this.flipX ? -1 : 1), this.scaleY * (this.flipY ? -1 : 1));
-            ctx.transform(1, 0, Math.tan(degreesToRadians(this.skewX)), 1, 0, 0);
-            ctx.transform(1, Math.tan(degreesToRadians(this.skewY)), 0, 1, 0, 0);
+            this.skewX && ctx.transform(1, 0, Math.tan(degreesToRadians(this.skewX)), 1, 0, 0);
+            this.skewY && ctx.transform(1, Math.tan(degreesToRadians(this.skewY)), 0, 1, 0, 0);
         },
         toObject: function(propertiesToInclude) {
             var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, object = {
@@ -6155,7 +6156,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 ctx.transform.apply(ctx, this.transformMatrix);
             }
             this.clipTo && fabric.util.clipContext(this, ctx);
-            if (this.objectCaching && !this.group) {
+            if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
                 if (this.isCacheDirty(noTransform)) {
                     this.statefullCache && this.saveState({
                         propertySet: "cacheProperties"
@@ -10942,7 +10943,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _renderTextLinesBackground: function(ctx) {
             this.callSuper("_renderTextLinesBackground", ctx);
-            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), line, _char, style;
+            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), colorCache = "", line, _char, style, leftCache, topCache, widthCache, heightCache;
             ctx.save();
             for (var i = 0, len = this._textLines.length; i < len; i++) {
                 heightOfLine = this._getHeightOfLine(ctx, i);
@@ -10953,14 +10954,36 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
                 lineWidth = this._getLineWidth(ctx, i);
                 lineLeftOffset = this._getLineLeftOffset(lineWidth);
+                leftCache = topCache = widthCache = heightCache = 0;
                 for (var j = 0, jlen = line.length; j < jlen; j++) {
-                    style = this._getStyleDeclaration(i, j);
-                    if (!style || !style.textBackgroundColor) {
+                    style = this._getStyleDeclaration(i, j) || {};
+                    if (colorCache !== style.textBackgroundColor) {
+                        if (heightCache && widthCache) {
+                            ctx.fillStyle = colorCache;
+                            ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+                        }
+                        leftCache = topCache = widthCache = heightCache = 0;
+                        colorCache = style.textBackgroundColor || "";
+                    }
+                    if (!style.textBackgroundColor) {
+                        colorCache = "";
                         continue;
                     }
                     _char = line[j];
-                    ctx.fillStyle = style.textBackgroundColor;
-                    ctx.fillRect(leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j), topOffset + lineTopOffset, this._getWidthOfChar(ctx, _char, i, j), heightOfLine / this.lineHeight);
+                    if (colorCache === style.textBackgroundColor) {
+                        colorCache = style.textBackgroundColor;
+                        if (!leftCache) {
+                            leftCache = leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j);
+                        }
+                        topCache = topOffset + lineTopOffset;
+                        widthCache += this._getWidthOfChar(ctx, _char, i, j);
+                        heightCache = heightOfLine / this.lineHeight;
+                    }
+                }
+                if (heightCache && widthCache) {
+                    ctx.fillStyle = colorCache;
+                    ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+                    leftCache = topCache = widthCache = heightCache = 0;
                 }
                 lineTopOffset += heightOfLine;
             }
@@ -11344,6 +11367,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this._textBeforeEdit = this.text;
             this._tick();
             this.fire("editing:entered");
+            this._fireSelectionChanged();
             if (!this.canvas) {
                 return this;
             }
@@ -11797,8 +11821,10 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.selectionStart = newSelection;
             this.selectionEnd = newSelection;
         }
-        this._fireSelectionChanged();
-        this._updateTextarea();
+        if (this.isEditing) {
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        }
     },
     getSelectionStartFromPointer: function(e) {
         var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, newSelectionStart, line;
