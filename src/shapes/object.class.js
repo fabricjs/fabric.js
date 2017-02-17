@@ -1814,8 +1814,17 @@
     object = clone(object, true);
     if (forceAsync) {
       fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
-        object.fill = patterns[0];
-        object.stroke = patterns[1];
+        // If fill or stroke is undefined use prototype property defaults
+        delete object.fill;
+        delete object.stroke;
+
+        if (patterns[0]) {
+          object.fill = patterns[0];
+        }
+        if (patterns[1]) {
+          object.stroke = patterns[1];
+        }
+
         var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
         callback && callback(instance);
       });
