@@ -97,6 +97,10 @@
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
+    else if (attr === 'charSpacing') {
+      // parseUnit returns px and we convert it to em
+      parsed = parseUnit(value, fontSize) / fontSize * 1000;
+    }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
     }

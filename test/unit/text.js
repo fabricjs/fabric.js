@@ -224,6 +224,7 @@
     elTextWithAttrs.setAttribute('font-style', 'italic');
     elTextWithAttrs.setAttribute('font-weight', 'bold');
     elTextWithAttrs.setAttribute('font-size', '123');
+    elTextWithAttrs.setAttribute('letter-spacing', '1em');
     elTextWithAttrs.setAttribute('text-decoration', 'underline');
     elTextWithAttrs.setAttribute('text-anchor', 'middle');
 
@@ -251,6 +252,7 @@
       fontStyle:        'italic',
       fontWeight:       'bold',
       fontSize:         123,
+      charSpacing:      1000,
       textDecoration:   'underline',
       originX:          'center'
     });
