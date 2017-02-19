@@ -296,6 +296,17 @@
     equal(isFired, true, 'removing active object should fire "selection:cleared"');
   });
 
+  test('setActiveObject fires deselected', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect1.on('deselected', function() { isFired = true; });
+
+    canvas.setActiveObject(rect1);
+    canvas.setActiveObject(rect2);
+    equal(isFired, true, 'switching active group fires deselected');
+  });
+
   test('getContext', function() {
     ok(typeof canvas.getContext == 'function');
   });
