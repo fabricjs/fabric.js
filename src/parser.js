@@ -34,6 +34,7 @@
         'font-size':          'fontSize',
         'font-style':         'fontStyle',
         'font-weight':        'fontWeight',
+        'letter-spacing':     'charSpacing',
         'stroke-dasharray':   'strokeDashArray',
         'stroke-linecap':     'strokeLineCap',
         'stroke-linejoin':    'strokeLineJoin',
