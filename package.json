@@ -47,7 +47,7 @@
   },
   "optionalDependencies": {
     "canvas": "1.6.x",
-    "jsdom": "3.x.x",
+    "jsdom": "9.x.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
@@ -58,7 +58,7 @@
     "onchange": "^3.0.2"
   },
   "engines": {
-    "node": ">=0.4.0"
+    "node": ">=4.0.0"
   },
   "main": "./dist/fabric.js"
 }
