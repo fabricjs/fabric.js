@@ -872,8 +872,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
-        width: Math.ceil(width) + 2,
-        height: Math.ceil(height) + 2,
+        width: width + 2,
+        height: height + 2,
         zoomX: zoomX,
         zoomY: zoomY
       };
@@ -897,8 +897,8 @@
           zoomX = dims.zoomX, zoomY = dims.zoomY;
 
       if (width !== this.cacheWidth || height !== this.cacheHeight) {
-        this._cacheCanvas.width = width;
-        this._cacheCanvas.height = height;
+        this._cacheCanvas.width = Math.ceil(width);
+        this._cacheCanvas.height = Math.ceil(height);
         this._cacheContext.translate(width / 2, height / 2);
         this._cacheContext.scale(zoomX, zoomY);
         this.cacheWidth = width;
