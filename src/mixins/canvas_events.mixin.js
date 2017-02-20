@@ -501,7 +501,7 @@
         if (target !== this.getActiveGroup() && target !== activeObject) {
           this.deactivateAll();
           if (target.selectable) {
-            activeObject.fire('deselected', { e: e });
+            activeObject && activeObject.fire('deselected', { e: e });
             this.setActiveObject(target, e);
           }
         }
