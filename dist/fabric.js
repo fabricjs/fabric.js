@@ -17897,7 +17897,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var originalPaths = object.paths;
     delete object.paths;
     // remove this pattern from 2.0 accepts only object
-    if (typeof orignalPaths === 'string') {
+    if (typeof originalPaths === 'string') {
       fabric.loadSVGFromURL(originalPaths, function (elements) {
         var pathUrl = originalPaths;
         var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
