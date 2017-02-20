@@ -19,7 +19,9 @@
     'fontWeight',
     'fontSize',
     'text',
-    'textDecoration',
+    'underline',
+    'overline',
+    'linethrough',
     'textAlign',
     'fontStyle',
     'lineHeight',
@@ -33,7 +35,9 @@
     'fontWeight',
     'fontSize',
     'text',
-    'textDecoration',
+    'underline',
+    'overline',
+    'linethrough',
     'textAlign',
     'fontStyle',
     'lineHeight',
@@ -152,17 +156,17 @@
      */
 
     /**
-     * Retrieves object's textDecoration
-     * @method getTextDecoration
+     * Retrieves object's underline
+     * @method getUnderline
      * @memberOf fabric.Text.prototype
-     * @return {String} Text decoration
+     * @return {Boolean} underline enabled or disabled
      */
 
     /**
-     * Sets object's textDecoration
-     * @method setTextDecoration
+     * Sets object's underline
+     * @method setUnderline
      * @memberOf fabric.Text.prototype
-     * @param {String} textDecoration Text decoration
+     * @param {Boolean} underline Text decoration
      * @return {fabric.Text}
      * @chainable
      */
@@ -262,11 +266,25 @@
     fontFamily:           'Times New Roman',
 
     /**
-     * Text decoration Possible values: "", "underline", "overline" or "line-through".
+     * Text decoration underline.
      * @type String
      * @default
      */
-    textDecoration:       '',
+    underline:       false,
+
+    /**
+     * Text decoration overline.
+     * @type String
+     * @default
+     */
+    overline:       false,
+
+    /**
+     * Text decoration linethrough.
+     * @type String
+     * @default
+     */
+    linethrough:       false,
 
     /**
      * Text alignment. Possible values: "left", "center", "right" or "justify".
@@ -376,7 +394,9 @@
       'fontSize',
       'fontWeight',
       'fontStyle',
-      'textDecoration',
+      'underline',
+      'overline',
+      'linethrough',
       'textBackgroundColor'
     ],
 
@@ -537,7 +557,7 @@
       this._renderTextDecoration(ctx, 'underline');
       this._renderText(ctx);
       this._renderTextDecoration(ctx, 'overline');
-      this._renderTextDecoration(ctx, 'line-through');
+      this._renderTextDecoration(ctx, 'linethrough');
     },
 
     /**
@@ -687,41 +707,43 @@
       }
       var lineTopOffset = 0, heightOfLine,
           lineWidth, lineLeftOffset, originalFill = ctx.fillStyle,
-          noTextBackgroundColor = !this.textBackgroundColor || this.textBackgroundColor === 'transparent',
-          line, style, _char,
+          line, lastColor = this.textBackgroundColor,
           leftOffset = this._getLeftOffset(),
-          topOffset = this._getTopOffset();
+          topOffset = this._getTopOffset(),
+          boxStart = 0, boxWidth = 0, charBox, charStyle;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (noTextBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
+        if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
           continue;
         }
-        lineWidth = this.getLineWidth(i);
-        if (lineWidth <= 0) {
-          continue;
-        }
-        ctx.fillStyle = this.textBackgroundColor;
+        line = this._textLines[i];
         heightOfLine = this.getHeightOfLine(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
-        noTextBackgroundColor || ctx.fillRect(
-          leftOffset + lineLeftOffset,
-          topOffset + lineTopOffset,
-          lineWidth,
-          heightOfLine / this.lineHeight
-        );
-        // check for single char textbgcolor
-        line = this._textLines[i];
         for (var j = 0, jlen = line.length; j < jlen; j++) {
-          style = this._getStyleDeclaration(i, j);
-          if (!style || !style.textBackgroundColor) {
-            continue;
+          charBox = this.__charBounds[i][j];
+          charStyle = charBox.style;
+          if (charStyle.textBackgroundColor !== lastColor && boxWidth > 0) {
+            ctx.fillStyle = lastColor;
+            lastColor && ctx.fillRect(
+              leftOffset + lineLeftOffset + boxStart,
+              topOffset + lineTopOffset,
+              boxWidth,
+              heightOfLine / this.lineHeight
+            );
+            boxStart = charBox.left;
+            boxWidth = charBox.width;
+            lastColor = charStyle.textBackgroundColor;
           }
-          _char = line[j];
-          ctx.fillStyle = style.textBackgroundColor;
+          else {
+            boxWidth += charBox.kernedWidth;
+          }
+        }
+        if (lastColor && lastColor !== 'rgba(0, 0, 0, 0)') {
+          ctx.fillStyle = lastColor;
           ctx.fillRect(
-            leftOffset + lineLeftOffset + this.getWidthOfCharsAt(i, 0, j).width,
+            leftOffset + lineLeftOffset + boxStart,
             topOffset + lineTopOffset,
-            this._getWidthOfChar(_char, i, j),
+            boxWidth,
             heightOfLine / this.lineHeight
           );
         }
@@ -898,7 +920,7 @@
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
-          fontMultiplier = this.fontSize / CACHE_FONT_SIZE, kernedWith;
+          fontMultiplier = this.fontSize / CACHE_FONT_SIZE, kernedWidth;
 
       if (previousChar && fontCache[previousChar]) {
         previousWidth = fontCache[previousChar] * fontMultiplier;
@@ -912,7 +934,7 @@
       var ctx = this.getMeasuringContext();
       this._setTextStyles(ctx, charStyle);
       if (!width) {
-        kernedWith = width = ctx.measureText(char).width;
+        kernedWidth = width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
       }
       if (stylesAreEqual && previousChar && !previousWidth) {
@@ -923,9 +945,9 @@
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth / fontMultiplier;
-        kernedWith = coupleWidth - previousWidth;
+        kernedWidth = coupleWidth - previousWidth;
       }
-      return { width: width, kernedWith: kernedWith };
+      return { width: width, kernedWidth: kernedWidth };
     },
 
     /**
@@ -991,9 +1013,9 @@
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
         lineBounds[i] = graphemeInfo;
-        width += graphemeInfo.width;
+        width += graphemeInfo.kernedWidth;
         if (this._reSpacesAndTabs.test(grapheme)) {
-          widthOfSpaces += graphemeInfo.width;
+          widthOfSpaces += graphemeInfo.kernedWidth;
         }
         prevGrapheme = grapheme;
       }
@@ -1013,18 +1035,22 @@
       var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle),
-          width = info.kernedWith;
+          kernedWidth = info.kernedWidth, width = info.width;
+
       if (this.charSpacing !== 0) {
         width += this._getWidthOfCharSpacing();
+        kernedWidth += this._getWidthOfCharSpacing();
       }
       var box = {
         width: width,
         left: 0,
         height: charStyle.fontSize,
+        style: charStyle,
+        kernedWidth: kernedWidth,
       };
       if (charIndex > 0) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
-        box.left = previousBox.left + previousBox.width + info.kernedWith - info.width;
+        box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
       }
       return box;
     },
@@ -1294,11 +1320,6 @@
         shouldStroke && ctx.strokeText(_char, left, top);
       }
 
-      if (textDecoration || textDecoration !== '') {
-        offset = this._fontSizeFraction * lineHeight / this.lineHeight;
-        this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
-      }
-
       decl && ctx.restore();
       ctx.translate(charWidth, 0);
     },
@@ -1312,39 +1333,12 @@
       return (prevStyle.fill !== thisStyle.fill ||
               prevStyle.fontSize !== thisStyle.fontSize ||
               prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
-              prevStyle.textDecoration !== thisStyle.textDecoration ||
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
               prevStyle.stroke !== thisStyle.stroke ||
               prevStyle.strokeWidth !== thisStyle.strokeWidth
       );
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderCharDecoration: function(ctx, textDecoration, left, top, offset, charWidth, charHeight) {
-
-      if (!textDecoration) {
-        return;
-      }
-
-      var decorationWeight = charHeight / 15,
-          positions = {
-            underline: top + charHeight / 10,
-            'line-through': top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
-            overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
-          },
-          decorations = ['underline', 'line-through', 'overline'], i, decoration;
-
-      for (i = 0; i < decorations.length; i++) {
-        decoration = decorations[i];
-        if (textDecoration.indexOf(decoration) > -1) {
-          ctx.fillRect(left, positions[decoration], charWidth , decorationWeight);
-        }
-      }
     },
 
     /**
@@ -1431,33 +1425,56 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextDecoration: function(ctx, type) {
-      if (this.textDecoration.indexOf(type) === -1) {
+      if (!this[type] && !this.styleHas(type)) {
         return;
       }
-      var halfOfVerticalBox = this.height / 2,
-          _this = this, offsets = [];
+      var lineTopOffset = 0, heightOfLine,
+          lineWidth, lineLeftOffset,
+          line, lastDecoration = this[type],
+          leftOffset = this._getLeftOffset(),
+          topOffset = this._getTopOffset(),
+          boxStart = 0, boxWidth = 0, charBox, charStyle,
+          offsets = {
+            underline: 0.85,
+            linethrough: 0.43,
+            overline: -0.12
+          };
 
-      offsets = {
-        underline: 0.85,
-        'line-through': 0.43,
-        overline: -0.12
-      };
-
-      var i, lineHeight = 0, len, lineWidth,
-          lineLeftOffset, heightOfLine;
-
-      for (i = 0, len = _this._textLines.length; i < len; i++) {
-        lineWidth = _this.getLineWidth(i);
-        lineLeftOffset = _this._getLineLeftOffset(lineWidth);
-        heightOfLine = _this.getHeightOfLine(i);
-        ctx.fillRect(
-          _this._getLeftOffset() + lineLeftOffset,
-          lineHeight + (_this._fontSizeMult - 1 + offsets[type]) * _this.fontSize - halfOfVerticalBox,
-          lineWidth,
-          _this.fontSize / 15);
-        lineHeight += heightOfLine;
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        if (!this[type] && !this.styleHas(type, i)) {
+          continue;
+        }
+        line = this._textLines[i];
+        heightOfLine = this.getHeightOfLine(i);
+        lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        for (var j = 0, jlen = line.length; j < jlen; j++) {
+          charBox = this.__charBounds[i][j];
+          charStyle = charBox.style;
+          if (charStyle[type] !== lastDecoration && boxWidth > 0) {
+            lastDecoration && ctx.fillRect(
+              leftOffset + lineLeftOffset + boxStart,
+              heightOfLine + topOffset + (this._fontSizeMult - 1 + offsets[type]) * this.fontSize,
+              boxWidth,
+              this.fontSize / 15);
+            boxStart = charBox.left;
+            boxWidth = charBox.width;
+            lastDecoration = charStyle[type];
+          }
+          else {
+            boxWidth += charBox.kernedWidth;
+          }
+        }
+        lastDecoration && ctx.fillRect(
+          leftOffset + lineLeftOffset + boxStart,
+          heightOfLine + topOffset + (this._fontSizeMult - 1 + offsets[type]) * this.fontSize,
+          boxWidth,
+          this.fontSize / 15
+        );
+        lineTopOffset += heightOfLine;
       }
-
+      // if there is text background color no
+      // other shadows should be casted
+      this._removeShadow(ctx);
     },
 
     /**
@@ -1517,7 +1534,9 @@
         'fontFamily',
         'fontStyle',
         'lineHeight',
-        'textDecoration',
+        'underline',
+        'overline',
+        'linethrough',
         'textAlign',
         'textBackgroundColor',
         'charSpacing'
