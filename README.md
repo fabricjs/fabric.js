@@ -50,7 +50,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (4.0 onward) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
+- Runs on a server under [Node.js](http://nodejs.org/) (stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 - Follows [Semantic Versioning](http://semver.org/)
 
 ### Supported browsers
