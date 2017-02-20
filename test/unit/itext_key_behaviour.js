@@ -13,7 +13,8 @@
     iText.on('selection:changed', countSelectionChange);
 
     iText.enterEditing();
-    equal(selection, 0, 'should not fire on enter edit');
+    equal(selection, 1, 'will fire on enter edit since the cursor is changing for the first time');
+    selection = 0;
 
     iText.selectAll();
     equal(selection, 1, 'should fire once on selectAll');
@@ -144,7 +145,8 @@
     iText.on('selection:changed', countSelectionChange);
 
     iText.enterEditing();
-    equal(selection, 0, 'should not fire on enter edit');
+    equal(selection, 1, 'should fire on enter edit');
+    selection = 0;
 
     iText.selectAll();
     equal(selection, 1, 'should fire once on selectAll');

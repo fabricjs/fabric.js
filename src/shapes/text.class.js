@@ -518,9 +518,9 @@
      */
     _getCacheCanvasDimensions: function() {
       var dim = this.callSuper('_getCacheCanvasDimensions');
-      var fontSize = Math.ceil(this.fontSize) * 2;
-      dim.width += fontSize;
-      dim.height += fontSize;
+      var fontSize = this.fontSize * 2;
+      dim.width += fontSize * dim.zoomX;
+      dim.height += fontSize * dim.zoomY;
       return dim;
     },
 

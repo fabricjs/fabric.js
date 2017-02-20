@@ -1399,7 +1399,7 @@
   });
 
   test('relativePan', function() {
-    ok(typeof canvas.relativePan == 'function');
+    ok(typeof canvas.relativePan === 'function');
     deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     var point = new fabric.Point(-50, -50);
     canvas.relativePan(point);
@@ -1410,9 +1410,36 @@
   });
 
   test('getContext', function() {
-    ok(typeof canvas.getContext == 'function');
+    ok(typeof canvas.getContext === 'function');
     var context = canvas.getContext();
     equal(context, canvas.contextContainer, 'should return the context container');
+  });
+
+  test('calcViewportBoundaries', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.calcViewportBoundaries();
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(0, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(canvas.getWidth(), 0), 'tr is width, 0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(0, canvas.getHeight()), 'bl is 0, height');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(canvas.getWidth(), canvas.getHeight()), 'tl is width, height');
+  });
+
+  test('calcViewportBoundaries with zoom', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(0, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(canvas.getWidth() / 2, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(0, canvas.getHeight() / 2), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), 'tl is 0,0');
+  });
+
+  test('calcViewportBoundaries with zoom and translation', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, 2, -60, 60]);
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(30, -30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(30 + canvas.getWidth() / 2, -30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(30, canvas.getHeight() / 2 - 30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
   });
 
   //how to test with an exception?

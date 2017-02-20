@@ -1,3 +1,31 @@
+**Version 1.7.6**
+
+- Fix: make the cacheCanvas created on the fly if not available [#3705](https://github.com/kangax/fabric.js/pull/3705)
+
+**Version 1.7.5**
+
+- Improvement: draw textbackgroundColor in one single pass when possible @stefanhayden [#3698](https://github.com/kangax/fabric.js/pull/3698)
+- Improvement: fire selection changed event just if text is editing [#3702](https://github.com/kangax/fabric.js/pull/3702)
+- Improvement: Add object property 'needsItsOwnCache' [#3703](https://github.com/kangax/fabric.js/pull/3703)
+- Improvement: Skip unnecessary transform if they can be detected with a single if [#3704](https://github.com/kangax/fabric.js/pull/3704)
+
+**Version 1.7.4**
+
+- Fix: Moved all the touch event to passive false so that they behave as before chrome changes [#3690](https://github.com/kangax/fabric.js/pull/3690)
+- Fix: force top and left in the object representation of a path to avoid reparsing on restore [#3691](https://github.com/kangax/fabric.js/pull/3691)
+- Add: Enable `deselected` event for activeObject switch. Ensure deactivateAll call exitEditing [#3689](https://github.com/kangax/fabric.js/pull/3689)
+- Fix: Perform subtargetCheck also if the group is an active object and on activeGroup [#3688](https://github.com/kangax/fabric.js/pull/3688)
+- Fix: Made cursor operation more precise at high canvas zoom level [#3671](https://github.com/kangax/fabric.js/pull/3671)
+- Add: Made getBoundingRect available to return both absolute or standard bounding rect [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Add: Introduced calcViewportBoundaries() function for fabric.StaticCanvas [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Add: Introduced isOnScreen() function for fabric.Object [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Subclassed Polygon from polyline [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Fix: Removed reference to hovered target when target gets removed [#3657](https://github.com/kangax/fabric.js/pull/3657)
+- Fix: Removed hover cursor for non selectable objects [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Fix: Switch to passive event for touch move [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Fix: Restart rendering of cursor after entering some text [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Add: fabric.Color support toHexa() method now [#3615](https://github.com/kangax/fabric.js/pull/3615)
+
 **Version 1.7.3**
 
 - Improvement: mousewheel event is handled with target and fired also from objects.  [#3612](https://github.com/kangax/fabric.js/pull/3612)

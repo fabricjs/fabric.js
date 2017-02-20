@@ -21,7 +21,6 @@ var mininfierCmd;
 
 var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
-var noES5Compat = 'no-es5-compat' in buildArgsAsObject;
 var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var sourceMap = 'sourcemap' in buildArgsAsObject;
 
@@ -69,7 +68,6 @@ var distFileContents =
     (modulesToExclude.length ? (' exclude=' + modulesToExclude.join(',')) : '') +
     (noStrict ? ' no-strict' : '') +
     (noSVGExport ? ' no-svg-export' : '') +
-    (noES5Compat ? ' no-es5-compat' : '') +
     (requirejs ? ' requirejs' : '') +
     (sourceMap ? ' sourcemap' : '') +
     ' minifier=' + minifier +
@@ -98,9 +96,6 @@ function appendFileContents(fileNames, callback) {
       if (noSVGExport) {
         strData = strData.replace(/\/\* _TO_SVG_START_ \*\/[\s\S]*?\/\* _TO_SVG_END_ \*\//g, '');
       }
-      if (noES5Compat) {
-        strData = strData.replace(/\/\* _ES5_COMPAT_START_ \*\/[\s\S]*?\/\* _ES5_COMPAT_END_ \*\//g, '');
-      }
       if (noSVGImport) {
         strData = strData.replace(/\/\* _FROM_SVG_START_ \*\/[\s\S]*?\/\* _FROM_SVG_END_ \*\//g, '');
       }
@@ -119,16 +114,6 @@ function ifSpecifiedInclude(moduleName, fileName) {
   return ((isInIncludedList || includeAllModules) && !isInExcludedList) ? fileName : '';
 }
 
-function ifSpecifiedDependencyInclude(included, excluded, fileName) {
-  return (
-    (
-      (modulesToInclude.indexOf(included) > -1 || includeAllModules) &&
-      (modulesToExclude.indexOf(excluded) == -1))
-    ? fileName
-    : ''
-  );
-}
-
 function ifSpecifiedAMDInclude(amdLib) {
   var supportedLibraries = ['requirejs'];
   if (supportedLibraries.indexOf(amdLib) > -1) {
@@ -140,7 +125,6 @@ function ifSpecifiedAMDInclude(amdLib) {
 var filesToInclude = [
   'HEADER.js',
 
-  ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',
@@ -151,7 +135,6 @@ var filesToInclude = [
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
-  'src/util/lang_function.js',
   'src/util/lang_class.js',
   'src/util/dom_event.js',
   'src/util/dom_style.js',

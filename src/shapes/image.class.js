@@ -433,22 +433,13 @@
       /** @ignore */
       replacement.width = canvasEl.width;
       replacement.height = canvasEl.height;
-      if (fabric.isLikelyNode) {
-        replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
-        // onload doesn't fire in some node versions, so we invoke callback manually
+      replacement.onload = function() {
         _this._element = replacement;
         !forResizing && (_this._filteredEl = replacement);
         callback && callback(_this);
-      }
-      else {
-        replacement.onload = function() {
-          _this._element = replacement;
-          !forResizing && (_this._filteredEl = replacement);
-          callback && callback(_this);
-          replacement.onload = canvasEl = null;
-        };
-        replacement.src = canvasEl.toDataURL('image/png');
-      }
+        replacement.onload = canvasEl = null;
+      };
+      replacement.src = canvasEl.toDataURL('image/png');
       return canvasEl;
     },
 
@@ -597,14 +588,6 @@
             ? this.getElement().height || 0
             : 0);
     },
-
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return 1;
-    }
   });
 
   /**

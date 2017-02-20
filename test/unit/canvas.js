@@ -256,6 +256,14 @@
     equal(canvas.isEmpty(), true, 'canvas should be empty');
   });
 
+  test('remove actual hovered target', function() {
+    var rect1 = makeRect();
+    canvas.add(rect1);
+    canvas._hoveredTarget = rect1;
+    canvas.remove(rect1);
+    equal(canvas._hoveredTarget, null, 'reference to hovered target should be removed');
+  });
+
   test('before:selection:cleared', function() {
     var isFired = false;
     canvas.on('before:selection:cleared', function() { isFired = true; });
@@ -286,6 +294,17 @@
     canvas.remove(canvas.item(0));
 
     equal(isFired, true, 'removing active object should fire "selection:cleared"');
+  });
+
+  test('setActiveObject fires deselected', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect1.on('deselected', function() { isFired = true; });
+
+    canvas.setActiveObject(rect1);
+    canvas.setActiveObject(rect2);
+    equal(isFired, true, 'switching active group fires deselected');
   });
 
   test('getContext', function() {
