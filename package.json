@@ -1,9 +1,15 @@
-{
+ {
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "1.6.3",
+  "version": "1.7.6",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
+  "contributors": [
+    {
+      "name": "Andrea Bogazzi",
+      "email": "andreabogazzi79@gmail.com"
+    }
+  ],
   "keywords": [
     "canvas",
     "graphic",
@@ -15,7 +21,7 @@
     "object model"
   ],
   "browser" : {
-    "canvas" : false,
+    "canvas": false,
     "fs":      false,
     "jsdom":   false,
     "xmldom":  false
@@ -30,28 +36,29 @@
   "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,gestures",
+    "build:watch": "onchange 'src/**/**' 'test/**/**' 'HEADER.js' 'lib/**/**' -- npm run build",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
     "test": "node test.js",
-    "lint": "jshint src && jscs src",
-    "lint_tests": "jshint test/unit --config .jshintrc_tests",
-    "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js",
+    "lint": "eslint --config .eslintrc.json src",
+    "lint_tests": "eslint test/unit --config .eslintrc_tests",
+    "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js && cp -r src HEADER.js lib ../fabricjs.com/build/files/",
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
   "optionalDependencies": {
-    "canvas": "1.4.x",
-    "jsdom": "3.x.x",
+    "canvas": "1.6.x",
+    "jsdom": "9.x.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "uglify-js": "2.6.x",
-    "jscs": "2.x.x",
-    "jshint": "2.9.x",
+    "uglify-js": "2.7.x",
+    "eslint": "2.x.x",
     "qunit": "0.9.x",
-    "istanbul": "0.4.x"
+    "istanbul": "0.4.x",
+    "onchange": "^3.0.2"
   },
   "engines": {
-    "node": ">=0.4.0"
+    "node": ">=4.0.0"
   },
   "main": "./dist/fabric.js"
 }

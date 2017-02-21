@@ -1,52 +1,68 @@
 (function() {
 
-  var EMPTY_JSON = '{"objects":[],"background":""}';
+  var EMPTY_JSON = '{"objects":[]}';
 
   // var emptyImageCanvasData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAH7ElEQVR4nO3VMQ0AMAzAsPInvYHoMS2yEeTLHADge/M6AADYM3QACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIuMjH4b7osLFBAAAAAElFTkSuQmCC";
 
-  var PATH_JSON = '{"objects": [{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,'+
-                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
-                  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],'+
-                  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],'+
-                  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, '+
-                  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], '+
-                  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, '+
-                  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", '+
-                  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],'+
-                  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],'+
-                  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],'+
-                  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,'+
-                  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",'+
-                  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], '+
-                  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
+  var PATH_JSON = '{"objects": [{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
+                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
+                  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
+                  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
+                  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
+                  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
+                  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
+                  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
+                  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
+                  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
+                  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
+                  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
+                  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
+                  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
+                  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
-  var PATH_OBJ_JSON = '{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,'+
-                      ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
-                      '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],'+
-                      ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],'+
-                      ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, '+
-                      '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], '+
-                      '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, '+
-                      '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", '+
-                      '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],'+
-                      ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],'+
-                      ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],'+
-                      ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,'+
-                      ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",'+
-                      ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], '+
-                      '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
+  var PATH_OBJ_JSON = '{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
+                      ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
+                      '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
+                      ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
+                      ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
+                      '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
+                      '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
+                      '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
+                      '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
+                      ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
+                      ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
+                      ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
+                      ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
+                      ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
+                      '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"pathOffset":{"x":200,"y":200},"path":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                  '"shadow":null,'+
+  var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                  '"shadow":null,' +
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  }
+
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) { return path; };
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
@@ -68,6 +84,8 @@
   QUnit.module('fabric.Canvas', {
     setup: function() {
       upperCanvasEl.style.display = '';
+      canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
+      canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
     },
     teardown: function() {
       canvas.clear();
@@ -101,6 +119,83 @@
     ok(typeof canvas.item == 'function', 'should respond to item');
     canvas.add(rect);
     equal(canvas.item(0), rect, 'should return proper item');
+  });
+
+  test('preserveObjectStacking', function() {
+    ok(typeof canvas.preserveObjectStacking == 'boolean');
+    ok(!canvas.preserveObjectStacking, 'default is false');
+  });
+
+  test('uniScaleTransform', function() {
+    ok(typeof canvas.uniScaleTransform == 'boolean');
+    ok(!canvas.uniScaleTransform, 'default is false');
+  });
+
+  test('uniScaleKey', function() {
+    ok(typeof canvas.uniScaleKey == 'string');
+    equal(canvas.uniScaleKey, 'shiftKey', 'default is shift');
+  });
+
+  test('centeredScaling', function() {
+    ok(typeof canvas.centeredScaling == 'boolean');
+    ok(!canvas.centeredScaling, 'default is false');
+  });
+
+  test('centeredRotation', function() {
+    ok(typeof canvas.centeredRotation == 'boolean');
+    ok(!canvas.centeredRotation, 'default is false');
+  });
+
+  test('centeredKey', function() {
+    ok(typeof canvas.centeredKey == 'string');
+    equal(canvas.centeredKey, 'altKey', 'default is alt');
+  });
+
+  test('altActionKey', function() {
+    ok(typeof canvas.altActionKey == 'string');
+    equal(canvas.altActionKey, 'shiftKey', 'default is shift');
+  });
+
+  test('interactive', function() {
+    ok(typeof canvas.interactive == 'boolean');
+    ok(canvas.interactive, 'default is true');
+  });
+
+  test('selection', function() {
+    ok(typeof canvas.selection == 'boolean');
+    ok(canvas.selection, 'default is true');
+  });
+
+  test('_initInteractive', function() {
+    ok(typeof canvas._initInteractive == 'function');
+  });
+
+  test('renderTop', function() {
+    ok(typeof canvas.renderTop == 'function');
+    equal(canvas, canvas.renderTop());
+  });
+
+  test('_chooseObjectsToRender', function() {
+    ok(typeof canvas._chooseObjectsToRender == 'function');
+    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    canvas.add(rect);
+    canvas.add(rect2);
+    canvas.add(rect3);
+    var objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect);
+    equal(objs[1], rect2);
+    equal(objs[2], rect3);
+    canvas.setActiveObject(rect);
+    objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect2);
+    equal(objs[1], rect3);
+    equal(objs[2], rect);
+    canvas.setActiveObject(rect2);
+    canvas.preserveObjectStacking = true;
+    objs = canvas._chooseObjectsToRender();
+    equal(objs[0], rect);
+    equal(objs[1], rect2);
+    equal(objs[2], rect3);
   });
 
   test('calcOffset', function() {
@@ -161,9 +256,17 @@
     equal(canvas.isEmpty(), true, 'canvas should be empty');
   });
 
+  test('remove actual hovered target', function() {
+    var rect1 = makeRect();
+    canvas.add(rect1);
+    canvas._hoveredTarget = rect1;
+    canvas.remove(rect1);
+    equal(canvas._hoveredTarget, null, 'reference to hovered target should be removed');
+  });
+
   test('before:selection:cleared', function() {
     var isFired = false;
-    canvas.on('before:selection:cleared', function() { isFired = true });
+    canvas.on('before:selection:cleared', function() { isFired = true; });
 
     canvas.add(new fabric.Rect());
     canvas.remove(canvas.item(0));
@@ -179,7 +282,7 @@
 
   test('selection:cleared', function() {
     var isFired = false;
-    canvas.on('selection:cleared', function() { isFired = true });
+    canvas.on('selection:cleared', function() { isFired = true; });
 
     canvas.add(new fabric.Rect());
     canvas.remove(canvas.item(0));
@@ -191,6 +294,17 @@
     canvas.remove(canvas.item(0));
 
     equal(isFired, true, 'removing active object should fire "selection:cleared"');
+  });
+
+  test('setActiveObject fires deselected', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect1.on('deselected', function() { isFired = true; });
+
+    canvas.setActiveObject(rect1);
+    canvas.setActiveObject(rect2);
+    equal(isFired, true, 'switching active group fires deselected');
   });
 
   test('getContext', function() {
@@ -214,9 +328,8 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
+  test('_drawSelection', function() {
+    ok(typeof canvas._drawSelection == 'function');
   });
 
   test('findTarget', function() {
@@ -252,17 +365,23 @@
   test('findTarget preserveObjectStacking true', function() {
     ok(typeof canvas.findTarget == 'function');
     canvas.preserveObjectStacking = true;
-    var rect = makeRect({ left: 0, top: 0 }),
-        rectOver = makeRect({ left: 0, top: 0 }),
+    var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
+        rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 5, clientY: 5 };
+        pointer = { clientX: 15, clientY: 15, 'shiftKey': true },
+        pointer2 = { clientX: 4, clientY: 4 };
     canvas.add(rect);
     canvas.add(rectOver);
     target = canvas.findTarget(pointer);
     equal(target, rectOver, 'Should return the rectOver, rect is not considered');
     canvas.setActiveObject(rect);
     target = canvas.findTarget(pointer);
-    equal(target, rect, 'Should return the rect, because it is active');
+    equal(target, rectOver, 'Should still return rectOver because is above active object');
+    target = canvas.findTarget(pointer2);
+    equal(target, rect, 'Should rect because a corner of the activeObject has been hit');
+    canvas.altSelectionKey = 'shiftKey';
+    target = canvas.findTarget(pointer);
+    equal(target, rect, 'Should rect because active and altSelectionKey is pressed');
     canvas.preserveObjectStacking = false;
   });
 
@@ -329,7 +448,7 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.Group([ rect1, rect2 ]);
+    var group = new fabric.Group([rect1, rect2]);
     canvas.setActiveGroup(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -360,7 +479,7 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    var group = new fabric.Group([ rect1, rect2 ]);
+    var group = new fabric.Group([rect1, rect2]);
     canvas.setActiveGroup(group);
     target = canvas.findTarget({
       clientX: 8, clientY: 8
@@ -384,7 +503,7 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([ rect3, rect4 ]);
+    var group = new fabric.Group([rect3, rect4]);
     canvas.setActiveGroup(group);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
@@ -404,7 +523,7 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([ rect1, rect2 ]);
+    var group = new fabric.Group([rect1, rect2]);
     canvas.setActiveGroup(group);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
@@ -424,7 +543,7 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([ rect1, rect2 ]);
+    var group = new fabric.Group([rect1, rect2]);
     canvas.setActiveGroup(group);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
@@ -443,7 +562,7 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([ rect3, rect4 ]);
+    var group = new fabric.Group([rect3, rect4]);
     canvas.setActiveGroup(group);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
@@ -457,7 +576,7 @@
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {
       var dataURL = canvas.toDataURL();
@@ -552,7 +671,7 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    canvas.setActiveGroup(new fabric.Group([ rect, circle ])).renderAll();
+    canvas.setActiveGroup(new fabric.Group([rect, circle])).renderAll();
     var jsonWithActiveGroup = JSON.stringify(canvas);
 
     equal(json, jsonWithActiveGroup);
@@ -569,7 +688,6 @@
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -583,7 +701,6 @@
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -602,10 +719,9 @@
     ok(!canvas.isEmpty());
   });
 
-  test('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string Canvas', function() {
     ok(typeof canvas.loadFromJSON == 'function');
-
-    canvas.loadFromJSON(PATH_JSON, function(){
+    canvas.loadFromJSON(PATH_JSON, function() {
       var obj = canvas.item(0);
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -627,12 +743,11 @@
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with json object', function() {
-    ok(typeof canvas.loadFromJSON == 'function');
-
+  asyncTest('loadFromJSON with json object', function() {
     canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
       var obj = canvas.item(0);
 
@@ -655,12 +770,11 @@
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with reviver function', function() {
-    ok(typeof canvas.loadFromJSON == 'function');
-
+  asyncTest('loadFromJSON with reviver function', function() {
     function reviver(obj, instance) {
       deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
@@ -692,12 +806,15 @@
       equal(obj.get('opacity'), 1);
       equal(obj.get('customID'), 'fabric_1');
       ok(obj.get('path').length > 0);
+      start();
     }, reviver);
   });
 
-  test('loadFromJSON with no objects', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
+  asyncTest('loadFromJSON with no objects', function() {
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
+        c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -707,13 +824,15 @@
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-
+      start();
     });
   });
 
-  test('loadFromJSON without "objects" property', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
-        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
+  asyncTest('loadFromJSON without "objects" property', function() {
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
+        c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
@@ -726,13 +845,15 @@
       ok(fired, 'Callback should be fired even if no "objects" property exists');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-
+      start();
     });
   });
 
-  test('loadFromJSON with empty fabric.Group', function() {
-    var c1 = new fabric.Canvas('c1'),
-        c2 = new fabric.Canvas('c2'),
+  asyncTest('loadFromJSON with empty fabric.Group', function() {
+    var canvas1 = fabric.document.createElement('canvas'),
+        canvas2 = fabric.document.createElement('canvas'),
+        c1 = new fabric.Canvas(canvas1),
+        c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
 
     c1.add(group);
@@ -744,6 +865,7 @@
       fired = true;
 
       ok(fired, 'Callback should be fired even if empty fabric.Group exists');
+      start();
     });
   });
 
@@ -791,6 +913,76 @@
 
       start();
     });
+  });
+
+  asyncTest('loadFromJSON with custom properties on Canvas with no async object', function() {
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.controlsAboveOverlay = true;
+    serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(canvas.controlsAboveOverlay, true);
+      equal(canvas.preserveObjectStacking, true);
+      start();
+    });
+  });
+
+  asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
++ '"background":"green"}';
+    var serialized = JSON.parse(JSON_STRING);
+    serialized.controlsAboveOverlay = true;
+    serialized.preserveObjectStacking = true;
+    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
+    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    canvas.loadFromJSON(serialized, function() {
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(canvas.controlsAboveOverlay, true);
+      equal(canvas.preserveObjectStacking, true);
+      start();
+    });
+    // before callback the properties are still false.
+    equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.preserveObjectStacking, false);
+  });
+
+
+  test('normalize pointer', function(){
+    ok(typeof canvas._normalizePointer == 'function');
+    var pointer = { x: 10, y: 20 },
+        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
+        normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
+    equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
+    object.angle = 90;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -15, 'should consider angle');
+    equal(normalizedPointer.y, -25, 'should consider angle');
+    object.angle = 0;
+    object.scaleX = 2;
+    object.scaleY = 2;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x, -25, 'should consider scale');
+    equal(normalizedPointer.y, -20, 'should consider scale');
+    object.skewX = 60;
+    normalizedPointer = canvas._normalizePointer(object, pointer);
+    equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
+    equal(normalizedPointer.y, -20, 'should not change');
+  });
+
+  test('restorePointerVpt', function(){
+    ok(typeof canvas.restorePointerVpt == 'function');
+    var pointer = { x: 10, y: 20 },
+        restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
+    equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
+    canvas.viewportTransform = [2, 0, 0, 2, 50, -60];
+    restoredPointer = canvas.restorePointerVpt(pointer);
+    equal(restoredPointer.x, -20, 'vpt changes restored');
+    equal(restoredPointer.y, 40, 'vpt changes restored');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   // asyncTest('loadFromJSON with backgroundImage', function() {
@@ -1079,7 +1271,7 @@
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
 
-    canvas.setActiveGroup(new fabric.Group([ rect, circle ])).renderAll();
+    canvas.setActiveGroup(new fabric.Group([rect, circle])).renderAll();
     var svgWithActiveGroup = canvas.toSVG();
 
     equal(svg, svgWithActiveGroup);
@@ -1095,7 +1287,7 @@
     equal(canvas._objects[1], rect2);
     equal(canvas._objects[2], circle1);
     equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.Group([ rect2, circle2, rect1, circle1 ]);
+    var aGroup = new fabric.Group([rect2, circle2, rect1, circle1]);
     // before rendering objects are ordered in insert order
     equal(aGroup._objects[0], rect2);
     equal(aGroup._objects[1], circle2);
@@ -1231,7 +1423,7 @@
     });
   });
 
- test('getSetWidth', function() {
+  test('getSetWidth', function() {
     ok(typeof canvas.getWidth == 'function');
     equal(canvas.getWidth(), 600);
     equal(canvas.setWidth(444), canvas, 'should be chainable');
@@ -1315,6 +1507,104 @@
     ok(canvas.containsPoint(eventStub, rect), 'on rect at (200, 200) should be within area (175, 175, 225, 225)');
   });
 
+  test('setupCurrentTransform', function() {
+    ok(typeof canvas._setupCurrentTransform == 'function');
+
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + 100,
+      clientY: canvasOffset.top + 100,
+      target: rect
+    };
+    rect.active = true;
+    canvas._setupCurrentTransform(eventStub, rect);
+    var t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'drag', 'should target inside rect and setup drag');
+    equal(t.corner, 0, 'no corner selected');
+    equal(t.originX, rect.originX, 'no origin change for drag');
+    equal(t.originY, rect.originY, 'no origin change for drag');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
+      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
+      target: rect
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'scale', 'should target a corner and setup scale');
+    equal(t.corner, 'tl', 'tl selected');
+    equal(t.originX, 'right', 'origin in opposite direction');
+    equal(t.originY, 'bottom', 'origin in opposite direction');
+    equal(t.shiftKey, undefined, 'shift was not pressed');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.left - 2,
+      clientY: canvasOffset.top + rect.top + rect.height / 2,
+      target: rect,
+      shiftKey: true
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'skewY', 'should target a corner and setup skew');
+    equal(t.shiftKey, true, 'shift was pressed');
+    equal(t.corner, 'ml', 'ml selected');
+    equal(t.originX, 'right', 'origin in opposite direction');
+
+    eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.mtr.x,
+      clientY: canvasOffset.top + rect.oCoords.mtr.y,
+      target: rect,
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    t = canvas._currentTransform;
+    equal(t.target, rect, 'should have rect as a target');
+    equal(t.action, 'rotate', 'should target a corner and setup rotate');
+    equal(t.corner, 'mtr', 'mtr selected');
+    canvas._currentTransform = false;
+  });
+
+  test('_scaleObject', function() {
+    ok(typeof canvas._scaleObject == 'function');
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
+      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
+      target: rect
+    };
+    canvas._setupCurrentTransform(eventStub, rect);
+    var scaled = canvas._scaleObject(30, 30, 'equally');
+    equal(scaled, true, 'return true if scaling happened');
+    scaled = canvas._scaleObject(30, 30, 'equally');
+    equal(scaled, false, 'return false if no movement happen');
+  });
+
+  test('containsPoint in viewport transform', function() {
+    canvas.viewportTransform = [2, 0, 0, 2, 50, 50];
+    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect);
+
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+
+    var eventStub = {
+      clientX: canvasOffset.left + 250,
+      clientY: canvasOffset.top + 250,
+      target: rect
+    };
+
+    ok(canvas.containsPoint(eventStub, rect), 'point at (250, 250) should be within area (75, 75, 125, 125)');
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+  });
+
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
 
@@ -1346,7 +1636,7 @@
   //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
 
   //     deepEqual(canvas.toJSON(), {
-  //       "objects": [ ],
+  //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
   //       "backgroundImage": (fabric.document.location.protocol +
   //                           '//' +
@@ -1372,7 +1662,7 @@
     try {
       canvas.renderAll();
     }
-    catch(err) {
+    catch (err) {
       error = err;
     }
     delete canvas.clipTo;

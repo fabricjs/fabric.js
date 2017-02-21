@@ -46,7 +46,8 @@
     'globalCompositeOperation':  'source-over',
     'skewX':                      0,
     'skewY':                      0,
-    'transformMatrix':           null
+    'transformMatrix':            null,
+    'charSpacing':                0
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
@@ -68,6 +69,20 @@
     var text = createTextObject();
     ok(typeof text.toString == 'function');
     equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+  });
+
+  test('_getFontDeclaration', function() {
+    var text = createTextObject();
+    ok(typeof text._getFontDeclaration == 'function', 'has a private method _getFontDeclaration');
+    var fontDecl = text._getFontDeclaration();
+    ok(typeof fontDecl == 'string', 'it returns a string');
+    if (fabric.isLikelyNode) {
+      equal(fontDecl, 'normal  40px "Times New Roman"');
+    }
+    else {
+      equal(fontDecl, ' normal 40px Times New Roman');
+    }
+
   });
 
   test('toObject', function() {
@@ -179,8 +194,8 @@
     // text.width = CHAR_WIDTH;
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 4,
-      top: -5.14,
+      left: 4.5,
+      top: -5.75,
       width: 8,
       height: 18.08,
       fontSize: 16,
@@ -221,7 +236,7 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -16.76,
+      top:              -18.54,
       width:            CHAR_WIDTH,
       height:           138.99,
       fill:             'rgb(255,255,255)',
@@ -253,6 +268,11 @@
 
     text.setText('xx');
     equal(text.width, CHAR_WIDTH * 2);
+  });
+
+  test('dimensions without text', function() {
+    var text = new fabric.Text('');
+    equal(text.width, 2);
   });
 
   test('setting fontFamily', function() {

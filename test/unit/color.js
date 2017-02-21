@@ -84,12 +84,22 @@
     equal(oColor.toHex(), '000000');
   });
 
+  test('toHexa', function() {
+    var oColor = new fabric.Color('ffffffff');
+    ok(typeof oColor.toHexa == 'function');
+    equal(oColor.toHexa(), 'FFFFFFFF');
+    oColor.setSource([255,255,255,0.8]);
+    equal(oColor.toHexa(), 'FFFFFFCC');
+  });
+
   test('getAlpha', function() {
     var oColor = new fabric.Color('ffffff');
     ok(typeof oColor.getAlpha == 'function');
     equal(oColor.getAlpha(), 1);
     oColor.setSource([10,20,30, 0.456]);
     equal(oColor.getAlpha(), 0.456);
+    oColor = new fabric.Color('ffffffcc');
+    equal(oColor.getAlpha(), 0.8);
   });
 
   test('setAlpha', function() {
@@ -283,15 +293,43 @@
     ok(typeof fabric.Color.sourceFromHex == 'function');
 
     // uppercase
-    deepEqual(fabric.Color.sourceFromHex('FFFFFF'), [255,255,255,1]);
-    deepEqual(fabric.Color.sourceFromHex('FFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFFFF00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFFFFCC'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFFFF00'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('#FFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFC'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('#FFF0'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('#FFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFF00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFFCC'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFF00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('FFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('FFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('FFFC'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('FFF0'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('FFF'), [255,255,255,1]);
 
     // lowercase
+    deepEqual(fabric.Color.sourceFromHex('#ffffff00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('#ffffffcc'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('#ffffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#ffffff00'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('#ffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#ffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#fffc'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('#fff0'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('#fff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('ffffff00'), [255,255,255,0]);
+    deepEqual(fabric.Color.sourceFromHex('ffffffcc'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('ffffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('ffffff00'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('ffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('ffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('fffc'), [255,255,255,0.8]);
+    deepEqual(fabric.Color.sourceFromHex('fff0'), [255,255,255,0]);
     deepEqual(fabric.Color.sourceFromHex('fff'), [255,255,255,1]);
   });
 

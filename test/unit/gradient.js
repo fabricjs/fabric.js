@@ -107,6 +107,13 @@
     equal(object.colorStops, gradient.colorStops);
   });
 
+  test('toObject with custom props', function() {
+    var gradient = createLinearGradient();
+    gradient.id = 'myId';
+    var object = gradient.toObject(['id']);
+    equal(object.id, 'myId');
+  });
+
   test('toObject radialGradient', function() {
     var gradient = createRadialGradient();
 
@@ -414,7 +421,7 @@
 
     equal(gradient.colorStops[0].color, 'rgb(0,0,0)');
     equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
-    deepEqual(gradient.gradientTransform, [ 3.321, -0.6998, 0.4077, 1.9347, -440.9168, -408.0598 ]);
+    deepEqual(gradient.gradientTransform, [3.321, -0.6998, 0.4077, 1.9347, -440.9168, -408.0598]);
   });
 
   test('fromElement linearGradient colorStop attributes/styles', function() {

@@ -2,7 +2,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -35,13 +35,13 @@
     'flipX':                    false,
     'flipY':                    false,
     'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
+    'src':                      IMG_SRC,
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],    
+    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
@@ -57,34 +57,51 @@
     return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
   }
 
-  function _createImageObject(width, height, callback) {
+  function _createImageObject(width, height, callback, options) {
     var elImage = _createImageElement();
-    elImage.width = width;
-    elImage.height = height;
     setSrc(elImage, IMG_SRC, function() {
-      callback(new fabric.Image(elImage));
+      if (width != elImage.width || height != elImage.height) {
+        if (fabric.isLikelyNode) {
+          var Canvas = require('canvas');
+          var canvas = new Canvas(width, height);
+          canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
+          elImage._src = canvas.toDataURL();
+          elImage.src = elImage._src;
+        }
+        else {
+          elImage.width = width;
+          elImage.height = height;
+        }
+        return new fabric.Image(elImage, options, callback);
+      }
+      else {
+        return new fabric.Image(elImage, options, callback);
+      }
     });
   }
 
-  function createImageObject(callback) {
-    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
+  function createImageObject(callback, options) {
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback, options);
   }
 
-  // function createSmallImageObject(callback) {
-  //   return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback);
-  // }
+  function createSmallImageObject(callback, options) {
+    return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback, options);
+  }
 
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) { throw err; };
         img.src = imgData;
+        img._src = src;
         callback && callback();
       });
     }
     else {
+      img.onload = function() {
+        callback && callback();
+      };
       img.src = src;
-      callback && callback();
     }
   }
 
@@ -121,7 +138,6 @@
 
   asyncTest('toObject with no element', function() {
     createImageObject(function(image) {
-      image._originalElement = null;
       ok(typeof image.toObject == 'function');
       var toObject = image.toObject();
       // workaround for node-canvas sometimes producing images with width/height and sometimes not
@@ -131,7 +147,7 @@
       if (toObject.height === 0) {
         toObject.height = IMG_HEIGHT;
       }
-      deepEqual(toObject, fabric.util.object.extend(REFERENCE_IMG_OBJECT, {src: ''}));
+      deepEqual(toObject, REFERENCE_IMG_OBJECT);
       start();
     });
   });
@@ -142,7 +158,6 @@
       var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
       image.resizeFilters.push(filter);
       ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-
       var toObject = image.toObject();
       deepEqual(toObject.resizeFilters[0], filter.toObject());
       fabric.Image.fromObject(toObject, function(imageFromObject) {
@@ -152,67 +167,42 @@
         equal(filterFromObj.scaleX, 0.3);
         equal(filterFromObj.scaleY, 0.3);
         equal(filterFromObj.resizeType, 'bilinear');
+        start();
       });
-      start();
     });
   });
 
   asyncTest('toObject with applied resize filter', function() {
     createImageObject(function(image) {
       ok(typeof image.toObject == 'function');
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.5, scaleY: 0.5});
+      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2});
       image.filters.push(filter);
       var width = image.width, height = image.height;
       ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       image.applyFilters(function() {
-        equal(image.width, width / 2, 'width should be halved now');
-        equal(image.height, height / 2, 'height should be halved now');
+        equal(image.width, width / 5, 'width should be a fifth');
+        equal(image.height, height / 5, 'height should a fifth');
         var toObject = image.toObject();
         deepEqual(toObject.filters[0], filter.toObject());
         equal(toObject.width, width, 'width is stored as before filters');
         equal(toObject.height, height, 'height is stored as before filters');
-        fabric.Image.fromObject(toObject, function(imageFromObject) {
-          var filterFromObj = imageFromObject.filters[0];
+        fabric.Image.fromObject(toObject, function(_imageFromObject) {
+          var filterFromObj = _imageFromObject.filters[0];
           ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-          equal(filterFromObj.scaleY, 0.5);
-          equal(filterFromObj.scaleX, 0.5);
-          //equal(imageFromObject.width, width, 'on image reload width is halved again');
-          //equal(imageFromObject.height, height, 'on image reload width is halved again');
+          equal(filterFromObj.scaleY, 0.2);
+          equal(filterFromObj.scaleX, 0.2);
+          equal(_imageFromObject.width, width / 5, 'on image reload width is halved again');
+          equal(_imageFromObject.height, height / 5, 'on image reload width is halved again');
           start();
         });
       });
     });
   });
 
-
-  // asyncTest('toObject without default values', function() {
-  //   createImageObject(function(image) {
-
-  //     image.includeDefaultValues = false;
-
-  //     var object = image.toObject();
-
-  //     // workaround for node-canvas sometimes producing images with width/height and sometimes not
-  //     if (object.width === 0) {
-  //       object.width = IMG_WIDTH;
-  //     }
-  //     if (object.height === 0) {
-  //       object.height = IMG_HEIGHT;
-  //     }
-  //     deepEqual(object, {
-  //       type: 'image',
-  //       // why the hell deepEqual fail [] == [] check?!
-  //       filters: [],
-  //       crossOrigin: ''
-  //     });
-  //     start();
-  //   });
-  // });
-
   asyncTest('toString', function() {
     createImageObject(function(image) {
       ok(typeof image.toString == 'function');
-      equal(image.toString(), '#<fabric.Image: { src: "' + (fabric.isLikelyNode ? undefined : IMG_SRC) + '" }>');
+      equal(image.toString(), '#<fabric.Image: { src: "' + IMG_SRC + '" }>');
       start();
     });
   });
@@ -220,7 +210,7 @@
   asyncTest('getSrc', function() {
     createImageObject(function(image) {
       ok(typeof image.getSrc == 'function');
-      equal(image.getSrc(), fabric.isLikelyNode ? undefined : IMG_SRC);
+      equal(image.getSrc(), IMG_SRC);
       start();
     });
   });
@@ -275,128 +265,106 @@
     });
   });
 
-  // asyncTest('clone', function() {
+  asyncTest('clone', function() {
+    createImageObject(function(image) {
+      ok(typeof image.clone == 'function');
+
+      image.clone(function(clone) {
+        ok(clone instanceof fabric.Image);
+        deepEqual(clone.toObject(), image.toObject());
+        start();
+      });
+    });
+  });
+
+  asyncTest('cloneWidthHeight', function() {
+    createSmallImageObject(function(image) {
+      image.clone(function(clone) {
+        equal(clone.width, IMG_WIDTH / 2,
+          'clone\'s element should have width identical to that of original image');
+        equal(clone.height, IMG_HEIGHT / 2,
+          'clone\'s element should have height identical to that of original image');
+        start();
+      });
+    });
+  });
+
+  asyncTest('fromObject', function() {
+    ok(typeof fabric.Image.fromObject == 'function');
+
+    // should not throw error when no callback is given
+    var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+      src: IMG_SRC
+    });
+    fabric.Image.fromObject(obj, function(instance){
+      ok(instance instanceof fabric.Image);
+      start();
+    });
+  });
+
+  asyncTest('fromURL', function() {
+    ok(typeof fabric.Image.fromURL == 'function');
+    fabric.Image.fromURL(IMG_SRC, function(instance) {
+      ok(instance instanceof fabric.Image);
+      deepEqual(REFERENCE_IMG_OBJECT, instance.toObject());
+      start();
+    });
+  });
+
+  asyncTest('fromElement', function() {
+
+    function makeImageElement(attributes) {
+      var element = _createImageElement();
+      if (fabric.isLikelyNode) {
+        element.getAttribute = function(x) {
+          return element[x];
+        };
+        element.setAttribute = function(x, value) {
+          element[x] = value;
+        };
+      }
+      for (var prop in attributes) {
+        element.setAttribute(prop, attributes[prop]);
+      }
+      return element;
+    }
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    ok(typeof fabric.Image.fromElement == 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      width: '14',
+      height: '17',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      ok(imgObject instanceof fabric.Image);
+      deepEqual(imgObject.get('width'), 14, 'width of an object');
+      deepEqual(imgObject.get('height'), 17, 'height of an object');
+      deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      start();
+    });
+  });
+
+  // asyncTest('minimumScale', function() {
   //   createImageObject(function(image) {
-  //     ok(typeof image.clone == 'function');
-
-  //     var imageClone = null;
-  //     image.clone(function(clone) {
-  //       imageClone = clone;
-  //     });
-
-  //     setTimeout(function() {
-  //       ok(imageClone instanceof fabric.Image);
-  //       deepEqual(imageClone.toObject(), image.toObject());
+  //     ok(typeof image.toObject == 'function');
+  //     var filter = new fabric.Image.filters.Resize({resizeType: 'sliceHack', scaleX: 0.2, scaleY: 0.2});
+  //     image.resizeFilters.push(filter);
+  //     var width = image.width, height = image.height;
+  //     ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+  //     var toObject = image.toObject();
+  //     fabric.Image.fromObject(toObject, function(_imageFromObject) {
+  //       var filterFromObj = _imageFromObject.resizeFilters[0];
+  //       ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+  //       equal(filterFromObj.scaleY, 0.2);
+  //       equal(filterFromObj.scaleX, 0.2);
+  //       var canvasEl = _imageFromObject.applyFilters(null, _imageFromObject.resizeFilters, _imageFromObject._originalElement, true);
   //       start();
-  //     }, 1000);
+  //     });
   //   });
-  // });
-
-  // asyncTest('cloneWidthHeight', function() {
-  //   var image = createSmallImageObject();
-
-  //   var imageClone = null;
-  //   image.clone(function(clone) {
-  //     imageClone = clone;
-  //   });
-
-  //   setTimeout(function() {
-  //     equal(imageClone.getElement().width, IMG_WIDTH / 2,
-  //       'clone\'s element should have width identical to that of original image');
-  //     equal(imageClone.getElement().height, IMG_HEIGHT / 2,
-  //       'clone\'s element should have height identical to that of original image');
-  //     start();
-  //   }, 1000);
-  // });
-
-  // asyncTest('fromObject', function() {
-  //   ok(typeof fabric.Image.fromObject == 'function');
-
-  //   // should not throw error when no callback is given
-  //   var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
-  //     src: IMG_SRC
-  //   });
-  //   fabric.Image.fromObject(obj);
-
-  //   var image;
-  //   fabric.Image.fromObject(obj, function(instance){
-  //     image = instance;
-  //   });
-
-  //   setTimeout(function() {
-  //     ok(image instanceof fabric.Image);
-  //     start();
-  //   }, 1000);
-  // });
-
-  // asyncTest('fromURL', function() {
-  //   ok(typeof fabric.Image.fromURL == 'function');
-
-  //   // should not throw error when no callback is given
-  //   // can't use `assertNothingRaised` due to asynchronous callback
-  //   fabric.Image.fromURL(IMG_SRC);
-
-  //   var image;
-  //   fabric.Image.fromURL(IMG_SRC, function(instance) {
-  //     image = instance;
-  //   });
-
-  //   setTimeout(function() {
-  //     ok(image instanceof fabric.Image);
-  //     deepEqual(REFERENCE_IMG_OBJECT, image.toObject());
-  //     start();
-  //   }, 1000);
-  // });
-
-  // test('toGrayscale', function() {
-  //   var image = createImageObject(),
-  //       imageEl = _createImageElement();
-
-  //   imageEl.src = IMG_SRC;
-  //   image.setElement(imageEl);
-
-  //   ok(typeof image.toGrayscale == 'function');
-
-  //   if (!fabric.Canvas.supports('toDataURL')) {
-  //     alert('toDataURL is not supported. Some tests can not be run.');
-  //   }
-  //   else {
-  //     equal(image.toGrayscale(), image, 'chainable');
-  //   }
-  // });
-
-  // asyncTest('fromElement', function() {
-
-  //   function makeImageElement(attributes) {
-  //     var element = _createImageElement();
-  //     for (var prop in attributes) {
-  //       element.setAttribute(prop, attributes[prop]);
-  //     }
-  //     return element;
-  //   }
-
-  //   var IMAGE_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==";
-
-  //   ok(typeof fabric.Image.fromElement == 'function', 'fromElement should exist');
-
-  //   var imageEl = makeImageElement({
-  //     width: "14",
-  //     height: "17",
-  //     "xlink:href": IMAGE_DATA_URL
-  //   });
-
-  //   var imgObject;
-  //   fabric.Image.fromElement(imageEl, function(obj) {
-  //     imgObject = obj;
-  //   });
-
-  //   setTimeout(function() {
-  //     ok(imgObject instanceof fabric.Image);
-  //     deepEqual(imgObject.get('width'), 14, 'width of an object');
-  //     deepEqual(imgObject.get('height'), 17, 'height of an object');
-  //     deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
-  //     start();
-  //   }, 500);
   // });
 
 })();

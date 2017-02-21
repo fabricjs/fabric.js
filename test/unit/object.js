@@ -4,7 +4,9 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) {
+      return path;
+    }
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -12,8 +14,8 @@
     return src;
   }
 
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_WIDTH   = 276,
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_WIDTH = 276,
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
@@ -32,7 +34,9 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) {
+          throw err;
+        };
         img.src = imgData;
         callback && callback();
       });
@@ -167,16 +171,16 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
+    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",' +
                           '"transformMatrix":null,"skewX":0,"skewY":0}';
 
-    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
-                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
-                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
+    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,' +
+                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
+                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",' +
                         '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var cObj = new fabric.Object();
@@ -308,7 +312,7 @@
       top: 20,
       width: 30,
       height: 40,
-      strokeDashArray: [ 5, 2 ],
+      strokeDashArray: [5, 2],
       strokeLineCap: 'round',
       strokeLineJoin: 'bevil',
       strokeMiterLimit: 5,
@@ -339,7 +343,6 @@
     deepEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
     notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
-
   });
 
   test('toDatalessObject', function() {
@@ -371,7 +374,6 @@
     equal(boundingRect.top, 0);
     equal(boundingRect.width, 0);
     equal(boundingRect.height, 0);
-
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
     equal(boundingRect.left, 0);
@@ -394,7 +396,7 @@
     equal(boundingRect.height, 334);
   });
 
-test('getBoundingRectWithStroke', function() {
+  test('getBoundingRectWithStroke', function() {
     var cObj = new fabric.Object(),
         boundingRect;
     ok(typeof cObj.getBoundingRect == 'function');
@@ -472,7 +474,7 @@ test('getBoundingRectWithStroke', function() {
     ok(typeof cObj.scaleToWidth == 'function');
     equal(cObj.scaleToWidth(100), cObj, 'chainable');
     equal(cObj.getWidth(), 100);
-    equal(cObj.get('scaleX'), 100/560);
+    equal(cObj.get('scaleX'), 100 / 560);
   });
 
   test('scaleToHeight', function() {
@@ -480,7 +482,7 @@ test('getBoundingRectWithStroke', function() {
     ok(typeof cObj.scaleToHeight == 'function');
     equal(cObj.scaleToHeight(100), cObj, 'chainable');
     equal(cObj.getHeight(), 100);
-    equal(cObj.get('scaleY'), 100/560);
+    equal(cObj.get('scaleY'), 100 / 560);
   });
 
   test('scaleToWidth on rotated object', function() {
@@ -525,11 +527,6 @@ test('getBoundingRectWithStroke', function() {
   test('drawBorders', function() {
     var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
 
-    //let excanvas kick in for IE8 and lower
-    if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-        G_vmlCanvasManager.initElement(canvas);
-    }
-
     var dummyContext = canvas.getContext('2d');
 
     ok(typeof cObj.drawBorders == 'function');
@@ -539,10 +536,6 @@ test('getBoundingRectWithStroke', function() {
   test('drawControls', function() {
     var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
 
-    //let excanvas kick in for IE8 and lower
-    if (!canvas.getContext && typeof G_vmlCanvasManager != 'undefined') {
-        G_vmlCanvasManager.initElement(canvas);
-    }
     var dummyContext = canvas.getContext('2d');
     ok(typeof cObj.drawControls == 'function');
     equal(cObj.drawControls(dummyContext), cObj, 'chainable');
@@ -566,7 +559,7 @@ test('getBoundingRectWithStroke', function() {
   });
 
   asyncTest('cloneAsImage', function() {
-    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red' });
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
 
     ok(typeof cObj.cloneAsImage == 'function');
 
@@ -575,17 +568,30 @@ test('getBoundingRectWithStroke', function() {
       start();
     }
     else {
-      var image;
-
-      setTimeout(function() {
+      cObj.cloneAsImage(function(image) {
         ok(image);
         ok(image instanceof fabric.Image);
+        equal(image.width, 100, 'the image has same dimension of object');
         start();
-      }, 500);
-
-      cObj.cloneAsImage(function(i) {
-        image = i;
       });
+    }
+  });
+
+  asyncTest('cloneAsImage with retina scaling enabled', function() {
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
+    fabric.devicePixelRatio = 2;
+    if (!fabric.Canvas.supports('toDataURL')) {
+      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+      start();
+    }
+    else {
+      cObj.cloneAsImage(function(image) {
+        ok(image);
+        ok(image instanceof fabric.Image);
+        equal(image.width, 200, 'the image has been scaled by retina');
+        fabric.devicePixelRatio = 1;
+        start();
+      }, { enableRetinaScaling: true });
     }
   });
 
@@ -601,7 +607,7 @@ test('getBoundingRectWithStroke', function() {
     //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
     var cObj = new fabric.Rect({
-      width: 100, height: 100, fill: 'red'
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
     });
 
     ok(typeof cObj.toDataURL == 'function');
@@ -618,13 +624,13 @@ test('getBoundingRectWithStroke', function() {
         dataURL = cObj.toDataURL({ format: 'jpeg' });
         equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
       }
-      catch(err) {
+      catch (err) {
         fabric.log('jpeg toDataURL not supported');
       }
     }
   });
 
-test('toDataURL & reference to canvas', function() {
+  test('toDataURL & reference to canvas', function() {
   // var data =
   //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
   //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
@@ -635,85 +641,20 @@ test('toDataURL & reference to canvas', function() {
   //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
   //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
-  var cObj = new fabric.Rect({
-    width: 100, height: 100, fill: 'red'
-  });
-  canvas.add(cObj);
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red'
+    });
+    canvas.add(cObj);
 
-  if (!fabric.Canvas.supports('toDataURL')) {
-    window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-  }
-  else {
-    var objCanvas = cObj.canvas;
-    cObj.toDataURL();
+    if (!fabric.Canvas.supports('toDataURL')) {
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var objCanvas = cObj.canvas;
+      cObj.toDataURL();
 
-    equal(objCanvas, cObj.canvas);
-  }
-});
-
-  test('hasStateChanged', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.hasStateChanged == 'function');
-    cObj.setupState();
-    ok(!cObj.hasStateChanged());
-    cObj.saveState();
-    cObj.set('left', 123).set('top', 456);
-    ok(cObj.hasStateChanged());
-  });
-
-  test('saveState', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.saveState == 'function');
-    cObj.setupState();
-    equal(cObj.saveState(), cObj, 'chainable');
-    cObj.set('left', 123).set('top', 456);
-    cObj.saveState();
-    cObj.set('left', 223).set('top', 556);
-    equal(cObj.originalState.left, 123);
-    equal(cObj.originalState.top, 456);
-  });
-
-  test('intersectsWithRectangle', function() {
-    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
-    cObj.setCoords();
-    ok(typeof cObj.intersectsWithRect == 'function');
-
-    var point1 = new fabric.Point(110, 100),
-        point2 = new fabric.Point(210, 200),
-        point3 = new fabric.Point(0, 0),
-        point4 = new fabric.Point(10, 10);
-
-    ok(cObj.intersectsWithRect(point1, point2));
-    ok(!cObj.intersectsWithRect(point3, point4));
-  });
-
-  test('intersectsWithObject', function() {
-    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
-    cObj.setCoords();
-    ok(typeof cObj.intersectsWithObject == 'function');
-
-    var cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
-    cObj2.setCoords();
-    ok(cObj.intersectsWithObject(cObj2));
-    ok(cObj2.intersectsWithObject(cObj));
-
-    var cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
-    cObj3.setCoords();
-    ok(!cObj.intersectsWithObject(cObj3));
-    ok(!cObj3.intersectsWithObject(cObj));
-  });
-
-  test('isContainedWithinRect', function() {
-    var cObj = new fabric.Object({ left: 20, top: 20, width: 10, height: 10 });
-    cObj.setCoords();
-    ok(typeof cObj.isContainedWithinRect == 'function');
-
-    // fully contained
-    ok(cObj.isContainedWithinRect(new fabric.Point(10,10), new fabric.Point(100,100)));
-    // only intersects
-    ok(!cObj.isContainedWithinRect(new fabric.Point(10,10), new fabric.Point(25, 25)));
-    // doesn't intersect
-    ok(!cObj.isContainedWithinRect(new fabric.Point(100,100), new fabric.Point(110, 110)));
+      equal(objCanvas, cObj.canvas);
+    }
   });
 
   test('isType', function() {
@@ -744,11 +685,9 @@ test('toDataURL & reference to canvas', function() {
   test('_setLineDash', function() {
     var object = new fabric.Rect({ left: 100, top: 124, width: 210, height: 66, stroke: 'black', strokeWidth: 2});
     ok(typeof object._setLineDash === 'function');
-
-    canvas.add(object);
     object.strokeDashArray = [3, 2, 1];
     equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
-    canvas.renderAll();
+    object._setLineDash(canvas.contextContainer, object.strokeDashArray, null);
     equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
   });
 
@@ -791,19 +730,14 @@ test('toDataURL & reference to canvas', function() {
     var onChange = function(){ onChangeFired = true; };
 
     var callbacks = { onComplete: onComplete, onChange: onChange };
-
     ok(typeof object.fxStraighten == 'function');
     equal(object.fxStraighten(callbacks), object, 'should be chainable');
-
     equal(fabric.util.toFixed(object.get('angle'), 0), 43);
-
     setTimeout(function(){
       ok(onCompleteFired);
       ok(onChangeFired);
-
       equal(object.get('angle'), 0, 'angle should be set to 0 by the end of animation');
       equal(object.fxStraighten(), object, 'should work without callbacks');
-
       start();
     }, 1000);
   });
@@ -1270,155 +1204,13 @@ test('toDataURL & reference to canvas', function() {
     equal(object.get('fill'), '123456');
   });
 
-  test('intersectsWithRect', function() {
-    var object = new fabric.Object({ left: 0, top: 0, width: 40, height: 50, angle: 160 }),
-        point1 = new fabric.Point(-10, -10),
-        point2 = new fabric.Point(20, 30),
-        point3 = new fabric.Point(10, 15),
-        point4 = new fabric.Point(30, 35),
-        point5 = new fabric.Point(50, 60),
-        point6 = new fabric.Point(70, 80);
-
-    object.setCoords();
-
-    // object and area intersects
-    equal(object.intersectsWithRect(point1, point2), true);
-    // area is contained in object (no intersection)
-    equal(object.intersectsWithRect(point3, point4), false);
-    // area is outside of object (no intersection)
-    equal(object.intersectsWithRect(point5, point6), false);
-  });
-
-  test('intersectsWithObject', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 230, strokeWidth: 0 }),
-        object1 = new fabric.Object({ left: 20, top: 30, width: 60, height: 30, angle: 10, strokeWidth: 0 }),
-        object2 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50, strokeWidth: 0 }),
-        object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0, strokeWidth: 0 });
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-    object1.set({ originX: 'center', originY: 'center' }).setCoords();
-    object2.set({ originX: 'center', originY: 'center' }).setCoords();
-    object3.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // object and object1 intersects
-    equal(object.intersectsWithObject(object1), true);
-    // object2 is contained in object (no intersection)
-    equal(object.intersectsWithObject(object2), false);
-    // object3 is outside of object (no intersection)
-    equal(object.intersectsWithObject(object3), false);
-  });
-
-  test('isContainedWithinObject', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 230 }),
-        object1 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50 }),
-        object2 = new fabric.Object({ left: 20, top: 30, width: 60, height: 30, angle: 10 }),
-        object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0 });
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-    object1.set({ originX: 'center', originY: 'center' }).setCoords();
-    object2.set({ originX: 'center', originY: 'center' }).setCoords();
-    object3.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // object1 is fully contained within object
-    equal(object1.isContainedWithinObject(object), true);
-    // object2 intersects object (not fully contained)
-    equal(object2.isContainedWithinObject(object), false);
-    // object3 is outside of object (not fully contained)
-    equal(object3.isContainedWithinObject(object), false);
-  });
-
-  test('isContainedWithinRect', function() {
-    var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160 }),
-        point1 = new fabric.Point(0, 0),
-        point2 = new fabric.Point(80, 80),
-        point3 = new fabric.Point(0, 0),
-        point4 = new fabric.Point(80, 60),
-        point5 = new fabric.Point(80, 80),
-        point6 = new fabric.Point(90, 90);
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // area is contained in object (no intersection)
-    equal(object.isContainedWithinRect(point1, point2), true);
-    // object and area intersects
-    equal(object.isContainedWithinRect(point3, point4), false);
-    // area is outside of object (no intersection)
-    equal(object.isContainedWithinRect(point5, point6), false);
-  });
-
-  test('isContainedWithinRect', function() {
-    var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160 }),
-        point1 = new fabric.Point(0, 0),
-        point2 = new fabric.Point(80, 80),
-        point3 = new fabric.Point(0, 0),
-        point4 = new fabric.Point(80, 60),
-        point5 = new fabric.Point(80, 80),
-        point6 = new fabric.Point(90, 90);
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // area is contained in object (no intersection)
-    equal(object.isContainedWithinRect(point1, point2), true);
-    // object and area intersects
-    equal(object.isContainedWithinRect(point3, point4), false);
-    // area is outside of object (no intersection)
-    equal(object.isContainedWithinRect(point5, point6), false);
-  });
-
-  test('containsPoint', function() {
-    var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160, strokeWidth: 0 }),
-        point1 = new fabric.Point(30, 30),
-        point2 = new fabric.Point(60, 30),
-        point3 = new fabric.Point(45, 65),
-        point4 = new fabric.Point(15, 40),
-        point5 = new fabric.Point(30, 15);
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // point1 is contained in object
-    equal(object.containsPoint(point1), true);
-    // point2 is outside of object (right)
-    equal(object.containsPoint(point2), false);
-    // point3 is outside of object (bottom)
-    equal(object.containsPoint(point3), false);
-    // point4 is outside of object (left)
-    equal(object.containsPoint(point4), false);
-    // point5 is outside of object (top)
-    equal(object.containsPoint(point5), false);
-  });
-
-  test('containsPoint with padding', function() {
-    var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160, padding: 5 }),
-        point1 = new fabric.Point(30, 30),
-        point2 = new fabric.Point(10, 20),
-        point3 = new fabric.Point(65, 30),
-        point4 = new fabric.Point(45, 75),
-        point5 = new fabric.Point(10, 40),
-        point6 = new fabric.Point(30, 5);
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // point1 is contained in object
-    equal(object.containsPoint(point1), true);
-    // point2 is contained in object (padding area)
-    equal(object.containsPoint(point2), true);
-    // point2 is outside of object (right)
-    equal(object.containsPoint(point3), false);
-    // point3 is outside of object (bottom)
-    equal(object.containsPoint(point4), false);
-    // point4 is outside of object (left)
-    equal(object.containsPoint(point5), false);
-    // point5 is outside of object (top)
-    equal(object.containsPoint(point6), false);
-  });
-
   test('clipTo', function() {
     var object = new fabric.Object({
       left: 40,
       top: 40,
       width: 40,
       height: 50,
-      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false) }
+      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false); }
     });
 
     equal(typeof object.clipTo, 'function');
@@ -1427,4 +1219,119 @@ test('toDataURL & reference to canvas', function() {
     equal(typeof deserializedObject.clipTo, 'function');
   });
 
+  test('getObjectScale', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    var objectScale = object.getObjectScaling();
+    deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
+  });
+
+  test('getObjectScale in group', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.group = group;
+    var objectScale = object.getObjectScaling();
+    deepEqual(objectScale, {
+      scaleX: object.scaleX * group.scaleX,
+      scaleY: object.scaleY * group.scaleY
+    });
+  });
+
+  test('dirty flag on set property', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    equal(object.dirty, false, 'object starts with dirty flag disabled');
+    object.set('propC', '3');
+    equal(object.dirty, false, 'after setting a property out of cache, dirty flag is still false');
+    object.set('propA', '2');
+    equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
+  });
+
+  test('isCacheDirty statefullCache disabled', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    object.statefullCache = false;
+    object._createCacheCanvas();
+    equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
+    object.dirty = true;
+    equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
+  });
+
+  test('isCacheDirty statefullCache enabled', function() {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    object.cacheProperties = ['propA', 'propB'];
+    object.dirty = false;
+    object.statefullCache = true;
+    object.propA = 'A';
+    object.setupState({ propertySet: 'cacheProperties' });
+    object._createCacheCanvas();
+    equal(object.isCacheDirty(), false, 'object is not dirty');
+    object.propA = 'B';
+    equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');
+  });
+
+  test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function() {
+    var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    object.strokeWidth = 2;
+    dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    object.scaleX = 2;
+    object.scaleY = 3;
+    dims = object._getCacheCanvasDimensions();
+    deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+  });
+
+  test('_updateCacheCanvas check if cache canvas should be updated', function() {
+    var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
+    object._createCacheCanvas();
+    equal(object.cacheWidth, 12, 'current cache dimensions are saved');
+    equal(object.cacheHeight, 12, 'current cache dimensions are saved');
+    equal(object._updateCacheCanvas(), false, 'second execution of cache canvas return false');
+    object.scaleX = 2;
+    equal(object._updateCacheCanvas(), true, 'if scale change, it returns true');
+    equal(object.cacheWidth, 22, 'current cache dimensions is updated');
+    equal(object.zoomX, 2, 'current scale level is saved');
+    object.width = 2;
+    equal(object._updateCacheCanvas(), true, 'if dimension change, it returns true');
+    equal(object.cacheWidth, 6, 'current cache dimensions is updated');
+    object.strokeWidth = 2;
+    equal(object._updateCacheCanvas(), true, 'if strokeWidth change, it returns true');
+  });
+
+  test('_setShadow', function(){
+    var el = fabric.document.createElement('canvas');
+    el.width = 600; el.height = 600;
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var context = canvas.contextContainer;
+    var object = new fabric.Object({ scaleX: 1, scaleY: 1});
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 2;
+    object.setShadow({
+      color: 'red',
+      blur: 10,
+      offsetX: 5,
+      offsetY: 15
+    });
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX);
+    equal(context.shadowOffsetY, object.shadow.offsetY);
+    equal(context.shadowBlur, object.shadow.blur);
+    object.scaleX = 2;
+    object.scaleY = 3;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2);
+    object.group = group;
+    object._setShadow(context);
+    equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX);
+    equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
+    equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
+  });
 })();

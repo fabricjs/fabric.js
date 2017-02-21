@@ -51,7 +51,7 @@
   }
 
   function makePathObject(callback) {
-    getPathObject("M 100 100 L 300 100 L 200 300 z", callback);
+    getPathObject('M 100 100 L 300 100 L 200 300 z', callback);
   }
 
   QUnit.module('fabric.Path');
@@ -69,7 +69,7 @@
       try {
         new fabric.Path();
       }
-      catch(err) {
+      catch (err) {
         error = err;
       }
 
@@ -102,9 +102,21 @@
     });
   });
 
+  asyncTest('toObject', function() {
+    makePathObject(function(path) {
+      path.top = fabric.Object.prototype.top;
+      path.left = fabric.Object.prototype.left;
+      path.includeDefaultValues = false;
+      var obj = path.toObject();
+      equal(obj.top, fabric.Object.prototype.top, 'top is available also when equal to prototype');
+      equal(obj.left, fabric.Object.prototype.left, 'left is available also when equal to prototype');
+      start();
+    });
+  });
+
   asyncTest('toSVG', function() {
     makePathObject(function(path) {
-      ok(typeof path.toObject == 'function');
+      ok(typeof path.toSVG == 'function');
       deepEqual(path.toSVG(), '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(200.5 200.5) translate(-200, -200) " stroke-linecap="round" />\n');
       start();
     });
@@ -189,7 +201,7 @@
 
         deepEqual(
           path.get('transformMatrix'),
-          [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ]
+          [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]
         );
         start();
       });

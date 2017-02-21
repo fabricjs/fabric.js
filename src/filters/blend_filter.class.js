@@ -1,7 +1,9 @@
 (function(global) {
   'use strict';
 
-  var fabric = global.fabric;
+  var fabric = global.fabric,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Color Blend filter class
@@ -23,7 +25,8 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Blend = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */{
+
+  filters.Blend = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */ {
     type: 'Blend',
 
     initialize: function(options) {
@@ -139,7 +142,13 @@
     }
   });
 
-  fabric.Image.filters.Blend.fromObject = function(object) {
-    return new fabric.Image.filters.Blend(object);
-  };
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] to be invoked after filter creation
+   * @return {fabric.Image.filters.Blend} Instance of fabric.Image.filters.Blend
+   */
+  fabric.Image.filters.Blend.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+
 })(typeof exports !== 'undefined' ? exports : this);

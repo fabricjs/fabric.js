@@ -2,47 +2,47 @@
 
   // var emptyImageCanvasData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAH7ElEQVR4nO3VMQ0AMAzAsPInvYHoMS2yEeTLHADge/M6AADYM3QACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIuMjH4b7osLFBAAAAAElFTkSuQmCC";
 
-  var CANVAS_SVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'+
-                   '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="0 0 600 600" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs></defs>\n</svg>';
+  var CANVAS_SVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
+                   '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="0 0 600 600" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n</svg>';
 
-  var CANVAS_SVG_VIEWBOX = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'+
-                           '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="100 100 300 300" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs></defs>\n</svg>';
+  var CANVAS_SVG_VIEWBOX = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
+                           '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="100 100 300 300" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n</svg>';
 
-  var PATH_JSON = '{"objects": [{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,'+
-                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
-                  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],'+
-                  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],'+
-                  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, '+
-                  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], '+
-                  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, '+
-                  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", '+
-                  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],'+
-                  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],'+
-                  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],'+
-                  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,'+
-                  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",'+
-                  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], '+
-                  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
+  var PATH_JSON = '{"objects": [{"type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
+                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
+                  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
+                  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
+                  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
+                  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
+                  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
+                  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
+                  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
+                  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
+                  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
+                  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
+                  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
+                  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
+                  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z", null]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"pathOffset":{"x":200,"y":200},"path":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+  var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
-  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",'+
-                               '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
+  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
+                               '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -75,13 +75,13 @@
     'flipX':                    false,
     'flipY':                    false,
     'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
+    'src':                      IMG_SRC,
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],    
+    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
@@ -113,8 +113,9 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) { throw err; };
         img.src = imgData;
+        img._src = src;
         callback && callback();
       });
     }
@@ -139,7 +140,8 @@
   var Canvas = fabric.Canvas;
   fabric.Canvas = null;
   var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
+  el.width = 600;
+  el.height = 600;
 
   var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el),
       canvas2 = this.canvas2 = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
@@ -158,9 +160,7 @@
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.backgroundImage = fabric.StaticCanvas.prototype.backgroundImage;
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
-      canvas.controlsAboveOverlay = fabric.StaticCanvas.prototype.controlsAboveOverlay;
-      canvas.preserveObjectStacking = fabric.StaticCanvas.prototype.preserveObjectStacking;
-      canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
     }
   });
@@ -171,12 +171,23 @@
     ok('backgroundImage' in canvas);
     ok('overlayImage' in canvas);
     ok('clipTo' in canvas);
+    ok('includeDefaultValues' in canvas);
+    ok('stateful' in canvas);
+    ok('renderOnAddRemove' in canvas);
+    ok('controlsAboveOverlay' in canvas);
+    ok('allowTouchScrolling' in canvas);
+    ok('imageSmoothingEnabled' in canvas);
+    ok('backgroundVpt' in canvas);
+    ok('overlayVpt' in canvas);
 
     equal(canvas.includeDefaultValues, true);
-    equal(canvas.stateful, true);
+    equal(canvas.stateful, false);
     equal(canvas.renderOnAddRemove, true);
     equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.allowTouchScrolling, false);
     equal(canvas.imageSmoothingEnabled, true);
+    equal(canvas.backgroundVpt, true);
+    equal(canvas.overlayVpt, true);
 
     notStrictEqual(canvas.viewportTransform, canvas2.viewportTransform);
   });
@@ -424,9 +435,17 @@
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
-
+    var bg = new fabric.Rect({ width: 10, height: 20 });
+    canvas.backgroundColor = '#FF0000';
+    canvas.overlayColor = '#FF0000';
+    canvas.backgroundImage = bg;
+    canvas.overlayImage = bg;
     equal(canvas.clear(), canvas, 'should be chainable');
-    equal(canvas.getObjects().length, 0);
+    equal(canvas.getObjects().length, 0, 'clear remove all objects');
+    equal(canvas.backgroundColor, '', 'clear remove background color');
+    equal(canvas.overlayColor, '', 'clear remove overlay color');
+    equal(canvas.backgroundImage, null, 'clear remove bg image');
+    equal(canvas.overlayImage, null, 'clear remove overlay image');
   });
 
   test('renderAll', function() {
@@ -434,23 +453,13 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('preserveObjectStacking', function() {
-    ok(typeof canvas.preserveObjectStacking == 'boolean');
-    ok(!canvas.preserveObjectStacking);
-  });
-
-  test('renderTop', function() {
-    ok(typeof canvas.renderTop == 'function');
-    equal(canvas, canvas.renderTop());
-  });
-
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {
-      var rect = new fabric.Rect({width: 100, height: 100, fill:'red', top: 0, left: 0});
+      var rect = new fabric.Rect({width: 100, height: 100, fill: 'red', top: 0, left: 0});
       canvas.add(rect);
       var dataURL = canvas.toDataURL();
       // don't compare actual data url, as it is often browser-dependent
@@ -464,7 +473,7 @@
 
   test('toDataURL jpg', function() {
     if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {
       try {
@@ -472,9 +481,26 @@
         equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
       }
       // node-canvas does not support jpeg data urls
-      catch(err) {
+      catch (err) {
         ok(true);
       }
+    }
+  });
+
+  test('toDataURL cropping', function() {
+    ok(typeof canvas.toDataURL == 'function');
+    if (!fabric.Canvas.supports('toDataURL')) {
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var croppingWidth = 75,
+          croppingHeight = 50,
+          dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
+
+      fabric.Image.fromURL(dataURL, function (img) {
+        equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
+        equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
+      });
     }
   });
 
@@ -486,7 +512,7 @@
     equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(4);
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
-
+    canvas.setZoom(1);
   });
 
   test('centerObjectV', function() {
@@ -511,6 +537,7 @@
     canvas.setZoom(4);
     equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
     equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
+    canvas.setZoom(1);
   });
 
   test('viewportCenterObjectH', function() {
@@ -734,7 +761,7 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[]}');
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
@@ -776,6 +803,17 @@
     });
   });
 
+  asyncTest('toJSON backgroundImage with custom props', function() {
+    createImageObject(function(image) {
+      canvas.backgroundImage = image;
+      image.custom = 'yes';
+      var json = canvas.toJSON(['custom']);
+      equal(json.backgroundImage.custom, 'yes');
+      canvas.backgroundImage = null;
+      start();
+    });
+  });
+
   asyncTest('toJSON overlayImage', function() {
     createImageObject(function(image) {
 
@@ -792,6 +830,17 @@
     });
   });
 
+  asyncTest('toJSON overlayImage with custom props', function() {
+    createImageObject(function(image) {
+      canvas.overlayImage = image;
+      image.custom = 'yes';
+      var json = canvas.toJSON(['custom']);
+      equal(json.overlayImage.custom, 'yes');
+      canvas.overlayImage = null;
+      start();
+    });
+  });
+
   test('toDatalessJSON', function() {
     var path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
       sourcePath: 'http://example.com/'
@@ -803,7 +852,6 @@
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toObject());
@@ -812,6 +860,16 @@
     canvas.add(rect);
 
     equal(canvas.toObject().objects[0].type, rect.type);
+  });
+
+  test('toObject non includeDefaultValues', function() {
+    canvas.includeDefaultValues = false;
+    var rect = makeRect();
+    canvas.add(rect);
+    var cObject = canvas.toObject();
+    var expectedRect = { type: 'rect', width: 10, height: 10 };
+    deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
+    canvas.includeDefaultValues = true;
   });
 
   test('toObject excludeFromExport', function() {
@@ -828,7 +886,6 @@
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
     deepEqual(expectedObject, canvas.toDatalessObject());
@@ -846,7 +903,6 @@
     canvas.foobar = 123;
 
     var expectedObject = {
-      background: canvas.backgroundColor,
       objects: canvas.getObjects(),
       freeDrawingColor: 'red',
       foobar: 123
@@ -867,7 +923,7 @@
     ok(!canvas.isEmpty());
   });
 
-  test('loadFromJSON with json string', function() {
+  asyncTest('loadFromJSON with json string staticCanvas', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(PATH_JSON, function(){
@@ -890,12 +946,12 @@
       equal(obj.get('flipX'), false);
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
-
       ok(obj.get('path').length > 0);
+      start();
     });
   });
 
-  test('loadFromJSON with json object', function() {
+  asyncTest('loadFromJSON with json object', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
@@ -921,44 +977,9 @@
       equal(obj.get('opacity'), 1);
 
       ok(obj.get('path').length > 0);
-    });
-  });
-
-  test('loadFromJSON with custom properties on Canvas with no async object', function() {
-    var serialized = JSON.parse(PATH_JSON);
-    serialized.controlsAboveOverlay = true;
-    serialized.preserveObjectStacking = true;
-    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
-    canvas.loadFromJSON(serialized, function() {
-      ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(canvas.controlsAboveOverlay, true);
-      equal(canvas.preserveObjectStacking, true);
-    });
-    // if no async object the callback is called syncronously
-    equal(canvas.controlsAboveOverlay, true);
-    equal(canvas.preserveObjectStacking, true);
-  });
-
-  asyncTest('loadFromJSON with custom properties on Canvas with image', function() {
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}],'
-+ '"background":"green"}';
-    var serialized = JSON.parse(JSON_STRING);
-    serialized.controlsAboveOverlay = true;
-    serialized.preserveObjectStacking = true;
-    equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
-    canvas.loadFromJSON(serialized, function() {
-      ok(!canvas.isEmpty(), 'canvas is not empty');
-      equal(canvas.controlsAboveOverlay, true);
-      equal(canvas.preserveObjectStacking, true);
       start();
     });
-    // before callback the properties are still false.
-    equal(canvas.controlsAboveOverlay, false);
-    equal(canvas.preserveObjectStacking, false);
   });
-
 
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
@@ -972,10 +993,10 @@
     });
   });
 
-  test('loadFromJSON custom properties', function() {
+  asyncTest('loadFromJSON custom properties', function() {
     var rect = new fabric.Rect({ width: 10, height: 20 });
     rect.padding = 123;
-    rect.foo = "bar";
+    rect.foo = 'bar';
 
     canvas.add(rect);
 
@@ -991,6 +1012,7 @@
 
       equal(obj.padding, 123, 'padding on object is set properly');
       equal(obj.foo, 'bar', '"foo" property on object is set properly');
+      start();
     });
   });
 
@@ -1322,6 +1344,102 @@
       left: 50,
       originX: 'right'
     });
+  });
+
+  test('setViewportTransform', function() {
+    ok(typeof canvas.setViewportTransform == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.viewportTransform, vpt, 'viewport now is the set one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getZoom', function() {
+    ok(typeof canvas.getZoom == 'function');
+    var vpt = [2, 0, 0, 2, 50, 50];
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setViewportTransform(vpt);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('setZoom', function() {
+    ok(typeof canvas.setZoom == 'function');
+    deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
+    canvas.setZoom(2);
+    deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('zoomToPoint', function() {
+    ok(typeof canvas.zoomToPoint == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.zoomToPoint(point, 1);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'viewport has no changes if not moving with zoom level');
+    canvas.zoomToPoint(point, 2);
+    deepEqual(canvas.viewportTransform, [2, 0, 0, 2, -50, -50], 'viewport has a translation effect and zoom');
+    canvas.zoomToPoint(point, 3);
+    deepEqual(canvas.viewportTransform, [3, 0, 0, 3, -100, -100], 'viewport has a translation effect and zoom');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('absolutePan', function() {
+    ok(typeof canvas.absolutePan == 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(50, 50);
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has translation effect applied');
+    canvas.absolutePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has same translation effect applied');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('relativePan', function() {
+    ok(typeof canvas.relativePan === 'function');
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var point = new fabric.Point(-50, -50);
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -50, -50], 'viewport has translation effect applied');
+    canvas.relativePan(point);
+    deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -100, -100], 'viewport has translation effect applied on top of old one');
+    canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  test('getContext', function() {
+    ok(typeof canvas.getContext === 'function');
+    var context = canvas.getContext();
+    equal(context, canvas.contextContainer, 'should return the context container');
+  });
+
+  test('calcViewportBoundaries', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.calcViewportBoundaries();
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(0, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(canvas.getWidth(), 0), 'tr is width, 0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(0, canvas.getHeight()), 'bl is 0, height');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(canvas.getWidth(), canvas.getHeight()), 'tl is width, height');
+  });
+
+  test('calcViewportBoundaries with zoom', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(0, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(canvas.getWidth() / 2, 0), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(0, canvas.getHeight() / 2), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), 'tl is 0,0');
+  });
+
+  test('calcViewportBoundaries with zoom and translation', function() {
+    ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, 2, -60, 60]);
+    deepEqual(canvas.vptCoords.tl, new fabric.Point(30, -30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.tr, new fabric.Point(30 + canvas.getWidth() / 2, -30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.bl, new fabric.Point(30, canvas.getHeight() / 2 - 30), 'tl is 0,0');
+    deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
   });
 
   //how to test with an exception?

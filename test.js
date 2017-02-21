@@ -36,7 +36,12 @@ testrunner.run({
       './test/unit/object_interactivity.js',
       './test/unit/object_geometry.js',
       './test/unit/object_origin.js',
-      './test/unit/itext.js'
+      './test/unit/itext.js',
+      './test/unit/itext_key_behaviour.js',
+      './test/unit/collection.js',
+      './test/unit/point.js',
+      './test/unit/intersection.js',
+      './test/unit/stateful.js'
     ]
 }, function(err, report) {
   if (err) {

@@ -61,7 +61,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes event handlers related to cursor or selection
    */
   initCursorSelectionHandlers: function() {
-    this.initSelectedHandler();
     this.initMousedownHandler();
     this.initMouseupHandler();
     this.initClicks();
@@ -93,17 +92,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__mousedownY = pointer.y;
       this.__isMousedown = true;
 
-      if (this.hiddenTextarea && this.canvas) {
-        this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
-      }
-
       if (this.selected) {
         this.setCursorByClick(options.e);
       }
 
       if (this.isEditing) {
         this.__selectionStartOnMouseDown = this.selectionStart;
-        this.initDelayedCursor(true);
+        if (this.selectionStart === this.selectionEnd) {
+          this.abortCursorAnimation();
+        }
+        this.renderCursorOrSelection();
       }
     });
   },
@@ -130,7 +128,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       if (this.__lastSelected && !this.__corner) {
         this.enterEditing(options.e);
-        this.initDelayedCursor(true);
+        if (this.selectionStart === this.selectionEnd) {
+          this.initDelayedCursor(true);
+        }
+        else {
+          this.renderCursorOrSelection();
+        }
       }
       this.selected = true;
     });
@@ -141,20 +144,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   setCursorByClick: function(e) {
-    var newSelectionStart = this.getSelectionStartFromPointer(e);
-
+    var newSelection = this.getSelectionStartFromPointer(e),
+        start = this.selectionStart, end = this.selectionEnd;
     if (e.shiftKey) {
-      if (newSelectionStart < this.selectionStart) {
-        this.setSelectionEnd(this.selectionStart);
-        this.setSelectionStart(newSelectionStart);
-      }
-      else {
-        this.setSelectionEnd(newSelectionStart);
-      }
+      this.setSelectionStartEndWithShift(start, end, newSelection);
     }
     else {
-      this.setSelectionStart(newSelectionStart);
-      this.setSelectionEnd(newSelectionStart);
+      this.selectionStart = newSelection;
+      this.selectionEnd = newSelection;
+    }
+    if (this.isEditing) {
+      this._fireSelectionChanged();
+      this._updateTextarea();
     }
   },
 

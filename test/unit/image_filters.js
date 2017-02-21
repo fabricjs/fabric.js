@@ -2,7 +2,7 @@
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) return path;
+    if (isAbsolute) { return path; };
     var imgEl = _createImageElement();
     imgEl.src = path;
     var src = imgEl.src;
@@ -68,7 +68,7 @@
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
       require('fs').readFile(src, function(err, imgData) {
-        if (err) throw err;
+        if (err) { throw err; };
         img.src = imgData;
         callback && callback();
       });
@@ -687,7 +687,7 @@
       if (maskObj.height === 0) {
         maskObj.height = IMG_HEIGHT;
       }
-      equal(JSON.stringify(object), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+      equal(JSON.stringify(object), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
 
       start();
     });
@@ -708,7 +708,7 @@
       if (maskObj.height === 0) {
         maskObj.height = IMG_HEIGHT;
       }
-      equal(JSON.stringify(json), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+      equal(JSON.stringify(json), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
 
       start();
     });

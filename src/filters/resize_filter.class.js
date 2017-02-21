@@ -4,7 +4,9 @@
 
   var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
       sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin,
-      ceil = Math.ceil;
+      ceil = Math.ceil,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
 
   /**
    * Resize image filter class
@@ -17,7 +19,7 @@
    * object.filters.push(filter);
    * object.applyFilters(canvas.renderAll.bind(canvas));
    */
-  fabric.Image.filters.Resize = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Resize.prototype */ {
+  filters.Resize = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Resize.prototype */ {
 
     /**
      * Filter type
@@ -58,8 +60,13 @@
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Resize.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} scaleX
+     * @param {Number} scaleY
      */
     applyTo: function(canvasEl, scaleX, scaleY) {
+      if (scaleX === 1 && scaleY === 1) {
+        return;
+      }
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
@@ -85,55 +92,73 @@
       canvasEl.getContext('2d').putImageData(imageData, 0, 0);
     },
 
-    sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
+    /**
+     * Filter sliceByTwo
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW Original Width
+     * @param {Number} oH Original Height
+     * @param {Number} dW Destination Width
+     * @param {Number} dH Destination Height
+     * @returns {ImageData}
+     */
+    sliceByTwo: function(canvasEl, oW, oH, dW, dH) {
       var context = canvasEl.getContext('2d'), imageData,
           multW = 0.5, multH = 0.5, signW = 1, signH = 1,
-          doneW = false, doneH = false, stepW = width, stepH = height,
+          doneW = false, doneH = false, stepW = oW, stepH = oH,
           tmpCanvas = fabric.util.createCanvasElement(),
           tmpCtx = tmpCanvas.getContext('2d');
-      newWidth = floor(newWidth);
-      newHeight = floor(newHeight);
-      tmpCanvas.width = max(newWidth, width);
-      tmpCanvas.height = max(newHeight, height);
+      dW = floor(dW);
+      dH = floor(dH);
+      tmpCanvas.width = max(dW, oW);
+      tmpCanvas.height = max(dH, oH);
 
-      if (newWidth > width) {
+      if (dW > oW) {
         multW = 2;
         signW = -1;
       }
-      if (newHeight > height) {
+      if (dH > oH) {
         multH = 2;
         signH = -1;
       }
-      imageData = context.getImageData(0, 0, width, height);
-      canvasEl.width = max(newWidth, width);
-      canvasEl.height = max(newHeight, height);
+      imageData = context.getImageData(0, 0, oW, oH);
+      canvasEl.width = max(dW, oW);
+      canvasEl.height = max(dH, oH);
       context.putImageData(imageData, 0, 0);
 
       while (!doneW || !doneH) {
-        width = stepW;
-        height = stepH;
-        if (newWidth * signW < floor(stepW * multW * signW)) {
+        oW = stepW;
+        oH = stepH;
+        if (dW * signW < floor(stepW * multW * signW)) {
           stepW = floor(stepW * multW);
         }
         else {
-          stepW = newWidth;
+          stepW = dW;
           doneW = true;
         }
-        if (newHeight * signH < floor(stepH * multH * signH)) {
+        if (dH * signH < floor(stepH * multH * signH)) {
           stepH = floor(stepH * multH);
         }
         else {
-          stepH = newHeight;
+          stepH = dH;
           doneH = true;
         }
-        imageData = context.getImageData(0, 0, width, height);
+        imageData = context.getImageData(0, 0, oW, oH);
         tmpCtx.putImageData(imageData, 0, 0);
         context.clearRect(0, 0, stepW, stepH);
-        context.drawImage(tmpCanvas, 0, 0, width, height, 0, 0, stepW, stepH);
+        context.drawImage(tmpCanvas, 0, 0, oW, oH, 0, 0, stepW, stepH);
       }
-      return context.getImageData(0, 0, newWidth, newHeight);
+      return context.getImageData(0, 0, dW, dH);
     },
 
+    /**
+     * Filter lanczosResize
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW Original Width
+     * @param {Number} oH Original Height
+     * @param {Number} dW Destination Width
+     * @param {Number} dH Destination Height
+     * @returns {ImageData}
+     */
     lanczosResize: function(canvasEl, oW, oH, dW, dH) {
 
       function lanczosCreate(lobes) {
@@ -158,7 +183,7 @@
         for (v = 0; v < dH; v++) {
           center.y = (v + 0.5) * ratioY;
           icenter.y = floor(center.y);
-          a = 0, red = 0, green = 0, blue = 0, alpha = 0;
+          a = 0; red = 0; green = 0; blue = 0; alpha = 0;
           for (i = icenter.x - range2X; i <= icenter.x + range2X; i++) {
             if (i < 0 || i >= oW) {
               continue;
@@ -215,20 +240,29 @@
       return process(0);
     },
 
-    bilinearFiltering: function(canvasEl, w, h, w2, h2) {
+    /**
+     * bilinearFiltering
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW Original Width
+     * @param {Number} oH Original Height
+     * @param {Number} dW Destination Width
+     * @param {Number} dH Destination Height
+     * @returns {ImageData}
+     */
+    bilinearFiltering: function(canvasEl, oW, oH, dW, dH) {
       var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
           color, offset = 0, origPix, ratioX = this.rcpScaleX,
           ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
-          w4 = 4 * (w - 1), img = context.getImageData(0, 0, w, h),
-          pixels = img.data, destImage = context.getImageData(0, 0, w2, h2),
+          w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH),
+          pixels = img.data, destImage = context.getImageData(0, 0, dW, dH),
           destPixels = destImage.data;
-      for (i = 0; i < h2; i++) {
-        for (j = 0; j < w2; j++) {
+      for (i = 0; i < dH; i++) {
+        for (j = 0; j < dW; j++) {
           x = floor(ratioX * j);
           y = floor(ratioY * i);
           xDiff = ratioX * j - x;
           yDiff = ratioY * i - y;
-          origPix = 4 * (y * w + x);
+          origPix = 4 * (y * oW + x);
 
           for (chnl = 0; chnl < 4; chnl++) {
             a = pixels[origPix + chnl];
@@ -244,6 +278,15 @@
       return destImage;
     },
 
+    /**
+     * hermiteFastResize
+     * @param {Object} canvasEl Canvas element to apply filter to
+     * @param {Number} oW Original Width
+     * @param {Number} oH Original Height
+     * @param {Number} dW Destination Width
+     * @param {Number} dH Destination Height
+     * @returns {ImageData}
+     */
     hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
       var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY,
           ratioWHalf = ceil(ratioW / 2),
@@ -261,7 +304,7 @@
             for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
               var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
                   w = sqrt(w0 + dx * dx);
-              /*jshint maxdepth:5 */
+              /* eslint-disable max-depth */
               if (w > 1 && w < -1) {
                 continue;
               }
@@ -273,17 +316,15 @@
                 gxA += weight * data[dx + 3];
                 weightsAlpha += weight;
                 //colors
-                /*jshint maxdepth:6 */
                 if (data[dx + 3] < 255) {
                   weight = weight * data[dx + 3] / 250;
                 }
-                /*jshint maxdepth:5 */
                 gxR += weight * data[dx];
                 gxG += weight * data[dx + 1];
                 gxB += weight * data[dx + 2];
                 weights += weight;
               }
-              /*jshint maxdepth:4 */
+              /* eslint-enable max-depth */
             }
           }
           data2[x2] = gxR / weights;
@@ -313,10 +354,10 @@
   /**
    * Returns filter instance from an object representation
    * @static
+   * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Resize} Instance of fabric.Image.filters.Resize
    */
-  fabric.Image.filters.Resize.fromObject = function(object) {
-    return new fabric.Image.filters.Resize(object);
-  };
+  fabric.Image.filters.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

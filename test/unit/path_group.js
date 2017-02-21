@@ -65,8 +65,8 @@
       }
     }
 
-    var objects = [ ],
-        paths = ["M 100 100 L 300 100 L 200 300 z", "M 200 200 L 100 200 L 400 50 z"],
+    var objects = [],
+        paths = ['M 100 100 L 300 100 L 200 300 z', 'M 200 200 L 100 200 L 400 50 z'],
         numLoadedObjects = 0,
         numTotalObjects = paths.length;
 
@@ -115,11 +115,11 @@
   });
 
   test('parsingDmensionsWithTransformMatrix', function() {
-      var pathA = new fabric.Path("M 100 100 L 300 100 L 200 300 z", {transformMatrix: [2, 0, 0, 2, 0, 0]}),
-          pathB = new fabric.Path("M 200 200 L 100 200 L 400 50 z", {transformMatrix: [3, 0, 0, 3, 0, 0]}),
-          pg = new fabric.PathGroup([pathA, pathB], {toBeParsed: true});
-      equal(pg.width, 1203);
-      equal(pg.height, 603);
+    var pathA = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {transformMatrix: [2, 0, 0, 2, 0, 0]}),
+        pathB = new fabric.Path('M 200 200 L 100 200 L 400 50 z', {transformMatrix: [3, 0, 0, 3, 0, 0]}),
+        pg = new fabric.PathGroup([pathA, pathB], {toBeParsed: true});
+    equal(pg.width, 1203);
+    equal(pg.height, 603);
   });
 
   asyncTest('getObjects', function() {

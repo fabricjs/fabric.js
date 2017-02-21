@@ -1,3 +1,135 @@
+**Version 1.7.6**
+
+- Fix: make the cacheCanvas created on the fly if not available [#3705](https://github.com/kangax/fabric.js/pull/3705)
+
+**Version 1.7.5**
+
+- Improvement: draw textbackgroundColor in one single pass when possible @stefanhayden [#3698](https://github.com/kangax/fabric.js/pull/3698)
+- Improvement: fire selection changed event just if text is editing [#3702](https://github.com/kangax/fabric.js/pull/3702)
+- Improvement: Add object property 'needsItsOwnCache' [#3703](https://github.com/kangax/fabric.js/pull/3703)
+- Improvement: Skip unnecessary transform if they can be detected with a single if [#3704](https://github.com/kangax/fabric.js/pull/3704)
+
+**Version 1.7.4**
+
+- Fix: Moved all the touch event to passive false so that they behave as before chrome changes [#3690](https://github.com/kangax/fabric.js/pull/3690)
+- Fix: force top and left in the object representation of a path to avoid reparsing on restore [#3691](https://github.com/kangax/fabric.js/pull/3691)
+- Add: Enable `deselected` event for activeObject switch. Ensure deactivateAll call exitEditing [#3689](https://github.com/kangax/fabric.js/pull/3689)
+- Fix: Perform subtargetCheck also if the group is an active object and on activeGroup [#3688](https://github.com/kangax/fabric.js/pull/3688)
+- Fix: Made cursor operation more precise at high canvas zoom level [#3671](https://github.com/kangax/fabric.js/pull/3671)
+- Add: Made getBoundingRect available to return both absolute or standard bounding rect [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Add: Introduced calcViewportBoundaries() function for fabric.StaticCanvas [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Add: Introduced isOnScreen() function for fabric.Object [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Subclassed Polygon from polyline [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Fix: Removed reference to hovered target when target gets removed [#3657](https://github.com/kangax/fabric.js/pull/3657)
+- Fix: Removed hover cursor for non selectable objects [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Fix: Switch to passive event for touch move [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Fix: Restart rendering of cursor after entering some text [#3643](https://github.com/kangax/fabric.js/pull/3643)
+- Add: fabric.Color support toHexa() method now [#3615](https://github.com/kangax/fabric.js/pull/3615)
+
+**Version 1.7.3**
+
+- Improvement: mousewheel event is handled with target and fired also from objects.  [#3612](https://github.com/kangax/fabric.js/pull/3612)
+- Improvement: Pattern loads for canvas background and overlay, corrected svg pattern export [#3601](https://github.com/kangax/fabric.js/pull/3601)
+- Fix: Wait for pattern loading before calling callback [#3598](https://github.com/kangax/fabric.js/pull/3598)
+- Fix: add 2 extra pixels to cache canvases to avoid aliasing cut [#3596](https://github.com/kangax/fabric.js/pull/3596)
+- Fix: Rerender when deselect an itext editing object [#3594](https://github.com/kangax/fabric.js/pull/3594)
+- Fix: save new state of dimensionProperties at every cache clear [#3595](https://github.com/kangax/fabric.js/pull/3595)
+- Improvement: Better error managment in loadFromJSON [#3586](https://github.com/kangax/fabric.js/pull/3586)
+- Improvement: do not reload backgroundImage as an image if is different type [#3550](https://github.com/kangax/fabric.js/pull/3550)
+- Improvement: if a children element is set dirty, set the parent dirty as well. [#3564](https://github.com/kangax/fabric.js/pull/3564)
+
+**Version 1.7.2**
+
+- Fix: Textbox do not use stylemap for line wrapping [#3546](https://github.com/kangax/fabric.js/pull/3546)
+- Fix: Fix for firing object:modfied in macOS sierra [#3539](https://github.com/kangax/fabric.js/pull/3539)
+- Fix: Itext with object caching was not refreshing selection correctly. [#3538](https://github.com/kangax/fabric.js/pull/3538)
+- Fix: stateful now works again with activeGroup and dinamyc swap between stateful false/true. [#3537](https://github.com/kangax/fabric.js/pull/3537)
+- Fix: includeDefaultValues was not applied to child objects of groups and path-groups. [#3497](https://github.com/kangax/fabric.js/pull/3497)
+- Fix: Itext style is cloned on paste action now, allow copie of styles to be independent. [#3502](https://github.com/kangax/fabric.js/pull/3502)
+- Fix: Add subclasses properties to cacheProperties. [#3490](https://github.com/kangax/fabric.js/pull/3490)
+- Add: Shift and Alt key used for transformations are now dinamic. [#3479](https://github.com/kangax/fabric.js/pull/3479)
+- Fix: fix to polygon and cache. Added cacheProperties for all classes [#3490](https://github.com/kangax/fabric.js/pull/3490)
+
+**Version 1.7.1**
+
+- Add: Gradients/Patterns support customAttributes in toObject method [#3477](https://github.com/kangax/fabric.js/pull/3477)
+- Fix: IText/Textbox not blurring keyboard on ios 10 [#3476](https://github.com/kangax/fabric.js/pull/3476)
+- Fix: Shadow on freedrawing and zoomed canvas [#3475](https://github.com/kangax/fabric.js/pull/3475)
+- Fix: Fix for group returning negative scales [#3474](https://github.com/kangax/fabric.js/pull/3474)
+- Fix: hotfix for textbox [#3441](https://github.com/kangax/fabric.js/pull/3441)[#3473](https://github.com/kangax/fabric.js/pull/3473)
+
+**Version 1.7.0**
+
+- Add: Object Caching [#3417](https://github.com/kangax/fabric.js/pull/3417)
+- Improvement: group internal objects have coords not affected by canvas zoom [#3420](https://github.com/kangax/fabric.js/pull/3420)
+- Fix: itext cursor trails on initDimension [#3436](https://github.com/kangax/fabric.js/pull/3436)
+- Fix: null check on .setActive [#3435](https://github.com/kangax/fabric.js/pull/3435)
+- Fix: function error in clone deep. [#3434](https://github.com/kangax/fabric.js/pull/3434)
+
+**Version 1.6.7**
+
+- Add: Snap rotation added to objects. two parameter introduced, snapAngle and snapTreshold. [#3383](https://github.com/kangax/fabric.js/pull/3383)
+- Fix: Pass target to right click event. [#3381](https://github.com/kangax/fabric.js/pull/3381)
+- Fix: Correct rendering of bg color for styled text and correct clearing of itext area. [#3388](https://github.com/kangax/fabric.js/pull/3388)
+- Add: Fire mouse:over on the canvas when we enter the canvas from outside the element. [#3388](https://github.com/kangax/fabric.js/pull/3389)
+- Fix: Fix calculation of words width with spaces and justify. [#3408](https://github.com/kangax/fabric.js/pull/3408)
+- Fix: Do not export defaults properties for bg and overlay if requested. [#3415](https://github.com/kangax/fabric.js/pull/3415)
+- Fix: Change export toObect to always delete default properties if requested. [#3416](https://github.com/kangax/fabric.js/pull/3416)
+
+**Version 1.6.6**
+
+- Add: Contrast and Saturate filters [#3341](https://github.com/kangax/fabric.js/pull/3341)
+- Fix: Correct registering and removal of events to handle iText objects. [#3349](https://github.com/kangax/fabric.js/pull/3349)
+- Fix: Corrected 2 regression of 1.6.5 (dataurl export and itext clicks)
+- Fix: Corrected path boundaries calculation for Arcs ( a and A ) [#3347](https://github.com/kangax/fabric.js/pull/3347)
+
+**Version 1.6.5**
+
+- Fix: charspacing, do not get subzero with charwidth.
+- Improvement: add callback support to all object cloning. [#3212](https://github.com/kangax/fabric.js/pull/3212)
+- Improvement: add backgroundColor to all classe [#3248](https://github.com/kangax/fabric.js/pull/3248)
+- Fix: add custom properties to backgroundImage and overlayImage [#3250](https://github.com/kangax/fabric.js/pull/3250)
+- Fix: Object intersection is calculated on boundingBox and boundingRect, intersection is fired if objects are overlapping [#3252](https://github.com/kangax/fabric.js/pull/3252)
+- Change: Restored previous selection behaviour, added key to selection active object under overlaid target [#3254](https://github.com/kangax/fabric.js/pull/3254)
+- Improvement: hasStateChanged let you find state changes of complex properties. [#3262](https://github.com/kangax/fabric.js/pull/3262)
+- Fix: IText/Textbox shift click selection backward. [#3270](https://github.com/kangax/fabric.js/pull/3270)
+- Revert: font family quoting was a bad idea. node-canvas stills use it. [#3276](https://github.com/kangax/fabric.js/pull/3276)
+- Fix: fire mouse:over event for activeObject and activeGroup when using findTarget shourtcuts [#3285](https://github.com/kangax/fabric.js/pull/3285)
+- Fix: clear method clear all properties of canvas [#3305](https://github.com/kangax/fabric.js/pull/3305)
+- Fix: text area position method takes in account canvas offset [#3306](https://github.com/kangax/fabric.js/pull/3306)
+- Improvement: Added event on right click and possibility to hide the context menu with a flag [3308](https://github.com/kangax/fabric.js/pull/3308)
+- Fix: remove canvas reference from object when object gets removed from canvas [#3307](https://github.com/kangax/fabric.js/pull/3307)
+- Improvement: use native stroke dash if available [#3309](https://github.com/kangax/fabric.js/pull/3309)
+- Fix: Export correct src when exporting to svg [#3310](https://github.com/kangax/fabric.js/pull/3310)
+- Fix: Stop text to go on zero dimensions [#3312](https://github.com/kangax/fabric.js/pull/3312)
+- Fix: Error in dataURL with multiplier was outputting very big canvas with retina [#3314](https://github.com/kangax/fabric.js/pull/3314)
+- Fix: Error in style map was not respecting style if textbox started with space [#3315](https://github.com/kangax/fabric.js/pull/3315)
+
+**Version 1.6.4**
+
+- Improvement: Ignore svg: namespace during svg import. [#3081](https://github.com/kangax/fabric.js/pull/3081)
+- Improvement: Better fix for lineHeight of iText/Text [#3094](https://github.com/kangax/fabric.js/pull/3094)
+- Improvement: Support for gradient with 'Infinity' coordinates [#3082](https://github.com/kangax/fabric.js/pull/3082)
+- Improvement: Generally "improved" logic of targeting [#3111](https://github.com/kangax/fabric.js/pull/3111)
+- Fix: Selection of active group with transparency and preserveObjectStacking true or false [#3109](https://github.com/kangax/fabric.js/pull/3109)
+- Fix: pattern brush now create the same pattern seen while drawing [#3112](https://github.com/kangax/fabric.js/pull/3112)
+- Fix: Allow css merge during svg import [#3114](https://github.com/kangax/fabric.js/pull/3114)
+- Improvement: added numeric origins handling fomr 0 to 1. [#3121](https://github.com/kangax/fabric.js/pull/3121)
+- Fix: Fix a defect with shadow of objects in a scaled group. [#3134](https://github.com/kangax/fabric.js/pull/3134)
+- Improvement: Do not fire unecessary selection:changed events. [#3119](https://github.com/kangax/fabric.js/pull/3119)
+- Fix: Attached hiddenTextarea to body fixes IE, thanks to @plainview. [#3137](https://github.com/kangax/fabric.js/pull/3137)
+- Fix: Shift unselect activegroup on transformed canvas. [#3144](https://github.com/kangax/fabric.js/pull/3144)
+- Added: ColorMatrix filter [#3139](https://github.com/kangax/fabric.js/pull/3139)
+- Fix: Fix condition in wich restoring from Object could cause object overwriting [#3146](https://github.com/kangax/fabric.js/pull/3146)
+- Change: cloneAsImage for Object and toDataUrl for object are not retina enabled by default. Added option to enable. [#3147](https://github.com/kangax/fabric.js/pull/3147)
+- Improvement: Added textSpacing support for text/itext/textbox [#3097](https://github.com/kangax/fabric.js/pull/3097)
+- Fix: Quote font family when setting the context fontstyle [#3191](https://github.com/kangax/fabric.js/pull/3191)
+- Fix: use getSrc during image export, make subclassing easier, return eventually the .src property if nothing else is available [#3189](https://github.com/kangax/fabric.js/pull/3189)
+- Fix: Inverted the meaning of border scale factor [#3154](https://github.com/kangax/fabric.js/pull/3154)
+- Improvement: Added support for RGBA in HEX notation. [#3202](https://github.com/kangax/fabric.js/pull/3202)
+- Improvement: Added object deselected event. [#3195](https://github.com/kangax/fabric.js/pull/3195)
+- Fix: loadFromJson callback now gets fired after filter are applied [#3210](https://github.com/kangax/fabric.js/pull/3210)
+
 **Version 1.6.3**
 
 - Improvement: Use reviver callback for background and overlay image when doing svg export. [#2975](https://github.com/kangax/fabric.js/pull/2975)
