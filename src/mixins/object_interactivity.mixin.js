@@ -310,8 +310,8 @@
           }
           break;
         case 'custom':
-          if (this.drawCustomControlShape[control]) {
-            this.drawCustomControlShape[control].call(this, ctx, left, top, control);
+          if (this.drawCustomControlShape) {
+            this.drawCustomControlShape.call(this, ctx, left, top, control);
           }
           break;
         default:
