@@ -468,23 +468,36 @@
     cornerStrokeColor:        null,
 
     /**
-     * Specify style of control, 'rect' or 'circle'
+     * Specify style of control, 'rect', 'circle' or 'custom'
      * @since 1.6.2
      * @type String
      */
     cornerStyle:          'rect',
 
     /**
-     * Draw custom control shapes, control in the corners and rotation-control.
-     * @since 1.6.4
+     * Specify functions to draw custom control shapes on scale-controls and rotation-control.
+     * @since 1.7.6
      * @type Object
-     * @example <caption>custom control shapes on all the corners</caption>
-     * drawCustomControlShape: {
-     *   bl: function(ctx: Object, left: number, top: number){},
-     *   br: function(ctx: Object, left: number, top: number){},
-     *   tl: function(ctx: Object, left: number, top: number){},
-     *   tr: function(ctx: Object, left: number, top: number){},
+     * @example <caption>Draw custom control shape on all the controls</caption>
+     * function drawCustomCircle (ctx, left, top, control) {
+     *   ctx.strokeStyle = ctx.fillStyle = this.borderColor;
+     *   ctx.beginPath();
+     *   ctx.arc(left, top, this.cornerSize, 0, 2 * Math.PI, false);
+     *   ctx.fill();
      * }
+     * object.set({
+     *   drawCustomControlShape: {
+     *     bl: drawCustomCircle,
+     *     br: drawCustomCircle,
+     *     tl: drawCustomCircle,
+     *     tr: drawCustomCircle,
+     *     ml: drawCustomCircle,
+     *     mr: drawCustomCircle,
+     *     mb: drawCustomCircle,
+     *     mt: drawCustomCircle,
+     *     mtr: drawCustomCircle
+     *   }
+     * });
      */
     drawCustomControlShape:   {},
 
