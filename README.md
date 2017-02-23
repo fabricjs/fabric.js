@@ -1,5 +1,19 @@
 ### Fabric
 
+Test it:
+var canvas = new fabric.Canvas('c');
+var example = 'אופיר מה המצב יא גבר? hi ma nishma??'; //'עוד 14 shalom !! עוד עוד'
+var iText9 = new fabric.IText(example, {
+  left: 500,
+  top: 50,
+  fontFamily: 'Hoefler Text',
+  fontSize: 20,
+  padding: 7,
+  textAlign: 'right',
+  originX: 'right',
+  isRTL: true
+});
+canvas.add(iText9);
 <!-- chat, support -->
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/kangax/fabric.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
