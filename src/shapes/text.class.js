@@ -499,10 +499,11 @@
         }
       }
       else {
+        if (this.isRTL) {
         if (chars) {
           var dic = [];
           chars = chars.split('');
-          let lastSet = 'ltr';
+          var lastSet = 'ltr';
           //array of rtl/ltr objects
           for (var i = 0, len = chars.length-1; i <= len; i++) {
             if (
@@ -535,19 +536,15 @@
             }
           }
         }
-        console.log(dic);
         if (dic) {
           for (var i = dic.length-1, len = 0; i >= len; i--) {
             if (dic[i].dir === 'rtl') {
-                let str = dic[i].chars.join('');
+                var str = dic[i].chars.join('');
                 width = ctx.measureText(str).width;
                 ctx[method](str, left, top);
                 left += width > 0 ? width : 0;
             } else {
-                let str = dic[i].chars.join('');
-                //let strArray = str.split(' ');
-                //strArray = strArray.reverse();
-                //str = strArray.join(' ');
+                var str = dic[i].chars.join('');
                 
                 width = ctx.measureText(str).width;
                 ctx[method](str, left, top);
@@ -556,7 +553,10 @@
             
           }
         }
-        //ctx[method](chars, left, top);
+        }
+        else {
+          ctx[method](chars, left, top);
+        }
         
       }
       this[shortM].toLive && ctx.restore();

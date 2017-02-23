@@ -14252,7 +14252,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Boolean
      * @default false
      */
-    isRTL: false,
+    isRTL: true,
     /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
@@ -23755,10 +23755,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
       else {
+        if (this.isRTL) {
         if (chars) {
           var dic = [];
           chars = chars.split('');
-          let lastSet = 'ltr';
+          var lastSet = 'ltr';
           //array of rtl/ltr objects
           for (var i = 0, len = chars.length-1; i <= len; i++) {
             if (
@@ -23791,19 +23792,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
           }
         }
-        console.log(dic);
         if (dic) {
           for (var i = dic.length-1, len = 0; i >= len; i--) {
             if (dic[i].dir === 'rtl') {
-                let str = dic[i].chars.join('');
+                var str = dic[i].chars.join('');
                 width = ctx.measureText(str).width;
                 ctx[method](str, left, top);
                 left += width > 0 ? width : 0;
             } else {
-                let str = dic[i].chars.join('');
-                //let strArray = str.split(' ');
-                //strArray = strArray.reverse();
-                //str = strArray.join(' ');
+                var str = dic[i].chars.join('');
                 
                 width = ctx.measureText(str).width;
                 ctx[method](str, left, top);
@@ -23812,7 +23809,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             
           }
         }
-        //ctx[method](chars, left, top);
+        }
+        else {
+          ctx[method](chars, left, top);
+        }
         
       }
       this[shortM].toLive && ctx.restore();
