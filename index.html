@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>IText tests | Fabric.js Demos</title>
+
+    <script src=dist/fabric.js data-cover></script>
+    <!--[if lt IE 9]>
+      <script src="../../lib/excanvas.js"></script>
+    <![endif]-->
+
+    <style>
+
+    
+    </style>
+  </head>
+  <body class="demo">
+<div class="example">
+  <h3>Right aligned</h3>
+  <canvas id="c" dir="rtl" width="600" height="400" style="border: 1px solid #ccc"></canvas>
+</div>
+<div>
+    <style>
+    textarea {
+      text-align: right;
+      direction: rtl;
+    }
+    </style>
+  <textarea dire=rtl></textarea>
+
+
+        <script>
+ //       fabric.Object.prototype.padding = 5;
+//fabric.Object.prototype.transparentCorners = false;
+
+var canvas = new fabric.Canvas('c');
+var example = 'אופיר מה המצב יא גבר? hi ma nishma??'; //'עוד 14 shalom !! עוד עוד'
+var iText9 = new fabric.IText(example, {
+  left: 500,
+  top: 50,
+  fontFamily: 'Hoefler Text',
+  fontSize: 20,
+  padding: 7,
+  textAlign: 'right',
+  originX: 'right',
+  isRTL: true
+});
+canvas.add(iText9);
+
+
+</script>
+    </body>
+</html>

@@ -418,6 +418,7 @@
         selectionStart -= this._textLines[i].length + 1;
       }
       return {
+        
         lineIndex: i - 1,
         charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
       };
@@ -483,7 +484,6 @@
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-
       return {
         left: left,
         top: top,
@@ -553,12 +553,12 @@
                     : boundaries.leftOffset,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
-
+          
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
+      
       ctx.fillRect(
-        boundaries.left + leftOffset - cursorWidth / 2,
+        this.isRTL ? boundaries.left - cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);

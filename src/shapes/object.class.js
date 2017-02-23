@@ -807,6 +807,13 @@
     needsItsOwnCache: false,
 
     /**
+     * When set to `true`, text direction in RTL language
+     * since 1.7.*
+     * @type Boolean
+     * @default false
+     */
+    isRTL: false,
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes

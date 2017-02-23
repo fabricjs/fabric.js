@@ -359,6 +359,7 @@
       this.__skipDimension = false;
       this._initDimensions();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
+      
     },
 
     /**
@@ -475,6 +476,7 @@
      * @param {Number} top Top position of text
      */
     _renderChars: function(method, ctx, chars, left, top) {
+
       // remove Text word from method var
       var shortM = method.slice(0, -4), char, width;
       if (this[shortM].toLive) {
@@ -489,6 +491,7 @@
         var additionalSpace = this._getWidthOfCharSpacing();
         chars = chars.split('');
         for (var i = 0, len = chars.length; i < len; i++) {
+          
           char = chars[i];
           width = ctx.measureText(char).width + additionalSpace;
           ctx[method](char, left, top);
@@ -496,7 +499,65 @@
         }
       }
       else {
-        ctx[method](chars, left, top);
+        if (chars) {
+          var dic = [];
+          chars = chars.split('');
+          let lastSet = 'ltr';
+          //array of rtl/ltr objects
+          for (var i = 0, len = chars.length-1; i <= len; i++) {
+            if (
+              (chars[i].charCodeAt(0) >= 1488 && chars[i].charCodeAt(0) <= 1514)
+            ) {
+              if (lastSet !== 'rtl') {
+                dic.push({
+                  dir: 'rtl',
+                  chars: []
+                })
+              }
+              dic[dic.length-1].chars.push(chars[i]);
+              lastSet = 'rtl';
+            } else if (chars[i].charCodeAt(0) == 32 ||
+              chars[i].charCodeAt(0) == 63) {
+              dic.push({
+                  dir: 'other',
+                  chars: [chars[i]]
+                });
+                lastSet = 'other';
+            } else {
+              if (lastSet !== 'ltr' || i ===0) {
+                dic.push({
+                  dir: 'ltr',
+                  chars: []
+                })
+              }
+              dic[dic.length-1].chars.push(chars[i]);
+              lastSet = 'ltr';
+            }
+          }
+        }
+        console.log(dic);
+        if (dic) {
+          for (var i = dic.length-1, len = 0; i >= len; i--) {
+            if (dic[i].dir === 'rtl') {
+                let str = dic[i].chars.join('');
+                width = ctx.measureText(str).width;
+                ctx[method](str, left, top);
+                left += width > 0 ? width : 0;
+            } else {
+                let str = dic[i].chars.join('');
+                //let strArray = str.split(' ');
+                //strArray = strArray.reverse();
+                //str = strArray.join(' ');
+                
+                width = ctx.measureText(str).width;
+                ctx[method](str, left, top);
+                left += width > 0 ? width : 0;
+            }
+            
+          }
+        }
+        //ctx[method](chars, left, top);
+        
       }
       this[shortM].toLive && ctx.restore();
     },
@@ -585,7 +646,6 @@
      * @param {String} method Method name ("fillText" or "strokeText")
      */
     _renderTextCommon: function(ctx, method) {
-
       var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
