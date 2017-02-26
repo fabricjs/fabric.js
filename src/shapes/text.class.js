@@ -504,6 +504,14 @@
           var specialChars = [32, 33, 58, 40, 41, 63 ];
           var dic = [];
           chars = chars.split('');
+          //replace chars 40 with 41 and vise versa
+          for (var i=0; i < chars.length; i++) {
+            if (chars[i].charCodeAt(0) === 40)
+              chars[i] = String.fromCharCode(41);
+              else if (chars[i].charCodeAt(0) === 41)
+              chars[i] = String.fromCharCode(40);
+          }
+
           var lastSet = 'ltr';
           //array of rtl/ltr objects
           for (var i = 0, len = chars.length-1; i <= len; i++) {
@@ -553,6 +561,7 @@
         }
        
         if (dic) {
+          for (var j = 0; j < 2; j++) {
           for (var i=dic.length-1; i > 1; i--) {
             if (dic[i-2].dir === 'ltr' && dic[i-1].dir === 'other' && dic[i].dir === 'ltr') {
               dic[i-2].chars = dic[i-2].chars.concat(dic[i-1].chars);
@@ -560,9 +569,12 @@
               dic.splice(i, 1);
               dic.splice(i-1, 1);
               i--;
+            } else if (dic[i-1].dir === 'other' && dic[i].dir === 'other') {
+              dic[i-1].chars = dic[i].chars.concat(dic[i-1].chars);
+              dic.splice(i, 1);
             }
           }
-   console.log(dic);
+          }
           for (var i = dic.length-1, len = 0; i >= len; i--) {
             if (dic[i].dir === 'rtl') {
                 var str = dic[i].chars.join('');
@@ -673,7 +685,6 @@
      */
     _renderTextCommon: function(ctx, method) {
       var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
-
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight,

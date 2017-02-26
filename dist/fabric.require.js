@@ -7468,7 +7468,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         noScaleCache: true,
         dirty: false,
         needsItsOwnCache: false,
-        isRTL: true,
+        isRTL: false,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
         initialize: function(options) {
@@ -11725,6 +11725,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                         var specialChars = [ 32, 33, 58, 40, 41, 63 ];
                         var dic = [];
                         chars = chars.split("");
+                        for (var i = 0; i < chars.length; i++) {
+                            if (chars[i].charCodeAt(0) === 40) chars[i] = String.fromCharCode(41); else if (chars[i].charCodeAt(0) === 41) chars[i] = String.fromCharCode(40);
+                        }
                         var lastSet = "ltr";
                         for (var i = 0, len = chars.length - 1; i <= len; i++) {
                             if (chars[i].charCodeAt(0) >= 1488 && chars[i].charCodeAt(0) <= 1514 || chars[i].charCodeAt(0) >= 48 && chars[i].charCodeAt(0) <= 57) {
@@ -11766,16 +11769,20 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                         }
                     }
                     if (dic) {
-                        for (var i = dic.length - 1; i > 1; i--) {
-                            if (dic[i - 2].dir === "ltr" && dic[i - 1].dir === "other" && dic[i].dir === "ltr") {
-                                dic[i - 2].chars = dic[i - 2].chars.concat(dic[i - 1].chars);
-                                dic[i - 2].chars = dic[i - 2].chars.concat(dic[i].chars);
-                                dic.splice(i, 1);
-                                dic.splice(i - 1, 1);
-                                i--;
+                        for (var j = 0; j < 2; j++) {
+                            for (var i = dic.length - 1; i > 1; i--) {
+                                if (dic[i - 2].dir === "ltr" && dic[i - 1].dir === "other" && dic[i].dir === "ltr") {
+                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i - 1].chars);
+                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i].chars);
+                                    dic.splice(i, 1);
+                                    dic.splice(i - 1, 1);
+                                    i--;
+                                } else if (dic[i - 1].dir === "other" && dic[i].dir === "other") {
+                                    dic[i - 1].chars = dic[i].chars.concat(dic[i - 1].chars);
+                                    dic.splice(i, 1);
+                                }
                             }
                         }
-                        console.log(dic);
                         for (var i = dic.length - 1, len = 0; i >= len; i--) {
                             if (dic[i].dir === "rtl") {
                                 var str = dic[i].chars.join("");
@@ -12365,7 +12372,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)) : boundaries.leftOffset, multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier;
             ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
             ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-            ctx.fillRect(this.isRTL ? boundaries.left - cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2, boundaries.top + boundaries.topOffset, cursorWidth, charHeight);
+            ctx.fillRect(this.isRTL ? -boundaries.left - leftOffset + cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2, boundaries.top + boundaries.topOffset, cursorWidth, charHeight);
         },
         renderSelection: function(chars, boundaries, ctx) {
             ctx.fillStyle = this.selectionColor;

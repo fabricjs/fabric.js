@@ -542,6 +542,7 @@
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
+    
     renderCursor: function(boundaries, ctx) {
 
       var cursorLocation = this.get2DCursorLocation(),
@@ -556,9 +557,9 @@
           
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-      
+
       ctx.fillRect(
-        this.isRTL ? boundaries.left - cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2,
+        this.isRTL ? -boundaries.left -leftOffset + cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);
