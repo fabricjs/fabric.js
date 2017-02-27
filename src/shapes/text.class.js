@@ -417,7 +417,8 @@
       this.__skipDimension = true;
       this.callSuper('initialize', options);
       this.__skipDimension = false;
-      this.initDimensions();
+      this._initDimensions();
+      this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
     },
 

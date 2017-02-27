@@ -40,8 +40,6 @@
     }
   };
 
-  var clone = fabric.util.object.clone;
-
   fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.IText.prototype */ {
     /**
      * @private
@@ -93,24 +91,10 @@
      */
     shiftLineStyles: function(lineIndex, offset) {
       // shift all line styles by 1 upward
-      var clonedStyles = clone(this.styles),
-          map          = this._styleMap[lineIndex];
-
+      var map = this._styleMap[lineIndex];
       // adjust line index
       lineIndex = map.line;
-
-      for (var line in this.styles) {
-        var numericLine = parseInt(line, 10);
-
-        if (numericLine > lineIndex) {
-          this.styles[numericLine + offset] = clonedStyles[numericLine];
-
-          if (!clonedStyles[numericLine - offset]) {
-            delete this.styles[numericLine];
-          }
-        }
-      }
-      //TODO: evaluate if delete old style lines with offset -1
+      fabric.IText.prototype.shiftLineStyles.call(this, lineIndex, offset);
     },
 
     /**

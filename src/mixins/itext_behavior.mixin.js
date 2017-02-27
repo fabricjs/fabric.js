@@ -466,9 +466,7 @@
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
-          leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getLineLeftOffset(this.getLineWidth(lineIndex))
-                    : boundaries.leftOffset,
+          leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {
             x: boundaries.left + leftOffset,
@@ -672,10 +670,6 @@
 
       this.shiftLineStyles(lineIndex, +1);
 
-      if (!this.styles[lineIndex + 1]) {
-        this.styles[lineIndex + 1] = {};
-      }
-
       var currentCharStyle = {},
           newLineStyles    = {};
 
@@ -685,21 +679,24 @@
 
       // if there's nothing after cursor,
       // we clone current char style onto the next (otherwise empty) line
-      if (isEndOfLine) {
+      if (isEndOfLine && currentCharStyle) {
         newLineStyles[0] = clone(currentCharStyle);
         this.styles[lineIndex + 1] = newLineStyles;
       }
       // otherwise we clone styles of all chars
       // after cursor onto the next line, from the beginning
       else {
+        var somethingAdded = false;
         for (var index in this.styles[lineIndex]) {
-          if (parseInt(index, 10) >= charIndex) {
-            newLineStyles[parseInt(index, 10) - charIndex] = this.styles[lineIndex][index];
+          var numIndex = parseInt(index, 10);
+          if (numIndex >= charIndex) {
+            somethingAdded = true;
+            newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
             // remove lines from the previous line since they're on a new line now
             delete this.styles[lineIndex][index];
           }
         }
-        this.styles[lineIndex + 1] = newLineStyles;
+        somethingAdded && (this.styles[lineIndex + 1] = newLineStyles);
       }
       this._forceClearCache = true;
     },
@@ -733,9 +730,8 @@
           }
         }
       }
-
-      this.styles[lineIndex][charIndex] =
-        style || clone(currentLineStyles[charIndex - 1]);
+      var newStyle = style || currentLineStyles[charIndex - 1];
+      newStyle && (this.styles[lineIndex][charIndex] = newStyle);
       this._forceClearCache = true;
     },
 
