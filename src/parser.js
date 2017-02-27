@@ -765,7 +765,7 @@
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
-        if (value) {
+        if (typeof value !== 'undefined') {
           memo[attr] = value;
         }
         return memo;
