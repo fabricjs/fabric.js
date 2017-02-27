@@ -765,7 +765,7 @@
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
-        if (value !== null) {
+        if (value) { // eslint-disable-line
           memo[attr] = value;
         }
         return memo;
