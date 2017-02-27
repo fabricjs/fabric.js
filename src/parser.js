@@ -779,9 +779,7 @@
       for (var attr in ownAttributes) {
         normalizedAttr = normalizeAttr(attr);
         normalizedValue = normalizeValue(normalizedAttr, ownAttributes[attr], parentAttributes, fontSize);
-        if (normalizedValue) {
-          normalizedStyle[normalizedAttr] = normalizedValue;
-        }
+        normalizedStyle[normalizedAttr] = normalizedValue;
       }
       if (normalizedStyle && normalizedStyle.font) {
         fabric.parseFontDeclaration(normalizedStyle.font, normalizedStyle);
