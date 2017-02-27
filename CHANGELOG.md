@@ -1,3 +1,14 @@
+**Version 1.7.7**
+
+- Fix for opacity parsing in svg with nested opacities [#3747] (https://github.com/kangax/fabric.js/pull/3747)
+- Fix text initialization and boundingrect [#3745] (https://github.com/kangax/fabric.js/pull/3745)
+- Fix line bounding box [#3742] (https://github.com/kangax/fabric.js/pull/3742)
+- Improvement: do not pollute style object while typing if not necessary [#3743](https://github.com/kangax/fabric.js/pull/3743)
+- fix for broken prototype chain when restoring a dataless object on fill an stroke [#3735](https://github.com/kangax/fabric.js/pull/3735)
+- fix for deselected event not fired on mouse actions [#3716](https://github.com/kangax/fabric.js/pull/3716)
+- fix for blurriness introduced on 1.7.3 [#3721](https://github.com/kangax/fabric.js/pull/3721)
+
+
 **Version 1.7.6**
 
 - Fix: make the cacheCanvas created on the fly if not available [#3705](https://github.com/kangax/fabric.js/pull/3705)
