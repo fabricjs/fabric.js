@@ -144,18 +144,18 @@
   test('get bounding rect after init', function() {
     var string = 'Some long text, the quick brown fox jumps over the lazy dog etc... blah blah blah';
     var text = new fabric.Text(string, {
-        left: 30,
-        top: 30,
-        fill: "#ffffff",
-        fontSize: 24,
-        fontWeight: 'normal',
-        fontFamily: "Arial",
-        originY: "bottom"
+      left: 30,
+      top: 30,
+      fill: '#ffffff',
+      fontSize: 24,
+      fontWeight: 'normal',
+      fontFamily: 'Arial',
+      originY: 'bottom'
     });
     var br = text.getBoundingRect();
     text.setCoords();
     var br2 = text.getBoundingRect();
-    deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords')
+    deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
   });
 
   test('setShadow', function(){
