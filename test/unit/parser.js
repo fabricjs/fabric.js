@@ -244,6 +244,16 @@
     deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
   });
 
+  test('parse 0 attribute', function() {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('opacity', 0);
+
+    var expectedObject = {
+      opacity: 0,
+    };
+    deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
+  });
+
   test('parsePointsAttribute', function() {
     ok(fabric.parsePointsAttribute);
 
