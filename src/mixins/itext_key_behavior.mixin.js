@@ -9,8 +9,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
                                         + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
-    fabric.document.body.appendChild(this.hiddenTextarea);
 
+    // Fix textarea focus problem when canvas is in a modal that has tabindex=-1 
+    //fabric.document.body.appendChild(this.hiddenTextarea);
+    this.canvas.upperCanvasEl.parentNode.appendChild(this.hiddenTextarea);
+    
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
