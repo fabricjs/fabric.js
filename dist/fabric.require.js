@@ -7468,7 +7468,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         noScaleCache: true,
         dirty: false,
         needsItsOwnCache: false,
-        isRTL: false,
+        isRTL: true,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
         initialize: function(options) {
@@ -12330,12 +12330,22 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _getCursorBoundaries: function(chars, typeOfBoundaries) {
             var left = Math.round(this._getLeftOffset()), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(chars, typeOfBoundaries);
-            return {
-                left: left,
-                top: top,
-                leftOffset: offsets.left + offsets.lineLeft,
-                topOffset: offsets.top
-            };
+            console.log(offsets);
+            if (this.isRTL) {
+                return {
+                    left: left,
+                    top: top,
+                    leftOffset: this.width - offsets.lineLeft,
+                    topOffset: offsets.top
+                };
+            } else {
+                return {
+                    left: left,
+                    top: top,
+                    leftOffset: offsets.left + offsets.lineLeft,
+                    topOffset: offsets.top
+                };
+            }
         },
         _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {

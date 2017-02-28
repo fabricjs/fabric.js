@@ -478,18 +478,29 @@
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
-
+      
       var left = Math.round(this._getLeftOffset()),
           top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
+      console.log(offsets);
+      if (this.isRTL) {
+        return {
+          left: left,
+          top: top,
+          leftOffset:  this.width- offsets.lineLeft,
+          topOffset: offsets.top
+        };
+    } else {
       return {
         left: left,
         top: top,
-        leftOffset: offsets.left + offsets.lineLeft,
+        leftOffset: offsets.left + offsets.lineLeft ,
         topOffset: offsets.top
       };
+    }
+    
     },
 
     /**
