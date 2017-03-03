@@ -345,7 +345,7 @@
   });
 
   test('isOnScreen with object that is in top left corner of canvas', function(){
-    var cObj = new fabric.Rect({left: -46.56, top: -9.23, width:50,height:50, angle:314.57});
+    var cObj = new fabric.Rect({left: -46.56, top: -9.23, width: 50,height: 50, angle: 314.57});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     cObj.setCoords();
