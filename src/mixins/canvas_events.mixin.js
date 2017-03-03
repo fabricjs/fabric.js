@@ -140,6 +140,13 @@
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
+      if (this._iTextInstances) {
+        this._iTextInstances.forEach(function(obj) {
+          if (obj.isEditing) {
+            obj.hiddenTextarea.focus();
+          }
+        });
+      }
     },
 
     /**
