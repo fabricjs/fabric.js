@@ -849,7 +849,7 @@
       if (!this.visible) {
         return;
       }
-      if (!this.group && !this.isOnScreen()) {
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
         return;
       }
       if (this._shouldClearDimensionCache()) {

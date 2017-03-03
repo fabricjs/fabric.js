@@ -1134,7 +1134,7 @@
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
-      if (!this.group && !this.isOnScreen()) {
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
         return;
       }
       ctx.save();
