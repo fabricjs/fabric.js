@@ -849,6 +849,9 @@
       if (!this.visible) {
         return;
       }
+      if (!this.group && !this.isOnScreen()) {
+        return;
+      }
       if (this._shouldClearDimensionCache()) {
         this._setTextStyles(ctx);
         this._initDimensions(ctx);
