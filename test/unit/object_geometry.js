@@ -331,6 +331,31 @@
     ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
   });
 
+  test('isOnScreen with object that include canvas', function(){
+    var cObj = new fabric.Object(
+      { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    equal(cObj.isOnScreen(), true, 'object is onScreen because it include the canvas');
+    cObj.top = -1000;
+    cObj.left = -1000;
+    cObj.setCoords();
+    equal(cObj.isOnScreen(), false, 'object is completely out of viewport');
+  });
+
+  test('isOnScreen with object that is in top left corner of canvas', function(){
+    var cObj = new fabric.Rect({left: -46.56, top: -9.23, width: 50,height: 50, angle: 314.57});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    ok(cObj.isOnScreen(), 'object is onScreen because it intersect a canvas line');
+    cObj.top -= 20;
+    cObj.left -= 20;
+    cObj.setCoords();
+    ok(!cObj.isOnScreen(), 'object is completely out of viewport');
+  });
+
   test('calcTransformMatrix', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     ok(typeof cObj.calcTransformMatrix == 'function', 'calcTransformMatrix should exist');
