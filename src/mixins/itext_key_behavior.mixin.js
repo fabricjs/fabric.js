@@ -10,7 +10,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
                                         + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
 
-    this.canvas.upperCanvasEl.parentNode.appendChild(this.hiddenTextarea);
+    this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
     
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
