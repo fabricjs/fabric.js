@@ -1726,4 +1726,29 @@
     ok(typeof InheritedCanvasClass === 'function');
   });
 
+  test('mouse:down with different buttons', function() {
+    var clickCount = 0;
+    function mouseHandler() {
+      clickCount++;
+    }
+    canvas.on('mouse:down', mouseHandler);
+    canvas.fireMiddleClick = false;
+    canvas.fireRightClick = false;
+    canvas._currentTransform = false;
+    canvas.isDrawingMode = false;
+    canvas.__onMouseDown({ which: 1 });
+    equal(clickCount, 1, 'mouse down fired');
+    clickCount = 0;
+    canvas.__onMouseDown({ which: 3 });
+    equal(clickCount, 0, 'rightclick did not fire a mouse:down event');
+    canvas.fireRightClick = true;
+    canvas.__onMouseDown({ which: 3 });
+    equal(clickCount, 1, 'rightclick did fire a mouse:down event');
+    clickCount = 0;
+    canvas.__onMouseDown({ which: 2 });
+    equal(clickCount, 0, 'middleClick did not fire a mouse:down event');
+    canvas.fireMiddleClick = true;
+    canvas.__onMouseDown({ which: 2 });
+    equal(clickCount, 1, 'middleClick did fire a mouse:down event');
+  });
 })();

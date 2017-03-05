@@ -474,6 +474,14 @@
         return;
       }
 
+      var isMiddleClick  = 'which' in e ? e.which === 2 : e.button === 1;
+      if (isMiddleClick) {
+        if (this.fireMiddleClick) {
+          this._handleEvent(e, 'down', target ? target : null);
+        }
+        return;
+      }
+
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
         return;
