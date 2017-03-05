@@ -661,6 +661,17 @@
     });
 
     deepEqual(iText.styles[0][0], {
+      fill: '#112233',
+      stroke: '#223344'
+    });
+
+    iText.selectionEnd = 1;
+    iText.setSelectionStyles({
+      fill: 'red',
+      stroke: 'yellow'
+    });
+
+    deepEqual(iText.styles[0][0], {
       fill: 'red',
       stroke: 'yellow'
     });

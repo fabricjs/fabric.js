@@ -270,14 +270,14 @@
     },
 
     /**
-     * Sets style of a current selection
+     * Sets style of a current selection, if no selection exist, do not set anything.
      * @param {Object} [styles] Styles object
      * @return {fabric.IText} thisArg
      * @chainable
      */
     setSelectionStyles: function(styles) {
       if (this.selectionStart === this.selectionEnd) {
-        this._extendStyles(this.selectionStart, styles);
+        return this;
       }
       else {
         for (var i = this.selectionStart; i < this.selectionEnd; i++) {
