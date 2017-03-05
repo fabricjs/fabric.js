@@ -661,10 +661,10 @@
     });
 
     deepEqual(iText.styles[0][0], {
-      fill: '#112233',
-      stroke: '#223344'
+      fill: '#112233'
     });
 
+    iText.selectionEnd = 0;
     iText.selectionEnd = 1;
     iText.setSelectionStyles({
       fill: 'red',
@@ -677,7 +677,7 @@
     });
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2;
+    iText.selectionEnd = 3;
 
     iText.setSelectionStyles({
       fill: '#998877',
