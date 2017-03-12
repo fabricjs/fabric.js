@@ -417,7 +417,7 @@
       this.__skipDimension = true;
       this.callSuper('initialize', options);
       this.__skipDimension = false;
-      this._initDimensions();
+      this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
     },
@@ -603,41 +603,6 @@
       return maxWidth;
     },
 
-    // /**
-    //  * @private
-    //  * @param {String} method Method name ("fillText" or "strokeText")
-    //  * @param {CanvasRenderingContext2D} ctx Context to render on
-    //  * @param {String} chars Chars to render
-    //  * @param {Number} left Left position of text
-    //  * @param {Number} top Top position of text
-    //  */
-    // _renderChars: function(method, ctx, chars, left, top) {
-    //   // remove Text word from method var
-    //   var shortM = method.slice(0, -4), char, width;
-    //   if (this[shortM].toLive) {
-    //     var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
-    //         offsetY = -this.height / 2 + this[shortM].offsetY || 0;
-    //     ctx.save();
-    //     ctx.translate(offsetX, offsetY);
-    //     left -= offsetX;
-    //     top -= offsetY;
-    //   }
-    //   if (this.charSpacing !== 0) {
-    //     var additionalSpace = this._getWidthOfCharSpacing();
-    //     chars = chars.split('');
-    //     for (var i = 0, len = chars.length; i < len; i++) {
-    //       char = chars[i];
-    //       width = ctx.measureText(char).width + additionalSpace;
-    //       ctx[method](char, left, top);
-    //       left += width > 0 ? width : 0;
-    //     }
-    //   }
-    //   else {
-    //     ctx[method](chars, left, top);
-    //   }
-    //   this[shortM].toLive && ctx.restore();
-    // },
-
     /**
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
@@ -649,7 +614,7 @@
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // lift the line by quarter of fontSize
-      top -= this.fontSize * this._fontSizeFraction;
+      //top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
       var lineWidth = this.getLineWidth(lineIndex);
@@ -678,25 +643,6 @@
       }
     },
 
-    // to be investigated
-    //  /**
-    //  * @private
-    //  * @param {String} method
-    //  * @param {CanvasRenderingContext2D} ctx Context to render on
-    //  * @param {String} line
-    //  * @param {Number} left
-    //  * @param {Number} top
-    //  * @param {Number} lineIndex
-    //  */
-    // _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
-    //   // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
-    //   // the adding 0.03 is just to align text with itext by overlap test
-    //   if (!this.isEmptyStyles()) {
-    //     top += this.fontSize * (this._fontSizeFraction + 0.03);
-    //   }
-    //   this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex);
-    // },
-
     /**
      * Renders the text background for lines, taking care of style
      * @private
@@ -711,7 +657,7 @@
           line, lastColor = this.textBackgroundColor,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
-          boxStart = 0, boxWidth = 0, charBox, charStyle;
+          boxStart = 0, boxWidth = 0, charBox, currentColor;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
@@ -720,10 +666,12 @@
         line = this._textLines[i];
         heightOfLine = this.getHeightOfLine(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        boxWidth = 0;
+        boxStart = 0;
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
-          charStyle = charBox.style;
-          if (charStyle.textBackgroundColor !== lastColor && boxWidth > 0) {
+          currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
+          if (currentColor !== lastColor && boxWidth > 0) {
             ctx.fillStyle = lastColor;
             lastColor && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
@@ -733,7 +681,7 @@
             );
             boxStart = charBox.left;
             boxWidth = charBox.width;
-            lastColor = charStyle.textBackgroundColor;
+            lastColor = currentColor;
           }
           else {
             boxWidth += charBox.kernedWidth;
@@ -785,17 +733,20 @@
      * @param {Number} charIndex
      * @param {Object} [decl]
      */
-    _applyCharStyles: function(ctx, lineIndex, charIndex) {
-      var styleDeclaration = this.getCompleteStyleDeclaration(lineIndex, charIndex),
-          fill = styleDeclaration.fill,
+    _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
+      var fill = styleDeclaration.fill,
           stroke = styleDeclaration.stroke;
 
       if (typeof styleDeclaration.shadow === 'string') {
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
 
-      fill && (ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill);
-      stroke && (ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke);
+      if (fill && fill !== 'transparent') {
+        ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
+      }
+      if (stroke && stroke !== 'transparent') {
+        ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke;
+      }
 
       //if we want this._setShadow.call to work with styleDeclarion
       //we have to add those references
@@ -809,25 +760,6 @@
 
       ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
       ctx.font = this._getFontDeclaration(styleDeclaration);
-    },
-
-    /**
-     * @private
-     * @param {Object} styleDeclaration
-     */
-    _applyFontStyles: function(styleDeclaration) {
-      if (!styleDeclaration.fontFamily) {
-        styleDeclaration.fontFamily = this.fontFamily;
-      }
-      if (!styleDeclaration.fontSize) {
-        styleDeclaration.fontSize = this.fontSize;
-      }
-      if (!styleDeclaration.fontWeight) {
-        styleDeclaration.fontWeight = this.fontWeight;
-      }
-      if (!styleDeclaration.fontStyle) {
-        styleDeclaration.fontStyle = this.fontStyle;
-      }
     },
 
     /**
@@ -921,16 +853,17 @@
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
-          fontMultiplier = this.fontSize / CACHE_FONT_SIZE, kernedWidth;
+          fontMultiplier = charStyle.fontSize / CACHE_FONT_SIZE, kernedWidth;
 
       if (previousChar && fontCache[previousChar]) {
         previousWidth = fontCache[previousChar] * fontMultiplier;
       }
       if (fontCache[char]) {
-        width = fontCache[char] * fontMultiplier;
+        kernedWidth = width = fontCache[char] * fontMultiplier;
       }
       if (stylesAreEqual && fontCache[couple]) {
         coupleWidth = fontCache[couple] * fontMultiplier;
+        kernedWidth = coupleWidth - previousWidth;
       }
       var ctx = this.getMeasuringContext();
       this._setTextStyles(ctx, charStyle);
@@ -938,15 +871,16 @@
         kernedWidth = width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
       }
-      if (stylesAreEqual && previousChar && !previousWidth) {
+      if (!previousWidth && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
         fontCache[previousChar] = previousWidth / fontMultiplier;
       }
-      if (previousWidth) {
+      if (stylesAreEqual && !coupleWidth) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth / fontMultiplier;
         kernedWidth = coupleWidth - previousWidth;
+        console.log('set:', couple, 'is ', coupleWidth / fontMultiplier, coupleWidth)
       }
       return { width: width, kernedWidth: kernedWidth };
     },
@@ -1046,7 +980,6 @@
         width: width,
         left: 0,
         height: charStyle.fontSize,
-        style: charStyle,
         kernedWidth: kernedWidth,
       };
       if (charIndex > 0) {
@@ -1158,8 +1091,7 @@
      * @return {Number} Character font size
      */
     getCurrentCharFontSize: function(lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
-      return style && style.fontSize ? style.fontSize : this.fontSize;
+      return this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize');
     },
 
     /**
@@ -1169,8 +1101,7 @@
      * @return {String} Character color (fill)
      */
     getCurrentCharColor: function(lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
-      return style && style.fill ? style.fill : this.cursorColor;
+      return this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
     },
 
     /**
@@ -1247,22 +1178,35 @@
 
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
-          prevStyle,
-          thisStyle,
-          charsToRender = '';
+          actualStyle,
+          nextStyle,
+          charsToRender = '',
+          styleChanged,
+          charBox,
+          boxWidth = 0;
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-      for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
-        prevStyle = prevStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-        thisStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-
-        if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
-          this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
-          charsToRender = '';
-          prevStyle = thisStyle;
-        }
+      for (var i = charOffset, len = line.length + charOffset; i < len; i++) {
         charsToRender += line[i - charOffset];
+        charBox = this.__charBounds[lineIndex][i - charOffset];
+        if (boxWidth === 0) {
+          left += charBox.kernedWidth - charBox.width;
+        }
+        boxWidth += charBox.kernedWidth;
+        if (!this.charSpacing) {
+          // if we have charSpacing, we render char by char
+          actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
+          nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+          styleChanged = this._hasStyleChanged(actualStyle, nextStyle);
+        }
+        if (this.charSpacing || styleChanged || i === len - 1) {
+          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          charsToRender = '';
+          actualStyle = nextStyle;
+          left += boxWidth;
+          boxWidth = 0;
+        }
       }
       ctx.restore();
     },
@@ -1278,51 +1222,26 @@
      * @param {Number} top Top coordinate
      * @param {Number} lineHeight Height of the line
      */
-    _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var charWidth, charHeight, shouldFill, shouldStroke,
-          decl = this._getStyleDeclaration(lineIndex, i),
-          offset, textDecoration, chars, additionalSpace, _charWidth;
+    _renderChar: function(method, ctx, lineIndex, charIndex, _char, left, top) {
+      var decl = this._getStyleDeclaration(lineIndex, charIndex),
+          fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+          shouldFill = method === 'fillText' && fullDecl.fill,
+          shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
 
-      if (decl) {
-        charHeight = this.getHeightOfChar(lineIndex, i);
-        shouldStroke = decl.stroke;
-        shouldFill = decl.fill;
-        textDecoration = decl.textDecoration;
+      if (!shouldStroke && !shouldFill) {
+        return;
       }
-      else {
-        charHeight = this.fontSize;
-      }
-
-      shouldStroke = (shouldStroke || this.stroke) && method === 'strokeText';
-      shouldFill = (shouldFill || this.fill) && method === 'fillText';
-
       decl && ctx.save();
 
-      charWidth = this._applyCharStyles(ctx, lineIndex, i);
-      textDecoration = textDecoration || this.textDecoration;
+      this._applyCharStyles(ctx, lineIndex, charIndex, fullDecl);
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
       }
-      if (this.charSpacing !== 0) {
-        additionalSpace = this._getWidthOfCharSpacing();
-        chars = _char.split('');
-        charWidth = 0;
-        for (var j = 0, len = chars.length, char; j < len; j++) {
-          char = chars[j];
-          shouldFill && ctx.fillText(char, left + charWidth, top);
-          shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          _charWidth = ctx.measureText(char).width + additionalSpace;
-          charWidth += _charWidth > 0 ? _charWidth : 0;
-        }
-      }
-      else {
-        shouldFill && ctx.fillText(_char, left, top);
-        shouldStroke && ctx.strokeText(_char, left, top);
-      }
 
+      shouldFill && ctx.fillText(_char, left, top);
+      shouldStroke && ctx.strokeText(_char, left, top);
       decl && ctx.restore();
-      ctx.translate(charWidth, 0);
     },
 
     /**
@@ -1332,13 +1251,12 @@
      */
     _hasStyleChanged: function(prevStyle, thisStyle) {
       return (prevStyle.fill !== thisStyle.fill ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
               prevStyle.fontSize !== thisStyle.fontSize ||
-              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.stroke !== thisStyle.stroke ||
-              prevStyle.strokeWidth !== thisStyle.strokeWidth
+              prevStyle.fontStyle !== thisStyle.fontStyle
       );
     },
 
@@ -1423,6 +1341,19 @@
 
     /**
      * @private
+     * @param {Number} LineIndex
+     * @param {Number} charIndex
+     * @param {String} property
+
+     */
+    getValueOfPropertyAt: function(lineIndex, charIndex, property) {
+      var charStyle = this._getStyleDeclaration(lineIndex, charIndex),
+          styleDecoration = charStyle && typeof charStyle[property] !== 'undefined';
+      return styleDecoration ? charStyle[property] : this[property];
+    },
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextDecoration: function(ctx, type) {
@@ -1434,11 +1365,11 @@
           line, lastDecoration = this[type],
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
-          boxStart = 0, boxWidth = 0, charBox, charStyle,
+          boxStart, boxWidth, charBox, currentDecoration,
           offsets = {
-            underline: 0.85,
-            linethrough: 0.43,
-            overline: -0.12
+            underline: 0.85 - 1,
+            linethrough: 0.43 - 1,
+            overline: -0.12 - 1
           };
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -1448,18 +1379,20 @@
         line = this._textLines[i];
         heightOfLine = this.getHeightOfLine(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        boxStart = 0;
+        boxWidth = 0;
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
-          charStyle = charBox.style;
-          if (charStyle[type] !== lastDecoration && boxWidth > 0) {
+          currentDecoration = this.getValueOfPropertyAt(i, j, type);
+          if (currentDecoration !== lastDecoration && boxWidth > 0) {
             lastDecoration && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              heightOfLine + topOffset + (this._fontSizeMult - 1 + offsets[type]) * this.fontSize,
+              topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize,
               boxWidth,
               this.fontSize / 15);
             boxStart = charBox.left;
             boxWidth = charBox.width;
-            lastDecoration = charStyle[type];
+            lastDecoration = currentDecoration;
           }
           else {
             boxWidth += charBox.kernedWidth;
@@ -1467,7 +1400,7 @@
         }
         lastDecoration && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
-          heightOfLine + topOffset + (this._fontSizeMult - 1 + offsets[type]) * this.fontSize,
+          topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize,
           boxWidth,
           this.fontSize / 15
         );

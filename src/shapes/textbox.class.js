@@ -86,7 +86,7 @@
      * @private
      * @override
      */
-    _initDimensions: function(ctx) {
+    initDimensions: function(ctx) {
       if (this.__skipDimension) {
         return;
       }

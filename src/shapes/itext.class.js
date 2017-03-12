@@ -259,11 +259,11 @@
      * @param {CanvasRenderingContext2D} [ctx] Context to render on
      * @private
      */
-    _initDimensions: function(ctx) {
+    initDimensions: function(ctx) {
       if (!ctx) {
         this.clearContextTop();
       }
-      this.callSuper('_initDimensions', ctx);
+      this.callSuper('initDimensions', ctx);
     },
 
     /**
