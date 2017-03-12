@@ -1504,6 +1504,9 @@
       if (!this.visible) {
         return;
       }
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+        return;
+      }
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
       }

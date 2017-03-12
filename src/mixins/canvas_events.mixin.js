@@ -140,6 +140,13 @@
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
+      if (this._iTextInstances) {
+        this._iTextInstances.forEach(function(obj) {
+          if (obj.isEditing) {
+            obj.hiddenTextarea.focus();
+          }
+        });
+      }
     },
 
     /**
@@ -462,6 +469,14 @@
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
       if (isRightClick) {
         if (this.fireRightClick) {
+          this._handleEvent(e, 'down', target ? target : null);
+        }
+        return;
+      }
+
+      var isMiddleClick  = 'which' in e ? e.which === 2 : e.button === 1;
+      if (isMiddleClick) {
+        if (this.fireMiddleClick) {
           this._handleEvent(e, 'down', target ? target : null);
         }
         return;
