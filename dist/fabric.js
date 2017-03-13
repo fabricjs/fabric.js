@@ -24661,8 +24661,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         prevWidth = width;
 
-        width += this._getWidthOfChar(line[j], i, this.flipX ? jlen - j : j) *
-                 this.scaleX;
+        width += this.__charBounds[i][j].kernedWidth * this.scaleX;
 
         if (height <= mouseOffset.y || width <= mouseOffset.x) {
           charIndex++;
