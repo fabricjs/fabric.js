@@ -158,6 +158,12 @@
     __widthOfSpace: [],
 
     /**
+     * Helps determining when the text is in composition, so that the cursor
+     * rendering is altered.
+     */
+    inCompositionMode: false,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -371,15 +377,18 @@
      * @param {Array} chars Array of characters
      * @param {String} typeOfBoundaries
      */
-    _getCursorBoundaries: function() {
+    _getCursorBoundaries: function(position) {
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
 
+      if (typeof position === 'undefined') {
+        position = this.selectionStart;
+      }
+
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-
-          offsets = this._getCursorBoundariesOffsets();
+          offsets = this._getCursorBoundariesOffsets(position);
 
       return {
         left: left,
@@ -392,7 +401,7 @@
     /**
      * @private
      */
-    _getCursorBoundariesOffsets: function() {
+    _getCursorBoundariesOffsets: function(position) {
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
@@ -402,7 +411,7 @@
           topOffset = 0,
           leftOffset = 0,
           boundaries,
-          cursorPosition = this.get2DCursorLocation(this.selectionStart);
+          cursorPosition = this.get2DCursorLocation(position);
       for (var i = 0; i < cursorPosition.lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
@@ -434,11 +443,15 @@
           cursorWidth = this.cursorWidth / multiplier,
           topOffset = boundaries.topOffset;
 
-      ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
-      ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
       topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
         - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+
+      if (this.inCompositionMode) {
+        this.renderSelection(boundaries, ctx);
+      }
+
+      ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
+      ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -454,10 +467,10 @@
      */
     renderSelection: function(boundaries, ctx) {
 
-      ctx.fillStyle = this.selectionColor;
-
-      var start = this.get2DCursorLocation(this.selectionStart),
-          end = this.get2DCursorLocation(this.selectionEnd),
+      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+          start = this.get2DCursorLocation(selectionStart),
+          end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
           startChar = start.charIndex,
@@ -481,11 +494,23 @@
         if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
           lineHeight /= this.lineHeight;
         }
-        ctx.fillRect(
-          boundaries.left + lineOffset + boxStart,
-          boundaries.top + boundaries.topOffset,
-          boxEnd - boxStart,
-          lineHeight);
+        if (this.inCompositionMode) {
+          ctx.fillStyle = this.compositionColor || 'black';
+          ctx.fillRect(
+            boundaries.left + lineOffset + boxStart,
+            boundaries.top + boundaries.topOffset + lineHeight,
+            boxEnd - boxStart,
+            1);
+        }
+        else {
+          ctx.fillStyle = this.selectionColor;
+          ctx.fillRect(
+            boundaries.left + lineOffset + boxStart,
+            boundaries.top + boundaries.topOffset,
+            boxEnd - boxStart,
+            lineHeight);
+        }
+
 
         boundaries.topOffset += realLineHeight;
       }

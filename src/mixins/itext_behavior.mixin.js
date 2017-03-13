@@ -437,7 +437,7 @@
      * @private
      */
     _updateTextarea: function() {
-      if (!this.hiddenTextarea || this.inCompositionMode) {
+      if (!this.hiddenTextarea) {
         return;
       }
       this.cursorOffsetCache = { };
@@ -454,15 +454,36 @@
 
     /**
      * @private
+     */
+    updateFromTextArea: function() {
+      if (!this.hiddenTextarea) {
+        return;
+      }
+      this.cursorOffsetCache = { };
+      this.text = this.hiddenTextarea.value;
+      this.selectionEnd = this.selectionStart = this.hiddenTextarea.selectionEnd;
+      if (!this.inCompositionMode) {
+        this.selectionStart = this.hiddenTextarea.selectionStart;
+      }
+      if (this.selectionStart === this.selectionEnd) {
+        var style = this._calcTextareaPosition();
+        this.hiddenTextarea.style.left = style.left;
+        this.hiddenTextarea.style.top = style.top;
+        this.hiddenTextarea.style.fontSize = style.fontSize;
+      }
+    },
+
+    /**
+     * @private
      * @return {Object} style contains style for hiddenTextarea
      */
     _calcTextareaPosition: function() {
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var chars = this.text.split(''),
-          boundaries = this._getCursorBoundaries(chars, 'cursor'),
-          cursorLocation = this.get2DCursorLocation(),
+      var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+          boundaries = this._getCursorBoundaries(desiredPostion),
+          cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
@@ -470,11 +491,15 @@
           m = this.calcTransformMatrix(),
           p = {
             x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset + charHeight
+            y: boundaries.top + boundaries.topOffset
           },
           upperCanvas = this.canvas.upperCanvasEl,
           maxWidth = upperCanvas.width - charHeight,
           maxHeight = upperCanvas.height - charHeight;
+
+      if (this.inCompositionMode) {
+        p.y += charHeight * this.lineHeight;
+      }
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);

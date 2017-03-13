@@ -10823,6 +10823,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _selectionDirection: null,
         _abortCursorAnimation: false,
         __widthOfSpace: [],
+        inCompositionMode: false,
         initialize: function(text, options) {
             this.styles = options ? options.styles || {} : {};
             this.callSuper("initialize", text, options);
@@ -10947,8 +10948,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
             };
         },
-        _getCursorBoundaries: function() {
-            var left = this._getLeftOffset(), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets();
+        _getCursorBoundaries: function(position) {
+            if (typeof position === "undefined") {
+                position = this.selectionStart;
+            }
+            var left = this._getLeftOffset(), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(position);
             return {
                 left: left,
                 top: top,
@@ -10956,11 +10960,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 topOffset: offsets.top
             };
         },
-        _getCursorBoundariesOffsets: function() {
+        _getCursorBoundariesOffsets: function(position) {
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
                 return this.cursorOffsetCache;
             }
-            var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(this.selectionStart);
+            var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(position);
             for (var i = 0; i < cursorPosition.lineIndex; i++) {
                 topOffset += this.getHeightOfLine(i);
             }
@@ -10978,14 +10982,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         renderCursor: function(boundaries, ctx) {
             var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier, topOffset = boundaries.topOffset;
+            topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+            if (this.inCompositionMode) {
+                this.renderSelection(boundaries, ctx);
+            }
             ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
             ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-            topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
             ctx.fillRect(boundaries.left + boundaries.leftOffset - cursorWidth / 2, topOffset + boundaries.top, cursorWidth, charHeight);
         },
         renderSelection: function(boundaries, ctx) {
-            ctx.fillStyle = this.selectionColor;
-            var start = this.get2DCursorLocation(this.selectionStart), end = this.get2DCursorLocation(this.selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex, startChar = start.charIndex, endChar = end.charIndex;
+            var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart, selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd, start = this.get2DCursorLocation(selectionStart), end = this.get2DCursorLocation(selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex, startChar = start.charIndex, endChar = end.charIndex;
             for (var i = startLine; i <= endLine; i++) {
                 var lineOffset = this._getLineLeftOffset(this.getLineWidth(i)) || 0, lineHeight = this.getHeightOfLine(i), realLineHeight = 0, boxStart = 0, boxEnd = 0;
                 if (i === startLine) {
@@ -11000,7 +11006,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 if (this.lineHeight < 1 || i === endLine && this.lineHeight > 1) {
                     lineHeight /= this.lineHeight;
                 }
-                ctx.fillRect(boundaries.left + lineOffset + boxStart, boundaries.top + boundaries.topOffset, boxEnd - boxStart, lineHeight);
+                if (this.inCompositionMode) {
+                    ctx.fillStyle = this.compositionColor || "black";
+                    ctx.fillRect(boundaries.left + lineOffset + boxStart, boundaries.top + boundaries.topOffset + lineHeight, boxEnd - boxStart, 1);
+                } else {
+                    ctx.fillStyle = this.selectionColor;
+                    ctx.fillRect(boundaries.left + lineOffset + boxStart, boundaries.top + boundaries.topOffset, boxEnd - boxStart, lineHeight);
+                }
                 boundaries.topOffset += realLineHeight;
             }
         }
@@ -11284,13 +11296,30 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.lockMovementX = this.lockMovementY = true;
         },
         _updateTextarea: function() {
-            if (!this.hiddenTextarea || this.inCompositionMode) {
+            if (!this.hiddenTextarea) {
                 return;
             }
             this.cursorOffsetCache = {};
             this.hiddenTextarea.value = this.text;
             this.hiddenTextarea.selectionStart = this.selectionStart;
             this.hiddenTextarea.selectionEnd = this.selectionEnd;
+            if (this.selectionStart === this.selectionEnd) {
+                var style = this._calcTextareaPosition();
+                this.hiddenTextarea.style.left = style.left;
+                this.hiddenTextarea.style.top = style.top;
+                this.hiddenTextarea.style.fontSize = style.fontSize;
+            }
+        },
+        updateFromTextArea: function() {
+            if (!this.hiddenTextarea) {
+                return;
+            }
+            this.cursorOffsetCache = {};
+            this.text = this.hiddenTextarea.value;
+            this.selectionEnd = this.selectionStart = this.hiddenTextarea.selectionEnd;
+            if (!this.inCompositionMode) {
+                this.selectionStart = this.hiddenTextarea.selectionStart;
+            }
             if (this.selectionStart === this.selectionEnd) {
                 var style = this._calcTextareaPosition();
                 this.hiddenTextarea.style.left = style.left;
@@ -11305,10 +11334,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     y: 1
                 };
             }
-            var chars = this.text.split(""), boundaries = this._getCursorBoundaries(chars, "cursor"), cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
+            var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
-                y: boundaries.top + boundaries.topOffset + charHeight
+                y: boundaries.top + boundaries.topOffset
             }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;
+            if (this.inCompositionMode) {
+                p.y += charHeight * this.lineHeight;
+            }
             p = fabric.util.transformPoint(p, m);
             p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
             if (p.x < 0) {
@@ -11729,7 +11761,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea = fabric.document.createElement("textarea");
         this.hiddenTextarea.setAttribute("autocapitalize", "off");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + ";" + " opacity: 0; width: 0px; height: 0px; z-index: -999;";
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: 1;" + " opacity: 1; width: 1px; height: 1px; font-size: 0.01px;";
         fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
@@ -11746,7 +11778,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
     },
     _keysMap: {
-        8: "removeChars",
         9: "exitEditing",
         27: "exitEditing",
         13: "insertNewline",
@@ -11757,8 +11788,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         37: "moveCursorLeft",
         38: "moveCursorUp",
         39: "moveCursorRight",
-        40: "moveCursorDown",
-        46: "forwardDelete"
+        40: "moveCursorDown"
     },
     _ctrlKeysMapUp: {
         67: "copy",
@@ -11805,35 +11835,21 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onInput: function(e) {
-        if (!this.isEditing || this.inCompositionMode) {
+        if (!this.isEditing) {
             return;
         }
-        var offset = this.selectionStart || 0, offsetEnd = this.selectionEnd || 0, textLength = this.text.length, newTextLength = this.hiddenTextarea.value.length, diff, charsToInsert, start;
-        if (newTextLength > textLength) {
-            start = this._selectionDirection === "left" ? offsetEnd : offset;
-            diff = newTextLength - textLength;
-            charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
-        } else {
-            diff = newTextLength - textLength + offsetEnd - offset;
-            charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
-        }
-        this.insertChars(charsToInsert);
+        this.updateFromTextArea();
+        this.canvas && this.canvas.renderAll();
         e.stopPropagation();
     },
     onCompositionStart: function() {
         this.inCompositionMode = true;
-        this.prevCompositionLength = 0;
-        this.compositionStart = this.selectionStart;
     },
     onCompositionEnd: function() {
         this.inCompositionMode = false;
     },
     onCompositionUpdate: function(e) {
-        var data = e.data;
-        this.selectionStart = this.compositionStart;
-        this.selectionEnd = this.selectionEnd === this.selectionStart ? this.compositionStart + this.prevCompositionLength : this.selectionEnd;
-        this.insertChars(data, false);
-        this.prevCompositionLength = data.length;
+        console.debug(e);
     },
     forwardDelete: function(e) {
         if (this.selectionStart === this.selectionEnd) {

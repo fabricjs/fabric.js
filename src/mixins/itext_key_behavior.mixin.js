@@ -7,8 +7,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
-                                        + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: 1;' +
+      ' opacity: 1; width: 1px; height: 1px; font-size: 0.01px;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -31,7 +31,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _keysMap: {
-    8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
     13: 'insertNewline',
@@ -43,7 +42,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     38: 'moveCursorUp',
     39: 'moveCursorRight',
     40: 'moveCursorDown',
-    46: 'forwardDelete'
   },
 
   /**
@@ -122,27 +120,29 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    if (!this.isEditing || this.inCompositionMode) {
+    if (!this.isEditing) {
       return;
     }
-    var offset = this.selectionStart || 0,
-        offsetEnd = this.selectionEnd || 0,
-        textLength = this.text.length,
-        newTextLength = this.hiddenTextarea.value.length,
-        diff, charsToInsert, start;
-    if (newTextLength > textLength) {
-      //we added some character
-      start = this._selectionDirection === 'left' ? offsetEnd : offset;
-      diff = newTextLength - textLength;
-      charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
-    }
-    else {
-      //we selected a portion of text and then input something else.
-      //Internet explorer does not trigger this else
-      diff = newTextLength - textLength + offsetEnd - offset;
-      charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
-    }
-    this.insertChars(charsToInsert);
+    // var offset = this.selectionStart || 0,
+    //     offsetEnd = this.selectionEnd || 0,
+    //     textLength = this.text.length,
+    //     newTextLength = this.hiddenTextarea.value.length,
+    //     diff, charsToInsert, start;
+    // if (newTextLength > textLength) {
+    //   //we added some character
+    //   start = this._selectionDirection === 'left' ? offsetEnd : offset;
+    //   diff = newTextLength - textLength;
+    //   charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
+    // }
+    // else {
+    //   //we selected a portion of text and then input something else.
+    //   //Internet explorer does not trigger this else
+    //   diff = newTextLength - textLength + offsetEnd - offset;
+    //   charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+    // }
+    // this.insertChars(charsToInsert);
+    this.updateFromTextArea();
+    this.canvas && this.canvas.renderAll();
     e.stopPropagation();
   },
 
@@ -151,8 +151,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   onCompositionStart: function() {
     this.inCompositionMode = true;
-    this.prevCompositionLength = 0;
-    this.compositionStart = this.selectionStart;
   },
 
   /**
@@ -162,16 +160,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.inCompositionMode = false;
   },
 
-  /**
-   * Composition update
-   */
+  // /**
+  //  * Composition update
+  //  */
   onCompositionUpdate: function(e) {
-    var data = e.data;
-    this.selectionStart = this.compositionStart;
-    this.selectionEnd = this.selectionEnd === this.selectionStart ?
-      this.compositionStart + this.prevCompositionLength : this.selectionEnd;
-    this.insertChars(data, false);
-    this.prevCompositionLength = data.length;
+    console.debug(e)
+  //   var data = e.data;
+  //   this.selectionStart = this.compositionStart;
+  //   this.selectionEnd = this.selectionEnd === this.selectionStart ?
+  //     this.compositionStart + this.prevCompositionLength : this.selectionEnd;
+  //   this.insertChars(data, false);
+  //   this.prevCompositionLength = data.length;
   },
 
   /**

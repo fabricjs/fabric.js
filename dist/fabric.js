@@ -23229,6 +23229,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     __widthOfSpace: [],
 
     /**
+     * Helps determining when the text is in composition, so that the cursor
+     * rendering is altered.
+     */
+    inCompositionMode: false,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -23442,15 +23448,18 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Array} chars Array of characters
      * @param {String} typeOfBoundaries
      */
-    _getCursorBoundaries: function() {
+    _getCursorBoundaries: function(position) {
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
 
+      if (typeof position === 'undefined') {
+        position = this.selectionStart;
+      }
+
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-
-          offsets = this._getCursorBoundariesOffsets();
+          offsets = this._getCursorBoundariesOffsets(position);
 
       return {
         left: left,
@@ -23463,7 +23472,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * @private
      */
-    _getCursorBoundariesOffsets: function() {
+    _getCursorBoundariesOffsets: function(position) {
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
@@ -23473,7 +23482,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           topOffset = 0,
           leftOffset = 0,
           boundaries,
-          cursorPosition = this.get2DCursorLocation(this.selectionStart);
+          cursorPosition = this.get2DCursorLocation(position);
       for (var i = 0; i < cursorPosition.lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
@@ -23505,11 +23514,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           cursorWidth = this.cursorWidth / multiplier,
           topOffset = boundaries.topOffset;
 
-      ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
-      ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
       topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
         - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+
+      if (this.inCompositionMode) {
+        this.renderSelection(boundaries, ctx);
+      }
+
+      ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
+      ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -23525,10 +23538,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     renderSelection: function(boundaries, ctx) {
 
-      ctx.fillStyle = this.selectionColor;
-
-      var start = this.get2DCursorLocation(this.selectionStart),
-          end = this.get2DCursorLocation(this.selectionEnd),
+      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+          start = this.get2DCursorLocation(selectionStart),
+          end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
           startChar = start.charIndex,
@@ -23552,11 +23565,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
           lineHeight /= this.lineHeight;
         }
-        ctx.fillRect(
-          boundaries.left + lineOffset + boxStart,
-          boundaries.top + boundaries.topOffset,
-          boxEnd - boxStart,
-          lineHeight);
+        if (this.inCompositionMode) {
+          ctx.fillStyle = this.compositionColor || 'black';
+          ctx.fillRect(
+            boundaries.left + lineOffset + boxStart,
+            boundaries.top + boundaries.topOffset + lineHeight,
+            boxEnd - boxStart,
+            1);
+        }
+        else {
+          ctx.fillStyle = this.selectionColor;
+          ctx.fillRect(
+            boundaries.left + lineOffset + boxStart,
+            boundaries.top + boundaries.topOffset,
+            boxEnd - boxStart,
+            lineHeight);
+        }
+
 
         boundaries.topOffset += realLineHeight;
       }
@@ -24017,7 +24042,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     _updateTextarea: function() {
-      if (!this.hiddenTextarea || this.inCompositionMode) {
+      if (!this.hiddenTextarea) {
         return;
       }
       this.cursorOffsetCache = { };
@@ -24034,15 +24059,36 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * @private
+     */
+    updateFromTextArea: function() {
+      if (!this.hiddenTextarea) {
+        return;
+      }
+      this.cursorOffsetCache = { };
+      this.text = this.hiddenTextarea.value;
+      this.selectionEnd = this.selectionStart = this.hiddenTextarea.selectionEnd;
+      if (!this.inCompositionMode) {
+        this.selectionStart = this.hiddenTextarea.selectionStart;
+      }
+      if (this.selectionStart === this.selectionEnd) {
+        var style = this._calcTextareaPosition();
+        this.hiddenTextarea.style.left = style.left;
+        this.hiddenTextarea.style.top = style.top;
+        this.hiddenTextarea.style.fontSize = style.fontSize;
+      }
+    },
+
+    /**
+     * @private
      * @return {Object} style contains style for hiddenTextarea
      */
     _calcTextareaPosition: function() {
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var chars = this.text.split(''),
-          boundaries = this._getCursorBoundaries(chars, 'cursor'),
-          cursorLocation = this.get2DCursorLocation(),
+      var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+          boundaries = this._getCursorBoundaries(desiredPostion),
+          cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
@@ -24050,11 +24096,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           m = this.calcTransformMatrix(),
           p = {
             x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset + charHeight
+            y: boundaries.top + boundaries.topOffset
           },
           upperCanvas = this.canvas.upperCanvasEl,
           maxWidth = upperCanvas.width - charHeight,
           maxHeight = upperCanvas.height - charHeight;
+
+      if (this.inCompositionMode) {
+        p.y += charHeight * this.lineHeight;
+      }
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
@@ -24718,8 +24768,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
-                                        + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: 1;' +
+      ' opacity: 1; width: 1px; height: 1px; font-size: 0.01px;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -24742,7 +24792,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _keysMap: {
-    8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
     13: 'insertNewline',
@@ -24754,7 +24803,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     38: 'moveCursorUp',
     39: 'moveCursorRight',
     40: 'moveCursorDown',
-    46: 'forwardDelete'
   },
 
   /**
@@ -24833,27 +24881,29 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    if (!this.isEditing || this.inCompositionMode) {
+    if (!this.isEditing) {
       return;
     }
-    var offset = this.selectionStart || 0,
-        offsetEnd = this.selectionEnd || 0,
-        textLength = this.text.length,
-        newTextLength = this.hiddenTextarea.value.length,
-        diff, charsToInsert, start;
-    if (newTextLength > textLength) {
-      //we added some character
-      start = this._selectionDirection === 'left' ? offsetEnd : offset;
-      diff = newTextLength - textLength;
-      charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
-    }
-    else {
-      //we selected a portion of text and then input something else.
-      //Internet explorer does not trigger this else
-      diff = newTextLength - textLength + offsetEnd - offset;
-      charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
-    }
-    this.insertChars(charsToInsert);
+    // var offset = this.selectionStart || 0,
+    //     offsetEnd = this.selectionEnd || 0,
+    //     textLength = this.text.length,
+    //     newTextLength = this.hiddenTextarea.value.length,
+    //     diff, charsToInsert, start;
+    // if (newTextLength > textLength) {
+    //   //we added some character
+    //   start = this._selectionDirection === 'left' ? offsetEnd : offset;
+    //   diff = newTextLength - textLength;
+    //   charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
+    // }
+    // else {
+    //   //we selected a portion of text and then input something else.
+    //   //Internet explorer does not trigger this else
+    //   diff = newTextLength - textLength + offsetEnd - offset;
+    //   charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+    // }
+    // this.insertChars(charsToInsert);
+    this.updateFromTextArea();
+    this.canvas && this.canvas.renderAll();
     e.stopPropagation();
   },
 
@@ -24862,8 +24912,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   onCompositionStart: function() {
     this.inCompositionMode = true;
-    this.prevCompositionLength = 0;
-    this.compositionStart = this.selectionStart;
   },
 
   /**
@@ -24873,16 +24921,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.inCompositionMode = false;
   },
 
-  /**
-   * Composition update
-   */
+  // /**
+  //  * Composition update
+  //  */
   onCompositionUpdate: function(e) {
-    var data = e.data;
-    this.selectionStart = this.compositionStart;
-    this.selectionEnd = this.selectionEnd === this.selectionStart ?
-      this.compositionStart + this.prevCompositionLength : this.selectionEnd;
-    this.insertChars(data, false);
-    this.prevCompositionLength = data.length;
+    console.debug(e)
+  //   var data = e.data;
+  //   this.selectionStart = this.compositionStart;
+  //   this.selectionEnd = this.selectionEnd === this.selectionStart ?
+  //     this.compositionStart + this.prevCompositionLength : this.selectionEnd;
+  //   this.insertChars(data, false);
+  //   this.prevCompositionLength = data.length;
   },
 
   /**
