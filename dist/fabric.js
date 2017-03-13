@@ -22203,7 +22203,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mdoe.
       lineBounds[i] = {
-        left: graphemeInfo.left + graphemeInfo.width,
+        left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
         kernedWidth: 0,
         height: this.fontSize
@@ -24660,7 +24660,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       for (var j = 0, jlen = line.length; j < jlen; j++) {
 
         prevWidth = width;
-
+        // i removed something about flipX here, check.
         width += this.__charBounds[i][j].kernedWidth * this.scaleX;
 
         if (height <= mouseOffset.y || width <= mouseOffset.x) {

@@ -960,7 +960,7 @@
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mdoe.
       lineBounds[i] = {
-        left: graphemeInfo.left + graphemeInfo.width,
+        left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
         kernedWidth: 0,
         height: this.fontSize

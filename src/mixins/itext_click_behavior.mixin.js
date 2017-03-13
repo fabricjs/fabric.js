@@ -185,7 +185,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       for (var j = 0, jlen = line.length; j < jlen; j++) {
 
         prevWidth = width;
-
+        // i removed something about flipX here, check.
         width += this.__charBounds[i][j].kernedWidth * this.scaleX;
 
         if (height <= mouseOffset.y || width <= mouseOffset.x) {

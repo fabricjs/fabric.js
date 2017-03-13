@@ -10396,7 +10396,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 prevGrapheme = grapheme;
             }
             lineBounds[i] = {
-                left: graphemeInfo.left + graphemeInfo.width,
+                left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
                 width: 0,
                 kernedWidth: 0,
                 height: this.fontSize
