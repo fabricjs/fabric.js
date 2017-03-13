@@ -896,8 +896,7 @@
      * @return {Number} fontSize of that character
      */
     getHeightOfChar: function(l, c) {
-      return this.styles && this.styles[l] && this.styles[l][c] && this.styles[l][c].fontSize ?
-        this.styles[l][c].fontSize : this.fontSize;
+      return this.getValueOfPropertyAt(l, c, 'fontSize');
     },
 
     /**
@@ -1364,16 +1363,17 @@
       if (!this[type] && !this.styleHas(type)) {
         return;
       }
-      var lineTopOffset = 0, heightOfLine,
+      var heightOfLine,
           lineWidth, lineLeftOffset,
           line, lastDecoration = this[type],
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           boxStart, boxWidth, charBox, currentDecoration,
+          maxHeight, currentFill, lastFill,
           offsets = {
-            underline: 0.85 - 1,
-            linethrough: 0.43 - 1,
-            overline: -0.12 - 1
+            underline: 0.12,
+            linethrough: -0.30,
+            overline: -0.86
           };
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -1382,33 +1382,40 @@
         }
         line = this._textLines[i];
         heightOfLine = this.getHeightOfLine(i);
+        maxHeight = heightOfLine / this.lineHeight;
+        lineWidth = this.getLineWidth(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
         boxStart = 0;
         boxWidth = 0;
+        lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentDecoration = this.getValueOfPropertyAt(i, j, type);
-          if (currentDecoration !== lastDecoration && boxWidth > 0) {
-            lastDecoration && ctx.fillRect(
+          currentFill = this.getValueOfPropertyAt(i, j, 'fill');
+          if ((currentDecoration !== lastDecoration || currentFill !== lastFill) && boxWidth > 0) {
+            ctx.fillStyle = lastFill;
+            lastDecoration && lastFill && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize,
+              topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize,
               boxWidth,
               this.fontSize / 15);
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
+            lastFill = currentFill;
           }
           else {
             boxWidth += charBox.kernedWidth;
           }
         }
-        lastDecoration && ctx.fillRect(
+        ctx.fillStyle = currentFill;
+        lastDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
-          topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize,
+          topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize,
           boxWidth,
           this.fontSize / 15
         );
-        lineTopOffset += heightOfLine;
+        topOffset += heightOfLine;
       }
       // if there is text background color no
       // other shadows should be casted

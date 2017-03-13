@@ -10354,7 +10354,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
         },
         getHeightOfChar: function(l, c) {
-            return this.styles && this.styles[l] && this.styles[l][c] && this.styles[l][c].fontSize ? this.styles[l][c].fontSize : this.fontSize;
+            return this.getValueOfPropertyAt(l, c, "fontSize");
         },
         getWidthOfCharsAt: function(lineIndex, indexStart, length) {
             var width = 0, i, char, line = this._textLines[lineIndex], prevChar, charWidth, widthOfSpaces = 0;
@@ -10602,10 +10602,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this[type] && !this.styleHas(type)) {
                 return;
             }
-            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, line, lastDecoration = this[type], leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, offsets = {
-                underline: .85 - 1,
-                linethrough: .43 - 1,
-                overline: -.12 - 1
+            var heightOfLine, lineWidth, lineLeftOffset, line, lastDecoration = this[type], leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, offsets = {
+                underline: .12,
+                linethrough: -.3,
+                overline: -.86
             };
             for (var i = 0, len = this._textLines.length; i < len; i++) {
                 if (!this[type] && !this.styleHas(type, i)) {
@@ -10613,23 +10613,30 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
                 line = this._textLines[i];
                 heightOfLine = this.getHeightOfLine(i);
+                maxHeight = heightOfLine / this.lineHeight;
+                lineWidth = this.getLineWidth(i);
                 lineLeftOffset = this._getLineLeftOffset(lineWidth);
                 boxStart = 0;
                 boxWidth = 0;
+                lastFill = this.getValueOfPropertyAt(i, 0, "fill");
                 for (var j = 0, jlen = line.length; j < jlen; j++) {
                     charBox = this.__charBounds[i][j];
                     currentDecoration = this.getValueOfPropertyAt(i, j, type);
-                    if (currentDecoration !== lastDecoration && boxWidth > 0) {
-                        lastDecoration && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize, boxWidth, this.fontSize / 15);
+                    currentFill = this.getValueOfPropertyAt(i, j, "fill");
+                    if ((currentDecoration !== lastDecoration || currentFill !== lastFill) && boxWidth > 0) {
+                        ctx.fillStyle = lastFill;
+                        lastDecoration && lastFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
                         boxStart = charBox.left;
                         boxWidth = charBox.width;
                         lastDecoration = currentDecoration;
+                        lastFill = currentFill;
                     } else {
                         boxWidth += charBox.kernedWidth;
                     }
                 }
-                lastDecoration && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + lineTopOffset + (this._fontSizeMult + offsets[type]) * this.fontSize, boxWidth, this.fontSize / 15);
-                lineTopOffset += heightOfLine;
+                ctx.fillStyle = currentFill;
+                lastDecoration && currentFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
+                topOffset += heightOfLine;
             }
             this._removeShadow(ctx);
         },
