@@ -21632,6 +21632,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     _styleProperties: [
       'stroke',
+      'strokeWidth',
       'fill',
       'fontFamily',
       'fontSize',
@@ -21640,7 +21641,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       'underline',
       'overline',
       'linethrough',
-      'textBackgroundColor'
+      'textBackgroundColor',
+      'shadow'
     ],
 
     /**
@@ -21897,24 +21899,27 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       var lineTopOffset = 0, heightOfLine,
           lineWidth, lineLeftOffset, originalFill = ctx.fillStyle,
-          line, lastColor = this.textBackgroundColor,
+          line, lastColor,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           boxStart = 0, boxWidth = 0, charBox, currentColor;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        heightOfLine = this.getHeightOfLine(i);
         if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor', i)) {
+          lineTopOffset += heightOfLine;
           continue;
         }
         line = this._textLines[i];
-        heightOfLine = this.getHeightOfLine(i);
+        lineWidth = this.getLineWidth(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
         boxWidth = 0;
         boxStart = 0;
+        lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-          if (currentColor !== lastColor && boxWidth > 0) {
+          if (currentColor !== lastColor) {
             ctx.fillStyle = lastColor;
             lastColor && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
@@ -21930,8 +21935,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             boxWidth += charBox.kernedWidth;
           }
         }
-        if (lastColor && lastColor !== 'rgba(0, 0, 0, 0)') {
-          ctx.fillStyle = lastColor;
+        if (currentColor) {
+          ctx.fillStyle = currentColor;
           ctx.fillRect(
             leftOffset + lineLeftOffset + boxStart,
             topOffset + lineTopOffset,
@@ -22001,7 +22006,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         this._setShadow.call(styleDeclaration, ctx);
       }
 
-      ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+      ctx.lineWidth = styleDeclaration.strokeWidth;
       ctx.font = this._getFontDeclaration(styleDeclaration);
     },
 
@@ -22123,7 +22128,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth / fontMultiplier;
         kernedWidth = coupleWidth - previousWidth;
-        console.log('set:', couple, 'is ', coupleWidth / fontMultiplier, coupleWidth)
       }
       return { width: width, kernedWidth: kernedWidth };
     },
@@ -22481,7 +22485,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
       }
-
+      console.log(shouldStroke, fullDecl.stroke, fullDecl.strokeWidth)
       shouldFill && ctx.fillText(_char, left, top);
       shouldStroke && ctx.strokeText(_char, left, top);
       decl && ctx.restore();

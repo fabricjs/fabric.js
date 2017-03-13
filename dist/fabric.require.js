@@ -10087,7 +10087,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         charSpacing: 0,
         styles: null,
         _measuringContext: null,
-        _styleProperties: [ "stroke", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough", "textBackgroundColor" ],
+        _styleProperties: [ "stroke", "strokeWidth", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough", "textBackgroundColor", "shadow" ],
         __charBounds: [],
         initialize: function(text, options) {
             options = options || {};
@@ -10224,20 +10224,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this.textBackgroundColor && !this.styleHas("textBackgroundColor")) {
                 return;
             }
-            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, originalFill = ctx.fillStyle, line, lastColor = this.textBackgroundColor, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart = 0, boxWidth = 0, charBox, currentColor;
+            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, originalFill = ctx.fillStyle, line, lastColor, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart = 0, boxWidth = 0, charBox, currentColor;
             for (var i = 0, len = this._textLines.length; i < len; i++) {
+                heightOfLine = this.getHeightOfLine(i);
                 if (!this.textBackgroundColor && !this.styleHas("textBackgroundColor", i)) {
+                    lineTopOffset += heightOfLine;
                     continue;
                 }
                 line = this._textLines[i];
-                heightOfLine = this.getHeightOfLine(i);
+                lineWidth = this.getLineWidth(i);
                 lineLeftOffset = this._getLineLeftOffset(lineWidth);
                 boxWidth = 0;
                 boxStart = 0;
+                lastColor = this.getValueOfPropertyAt(i, 0, "textBackgroundColor");
                 for (var j = 0, jlen = line.length; j < jlen; j++) {
                     charBox = this.__charBounds[i][j];
                     currentColor = this.getValueOfPropertyAt(i, j, "textBackgroundColor");
-                    if (currentColor !== lastColor && boxWidth > 0) {
+                    if (currentColor !== lastColor) {
                         ctx.fillStyle = lastColor;
                         lastColor && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
                         boxStart = charBox.left;
@@ -10247,8 +10250,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                         boxWidth += charBox.kernedWidth;
                     }
                 }
-                if (lastColor && lastColor !== "rgba(0, 0, 0, 0)") {
-                    ctx.fillStyle = lastColor;
+                if (currentColor) {
+                    ctx.fillStyle = currentColor;
                     ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
                 }
                 lineTopOffset += heightOfLine;
@@ -10285,7 +10288,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 styleDeclaration.getObjectScaling = this.getObjectScaling;
                 this._setShadow.call(styleDeclaration, ctx);
             }
-            ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+            ctx.lineWidth = styleDeclaration.strokeWidth;
             ctx.font = this._getFontDeclaration(styleDeclaration);
         },
         _getStyleDeclaration: function(lineIndex, charIndex) {
@@ -10344,7 +10347,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 coupleWidth = ctx.measureText(couple).width;
                 fontCache[couple] = coupleWidth / fontMultiplier;
                 kernedWidth = coupleWidth - previousWidth;
-                console.log("set:", couple, "is ", coupleWidth / fontMultiplier, coupleWidth);
             }
             return {
                 width: width,
@@ -10532,6 +10534,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (decl && decl.textBackgroundColor) {
                 this._removeShadow(ctx);
             }
+            console.log(shouldStroke, fullDecl.stroke, fullDecl.strokeWidth);
             shouldFill && ctx.fillText(_char, left, top);
             shouldStroke && ctx.strokeText(_char, left, top);
             decl && ctx.restore();
