@@ -957,6 +957,14 @@
         }
         prevGrapheme = grapheme;
       }
+      // this latest bound box represent the last character of the line
+      // to simplify cursor handling in interactive mdoe.
+      lineBounds[i] = {
+        left: graphemeInfo.left + graphemeInfo.width,
+        width: 0,
+        kernedWidth: 0,
+        height: this.fontSize
+      };
       return { width: width, widthOfSpaces: widthOfSpaces };
     },
 
@@ -995,6 +1003,7 @@
     /**
      * Measure and return the width of a single grapheme.
      * takes in consideration style, and kerning where possible.
+     * do not use outsi
      * @private
      * @param {String} _char to be measured
      * @param {Number} lineIndex index of the line where the char is
@@ -1241,7 +1250,6 @@
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
       }
-      console.log(shouldStroke, fullDecl.stroke, fullDecl.strokeWidth)
       shouldFill && ctx.fillText(_char, left, top);
       shouldStroke && ctx.strokeText(_char, left, top);
       decl && ctx.restore();

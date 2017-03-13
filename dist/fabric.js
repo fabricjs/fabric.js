@@ -22200,6 +22200,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
         prevGrapheme = grapheme;
       }
+      // this latest bound box represent the last character of the line
+      // to simplify cursor handling in interactive mdoe.
+      lineBounds[i] = {
+        left: graphemeInfo.left + graphemeInfo.width,
+        width: 0,
+        kernedWidth: 0,
+        height: this.fontSize
+      };
       return { width: width, widthOfSpaces: widthOfSpaces };
     },
 
@@ -22238,6 +22246,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * Measure and return the width of a single grapheme.
      * takes in consideration style, and kerning where possible.
+     * do not use outsi
      * @private
      * @param {String} _char to be measured
      * @param {Number} lineIndex index of the line where the char is
@@ -22484,7 +22493,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
       }
-      console.log(shouldStroke, fullDecl.stroke, fullDecl.strokeWidth)
       shouldFill && ctx.fillText(_char, left, top);
       shouldStroke && ctx.strokeText(_char, left, top);
       decl && ctx.restore();
@@ -23377,8 +23385,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this.active || !this.isEditing) {
         return;
       }
-      var chars = this.text.split(''),
-          boundaries, ctx;
+      var boundaries = this._getCursorBoundaries(), ctx;
       if (this.canvas && this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
@@ -23392,12 +23399,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         ctx.save();
       }
       if (this.selectionStart === this.selectionEnd) {
-        boundaries = this._getCursorBoundaries(chars, 'cursor');
         this.renderCursor(boundaries, ctx);
       }
       else {
-        boundaries = this._getCursorBoundaries(chars, 'selection');
-        this.renderSelection(chars, boundaries, ctx);
+        this.renderSelection(boundaries, ctx);
       }
       ctx.restore();
     },
@@ -23437,21 +23442,20 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Array} chars Array of characters
      * @param {String} typeOfBoundaries
      */
-    _getCursorBoundaries: function(chars, typeOfBoundaries) {
+    _getCursorBoundaries: function() {
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
 
-      var left = Math.round(this._getLeftOffset()),
+      var left = this._getLeftOffset(),
           top = this._getTopOffset(),
 
-          offsets = this._getCursorBoundariesOffsets(
-                      chars, typeOfBoundaries);
+          offsets = this._getCursorBoundariesOffsets();
 
       return {
         left: left,
         top: top,
-        leftOffset: offsets.left + offsets.lineLeft,
+        leftOffset: offsets.left,
         topOffset: offsets.top
       };
     },
@@ -23459,7 +23463,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * @private
      */
-    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+    _getCursorBoundariesOffsets: function() {
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
@@ -23468,34 +23472,19 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           charIndex = 0,
           topOffset = 0,
           leftOffset = 0,
-          boundaries;
-
-      for (var i = 0; i < this.selectionStart; i++) {
-        if (chars[i] === '\n') {
-          leftOffset = 0;
-          topOffset += this.getHeightOfLine(lineIndex);
-
-          lineIndex++;
-          charIndex = 0;
-        }
-        else {
-          leftOffset += this._getWidthOfChar(chars[i], lineIndex, charIndex);
-          charIndex++;
-        }
-
-        lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(lineIndex));
+          boundaries,
+          cursorPosition = this.get2DCursorLocation(this.selectionStart);
+      for (var i = 0; i < cursorPosition.lineIndex; i++) {
+        topOffset += this.getHeightOfLine(i);
       }
-      if (typeOfBoundaries === 'cursor') {
-        topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
-          - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
-      }
+      lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorPosition.lineIndex));
+      leftOffset = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex].left;
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
       }
       boundaries = {
         top: topOffset,
-        left: leftOffset > 0 ? leftOffset : 0,
-        lineLeft: lineLeftOffset
+        left: lineLeftOffset + leftOffset > 0 ? leftOffset : 0,
       };
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -23510,73 +23499,63 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex,
+          charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
-          leftOffset = boundaries.leftOffset,
           multiplier = this.scaleX * this.canvas.getZoom(),
-          cursorWidth = this.cursorWidth / multiplier;
+          cursorWidth = this.cursorWidth / multiplier,
+          topOffset = boundaries.topOffset;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
+      topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
+        - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+
       ctx.fillRect(
-        boundaries.left + leftOffset - cursorWidth / 2,
-        boundaries.top + boundaries.topOffset,
+        boundaries.left + boundaries.leftOffset - cursorWidth / 2,
+        topOffset + boundaries.top,
         cursorWidth,
         charHeight);
     },
 
     /**
      * Renders text selection
-     * @param {Array} chars Array of characters
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function(chars, boundaries, ctx) {
+    renderSelection: function(boundaries, ctx) {
 
       ctx.fillStyle = this.selectionColor;
 
       var start = this.get2DCursorLocation(this.selectionStart),
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
-          endLine = end.lineIndex;
+          endLine = end.lineIndex,
+          startChar = start.charIndex,
+          endChar = end.charIndex;
+
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getLineLeftOffset(this.getLineWidth(i)) || 0,
             lineHeight = this.getHeightOfLine(i),
-            realLineHeight = 0, boxWidth = 0, line = this._textLines[i];
+            realLineHeight = 0, boxStart = 0, boxEnd = 0;
 
         if (i === startLine) {
-          for (var j = 0, len = line.length; j < len; j++) {
-            if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
-              boxWidth += this._getWidthOfChar(line[j], i, j);
-            }
-            if (j < start.charIndex) {
-              lineOffset += this._getWidthOfChar(line[j], i, j);
-            }
-          }
-          if (j === line.length) {
-            boxWidth -= this._getWidthOfCharSpacing();
-          }
+          boxStart = this.__charBounds[startLine][startChar].left;
         }
-        else if (i > startLine && i < endLine) {
-          boxWidth += this.getLineWidth(i) || 5;
+        if (i >= startLine && i < endLine) {
+          boxEnd = this.getLineWidth(i) || 5; // WTF is this 5?
         }
         else if (i === endLine) {
-          for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
-            boxWidth += this._getWidthOfChar(line[j2], i, j2);
-          }
-          if (end.charIndex === line.length) {
-            boxWidth -= this._getWidthOfCharSpacing();
-          }
+          boxEnd = this.__charBounds[endLine][endChar].left;
         }
         realLineHeight = lineHeight;
         if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
           lineHeight /= this.lineHeight;
         }
         ctx.fillRect(
-          boundaries.left + lineOffset,
+          boundaries.left + lineOffset + boxStart,
           boundaries.top + boundaries.topOffset,
-          boxWidth > 0 ? boxWidth : 0,
+          boxEnd - boxStart,
           lineHeight);
 
         boundaries.topOffset += realLineHeight;
