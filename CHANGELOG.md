@@ -1,8 +1,16 @@
+**Version 1.7.8**
+
+- Fix: Fix dirty flag propagation [#3782](https://github.com/kangax/fabric.js/pull/3782)
+- Fix: Path parsing error in bounding boxes of curves [#3774](https://github.com/kangax/fabric.js/pull/3774)
+- Add: Middle click mouse management on canvas [#3764](https://github.com/kangax/fabric.js/pull/3764)
+- Add: Add parameter to detect and skip offscreen drawing [#3758](https://github.com/kangax/fabric.js/pull/3758)
+- Fix: textarea loosing focus after a drag and exit from canvas [#3759](https://github.com/kangax/fabric.js/pull/3759)
+
 **Version 1.7.7**
 
-- Fix for opacity parsing in svg with nested opacities [#3747] (https://github.com/kangax/fabric.js/pull/3747)
-- Fix text initialization and boundingrect [#3745] (https://github.com/kangax/fabric.js/pull/3745)
-- Fix line bounding box [#3742] (https://github.com/kangax/fabric.js/pull/3742)
+- Fix for opacity parsing in svg with nested opacities [#3747](https://github.com/kangax/fabric.js/pull/3747)
+- Fix text initialization and boundingrect [#3745](https://github.com/kangax/fabric.js/pull/3745)
+- Fix line bounding box [#3742](https://github.com/kangax/fabric.js/pull/3742)
 - Improvement: do not pollute style object while typing if not necessary [#3743](https://github.com/kangax/fabric.js/pull/3743)
 - fix for broken prototype chain when restoring a dataless object on fill an stroke [#3735](https://github.com/kangax/fabric.js/pull/3735)
 - fix for deselected event not fired on mouse actions [#3716](https://github.com/kangax/fabric.js/pull/3716)

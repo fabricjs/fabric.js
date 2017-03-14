@@ -189,7 +189,7 @@
      * the objects get rendered.
      * @memberOf fabric.StaticCanvas.prototype
      */
-    skipOffscreen: true,
+    skipOffscreen: false,
 
     /**
      * @private

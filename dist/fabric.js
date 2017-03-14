@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.7.7" };
+var fabric = fabric || { version: "1.7.8" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -6278,6 +6278,16 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     vptCoords: { },
 
     /**
+     * Based on vptCoords and object.aCoords, skip rendering of objects that
+     * are not included in current viewport.
+     * May greatly help in applications with crowded canvas and use of zoom/pan
+     * If One of the corner of the bounding box of the object is on the canvas
+     * the objects get rendered.
+     * @memberOf fabric.StaticCanvas.prototype
+     */
+    skipOffscreen: false,
+
+    /**
      * @private
      * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
      * @param {Object} [options] Options object
@@ -8793,6 +8803,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     fireRightClick: false,
 
     /**
+     * Indicates if the canvas can fire middle click events
+     * @type Boolean
+     * @since 1.7.8
+     * @default
+     */
+    fireMiddleClick: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -10332,6 +10350,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
+      if (this._iTextInstances) {
+        this._iTextInstances.forEach(function(obj) {
+          if (obj.isEditing) {
+            obj.hiddenTextarea.focus();
+          }
+        });
+      }
     },
 
     /**
@@ -10654,6 +10679,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
       if (isRightClick) {
         if (this.fireRightClick) {
+          this._handleEvent(e, 'down', target ? target : null);
+        }
+        return;
+      }
+
+      var isMiddleClick  = 'which' in e ? e.which === 2 : e.button === 1;
+      if (isMiddleClick) {
+        if (this.fireMiddleClick) {
           this._handleEvent(e, 'down', target ? target : null);
         }
         return;
@@ -12639,6 +12672,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.dirty = true;
       }
 
+      if (this.group && this.stateProperties.indexOf(key) > -1) {
+        this.group.set('dirty', true);
+      }
+
       if (key === 'width' || key === 'height') {
         this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));
       }
@@ -12688,6 +12725,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
       if ((this.width === 0 && this.height === 0) || !this.visible) {
+        return;
+      }
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
         return;
       }
       ctx.save();
@@ -13821,6 +13861,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (point.x <= pointBR.x && point.x >= pointTL.x && point.y <= pointBR.y && point.y >= pointTL.y) {
           return true;
         }
+      }
+      // no points on screen, check intersection with absolute coordinates
+      if (this.intersectsWithRect(pointTL, pointBR, true)) {
+        return true;
+      }
+      // worst case scenario the object is so big that contanins the screen
+      var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
+      if (this.containsPoint(centerPoint, null, true)) {
+        return true;
       }
       return false;
     },
@@ -16104,6 +16153,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push('rx', 'ry');
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -16141,11 +16193,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     ry:   0,
 
-    /**
-     * Used to specify dash pattern for stroke on this object
-     * @type Array
-     */
-    strokeDashArray: null,
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -17358,8 +17406,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             break;
 
           case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
             controlX = current[3];
             controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
@@ -17367,9 +17413,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               current[2],
               controlX,
               controlY,
-              x,
-              y
+              current[5],
+              current[6]
             );
+            x = current[5];
+            y = current[6];
             break;
 
           case 's': // shorthand cubic bezierCurveTo, relative
@@ -22244,6 +22292,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) {
+        return;
+      }
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
         return;
       }
       if (this._shouldClearDimensionCache()) {

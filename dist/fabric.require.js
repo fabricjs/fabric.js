@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.7"
+    version: "1.7.8"
 };
 
 if (typeof exports !== "undefined") {
@@ -3245,6 +3245,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         onBeforeScaleRotate: function() {},
         enableRetinaScaling: true,
         vptCoords: {},
+        skipOffscreen: false,
         _initStatic: function(el, options) {
             var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
             this._objects = [];
@@ -4329,6 +4330,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         snapThreshold: null,
         stopContextMenu: false,
         fireRightClick: false,
+        fireMiddleClick: false,
         _initInteractive: function() {
             this._currentTransform = null;
             this._groupSelector = null;
@@ -5245,6 +5247,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             target && target.fire("mouseout", {
                 e: e
             });
+            if (this._iTextInstances) {
+                this._iTextInstances.forEach(function(obj) {
+                    if (obj.isEditing) {
+                        obj.hiddenTextarea.focus();
+                    }
+                });
+            }
         },
         _onMouseEnter: function(e) {
             if (!this.findTarget(e)) {
@@ -5416,6 +5425,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             var isRightClick = "which" in e ? e.which === 3 : e.button === 2;
             if (isRightClick) {
                 if (this.fireRightClick) {
+                    this._handleEvent(e, "down", target ? target : null);
+                }
+                return;
+            }
+            var isMiddleClick = "which" in e ? e.which === 2 : e.button === 1;
+            if (isMiddleClick) {
+                if (this.fireMiddleClick) {
                     this._handleEvent(e, "down", target ? target : null);
                 }
                 return;
@@ -6141,6 +6157,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 }
                 this.dirty = true;
             }
+            if (this.group && this.stateProperties.indexOf(key) > -1) {
+                this.group.set("dirty", true);
+            }
             if (key === "width" || key === "height") {
                 this.minScaleLimit = Math.min(.1, 1 / Math.max(this.width, this.height));
             }
@@ -6159,6 +6178,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         },
         render: function(ctx, noTransform) {
             if (this.width === 0 && this.height === 0 || !this.visible) {
+                return;
+            }
+            if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
                 return;
             }
             ctx.save();
@@ -6683,6 +6705,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 if (point.x <= pointBR.x && point.x >= pointTL.x && point.y <= pointBR.y && point.y >= pointTL.y) {
                     return true;
                 }
+            }
+            if (this.intersectsWithRect(pointTL, pointBR, true)) {
+                return true;
+            }
+            var centerPoint = {
+                x: (pointTL.x + pointBR.x) / 2,
+                y: (pointTL.y + pointBR.y) / 2
+            };
+            if (this.containsPoint(centerPoint, null, true)) {
+                return true;
             }
             return false;
         },
@@ -7722,12 +7754,14 @@ fabric.util.object.extend(fabric.Object.prototype, {
     }
     var stateProperties = fabric.Object.prototype.stateProperties.concat();
     stateProperties.push("rx", "ry");
+    var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+    cacheProperties.push("rx", "ry");
     fabric.Rect = fabric.util.createClass(fabric.Object, {
         stateProperties: stateProperties,
         type: "rect",
         rx: 0,
         ry: 0,
-        strokeDashArray: null,
+        cacheProperties: cacheProperties,
         initialize: function(options) {
             this.callSuper("initialize", options);
             this._initRxRy();
@@ -8323,11 +8357,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
                     break;
 
                   case "C":
-                    x = current[5];
-                    y = current[6];
                     controlX = current[3];
                     controlY = current[4];
-                    bounds = fabric.util.getBoundsOfCurve(x, y, current[1], current[2], controlX, controlY, x, y);
+                    bounds = fabric.util.getBoundsOfCurve(x, y, current[1], current[2], controlX, controlY, current[5], current[6]);
+                    x = current[5];
+                    y = current[6];
                     break;
 
                   case "s":
@@ -10443,6 +10477,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         render: function(ctx, noTransform) {
             if (!this.visible) {
+                return;
+            }
+            if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
                 return;
             }
             if (this._shouldClearDimensionCache()) {
