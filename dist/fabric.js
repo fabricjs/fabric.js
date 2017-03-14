@@ -23476,6 +23476,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
+      console.log(position);
       var lineLeftOffset = 0,
           lineIndex = 0,
           charIndex = 0,
@@ -23505,7 +23506,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
     renderCursor: function(boundaries, ctx) {
-
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
@@ -24042,13 +24042,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     _updateTextarea: function() {
+      this.cursorOffsetCache = { };
       if (!this.hiddenTextarea) {
         return;
       }
-      this.cursorOffsetCache = { };
-      this.hiddenTextarea.value = this.text;
-      this.hiddenTextarea.selectionStart = this.selectionStart;
-      this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      if (!this.inCompositionMode) {
+        this.hiddenTextarea.value = this.text;
+        this.hiddenTextarea.selectionStart = this.selectionStart;
+        this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      }
       if (this.selectionStart === this.selectionEnd) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
@@ -24086,7 +24088,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+      var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart,
           boundaries = this._getCursorBoundaries(desiredPostion),
           cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
@@ -24105,7 +24107,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (this.inCompositionMode) {
         p.y += charHeight * this.lineHeight;
       }
-
+console.log(this.inCompositionMode, desiredPostion, this.compositionStart, this.compositionEnd)
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
 
@@ -24769,7 +24771,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: 1;' +
-      ' opacity: 1; width: 1px; height: 1px; font-size: 0.01px;';
+      ' opacity: 1; width: 1px; height: 1px; font-size: 0px;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -24910,14 +24912,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Composition start
    */
-  onCompositionStart: function() {
+  onCompositionStart: function(e) {
+    console.debug(e)
     this.inCompositionMode = true;
   },
 
   /**
    * Composition end
    */
-  onCompositionEnd: function() {
+  onCompositionEnd: function(e) {
+    console.debug(e)
     this.inCompositionMode = false;
   },
 
@@ -24926,6 +24930,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   //  */
   onCompositionUpdate: function(e) {
     console.debug(e)
+    this.compositionStart = e.target.selectionStart;
+    this.compositionEnd = e.target.selectionEnd;
   //   var data = e.data;
   //   this.selectionStart = this.compositionStart;
   //   this.selectionEnd = this.selectionEnd === this.selectionStart ?

@@ -10964,6 +10964,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
                 return this.cursorOffsetCache;
             }
+            console.log(position);
             var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(position);
             for (var i = 0; i < cursorPosition.lineIndex; i++) {
                 topOffset += this.getHeightOfLine(i);
@@ -11296,13 +11297,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.lockMovementX = this.lockMovementY = true;
         },
         _updateTextarea: function() {
+            this.cursorOffsetCache = {};
             if (!this.hiddenTextarea) {
                 return;
             }
-            this.cursorOffsetCache = {};
-            this.hiddenTextarea.value = this.text;
-            this.hiddenTextarea.selectionStart = this.selectionStart;
-            this.hiddenTextarea.selectionEnd = this.selectionEnd;
+            if (!this.inCompositionMode) {
+                this.hiddenTextarea.value = this.text;
+                this.hiddenTextarea.selectionStart = this.selectionStart;
+                this.hiddenTextarea.selectionEnd = this.selectionEnd;
+            }
             if (this.selectionStart === this.selectionEnd) {
                 var style = this._calcTextareaPosition();
                 this.hiddenTextarea.style.left = style.left;
@@ -11334,13 +11337,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     y: 1
                 };
             }
-            var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
+            var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
                 y: boundaries.top + boundaries.topOffset
             }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;
             if (this.inCompositionMode) {
                 p.y += charHeight * this.lineHeight;
             }
+            console.log(this.inCompositionMode, desiredPostion, this.compositionStart, this.compositionEnd);
             p = fabric.util.transformPoint(p, m);
             p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
             if (p.x < 0) {
@@ -11761,7 +11765,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea = fabric.document.createElement("textarea");
         this.hiddenTextarea.setAttribute("autocapitalize", "off");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: 1;" + " opacity: 1; width: 1px; height: 1px; font-size: 0.01px;";
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: 1;" + " opacity: 1; width: 1px; height: 1px; font-size: 0px;";
         fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
@@ -11842,14 +11846,18 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
         e.stopPropagation();
     },
-    onCompositionStart: function() {
+    onCompositionStart: function(e) {
+        console.debug(e);
         this.inCompositionMode = true;
     },
-    onCompositionEnd: function() {
+    onCompositionEnd: function(e) {
+        console.debug(e);
         this.inCompositionMode = false;
     },
     onCompositionUpdate: function(e) {
         console.debug(e);
+        this.compositionStart = e.target.selectionStart;
+        this.compositionEnd = e.target.selectionEnd;
     },
     forwardDelete: function(e) {
         if (this.selectionStart === this.selectionEnd) {

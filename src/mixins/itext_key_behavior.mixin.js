@@ -8,7 +8,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: 1;' +
-      ' opacity: 1; width: 1px; height: 1px; font-size: 0.01px;';
+      ' opacity: 1; width: 1px; height: 1px; font-size: 0px;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -149,14 +149,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Composition start
    */
-  onCompositionStart: function() {
+  onCompositionStart: function(e) {
+    console.debug(e)
     this.inCompositionMode = true;
   },
 
   /**
    * Composition end
    */
-  onCompositionEnd: function() {
+  onCompositionEnd: function(e) {
+    console.debug(e)
     this.inCompositionMode = false;
   },
 
@@ -165,6 +167,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   //  */
   onCompositionUpdate: function(e) {
     console.debug(e)
+    this.compositionStart = e.target.selectionStart;
+    this.compositionEnd = e.target.selectionEnd;
   //   var data = e.data;
   //   this.selectionStart = this.compositionStart;
   //   this.selectionEnd = this.selectionEnd === this.selectionStart ?

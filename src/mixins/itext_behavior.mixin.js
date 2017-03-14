@@ -437,13 +437,15 @@
      * @private
      */
     _updateTextarea: function() {
+      this.cursorOffsetCache = { };
       if (!this.hiddenTextarea) {
         return;
       }
-      this.cursorOffsetCache = { };
-      this.hiddenTextarea.value = this.text;
-      this.hiddenTextarea.selectionStart = this.selectionStart;
-      this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      if (!this.inCompositionMode) {
+        this.hiddenTextarea.value = this.text;
+        this.hiddenTextarea.selectionStart = this.selectionStart;
+        this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      }
       if (this.selectionStart === this.selectionEnd) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
@@ -481,7 +483,7 @@
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var desiredPostion = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+      var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart,
           boundaries = this._getCursorBoundaries(desiredPostion),
           cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
@@ -500,7 +502,7 @@
       if (this.inCompositionMode) {
         p.y += charHeight * this.lineHeight;
       }
-
+console.log(this.inCompositionMode, desiredPostion, this.compositionStart, this.compositionEnd)
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
 
