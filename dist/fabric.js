@@ -12672,6 +12672,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.dirty = true;
       }
 
+      if (this.group && this.stateProperties.indexOf(key) > -1) {
+        this.group.set('dirty', true);
+      }
+
       if (key === 'width' || key === 'height') {
         this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));
       }
@@ -16149,6 +16153,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push('rx', 'ry');
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -16186,11 +16193,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     ry:   0,
 
-    /**
-     * Used to specify dash pattern for stroke on this object
-     * @type Array
-     */
-    strokeDashArray: null,
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor

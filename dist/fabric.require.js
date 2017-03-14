@@ -6157,6 +6157,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 }
                 this.dirty = true;
             }
+            if (this.group && this.stateProperties.indexOf(key) > -1) {
+                this.group.set("dirty", true);
+            }
             if (key === "width" || key === "height") {
                 this.minScaleLimit = Math.min(.1, 1 / Math.max(this.width, this.height));
             }
@@ -7751,12 +7754,14 @@ fabric.util.object.extend(fabric.Object.prototype, {
     }
     var stateProperties = fabric.Object.prototype.stateProperties.concat();
     stateProperties.push("rx", "ry");
+    var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+    cacheProperties.push("rx", "ry");
     fabric.Rect = fabric.util.createClass(fabric.Object, {
         stateProperties: stateProperties,
         type: "rect",
         rx: 0,
         ry: 0,
-        strokeDashArray: null,
+        cacheProperties: cacheProperties,
         initialize: function(options) {
             this.callSuper("initialize", options);
             this._initRxRy();
