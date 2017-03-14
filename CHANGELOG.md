@@ -1,5 +1,10 @@
 **Version 1.7.8**
 
+- Fix: Path parsing error in bounding boxes of curves [#3774] (https://github.com/kangax/fabric.js/pull/3774)
+- Add: Middle click mouse management on canvas [#3764] (https://github.com/kangax/fabric.js/pull/3764)
+- Add: Add parameter to detect and skip offscreen drawing [#3758] (https://github.com/kangax/fabric.js/pull/3758)
+- Fix: textarea loosing focus after a drag and exit from canvas [#3759] (https://github.com/kangax/fabric.js/pull/3759)
+
 **Version 1.7.7**
 
 - Fix for opacity parsing in svg with nested opacities [#3747] (https://github.com/kangax/fabric.js/pull/3747)
