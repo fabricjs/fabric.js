@@ -3,7 +3,7 @@
 
   function createImageElement() {
     return fabric.isLikelyNode
-            ? new (require('canvas').Image)()
+            ? new (require(fabric.canvasModule).Image)()
             : fabric.document.createElement('img');
   }
   function setSrc(img, src, callback) {

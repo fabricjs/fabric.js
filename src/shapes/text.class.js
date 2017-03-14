@@ -1470,10 +1470,15 @@
      * @returns {Array} Lines in the text
      */
     _splitTextIntoLines: function() {
-      var lines = this.text.split(this._reNewline);
+      var lines = this.text.split(this._reNewline),
+          newLine = ['\n'],
+          newText = [];
       for (var i = 0; i < lines.length; i++) {
         lines[i] = fabric.util.string.graphemeSplit(lines[i]);
+        newText = newText.concat(lines[i], newLine);
       }
+      newText.pop();
+      this.graphemeText = newText;
       return lines;
     },
 

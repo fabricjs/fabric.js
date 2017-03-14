@@ -6,10 +6,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initHiddenTextarea: function() {
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
+    this.hiddenTextarea.setAttribute('autocorrect', 'off');
+    this.hiddenTextarea.setAttribute('autocomplete', 'off');
+    this.hiddenTextarea.setAttribute('spellcheck', 'false');
+
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: 1;' +
-      ' opacity: 1; width: 1px; height: 1px; font-size: 0px;';
-    fabric.document.body.appendChild(this.hiddenTextarea);
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + '; z-index: -999;' +
+      ' opacity: 0; width: 0.1px; height: 0.1px; font-size: 0px; line-height: 0; paddingｰtop: ' + style.fontSize + ';';
+    if (this.canvas) {
+      this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
+    }
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
@@ -69,7 +75,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyDown: function(e) {
-    if (!this.isEditing) {
+    if (!this.isEditing　|| this.inCompositionMode) {
       return;
     }
     if (e.keyCode in this._keysMap) {
@@ -100,7 +106,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyUp: function(e) {
-    if (!this.isEditing || this._copyDone) {
+    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
       this._copyDone = false;
       return;
     }
@@ -123,6 +129,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
+    console.log(e.target.selectionEnd - e.target.selectionStart)
     // var offset = this.selectionStart || 0,
     //     offsetEnd = this.selectionEnd || 0,
     //     textLength = this.text.length,
@@ -169,12 +176,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     console.debug(e)
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
-  //   var data = e.data;
-  //   this.selectionStart = this.compositionStart;
-  //   this.selectionEnd = this.selectionEnd === this.selectionStart ?
-  //     this.compositionStart + this.prevCompositionLength : this.selectionEnd;
-  //   this.insertChars(data, false);
-  //   this.prevCompositionLength = data.length;
+    this.updateTextareaPosition();
   },
 
   /**

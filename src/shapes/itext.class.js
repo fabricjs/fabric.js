@@ -405,7 +405,6 @@
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
-      console.log(position);
       var lineLeftOffset = 0,
           lineIndex = 0,
           charIndex = 0,

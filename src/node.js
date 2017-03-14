@@ -9,8 +9,8 @@
       HTTP = require('http'),
       HTTPS = require('https'),
 
-      Canvas = require('canvas'),
-      Image = require('canvas').Image;
+      Canvas = require(fabric.canvasModule),
+      Image = require(fabric.canvasModule).Image;
 
   /** @private */
   function request(url, encoding, callback) {

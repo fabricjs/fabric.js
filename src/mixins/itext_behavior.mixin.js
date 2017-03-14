@@ -446,12 +446,7 @@
         this.hiddenTextarea.selectionStart = this.selectionStart;
         this.hiddenTextarea.selectionEnd = this.selectionEnd;
       }
-      if (this.selectionStart === this.selectionEnd) {
-        var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.left = style.left;
-        this.hiddenTextarea.style.top = style.top;
-        this.hiddenTextarea.style.fontSize = style.fontSize;
-      }
+      this.updateTextareaPosition();
     },
 
     /**
@@ -467,11 +462,20 @@
       if (!this.inCompositionMode) {
         this.selectionStart = this.hiddenTextarea.selectionStart;
       }
+      this.updateTextareaPosition();
+    },
+
+    /**
+     * @private
+     */
+    updateTextareaPosition: function() {
       if (this.selectionStart === this.selectionEnd) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
-        this.hiddenTextarea.style.fontSize = style.fontSize;
+        //this.hiddenTextarea.style.fontSize = style.fontSize;
+        this.hiddenTextarea.style.height = style.charHeight　* this.lineHeight + 'px';
+        this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
       }
     },
 
@@ -499,10 +503,6 @@
           maxWidth = upperCanvas.width - charHeight,
           maxHeight = upperCanvas.height - charHeight;
 
-      if (this.inCompositionMode) {
-        p.y += charHeight * this.lineHeight;
-      }
-console.log(this.inCompositionMode, desiredPostion, this.compositionStart, this.compositionEnd)
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
 
@@ -519,11 +519,7 @@ console.log(this.inCompositionMode, desiredPostion, this.compositionStart, this.
         p.y = maxHeight;
       }
 
-      // add canvas offset on document
-      p.x += this.canvas._offset.left;
-      p.y += this.canvas._offset.top;
-
-      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight };
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight + 'px', charHeight: charHeight };
     },
 
     /**
