@@ -1,3 +1,5 @@
+**Version 1.7.8**
+
 **Version 1.7.7**
 
 - Fix for opacity parsing in svg with nested opacities [#3747] (https://github.com/kangax/fabric.js/pull/3747)
