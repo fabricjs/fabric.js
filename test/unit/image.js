@@ -54,7 +54,7 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback, options) {
@@ -62,7 +62,7 @@
     setSrc(elImage, IMG_SRC, function() {
       if (width != elImage.width || height != elImage.height) {
         if (fabric.isLikelyNode) {
-          var Canvas = require('canvas');
+          var Canvas = require(fabric.canvasModule);
           var canvas = new Canvas(width, height);
           canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
           elImage._src = canvas.toDataURL();

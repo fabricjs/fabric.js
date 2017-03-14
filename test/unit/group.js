@@ -6,7 +6,7 @@
   var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
 
   // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
   // }
 
   function makeGroupWith2Objects() {
