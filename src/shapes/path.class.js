@@ -684,8 +684,6 @@
             break;
 
           case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
             controlX = current[3];
             controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
@@ -693,9 +691,11 @@
               current[2],
               controlX,
               controlY,
-              x,
-              y
+              current[5],
+              current[6]
             );
+            x = current[5];
+            y = current[6];
             break;
 
           case 's': // shorthand cubic bezierCurveTo, relative
