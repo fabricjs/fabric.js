@@ -538,6 +538,17 @@
     equal(g1.dirty, true, 'Group has dirty flag set');
   });
 
+  test('dirty flag propagation from children up with', function() {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    g1.dirty = false;
+    obj.dirty = false;
+    equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('angle', 5);
+    equal(obj.dirty, false, 'Obj has dirty flag still false');
+    equal(g1.dirty, true, 'Group has dirty flag set');
+  });
+
   test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by group', function() {
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
