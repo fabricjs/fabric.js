@@ -13,6 +13,9 @@
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push('rx', 'ry');
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -50,11 +53,7 @@
      */
     ry:   0,
 
-    /**
-     * Used to specify dash pattern for stroke on this object
-     * @type Array
-     */
-    strokeDashArray: null,
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
