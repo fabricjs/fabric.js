@@ -492,10 +492,6 @@
         p.y = maxHeight;
       }
 
-      // add canvas offset on document -- We now put textarea inside same wrapper as canvas
-      // p.x += this.canvas._offset.left;
-      // p.y += this.canvas._offset.top;
-
       return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight };
     },
 
