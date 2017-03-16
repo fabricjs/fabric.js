@@ -252,7 +252,7 @@
       var width = 0;
       charOffset = charOffset || 0;
       for (var i = 0, len = text.length; i < len; i++) {
-        width += this._getWidthOfChar(text[i], lineIndex, i + charOffset);
+        width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
       }
       return width;
     },
@@ -397,40 +397,40 @@
       };
     },
 
-    /**
-     * Overrides superclass function and uses text wrapping data to get cursor
-     * boundary offsets instead of the array of chars.
-     * @param {Array} chars Unused
-     * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
-     * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
-     */
-    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-      var topOffset      = 0,
-          leftOffset     = 0,
-          cursorLocation = this.get2DCursorLocation(),
-          lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
-          lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorLocation.lineIndex));
-
-      for (var i = 0; i < cursorLocation.charIndex; i++) {
-        leftOffset += this._getWidthOfChar(lineChars[i], cursorLocation.lineIndex, i);
-      }
-
-      for (i = 0; i < cursorLocation.lineIndex; i++) {
-        topOffset += this.getHeightOfLine(i);
-      }
-
-      if (typeOfBoundaries === 'cursor') {
-        topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(cursorLocation.lineIndex)
-          / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
-          * (1 - this._fontSizeFraction);
-      }
-
-      return {
-        top: topOffset,
-        left: leftOffset,
-        lineLeft: lineLeftOffset
-      };
-    },
+    // /**
+    //  * Overrides superclass function and uses text wrapping data to get cursor
+    //  * boundary offsets instead of the array of chars.
+    //  * @param {Array} chars Unused
+    //  * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
+    //  * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
+    //  */
+    // _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+    //   var topOffset      = 0,
+    //       leftOffset     = 0,
+    //       cursorLocation = this.get2DCursorLocation(),
+    //       lineChars      = this._textLines[cursorLocation.lineIndex],
+    //       lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorLocation.lineIndex));
+    //
+    //   for (var i = 0; i < cursorLocation.charIndex; i++) {
+    //     leftOffset += this._getWidthOfChar(lineChars[i], cursorLocation.lineIndex, i);
+    //   }
+    //
+    //   for (i = 0; i < cursorLocation.lineIndex; i++) {
+    //     topOffset += this.getHeightOfLine(i);
+    //   }
+    //
+    //   if (typeOfBoundaries === 'cursor') {
+    //     topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(cursorLocation.lineIndex)
+    //       / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
+    //       * (1 - this._fontSizeFraction);
+    //   }
+    //
+    //   return {
+    //     top: topOffset,
+    //     left: leftOffset,
+    //     lineLeft: lineLeftOffset
+    //   };
+    // },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);

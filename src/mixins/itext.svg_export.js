@@ -37,7 +37,7 @@
           this._createTextCharSpan(
             chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
 
-        var charWidth = this._getWidthOfChar(chars[i], lineIndex, i);
+        var charWidth = this.__charBounds[lineIndex][i].kernedWidth;
 
         if (styleDecl.textBackgroundColor) {
           textBgRects.push(

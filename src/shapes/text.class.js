@@ -515,7 +515,9 @@
       if (this.__skipDimension) {
         return;
       }
-      this._textLines = this._splitTextIntoLines();
+      var newLines = this._splitTextIntoLines(this.text);
+      this._textLines = newLines.lines;
+      this._text = newLines.graphemeArray;
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
       this.height = this.calcTextHeight();
@@ -900,27 +902,6 @@
     },
 
     /**
-     * measure an interval of characters from a given line
-     * @param {Number} lineIndex
-     * @param {Number} indexStart
-     * @return {Object} object.width total width of characters
-     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
-     */
-    getWidthOfCharsAt: function(lineIndex, indexStart, length) {
-      var width = 0, i, char, line = this._textLines[lineIndex], prevChar, charWidth, widthOfSpaces = 0;
-      for (i = indexStart; i < indexStart + length; i++) {
-        char = line[i];
-        charWidth = this._getWidthOfChar(char, lineIndex, i, prevChar);
-        width += charWidth;
-        if (this._reSpacesAndTabs.test(char)) {
-          widthOfSpaces += charWidth;
-        }
-        prevChar = char;
-      }
-      return { width: width, widthOfSpaces: widthOfSpaces };
-    },
-
-    /**
      * measure a text line measuring all characters.
      * @param {Number} lineIndex line number
      * @return {Number} Line width
@@ -1001,28 +982,6 @@
     },
 
     /**
-     * Measure and return the width of a single grapheme.
-     * takes in consideration style, and kerning where possible.
-     * do not use outsi
-     * @private
-     * @param {String} _char to be measured
-     * @param {Number} lineIndex index of the line where the char is
-     * @param {Number} charIndex position in the line
-     * @param {String} [previousChar] character preceding the one to be measured
-     */
-    _getWidthOfChar: function(_char, lineIndex, charIndex, previousChar) {
-      var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
-          prevCharStyle = previousChar ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
-          width = this._measureChar(_char, charStyle, previousChar, prevCharStyle);
-      if (this.charSpacing !== 0) {
-        width += this._getWidthOfCharSpacing();
-      }
-
-      // being charSpacing possibly negative we do not want the width being negative.
-      return width > 0 ? width : 0;
-    },
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} line
@@ -1036,7 +995,7 @@
         var _char = line[charIndex];
 
         if (!_char.match(/\s/)) {
-          width += this._getWidthOfChar(_char, lineIndex, charIndex + charOffset);
+          width += this.__charBounds[lineIndex][charIndex + charOffset].kernedWidth;
         }
       }
 
@@ -1467,10 +1426,11 @@
 
     /**
      * Returns the text as an array of lines.
+     * @param {String} text text to split
      * @returns {Array} Lines in the text
      */
-    _splitTextIntoLines: function() {
-      var lines = this.text.split(this._reNewline),
+    _splitTextIntoLines: function(text) {
+      var lines = text.split(this._reNewline),
           newLine = ['\n'],
           newText = [];
       for (var i = 0; i < lines.length; i++) {
@@ -1478,8 +1438,7 @@
         newText = newText.concat(lines[i], newLine);
       }
       newText.pop();
-      this.graphemeText = newText;
-      return lines;
+      return { lines: lines, graphemeArray: newText };
     },
 
     /**
@@ -1600,14 +1559,14 @@
       }
       textSpans.push(
         '\t\t\t<tspan x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(i)), NUM_FRACTION_DIGITS), '" ',
           'y="',
           toFixed(yPos, NUM_FRACTION_DIGITS),
           '" ',
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
-          fabric.util.string.escapeXml(this._textLines[i]),
+          fabric.util.string.escapeXml(this._textLines[i].join('')),
         '</tspan>\n'
       );
     },
@@ -1651,7 +1610,7 @@
         '\t\t<rect ',
           this._getFillAttributes(this.textBackgroundColor),
           ' x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(i)), NUM_FRACTION_DIGITS),
           '" y="',
           toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',

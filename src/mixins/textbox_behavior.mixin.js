@@ -98,25 +98,6 @@
     },
 
     /**
-     * Figure out programatically the text on previous actual line (actual = separated by \n);
-     *
-     * @param {Number} lIndex
-     * @returns {String}
-     * @private
-     */
-    _getTextOnPreviousLine: function(lIndex) {
-      var textOnPreviousLine = this._textLines[lIndex - 1];
-
-      while (this._styleMap[lIndex - 2] && this._styleMap[lIndex - 2].line === this._styleMap[lIndex - 1].line) {
-        textOnPreviousLine = this._textLines[lIndex - 2] + textOnPreviousLine;
-
-        lIndex--;
-      }
-
-      return textOnPreviousLine;
-    },
-
-    /**
      * Removes style object
      * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
      * @param {Number} [index] Optional index. When not given, current selectionStart is used.
