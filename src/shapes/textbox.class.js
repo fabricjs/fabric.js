@@ -126,12 +126,12 @@
           map               = {};
 
       for (var i = 0; i < this._textLines.length; i++) {
-        if (this.text[charCount] === '\n' && i > 0) {
+        if (this._text[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this.text[charCount] === ' ' && i > 0) {
+        else if (this._text[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -228,11 +228,11 @@
      * @param {String} text The string of text that is split into lines
      * @returns {Array} Array of lines
      */
-    _wrapText: function(ctx, text) {
-      var lines = text.split(this._reNewline), wrapped = [], i;
+    _wrapText: function(lines) {
+      var wrapped = [], i;
 
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
+        wrapped = wrapped.concat(this._wrapLine(lines[i], i));
       }
 
       return wrapped;
@@ -240,7 +240,7 @@
 
     /**
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
-     *
+     * it gets called when charBounds are not available yet.
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
@@ -248,10 +248,11 @@
      * @returns {number}
      * @private
      */
-    _measureText: function(ctx, text, lineIndex, charOffset) {
+    _measureWord: function(ctx, text, lineIndex, charOffset) {
       var width = 0;
       charOffset = charOffset || 0;
       for (var i = 0, len = text.length; i < len; i++) {
+        var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
         width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
       }
       return width;
@@ -260,16 +261,17 @@
     /**
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {CanvasRenderingContext2D} ctx Context to use for measurements
-     * @param {String} text The string of text to split into lines
+     * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(ctx, text, lineIndex) {
+    _wrapLine: function(line, lineIndex) {
       var lineWidth        = 0,
           lines            = [],
           line             = '',
-          words            = text.split(' '),
+          // spaces in different languges?
+          words            = line.split.join('').split(' '),
           word             = '',
           offset           = 0,
           infix            = ' ',
@@ -280,8 +282,9 @@
           additionalSpace = this._getWidthOfCharSpacing();
 
       for (var i = 0; i < words.length; i++) {
-        word = words[i];
-        wordWidth = this._measureText(ctx, word, lineIndex, offset);
+        // i would avoid resplitting the graphemes
+        word = fabric.util.string.graphemeSplit(words[i]);
+        wordWidth = this._measureWord(word, lineIndex, offset);
 
         offset += word.length;
 
@@ -322,22 +325,16 @@
     /**
      * Gets lines of text to render in the Textbox. This function calculates
      * text wrapping on the fly everytime it is called.
+     * @param {String} text text to split
      * @returns {Array} Array of lines in the Textbox.
      * @override
      */
-    _splitTextIntoLines: function(ctx) {
-      ctx = ctx || this.ctx;
-      var originalAlign = this.textAlign;
-      this._styleMap = null;
-      ctx.save();
-      this._setTextStyles(ctx);
-      this.textAlign = 'left';
-      var lines = this._wrapText(ctx, this.text);
-      this.textAlign = originalAlign;
-      ctx.restore();
-      this._textLines = lines;
+    _splitTextIntoLines: function(text) {
+      var newText = this.callSuper('_splitTextIntoLines', text);
+      var wrappedLines = this._wrapText(newText.lines);
+      this._textLines = wrappedLines;
       this._styleMap = this._generateStyleMap();
-      return lines;
+      return { lines: wrappedLines, graphemeArray: newText };
     },
 
     /**

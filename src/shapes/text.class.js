@@ -907,7 +907,7 @@
      * @return {Number} Line width
      */
     measureLine: function(lineIndex) {
-      var lineInfo = this._measureLine(lineIndex, 0, this._textLines[lineIndex].length);
+      var lineInfo = this._measureLine(lineIndex);
       if (this.charSpacing !== 0) {
         lineInfo.width -= this._getWidthOfCharSpacing();
       }

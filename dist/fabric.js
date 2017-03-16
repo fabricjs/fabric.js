@@ -22150,7 +22150,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @return {Number} Line width
      */
     measureLine: function(lineIndex) {
-      var lineInfo = this._measureLine(lineIndex, 0, this._textLines[lineIndex].length);
+      var lineInfo = this._measureLine(lineIndex);
       if (this.charSpacing !== 0) {
         lineInfo.width -= this._getWidthOfCharSpacing();
       }
@@ -23440,7 +23440,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
-      var lineLeftOffset = 0,
+      var lineLeftOffset,
           lineIndex = 0,
           charIndex = 0,
           topOffset = 0,
@@ -23450,6 +23450,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       for (var i = 0; i < cursorPosition.lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
+
       lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorPosition.lineIndex));
       leftOffset = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex].left;
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
@@ -23457,7 +23458,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       boundaries = {
         top: topOffset,
-        left: lineLeftOffset + leftOffset > 0 ? leftOffset : 0,
+        left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -23486,7 +23487,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
         topOffset + boundaries.top,
@@ -25593,12 +25593,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           map               = {};
 
       for (var i = 0; i < this._textLines.length; i++) {
-        if (this.text[charCount] === '\n' && i > 0) {
+        if (this._text[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this.text[charCount] === ' ' && i > 0) {
+        else if (this._text[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -25695,11 +25695,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @param {String} text The string of text that is split into lines
      * @returns {Array} Array of lines
      */
-    _wrapText: function(ctx, text) {
-      var lines = text.split(this._reNewline), wrapped = [], i;
+    _wrapText: function(lines) {
+      var wrapped = [], i;
 
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
+        wrapped = wrapped.concat(this._wrapLine(lines[i], i));
       }
 
       return wrapped;
@@ -25707,7 +25707,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     /**
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
-     *
+     * it gets called when charBounds are not available yet.
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
@@ -25715,10 +25715,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @returns {number}
      * @private
      */
-    _measureText: function(ctx, text, lineIndex, charOffset) {
+    _measureWord: function(ctx, text, lineIndex, charOffset) {
       var width = 0;
       charOffset = charOffset || 0;
       for (var i = 0, len = text.length; i < len; i++) {
+        var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
         width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
       }
       return width;
@@ -25727,16 +25728,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {CanvasRenderingContext2D} ctx Context to use for measurements
-     * @param {String} text The string of text to split into lines
+     * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(ctx, text, lineIndex) {
+    _wrapLine: function(line, lineIndex) {
       var lineWidth        = 0,
           lines            = [],
           line             = '',
-          words            = text.split(' '),
+          // spaces in different languges?
+          words            = line.split.join('').split(' '),
           word             = '',
           offset           = 0,
           infix            = ' ',
@@ -25747,8 +25749,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           additionalSpace = this._getWidthOfCharSpacing();
 
       for (var i = 0; i < words.length; i++) {
-        word = words[i];
-        wordWidth = this._measureText(ctx, word, lineIndex, offset);
+        // i would avoid resplitting the graphemes
+        word = fabric.util.string.graphemeSplit(words[i]);
+        wordWidth = this._measureWord(word, lineIndex, offset);
 
         offset += word.length;
 
@@ -25789,22 +25792,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * Gets lines of text to render in the Textbox. This function calculates
      * text wrapping on the fly everytime it is called.
+     * @param {String} text text to split
      * @returns {Array} Array of lines in the Textbox.
      * @override
      */
-    _splitTextIntoLines: function(ctx) {
-      ctx = ctx || this.ctx;
-      var originalAlign = this.textAlign;
-      this._styleMap = null;
-      ctx.save();
-      this._setTextStyles(ctx);
-      this.textAlign = 'left';
-      var lines = this._wrapText(ctx, this.text);
-      this.textAlign = originalAlign;
-      ctx.restore();
-      this._textLines = lines;
+    _splitTextIntoLines: function(text) {
+      var newText = this.callSuper('_splitTextIntoLines', text);
+      var wrappedLines = this._wrapText(newText.lines);
+      this._textLines = wrappedLines;
       this._styleMap = this._generateStyleMap();
-      return lines;
+      return { lines: wrappedLines, graphemeArray: newText };
     },
 
     /**

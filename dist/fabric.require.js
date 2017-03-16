@@ -10361,7 +10361,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return this.getValueOfPropertyAt(l, c, "fontSize");
         },
         measureLine: function(lineIndex) {
-            var lineInfo = this._measureLine(lineIndex, 0, this._textLines[lineIndex].length);
+            var lineInfo = this._measureLine(lineIndex);
             if (this.charSpacing !== 0) {
                 lineInfo.width -= this._getWidthOfCharSpacing();
             }
@@ -10950,7 +10950,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
                 return this.cursorOffsetCache;
             }
-            var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(position);
+            var lineLeftOffset, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(position);
             for (var i = 0; i < cursorPosition.lineIndex; i++) {
                 topOffset += this.getHeightOfLine(i);
             }
@@ -10961,7 +10961,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             boundaries = {
                 top: topOffset,
-                left: lineLeftOffset + leftOffset > 0 ? leftOffset : 0
+                left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0)
             };
             this.cursorOffsetCache = boundaries;
             return this.cursorOffsetCache;
@@ -12174,11 +12174,11 @@ fabric.util.object.extend(fabric.IText.prototype, {
         _generateStyleMap: function() {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
             for (var i = 0; i < this._textLines.length; i++) {
-                if (this.text[charCount] === "\n" && i > 0) {
+                if (this._text[charCount] === "\n" && i > 0) {
                     realLineCharCount = 0;
                     charCount++;
                     realLineCount++;
-                } else if (this.text[charCount] === " " && i > 0) {
+                } else if (this._text[charCount] === " " && i > 0) {
                     realLineCharCount++;
                     charCount++;
                 }
@@ -12226,26 +12226,27 @@ fabric.util.object.extend(fabric.IText.prototype, {
             var map = this._styleMap[lineIndex];
             delete this.styles[map.line];
         },
-        _wrapText: function(ctx, text) {
-            var lines = text.split(this._reNewline), wrapped = [], i;
+        _wrapText: function(lines) {
+            var wrapped = [], i;
             for (i = 0; i < lines.length; i++) {
-                wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
+                wrapped = wrapped.concat(this._wrapLine(lines[i], i));
             }
             return wrapped;
         },
-        _measureText: function(ctx, text, lineIndex, charOffset) {
+        _measureWord: function(ctx, text, lineIndex, charOffset) {
             var width = 0;
             charOffset = charOffset || 0;
             for (var i = 0, len = text.length; i < len; i++) {
+                var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
                 width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
             }
             return width;
         },
-        _wrapLine: function(ctx, text, lineIndex) {
-            var lineWidth = 0, lines = [], line = "", words = text.split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
+        _wrapLine: function(line, lineIndex) {
+            var lineWidth = 0, lines = [], line = "", words = line.split.join("").split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
             for (var i = 0; i < words.length; i++) {
-                word = words[i];
-                wordWidth = this._measureText(ctx, word, lineIndex, offset);
+                word = fabric.util.string.graphemeSplit(words[i]);
+                wordWidth = this._measureWord(word, lineIndex, offset);
                 offset += word.length;
                 lineWidth += infixWidth + wordWidth - additionalSpace;
                 if (lineWidth >= this.width && !lineJustStarted) {
@@ -12273,19 +12274,15 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return lines;
         },
-        _splitTextIntoLines: function(ctx) {
-            ctx = ctx || this.ctx;
-            var originalAlign = this.textAlign;
-            this._styleMap = null;
-            ctx.save();
-            this._setTextStyles(ctx);
-            this.textAlign = "left";
-            var lines = this._wrapText(ctx, this.text);
-            this.textAlign = originalAlign;
-            ctx.restore();
-            this._textLines = lines;
+        _splitTextIntoLines: function(text) {
+            var newText = this.callSuper("_splitTextIntoLines", text);
+            var wrappedLines = this._wrapText(newText.lines);
+            this._textLines = wrappedLines;
             this._styleMap = this._generateStyleMap();
-            return lines;
+            return {
+                lines: wrappedLines,
+                graphemeArray: newText
+            };
         },
         setOnGroup: function(key, value) {
             if (key === "scaleX") {

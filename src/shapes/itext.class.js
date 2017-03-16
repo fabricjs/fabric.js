@@ -405,7 +405,7 @@
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
-      var lineLeftOffset = 0,
+      var lineLeftOffset,
           lineIndex = 0,
           charIndex = 0,
           topOffset = 0,
@@ -415,6 +415,7 @@
       for (var i = 0; i < cursorPosition.lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
+
       lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorPosition.lineIndex));
       leftOffset = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex].left;
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
@@ -422,7 +423,7 @@
       }
       boundaries = {
         top: topOffset,
-        left: lineLeftOffset + leftOffset > 0 ? leftOffset : 0,
+        left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -451,7 +452,6 @@
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
         topOffset + boundaries.top,
