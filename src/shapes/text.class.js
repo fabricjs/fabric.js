@@ -758,11 +758,10 @@
       //if we want this._setShadow.call to work with styleDeclarion
       //we have to add those references
       if (styleDeclaration.shadow) {
-        styleDeclaration.scaleX = this.scaleX;
-        styleDeclaration.scaleY = this.scaleY;
-        styleDeclaration.canvas = this.canvas;
-        styleDeclaration.getObjectScaling = this.getObjectScaling;
-        this._setShadow.call(styleDeclaration, ctx);
+        var originalShadow = this.shadow;
+        this.shadow = styleDeclaration.shadow;
+        this._setShadow(ctx);
+        this.shadow = originalShadow;
       }
 
       ctx.lineWidth = styleDeclaration.strokeWidth;

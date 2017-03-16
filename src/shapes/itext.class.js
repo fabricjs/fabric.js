@@ -543,7 +543,6 @@
         }
       }
     }
-    console.log(object.styles)
     return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
   };
 })();

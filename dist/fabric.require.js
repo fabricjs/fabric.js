@@ -10286,11 +10286,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke;
             }
             if (styleDeclaration.shadow) {
-                styleDeclaration.scaleX = this.scaleX;
-                styleDeclaration.scaleY = this.scaleY;
-                styleDeclaration.canvas = this.canvas;
-                styleDeclaration.getObjectScaling = this.getObjectScaling;
-                this._setShadow.call(styleDeclaration, ctx);
+                var originalShadow = this.shadow;
+                this.shadow = styleDeclaration.shadow;
+                this._setShadow(ctx);
+                this.shadow = originalShadow;
             }
             ctx.lineWidth = styleDeclaration.strokeWidth;
             ctx.font = this._getFontDeclaration(styleDeclaration);
@@ -11024,7 +11023,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
             }
         }
-        console.log(object.styles);
         return fabric.Object._fromObject("IText", object, callback, forceAsync, "text");
     };
 })();
@@ -12175,14 +12173,9 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext("2d");
             this._dimensionAffectingProps.push("width");
         },
-        initDimensions: function(ctx) {
+        initDimensions: function() {
             if (this.__skipDimension) {
                 return;
-            }
-            if (!ctx) {
-                ctx = fabric.util.createCanvasElement().getContext("2d");
-                this._setTextStyles(ctx);
-                this.clearContextTop();
             }
             this.dynamicMinWidth = 0;
             var newText = this._splitTextIntoLines(this.text);

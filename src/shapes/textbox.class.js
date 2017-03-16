@@ -82,21 +82,13 @@
     /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
      * @private
      * @override
      */
-    initDimensions: function(ctx) {
+    initDimensions: function() {
       if (this.__skipDimension) {
         return;
       }
-
-      if (!ctx) {
-        ctx = fabric.util.createCanvasElement().getContext('2d');
-        this._setTextStyles(ctx);
-        this.clearContextTop();
-      }
-
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
       // wrap lines
