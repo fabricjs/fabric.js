@@ -872,8 +872,10 @@
         coupleWidth = fontCache[couple] * fontMultiplier;
         kernedWidth = coupleWidth - previousWidth;
       }
-      var ctx = this.getMeasuringContext();
-      this._setTextStyles(ctx, charStyle);
+      if (!width || !previousWidth || !coupleWidth) {
+        var ctx = this.getMeasuringContext();
+        this._setTextStyles(ctx, charStyle);
+      }
       if (!width) {
         kernedWidth = width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
@@ -958,7 +960,7 @@
      * @param {Number} charIndex position in the line
      * @param {String} [previousChar] character preceding the one to be measured
      */
-    _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme) {
+    _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme, skipLeft) {
       var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle),
@@ -974,7 +976,7 @@
         height: charStyle.fontSize,
         kernedWidth: kernedWidth,
       };
-      if (charIndex > 0) {
+      if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
         box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
       }
@@ -1332,7 +1334,7 @@
       }
       var heightOfLine,
           lineWidth, lineLeftOffset,
-          line, lastDecoration = this[type],
+          line, lastDecoration,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           boxStart, boxWidth, charBox, currentDecoration,
@@ -1344,16 +1346,18 @@
           };
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        heightOfLine = this.getHeightOfLine(i);
         if (!this[type] && !this.styleHas(type, i)) {
+          topOffset += heightOfLine;
           continue;
         }
         line = this._textLines[i];
-        heightOfLine = this.getHeightOfLine(i);
         maxHeight = heightOfLine / this.lineHeight;
         lineWidth = this.getLineWidth(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
         boxStart = 0;
         boxWidth = 0;
+        lastDecoration = this.getValueOfPropertyAt(i, 0, type);
         lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
@@ -1459,7 +1463,8 @@
         'linethrough',
         'textAlign',
         'textBackgroundColor',
-        'charSpacing'
+        'charSpacing',
+        'styles',
       ].concat(propertiesToInclude);
       return this.callSuper('toObject', additionalProperties);
     },

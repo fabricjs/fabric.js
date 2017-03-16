@@ -22115,8 +22115,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         coupleWidth = fontCache[couple] * fontMultiplier;
         kernedWidth = coupleWidth - previousWidth;
       }
-      var ctx = this.getMeasuringContext();
-      this._setTextStyles(ctx, charStyle);
+      if (!width || !previousWidth || !coupleWidth) {
+        var ctx = this.getMeasuringContext();
+        this._setTextStyles(ctx, charStyle);
+      }
       if (!width) {
         kernedWidth = width = ctx.measureText(char).width;
         fontCache[char] = width / fontMultiplier;
@@ -22201,7 +22203,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} charIndex position in the line
      * @param {String} [previousChar] character preceding the one to be measured
      */
-    _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme) {
+    _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme, skipLeft) {
       var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle),
@@ -22217,7 +22219,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         height: charStyle.fontSize,
         kernedWidth: kernedWidth,
       };
-      if (charIndex > 0) {
+      if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
         box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
       }
@@ -22575,7 +22577,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       var heightOfLine,
           lineWidth, lineLeftOffset,
-          line, lastDecoration = this[type],
+          line, lastDecoration,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           boxStart, boxWidth, charBox, currentDecoration,
@@ -22587,16 +22589,18 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           };
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        heightOfLine = this.getHeightOfLine(i);
         if (!this[type] && !this.styleHas(type, i)) {
+          topOffset += heightOfLine;
           continue;
         }
         line = this._textLines[i];
-        heightOfLine = this.getHeightOfLine(i);
         maxHeight = heightOfLine / this.lineHeight;
         lineWidth = this.getLineWidth(i);
         lineLeftOffset = this._getLineLeftOffset(lineWidth);
         boxStart = 0;
         boxWidth = 0;
+        lastDecoration = this.getValueOfPropertyAt(i, 0, type);
         lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
@@ -22702,7 +22706,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         'linethrough',
         'textAlign',
         'textBackgroundColor',
-        'charSpacing'
+        'charSpacing',
+        'styles',
       ].concat(propertiesToInclude);
       return this.callSuper('toObject', additionalProperties);
     },
@@ -23034,6 +23039,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 
 (function() {
+
+  function parseDecoration(object) {
+    if (object.textDecoration) {
+      object.textDecoration.indexOf('underline') > -1 && (object.underline = true);
+      object.textDecoration.indexOf('line-through') > -1 && (object.linethrough = true);
+      object.textDecoration.indexOf('overline') > -1 && (object.overline = true);
+      delete object.textDecoration;
+    }
+  }
 
   /**
    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -23561,6 +23575,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @return {fabric.IText} instance of fabric.IText
    */
   fabric.IText.fromObject = function(object, callback, forceAsync) {
+    parseDecoration(object);
+    if (object.styles) {
+      for (var i in object.styles) {
+        for (var j in object.styles[i]) {
+          parseDecoration(object.styles[i][j]);
+        }
+      }
+    }
+    console.log(object.styles)
     return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
   };
 })();
@@ -25566,9 +25589,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
-
       // wrap lines
-      this._textLines = this._splitTextIntoLines(ctx);
+      var newText = this._splitTextIntoLines(this.text);
+      this._textLines = newText.lines;
+      this._text = newText.graphemeArray;
+
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
@@ -25576,7 +25601,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       // clear cache and re-calculate height
       this._clearCache();
-      this.height = this._getTextHeight(ctx);
+      this.height = this.calcTextHeight();
     },
 
     /**
@@ -25586,19 +25611,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * which is only sufficient for Text / IText
      * @private
      */
-    _generateStyleMap: function() {
+    _generateStyleMap: function(textInfo) {
       var realLineCount     = 0,
           realLineCharCount = 0,
           charCount         = 0,
           map               = {};
 
-      for (var i = 0; i < this._textLines.length; i++) {
-        if (this._text[charCount] === '\n' && i > 0) {
+      for (var i = 0; i < textInfo.lines.length; i++) {
+        if (textInfo.graphemeArray[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this._text[charCount] === ' ' && i > 0) {
+        else if (textInfo.graphemeArray[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -25606,8 +25631,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         map[i] = { line: realLineCount, offset: realLineCharCount };
 
-        charCount += this._textLines[i].length;
-        realLineCharCount += this._textLines[i].length;
+        charCount += textInfo.lines[i].length;
+        realLineCharCount += textInfo.lines[i].length;
       }
 
       return map;
@@ -25715,12 +25740,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @returns {number}
      * @private
      */
-    _measureWord: function(ctx, text, lineIndex, charOffset) {
-      var width = 0;
+    _measureWord: function(word, lineIndex, charOffset) {
+      var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
-      for (var i = 0, len = text.length; i < len; i++) {
-        var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-        width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
+      for (var i = 0, len = word.length; i < len; i++) {
+        var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+        width += box.kernedWidth;
+        prevGrapheme = word[i];
       }
       return width;
     },
@@ -25733,12 +25759,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(line, lineIndex) {
+    _wrapLine: function(_line, lineIndex) {
       var lineWidth        = 0,
           lines            = [],
-          line             = '',
+          line             = [],
           // spaces in different languges?
-          words            = line.split.join('').split(' '),
+          words            = _line.join('').split(' '),
           word             = '',
           offset           = 0,
           infix            = ' ',
@@ -25752,14 +25778,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
         wordWidth = this._measureWord(word, lineIndex, offset);
-
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
         if (lineWidth >= this.width && !lineJustStarted) {
           lines.push(line);
-          line = '';
+          line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
@@ -25768,11 +25793,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
 
         if (!lineJustStarted) {
-          line += infix;
+          line.push(infix);
         }
-        line += word;
+        line = line.concat(word);
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+        infixWidth = this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
         // keep track of largest word
@@ -25798,10 +25823,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     _splitTextIntoLines: function(text) {
       var newText = this.callSuper('_splitTextIntoLines', text);
-      var wrappedLines = this._wrapText(newText.lines);
-      this._textLines = wrappedLines;
-      this._styleMap = this._generateStyleMap();
-      return { lines: wrappedLines, graphemeArray: newText };
+      newText.lines = this._wrapText(newText.lines);
+      this._styleMap = this._generateStyleMap(newText);
+      return newText;
     },
 
     /**
@@ -25860,41 +25884,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         charIndex: this._textLines[numLines - 1].length
       };
     },
-
-    // /**
-    //  * Overrides superclass function and uses text wrapping data to get cursor
-    //  * boundary offsets instead of the array of chars.
-    //  * @param {Array} chars Unused
-    //  * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
-    //  * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
-    //  */
-    // _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-    //   var topOffset      = 0,
-    //       leftOffset     = 0,
-    //       cursorLocation = this.get2DCursorLocation(),
-    //       lineChars      = this._textLines[cursorLocation.lineIndex],
-    //       lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorLocation.lineIndex));
-    //
-    //   for (var i = 0; i < cursorLocation.charIndex; i++) {
-    //     leftOffset += this._getWidthOfChar(lineChars[i], cursorLocation.lineIndex, i);
-    //   }
-    //
-    //   for (i = 0; i < cursorLocation.lineIndex; i++) {
-    //     topOffset += this.getHeightOfLine(i);
-    //   }
-    //
-    //   if (typeOfBoundaries === 'cursor') {
-    //     topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(cursorLocation.lineIndex)
-    //       / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
-    //       * (1 - this._fontSizeFraction);
-    //   }
-    //
-    //   return {
-    //     top: topOffset,
-    //     left: leftOffset,
-    //     lineLeft: lineLeftOffset
-    //   };
-    // },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);

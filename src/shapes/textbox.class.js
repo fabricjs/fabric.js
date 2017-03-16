@@ -99,9 +99,11 @@
 
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
-
       // wrap lines
-      this._textLines = this._splitTextIntoLines(ctx);
+      var newText = this._splitTextIntoLines(this.text);
+      this._textLines = newText.lines;
+      this._text = newText.graphemeArray;
+
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
@@ -109,7 +111,7 @@
 
       // clear cache and re-calculate height
       this._clearCache();
-      this.height = this._getTextHeight(ctx);
+      this.height = this.calcTextHeight();
     },
 
     /**
@@ -119,19 +121,19 @@
      * which is only sufficient for Text / IText
      * @private
      */
-    _generateStyleMap: function() {
+    _generateStyleMap: function(textInfo) {
       var realLineCount     = 0,
           realLineCharCount = 0,
           charCount         = 0,
           map               = {};
 
-      for (var i = 0; i < this._textLines.length; i++) {
-        if (this._text[charCount] === '\n' && i > 0) {
+      for (var i = 0; i < textInfo.lines.length; i++) {
+        if (textInfo.graphemeArray[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this._text[charCount] === ' ' && i > 0) {
+        else if (textInfo.graphemeArray[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -139,8 +141,8 @@
 
         map[i] = { line: realLineCount, offset: realLineCharCount };
 
-        charCount += this._textLines[i].length;
-        realLineCharCount += this._textLines[i].length;
+        charCount += textInfo.lines[i].length;
+        realLineCharCount += textInfo.lines[i].length;
       }
 
       return map;
@@ -248,12 +250,13 @@
      * @returns {number}
      * @private
      */
-    _measureWord: function(ctx, text, lineIndex, charOffset) {
-      var width = 0;
+    _measureWord: function(word, lineIndex, charOffset) {
+      var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
-      for (var i = 0, len = text.length; i < len; i++) {
-        var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-        width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
+      for (var i = 0, len = word.length; i < len; i++) {
+        var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+        width += box.kernedWidth;
+        prevGrapheme = word[i];
       }
       return width;
     },
@@ -266,12 +269,12 @@
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(line, lineIndex) {
+    _wrapLine: function(_line, lineIndex) {
       var lineWidth        = 0,
           lines            = [],
-          line             = '',
+          line             = [],
           // spaces in different languges?
-          words            = line.split.join('').split(' '),
+          words            = _line.join('').split(' '),
           word             = '',
           offset           = 0,
           infix            = ' ',
@@ -285,14 +288,13 @@
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
         wordWidth = this._measureWord(word, lineIndex, offset);
-
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
         if (lineWidth >= this.width && !lineJustStarted) {
           lines.push(line);
-          line = '';
+          line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
@@ -301,11 +303,11 @@
         }
 
         if (!lineJustStarted) {
-          line += infix;
+          line.push(infix);
         }
-        line += word;
+        line = line.concat(word);
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+        infixWidth = this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
         // keep track of largest word
@@ -331,10 +333,9 @@
      */
     _splitTextIntoLines: function(text) {
       var newText = this.callSuper('_splitTextIntoLines', text);
-      var wrappedLines = this._wrapText(newText.lines);
-      this._textLines = wrappedLines;
-      this._styleMap = this._generateStyleMap();
-      return { lines: wrappedLines, graphemeArray: newText };
+      newText.lines = this._wrapText(newText.lines);
+      this._styleMap = this._generateStyleMap(newText);
+      return newText;
     },
 
     /**
@@ -393,41 +394,6 @@
         charIndex: this._textLines[numLines - 1].length
       };
     },
-
-    // /**
-    //  * Overrides superclass function and uses text wrapping data to get cursor
-    //  * boundary offsets instead of the array of chars.
-    //  * @param {Array} chars Unused
-    //  * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
-    //  * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
-    //  */
-    // _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-    //   var topOffset      = 0,
-    //       leftOffset     = 0,
-    //       cursorLocation = this.get2DCursorLocation(),
-    //       lineChars      = this._textLines[cursorLocation.lineIndex],
-    //       lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorLocation.lineIndex));
-    //
-    //   for (var i = 0; i < cursorLocation.charIndex; i++) {
-    //     leftOffset += this._getWidthOfChar(lineChars[i], cursorLocation.lineIndex, i);
-    //   }
-    //
-    //   for (i = 0; i < cursorLocation.lineIndex; i++) {
-    //     topOffset += this.getHeightOfLine(i);
-    //   }
-    //
-    //   if (typeOfBoundaries === 'cursor') {
-    //     topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(cursorLocation.lineIndex)
-    //       / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
-    //       * (1 - this._fontSizeFraction);
-    //   }
-    //
-    //   return {
-    //     top: topOffset,
-    //     left: leftOffset,
-    //     lineLeft: lineLeftOffset
-    //   };
-    // },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);

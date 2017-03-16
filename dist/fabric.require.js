@@ -10337,8 +10337,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 coupleWidth = fontCache[couple] * fontMultiplier;
                 kernedWidth = coupleWidth - previousWidth;
             }
-            var ctx = this.getMeasuringContext();
-            this._setTextStyles(ctx, charStyle);
+            if (!width || !previousWidth || !coupleWidth) {
+                var ctx = this.getMeasuringContext();
+                this._setTextStyles(ctx, charStyle);
+            }
             if (!width) {
                 kernedWidth = width = ctx.measureText(char).width;
                 fontCache[char] = width / fontMultiplier;
@@ -10394,7 +10396,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 widthOfSpaces: widthOfSpaces
             };
         },
-        _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme) {
+        _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme, skipLeft) {
             var charStyle = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevCharStyle = previousGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, info = this._measureChar(grapheme, charStyle, previousGrapheme, prevCharStyle), kernedWidth = info.kernedWidth, width = info.width;
             if (this.charSpacing !== 0) {
                 width += this._getWidthOfCharSpacing();
@@ -10406,7 +10408,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 height: charStyle.fontSize,
                 kernedWidth: kernedWidth
             };
-            if (charIndex > 0) {
+            if (charIndex > 0 && !skipLeft) {
                 var previousBox = this.__charBounds[lineIndex][charIndex - 1];
                 box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
             }
@@ -10588,22 +10590,24 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this[type] && !this.styleHas(type)) {
                 return;
             }
-            var heightOfLine, lineWidth, lineLeftOffset, line, lastDecoration = this[type], leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, offsets = {
+            var heightOfLine, lineWidth, lineLeftOffset, line, lastDecoration, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, offsets = {
                 underline: .12,
                 linethrough: -.3,
                 overline: -.86
             };
             for (var i = 0, len = this._textLines.length; i < len; i++) {
+                heightOfLine = this.getHeightOfLine(i);
                 if (!this[type] && !this.styleHas(type, i)) {
+                    topOffset += heightOfLine;
                     continue;
                 }
                 line = this._textLines[i];
-                heightOfLine = this.getHeightOfLine(i);
                 maxHeight = heightOfLine / this.lineHeight;
                 lineWidth = this.getLineWidth(i);
                 lineLeftOffset = this._getLineLeftOffset(lineWidth);
                 boxStart = 0;
                 boxWidth = 0;
+                lastDecoration = this.getValueOfPropertyAt(i, 0, type);
                 lastFill = this.getValueOfPropertyAt(i, 0, "fill");
                 for (var j = 0, jlen = line.length; j < jlen; j++) {
                     charBox = this.__charBounds[i][j];
@@ -10655,7 +10659,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
         },
         toObject: function(propertiesToInclude) {
-            var additionalProperties = [ "text", "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "underline", "overline", "linethrough", "textAlign", "textBackgroundColor", "charSpacing" ].concat(propertiesToInclude);
+            var additionalProperties = [ "text", "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "underline", "overline", "linethrough", "textAlign", "textBackgroundColor", "charSpacing", "styles" ].concat(propertiesToInclude);
             return this.callSuper("toObject", additionalProperties);
         },
         toSVG: function(reviver) {
@@ -10791,6 +10795,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 })(typeof exports !== "undefined" ? exports : this);
 
 (function() {
+    function parseDecoration(object) {
+        if (object.textDecoration) {
+            object.textDecoration.indexOf("underline") > -1 && (object.underline = true);
+            object.textDecoration.indexOf("line-through") > -1 && (object.linethrough = true);
+            object.textDecoration.indexOf("overline") > -1 && (object.overline = true);
+            delete object.textDecoration;
+        }
+    }
     fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, {
         type: "i-text",
         selectionStart: 0,
@@ -11004,6 +11016,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
     });
     fabric.IText.fromObject = function(object, callback, forceAsync) {
+        parseDecoration(object);
+        if (object.styles) {
+            for (var i in object.styles) {
+                for (var j in object.styles[i]) {
+                    parseDecoration(object.styles[i][j]);
+                }
+            }
+        }
+        console.log(object.styles);
         return fabric.Object._fromObject("IText", object, callback, forceAsync, "text");
     };
 })();
@@ -12164,21 +12185,23 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 this.clearContextTop();
             }
             this.dynamicMinWidth = 0;
-            this._textLines = this._splitTextIntoLines(ctx);
+            var newText = this._splitTextIntoLines(this.text);
+            this._textLines = newText.lines;
+            this._text = newText.graphemeArray;
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
             this._clearCache();
-            this.height = this._getTextHeight(ctx);
+            this.height = this.calcTextHeight();
         },
-        _generateStyleMap: function() {
+        _generateStyleMap: function(textInfo) {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
-            for (var i = 0; i < this._textLines.length; i++) {
-                if (this._text[charCount] === "\n" && i > 0) {
+            for (var i = 0; i < textInfo.lines.length; i++) {
+                if (textInfo.graphemeArray[charCount] === "\n" && i > 0) {
                     realLineCharCount = 0;
                     charCount++;
                     realLineCount++;
-                } else if (this._text[charCount] === " " && i > 0) {
+                } else if (textInfo.graphemeArray[charCount] === " " && i > 0) {
                     realLineCharCount++;
                     charCount++;
                 }
@@ -12186,8 +12209,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     line: realLineCount,
                     offset: realLineCharCount
                 };
-                charCount += this._textLines[i].length;
-                realLineCharCount += this._textLines[i].length;
+                charCount += textInfo.lines[i].length;
+                realLineCharCount += textInfo.lines[i].length;
             }
             return map;
         },
@@ -12233,17 +12256,18 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return wrapped;
         },
-        _measureWord: function(ctx, text, lineIndex, charOffset) {
-            var width = 0;
+        _measureWord: function(word, lineIndex, charOffset) {
+            var width = 0, prevGrapheme, skipLeft = true;
             charOffset = charOffset || 0;
-            for (var i = 0, len = text.length; i < len; i++) {
-                var box = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-                width += this.__charBounds[lineIndex][i + charOffset].kernedWidth;
+            for (var i = 0, len = word.length; i < len; i++) {
+                var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+                width += box.kernedWidth;
+                prevGrapheme = word[i];
             }
             return width;
         },
-        _wrapLine: function(line, lineIndex) {
-            var lineWidth = 0, lines = [], line = "", words = line.split.join("").split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
+        _wrapLine: function(_line, lineIndex) {
+            var lineWidth = 0, lines = [], line = [], words = _line.join("").split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
             for (var i = 0; i < words.length; i++) {
                 word = fabric.util.string.graphemeSplit(words[i]);
                 wordWidth = this._measureWord(word, lineIndex, offset);
@@ -12251,17 +12275,17 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 lineWidth += infixWidth + wordWidth - additionalSpace;
                 if (lineWidth >= this.width && !lineJustStarted) {
                     lines.push(line);
-                    line = "";
+                    line = [];
                     lineWidth = wordWidth;
                     lineJustStarted = true;
                 } else {
                     lineWidth += additionalSpace;
                 }
                 if (!lineJustStarted) {
-                    line += infix;
+                    line.push(infix);
                 }
-                line += word;
-                infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+                line = line.concat(word);
+                infixWidth = this._measureWord([ infix ], lineIndex, offset);
                 offset++;
                 lineJustStarted = false;
                 if (wordWidth > largestWordWidth) {
@@ -12276,13 +12300,9 @@ fabric.util.object.extend(fabric.IText.prototype, {
         },
         _splitTextIntoLines: function(text) {
             var newText = this.callSuper("_splitTextIntoLines", text);
-            var wrappedLines = this._wrapText(newText.lines);
-            this._textLines = wrappedLines;
-            this._styleMap = this._generateStyleMap();
-            return {
-                lines: wrappedLines,
-                graphemeArray: newText
-            };
+            newText.lines = this._wrapText(newText.lines);
+            this._styleMap = this._generateStyleMap(newText);
+            return newText;
         },
         setOnGroup: function(key, value) {
             if (key === "scaleX") {
