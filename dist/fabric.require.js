@@ -11756,7 +11756,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea.setAttribute("autocomplete", "off");
         this.hiddenTextarea.setAttribute("spellcheck", "false");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 0px; line-height: 0; paddingｰtop: " + style.fontSize + ";";
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: " + style.fontSize + ";";
         if (this.canvas) {
             this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
         }
@@ -11805,8 +11805,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
         } else {
             return;
         }
-        e.stopImmediatePropagation();
-        e.preventDefault();
         if (e.keyCode >= 33 && e.keyCode <= 40) {
             this.clearContextTop();
             this.renderCursorOrSelection();
@@ -11829,10 +11827,17 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onInput: function(e) {
+        e.stopPropagation();
         if (!this.isEditing) {
             return;
         }
         var nextText = this._splitTextIntoLines(e.target.value).graphemeArray, charCount = this._text.length, nextCharCount = nextText.length, removedText, insertedText, charDiff = nextCharCount - charCount;
+        if (e.target.value === "") {
+            this.styles = {};
+            this.updateFromTextArea();
+            this.canvas && this.canvas.renderAll();
+            return;
+        }
         if (this.selectionStart !== this.selectionEnd) {
             removedText = this._text.slice(this.selectionStart, this.selectionEnd);
             charDiff += this.selectionEnd - this.selectionStart;
@@ -11852,7 +11857,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
         this.updateFromTextArea();
         this.canvas && this.canvas.renderAll();
-        e.stopPropagation();
     },
     onCompositionStart: function() {
         this.inCompositionMode = true;

@@ -473,7 +473,6 @@
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
-        //this.hiddenTextarea.style.fontSize = style.fontSize;
         this.hiddenTextarea.style.height = style.charHeight　* this.lineHeight + 'px';
         this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
       }

@@ -12,7 +12,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left +
-    '; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 0px; line-height: 0; paddingｰtop: ' +
+    '; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: ' +
     style.fontSize + ';';
     if (this.canvas) {
       this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
@@ -85,8 +85,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else {
       return;
     }
-    e.stopImmediatePropagation();
-    e.preventDefault();
+    // e.stopImmediatePropagation();
+    // e.preventDefault();
     if (e.keyCode >= 33 && e.keyCode <= 40) {
       // if i press an arrow key just update selection
       this.clearContextTop();
@@ -124,6 +124,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
+    e.stopPropagation();
     if (!this.isEditing) {
       return;
     }
@@ -133,6 +134,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         nextCharCount = nextText.length,
         removedText, insertedText,
         charDiff = nextCharCount - charCount;
+
+    if (e.target.value === '') {
+      this.styles = { };
+      this.updateFromTextArea();
+      this.canvas && this.canvas.renderAll();
+      return;
+    }
 
     if (this.selectionStart !== this.selectionEnd) {
       removedText = this._text.slice(this.selectionStart, this.selectionEnd);
@@ -154,10 +162,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (insertedText.length) {
       this.insertNewStyleBlock(insertedText, this.selectionStart);
     }
-
     this.updateFromTextArea();
     this.canvas && this.canvas.renderAll();
-    e.stopPropagation();
   },
 
   /**
