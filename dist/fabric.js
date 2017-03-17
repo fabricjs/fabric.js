@@ -12566,7 +12566,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.transform(ctx);
       }
       this._setOpacity(ctx);
-      this._setShadow(ctx);
+      this._setShadow(ctx, this);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
@@ -12599,8 +12599,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     drawObject: function(ctx, noTransform) {
       this._renderBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
+      this._setStrokeStyles(ctx, this);
+      this._setFillStyles(ctx, this);
       this._render(ctx, noTransform);
     },
 
@@ -12667,23 +12667,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.globalAlpha *= this.opacity;
     },
 
-    _setStrokeStyles: function(ctx) {
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx, this)
-          : this.stroke;
+    _setStrokeStyles: function(ctx, decl) {
+      if (decl.stroke) {
+        ctx.lineWidth = decl.strokeWidth;
+        ctx.lineCap = decl.strokeLineCap;
+        ctx.lineJoin = decl.strokeLineJoin;
+        ctx.miterLimit = decl.strokeMiterLimit;
+        ctx.strokeStyle = decl.stroke.toLive
+          ? decl.stroke.toLive(ctx, this)
+          : decl.stroke;
       }
     },
 
-    _setFillStyles: function(ctx) {
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx, this)
-          : this.fill;
+    _setFillStyles: function(ctx, decl) {
+      if (decl.fill) {
+        ctx.fillStyle = decl.fill.toLive
+          ? decl.fill.toLive(ctx, this)
+          : decl.fill;
       }
     },
 
@@ -12749,7 +12749,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _setShadow: function(ctx) {
+    _setShadow: function(ctx, decl) {
       if (!this.shadow) {
         return;
       }
@@ -12761,10 +12761,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
       }
-      ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
-      ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
-      ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
+      ctx.shadowColor = decl.shadow.color;
+      ctx.shadowBlur = decl.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowOffsetX = decl.shadow.offsetX * multX * scaling.scaleX;
+      ctx.shadowOffsetY = decl.shadow.offsetY * multY * scaling.scaleY;
     },
 
     /**
@@ -18612,7 +18612,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           h = this.height;
 
       ctx.save();
-      this._setStrokeStyles(ctx);
+      this._setStrokeStyles(ctx, this);
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
@@ -21987,30 +21987,20 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Object} [decl]
      */
     _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
-      var fill = styleDeclaration.fill,
-          stroke = styleDeclaration.stroke;
 
       if (typeof styleDeclaration.shadow === 'string') {
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
 
-      if (fill && fill !== 'transparent') {
-        ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
-      }
-      if (stroke && stroke !== 'transparent') {
-        ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke;
-      }
+      this._setFillStyles(ctx, styleDeclaration);
+      this._setStrokeStyles(ctx, styleDeclaration);
 
       //if we want this._setShadow.call to work with styleDeclarion
       //we have to add those references
       if (styleDeclaration.shadow) {
-        var originalShadow = this.shadow;
-        this.shadow = styleDeclaration.shadow;
-        this._setShadow(ctx);
-        this.shadow = originalShadow;
+        this._setShadow(ctx, styleDeclaration);
       }
 
-      ctx.lineWidth = styleDeclaration.strokeWidth;
       ctx.font = this._getFontDeclaration(styleDeclaration);
     },
 

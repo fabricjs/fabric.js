@@ -741,30 +741,20 @@
      * @param {Object} [decl]
      */
     _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
-      var fill = styleDeclaration.fill,
-          stroke = styleDeclaration.stroke;
 
       if (typeof styleDeclaration.shadow === 'string') {
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
 
-      if (fill && fill !== 'transparent') {
-        ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
-      }
-      if (stroke && stroke !== 'transparent') {
-        ctx.strokeStyle = stroke.toLive ? stroke.toLive(ctx, this) : stroke;
-      }
+      this._setFillStyles(ctx, styleDeclaration);
+      this._setStrokeStyles(ctx, styleDeclaration);
 
       //if we want this._setShadow.call to work with styleDeclarion
       //we have to add those references
       if (styleDeclaration.shadow) {
-        var originalShadow = this.shadow;
-        this.shadow = styleDeclaration.shadow;
-        this._setShadow(ctx);
-        this.shadow = originalShadow;
+        this._setShadow(ctx, styleDeclaration);
       }
 
-      ctx.lineWidth = styleDeclaration.strokeWidth;
       ctx.font = this._getFontDeclaration(styleDeclaration);
     },
 

@@ -235,7 +235,7 @@
           h = this.height;
 
       ctx.save();
-      this._setStrokeStyles(ctx);
+      this._setStrokeStyles(ctx, this);
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);

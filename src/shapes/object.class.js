@@ -1149,7 +1149,7 @@
         this.transform(ctx);
       }
       this._setOpacity(ctx);
-      this._setShadow(ctx);
+      this._setShadow(ctx, this);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
@@ -1182,8 +1182,8 @@
      */
     drawObject: function(ctx, noTransform) {
       this._renderBackground(ctx);
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
+      this._setStrokeStyles(ctx, this);
+      this._setFillStyles(ctx, this);
       this._render(ctx, noTransform);
     },
 
@@ -1250,23 +1250,23 @@
       ctx.globalAlpha *= this.opacity;
     },
 
-    _setStrokeStyles: function(ctx) {
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx, this)
-          : this.stroke;
+    _setStrokeStyles: function(ctx, decl) {
+      if (decl.stroke) {
+        ctx.lineWidth = decl.strokeWidth;
+        ctx.lineCap = decl.strokeLineCap;
+        ctx.lineJoin = decl.strokeLineJoin;
+        ctx.miterLimit = decl.strokeMiterLimit;
+        ctx.strokeStyle = decl.stroke.toLive
+          ? decl.stroke.toLive(ctx, this)
+          : decl.stroke;
       }
     },
 
-    _setFillStyles: function(ctx) {
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx, this)
-          : this.fill;
+    _setFillStyles: function(ctx, decl) {
+      if (decl.fill) {
+        ctx.fillStyle = decl.fill.toLive
+          ? decl.fill.toLive(ctx, this)
+          : decl.fill;
       }
     },
 
@@ -1332,7 +1332,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _setShadow: function(ctx) {
+    _setShadow: function(ctx, decl) {
       if (!this.shadow) {
         return;
       }
@@ -1344,10 +1344,10 @@
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
       }
-      ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
-      ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
-      ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
+      ctx.shadowColor = decl.shadow.color;
+      ctx.shadowBlur = decl.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowOffsetX = decl.shadow.offsetX * multX * scaling.scaleX;
+      ctx.shadowOffsetY = decl.shadow.offsetY * multY * scaling.scaleY;
     },
 
     /**
