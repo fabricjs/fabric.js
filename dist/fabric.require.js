@@ -6060,6 +6060,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 }
                 this.dirty = true;
             }
+            if (this.group && this.stateProperties.indexOf(key) > -1) {
+                this.group.set("dirty", true);
+            }
             if (key === "width" || key === "height") {
                 this.minScaleLimit = Math.min(.1, 1 / Math.max(this.width, this.height));
             }
@@ -7652,12 +7655,14 @@ fabric.util.object.extend(fabric.Object.prototype, {
     }
     var stateProperties = fabric.Object.prototype.stateProperties.concat();
     stateProperties.push("rx", "ry");
+    var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+    cacheProperties.push("rx", "ry");
     fabric.Rect = fabric.util.createClass(fabric.Object, {
         stateProperties: stateProperties,
         type: "rect",
         rx: 0,
         ry: 0,
-        strokeDashArray: null,
+        cacheProperties: cacheProperties,
         initialize: function(options) {
             this.callSuper("initialize", options);
             this._initRxRy();
@@ -8253,11 +8258,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
                     break;
 
                   case "C":
-                    x = current[5];
-                    y = current[6];
                     controlX = current[3];
                     controlY = current[4];
-                    bounds = fabric.util.getBoundsOfCurve(x, y, current[1], current[2], controlX, controlY, x, y);
+                    bounds = fabric.util.getBoundsOfCurve(x, y, current[1], current[2], controlX, controlY, current[5], current[6]);
+                    x = current[5];
+                    y = current[6];
                     break;
 
                   case "s":
@@ -11358,6 +11363,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (p.y > maxHeight) {
                 p.y = maxHeight;
             }
+            p.x += this.canvas._offset.left;
+            p.y += this.canvas._offset.top;
             return {
                 left: p.x + "px",
                 top: p.y + "px",
@@ -11757,9 +11764,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea.setAttribute("spellcheck", "false");
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: " + style.fontSize + ";";
-        if (this.canvas) {
-            this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
-        }
+        fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "input", this.onInput.bind(this));

@@ -12500,6 +12500,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.dirty = true;
       }
 
+      if (this.group && this.stateProperties.indexOf(key) > -1) {
+        this.group.set('dirty', true);
+      }
+
       if (key === 'width' || key === 'height') {
         this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));
       }
@@ -15975,6 +15979,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push('rx', 'ry');
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -16012,11 +16019,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     ry:   0,
 
-    /**
-     * Used to specify dash pattern for stroke on this object
-     * @type Array
-     */
-    strokeDashArray: null,
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -17229,8 +17232,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             break;
 
           case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
             controlX = current[3];
             controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
@@ -17238,9 +17239,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               current[2],
               controlX,
               controlY,
-              x,
-              y
+              current[5],
+              current[6]
             );
+            x = current[5];
+            y = current[6];
             break;
 
           case 's': // shorthand cubic bezierCurveTo, relative
@@ -24107,6 +24110,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         p.y = maxHeight;
       }
 
+      // add canvas offset on document
+      p.x += this.canvas._offset.left;
+      p.y += this.canvas._offset.top;
+
       return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight + 'px', charHeight: charHeight };
     },
 
@@ -24731,9 +24738,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left +
     '; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: ' +
     style.fontSize + ';';
-    if (this.canvas) {
-      this.canvas.lowerCanvasEl.parentNode.appendChild(this.hiddenTextarea);
-    }
+    fabric.document.body.appendChild(this.hiddenTextarea);
+
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));

@@ -53,6 +53,13 @@
     ok(typeof rect.complexity == 'function');
   });
 
+  test('cache properties', function() {
+    var rect = new fabric.Rect();
+
+    ok(rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
+    ok(rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
+  });
+
   test('toObject', function() {
     var rect = new fabric.Rect();
     ok(typeof rect.toObject == 'function');
