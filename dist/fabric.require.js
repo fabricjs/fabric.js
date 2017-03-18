@@ -10073,7 +10073,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     fabric.Text = fabric.util.createClass(fabric.Object, {
         _dimensionAffectingProps: [ "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "text", "charSpacing", "textAlign" ],
         _reNewline: /\r?\n/,
-        _reSpacesAndTabs: /[ \t\r]+/g,
+        _reSpacesAndTabs: /[ \t\r]/g,
+        _reWords: /\S+/g,
         type: "text",
         fontSize: 40,
         fontWeight: "normal",
@@ -10167,11 +10168,39 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return;
             }
             var newLines = this._splitTextIntoLines(this.text);
-            this._textLines = newLines.lines;
-            this._text = newLines.graphemeArray;
+            this.textLines = newLines.lines;
+            this._textLines = newLines.graphemeLines;
+            this._text = newLines.graphemeText;
             this._clearCache();
             this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
+            if (this.textAlign === "justify") {
+                this.enlargeSpaces();
+            }
             this.height = this.calcTextHeight();
+        },
+        enlargeSpaces: function() {
+            var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                accumulatedSpace = 0;
+                line = this._textLines[i];
+                currentLineWidth = this.getLineWidth(i);
+                if (currentLineWidth < this.width) {
+                    console.log(this.textLines[i], this.textLines[i].match(this._reSpacesAndTabs));
+                    numberOfSpaces = this.textLines[i].match(this._reSpacesAndTabs).length;
+                    diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
+                    for (var j = 0, jlen = line.length; j <= jlen; j++) {
+                        charBound = this.__charBounds[i][j];
+                        if (this._reSpacesAndTabs.test(line[j])) {
+                            charBound.width += diffSpace;
+                            charBound.kernedWidth += diffSpace;
+                            charBound.left += accumulatedSpace;
+                            accumulatedSpace += diffSpace;
+                        } else {
+                            charBound.left += accumulatedSpace;
+                        }
+                    }
+                }
+            }
         },
         toString: function() {
             return "#<fabric.Text (" + this.complexity() + '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
@@ -10213,21 +10242,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return maxWidth;
         },
         _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
-            var lineWidth = this.getLineWidth(lineIndex);
-            if (this.textAlign !== "justify" || this.width < lineWidth) {
-                this._renderChars(method, ctx, line, left, top, lineIndex);
-                return;
-            }
-            var words = line.split(/\s+/), charOffset = 0, wordsWidth = this._getWidthOfWords(ctx, words.join(" "), lineIndex, 0), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, leftOffset = 0, word;
-            for (var i = 0, len = words.length; i < len; i++) {
-                while (line[charOffset] === " " && charOffset < line.length) {
-                    charOffset++;
-                }
-                word = words[i];
-                this._renderChars(method, ctx, word, left + leftOffset, top, lineIndex, charOffset);
-                leftOffset += this._getWidthOfWords(ctx, word, lineIndex, charOffset) + spaceWidth;
-                charOffset += word.length;
-            }
+            this._renderChars(method, ctx, line, left, top, lineIndex);
         },
         _renderTextLinesBackground: function(ctx) {
             if (!this.textBackgroundColor && !this.styleHas("textBackgroundColor")) {
@@ -10368,16 +10383,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return lineInfo;
         },
         _measureLine: function(lineIndex) {
-            var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme, graphemeInfo, widthOfSpaces = 0, lineBounds = new Array(line.length);
+            var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme, graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length);
             this.__charBounds[lineIndex] = lineBounds;
             for (i = 0; i < line.length; i++) {
                 grapheme = line[i];
                 graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
                 lineBounds[i] = graphemeInfo;
                 width += graphemeInfo.kernedWidth;
-                if (this._reSpacesAndTabs.test(grapheme)) {
-                    widthOfSpaces += graphemeInfo.kernedWidth;
-                }
                 prevGrapheme = grapheme;
             }
             lineBounds[i] = {
@@ -10388,7 +10400,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
             return {
                 width: width,
-                widthOfSpaces: widthOfSpaces
+                numOfSpaces: numOfSpaces
             };
         },
         _getGraphemeBox: function(grapheme, lineIndex, charIndex, previousGrapheme, skipLeft) {
@@ -10408,16 +10420,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
             }
             return box;
-        },
-        _getWidthOfWords: function(ctx, line, lineIndex, charOffset) {
-            var width = 0;
-            for (var charIndex = 0; charIndex < line.length; charIndex++) {
-                var _char = line[charIndex];
-                if (!_char.match(/\s/)) {
-                    width += this.__charBounds[lineIndex][charIndex + charOffset].kernedWidth;
-                }
-            }
-            return width;
         },
         getHeightOfLine: function(lineIndex) {
             if (this.__lineHeights[lineIndex]) {
@@ -10483,22 +10485,28 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
             charOffset = charOffset || 0;
-            var lineHeight = this.getHeightOfLine(lineIndex), actualStyle, nextStyle, charsToRender = "", styleChanged, charBox, boxWidth = 0;
+            var lineHeight = this.getHeightOfLine(lineIndex), actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender;
             ctx.save();
             top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-            for (var i = charOffset, len = line.length + charOffset; i < len; i++) {
+            for (var i = charOffset, len = line.length + charOffset - 1; i <= len; i++) {
+                timeToRender = i === len || this.charSpacing;
                 charsToRender += line[i - charOffset];
                 charBox = this.__charBounds[lineIndex][i - charOffset];
                 if (boxWidth === 0) {
                     left += charBox.kernedWidth - charBox.width;
                 }
                 boxWidth += charBox.kernedWidth;
-                if (!this.charSpacing) {
+                if (this.textAlign === "justify" && !timeToRender) {
+                    if (this._reSpacesAndTabs.test(line[i - charOffset])) {
+                        timeToRender = true;
+                    }
+                }
+                if (!timeToRender) {
                     actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
                     nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-                    styleChanged = this._hasStyleChanged(actualStyle, nextStyle);
+                    timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
                 }
-                if (this.charSpacing || styleChanged || i === len - 1) {
+                if (timeToRender) {
                     this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
                     charsToRender = "";
                     actualStyle = nextStyle;
@@ -10537,8 +10545,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _clearCache: function() {
             this.__lineWidths = [];
             this.__lineHeights = [];
-            this.__widthOfSpaces = [];
-            this.__wordsCount = [];
+            this.__numberOfSpaces = [];
             this.__charBounds = [];
         },
         _shouldClearDimensionCache: function() {
@@ -10554,9 +10561,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         getLineWidth: function(lineIndex) {
             if (this.__lineWidths[lineIndex]) {
-                return this.textAlign === "justify" && this.__wordsCount[lineIndex] > 1 ? this.width : this.__lineWidths[lineIndex];
+                return this.__lineWidths[lineIndex];
             }
-            var width, wordCount, line = this._textLines[lineIndex], lineInfo;
+            var width, line = this._textLines[lineIndex], lineInfo;
             if (line === "") {
                 width = 0;
             } else {
@@ -10564,11 +10571,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 width = lineInfo.width;
             }
             this.__lineWidths[lineIndex] = width;
-            this.__widthOfSpaces[lineIndex] = lineInfo.widthOfSpaces;
-            if (width) {
-                wordCount = line.join("").split(this._reSpacesAndTabs);
-                this.__wordsCount[lineIndex] = wordCount.length;
-            }
+            this.__numberOfSpaces[lineIndex] = lineInfo.numberOfSpaces;
             return width;
         },
         _getWidthOfCharSpacing: function() {
@@ -10642,15 +10645,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.callSuper("render", ctx, noTransform);
         },
         _splitTextIntoLines: function(text) {
-            var lines = text.split(this._reNewline), newLine = [ "\n" ], newText = [];
+            var lines = text.split(this._reNewline), newLines = new Array(lines.length), newLine = [ "\n" ], newText = [];
             for (var i = 0; i < lines.length; i++) {
-                lines[i] = fabric.util.string.graphemeSplit(lines[i]);
-                newText = newText.concat(lines[i], newLine);
+                newLines[i] = fabric.util.string.graphemeSplit(lines[i]);
+                newText = newText.concat(newLines[i], newLine);
             }
             newText.pop();
             return {
                 lines: lines,
-                graphemeArray: newText
+                graphemeText: newText,
+                graphemeLines: newLines
             };
         },
         toObject: function(propertiesToInclude) {
@@ -11801,6 +11805,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
         } else {
             return;
         }
+        e.stopImmediatePropagation();
+        e.preventDefault();
         if (e.keyCode >= 33 && e.keyCode <= 40) {
             this.clearContextTop();
             this.renderCursorOrSelection();
@@ -11823,11 +11829,12 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onInput: function(e) {
+        debugger;
         e.stopPropagation();
         if (!this.isEditing) {
             return;
         }
-        var nextText = this._splitTextIntoLines(e.target.value).graphemeArray, charCount = this._text.length, nextCharCount = nextText.length, removedText, insertedText, charDiff = nextCharCount - charCount;
+        var nextText = this._splitTextIntoLines(e.target.value).graphemeText, charCount = this._text.length, nextCharCount = nextText.length, removedText, insertedText, charDiff = nextCharCount - charCount;
         if (e.target.value === "") {
             this.styles = {};
             this.updateFromTextArea();
@@ -12179,8 +12186,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             this.dynamicMinWidth = 0;
             var newText = this._splitTextIntoLines(this.text);
-            this._textLines = newText.lines;
-            this._text = newText.graphemeArray;
+            this._textLines = newText.graphemeLines;
+            this._text = newText.graphemeText;
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
@@ -12190,11 +12197,11 @@ fabric.util.object.extend(fabric.IText.prototype, {
         _generateStyleMap: function(textInfo) {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
             for (var i = 0; i < textInfo.lines.length; i++) {
-                if (textInfo.graphemeArray[charCount] === "\n" && i > 0) {
+                if (textInfo.graphemeText[charCount] === "\n" && i > 0) {
                     realLineCharCount = 0;
                     charCount++;
                     realLineCount++;
-                } else if (textInfo.graphemeArray[charCount] === " " && i > 0) {
+                } else if (textInfo.graphemeText[charCount] === " " && i > 0) {
                     realLineCharCount++;
                     charCount++;
                 }

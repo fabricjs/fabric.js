@@ -93,8 +93,8 @@
       this.dynamicMinWidth = 0;
       // wrap lines
       var newText = this._splitTextIntoLines(this.text);
-      this._textLines = newText.lines;
-      this._text = newText.graphemeArray;
+      this._textLines = newText.graphemeLines;
+      this._text = newText.graphemeText;
 
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
@@ -120,12 +120,12 @@
           map               = {};
 
       for (var i = 0; i < textInfo.lines.length; i++) {
-        if (textInfo.graphemeArray[charCount] === '\n' && i > 0) {
+        if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (textInfo.graphemeArray[charCount] === ' ' && i > 0) {
+        else if (textInfo.graphemeText[charCount] === ' ' && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;

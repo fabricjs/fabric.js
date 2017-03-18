@@ -84,8 +84,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else {
       return;
     }
-    // e.stopImmediatePropagation();
-    // e.preventDefault();
+    e.stopImmediatePropagation();
+    e.preventDefault();
     if (e.keyCode >= 33 && e.keyCode <= 40) {
       // if i press an arrow key just update selection
       this.clearContextTop();
@@ -123,12 +123,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
+    debugger
     e.stopPropagation();
     if (!this.isEditing) {
       return;
     }
     // decisions about style changes.
-    var nextText = this._splitTextIntoLines(e.target.value).graphemeArray,
+    var nextText = this._splitTextIntoLines(e.target.value).graphemeText,
         charCount = this._text.length,
         nextCharCount = nextText.length,
         removedText, insertedText,
