@@ -77,11 +77,18 @@
     _reNewline: /\r?\n/,
 
     /**
-     * Use this regular expression to filter for whitespace that is not a new line.
+     * Use this regular expression to filter for whitespaces that is not a new line.
      * Mostly used when text is 'justify' aligned.
      * @private
      */
     _reSpacesAndTabs: /[ \t\r]/g,
+
+    /**
+     * Use this regular expression to filter for whitespace that is not a new line.
+     * Mostly used when text is 'justify' aligned.
+     * @private
+     */
+    _reSpacesAndTab: /[ \t\r]/,
 
     /**
      * Use this regular expression to filter consecutive groups of non spaces.
@@ -539,18 +546,17 @@
      * Enlarge space boxes and shift the others
      */
     enlargeSpaces: function() {
-      var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound;
+      var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
-        if (currentLineWidth < this.width) {
-          console.log(this.textLines[i], this.textLines[i].match(this._reSpacesAndTabs))
-          numberOfSpaces = this.textLines[i].match(this._reSpacesAndTabs).length;
+        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+          numberOfSpaces = spaces.length;
           diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
           for (var j = 0, jlen = line.length; j <= jlen; j++) {
             charBound = this.__charBounds[i][j];
-            if (this._reSpacesAndTabs.test(line[j])) {
+            if (this._reSpacesAndTab.test(line[j])) {
               charBound.width += diffSpace;
               charBound.kernedWidth += diffSpace;
               charBound.left += accumulatedSpace;
@@ -1150,7 +1156,7 @@
         }
         boxWidth += charBox.kernedWidth;
         if (this.textAlign === 'justify' && !timeToRender) {
-          if (this._reSpacesAndTabs.test(line[i - charOffset])) {
+          if (this._reSpacesAndTab.test(line[i - charOffset])) {
             timeToRender = true;
           }
         }

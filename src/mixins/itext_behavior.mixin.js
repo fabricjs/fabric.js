@@ -457,8 +457,6 @@
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
-        this.hiddenTextarea.style.height = style.charHeight　* this.lineHeight + 'px';
-        //this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
       }
     },
 
@@ -475,12 +473,12 @@
           cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
-          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex) * this.lineHeight,
           leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {
             x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset
+            y: boundaries.top + boundaries.topOffset + charHeight
           },
           upperCanvas = this.canvas.upperCanvasEl,
           maxWidth = upperCanvas.width - charHeight,
@@ -488,7 +486,6 @@
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
-
       if (p.x < 0) {
         p.x = 0;
       }
@@ -613,9 +610,7 @@
           for (i = charEnd; i < this._textLines[lineEnd].length; i++) {
             styleObj = this.styles[lineEnd][i];
             if (styleObj) {
-              if (!this.styles[lineStart]) {
-                this.styles[lineStart] = { };
-              }
+              this.styles[lineStart] || (this.styles[lineStart] = { });
               this.styles[lineStart][charStart + i - charEnd] = styleObj;
             }
           }

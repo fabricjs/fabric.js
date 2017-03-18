@@ -21323,11 +21323,18 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     _reNewline: /\r?\n/,
 
     /**
-     * Use this regular expression to filter for whitespace that is not a new line.
+     * Use this regular expression to filter for whitespaces that is not a new line.
      * Mostly used when text is 'justify' aligned.
      * @private
      */
     _reSpacesAndTabs: /[ \t\r]/g,
+
+    /**
+     * Use this regular expression to filter for whitespace that is not a new line.
+     * Mostly used when text is 'justify' aligned.
+     * @private
+     */
+    _reSpacesAndTab: /[ \t\r]/,
 
     /**
      * Use this regular expression to filter consecutive groups of non spaces.
@@ -21785,18 +21792,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Enlarge space boxes and shift the others
      */
     enlargeSpaces: function() {
-      var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound;
+      var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
-        if (currentLineWidth < this.width) {
-          console.log(this.textLines[i], this.textLines[i].match(this._reSpacesAndTabs))
-          numberOfSpaces = this.textLines[i].match(this._reSpacesAndTabs).length;
+        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+          numberOfSpaces = spaces.length;
           diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
           for (var j = 0, jlen = line.length; j <= jlen; j++) {
             charBound = this.__charBounds[i][j];
-            if (this._reSpacesAndTabs.test(line[j])) {
+            if (this._reSpacesAndTab.test(line[j])) {
               charBound.width += diffSpace;
               charBound.kernedWidth += diffSpace;
               charBound.left += accumulatedSpace;
@@ -22396,7 +22402,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
         boxWidth += charBox.kernedWidth;
         if (this.textAlign === 'justify' && !timeToRender) {
-          if (this._reSpacesAndTabs.test(line[i - charOffset])) {
+          if (this._reSpacesAndTab.test(line[i - charOffset])) {
             timeToRender = true;
           }
         }
@@ -24030,8 +24036,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
-        this.hiddenTextarea.style.height = style.charHeight　* this.lineHeight + 'px';
-        //this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
       }
     },
 
@@ -24048,12 +24052,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
-          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex) * this.lineHeight,
           leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {
             x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset
+            y: boundaries.top + boundaries.topOffset + charHeight
           },
           upperCanvas = this.canvas.upperCanvasEl,
           maxWidth = upperCanvas.width - charHeight,
@@ -24061,7 +24065,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
-
       if (p.x < 0) {
         p.x = 0;
       }
@@ -24186,9 +24189,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           for (i = charEnd; i < this._textLines[lineEnd].length; i++) {
             styleObj = this.styles[lineEnd][i];
             if (styleObj) {
-              if (!this.styles[lineStart]) {
-                this.styles[lineStart] = { };
-              }
+              this.styles[lineStart] || (this.styles[lineStart] = { });
               this.styles[lineStart][charStart + i - charEnd] = styleObj;
             }
           }
@@ -24667,9 +24668,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('spellcheck', 'false');
 
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left +
-    '; z-index: -999; opacity: 0; width: 2px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: ' +
-    style.fontSize + ';';
+    this.hiddenTextarea.style.cssText = 'white-space: nowrap; position: absolute; top: ' + style.top +
+    '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
+    ' line-height: 1px; paddingｰtop: ' + style.fontSize + ';';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -24824,7 +24825,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Composition start
    */
   onCompositionStart: function() {
-    console.log(e)
     this.inCompositionMode = true;
   },
 
@@ -24832,7 +24832,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Composition end
    */
   onCompositionEnd: function() {
-    console.log(e)
     this.inCompositionMode = false;
   },
 
@@ -24840,7 +24839,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   //  * Composition update
   //  */
   onCompositionUpdate: function(e) {
-    console.log(e)
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();

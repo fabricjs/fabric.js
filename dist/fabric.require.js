@@ -10074,6 +10074,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _dimensionAffectingProps: [ "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "text", "charSpacing", "textAlign" ],
         _reNewline: /\r?\n/,
         _reSpacesAndTabs: /[ \t\r]/g,
+        _reSpacesAndTab: /[ \t\r]/,
         _reWords: /\S+/g,
         type: "text",
         fontSize: 40,
@@ -10179,18 +10180,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.height = this.calcTextHeight();
         },
         enlargeSpaces: function() {
-            var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound;
+            var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
             for (var i = 0, len = this._textLines.length; i < len; i++) {
                 accumulatedSpace = 0;
                 line = this._textLines[i];
                 currentLineWidth = this.getLineWidth(i);
-                if (currentLineWidth < this.width) {
-                    console.log(this.textLines[i], this.textLines[i].match(this._reSpacesAndTabs));
-                    numberOfSpaces = this.textLines[i].match(this._reSpacesAndTabs).length;
+                if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+                    numberOfSpaces = spaces.length;
                     diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
                     for (var j = 0, jlen = line.length; j <= jlen; j++) {
                         charBound = this.__charBounds[i][j];
-                        if (this._reSpacesAndTabs.test(line[j])) {
+                        if (this._reSpacesAndTab.test(line[j])) {
                             charBound.width += diffSpace;
                             charBound.kernedWidth += diffSpace;
                             charBound.left += accumulatedSpace;
@@ -10497,7 +10497,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
                 boxWidth += charBox.kernedWidth;
                 if (this.textAlign === "justify" && !timeToRender) {
-                    if (this._reSpacesAndTabs.test(line[i - charOffset])) {
+                    if (this._reSpacesAndTab.test(line[i - charOffset])) {
                         timeToRender = true;
                     }
                 }
@@ -11320,7 +11320,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 var style = this._calcTextareaPosition();
                 this.hiddenTextarea.style.left = style.left;
                 this.hiddenTextarea.style.top = style.top;
-                this.hiddenTextarea.style.height = style.charHeight * this.lineHeight + "px";
             }
         },
         _calcTextareaPosition: function() {
@@ -11330,9 +11329,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     y: 1
                 };
             }
-            var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
+            var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex) * this.lineHeight, leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
-                y: boundaries.top + boundaries.topOffset
+                y: boundaries.top + boundaries.topOffset + charHeight
             }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;
             p = fabric.util.transformPoint(p, m);
             p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
@@ -11428,9 +11427,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     for (i = charEnd; i < this._textLines[lineEnd].length; i++) {
                         styleObj = this.styles[lineEnd][i];
                         if (styleObj) {
-                            if (!this.styles[lineStart]) {
-                                this.styles[lineStart] = {};
-                            }
+                            this.styles[lineStart] || (this.styles[lineStart] = {});
                             this.styles[lineStart][charStart + i - charEnd] = styleObj;
                         }
                     }
@@ -11733,7 +11730,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea.setAttribute("autocomplete", "off");
         this.hiddenTextarea.setAttribute("spellcheck", "false");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 2px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: " + style.fontSize + ";";
+        this.hiddenTextarea.style.cssText = "white-space: nowrap; position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;" + " line-height: 1px; paddingｰtop: " + style.fontSize + ";";
         fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
@@ -11836,15 +11833,12 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onCompositionStart: function() {
-        console.log(e);
         this.inCompositionMode = true;
     },
     onCompositionEnd: function() {
-        console.log(e);
         this.inCompositionMode = false;
     },
     onCompositionUpdate: function(e) {
-        console.log(e);
         this.compositionStart = e.target.selectionStart;
         this.compositionEnd = e.target.selectionEnd;
         this.updateTextareaPosition();
