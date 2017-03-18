@@ -11146,17 +11146,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this._updateTextarea();
         },
         getSelectedText: function() {
-            return this.text.slice(this.selectionStart, this.selectionEnd);
+            return this._text.slice(this.selectionStart, this.selectionEnd).join("");
         },
         findWordBoundaryLeft: function(startFrom) {
             var offset = 0, index = startFrom - 1;
-            if (this._reSpace.test(this.text.charAt(index))) {
-                while (this._reSpace.test(this.text.charAt(index))) {
+            if (this._reSpace.test(this._text[index])) {
+                while (this._reSpace.test(this._text[index])) {
                     offset++;
                     index--;
                 }
             }
-            while (/\S/.test(this.text.charAt(index)) && index > -1) {
+            while (/\S/.test(this._text[index]) && index > -1) {
                 offset++;
                 index--;
             }
@@ -11164,13 +11164,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         findWordBoundaryRight: function(startFrom) {
             var offset = 0, index = startFrom;
-            if (this._reSpace.test(this.text.charAt(index))) {
-                while (this._reSpace.test(this.text.charAt(index))) {
+            if (this._reSpace.test(this._text[index])) {
+                while (this._reSpace.test(this._text[index])) {
                     offset++;
                     index++;
                 }
             }
-            while (/\S/.test(this.text.charAt(index)) && index < this.text.length) {
+            while (/\S/.test(this._text[index]) && index < this.text.length) {
                 offset++;
                 index++;
             }
@@ -11178,7 +11178,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         findLineBoundaryLeft: function(startFrom) {
             var offset = 0, index = startFrom - 1;
-            while (!/\n/.test(this.text.charAt(index)) && index > -1) {
+            while (!/\n/.test(this._text[index]) && index > -1) {
                 offset++;
                 index--;
             }
@@ -11186,20 +11186,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         findLineBoundaryRight: function(startFrom) {
             var offset = 0, index = startFrom;
-            while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
+            while (!/\n/.test(this._text[index]) && index < this.text.length) {
                 offset++;
                 index++;
             }
             return startFrom + offset;
-        },
-        getNumNewLinesInSelectedText: function() {
-            var selectedText = this.getSelectedText(), numNewLines = 0;
-            for (var i = 0, len = selectedText.length; i < len; i++) {
-                if (selectedText[i] === "\n") {
-                    numNewLines++;
-                }
-            }
-            return numNewLines;
         },
         searchWordBoundary: function(selectionStart, direction) {
             var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart, _char = this.text.charAt(index), reNonWord = /[ \n\.,;!\?\-]/;
@@ -11330,7 +11321,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 this.hiddenTextarea.style.left = style.left;
                 this.hiddenTextarea.style.top = style.top;
                 this.hiddenTextarea.style.height = style.charHeight * this.lineHeight + "px";
-                this.hiddenTextarea.style.paddingTop = style.charHeight * this.lineHeight + "px";
             }
         },
         _calcTextareaPosition: function() {
@@ -11426,14 +11416,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
             }
         },
-        _removeCharsFromTo: function(start, end) {
-            while (end !== start) {
-                this._removeSingleCharAndStyle(start + 1);
-                end--;
-            }
-            this.selectionStart = start;
-            this.selectionEnd = start;
-        },
         removeStyleFromTo: function(start, end) {
             var cursorStart = this.get2DCursorLocation(start), cursorEnd = this.get2DCursorLocation(end), lineStart = cursorStart.lineIndex, charStart = cursorStart.charIndex, lineEnd = cursorEnd.lineIndex, charEnd = cursorEnd.charIndex, i, styleObj;
             if (lineStart !== lineEnd) {
@@ -11484,10 +11466,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     }
                 }
             }
-        },
-        removeStyleObject: function(isBeginningOfLine, index) {
-            var cursorLocation = this.get2DCursorLocation(index), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex;
-            this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
         },
         restartCursorIfNeeded: function() {
             if (!this._currentTickState || this._currentTickState.isAborted || !this._currentTickCompleteState || this._currentTickCompleteState.isAborted) {
@@ -11568,9 +11546,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             addingChars && this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars);
             addingNewLines && this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines);
-        },
-        insertNewline: function() {
-            this.insertChars("\n");
         },
         setSelectionStartEndWithShift: function(start, end, newSelection) {
             if (newSelection <= start) {
@@ -11758,7 +11733,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.hiddenTextarea.setAttribute("autocomplete", "off");
         this.hiddenTextarea.setAttribute("spellcheck", "false");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: " + style.fontSize + ";";
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 2px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: " + style.fontSize + ";";
         fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
@@ -11829,7 +11804,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onInput: function(e) {
-        debugger;
         e.stopPropagation();
         if (!this.isEditing) {
             return;
@@ -11862,24 +11836,18 @@ fabric.util.object.extend(fabric.IText.prototype, {
         this.canvas && this.canvas.renderAll();
     },
     onCompositionStart: function() {
+        console.log(e);
         this.inCompositionMode = true;
     },
     onCompositionEnd: function() {
+        console.log(e);
         this.inCompositionMode = false;
     },
     onCompositionUpdate: function(e) {
+        console.log(e);
         this.compositionStart = e.target.selectionStart;
         this.compositionEnd = e.target.selectionEnd;
         this.updateTextareaPosition();
-    },
-    forwardDelete: function(e) {
-        if (this.selectionStart === this.selectionEnd) {
-            if (this.selectionStart === this.text.length) {
-                return;
-            }
-            this.moveCursorRight(e);
-        }
-        this.removeChars(e);
     },
     copy: function(e) {
         if (this.selectionStart === this.selectionEnd) {

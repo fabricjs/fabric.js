@@ -12,10 +12,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left +
-    '; z-index: -999; opacity: 0; width: 0.1px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: ' +
+    '; z-index: -999; opacity: 0; width: 2px; height: 0.1px; font-size: 1px; line-height: 1px; paddingｰtop: ' +
     style.fontSize + ';';
     fabric.document.body.appendChild(this.hiddenTextarea);
-
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
@@ -123,7 +122,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    debugger
     e.stopPropagation();
     if (!this.isEditing) {
       return;
@@ -170,6 +168,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Composition start
    */
   onCompositionStart: function() {
+    console.log(e)
     this.inCompositionMode = true;
   },
 
@@ -177,6 +176,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Composition end
    */
   onCompositionEnd: function() {
+    console.log(e)
     this.inCompositionMode = false;
   },
 
@@ -184,22 +184,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   //  * Composition update
   //  */
   onCompositionUpdate: function(e) {
+    console.log(e)
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();
-  },
-
-  /**
-   * Forward delete
-   */
-  forwardDelete: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      if (this.selectionStart === this.text.length) {
-        return;
-      }
-      this.moveCursorRight(e);
-    }
-    this.removeChars(e);
   },
 
   /**

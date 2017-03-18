@@ -181,7 +181,7 @@
      * @return {String}
      */
     getSelectedText: function() {
-      return this.text.slice(this.selectionStart, this.selectionEnd);
+      return this._text.slice(this.selectionStart, this.selectionEnd).join('');
     },
 
     /**
@@ -193,13 +193,13 @@
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
-      if (this._reSpace.test(this.text.charAt(index))) {
-        while (this._reSpace.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this._text[index])) {
+        while (this._reSpace.test(this._text[index])) {
           offset++;
           index--;
         }
       }
-      while (/\S/.test(this.text.charAt(index)) && index > -1) {
+      while (/\S/.test(this._text[index]) && index > -1) {
         offset++;
         index--;
       }
@@ -216,13 +216,13 @@
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
-      if (this._reSpace.test(this.text.charAt(index))) {
-        while (this._reSpace.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this._text[index])) {
+        while (this._reSpace.test(this._text[index])) {
           offset++;
           index++;
         }
       }
-      while (/\S/.test(this.text.charAt(index)) && index < this.text.length) {
+      while (/\S/.test(this._text[index]) && index < this.text.length) {
         offset++;
         index++;
       }
@@ -238,7 +238,7 @@
     findLineBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
-      while (!/\n/.test(this.text.charAt(index)) && index > -1) {
+      while (!/\n/.test(this._text[index]) && index > -1) {
         offset++;
         index--;
       }
@@ -254,28 +254,12 @@
     findLineBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
 
-      while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
+      while (!/\n/.test(this._text[index]) && index < this.text.length) {
         offset++;
         index++;
       }
 
       return startFrom + offset;
-    },
-
-    /**
-     * Returns number of newlines in selected text
-     * @return {Number} Number of newlines in selected text
-     */
-    getNumNewLinesInSelectedText: function() {
-      var selectedText = this.getSelectedText(),
-          numNewLines  = 0;
-
-      for (var i = 0, len = selectedText.length; i < len; i++) {
-        if (selectedText[i] === '\n') {
-          numNewLines++;
-        }
-      }
-      return numNewLines;
     },
 
     /**
@@ -474,7 +458,7 @@
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
         this.hiddenTextarea.style.height = style.charHeight　* this.lineHeight + 'px';
-        this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
+        //this.hiddenTextarea.style.paddingTop = style.charHeight　* this.lineHeight + 'px';
       }
     },
 
@@ -605,18 +589,6 @@
     },
 
     /**
-     * @private
-     */
-    _removeCharsFromTo: function(start, end) {
-      while (end !== start) {
-        this._removeSingleCharAndStyle(start + 1);
-        end--;
-      }
-      this.selectionStart = start;
-      this.selectionEnd = start;
-    },
-
-    /**
      * remove and reflow a style block from start to end.
      * @param {Number} start linear start position for removal (included in removal)
      * @param {Number} end linear end position for removal ( excluded from removal )
@@ -693,20 +665,6 @@
         }
       }
       //TODO: evaluate if delete old style lines with offset -1
-    },
-
-    /**
-     * Removes style object
-     * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
-     * @param {Number} [index] Optional index. When not given, current selectionStart is used.
-     */
-    removeStyleObject: function(isBeginningOfLine, index) {
-
-      var cursorLocation = this.get2DCursorLocation(index),
-          lineIndex      = cursorLocation.lineIndex,
-          charIndex      = cursorLocation.charIndex;
-
-      this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
     },
 
     restartCursorIfNeeded: function() {
@@ -830,13 +788,6 @@
       }
       addingChars && this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars);
       addingNewLines && this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines);
-    },
-
-    /**
-     * Inserts new line
-     */
-    insertNewline: function() {
-      this.insertChars('\n');
     },
 
     /**
