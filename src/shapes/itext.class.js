@@ -484,12 +484,11 @@
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-      console.log(offsets);
       if (this.isRTL) {
         return {
           left: left,
           top: top,
-          leftOffset:  this.width- offsets.lineLeft,
+          leftOffset: -  offsets.left*2,
           topOffset: offsets.top
         };
     } else {
@@ -555,14 +554,13 @@
      */
     
     renderCursor: function(boundaries, ctx) {
-
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
-                    : boundaries.leftOffset,
+                    ? this.width + boundaries.leftOffset / 2
+                    : + this.width + boundaries.leftOffset / 2,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
           
@@ -570,7 +568,7 @@
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        this.isRTL ? -boundaries.left -leftOffset + cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2,
+        boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);

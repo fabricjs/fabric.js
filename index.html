@@ -12,27 +12,26 @@
 
     <style>
         body {
-          width: 700px;
-          margin:0 auto;
+          width: 1250px;
+          margin:20px auto;
+        }
+        textarea, input {
+          direction: rtl !important;
+        }
+        .left {
+          float: left;
+          width:50%;
         }
     
     </style>
   </head>
-  <body class="demo">
-<div class="example">
-  <h3>Right aligned</h3>
-  <canvas id="c" dir="rtl" width="600" height="300" style="border: 1px solid #ccc"></canvas>
+  <body>
+<div class="left">
+  <canvas id="c" dir="rtl" width="600" height="450" style="border: 1px solid #ccc"></canvas>
 </div>
-<div>
-    <style>
-    textarea {
-      text-align: right;
-      direction: rtl;
-    }
-    </style>
-    <br>  
-  <textarea cols="90" rows="20" dir=rtl id=textarea></textarea>
-
+<div class=left>
+  <textarea  cols="90" rows="30" dir=rtl id=textarea></textarea>
+</div>
 
         <script>
  //       fabric.Object.prototype.padding = 5;
@@ -40,26 +39,36 @@
 
 
 var canvas = new fabric.Canvas('c');
+
 var ta = document.getElementById('textarea');
 
 var strings = [
-  'יא גבר? hi ma nishma??',
-  'עוד 14 shalom !! עוד עוד',
+ // 'יא גבר? hi ma nishma??',
+ // 'עוד 14 shalom !! עוד עוד',
   'היי :) מה נשמע? :)',
-  'ספירה 1 2 3 4 5',
-  'זה גדול!!!',
-  'אולי    כדאי לעשות some      tests',
-  'אולי ??? כדאי לעשות some  ???  tests',
-  'happy birthday! יובל בת 16!',
-  'זה! פשוט awesome!'
+ // 'ספירה 1 2 3 4 5',
+  //'זה גדול!!!',
+  //'אולי    כדאי לעשות some      tests',
+  //'אולי ??? כדאי לעשות some  ???  tests',
+//  'happy birthday! יובל בת 16!',
+  'זה! פשוט awesome!',
+  //  '25.01.2017',
+    '{[ ]מזל { } | < > טוב #4',
+    'ליאורי #1',
+    '100₪ שלום. 4.5 1.01  כיתה א׳ליאורי #1',
+    '100$ שלום. 4.5 1.01  כיתה א׳ליאורי #1',
+    '100% ֿ 12/13/70',
+    //'20-1#3$4%4.3/3',
+    'מזל טוב ( : 01.07.79'
+    
 ];
 
 for (let i=0 ; i < strings.length; i++ ) {
   canvas.add(new fabric.IText(strings[i], {
     left: 500,
-    top: 30*i ,
+    top: 25*i ,
     fontFamily: 'Hoefler Text',
-    fontSize: 20,
+    fontSize: 18,
     padding: 7,
     textAlign: 'right',
     originX: 'right',
@@ -72,11 +81,6 @@ for (let i=0 ; i < strings.length; i++ ) {
 
 
 }
-</script>
-
-
-<script>
-
 </script>
     </body>
 </html>

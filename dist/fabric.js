@@ -23757,15 +23757,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       else {
         if (this.isRTL) {
         if (chars) {
-          var specialChars = [32, 33, 58, 40, 41, 63 ];
+          var neutralCharCodes = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 
+          58, 59, 60, 61, 62, 63, 64];
+          var numbersCharCodes = [48, 49, 50, 51, 52, 53 ,54 ,55 ,56 ,57];
+
           var dic = [];
           chars = chars.split('');
           //replace chars 40 with 41 and vise versa
           for (var i=0; i < chars.length; i++) {
             if (chars[i].charCodeAt(0) === 40)
               chars[i] = String.fromCharCode(41);
-              else if (chars[i].charCodeAt(0) === 41)
+            else if (chars[i].charCodeAt(0) === 41)
               chars[i] = String.fromCharCode(40);
+            
+            if (chars[i].charCodeAt(0) === 60)
+              chars[i] = String.fromCharCode(62);
+            else if (chars[i].charCodeAt(0) === 62)
+              chars[i] = String.fromCharCode(60);
           }
 
           var lastSet = 'ltr';
@@ -23774,7 +23782,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (
               (chars[i].charCodeAt(0) >= 1488 && chars[i].charCodeAt(0) <= 1514)
               ||
-              (chars[i].charCodeAt(0) >= 48 && chars[i].charCodeAt(0) <= 57)
+              (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1)
             ) {
               if (lastSet !== 'rtl') {
                 dic.push({
@@ -23785,7 +23793,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 dic[dic.length-1].chars.push(chars[i]);
               }
               lastSet = 'rtl';
-            } else if (specialChars.indexOf(chars[i].charCodeAt(0)) > -1) {
+            } else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
               if (lastSet !== 'other') {
                 dic.push({
                     dir: 'other',
@@ -23825,12 +23833,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
               dic.splice(i, 1);
               dic.splice(i-1, 1);
               i--;
-            } else if (dic[i-1].dir === 'other' && dic[i].dir === 'other') {
+            }
+            else if (dic[i-2].dir === 'rtl' && dic[i-1].dir === 'other' && dic[i].dir === 'rtl') {
+              dic[i-2].chars = dic[i-2].chars.concat(dic[i-1].chars);
+              dic[i-2].chars = dic[i-2].chars.concat(dic[i].chars);
+              dic.splice(i, 1);
+              dic.splice(i-1, 1);
+              i--;
+            }
+            else if (dic[i-1].dir === 'other' && dic[i].dir === 'other') {
               dic[i-1].chars = dic[i].chars.concat(dic[i-1].chars);
               dic.splice(i, 1);
             }
           }
-          }
+        }
+        
           for (var i = dic.length-1, len = 0; i >= len; i--) {
             if (dic[i].dir === 'rtl') {
                 var str = dic[i].chars.join('');
@@ -25049,12 +25066,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-      console.log(offsets);
       if (this.isRTL) {
         return {
           left: left,
           top: top,
-          leftOffset:  this.width- offsets.lineLeft,
+          leftOffset: -  offsets.left*2,
           topOffset: offsets.top
         };
     } else {
@@ -25120,14 +25136,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     
     renderCursor: function(boundaries, ctx) {
-
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
-                    : boundaries.leftOffset,
+                    ? this.width + boundaries.leftOffset / 2
+                    : + this.width + boundaries.leftOffset / 2,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
           
@@ -25135,7 +25150,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
-        this.isRTL ? -boundaries.left -leftOffset + cursorWidth / 2 : boundaries.left + leftOffset - cursorWidth / 2,
+        boundaries.left + leftOffset - cursorWidth / 2,
         boundaries.top + boundaries.topOffset,
         cursorWidth,
         charHeight);

@@ -812,7 +812,7 @@
      * @type Boolean
      * @default false
      */
-    isRTL: false,
+    isRTL: true,
     /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
