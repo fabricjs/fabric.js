@@ -10997,7 +10997,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 if (i >= startLine && i < endLine) {
                     boxEnd = this.getLineWidth(i) || 5;
                 } else if (i === endLine) {
-                    boxEnd = this.__charBounds[endLine][endChar].left;
+                    boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
                 }
                 realLineHeight = lineHeight;
                 if (this.lineHeight < 1 || i === endLine && this.lineHeight > 1) {
