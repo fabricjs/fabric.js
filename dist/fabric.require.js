@@ -11141,7 +11141,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         selectAll: function() {
             this.selectionStart = 0;
-            this.selectionEnd = this.text.length;
+            this.selectionEnd = this._text.length;
             this._fireSelectionChanged();
             this._updateTextarea();
         },
@@ -11230,6 +11230,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.isEditing = true;
             this.initHiddenTextarea(e);
             this.hiddenTextarea.focus();
+            this.hiddenTextarea.value = this.text;
             this._updateTextarea();
             this._saveEditingProps();
             this._setEditingProps();
@@ -11291,15 +11292,43 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.hasControls = this.selectable = false;
             this.lockMovementX = this.lockMovementY = true;
         },
+        fromStringToGraphemeSelection: function(start, end) {
+            var smallerTextEnd = this.text.slice(0, end), graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+            if (start === end) {
+                return {
+                    selectionStart: graphemeEnd,
+                    selectionEnd: graphemeEnd
+                };
+            }
+            var smallerTextStart = smallerTextEnd.slice(0, start), graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+            return {
+                selectionStart: graphemeStart,
+                selectionEnd: graphemeEnd
+            };
+        },
+        fromGraphemeToStringSelection: function(start, end) {
+            var smallerTextEnd = this._text.slice(0, end), graphemeEnd = smallerTextEnd.join("").length;
+            if (start === end) {
+                return {
+                    selectionStart: graphemeEnd,
+                    selectionEnd: graphemeEnd
+                };
+            }
+            var smallerTextStart = smallerTextEnd.slice(0, start), graphemeStart = smallerTextStart.join("").length;
+            return {
+                selectionStart: graphemeStart,
+                selectionEnd: graphemeEnd
+            };
+        },
         _updateTextarea: function() {
             this.cursorOffsetCache = {};
             if (!this.hiddenTextarea) {
                 return;
             }
             if (!this.inCompositionMode) {
-                this.hiddenTextarea.value = this.text;
-                this.hiddenTextarea.selectionStart = this.selectionStart;
-                this.hiddenTextarea.selectionEnd = this.selectionEnd;
+                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd);
+                this.hiddenTextarea.selectionStart = newSelection.selectionStart;
+                this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
             }
             this.updateTextareaPosition();
         },
@@ -11309,9 +11338,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             this.cursorOffsetCache = {};
             this.text = this.hiddenTextarea.value;
-            this.selectionEnd = this.selectionStart = this.hiddenTextarea.selectionEnd;
+            var newSelection = this.fromStringToGraphemeSelection(this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd);
+            this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
             if (!this.inCompositionMode) {
-                this.selectionStart = this.hiddenTextarea.selectionStart;
+                this.selectionStart = newSelection.selectionStart;
             }
             this.updateTextareaPosition();
         },
