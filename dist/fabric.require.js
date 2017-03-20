@@ -11293,31 +11293,31 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.lockMovementX = this.lockMovementY = true;
         },
         fromStringToGraphemeSelection: function(start, end) {
-            var smallerTextEnd = this.text.slice(0, end), graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+            var smallerTextStart = this.text.slice(0, start), graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
             if (start === end) {
                 return {
-                    selectionStart: graphemeEnd,
-                    selectionEnd: graphemeEnd
+                    selectionStart: graphemeStart,
+                    selectionEnd: graphemeStart
                 };
             }
-            var smallerTextStart = smallerTextEnd.slice(0, start), graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+            var smallerTextEnd = this.text.slice(start, end), graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
             return {
                 selectionStart: graphemeStart,
-                selectionEnd: graphemeEnd
+                selectionEnd: graphemeStart + graphemeEnd
             };
         },
         fromGraphemeToStringSelection: function(start, end) {
-            var smallerTextEnd = this._text.slice(0, end), graphemeEnd = smallerTextEnd.join("").length;
+            var smallerTextStart = this._text.slice(0, start), graphemeStart = smallerTextStart.join("").length;
             if (start === end) {
                 return {
-                    selectionStart: graphemeEnd,
-                    selectionEnd: graphemeEnd
+                    selectionStart: graphemeStart,
+                    selectionEnd: graphemeStart
                 };
             }
-            var smallerTextStart = smallerTextEnd.slice(0, start), graphemeStart = smallerTextStart.join("").length;
+            var smallerTextEnd = this._text.slice(start, end), graphemeEnd = smallerTextEnd.join("").length;
             return {
                 selectionStart: graphemeStart,
-                selectionEnd: graphemeEnd
+                selectionEnd: graphemeStart + graphemeEnd
             };
         },
         _updateTextarea: function() {

@@ -24002,28 +24002,28 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * convert from textarea to grapheme indexes
      */
     fromStringToGraphemeSelection: function(start, end) {
-      var smallerTextEnd = this.text.slice(0, end),
-          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
-      if (start === end) {
-        return { selectionStart: graphemeEnd, selectionEnd: graphemeEnd };
-      }
-      var smallerTextStart = smallerTextEnd.slice(0, start),
+      var smallerTextStart = this.text.slice(0, start),
           graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
-      return { selectionStart: graphemeStart, selectionEnd: graphemeEnd };
+      if (start === end) {
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+      }
+      var smallerTextEnd = this.text.slice(start, end),
+          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
 
     /**
      * convert from fabric to textarea values
      */
     fromGraphemeToStringSelection: function(start, end) {
-      var smallerTextEnd = this._text.slice(0, end),
-          graphemeEnd = smallerTextEnd.join('').length;
-      if (start === end) {
-        return { selectionStart: graphemeEnd, selectionEnd: graphemeEnd };
-      }
-      var smallerTextStart = smallerTextEnd.slice(0, start),
+      var smallerTextStart = this._text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
-      return { selectionStart: graphemeStart, selectionEnd: graphemeEnd };
+      if (start === end) {
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+      }
+      var smallerTextEnd = this._text.slice(start, end),
+          graphemeEnd = smallerTextEnd.join('').length;
+      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
 
     /**
