@@ -56,30 +56,30 @@
      * Inserts style object for a given line/char index
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
-     * @param {Object} [style] Style object to insert, if given
+     * @param {Number} quantity number Style object to insert, if given
      */
-    insertCharStyleObject: function(lineIndex, charIndex, style) {
+    insertCharStyleObject: function(lineIndex, charIndex, quantity) {
       // adjust lineIndex and charIndex
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
 
-      fabric.IText.prototype.insertCharStyleObject.apply(this, [lineIndex, charIndex, style]);
+      fabric.IText.prototype.insertCharStyleObject.call(this, lineIndex, charIndex, quantity);
     },
 
     /**
      * Inserts new style object
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
-     * @param {Boolean} isEndOfLine True if it's end of line
+     * @param {Number} qty how many lines are we adding
      */
-    insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+    insertNewlineStyleObject: function(lineIndex, charIndex, qty) {
       // adjust lineIndex and charIndex
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
 
-      fabric.IText.prototype.insertNewlineStyleObject.apply(this, [lineIndex, charIndex, isEndOfLine]);
+      fabric.IText.prototype.insertNewlineStyleObject.call(this, lineIndex, charIndex, qty);
     },
 
     /**
@@ -96,19 +96,5 @@
       lineIndex = map.line;
       fabric.IText.prototype.shiftLineStyles.call(this, lineIndex, offset);
     },
-
-    /**
-     * Removes style object
-     * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
-     * @param {Number} [index] Optional index. When not given, current selectionStart is used.
-     */
-    removeStyleObject: function(isBeginningOfLine, index) {
-
-      var cursorLocation = this.get2DCursorLocation(index),
-          map            = this._styleMap[cursorLocation.lineIndex],
-          lineIndex      = map.line,
-          charIndex      = map.offset + cursorLocation.charIndex;
-      this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
-    }
   });
 })();

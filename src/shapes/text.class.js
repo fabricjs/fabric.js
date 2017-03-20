@@ -1366,7 +1366,7 @@
           }
         }
         ctx.fillStyle = currentFill;
-        lastDecoration && currentFill && ctx.fillRect(
+        currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
           topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize,
           boxWidth,

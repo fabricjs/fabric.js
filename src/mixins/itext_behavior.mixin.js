@@ -775,7 +775,7 @@
         }
         else {
           if (addingNewLines) {
-            this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines, isEndOfLine);
+            this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines);
             addingNewLines = 0;
           }
           addingChars++;

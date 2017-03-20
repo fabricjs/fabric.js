@@ -89,10 +89,12 @@
       if (this.__skipDimension) {
         return;
       }
+      this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
       // wrap lines
       var newText = this._splitTextIntoLines(this.text);
+      this.textLines = newText.lines;
       this._textLines = newText.graphemeLines;
       this._text = newText.graphemeText;
       this._styleMap = this._generateStyleMap(newText);
@@ -101,7 +103,6 @@
         this._set('width', this.dynamicMinWidth);
       }
       // clear cache and re-calculate height
-      this._clearCache();
       this.height = this.calcTextHeight();
     },
 
