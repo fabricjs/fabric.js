@@ -22905,7 +22905,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.callSuper('_set', key, value);
 
       if (this._dimensionAffectingProps.indexOf(key) > -1) {
-        console.log('calling', key)
         this.initDimensions();
         this.setCoords();
       }
