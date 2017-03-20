@@ -26,7 +26,8 @@
     'fontStyle',
     'lineHeight',
     'textBackgroundColor',
-    'charSpacing'
+    'charSpacing',
+    'styles'
   );
 
   var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
@@ -68,7 +69,8 @@
       'lineHeight',
       'text',
       'charSpacing',
-      'textAlign'
+      'textAlign',
+      'styles',
     ],
 
     /**
@@ -88,7 +90,7 @@
      * Mostly used when text is 'justify' aligned.
      * @private
      */
-    _reSpacesAndTab: /[ \t\r]/,
+    _reSpaceAndTab: /[ \t\r]/,
 
     /**
      * Use this regular expression to filter consecutive groups of non spaces.
@@ -551,12 +553,12 @@
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
-        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpaceAndTabs))) {
           numberOfSpaces = spaces.length;
           diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
           for (var j = 0, jlen = line.length; j <= jlen; j++) {
             charBound = this.__charBounds[i][j];
-            if (this._reSpacesAndTab.test(line[j])) {
+            if (this._reSpaceAndTab.test(line[j])) {
               charBound.width += diffSpace;
               charBound.kernedWidth += diffSpace;
               charBound.left += accumulatedSpace;
@@ -1156,7 +1158,7 @@
         }
         boxWidth += charBox.kernedWidth;
         if (this.textAlign === 'justify' && !timeToRender) {
-          if (this._reSpacesAndTab.test(line[i - charOffset])) {
+          if (this._reSpaceAndTab.test(line[i - charOffset])) {
             timeToRender = true;
           }
         }
@@ -1259,6 +1261,7 @@
       if (shouldClear) {
         this.saveState({ propertySet: '_dimensionAffectingProps' });
         this.dirty = true;
+        this._forceClearCache = false;
       }
       return shouldClear;
     },
@@ -1656,6 +1659,7 @@
       this.callSuper('_set', key, value);
 
       if (this._dimensionAffectingProps.indexOf(key) > -1) {
+        console.log('calling', key)
         this.initDimensions();
         this.setCoords();
       }

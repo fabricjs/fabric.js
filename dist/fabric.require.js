@@ -10067,14 +10067,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
     }
     var stateProperties = fabric.Object.prototype.stateProperties.concat();
-    stateProperties.push("fontFamily", "fontWeight", "fontSize", "text", "underline", "overline", "linethrough", "textAlign", "fontStyle", "lineHeight", "textBackgroundColor", "charSpacing");
+    stateProperties.push("fontFamily", "fontWeight", "fontSize", "text", "underline", "overline", "linethrough", "textAlign", "fontStyle", "lineHeight", "textBackgroundColor", "charSpacing", "styles");
     var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
     cacheProperties.push("fontFamily", "fontWeight", "fontSize", "text", "underline", "overline", "linethrough", "textAlign", "fontStyle", "lineHeight", "textBackgroundColor", "charSpacing", "styles");
     fabric.Text = fabric.util.createClass(fabric.Object, {
-        _dimensionAffectingProps: [ "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "text", "charSpacing", "textAlign" ],
+        _dimensionAffectingProps: [ "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "text", "charSpacing", "textAlign", "styles" ],
         _reNewline: /\r?\n/,
         _reSpacesAndTabs: /[ \t\r]/g,
-        _reSpacesAndTab: /[ \t\r]/,
+        _reSpaceAndTab: /[ \t\r]/,
         _reWords: /\S+/g,
         type: "text",
         fontSize: 40,
@@ -10185,12 +10185,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 accumulatedSpace = 0;
                 line = this._textLines[i];
                 currentLineWidth = this.getLineWidth(i);
-                if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+                if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpaceAndTabs))) {
                     numberOfSpaces = spaces.length;
                     diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
                     for (var j = 0, jlen = line.length; j <= jlen; j++) {
                         charBound = this.__charBounds[i][j];
-                        if (this._reSpacesAndTab.test(line[j])) {
+                        if (this._reSpaceAndTab.test(line[j])) {
                             charBound.width += diffSpace;
                             charBound.kernedWidth += diffSpace;
                             charBound.left += accumulatedSpace;
@@ -10497,7 +10497,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
                 boxWidth += charBox.kernedWidth;
                 if (this.textAlign === "justify" && !timeToRender) {
-                    if (this._reSpacesAndTab.test(line[i - charOffset])) {
+                    if (this._reSpaceAndTab.test(line[i - charOffset])) {
                         timeToRender = true;
                     }
                 }
@@ -10556,6 +10556,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     propertySet: "_dimensionAffectingProps"
                 });
                 this.dirty = true;
+                this._forceClearCache = false;
             }
             return shouldClear;
         },
@@ -10733,6 +10734,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _set: function(key, value) {
             this.callSuper("_set", key, value);
             if (this._dimensionAffectingProps.indexOf(key) > -1) {
+                console.log("calling", key);
                 this.initDimensions();
                 this.setCoords();
             }
@@ -11516,6 +11518,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     }
                 }
             }
+            this._forceClearCache = true;
             if (!currentLineStyles) {
                 return;
             }
@@ -12150,6 +12153,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             var newText = this._splitTextIntoLines(this.text);
             this._textLines = newText.graphemeLines;
             this._text = newText.graphemeText;
+            this._styleMap = this._generateStyleMap(newText);
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
@@ -12163,7 +12167,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     realLineCharCount = 0;
                     charCount++;
                     realLineCount++;
-                } else if (textInfo.graphemeText[charCount] === " " && i > 0) {
+                } else if (this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
                     realLineCharCount++;
                     charCount++;
                 }
@@ -12176,16 +12180,16 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return map;
         },
-        _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
-            if (this._styleMap) {
+        _getStyleDeclaration: function(lineIndex, charIndex) {
+            if (this._styleMap && !this.isWrapping) {
                 var map = this._styleMap[lineIndex];
                 if (!map) {
-                    return returnCloneOrEmpty ? {} : null;
+                    return null;
                 }
                 lineIndex = map.line;
                 charIndex = map.offset + charIndex;
             }
-            return this.callSuper("_getStyleDeclaration", lineIndex, charIndex, returnCloneOrEmpty);
+            return this.callSuper("_getStyleDeclaration", lineIndex, charIndex);
         },
         _setStyleDeclaration: function(lineIndex, charIndex, style) {
             var map = this._styleMap[lineIndex];
@@ -12213,9 +12217,11 @@ fabric.util.object.extend(fabric.IText.prototype, {
         },
         _wrapText: function(lines) {
             var wrapped = [], i;
+            this.isWrapping = true;
             for (i = 0; i < lines.length; i++) {
                 wrapped = wrapped.concat(this._wrapLine(lines[i], i));
             }
+            this.isWrapping = false;
             return wrapped;
         },
         _measureWord: function(word, lineIndex, charOffset) {
@@ -12229,19 +12235,17 @@ fabric.util.object.extend(fabric.IText.prototype, {
             return width;
         },
         _wrapLine: function(_line, lineIndex) {
-            var lineWidth = 0, lines = [], line = [], words = _line.join("").split(" "), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
+            var lineWidth = 0, graphemeLines = [], line = [], words = _line.split(this._reSpaceAndTab), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
             for (var i = 0; i < words.length; i++) {
                 word = fabric.util.string.graphemeSplit(words[i]);
                 wordWidth = this._measureWord(word, lineIndex, offset);
                 offset += word.length;
                 lineWidth += infixWidth + wordWidth - additionalSpace;
                 if (lineWidth >= this.width && !lineJustStarted) {
-                    lines.push(line);
+                    graphemeLines.push(line);
                     line = [];
                     lineWidth = wordWidth;
                     lineJustStarted = true;
-                } else {
-                    lineWidth += additionalSpace;
                 }
                 if (!lineJustStarted) {
                     line.push(infix);
@@ -12254,17 +12258,23 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     largestWordWidth = wordWidth;
                 }
             }
-            i && lines.push(line);
+            i && graphemeLines.push(line);
             if (largestWordWidth > this.dynamicMinWidth) {
                 this.dynamicMinWidth = largestWordWidth - additionalSpace;
             }
-            return lines;
+            return graphemeLines;
         },
         _splitTextIntoLines: function(text) {
-            var newText = this.callSuper("_splitTextIntoLines", text);
-            newText.lines = this._wrapText(newText.lines);
-            this._styleMap = this._generateStyleMap(newText);
-            return newText;
+            var rawLines = text.split(this._reNewline), graphemeLines = this._wrapText(rawLines), lines = new Array(graphemeLines.length), newText = [];
+            for (var i = 0; i < graphemeLines.length; i++) {
+                lines[i] = graphemeLines[i].join("");
+            }
+            newText = fabric.util.string.graphemeSplit(text);
+            return {
+                lines: lines,
+                graphemeText: newText,
+                graphemeLines: graphemeLines
+            };
         },
         setOnGroup: function(key, value) {
             if (key === "scaleX") {

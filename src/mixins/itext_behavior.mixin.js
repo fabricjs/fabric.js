@@ -716,7 +716,6 @@
           delete this.styles[lineIndex + qty];
         }
       }
-
       this._forceClearCache = true;
     },
 
@@ -747,6 +746,7 @@
           }
         }
       }
+      this._forceClearCache = true;
       if (!currentLineStyles) {
         return;
       }

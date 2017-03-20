@@ -95,12 +95,11 @@
       var newText = this._splitTextIntoLines(this.text);
       this._textLines = newText.graphemeLines;
       this._text = newText.graphemeText;
-
+      this._styleMap = this._generateStyleMap(newText);
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
-
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this.calcTextHeight();
@@ -125,7 +124,7 @@
           charCount++;
           realLineCount++;
         }
-        else if (textInfo.graphemeText[charCount] === ' ' && i > 0) {
+        else if (this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -143,19 +142,18 @@
     /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
-     * @param {Boolean} [returnCloneOrEmpty=false]
      * @private
      */
-    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
-      if (this._styleMap) {
+    _getStyleDeclaration: function(lineIndex, charIndex) {
+      if (this._styleMap && !this.isWrapping) {
         var map = this._styleMap[lineIndex];
         if (!map) {
-          return returnCloneOrEmpty ? { } : null;
+          return null;
         }
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
-      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex, returnCloneOrEmpty);
+      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex);
     },
 
     /**
@@ -218,17 +216,16 @@
      * splits text on newlines, so we preserve newlines entered by the user.
      * Then it wraps each line using the width of the Textbox by calling
      * _wrapLine().
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
-     * @param {String} text The string of text that is split into lines
+     * @param {Array} lines The string array of text that is split into lines
      * @returns {Array} Array of lines
      */
     _wrapText: function(lines) {
       var wrapped = [], i;
-
+      this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
         wrapped = wrapped.concat(this._wrapLine(lines[i], i));
       }
-
+      this.isWrapping = false;
       return wrapped;
     },
 
@@ -263,10 +260,10 @@
      */
     _wrapLine: function(_line, lineIndex) {
       var lineWidth        = 0,
-          lines            = [],
+          graphemeLines    = [],
           line             = [],
           // spaces in different languges?
-          words            = _line.join('').split(' '),
+          words            = _line.split(this._reSpaceAndTab),
           word             = '',
           offset           = 0,
           infix            = ' ',
@@ -275,7 +272,6 @@
           largestWordWidth = 0,
           lineJustStarted = true,
           additionalSpace = this._getWidthOfCharSpacing();
-
       for (var i = 0; i < words.length; i++) {
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
@@ -285,14 +281,14 @@
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
         if (lineWidth >= this.width && !lineJustStarted) {
-          lines.push(line);
+          graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
-        else {
-          lineWidth += additionalSpace;
-        }
+        // else {
+        //   lineWidth += additionalSpace;
+        // }
 
         if (!lineJustStarted) {
           line.push(infix);
@@ -308,26 +304,32 @@
         }
       }
 
-      i && lines.push(line);
+      i && graphemeLines.push(line);
 
       if (largestWordWidth > this.dynamicMinWidth) {
         this.dynamicMinWidth = largestWordWidth - additionalSpace;
       }
 
-      return lines;
+      return graphemeLines;
     },
+
     /**
-     * Gets lines of text to render in the Textbox. This function calculates
-     * text wrapping on the fly everytime it is called.
-     * @param {String} text text to split
-     * @returns {Array} Array of lines in the Textbox.
-     * @override
-     */
+    * Gets lines of text to render in the Textbox. This function calculates
+    * text wrapping on the fly everytime it is called.
+    * @param {String} text text to split
+    * @returns {Array} Array of lines in the Textbox.
+    * @override
+    */
     _splitTextIntoLines: function(text) {
-      var newText = this.callSuper('_splitTextIntoLines', text);
-      newText.lines = this._wrapText(newText.lines);
-      this._styleMap = this._generateStyleMap(newText);
-      return newText;
+      var rawLines = text.split(this._reNewline),
+          graphemeLines = this._wrapText(rawLines),
+          lines = new Array(graphemeLines.length),
+          newText = [];
+      for (var i = 0; i < graphemeLines.length; i++) {
+        lines[i] = graphemeLines[i].join('');
+      }
+      newText = fabric.util.string.graphemeSplit(text);
+      return { lines: lines, graphemeText: newText, graphemeLines: graphemeLines };
     },
 
     /**
