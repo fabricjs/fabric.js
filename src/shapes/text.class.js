@@ -314,7 +314,7 @@
      * @type String
      * @default
      */
-    fontStyle:            '',
+    fontStyle:            'normal',
 
     /**
      * Line height

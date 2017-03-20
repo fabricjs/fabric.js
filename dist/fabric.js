@@ -21560,7 +21560,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @type String
      * @default
      */
-    fontStyle:            '',
+    fontStyle:            'normal',
 
     /**
      * Line height
