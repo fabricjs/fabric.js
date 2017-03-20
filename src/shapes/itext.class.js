@@ -425,7 +425,7 @@
         topOffset += this.getHeightOfLine(i);
       }
 
-      lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(cursorPosition.lineIndex));
+      lineLeftOffset = this._getLineLeftOffset(cursorPosition.lineIndex);
       leftOffset = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex].left;
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
@@ -485,7 +485,7 @@
           endChar = end.charIndex;
 
       for (var i = startLine; i <= endLine; i++) {
-        var lineOffset = this._getLineLeftOffset(this.getLineWidth(i)) || 0,
+        var lineOffset = this._getLineLeftOffset(i) || 0,
             lineHeight = this.getHeightOfLine(i),
             realLineHeight = 0, boxStart = 0, boxEnd = 0;
 

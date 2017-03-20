@@ -681,7 +681,7 @@
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-          lineWidth, lineLeftOffset, originalFill = ctx.fillStyle,
+          lineLeftOffset, originalFill = ctx.fillStyle,
           line, lastColor,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
@@ -694,8 +694,7 @@
           continue;
         }
         line = this._textLines[i];
-        lineWidth = this.getLineWidth(i);
-        lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        lineLeftOffset = this._getLineLeftOffset(i);
         boxWidth = 0;
         boxStart = 0;
         lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
@@ -1078,8 +1077,7 @@
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
-            lineWidth = this.getLineWidth(i),
-            leftOffset = this._getLineLeftOffset(lineWidth);
+            leftOffset = this._getLineLeftOffset(i);
         this._renderTextLine(
           method,
           ctx,
@@ -1229,10 +1227,11 @@
 
     /**
      * @private
-     * @param {Number} lineWidth Width of text line
+     * @param {Number} lineIndex index text line
      * @return {Number} Line left offset
      */
-    _getLineLeftOffset: function(lineWidth) {
+    _getLineLeftOffset: function(lineIndex) {
+      var lineWidth = this.getLineWidth(lineIndex);
       if (this.textAlign === 'center') {
         return (this.width - lineWidth) / 2;
       }
@@ -1321,7 +1320,7 @@
         return;
       }
       var heightOfLine,
-          lineWidth, lineLeftOffset,
+          lineLeftOffset,
           line, lastDecoration,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
@@ -1341,8 +1340,7 @@
         }
         line = this._textLines[i];
         maxHeight = heightOfLine / this.lineHeight;
-        lineWidth = this.getLineWidth(i);
-        lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        lineLeftOffset = this._getLineLeftOffset(i);
         boxStart = 0;
         boxWidth = 0;
         lastDecoration = this.getValueOfPropertyAt(i, 0, type);
@@ -1553,7 +1551,7 @@
       }
       textSpans.push(
         '\t\t\t<tspan x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(i)), NUM_FRACTION_DIGITS), '" ',
+          toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS), '" ',
           'y="',
           toFixed(yPos, NUM_FRACTION_DIGITS),
           '" ',
@@ -1579,7 +1577,7 @@
           word, attributes = this._getFillAttributes(this.fill),
           len;
 
-      textLeftOffset += this._getLineLeftOffset(this.getLineWidth(i));
+      textLeftOffset += this._getLineLeftOffset(i);
 
       for (i = 0, len = words.length; i < len; i++) {
         word = words[i];
@@ -1604,7 +1602,7 @@
         '\t\t<rect ',
           this._getFillAttributes(this.textBackgroundColor),
           ' x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.getLineWidth(i)), NUM_FRACTION_DIGITS),
+          toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS),
           '" y="',
           toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',

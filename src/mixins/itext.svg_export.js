@@ -26,7 +26,7 @@
 
       var chars = this._textLines[lineIndex],
           charOffset = 0,
-          lineLeftOffset = this._getLineLeftOffset(this.getLineWidth(lineIndex)) - this.width / 2,
+          lineLeftOffset = this._getLineLeftOffset(lineIndex) - this.width / 2,
           lineOffset = this._getSVGLineTopOffset(lineIndex),
           heightOfLine = this.getHeightOfLine(lineIndex);
 

@@ -268,8 +268,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @return {Number} widthBeforeCursor width before cursor
    */
   _getWidthBeforeCursor: function(lineIndex, charIndex) {
-    var widthOfLine = this.getLineWidth(lineIndex),
-        widthBeforeCursor = this._getLineLeftOffset(widthOfLine), bound;
+    var widthBeforeCursor = this._getLineLeftOffset(lineIndex), bound;
 
     if (charIndex > 0) {
       bound = this.__charBounds[lineIndex][charIndex - 1];
@@ -343,9 +342,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getIndexOnLine: function(lineIndex, width) {
 
-    var widthOfLine = this.getLineWidth(lineIndex),
-        line = this._textLines[lineIndex],
-        lineLeftOffset = this._getLineLeftOffset(widthOfLine),
+    var line = this._textLines[lineIndex],
+        lineLeftOffset = this._getLineLeftOffset(lineIndex),
         widthOfCharsOnLine = lineLeftOffset,
         indexOnLine = 0, charWidth, foundMatch;
 
