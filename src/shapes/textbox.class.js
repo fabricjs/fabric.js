@@ -364,22 +364,18 @@
       }
 
       var numLines = this._textLines.length,
-          removed  = 0;
+          removed = 0, lineLen;
 
       for (var i = 0; i < numLines; i++) {
-        var line    = this._textLines[i],
-            lineLen = line.length;
-
+        lineLen  = this._textLines[i].length;
         if (selectionStart <= removed + lineLen) {
           return {
             lineIndex: i,
             charIndex: selectionStart - removed
           };
         }
-
         removed += lineLen;
-
-        if (this.text[removed] === '\n' || this.text[removed] === ' ') {
+        if (this._text[removed] === '\n' || this._text[removed] === ' ') {
           removed++;
         }
       }

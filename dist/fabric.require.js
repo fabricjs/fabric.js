@@ -10997,7 +10997,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 if (i >= startLine && i < endLine) {
                     boxEnd = this.getLineWidth(i) || 5;
                 } else if (i === endLine) {
-                    boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
+                    if (endChar === 0) {
+                        boxEnd = this.__charBounds[endLine][endChar].left;
+                    } else {
+                        boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
+                    }
                 }
                 realLineHeight = lineHeight;
                 if (this.lineHeight < 1 || i === endLine && this.lineHeight > 1) {
@@ -11712,42 +11716,46 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.selectionStart = newSelection;
             this.selectionEnd = newSelection;
         }
+        console.trace(newSelection, this.selectionStart);
         if (this.isEditing) {
             this._fireSelectionChanged();
             this._updateTextarea();
         }
     },
     getSelectionStartFromPointer: function(e) {
-        var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, newSelectionStart, line;
+        var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, lineIndex = 0, lineLeftOffset, line;
         for (var i = 0, len = this._textLines.length; i < len; i++) {
-            line = this._textLines[i];
-            height += this.getHeightOfLine(i) * this.scaleY;
-            var widthOfLine = this.getLineWidth(i), lineLeftOffset = this._getLineLeftOffset(i);
-            width = lineLeftOffset * this.scaleX;
-            for (var j = 0, jlen = line.length; j < jlen; j++) {
-                prevWidth = width;
-                width += this.__charBounds[i][j].kernedWidth * this.scaleX;
-                if (height <= mouseOffset.y || width <= mouseOffset.x) {
-                    charIndex++;
-                    continue;
+            if (height <= mouseOffset.y) {
+                height += this.getHeightOfLine(i) * this.scaleY;
+                lineIndex = i;
+                if (i > 0) {
+                    charIndex += this._textLines[i - 1].length + 1;
                 }
-                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i, jlen);
-            }
-            if (mouseOffset.y < height) {
-                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i - 1, jlen);
+            } else {
+                break;
             }
         }
-        if (typeof newSelectionStart === "undefined") {
-            return this.text.length;
+        lineLeftOffset = this._getLineLeftOffset(lineIndex);
+        width = lineLeftOffset * this.scaleX;
+        line = this._textLines[lineIndex];
+        for (var j = 0, jlen = line.length; j < jlen; j++) {
+            prevWidth = width;
+            width += this.__charBounds[lineIndex][j].kernedWidth * this.scaleX;
+            if (width <= mouseOffset.x) {
+                charIndex++;
+            } else {
+                break;
+            }
         }
+        return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex, jlen);
     },
     _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
         var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth, distanceBtwNextCharAndCursor = width - mouseOffset.x, offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1, newSelectionStart = index + offset;
         if (this.flipX) {
             newSelectionStart = jlen - newSelectionStart;
         }
-        if (newSelectionStart > this.text.length) {
-            newSelectionStart = this.text.length;
+        if (newSelectionStart > this._text.length) {
+            newSelectionStart = this._text.length;
         }
         return newSelectionStart;
     }
@@ -12033,7 +12041,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
     },
     moveCursorRight: function(e) {
-        if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+        if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
             return;
         }
         this._moveCursorLeftOrRight("Right", e);
@@ -12056,7 +12064,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
     moveCursorRightWithShift: function(e) {
         if (this._selectionDirection === "left" && this.selectionStart !== this.selectionEnd) {
             return this._moveRight(e, "selectionStart");
-        } else if (this.selectionEnd !== this.text.length) {
+        } else if (this.selectionEnd !== this._text.length) {
             this._selectionDirection = "right";
             return this._moveRight(e, "selectionEnd");
         }
@@ -12316,9 +12324,9 @@ fabric.util.object.extend(fabric.IText.prototype, {
             if (typeof selectionStart === "undefined") {
                 selectionStart = this.selectionStart;
             }
-            var numLines = this._textLines.length, removed = 0;
+            var numLines = this._textLines.length, removed = 0, lineLen;
             for (var i = 0; i < numLines; i++) {
-                var line = this._textLines[i], lineLen = line.length;
+                lineLen = this._textLines[i].length;
                 if (selectionStart <= removed + lineLen) {
                     return {
                         lineIndex: i,
@@ -12326,7 +12334,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     };
                 }
                 removed += lineLen;
-                if (this.text[removed] === "\n" || this.text[removed] === " ") {
+                if (this._text[removed] === "\n" || this._text[removed] === " ") {
                     removed++;
                 }
             }
@@ -12411,24 +12419,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
             fabric.IText.prototype.shiftLineStyles.call(this, lineIndex, offset);
         }
     });
-})();
-
-(function() {
-    var override = fabric.IText.prototype._getNewSelectionStartFromOffset;
-    fabric.IText.prototype._getNewSelectionStartFromOffset = function(mouseOffset, prevWidth, width, index, jlen) {
-        index = override.call(this, mouseOffset, prevWidth, width, index, jlen);
-        var tmp = 0, removed = 0;
-        for (var i = 0; i < this._textLines.length; i++) {
-            tmp += this._textLines[i].length;
-            if (tmp + removed >= index) {
-                break;
-            }
-            if (this.text[tmp + removed] === "\n" || this.text[tmp + removed] === " ") {
-                removed++;
-            }
-        }
-        return index - i + removed;
-    };
 })();
 
 (function() {

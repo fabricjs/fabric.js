@@ -531,7 +531,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorRight: function(e) {
-    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+    if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
     this._moveCursorLeftOrRight('Right', e);
@@ -568,7 +568,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
       return this._moveRight(e, 'selectionStart');
     }
-    else if (this.selectionEnd !== this.text.length) {
+    else if (this.selectionEnd !== this._text.length) {
       this._selectionDirection = 'right';
       return this._moveRight(e, 'selectionEnd');
     }
