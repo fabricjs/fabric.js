@@ -10096,7 +10096,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         charSpacing: 0,
         styles: null,
         _measuringContext: null,
-        _styleProperties: [ "stroke", "strokeWidth", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough", "textBackgroundColor", "shadow" ],
+        _styleProperties: [ "stroke", "strokeWidth", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough" ],
         __charBounds: [],
         initialize: function(text, options) {
             options = options || {};
@@ -10140,7 +10140,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return false;
             }
             if (typeof lineIndex !== "undefined" && !this.styles[lineIndex]) {
-                return true;
+                return false;
             }
             var obj = typeof lineIndex === "undefined" ? this.styles : {
                 line: this.styles[lineIndex]
@@ -10293,15 +10293,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             return cache[cacheProp];
         },
-        _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
-            if (typeof styleDeclaration.shadow === "string") {
-                styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
-            }
+        _applyCharStyles: function(method, ctx, lineIndex, charIndex, styleDeclaration) {
             this._setFillStyles(ctx, styleDeclaration);
             this._setStrokeStyles(ctx, styleDeclaration);
-            if (styleDeclaration.shadow) {
-                this._setShadow(ctx, styleDeclaration);
-            }
             ctx.font = this._getFontDeclaration(styleDeclaration);
         },
         _getStyleDeclaration: function(lineIndex, charIndex) {
@@ -10521,7 +10515,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return;
             }
             decl && ctx.save();
-            this._applyCharStyles(ctx, lineIndex, charIndex, fullDecl);
+            this._applyCharStyles(method, ctx, lineIndex, charIndex, fullDecl);
             if (decl && decl.textBackgroundColor) {
                 this._removeShadow(ctx);
             }
@@ -11716,7 +11710,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.selectionStart = newSelection;
             this.selectionEnd = newSelection;
         }
-        console.trace(newSelection, this.selectionStart);
         if (this.isEditing) {
             this._fireSelectionChanged();
             this._updateTextarea();

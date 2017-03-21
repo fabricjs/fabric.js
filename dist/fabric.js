@@ -21659,9 +21659,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       'fontStyle',
       'underline',
       'overline',
-      'linethrough',
-      'textBackgroundColor',
-      'shadow'
+      'linethrough'
     ],
 
     /**
@@ -21736,7 +21734,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return false;
       }
       if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-        return true;
+        return false;
       }
       var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
       // eslint-disable-next-line
@@ -22009,20 +22007,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} charIndex
      * @param {Object} [decl]
      */
-    _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
-
-      if (typeof styleDeclaration.shadow === 'string') {
-        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
-      }
+    _applyCharStyles: function(method, ctx, lineIndex, charIndex, styleDeclaration) {
 
       this._setFillStyles(ctx, styleDeclaration);
       this._setStrokeStyles(ctx, styleDeclaration);
-
-      //if we want this._setShadow.call to work with styleDeclarion
-      //we have to add those references
-      if (styleDeclaration.shadow) {
-        this._setShadow(ctx, styleDeclaration);
-      }
 
       ctx.font = this._getFontDeclaration(styleDeclaration);
     },
@@ -22445,7 +22433,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       decl && ctx.save();
 
-      this._applyCharStyles(ctx, lineIndex, charIndex, fullDecl);
+      this._applyCharStyles(method, ctx, lineIndex, charIndex, fullDecl);
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
@@ -24611,7 +24599,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = newSelection;
       this.selectionEnd = newSelection;
     }
-    console.trace(newSelection, this.selectionStart)
     if (this.isEditing) {
       this._fireSelectionChanged();
       this._updateTextarea();

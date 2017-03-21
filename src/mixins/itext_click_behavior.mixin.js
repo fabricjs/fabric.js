@@ -153,7 +153,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = newSelection;
       this.selectionEnd = newSelection;
     }
-    console.trace(newSelection, this.selectionStart)
     if (this.isEditing) {
       this._fireSelectionChanged();
       this._updateTextarea();

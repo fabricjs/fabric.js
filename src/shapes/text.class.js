@@ -413,9 +413,7 @@
       'fontStyle',
       'underline',
       'overline',
-      'linethrough',
-      'textBackgroundColor',
-      'shadow'
+      'linethrough'
     ],
 
     /**
@@ -490,7 +488,7 @@
         return false;
       }
       if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-        return true;
+        return false;
       }
       var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
       // eslint-disable-next-line
@@ -763,20 +761,10 @@
      * @param {Number} charIndex
      * @param {Object} [decl]
      */
-    _applyCharStyles: function(ctx, lineIndex, charIndex, styleDeclaration) {
-
-      if (typeof styleDeclaration.shadow === 'string') {
-        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
-      }
+    _applyCharStyles: function(method, ctx, lineIndex, charIndex, styleDeclaration) {
 
       this._setFillStyles(ctx, styleDeclaration);
       this._setStrokeStyles(ctx, styleDeclaration);
-
-      //if we want this._setShadow.call to work with styleDeclarion
-      //we have to add those references
-      if (styleDeclaration.shadow) {
-        this._setShadow(ctx, styleDeclaration);
-      }
 
       ctx.font = this._getFontDeclaration(styleDeclaration);
     },
@@ -1199,7 +1187,7 @@
       }
       decl && ctx.save();
 
-      this._applyCharStyles(ctx, lineIndex, charIndex, fullDecl);
+      this._applyCharStyles(method, ctx, lineIndex, charIndex, fullDecl);
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
