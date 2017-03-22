@@ -483,8 +483,8 @@
           end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
-          startChar = start.charIndex,
-          endChar = end.charIndex;
+          startChar = start.charIndex < 0 ? 0 : start.charIndex,
+          endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getLineLeftOffset(i) || 0,
