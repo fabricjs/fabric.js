@@ -10185,7 +10185,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 accumulatedSpace = 0;
                 line = this._textLines[i];
                 currentLineWidth = this.getLineWidth(i);
-                if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpaceAndTabs))) {
+                if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
                     numberOfSpaces = spaces.length;
                     diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
                     for (var j = 0, jlen = line.length; j <= jlen; j++) {
@@ -11290,29 +11290,29 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.hasControls = this.selectable = false;
             this.lockMovementX = this.lockMovementY = true;
         },
-        fromStringToGraphemeSelection: function(start, end) {
-            var smallerTextStart = this.text.slice(0, start), graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+        fromStringToGraphemeSelection: function(start, end, text) {
+            var smallerTextStart = text.slice(0, start), graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
             if (start === end) {
                 return {
                     selectionStart: graphemeStart,
                     selectionEnd: graphemeStart
                 };
             }
-            var smallerTextEnd = this.text.slice(start, end), graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+            var smallerTextEnd = text.slice(start, end), graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
             return {
                 selectionStart: graphemeStart,
                 selectionEnd: graphemeStart + graphemeEnd
             };
         },
-        fromGraphemeToStringSelection: function(start, end) {
-            var smallerTextStart = this._text.slice(0, start), graphemeStart = smallerTextStart.join("").length;
+        fromGraphemeToStringSelection: function(start, end, _text) {
+            var smallerTextStart = _text.slice(0, start), graphemeStart = smallerTextStart.join("").length;
             if (start === end) {
                 return {
                     selectionStart: graphemeStart,
                     selectionEnd: graphemeStart
                 };
             }
-            var smallerTextEnd = this._text.slice(start, end), graphemeEnd = smallerTextEnd.join("").length;
+            var smallerTextEnd = _text.slice(start, end), graphemeEnd = smallerTextEnd.join("").length;
             return {
                 selectionStart: graphemeStart,
                 selectionEnd: graphemeStart + graphemeEnd
@@ -11324,7 +11324,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return;
             }
             if (!this.inCompositionMode) {
-                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd);
+                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this.text);
                 this.hiddenTextarea.selectionStart = newSelection.selectionStart;
                 this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
             }
@@ -11336,7 +11336,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             this.cursorOffsetCache = {};
             this.text = this.hiddenTextarea.value;
-            var newSelection = this.fromStringToGraphemeSelection(this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd);
+            var newSelection = this.fromStringToGraphemeSelection(this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
             this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
             if (!this.inCompositionMode) {
                 this.selectionStart = newSelection.selectionStart;
@@ -11850,9 +11850,10 @@ fabric.util.object.extend(fabric.IText.prototype, {
         } else if (nextCharCount < charCount) {
             removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
         }
-        insertedText = nextText.slice(e.target.selectionEnd - charDiff, e.target.selectionEnd);
+        var textareaSelection = this.fromStringToGraphemeSelection(e.target.selectionStart, e.target.selectionEnd, e.target.value);
+        insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
         if (removedText && removedText.length) {
-            if (this.selectionStart > e.target.selectionStart) {
+            if (this.selectionStart > textareaSelection.selectionStart) {
                 this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
             } else {
                 this.removeStyleFromTo(this.selectionEnd, this.selectionEnd + removedText.length);
@@ -12188,6 +12189,9 @@ fabric.util.object.extend(fabric.IText.prototype, {
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
+            if (this.textAlign === "justify") {
+                this.enlargeSpaces();
+            }
             this.height = this.calcTextHeight();
         },
         _generateStyleMap: function(textInfo) {
@@ -12245,11 +12249,11 @@ fabric.util.object.extend(fabric.IText.prototype, {
             var map = this._styleMap[lineIndex];
             delete this.styles[map.line];
         },
-        _wrapText: function(lines) {
+        _wrapText: function(lines, desiredWidth) {
             var wrapped = [], i;
             this.isWrapping = true;
             for (i = 0; i < lines.length; i++) {
-                wrapped = wrapped.concat(this._wrapLine(lines[i], i));
+                wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
             }
             this.isWrapping = false;
             return wrapped;
@@ -12264,14 +12268,14 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return width;
         },
-        _wrapLine: function(_line, lineIndex) {
+        _wrapLine: function(_line, lineIndex, desiredWidth) {
             var lineWidth = 0, graphemeLines = [], line = [], words = _line.split(this._reSpaceAndTab), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
             for (var i = 0; i < words.length; i++) {
                 word = fabric.util.string.graphemeSplit(words[i]);
                 wordWidth = this._measureWord(word, lineIndex, offset);
                 offset += word.length;
                 lineWidth += infixWidth + wordWidth - additionalSpace;
-                if (lineWidth >= this.width && !lineJustStarted) {
+                if (lineWidth >= desiredWidth && !lineJustStarted) {
                     graphemeLines.push(line);
                     line = [];
                     lineWidth = wordWidth;
@@ -12295,7 +12299,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             return graphemeLines;
         },
         _splitTextIntoLines: function(text) {
-            var rawLines = text.split(this._reNewline), graphemeLines = this._wrapText(rawLines), lines = new Array(graphemeLines.length), newText = [];
+            var rawLines = text.split(this._reNewline), graphemeLines = this._wrapText(rawLines, this.width), lines = new Array(graphemeLines.length), newText = [];
             for (var i = 0; i < graphemeLines.length; i++) {
                 lines[i] = graphemeLines[i].join("");
             }

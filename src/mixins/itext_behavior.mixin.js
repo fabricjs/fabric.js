@@ -421,13 +421,13 @@
     /**
      * convert from textarea to grapheme indexes
      */
-    fromStringToGraphemeSelection: function(start, end) {
-      var smallerTextStart = this.text.slice(0, start),
+    fromStringToGraphemeSelection: function(start, end, text) {
+      var smallerTextStart = text.slice(0, start),
           graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = this.text.slice(start, end),
+      var smallerTextEnd = text.slice(start, end),
           graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
@@ -435,13 +435,13 @@
     /**
      * convert from fabric to textarea values
      */
-    fromGraphemeToStringSelection: function(start, end) {
-      var smallerTextStart = this._text.slice(0, start),
+    fromGraphemeToStringSelection: function(start, end, _text) {
+      var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = this._text.slice(start, end),
+      var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
@@ -455,7 +455,7 @@
         return;
       }
       if (!this.inCompositionMode) {
-        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd);
+        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this.text);
         this.hiddenTextarea.selectionStart = newSelection.selectionStart;
         this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
@@ -472,7 +472,7 @@
       this.cursorOffsetCache = { };
       this.text = this.hiddenTextarea.value;
       var newSelection = this.fromStringToGraphemeSelection(
-        this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd);
+        this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
       this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
       if (!this.inCompositionMode) {
         this.selectionStart = newSelection.selectionStart;

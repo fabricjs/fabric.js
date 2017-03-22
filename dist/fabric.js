@@ -21797,7 +21797,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
-        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpaceAndTabs))) {
+        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
           numberOfSpaces = spaces.length;
           diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
           for (var j = 0, jlen = line.length; j <= jlen; j++) {
@@ -23994,13 +23994,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * convert from textarea to grapheme indexes
      */
-    fromStringToGraphemeSelection: function(start, end) {
-      var smallerTextStart = this.text.slice(0, start),
+    fromStringToGraphemeSelection: function(start, end, text) {
+      var smallerTextStart = text.slice(0, start),
           graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = this.text.slice(start, end),
+      var smallerTextEnd = text.slice(start, end),
           graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
@@ -24008,13 +24008,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * convert from fabric to textarea values
      */
-    fromGraphemeToStringSelection: function(start, end) {
-      var smallerTextStart = this._text.slice(0, start),
+    fromGraphemeToStringSelection: function(start, end, _text) {
+      var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = this._text.slice(start, end),
+      var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
@@ -24028,7 +24028,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
       }
       if (!this.inCompositionMode) {
-        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd);
+        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this.text);
         this.hiddenTextarea.selectionStart = newSelection.selectionStart;
         this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
@@ -24045,7 +24045,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.cursorOffsetCache = { };
       this.text = this.hiddenTextarea.value;
       var newSelection = this.fromStringToGraphemeSelection(
-        this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd);
+        this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
       this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
       if (!this.inCompositionMode) {
         this.selectionStart = newSelection.selectionStart;
@@ -24821,10 +24821,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else if (nextCharCount < charCount) {
       removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
     }
-    insertedText = nextText.slice(e.target.selectionEnd - charDiff, e.target.selectionEnd);
+    var textareaSelection =
+      this.fromStringToGraphemeSelection(e.target.selectionStart, e.target.selectionEnd, e.target.value);
+    insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
       // detect differencies between forwardDelete and backDelete
-      if (this.selectionStart > e.target.selectionStart) {
+      if (this.selectionStart > textareaSelection.selectionStart) {
         this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
       }
       else {
@@ -24837,7 +24839,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.updateFromTextArea();
     this.canvas && this.canvas.renderAll();
   },
-
   /**
    * Composition start
    */
@@ -25535,6 +25536,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
+      if (this.textAlign === 'justify') {
+        // once text is misured we need to make space fatter to make justified text.
+        this.enlargeSpaces();
+      }
       // clear cache and re-calculate height
       this.height = this.calcTextHeight();
     },
@@ -25651,13 +25656,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * Then it wraps each line using the width of the Textbox by calling
      * _wrapLine().
      * @param {Array} lines The string array of text that is split into lines
+     * @param {Number} desiredWidth width you want to wrap to
      * @returns {Array} Array of lines
      */
-    _wrapText: function(lines) {
+    _wrapText: function(lines, desiredWidth) {
       var wrapped = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(lines[i], i));
+        wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
       }
       this.isWrapping = false;
       return wrapped;
@@ -25686,13 +25692,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     /**
      * Wraps a line of text using the width of the Textbox and a context.
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
      * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
+     * @param {Number} desiredWidth width you want to wrap the line to
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(_line, lineIndex) {
+    _wrapLine: function(_line, lineIndex, desiredWidth) {
       var lineWidth        = 0,
           graphemeLines    = [],
           line             = [],
@@ -25714,15 +25720,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
-        if (lineWidth >= this.width && !lineJustStarted) {
+        if (lineWidth >= desiredWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
-        // else {
-        //   lineWidth += additionalSpace;
-        // }
 
         if (!lineJustStarted) {
           line.push(infix);
@@ -25756,7 +25759,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     */
     _splitTextIntoLines: function(text) {
       var rawLines = text.split(this._reNewline),
-          graphemeLines = this._wrapText(rawLines),
+          graphemeLines = this._wrapText(rawLines, this.width),
           lines = new Array(graphemeLines.length),
           newText = [];
       for (var i = 0; i < graphemeLines.length; i++) {

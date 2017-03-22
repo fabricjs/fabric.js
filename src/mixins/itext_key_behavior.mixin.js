@@ -147,10 +147,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else if (nextCharCount < charCount) {
       removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
     }
-    insertedText = nextText.slice(e.target.selectionEnd - charDiff, e.target.selectionEnd);
+    var textareaSelection =
+      this.fromStringToGraphemeSelection(e.target.selectionStart, e.target.selectionEnd, e.target.value);
+    insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
       // detect differencies between forwardDelete and backDelete
-      if (this.selectionStart > e.target.selectionStart) {
+      if (this.selectionStart > textareaSelection.selectionStart) {
         this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
       }
       else {
@@ -163,7 +165,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.updateFromTextArea();
     this.canvas && this.canvas.renderAll();
   },
-
   /**
    * Composition start
    */

@@ -102,6 +102,10 @@
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
+      if (this.textAlign === 'justify') {
+        // once text is misured we need to make space fatter to make justified text.
+        this.enlargeSpaces();
+      }
       // clear cache and re-calculate height
       this.height = this.calcTextHeight();
     },
@@ -218,13 +222,14 @@
      * Then it wraps each line using the width of the Textbox by calling
      * _wrapLine().
      * @param {Array} lines The string array of text that is split into lines
+     * @param {Number} desiredWidth width you want to wrap to
      * @returns {Array} Array of lines
      */
-    _wrapText: function(lines) {
+    _wrapText: function(lines, desiredWidth) {
       var wrapped = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(lines[i], i));
+        wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
       }
       this.isWrapping = false;
       return wrapped;
@@ -253,13 +258,13 @@
 
     /**
      * Wraps a line of text using the width of the Textbox and a context.
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
      * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
+     * @param {Number} desiredWidth width you want to wrap the line to
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(_line, lineIndex) {
+    _wrapLine: function(_line, lineIndex, desiredWidth) {
       var lineWidth        = 0,
           graphemeLines    = [],
           line             = [],
@@ -281,15 +286,12 @@
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
-        if (lineWidth >= this.width && !lineJustStarted) {
+        if (lineWidth >= desiredWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
-        // else {
-        //   lineWidth += additionalSpace;
-        // }
 
         if (!lineJustStarted) {
           line.push(infix);
@@ -323,7 +325,7 @@
     */
     _splitTextIntoLines: function(text) {
       var rawLines = text.split(this._reNewline),
-          graphemeLines = this._wrapText(rawLines),
+          graphemeLines = this._wrapText(rawLines, this.width),
           lines = new Array(graphemeLines.length),
           newText = [];
       for (var i = 0; i < graphemeLines.length; i++) {

@@ -551,7 +551,7 @@
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
-        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpaceAndTabs))) {
+        if (currentLineWidth < this.width && (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
           numberOfSpaces = spaces.length;
           diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
           for (var j = 0, jlen = line.length; j <= jlen; j++) {
