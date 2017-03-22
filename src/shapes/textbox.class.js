@@ -145,6 +145,21 @@
     },
 
     /**
+     * Returns true if object has a style property or has it ina specified line
+     * @param {Number} lineIndex
+     * @return {Boolean}
+     */
+    styleHas: function(property, lineIndex) {
+      if (this._styleMap && !this.isWrapping) {
+        var map = this._styleMap[lineIndex];
+        if (map) {
+          lineIndex = map.line;
+        }
+      }
+      return fabric.Text.prototype.styleHas.call(this, property, lineIndex);
+    },
+
+    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @private

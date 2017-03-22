@@ -11324,7 +11324,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return;
             }
             if (!this.inCompositionMode) {
-                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this.text);
+                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
                 this.hiddenTextarea.selectionStart = newSelection.selectionStart;
                 this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
             }
@@ -11554,7 +11554,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
         },
         insertNewStyleBlock: function(insertedText, start) {
-            var cursorLoc = this.get2DCursorLocation(start), addingNewLines = 0, addingChars = 0, isEndOfLine = this._text[start] === "\n";
+            var cursorLoc = this.get2DCursorLocation(start), addingNewLines = 0, addingChars = 0;
             for (var i = 0; i < insertedText.length; i++) {
                 if (insertedText[i] === "\n") {
                     if (addingChars) {
@@ -12213,6 +12213,15 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 realLineCharCount += textInfo.lines[i].length;
             }
             return map;
+        },
+        styleHas: function(property, lineIndex) {
+            if (this._styleMap && !this.isWrapping) {
+                var map = this._styleMap[lineIndex];
+                if (map) {
+                    lineIndex = map.line;
+                }
+            }
+            return fabric.Text.prototype.styleHas.call(this, property, lineIndex);
         },
         _getStyleDeclaration: function(lineIndex, charIndex) {
             if (this._styleMap && !this.isWrapping) {

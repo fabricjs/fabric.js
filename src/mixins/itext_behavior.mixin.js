@@ -455,7 +455,7 @@
         return;
       }
       if (!this.inCompositionMode) {
-        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this.text);
+        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
         this.hiddenTextarea.selectionStart = newSelection.selectionStart;
         this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
@@ -794,7 +794,7 @@
      */
     insertNewStyleBlock: function(insertedText, start) {
       var cursorLoc = this.get2DCursorLocation(start),
-          addingNewLines = 0, addingChars = 0, isEndOfLine = this._text[start] === '\n';
+          addingNewLines = 0, addingChars = 0;
 
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
