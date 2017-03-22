@@ -10170,6 +10170,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             var newLines = this._splitTextIntoLines(this.text);
             this.textLines = newLines.lines;
+            this._unwrappedTextLines = newLines._unwrappedLines;
             this._textLines = newLines.graphemeLines;
             this._text = newLines.graphemeText;
             this._clearCache();
@@ -10646,6 +10647,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             newText.pop();
             return {
+                _unwrappedLines: newLines,
                 lines: lines,
                 graphemeText: newText,
                 graphemeLines: newLines
@@ -10920,23 +10922,24 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             var width = this.width + 4, height = this.height + 4;
             ctx.clearRect(-width / 2, -height / 2, width, height);
         },
-        get2DCursorLocation: function(selectionStart) {
+        get2DCursorLocation: function(selectionStart, skipWrapping) {
             if (typeof selectionStart === "undefined") {
                 selectionStart = this.selectionStart;
             }
-            var len = this._textLines.length;
+            var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+            var len = lines.length;
             for (var i = 0; i < len; i++) {
-                if (selectionStart <= this._textLines[i].length) {
+                if (selectionStart <= lines[i].length) {
                     return {
                         lineIndex: i,
                         charIndex: selectionStart
                     };
                 }
-                selectionStart -= this._textLines[i].length + 1;
+                selectionStart -= lines[i].length + 1;
             }
             return {
                 lineIndex: i - 1,
-                charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
+                charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
             };
         },
         _getCursorBoundaries: function(position) {
@@ -11444,7 +11447,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
         },
         removeStyleFromTo: function(start, end) {
-            var cursorStart = this.get2DCursorLocation(start), cursorEnd = this.get2DCursorLocation(end), lineStart = cursorStart.lineIndex, charStart = cursorStart.charIndex, lineEnd = cursorEnd.lineIndex, charEnd = cursorEnd.charIndex, i, styleObj;
+            var cursorStart = this.get2DCursorLocation(start, true), cursorEnd = this.get2DCursorLocation(end, true), lineStart = cursorStart.lineIndex, charStart = cursorStart.charIndex, lineEnd = cursorEnd.lineIndex, charEnd = cursorEnd.charIndex, i, styleObj;
             if (lineStart !== lineEnd) {
                 if (this.styles[lineStart]) {
                     for (i = charStart; i < this._textLines[lineStart].length; i++) {
@@ -11554,7 +11557,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
         },
         insertNewStyleBlock: function(insertedText, start) {
-            var cursorLoc = this.get2DCursorLocation(start), addingNewLines = 0, addingChars = 0;
+            var cursorLoc = this.get2DCursorLocation(start, true), addingNewLines = 0, addingChars = 0;
             for (var i = 0; i < insertedText.length; i++) {
                 if (insertedText[i] === "\n") {
                     if (addingChars) {
@@ -12184,6 +12187,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             var newText = this._splitTextIntoLines(this.text);
             this.textLines = newText.lines;
             this._textLines = newText.graphemeLines;
+            this._unwrappedTextLines = newText._unwrappedLines;
             this._text = newText.graphemeText;
             this._styleMap = this._generateStyleMap(newText);
             if (this.dynamicMinWidth > this.width) {
@@ -12196,7 +12200,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         },
         _generateStyleMap: function(textInfo) {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
-            for (var i = 0; i < textInfo.lines.length; i++) {
+            for (var i = 0; i < textInfo.graphemeLines.length; i++) {
                 if (textInfo.graphemeText[charCount] === "\n" && i > 0) {
                     realLineCharCount = 0;
                     charCount++;
@@ -12209,8 +12213,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     line: realLineCount,
                     offset: realLineCharCount
                 };
-                charCount += textInfo.lines[i].length;
-                realLineCharCount += textInfo.lines[i].length;
+                charCount += textInfo.graphemeLines[i].length;
+                realLineCharCount += textInfo.graphemeLines[i].length;
             }
             return map;
         },
@@ -12308,16 +12312,14 @@ fabric.util.object.extend(fabric.IText.prototype, {
             return graphemeLines;
         },
         _splitTextIntoLines: function(text) {
-            var rawLines = text.split(this._reNewline), graphemeLines = this._wrapText(rawLines, this.width), lines = new Array(graphemeLines.length), newText = [];
+            var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text), graphemeLines = this._wrapText(newText.lines, this.width), lines = new Array(graphemeLines.length);
             for (var i = 0; i < graphemeLines.length; i++) {
                 lines[i] = graphemeLines[i].join("");
             }
-            newText = fabric.util.string.graphemeSplit(text);
-            return {
-                lines: lines,
-                graphemeText: newText,
-                graphemeLines: graphemeLines
-            };
+            newText.lines = lines;
+            newText.graphemeLines = graphemeLines;
+            console.log(newText);
+            return newText;
         },
         setOnGroup: function(key, value) {
             if (key === "scaleX") {
@@ -12325,29 +12327,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 this.set("width", this.get("width") * value / (typeof this.__oldScaleX === "undefined" ? 1 : this.__oldScaleX));
                 this.__oldScaleX = value;
             }
-        },
-        get2DCursorLocation: function(selectionStart) {
-            if (typeof selectionStart === "undefined") {
-                selectionStart = this.selectionStart;
-            }
-            var numLines = this._textLines.length, removed = 0, lineLen;
-            for (var i = 0; i < numLines; i++) {
-                lineLen = this._textLines[i].length;
-                if (selectionStart <= removed + lineLen) {
-                    return {
-                        lineIndex: i,
-                        charIndex: selectionStart - removed
-                    };
-                }
-                removed += lineLen;
-                if (this._text[removed] === "\n" || this._text[removed] === " ") {
-                    removed++;
-                }
-            }
-            return {
-                lineIndex: numLines - 1,
-                charIndex: this._textLines[numLines - 1].length
-            };
         },
         getMinWidth: function() {
             return Math.max(this.minWidth, this.dynamicMinWidth);
@@ -12406,23 +12385,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     delete this.styles[this._styleMap[prop].line];
                 }
             }
-        },
-        insertCharStyleObject: function(lineIndex, charIndex, quantity) {
-            var map = this._styleMap[lineIndex];
-            lineIndex = map.line;
-            charIndex = map.offset + charIndex;
-            fabric.IText.prototype.insertCharStyleObject.call(this, lineIndex, charIndex, quantity);
-        },
-        insertNewlineStyleObject: function(lineIndex, charIndex, qty) {
-            var map = this._styleMap[lineIndex];
-            lineIndex = map.line;
-            charIndex = map.offset + charIndex;
-            fabric.IText.prototype.insertNewlineStyleObject.call(this, lineIndex, charIndex, qty);
-        },
-        shiftLineStyles: function(lineIndex, offset) {
-            var map = this._styleMap[lineIndex];
-            lineIndex = map.line;
-            fabric.IText.prototype.shiftLineStyles.call(this, lineIndex, offset);
         }
     });
 })();

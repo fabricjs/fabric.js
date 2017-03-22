@@ -622,8 +622,8 @@
      * @param {Number} end linear end position for removal ( excluded from removal )
      */
     removeStyleFromTo: function(start, end) {
-      var cursorStart = this.get2DCursorLocation(start),
-          cursorEnd = this.get2DCursorLocation(end),
+      var cursorStart = this.get2DCursorLocation(start, true),
+          cursorEnd = this.get2DCursorLocation(end, true),
           lineStart = cursorStart.lineIndex,
           charStart = cursorStart.charIndex,
           lineEnd = cursorEnd.lineIndex,
@@ -793,9 +793,8 @@
      * @param {Number} start True if it's end of line
      */
     insertNewStyleBlock: function(insertedText, start) {
-      var cursorLoc = this.get2DCursorLocation(start),
+      var cursorLoc = this.get2DCursorLocation(start, true),
           addingNewLines = 0, addingChars = 0;
-
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
           if (addingChars) {

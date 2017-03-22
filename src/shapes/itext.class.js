@@ -359,24 +359,26 @@
     /**
      * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
      * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
      */
-    get2DCursorLocation: function(selectionStart) {
+    get2DCursorLocation: function(selectionStart, skipWrapping) {
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var len = this._textLines.length;
+      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+      var len = lines.length;
       for (var i = 0; i < len; i++) {
-        if (selectionStart <= this._textLines[i].length) {
+        if (selectionStart <= lines[i].length) {
           return {
             lineIndex: i,
             charIndex: selectionStart
           };
         }
-        selectionStart -= this._textLines[i].length + 1;
+        selectionStart -= lines[i].length + 1;
       }
       return {
         lineIndex: i - 1,
-        charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
+        charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
       };
     },
 

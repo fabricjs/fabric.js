@@ -21777,6 +21777,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       var newLines = this._splitTextIntoLines(this.text);
       this.textLines = newLines.lines;
+      this._unwrappedTextLines = newLines._unwrappedLines;
       this._textLines = newLines.graphemeLines;
       this._text = newLines.graphemeText;
       this._clearCache();
@@ -22663,7 +22664,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         newText = newText.concat(newLines[i], newLine);
       }
       newText.pop();
-      return { lines: lines, graphemeText: newText, graphemeLines: newLines };
+      return { _unwrappedLines: newLines, lines: lines, graphemeText: newText, graphemeLines: newLines };
     },
 
     /**
@@ -23377,24 +23378,26 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
      * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
      */
-    get2DCursorLocation: function(selectionStart) {
+    get2DCursorLocation: function(selectionStart, skipWrapping) {
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var len = this._textLines.length;
+      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+      var len = lines.length;
       for (var i = 0; i < len; i++) {
-        if (selectionStart <= this._textLines[i].length) {
+        if (selectionStart <= lines[i].length) {
           return {
             lineIndex: i,
             charIndex: selectionStart
           };
         }
-        selectionStart -= this._textLines[i].length + 1;
+        selectionStart -= lines[i].length + 1;
       }
       return {
         lineIndex: i - 1,
-        charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
+        charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
       };
     },
 
@@ -24195,8 +24198,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} end linear end position for removal ( excluded from removal )
      */
     removeStyleFromTo: function(start, end) {
-      var cursorStart = this.get2DCursorLocation(start),
-          cursorEnd = this.get2DCursorLocation(end),
+      var cursorStart = this.get2DCursorLocation(start, true),
+          cursorEnd = this.get2DCursorLocation(end, true),
           lineStart = cursorStart.lineIndex,
           charStart = cursorStart.charIndex,
           lineEnd = cursorEnd.lineIndex,
@@ -24366,9 +24369,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} start True if it's end of line
      */
     insertNewStyleBlock: function(insertedText, start) {
-      var cursorLoc = this.get2DCursorLocation(start),
+      var cursorLoc = this.get2DCursorLocation(start, true),
           addingNewLines = 0, addingChars = 0;
-
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
           if (addingChars) {
@@ -25530,6 +25532,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var newText = this._splitTextIntoLines(this.text);
       this.textLines = newText.lines;
       this._textLines = newText.graphemeLines;
+      this._unwrappedTextLines = newText._unwrappedLines;
       this._text = newText.graphemeText;
       this._styleMap = this._generateStyleMap(newText);
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
@@ -25557,7 +25560,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           charCount         = 0,
           map               = {};
 
-      for (var i = 0; i < textInfo.lines.length; i++) {
+      for (var i = 0; i < textInfo.graphemeLines.length; i++) {
         if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
@@ -25571,8 +25574,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         map[i] = { line: realLineCount, offset: realLineCharCount };
 
-        charCount += textInfo.lines[i].length;
-        realLineCharCount += textInfo.lines[i].length;
+        charCount += textInfo.graphemeLines[i].length;
+        realLineCharCount += textInfo.graphemeLines[i].length;
       }
 
       return map;
@@ -25773,15 +25776,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     * @override
     */
     _splitTextIntoLines: function(text) {
-      var rawLines = text.split(this._reNewline),
-          graphemeLines = this._wrapText(rawLines, this.width),
-          lines = new Array(graphemeLines.length),
-          newText = [];
+      var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
+          graphemeLines = this._wrapText(newText.lines, this.width),
+          lines = new Array(graphemeLines.length);
+
       for (var i = 0; i < graphemeLines.length; i++) {
         lines[i] = graphemeLines[i].join('');
       }
-      newText = fabric.util.string.graphemeSplit(text);
-      return { lines: lines, graphemeText: newText, graphemeLines: graphemeLines };
+      newText.lines = lines;
+      newText.graphemeLines = graphemeLines;
+      console.log(newText)
+      return newText;
     },
 
     /**
@@ -25803,39 +25808,39 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     },
 
-    /**
-     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
-     * Overrides the superclass function to take into account text wrapping.
-     *
-     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-     */
-    get2DCursorLocation: function(selectionStart) {
-      if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
-      }
-
-      var numLines = this._textLines.length,
-          removed = 0, lineLen;
-
-      for (var i = 0; i < numLines; i++) {
-        lineLen  = this._textLines[i].length;
-        if (selectionStart <= removed + lineLen) {
-          return {
-            lineIndex: i,
-            charIndex: selectionStart - removed
-          };
-        }
-        removed += lineLen;
-        if (this._text[removed] === '\n' || this._text[removed] === ' ') {
-          removed++;
-        }
-      }
-
-      return {
-        lineIndex: numLines - 1,
-        charIndex: this._textLines[numLines - 1].length
-      };
-    },
+    // /**
+    //  * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
+    //  * Overrides the superclass function to take into account text wrapping.
+    //  *
+    //  * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+    //  */
+    // get2DCursorLocation: function(selectionStart) {
+    //   if (typeof selectionStart === 'undefined') {
+    //     selectionStart = this.selectionStart;
+    //   }
+    //
+    //   var numLines = this._textLines.length,
+    //       removed = 0, lineLen;
+    //
+    //   for (var i = 0; i < numLines; i++) {
+    //     lineLen  = this._textLines[i].length;
+    //     if (selectionStart <= removed + lineLen) {
+    //       return {
+    //         lineIndex: i,
+    //         charIndex: selectionStart - removed
+    //       };
+    //     }
+    //     removed += lineLen;
+    //     if (this._text[removed] === '\n' || this._text[removed] === ' ') {
+    //       removed++;
+    //     }
+    //   }
+    //
+    //   return {
+    //     lineIndex: numLines - 1,
+    //     charIndex: this._textLines[numLines - 1].length
+    //   };
+    // },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
@@ -25940,50 +25945,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     },
 
-    /**
-     * Inserts style object for a given line/char index
-     * @param {Number} lineIndex Index of a line
-     * @param {Number} charIndex Index of a char
-     * @param {Number} quantity number Style object to insert, if given
-     */
-    insertCharStyleObject: function(lineIndex, charIndex, quantity) {
-      // adjust lineIndex and charIndex
-      var map = this._styleMap[lineIndex];
-      lineIndex = map.line;
-      charIndex = map.offset + charIndex;
-
-      fabric.IText.prototype.insertCharStyleObject.call(this, lineIndex, charIndex, quantity);
-    },
-
-    /**
-     * Inserts new style object
-     * @param {Number} lineIndex Index of a line
-     * @param {Number} charIndex Index of a char
-     * @param {Number} qty how many lines are we adding
-     */
-    insertNewlineStyleObject: function(lineIndex, charIndex, qty) {
-      // adjust lineIndex and charIndex
-      var map = this._styleMap[lineIndex];
-      lineIndex = map.line;
-      charIndex = map.offset + charIndex;
-
-      fabric.IText.prototype.insertNewlineStyleObject.call(this, lineIndex, charIndex, qty);
-    },
-
-    /**
-     * Shifts line styles up or down. This function is slightly different than the one in
-     * itext_behaviour as it takes into account the styleMap.
-     *
-     * @param {Number} lineIndex Index of a line
-     * @param {Number} offset Can be -1 or +1
-     */
-    shiftLineStyles: function(lineIndex, offset) {
-      // shift all line styles by 1 upward
-      var map = this._styleMap[lineIndex];
-      // adjust line index
-      lineIndex = map.line;
-      fabric.IText.prototype.shiftLineStyles.call(this, lineIndex, offset);
-    },
   });
 })();
 

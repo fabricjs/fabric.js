@@ -531,6 +531,7 @@
       }
       var newLines = this._splitTextIntoLines(this.text);
       this.textLines = newLines.lines;
+      this._unwrappedTextLines = newLines._unwrappedLines;
       this._textLines = newLines.graphemeLines;
       this._text = newLines.graphemeText;
       this._clearCache();
@@ -1417,7 +1418,7 @@
         newText = newText.concat(newLines[i], newLine);
       }
       newText.pop();
-      return { lines: lines, graphemeText: newText, graphemeLines: newLines };
+      return { _unwrappedLines: newLines, lines: lines, graphemeText: newText, graphemeLines: newLines };
     },
 
     /**
