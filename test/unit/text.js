@@ -77,7 +77,7 @@
     var fontDecl = text._getFontDeclaration();
     ok(typeof fontDecl == 'string', 'it returns a string');
     if (fabric.isLikelyNode) {
-      equal(fontDecl, 'normal  40px "Times New Roman"');
+      equal(fontDecl, '  40px "Times New Roman"');
     }
     else {
       equal(fontDecl, ' normal 40px Times New Roman');
