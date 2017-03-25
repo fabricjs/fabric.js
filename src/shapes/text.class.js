@@ -832,8 +832,8 @@
     _getFontDeclaration: function() {
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
-        (fabric.isLikelyNode ? (this.fontWeight == 'normal' ? '' : this.fontWeight) : this.fontStyle),
-        (fabric.isLikelyNode ? (this.fontStyle == 'normal' ? '' : this.fontStyle) : this.fontWeight),
+        (fabric.isLikelyNode ? (this.fontWeight === 'normal' ? '' : this.fontWeight) : this.fontStyle),
+        (fabric.isLikelyNode ? (this.fontStyle === 'normal' ? '' : this.fontStyle) : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
