@@ -345,7 +345,7 @@
       }
 
       this.isEditing = true;
-
+      this.selected = true;
       this.initHiddenTextarea(e);
       this.hiddenTextarea.focus();
       this._updateTextarea();
@@ -730,7 +730,7 @@
           }
         }
       }
-      var newStyle = style || currentLineStyles[charIndex - 1];
+      var newStyle = style || clone(currentLineStyles[charIndex - 1]);
       newStyle && (this.styles[lineIndex][charIndex] = newStyle);
       this._forceClearCache = true;
     },
@@ -766,8 +766,14 @@
      * @param {Number} offset Can be -1 or +1
      */
     shiftLineStyles: function(lineIndex, offset) {
-      // shift all line styles by 1 upward
+      // shift all line styles by 1 upward or downward
       var clonedStyles = clone(this.styles);
+      for (var line in clonedStyles) {
+        var numericLine = parseInt(line, 10);
+        if (numericLine <= lineIndex) {
+          delete clonedStyles[numericLine];
+        }
+      }
       for (var line in this.styles) {
         var numericLine = parseInt(line, 10);
         if (numericLine > lineIndex) {

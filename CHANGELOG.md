@@ -1,3 +1,10 @@
+**Version 1.7.9**
+
+- Fix: Avoid textarea wrapping from chome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Fix: double click needed to move cursor when enterEditing is called programatically [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Fix: Style regression when inputing new style objects [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Add: try to support crossOrigin for svg image tags [#3804](https://github.com/kangax/fabric.js/pull/3804)
+
 **Version 1.7.8**
 
 - Fix: Fix dirty flag propagation [#3782](https://github.com/kangax/fabric.js/pull/3782)
