@@ -36,6 +36,47 @@
     });
   }
 
+  function createRadialGradientWithInternalRadius() {
+    return new fabric.Gradient({
+      type: 'radial',
+      coords: {
+        x1: 0,
+        y1: 10,
+        x2: 100,
+        y2: 200,
+        r1: 10,
+        r2: 50
+      },
+      colorStops: [
+        { offset: 0, color: 'red' },
+        { offset: 1, color: 'green', opacity: 0 }
+      ]
+    });
+  }
+
+  function createRadialGradientSwapped() {
+    return new fabric.Gradient({
+      type: 'radial',
+      coords: {
+        x1: 0,
+        y1: 10,
+        x2: 100,
+        y2: 200,
+        r1: 50,
+        r2: 10
+      },
+      colorStops: [
+        { offset: 0, color: 'red' },
+        { offset: 1, color: 'green', opacity: 0 }
+      ]
+    });
+  }
+
+  var SVG_LINEAR = '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" x1="-50" y1="-40" x2="50" y2="150">\n<stop offset="0%" style="stop-color:red;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: undefined"/>\n</linearGradient>\n';
+  var SVG_RADIAL = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="0%" style="stop-color:red;stop-opacity: undefined"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
+  var SVG_INTERNALRADIUS = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="20%" style="stop-color:red;stop-opacity: undefined"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
+  var SVG_SWAPPED = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="-50" cy="-40" r="50" fx="50" fy="150">\n<stop offset="20%" style="stop-color:green;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:red;stop-opacity: undefined"/>\n</radialGradient>\n';
+
   test('constructor linearGradient', function() {
     ok(fabric.Gradient);
 
@@ -634,10 +675,35 @@
 
   test('toSVG', function() {
     var gradient = createLinearGradient();
-
     ok(typeof gradient.toSVG == 'function');
+  });
 
-    // TODO: test toSVG
+  test('toSVG linear', function() {
+    fabric.Object.__uid = 0;
+    var gradient = createLinearGradient();
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    equal(gradient.toSVG(obj), SVG_LINEAR);
+  });
+
+  test('toSVG radial', function() {
+    fabric.Object.__uid = 0;
+    var gradient = createRadialGradient();
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    equal(gradient.toSVG(obj), SVG_RADIAL);
+  });
+
+  test('toSVG radial with r1 > 0', function() {
+    fabric.Object.__uid = 0;
+    var gradient = createRadialGradientWithInternalRadius();
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    equal(gradient.toSVG(obj), SVG_INTERNALRADIUS);
+  });
+
+  test('toSVG radial with r1 > 0', function() {
+    fabric.Object.__uid = 0;
+    var gradient = createRadialGradientSwapped();
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    equal(gradient.toSVG(obj), SVG_SWAPPED);
   });
 
 })();
