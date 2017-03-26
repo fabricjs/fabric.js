@@ -615,7 +615,7 @@
     var svgUid =  fabric.Object.__uid++,
         options = applyViewboxTransform(doc),
         descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
-    options.crossOrigin = parsingOptions.crossOrigin;
+    options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
     options.svgUid = svgUid;
 
     if (descendants.length === 0 && fabric.isLikelyNode) {
