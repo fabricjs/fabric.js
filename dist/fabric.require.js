@@ -10091,7 +10091,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         cacheProperties: cacheProperties,
         stroke: null,
         shadow: null,
-        _fontSizeFraction: .25,
+        _fontSizeFraction: .222,
+        offsets: {
+            underline: .1,
+            linethrough: -.315,
+            overline: -.88
+        },
         _fontSizeMult: 1.13,
         charSpacing: 0,
         styles: null,
@@ -10481,7 +10486,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             charOffset = charOffset || 0;
             var lineHeight = this.getHeightOfLine(lineIndex), actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender;
             ctx.save();
-            top -= lineHeight / this.lineHeight * this._fontSizeFraction;
+            top -= lineHeight * this._fontSizeFraction / this.lineHeight;
             for (var i = charOffset, len = line.length + charOffset - 1; i <= len; i++) {
                 timeToRender = i === len || this.charSpacing;
                 charsToRender += line[i - charOffset];
@@ -10584,11 +10589,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this[type] && !this.styleHas(type)) {
                 return;
             }
-            var heightOfLine, lineLeftOffset, line, lastDecoration, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, offsets = {
-                underline: .12,
-                linethrough: -.3,
-                overline: -.86
-            };
+            var heightOfLine, lineLeftOffset, line, lastDecoration, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill;
             for (var i = 0, len = this._textLines.length; i < len; i++) {
                 heightOfLine = this.getHeightOfLine(i);
                 if (!this[type] && !this.styleHas(type, i)) {
@@ -10608,7 +10609,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     currentFill = this.getValueOfPropertyAt(i, j, "fill");
                     if ((currentDecoration !== lastDecoration || currentFill !== lastFill) && boxWidth > 0) {
                         ctx.fillStyle = lastFill;
-                        lastDecoration && lastFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
+                        lastDecoration && lastFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
                         boxStart = charBox.left;
                         boxWidth = charBox.width;
                         lastDecoration = currentDecoration;
@@ -10618,7 +10619,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     }
                 }
                 ctx.fillStyle = currentFill;
-                currentDecoration && currentFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
+                currentDecoration && currentFill && ctx.fillRect(leftOffset + lineLeftOffset + boxStart, topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize, boxWidth, this.fontSize / 15);
                 topOffset += heightOfLine;
             }
             this._removeShadow(ctx);

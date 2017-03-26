@@ -21609,7 +21609,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * @private
      */
-    _fontSizeFraction: 0.25,
+    _fontSizeFraction: 0.222,
+
+    /**
+     * @private
+     */
+    offsets: {
+      underline: 0.10,
+      linethrough: -0.315,
+      overline: -0.88
+    },
 
     /**
      * Text Line proportion to font Size (in pixels)
@@ -22381,7 +22390,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           timeToRender;
 
       ctx.save();
-      top -= lineHeight / this.lineHeight * this._fontSizeFraction;
+      top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       for (var i = charOffset, len = line.length + charOffset - 1; i <= len; i++) {
         timeToRender = i === len || this.charSpacing;
         charsToRender += line[i - charOffset];
@@ -22560,12 +22569,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill,
-          offsets = {
-            underline: 0.12,
-            linethrough: -0.30,
-            overline: -0.86
-          };
+          maxHeight, currentFill, lastFill;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -22588,7 +22592,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             ctx.fillStyle = lastFill;
             lastDecoration && lastFill && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize,
+              topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
               boxWidth,
               this.fontSize / 15);
             boxStart = charBox.left;
@@ -22603,7 +22607,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         ctx.fillStyle = currentFill;
         currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
-          topOffset + maxHeight * (1 - this._fontSizeFraction) + offsets[type] * this.fontSize,
+          topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
           boxWidth,
           this.fontSize / 15
         );
