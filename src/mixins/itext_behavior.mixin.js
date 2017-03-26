@@ -504,7 +504,7 @@
           cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
-          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex) * this.lineHeight,
+          charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') * this.lineHeight,
           leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {

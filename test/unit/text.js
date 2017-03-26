@@ -37,9 +37,11 @@
     'fontSize':                  40,
     'fontWeight':                'normal',
     'fontFamily':                'Times New Roman',
-    'fontStyle':                 '',
+    'fontStyle':                 'normal',
     'lineHeight':                1.16,
-    'textDecoration':            '',
+    'underline':                 false,
+    'overline':                  false,
+    'linethrough':               false,
     'textAlign':                 'left',
     'textBackgroundColor':       '',
     'fillRule':                  'nonzero',
@@ -77,10 +79,10 @@
     var fontDecl = text._getFontDeclaration();
     ok(typeof fontDecl == 'string', 'it returns a string');
     if (fabric.isLikelyNode) {
-      equal(fontDecl, 'normal  40px "Times New Roman"');
+      equal(fontDecl, 'normal normal 40px "Times New Roman"');
     }
     else {
-      equal(fontDecl, ' normal 40px Times New Roman');
+      equal(fontDecl, 'normal normal 40px Times New Roman');
     }
 
   });
@@ -113,10 +115,10 @@
     var text = createTextObject();
     text.text = 'text with one line';
     text.lineHeight = 2;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height;
     text.lineHeight = 0.5;
-    text._initDimensions();
+    text.initDimensions();
     var heightNew = text.height;
     equal(height, heightNew, 'text height does not change with one single line');
   });
@@ -125,7 +127,7 @@
     var text = createTextObject();
     text.text = 'text with\ntwo lines';
     text.lineHeight = 0.1;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height,
         minimumHeight = text.fontSize * text._fontSizeMult;
     equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
@@ -268,7 +270,7 @@
       fontStyle:        'italic',
       fontWeight:       'bold',
       fontSize:         123,
-      textDecoration:   'underline',
+      underline:        true,
       originX:          'center'
     });
 

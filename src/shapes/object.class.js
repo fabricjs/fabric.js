@@ -1332,7 +1332,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _setShadow: function(ctx, decl) {
+    _setShadow: function(ctx) {
       if (!this.shadow) {
         return;
       }
@@ -1344,10 +1344,10 @@
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
       }
-      ctx.shadowColor = decl.shadow.color;
-      ctx.shadowBlur = decl.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
-      ctx.shadowOffsetX = decl.shadow.offsetX * multX * scaling.scaleX;
-      ctx.shadowOffsetY = decl.shadow.offsetY * multY * scaling.scaleY;
+      ctx.shadowColor = this.shadow.color;
+      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
+      ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
     },
 
     /**

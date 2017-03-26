@@ -6208,7 +6208,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.drawControls(ctx);
             ctx.restore();
         },
-        _setShadow: function(ctx, decl) {
+        _setShadow: function(ctx) {
             if (!this.shadow) {
                 return;
             }
@@ -6217,10 +6217,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 multX *= fabric.devicePixelRatio;
                 multY *= fabric.devicePixelRatio;
             }
-            ctx.shadowColor = decl.shadow.color;
-            ctx.shadowBlur = decl.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
-            ctx.shadowOffsetX = decl.shadow.offsetX * multX * scaling.scaleX;
-            ctx.shadowOffsetY = decl.shadow.offsetY * multY * scaling.scaleY;
+            ctx.shadowColor = this.shadow.color;
+            ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+            ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
+            ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
         },
         _removeShadow: function(ctx) {
             if (!this.shadow) {
@@ -10061,7 +10061,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, MIN_TEXT_WIDTH = 2, CACHE_FONT_SIZE = 40;
+    var fabric = global.fabric || (global.fabric = {}), toFixed = fabric.util.toFixed, clone = fabric.util.object.clone, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, MIN_TEXT_WIDTH = 2, CACHE_FONT_SIZE = 40;
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
         return;
@@ -10448,12 +10448,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _getTopOffset: function() {
             return -this.height / 2;
         },
-        getCurrentCharFontSize: function(lineIndex, charIndex) {
-            return this.getValueOfPropertyAt(lineIndex, charIndex, "fontSize");
-        },
-        getCurrentCharColor: function(lineIndex, charIndex) {
-            return this.getValueOfPropertyAt(lineIndex, charIndex, "fill");
-        },
         _renderTextCommon: function(ctx, method) {
             var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
             for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -10655,8 +10649,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
         },
         toObject: function(propertiesToInclude) {
-            var additionalProperties = [ "text", "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "underline", "overline", "linethrough", "textAlign", "textBackgroundColor", "charSpacing", "styles" ].concat(propertiesToInclude);
-            return this.callSuper("toObject", additionalProperties);
+            var additionalProperties = [ "text", "fontSize", "fontWeight", "fontFamily", "fontStyle", "lineHeight", "underline", "overline", "linethrough", "textAlign", "textBackgroundColor", "charSpacing" ].concat(propertiesToInclude);
+            var obj = this.callSuper("toObject", additionalProperties);
+            obj.styles = clone(this.styles, true);
+            return obj;
         },
         toSVG: function(reviver) {
             if (!this.ctx) {
@@ -10745,9 +10741,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return null;
         }
         var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
-        options = fabric.util.object.extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes);
+        options = fabric.util.object.extend(options ? clone(options) : {}, parsedAttributes);
         options.top = options.top || 0;
         options.left = options.left || 0;
+        if ("textDecoration" in parsedAttributes) {
+            if (parsedAttributes.indexOf("underline") !== -1) {
+                options.underline = true;
+            }
+            if (parsedAttributes.indexOf("overline") !== -1) {
+                options.overline = true;
+            }
+            if (parsedAttributes.indexOf("line-through") !== -1) {
+                options.linethrough = true;
+            }
+            delete options.textDecoration;
+        }
         if ("dx" in parsedAttributes) {
             options.left += parsedAttributes.dx;
         }
@@ -10976,12 +10984,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return this.cursorOffsetCache;
         },
         renderCursor: function(boundaries, ctx) {
-            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier, topOffset = boundaries.topOffset;
-            topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, "fontSize"), multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier, topOffset = boundaries.topOffset;
+            topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight - charHeight * (1 - this._fontSizeFraction);
             if (this.inCompositionMode) {
                 this.renderSelection(boundaries, ctx);
             }
-            ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
+            ctx.fillStyle = this.getValueOfPropertyAt(lineIndex, charIndex, "fill");
             ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
             ctx.fillRect(boundaries.left + boundaries.leftOffset - cursorWidth / 2, topOffset + boundaries.top, cursorWidth, charHeight);
         },
@@ -11014,6 +11022,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
                 boundaries.topOffset += realLineHeight;
             }
+        },
+        getCurrentCharFontSize: function() {
+            var cp = this._getCurrentCharIndex();
+            return this.getValueOfPropertyAt(cp.l, cp.c, "fontSize");
+        },
+        getCurrentCharColor: function() {
+            var cp = this._getCurrentCharIndex();
+            return this.getValueOfPropertyAt(cp.l, cp.c, "fill");
+        },
+        _getCurrentCharIndex: function() {
+            var cursorPosition = this.get2DCursorLocation(this.selectionStart, true), charIndex = cursorPosition.charIndex > 0 ? charIndex - 1 : 0;
+            return {
+                l: cursorPosition.lineIndex,
+                c: charIndex
+            };
         }
     });
     fabric.IText.fromObject = function(object, callback, forceAsync) {
@@ -11361,7 +11384,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     y: 1
                 };
             }
-            var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex) * this.lineHeight, leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
+            var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, "fontSize") * this.lineHeight, leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
                 y: boundaries.top + boundaries.topOffset + charHeight
             }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;

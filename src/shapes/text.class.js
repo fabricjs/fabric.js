@@ -4,6 +4,7 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed,
+      clone = fabric.util.object.clone,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
       MIN_TEXT_WIDTH = 2,
       CACHE_FONT_SIZE = 40;
@@ -1044,26 +1045,6 @@
     },
 
     /**
-     * Returns fontSize of char at the current cursor
-     * @param {Number} lineIndex Line index
-     * @param {Number} charIndex Char index
-     * @return {Number} Character font size
-     */
-    getCurrentCharFontSize: function(lineIndex, charIndex) {
-      return this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize');
-    },
-
-    /**
-     * Returns color (fill) of char at the current cursor
-     * @param {Number} lineIndex Line index
-     * @param {Number} charIndex Char index
-     * @return {String} Character color (fill)
-     */
-    getCurrentCharColor: function(lineIndex, charIndex) {
-      return this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    },
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} method Method name ("fillText" or "strokeText")
@@ -1444,9 +1425,10 @@
         'textAlign',
         'textBackgroundColor',
         'charSpacing',
-        'styles',
       ].concat(propertiesToInclude);
-      return this.callSuper('toObject', additionalProperties);
+      var obj = this.callSuper('toObject', additionalProperties);
+      obj.styles = clone(this.styles, true);
+      return obj;
     },
 
     /* _TO_SVG_START_ */
@@ -1695,10 +1677,22 @@
     }
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
-    options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+    options = fabric.util.object.extend((options ? clone(options) : { }), parsedAttributes);
 
     options.top = options.top || 0;
     options.left = options.left || 0;
+    if ('textDecoration' in parsedAttributes) {
+      if (parsedAttributes.indexOf('underline') !== -1) {
+        options.underline = true;
+      }
+      if (parsedAttributes.indexOf('overline') !== -1) {
+        options.overline = true;
+      }
+      if (parsedAttributes.indexOf('line-through') !== -1) {
+        options.linethrough = true;
+      }
+      delete options.textDecoration;
+    }
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
