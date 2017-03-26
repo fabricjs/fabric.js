@@ -23576,7 +23576,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     _getCurrentCharIndex: function() {
       var cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
-          charIndex = cursorPosition.charIndex > 0 ? charIndex - 1 : 0;
+          charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
       return { l: cursorPosition.lineIndex, c: charIndex };
     }
   });

@@ -11032,7 +11032,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return this.getValueOfPropertyAt(cp.l, cp.c, "fill");
         },
         _getCurrentCharIndex: function() {
-            var cursorPosition = this.get2DCursorLocation(this.selectionStart, true), charIndex = cursorPosition.charIndex > 0 ? charIndex - 1 : 0;
+            var cursorPosition = this.get2DCursorLocation(this.selectionStart, true), charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
             return {
                 l: cursorPosition.lineIndex,
                 c: charIndex
