@@ -187,9 +187,22 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
+    var newValue = stripControlCharacters(this.hiddenTextarea.value);
+    if (this.hiddenTextarea.value !== newValue) {
+      // If we stripped something, update the textarea. This will cause the cursor to jump, so we avoid it normally.
+      this.hiddenTextarea.value = newValue;
+    }
+
     this.set('text', this.hiddenTextarea.value);
 
     // Broadcast hiddenTextArea input events as 'changed' event on this itext instance
     this.fire('changed');
   }
 });
+
+function stripControlCharacters(text) {
+  return text
+    .replace(/\t/g, ' ')  // Replace TAB with a single space - that's how Fabric renders it, so it should look the same in the textarea
+    .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F]/g, '') // Strip all ASCII control characters except LF (0x0A) and CR (0x0D)
+  ;
+}
