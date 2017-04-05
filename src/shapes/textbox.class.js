@@ -351,7 +351,6 @@
       }
       newText.lines = lines;
       newText.graphemeLines = graphemeLines;
-      console.log(newText)
       return newText;
     },
 

@@ -136,8 +136,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.target.value === '') {
       this.styles = { };
       this.updateFromTextArea();
-      this.canvas && this.canvas.renderAll();
-      return;
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.renderAll();
+      }
     }
 
     if (this.selectionStart !== this.selectionEnd) {
@@ -169,7 +172,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.fire('changed');
     if (this.canvas) {
       this.canvas.fire('text:changed', { target: this });
-      this.canvas && this.canvas.renderAll();
+      this.canvas.renderAll();
     }
   },
   /**
