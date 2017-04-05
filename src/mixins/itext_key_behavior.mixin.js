@@ -30,7 +30,22 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _keysMap: {
+  //TODO: change it
+  _keysMap: fabric.IText.prototype.isRTL ? {
+    8:  'removeChars',
+    9:  'exitEditing',
+    27: 'exitEditing',
+    13: 'insertNewline',
+    33: 'moveCursorUp',
+    34: 'moveCursorDown',
+    35: 'moveCursorLeft',
+    36: 'moveCursorRight',
+    37: 'moveCursorRight',
+    38: 'moveCursorUp',
+    39: 'moveCursorLeft',
+    40: 'moveCursorDown',
+    46: 'forwardDelete'
+  } :  {
     8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',

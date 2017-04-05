@@ -11724,6 +11724,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     if (chars) {
                         var neutralCharCodes = [ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64 ];
                         var numbersCharCodes = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 ];
+                        var ltrCharCodes = [];
                         var dic = [];
                         chars = chars.split("");
                         for (var i = 0; i < chars.length; i++) {
@@ -11770,6 +11771,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                             }
                         }
                     }
+                    console.log(dic);
                     if (dic) {
                         for (var j = 0; j < 2; j++) {
                             for (var i = dic.length - 1; i > 1; i--) {
@@ -13466,7 +13468,21 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this._clickHandlerInitialized = true;
         }
     },
-    _keysMap: {
+    _keysMap: fabric.IText.prototype.isRTL ? {
+        8: "removeChars",
+        9: "exitEditing",
+        27: "exitEditing",
+        13: "insertNewline",
+        33: "moveCursorUp",
+        34: "moveCursorDown",
+        35: "moveCursorLeft",
+        36: "moveCursorRight",
+        37: "moveCursorRight",
+        38: "moveCursorUp",
+        39: "moveCursorLeft",
+        40: "moveCursorDown",
+        46: "forwardDelete"
+    } : {
         8: "removeChars",
         9: "exitEditing",
         27: "exitEditing",

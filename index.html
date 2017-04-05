@@ -27,10 +27,10 @@
   </head>
   <body>
 <div class="left">
-  <canvas id="c" dir="rtl" width="600" height="450" style="border: 1px solid #ccc"></canvas>
+  <canvas id="c" width="600" height="450" style="border: 1px solid #ccc"></canvas>
 </div>
 <div class=left>
-  <textarea  cols="90" rows="30" dir=rtl id=textarea></textarea>
+  <textarea  cols="90" rows="30" id=textarea></textarea>
 </div>
 
         <script>
@@ -62,7 +62,6 @@ var strings = [
     'מזל טוב ( : 01.07.79'
     
 ];
-
 for (let i=0 ; i < strings.length; i++ ) {
   canvas.add(new fabric.IText(strings[i], {
     left: 500,
@@ -72,7 +71,7 @@ for (let i=0 ; i < strings.length; i++ ) {
     padding: 7,
     textAlign: 'right',
     originX: 'right',
-    isRTL: true
+    //isRTL: true
   }));
 
   let taLines = ta.value.split('\n');
