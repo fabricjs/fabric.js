@@ -89,6 +89,8 @@
       if (this.__skipDimension) {
         return;
       }
+      this.abortCursorAnimation();
+      this.clearContextTop();
       this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
@@ -371,40 +373,6 @@
         this.__oldScaleX = value;
       }
     },
-
-    // /**
-    //  * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
-    //  * Overrides the superclass function to take into account text wrapping.
-    //  *
-    //  * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-    //  */
-    // get2DCursorLocation: function(selectionStart) {
-    //   if (typeof selectionStart === 'undefined') {
-    //     selectionStart = this.selectionStart;
-    //   }
-    //
-    //   var numLines = this._textLines.length,
-    //       removed = 0, lineLen;
-    //
-    //   for (var i = 0; i < numLines; i++) {
-    //     lineLen  = this._textLines[i].length;
-    //     if (selectionStart <= removed + lineLen) {
-    //       return {
-    //         lineIndex: i,
-    //         charIndex: selectionStart - removed
-    //       };
-    //     }
-    //     removed += lineLen;
-    //     if (this._text[removed] === '\n' || this._text[removed] === ' ') {
-    //       removed++;
-    //     }
-    //   }
-    //
-    //   return {
-    //     lineIndex: numLines - 1,
-    //     charIndex: this._textLines[numLines - 1].length
-    //   };
-    // },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
