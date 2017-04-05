@@ -305,7 +305,7 @@
     /**
      * Prepare and clean the contextTop
      */
-    clearContextTop: function() {
+    clearContextTop: function(skipRestore) {
       if (!this.active || !this.isEditing) {
         return;
       }
@@ -316,7 +316,7 @@
         this.transform(ctx);
         this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
         this._clearTextArea(ctx);
-        ctx.restore();
+        skipRestore || ctx.restore();
       }
     },
 
@@ -330,11 +330,7 @@
       var boundaries = this._getCursorBoundaries(), ctx;
       if (this.canvas && this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
-        ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
-        this.transform(ctx);
-        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-        this._clearTextArea(ctx);
+        this.clearContextTop(true);
       }
       else {
         ctx = this.ctx;
@@ -426,7 +422,8 @@
       }
 
       lineLeftOffset = this._getLineLeftOffset(cursorPosition.lineIndex);
-      leftOffset = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex].left;
+      var bound = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex];
+      bound && (leftOffset = bound.left);
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
       }
