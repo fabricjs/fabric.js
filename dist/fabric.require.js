@@ -11721,10 +11721,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
             } else {
                 if (this.isRTL) {
+                    var hebrewCharCodes = [ 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514 ];
                     if (chars) {
-                        var neutralCharCodes = [ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64 ];
+                        var appendedToLastCharCodes = [ 32 ];
+                        var neutralCharCodes = [ 32, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 58, 59, 60, 61, 62, 63, 64 ];
                         var numbersCharCodes = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 ];
-                        var ltrCharCodes = [];
+                        var rtlCharCodes = [ 33, 46, 47 ];
                         var dic = [];
                         chars = chars.split("");
                         for (var i = 0; i < chars.length; i++) {
@@ -11733,7 +11735,19 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                         }
                         var lastSet = "ltr";
                         for (var i = 0, len = chars.length - 1; i <= len; i++) {
-                            if (chars[i].charCodeAt(0) >= 1488 && chars[i].charCodeAt(0) <= 1514 || numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                            if (rtlCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                                if (lastSet == "number") {
+                                    dic[dic.length - 1].chars.push(chars[i]);
+                                } else if (lastSet !== "rtl") {
+                                    dic.push({
+                                        dir: "rtl",
+                                        chars: [ chars[i] ]
+                                    });
+                                    lastSet = "rtl";
+                                } else {
+                                    dic[dic.length - 1].chars.push(chars[i]);
+                                }
+                            } else if (hebrewCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
                                 if (lastSet !== "rtl") {
                                     dic.push({
                                         dir: "rtl",
@@ -11743,21 +11757,49 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                                     dic[dic.length - 1].chars.push(chars[i]);
                                 }
                                 lastSet = "rtl";
+                            } else if (appendedToLastCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                                var next = hebrewCharCodes.indexOf(chars[i + 1].charCodeAt(0)) > -1 || rtlCharCodes.indexOf(chars[i + 1].charCodeAt(0)) > -1 ? "rtl" : "ltr";
+                                if (next == "ltr" && lastSet == "ltr") {
+                                    dic[dic.length - 1].chars.push(chars[i]);
+                                } else {
+                                    if (lastSet == "rtl") {
+                                        dic[dic.length - 1].chars.push(chars[i]);
+                                    } else {
+                                        dic.push({
+                                            dir: "rtl",
+                                            chars: [ chars[i] ]
+                                        });
+                                        lastSet = "rtl";
+                                    }
+                                }
                             } else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-                                if (lastSet !== "other") {
-                                    dic.push({
-                                        dir: "other",
-                                        chars: [ chars[i] ]
-                                    });
-                                } else if (dic[dic.length - 1].chars[0] == chars[i]) {
+                                var next = "rtl";
+                                if (i < len) {
+                                    next = hebrewCharCodes.indexOf(chars[i + 1].charCodeAt(0)) > -1 ? "rtl" : "ltr";
+                                }
+                                if (lastSet == "ltr" && next == "ltr") {
+                                    dic[dic.length - 1].chars.push(chars[i]);
+                                } else {
+                                    if (lastSet == "rtl") {
+                                        dic[dic.length - 1].chars.push(chars[i]);
+                                    } else {
+                                        dic.push({
+                                            dir: "rtl",
+                                            chars: [ chars[i] ]
+                                        });
+                                        lastSet = "rtl";
+                                    }
+                                }
+                            } else if (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                                if (lastSet == "number") {
                                     dic[dic.length - 1].chars.push(chars[i]);
                                 } else {
                                     dic.push({
-                                        dir: "other",
+                                        dir: "number",
                                         chars: [ chars[i] ]
                                     });
                                 }
-                                lastSet = "other";
+                                lastSet = "number";
                             } else {
                                 if (lastSet !== "ltr" || i === 0) {
                                     dic.push({
@@ -11773,36 +11815,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     }
                     console.log(dic);
                     if (dic) {
-                        for (var j = 0; j < 2; j++) {
-                            for (var i = dic.length - 1; i > 1; i--) {
-                                if (dic[i - 2].dir === "ltr" && dic[i - 1].dir === "other" && dic[i].dir === "ltr") {
-                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i - 1].chars);
-                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i].chars);
-                                    dic.splice(i, 1);
-                                    dic.splice(i - 1, 1);
-                                    i--;
-                                } else if (dic[i - 2].dir === "rtl" && dic[i - 1].dir === "other" && dic[i].dir === "rtl") {
-                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i - 1].chars);
-                                    dic[i - 2].chars = dic[i - 2].chars.concat(dic[i].chars);
-                                    dic.splice(i, 1);
-                                    dic.splice(i - 1, 1);
-                                    i--;
-                                } else if (dic[i - 1].dir === "other" && dic[i].dir === "other") {
-                                    dic[i - 1].chars = dic[i].chars.concat(dic[i - 1].chars);
-                                    dic.splice(i, 1);
+                        for (var i = 0; i < dic.length; i++) {
+                            if (dic[i].dir == "rtl") {
+                                dic[i].chars = dic[i].chars.reverse().join("");
+                            } else if (dic[i].dir == "ltr") {
+                                if (dic[i].chars[0] == " ") {
+                                    dic[i].chars.splice(0, 1);
+                                    dic[i].chars.splice(dic[i].chars.length, 0, " ");
                                 }
+                                console.log(dic[i].chars);
                             }
                         }
                         for (var i = dic.length - 1, len = 0; i >= len; i--) {
-                            if (dic[i].dir === "rtl") {
-                                var str = dic[i].chars.join("");
-                                width = ctx.measureText(str).width;
-                                ctx[method](str, left, top);
-                                left += width > 0 ? width : 0;
-                            } else if (dic[i].dir === "ltr" || dic[i].dir === "other") {
-                                var str = dic[i].chars.join("");
-                                width = ctx.measureText(str).width;
-                                ctx[method](str, left, top);
+                            for (var j = 0; j < dic[i].chars.length; j++) {
+                                width = ctx.measureText(dic[i].chars[j]).width;
+                                ctx[method](dic[i].chars[j], left, top);
                                 left += width > 0 ? width : 0;
                             }
                         }
