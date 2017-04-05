@@ -10691,22 +10691,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _setSVGTextLineText: function(i, textSpans, height, textLeftOffset, textTopOffset) {
             var yPos = this.fontSize * (this._fontSizeMult - this._fontSizeFraction) - textTopOffset + height - this.height / 2;
-            if (this.textAlign === "justify") {
-                this._setSVGTextLineJustifed(i, textSpans, yPos, textLeftOffset);
-                return;
-            }
             textSpans.push('\t\t\t<tspan x="', toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS), '" ', 'y="', toFixed(yPos, NUM_FRACTION_DIGITS), '" ', this._getFillAttributes(this.fill), ">", fabric.util.string.escapeXml(this._textLines[i].join("")), "</tspan>\n");
-        },
-        _setSVGTextLineJustifed: function(i, textSpans, yPos, textLeftOffset) {
-            var ctx = fabric.util.createCanvasElement().getContext("2d");
-            this._setTextStyles(ctx);
-            var line = this._textLines[i], words = line.split(/\s+/), wordsWidth = this._getWidthOfWords(ctx, words.join("")), widthDiff = this.width - wordsWidth, numSpaces = words.length - 1, spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0, word, attributes = this._getFillAttributes(this.fill), len;
-            textLeftOffset += this._getLineLeftOffset(i);
-            for (i = 0, len = words.length; i < len; i++) {
-                word = words[i];
-                textSpans.push('\t\t\t<tspan x="', toFixed(textLeftOffset, NUM_FRACTION_DIGITS), '" ', 'y="', toFixed(yPos, NUM_FRACTION_DIGITS), '" ', attributes, ">", fabric.util.string.escapeXml(word), "</tspan>\n");
-                textLeftOffset += this._getWidthOfWords(ctx, word) + spaceWidth;
-            }
         },
         _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
             textBgRects.push("\t\t<rect ", this._getFillAttributes(this.textBackgroundColor), ' x="', toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS), '" y="', toFixed(height - this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(this.getLineWidth(i), NUM_FRACTION_DIGITS), '" height="', toFixed(this.getHeightOfLine(i) / this.lineHeight, NUM_FRACTION_DIGITS), '"></rect>\n');
