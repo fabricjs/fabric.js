@@ -500,168 +500,175 @@
       }
       else {
         if (this.isRTL) {
+          var dic = [];
+
           var hebrewCharCodes = 
             [
               1488, 1489,
               1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 
               1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 
-              1510, 1511, 1512, 1513, 1514];
-
-          
-        if (chars) {
-          var appendedToLastCharCodes = [32];
-          var neutralCharCodes = [32, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 
-          58, 59, 60, 61, 62, 63, 64];
+              1510, 1511, 1512, 1513, 1514
+            ];
+          var neutralCharCodes = 
+            [
+              32, 33, 34, 35, 36, 37, 38, 39, 
+              40, 41, 42, 43, 44, 45, 46, 47,
+              58, 59, 
+              60, 61, 62, 63, 64, 
+              123, 125
+            ];
           var numbersCharCodes = [48, 49, 50, 51, 52, 53 ,54 ,55 ,56 ,57];
-          var rtlCharCodes = [33, 46, 47];
-          
-          var dic = [];
-          chars = chars.split('');
-          //replace chars 40 with 41 and vise versa
-          for (var i=0; i < chars.length; i++) {
-            if (chars[i].charCodeAt(0) === 40)
-              chars[i] = String.fromCharCode(41);
-            else if (chars[i].charCodeAt(0) === 41)
-              chars[i] = String.fromCharCode(40);
+          var datesCharCodes = [33, 46, 47];
+          if (chars) {
+            chars = chars.split('');
             
-            if (chars[i].charCodeAt(0) === 60)
-              chars[i] = String.fromCharCode(62);
-            else if (chars[i].charCodeAt(0) === 62)
-              chars[i] = String.fromCharCode(60);
-          }
+            var temp = chars[0];
+            var lastDir = 
+              hebrewCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? 'rtl' : 
+              neutralCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? 'special' : 
+              numbersCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? 'number' : 'ltr';
 
-          var lastSet = 'ltr';
-          //array of rtl/ltr objects
-          for (var i = 0, len = chars.length-1; i <= len; i++) {
-            if (rtlCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-               
-               if (lastSet == 'number') {
-                  dic[dic.length-1].chars.push(chars[i]);
-               }
-               else if (lastSet !== 'rtl') {
-                dic.push({
-                  dir: 'rtl',
-                  chars: [chars[i]]
-                })
-                 lastSet = 'rtl';
-              } else {
-                dic[dic.length-1].chars.push(chars[i]);
-              }
-             
-            }
-            else if (hebrewCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-              if (lastSet !== 'rtl') {
-                dic.push({
-                  dir: 'rtl',
-                  chars: [chars[i]]
-                })
-              } else {
-                dic[dic.length-1].chars.push(chars[i]);
-              }
-              lastSet = 'rtl';
-            } else if (appendedToLastCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-              var next = hebrewCharCodes.indexOf(chars[i+1].charCodeAt(0)) > -1 || rtlCharCodes.indexOf(chars[i+1].charCodeAt(0)) > -1? 'rtl' : 'ltr';
-              if (next == 'ltr' && lastSet == 'ltr') {
-                dic[dic.length-1].chars.push(chars[i]);
-              } else {
-                 if (lastSet == 'rtl') {
-                  dic[dic.length-1].chars.push(chars[i]);
+            for (var i=1; i < chars.length; i++) {
+              if (hebrewCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                if (lastDir == 'rtl') {
+                  temp += chars[i];
                 }
                 else {
-              dic.push({
-                  dir: 'rtl',
-                  chars: [chars[i]]
-                })
-                 lastSet = 'rtl';
-              }          
-              }  
-            }
-            else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-              var next = 'rtl';
-              if (i < len) {
-               next = hebrewCharCodes.indexOf(chars[i+1].charCodeAt(0)) > -1 ? 'rtl' : 'ltr';
+                  dic.push({
+                    chars: temp,
+                    dir: lastDir
+                  });
+                  temp = chars[i];
+                  lastDir = 'rtl'
+                }
               }
-              if (lastSet == 'ltr' && next == 'ltr') {
-                dic[dic.length-1].chars.push(chars[i]);
-              }
-              else {
-                if (lastSet == 'rtl') {
-                  dic[dic.length-1].chars.push(chars[i]);
+              else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                if (lastDir == 'special') {
+                  temp += chars[i];
                 }
                 else {
-              dic.push({
-                  dir: 'rtl',
-                  chars: [chars[i]]
-                })
-                  lastSet = 'rtl';
+                  dic.push({
+                    chars: temp,
+                    dir: lastDir
+                  });
+                  temp = chars[i];
+                  lastDir = 'special'
+                }
               }
-              }
-            } 
-            else if (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-              if (lastSet == 'number') {
-                dic[dic.length-1].chars.push(chars[i]);
+              else if (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+              if (lastDir == 'number') {
+                  temp += chars[i];
+                }
+                else {
+                  dic.push({
+                    chars: temp,
+                    dir: lastDir
+                  });
+                  temp = chars[i];
+                  lastDir = 'number'
+                };
               }
               else {
-                dic.push({
-                    dir: 'number',
-                    chars: [chars[i]]
-                });
+                if (lastDir == 'ltr') {
+                  temp += chars[i];
+                }
+                else {
+                  dic.push({
+                    chars: temp,
+                    dir: lastDir
+                  });
+                  temp = chars[i];
+                  lastDir = 'ltr'
+                };
               }
-              lastSet = 'number';
-            }
-            else {
-              if (lastSet !== 'ltr' || i ===0) {
+
+              if (i == chars.length-1) {
                 dic.push({
-                  dir: 'ltr',
-                  chars: [chars[i]]
-                })
-              } else {
-                dic[dic.length-1].chars.push(chars[i]);
+                    chars: temp,
+                    dir: lastDir
+                  });
               }
               
-              lastSet = 'ltr';
             }
           }
-        }
-       console.log(dic);
-        if (dic) {
-          /*
-          for (var j = 0; j < 2; j++) {
-          for (var i=dic.length-1; i > 1; i--) {
-            if (dic[i-2].dir === 'ltr' && dic[i-1].dir === 'other' && dic[i].dir === 'ltr') {
-              dic[i-2].chars = dic[i-2].chars.concat(dic[i-1].chars);
-              dic[i-2].chars = dic[i-2].chars.concat(dic[i].chars);
-              dic.splice(i, 1);
-              dic.splice(i-1, 1);
-              i--;
+          if (dic) {
+            console.log(dic);
+            //dates
+            for (var i=0; i < dic.length; i++) {
+               if (dic[i].dir == 'number') {
+                 dic[i].dir = 'ltr';
+               }
             }
-            else if (dic[i-2].dir === 'rtl' && dic[i-1].dir === 'other' && dic[i].dir === 'rtl') {
-              dic[i-2].chars = dic[i-2].chars.concat(dic[i-1].chars);
-              dic[i-2].chars = dic[i-2].chars.concat(dic[i].chars);
-              dic.splice(i, 1);
-              dic.splice(i-1, 1);
-              i--;
+
+            //join special between ltr
+            for (var i=1; i < dic.length-1; i++) {
+              if (dic[i].dir == 'special') {
+                if (dic[i-1].dir == 'ltr' && dic[i+1].dir == 'ltr') {
+                  dic[i].dir = 'ltr';
+                }
+                else {
+                  dic[i].dir = 'rtl';
+                }
+              }
+              if (i == dic.length-2) { //last element
+                if (dic[dic.length-1].dir == 'special') {
+                  dic[dic.length-1].dir = 'rtl';
+                }
+              }
             }
-            else if (dic[i-1].dir === 'other' && dic[i].dir === 'other') {
-              dic[i-1].chars = dic[i].chars.concat(dic[i-1].chars);
-              dic.splice(i, 1);
+
+          //join same sets
+          var newDic = [];
+          newDic.push(dic[0]);
+          for (var i=1; i < dic.length; i++) {
+            if (dic[i].dir == newDic[newDic.length-1].dir) {
+              newDic[newDic.length-1].chars = newDic[newDic.length-1].chars.concat(dic[i].chars);
+            }
+            else {
+              newDic.push(dic[i]);
             }
           }
-          }*/
-        for(var i=0; i < dic.length; i++) {
-          if (dic[i].dir == 'rtl') {
-            dic[i].chars = dic[i].chars.reverse().join("");
+
+          
+          dic = newDic;
+
+          //reverse hebrew
+          for (var i=0; i < dic.length; i++) {
+            if (dic[i].dir == 'rtl') {
+              dic[i].chars = dic[i].chars.split('').reverse().join('');
+            }
           }
-          else if (dic[i].dir == 'ltr') { 
+
+          String.prototype.replaceAt=function(index, replacement) {
+              return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
+          }
+          //change direction of brackets
+          for (var i=0; i < dic.length; i++) { 
+            for (var j=0; j < dic[i].chars.length; j++) {
+              switch (dic[i].chars[j]) {
+                case '{':
+                  dic[i].chars = dic[i].chars.replaceAt(j, '}');
+                  break;
+                case '}':
+                  dic[i].chars = dic[i].chars.replaceAt(j, '{');
+                  break;
+                case '(':
+                  dic[i].chars = dic[i].chars.replaceAt(j, ')');
+                  break;
+                case ')':
+                  dic[i].chars = dic[i].chars.replaceAt(j, '(');
+                  break;
+                case '<':
+                  dic[i].chars = dic[i].chars.replaceAt(j, '>');
+                  break;
+                case '>':
+                  dic[i].chars = dic[i].chars.replaceAt(j, '<');
+                  break;
+              }
+            }
             
-            if (dic[i].chars[0] == ' ') { //move trailing spaces to end
-              dic[i].chars.splice(0, 1);
-              dic[i].chars.splice(dic[i].chars.length, 0, ' ');
-            }  
-            console.log(dic[i].chars);
           }
-        }
-        
+
           for (var i = dic.length-1, len = 0; i >= len; i--) {
             for (var j=0; j < dic[i].chars.length; j++) {
                 width = ctx.measureText(dic[i].chars[j]).width;
@@ -740,7 +747,7 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      return -this.width / 2;
+      return - this.width / 2;
     },
 
     /**

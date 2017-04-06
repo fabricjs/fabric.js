@@ -87,7 +87,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return;
       }
       var pointer = this.canvas.getPointer(options.e);
-
+      console.log(options.e);
       this.__mousedownX = pointer.x;
       this.__mousedownY = pointer.y;
       this.__isMousedown = true;
