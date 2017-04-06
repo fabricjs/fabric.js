@@ -23887,7 +23887,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
           
           dic = newDic;
-
+          Array.prototype.clean = function(deleteValue) {
+            for (var i = 0; i < this.length; i++) {
+              if (this[i] == deleteValue) {         
+                this.splice(i, 1);
+                i--;
+              }
+            }
+            return this;
+          };
+          dic.clean(undefined);
           //reverse hebrew
           for (var i=0; i < dic.length; i++) {
             if (dic[i].dir == 'rtl') {
@@ -25136,15 +25145,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-         
-      
+      if (this.isRTL) {
+        return {
+          left: left,
+          top: top,
+          leftOffset: -  offsets.left*2,
+          topOffset: offsets.top
+        };
+    } else {
       return {
         left: left,
         top: top,
         leftOffset: offsets.left + offsets.lineLeft ,
         topOffset: offsets.top
       };
-    
+    }
     
     },
 
@@ -25152,7 +25167,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-      console.log('_getCursorBoundariesOffsets');
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }

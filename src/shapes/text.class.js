@@ -631,7 +631,16 @@
 
           
           dic = newDic;
-
+          Array.prototype.clean = function(deleteValue) {
+            for (var i = 0; i < this.length; i++) {
+              if (this[i] == deleteValue) {         
+                this.splice(i, 1);
+                i--;
+              }
+            }
+            return this;
+          };
+          dic.clean(undefined);
           //reverse hebrew
           for (var i=0; i < dic.length; i++) {
             if (dic[i].dir == 'rtl') {

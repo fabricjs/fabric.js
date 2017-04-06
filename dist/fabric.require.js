@@ -11815,6 +11815,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                             }
                         }
                         dic = newDic;
+                        Array.prototype.clean = function(deleteValue) {
+                            for (var i = 0; i < this.length; i++) {
+                                if (this[i] == deleteValue) {
+                                    this.splice(i, 1);
+                                    i--;
+                                }
+                            }
+                            return this;
+                        };
+                        dic.clean(undefined);
                         for (var i = 0; i < dic.length; i++) {
                             if (dic[i].dir == "rtl") {
                                 dic[i].chars = dic[i].chars.split("").reverse().join("");
@@ -12393,15 +12403,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _getCursorBoundaries: function(chars, typeOfBoundaries) {
             var left = Math.round(this._getLeftOffset()), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(chars, typeOfBoundaries);
-            return {
-                left: left,
-                top: top,
-                leftOffset: offsets.left + offsets.lineLeft,
-                topOffset: offsets.top
-            };
+            if (this.isRTL) {
+                return {
+                    left: left,
+                    top: top,
+                    leftOffset: -offsets.left * 2,
+                    topOffset: offsets.top
+                };
+            } else {
+                return {
+                    left: left,
+                    top: top,
+                    leftOffset: offsets.left + offsets.lineLeft,
+                    topOffset: offsets.top
+                };
+            }
         },
         _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-            console.log("_getCursorBoundariesOffsets");
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
                 return this.cursorOffsetCache;
             }
