@@ -76,8 +76,6 @@
         this._objects[i].group = this;
       }
 
-      this.originalState = { };
-
       if (options.originX) {
         this.originX = options.originX;
       }
