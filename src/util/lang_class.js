@@ -51,13 +51,12 @@
   function Subclass() { }
 
   function callSuper(methodName) {
-    var parentMethod;
+    var parentMethod = null,
+        currentContext = this;
 
     // climb prototype chain to find method not equal to callee's method
-    var currentContext = this;
     while (currentContext.constructor.superclass) {
-      var superClassProto = currentContext.constructor.superclass.prototype;
-      var superClassMethod = superClassProto[methodName];
+      var superClassMethod = currentContext.constructor.superclass.prototype[methodName];
       if (currentContext[methodName] !== superClassMethod) {
         parentMethod = superClassMethod;
         break;
