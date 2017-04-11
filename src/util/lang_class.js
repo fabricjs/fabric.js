@@ -51,10 +51,27 @@
   function Subclass() { }
 
   function callSuper(methodName) {
-    var fn = this.constructor.superclass.prototype[methodName];
+    var parentMethod;
+
+    // climb prototype chain to find method not equal to callee's method
+    var currentContext = this;
+    while (currentContext.constructor.superclass) {
+      var superClassProto = currentContext.constructor.superclass.prototype;
+      var superClassMethod = superClassProto[methodName];
+      if (currentContext[methodName] !== superClassMethod) {
+        parentMethod = superClassMethod;
+        break;
+      }
+      currentContext = currentContext.constructor.superclass.prototype;
+    }
+
+    if (!parentMethod) {
+      return console.log('tried to callSuper ' + methodName + ', method not found in prototype chain', this);
+    }
+
     return (arguments.length > 1)
-      ? fn.apply(this, slice.call(arguments, 1))
-      : fn.call(this);
+      ? parentMethod.apply(this, slice.call(arguments, 1))
+      : parentMethod.call(this);
   }
 
   /**
