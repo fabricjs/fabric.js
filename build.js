@@ -127,6 +127,7 @@ var filesToInclude = [
 
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
+  'src/mixins/accessors.mixin.js',
   'src/mixins/observable.mixin.js',
   'src/mixins/collection.mixin.js',
   'src/mixins/shared_methods.mixin.js',
