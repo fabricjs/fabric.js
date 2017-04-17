@@ -862,6 +862,8 @@
 
     var json = c1.toJSON();
     var fired = false;
+    stop();
+
     c2.loadFromJSON(json, function() {
       fired = true;
 
@@ -882,6 +884,7 @@
     var fired = false;
 
     delete json.objects;
+    stop();
 
     c2.loadFromJSON(json, function() {
       fired = true;
