@@ -20,6 +20,8 @@
     }
   }
 
+  var toFixed = fabric.util.toFixed;
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
      * Returns styles-string for svg-export
@@ -79,8 +81,7 @@
       if (this.group && this.group.type === 'path-group') {
         return '';
       }
-      var toFixed = fabric.util.toFixed,
-          angle = this.getAngle(),
+      var angle = this.getAngle(),
           skewX = (this.getSkewX() % 360),
           skewY = (this.getSkewY() % 360),
           center = this.getCenterPoint(),
@@ -128,6 +129,23 @@
      */
     getSvgTransformMatrix: function() {
       return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ') ' : '';
+    },
+
+    _setSVGBg: function(textBgRects) {
+      if (this.backgroundColor) {
+        textBgRects.push(
+          '\t\t<rect ',
+            this._getFillAttributes(this.backgroundColor),
+            ' x="',
+            toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+            '" y="',
+            toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+            '" width="',
+            toFixed(this.width, NUM_FRACTION_DIGITS),
+            '" height="',
+            toFixed(this.height, NUM_FRACTION_DIGITS),
+          '"></rect>\n');
+      }
     },
 
     /**

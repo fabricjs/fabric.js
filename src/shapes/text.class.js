@@ -3,9 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
       clone = fabric.util.object.clone,
-      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
       MIN_TEXT_WIDTH = 2,
       CACHE_FONT_SIZE = 40;
 
@@ -675,8 +673,6 @@
      * @param {Number} lineIndex Index of a line in a text
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
-      // lift the line by quarter of fontSize
-      //top -= this.fontSize * this._fontSizeFraction;
       this._renderChars(method, ctx, line, left, top, lineIndex);
     },
 
@@ -1112,9 +1108,7 @@
      * @param {Number} lineIndex
      * @param {Number} charOffset
      */
-    _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
-      charOffset = charOffset || 0;
-
+    _renderChars: function(method, ctx, line, left, top, lineIndex) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
           actualStyle,
@@ -1126,16 +1120,16 @@
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
-      for (var i = charOffset, len = line.length + charOffset - 1; i <= len; i++) {
+      for (var i = 0, len = line.length - 1; i <= len; i++) {
         timeToRender = i === len || this.charSpacing;
-        charsToRender += line[i - charOffset];
-        charBox = this.__charBounds[lineIndex][i - charOffset];
+        charsToRender += line[i];
+        charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
           left += charBox.kernedWidth - charBox.width;
         }
         boxWidth += charBox.kernedWidth;
         if (this.textAlign === 'justify' && !timeToRender) {
-          if (this._reSpaceAndTab.test(line[i - charOffset])) {
+          if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }
         }

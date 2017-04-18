@@ -3,7 +3,7 @@
   var toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
-  fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.IText.prototype */ {
+  fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
 
     /**
      * Returns SVG representation of an instance
@@ -25,7 +25,7 @@
     _getSVGLeftTopOffsets: function() {
       var lineTop = this.getHeightOfLine(0),
           textLeft = -this.width / 2,
-          textTop = 0;
+          textTop = -this.height / 2;
 
       return {
         textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
@@ -67,16 +67,17 @@
     _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
       var textSpans = [],
           textBgRects = [],
-          height = 0;
+          height = textTopOffset, lineOffset;
       // bounding-box background
       this._setSVGBg(textBgRects);
 
       // text and text-background
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (this.textBackgroundColor) {
-          this._setSVGTextLineBg(textBgRects, i, textLeftOffset, textTopOffset, height);
+        lineOffset = this._getLineLeftOffset(i);
+        if (this.textBackgroundColor || this.styleHas('textBackgroundColor', i)) {
+          this._setSVGTextLineBg(textBgRects, i, textLeftOffset + lineOffset, height);
         }
-        this._setSVGTextLineText(i, textSpans, height, textLeftOffset, textTopOffset, textBgRects);
+        this._setSVGTextLineText(textSpans, i, textLeftOffset + lineOffset, height);
         height += this.getHeightOfLine(i);
       }
 
@@ -86,53 +87,113 @@
       };
     },
 
-    _setSVGTextLineText: function(i, textSpans, height, textLeftOffset, textTopOffset) {
-      var yPos = this.fontSize * (this._fontSizeMult - this._fontSizeFraction)
-        - textTopOffset + height - this.height / 2;
-      textSpans.push(
-        '\t\t\t<tspan x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS), '" ',
-          'y="',
-          toFixed(yPos, NUM_FRACTION_DIGITS),
-          '" ',
-          // doing this on <tspan> elements since setting opacity
-          // on containing <text> one doesn't work in Illustrator
-          this._getFillAttributes(this.fill), '>',
-          fabric.util.string.escapeXml(this._textLines[i].join('')),
+    /**
+     * @private
+     */
+    _createTextCharSpan: function(_char, styleDecl, left, top) {
+
+      var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
+        visible: true,
+        fill: this.fill,
+        stroke: this.stroke,
+        type: 'text',
+        getSvgFilter: fabric.Object.prototype.getSvgFilter
+      }, styleDecl));
+
+      return [
+        '\t\t\t<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
+        toFixed(top, NUM_FRACTION_DIGITS), '" ',
+          (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+          (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : ''),
+          (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : ''),
+          (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : ''),
+          (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : ''),
+        'style="', fillStyles, '">',
+        fabric.util.string.escapeXml(_char),
         '</tspan>\n'
-      );
+      ].join('');
     },
 
-    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
+    _setSVGTextLineText: function(textSpans, lineIndex, textLeftOffset, textTopOffset) {
+      // set proper line offset
+      var lineHeight = this.getHeightOfLine(lineIndex),
+          actualStyle,
+          nextStyle,
+          charsToRender = '',
+          charBox, style,
+          boxWidth = 0,
+          line = this._textLines[lineIndex],
+          timeToRender;
+
+      textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
+      for (var i = 0, len = line.length - 1; i <= len; i++) {
+        timeToRender = i === len || this.charSpacing;
+        charsToRender += line[i];
+        charBox = this.__charBounds[lineIndex][i];
+        if (boxWidth === 0) {
+          textLeftOffset += charBox.kernedWidth - charBox.width;
+        }
+        boxWidth += charBox.kernedWidth;
+        if (this.textAlign === 'justify' && !timeToRender) {
+          if (this._reSpaceAndTab.test(line[i])) {
+            timeToRender = true;
+          }
+        }
+        if (!timeToRender) {
+          // if we have charSpacing, we render char by char
+          actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
+          nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+          timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
+        }
+        if (timeToRender) {
+          style = this._getStyleDeclaration(lineIndex, i) || { };
+          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
+          charsToRender = '';
+          actualStyle = nextStyle;
+          textLeftOffset += boxWidth;
+          boxWidth = 0;
+        }
+      }
+    },
+
+    _pushTextBgRect: function(textBgRects, color, left, top, width, height) {
       textBgRects.push(
         '\t\t<rect ',
-          this._getFillAttributes(this.textBackgroundColor),
+          this._getFillAttributes(color),
           ' x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(i), NUM_FRACTION_DIGITS),
+          toFixed(left, NUM_FRACTION_DIGITS),
           '" y="',
-          toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
+          toFixed(top, NUM_FRACTION_DIGITS),
           '" width="',
-          toFixed(this.getLineWidth(i), NUM_FRACTION_DIGITS),
+          toFixed(width, NUM_FRACTION_DIGITS),
           '" height="',
-          toFixed(this.getHeightOfLine(i) / this.lineHeight, NUM_FRACTION_DIGITS),
+          toFixed(height, NUM_FRACTION_DIGITS),
         '"></rect>\n');
     },
 
-    _setSVGBg: function(textBgRects) {
-      if (this.backgroundColor) {
-        textBgRects.push(
-          '\t\t<rect ',
-            this._getFillAttributes(this.backgroundColor),
-            ' x="',
-            toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
-            '" y="',
-            toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
-            '" width="',
-            toFixed(this.width, NUM_FRACTION_DIGITS),
-            '" height="',
-            toFixed(this.height, NUM_FRACTION_DIGITS),
-          '"></rect>\n');
+    _setSVGTextLineBg: function(textBgRects, i, leftOffset, textTopOffset) {
+      var line = this._textLines[i],
+          heightOfLine = this.getHeightOfLine(i) / this.lineHeight,
+          boxWidth = 0,
+          boxStart = 0,
+          charBox, currentColor,
+          lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      for (var j = 0, jlen = line.length; j < jlen; j++) {
+        charBox = this.__charBounds[i][j];
+        currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
+        if (currentColor !== lastColor) {
+          lastColor && this._pushTextBgRect(textBgRects, lastColor, leftOffset + boxStart,
+            textTopOffset, boxWidth, heightOfLine);
+          boxStart = charBox.left;
+          boxWidth = charBox.width;
+          lastColor = currentColor;
+        }
+        else {
+          boxWidth += charBox.kernedWidth;
+        }
       }
+      currentColor && this._pushTextBgRect(textBgRects, currentColor, leftOffset + boxStart,
+        textTopOffset, boxWidth, heightOfLine);
     },
 
     /**
@@ -154,50 +215,6 @@
     /**
      * @private
      */
-    _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
-      if (!this._getLineStyle(lineIndex)) {
-        fabric.Text.prototype._setSVGTextLineText.call(this,
-          lineIndex, textSpans, height, textLeftOffset, textTopOffset);
-      }
-      else {
-        this._setSVGTextLineChars(
-          lineIndex, textSpans, height, textLeftOffset, textBgRects);
-      }
-    },
-
-    /**
-     * @private
-     */
-    _setSVGTextLineChars: function(lineIndex, textSpans, height, textLeftOffset, textBgRects) {
-
-      var chars = this._textLines[lineIndex],
-          charOffset = 0,
-          lineLeftOffset = this._getLineLeftOffset(lineIndex) - this.width / 2,
-          lineOffset = this._getSVGLineTopOffset(lineIndex),
-          heightOfLine = this.getHeightOfLine(lineIndex);
-
-      for (var i = 0, len = chars.length; i < len; i++) {
-        var styleDecl = this._getStyleDeclaration(lineIndex, i) || { };
-
-        textSpans.push(
-          this._createTextCharSpan(
-            chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
-
-        var charWidth = this.__charBounds[lineIndex][i].kernedWidth;
-
-        if (styleDecl.textBackgroundColor) {
-          textBgRects.push(
-            this._createTextCharBg(
-              styleDecl, lineLeftOffset, lineOffset.lineTop, heightOfLine, charWidth, charOffset));
-        }
-
-        charOffset += charWidth;
-      }
-    },
-
-    /**
-     * @private
-     */
     _getSVGLineTopOffset: function(lineIndex) {
       var lineTopOffset = 0, lastHeight = 0;
       for (var j = 0; j < lineIndex; j++) {
@@ -209,47 +226,6 @@
         offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
       };
     },
-
-    /**
-     * @private
-     */
-    _createTextCharBg: function(styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset) {
-      return [
-        '\t\t<rect fill="', styleDecl.textBackgroundColor,
-        '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS),
-        '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS),
-        '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS),
-        '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS),
-        '"></rect>\n'
-      ].join('');
-    },
-
-    /**
-     * @private
-     */
-    _createTextCharSpan: function(_char, styleDecl, lineLeftOffset, lineTopOffset, charOffset) {
-
-      var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
-        visible: true,
-        fill: this.fill,
-        stroke: this.stroke,
-        type: 'text',
-        getSvgFilter: fabric.Object.prototype.getSvgFilter
-      }, styleDecl));
-
-      return [
-        '\t\t\t<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
-        toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" ',
-          (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ' : ''),
-          (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : ''),
-          (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : ''),
-          (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : ''),
-          (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : ''),
-        'style="', fillStyles, '">',
-        fabric.util.string.escapeXml(_char),
-        '</tspan>\n'
-      ].join('');
-    }
   });
 })();
 /* _TO_SVG_END_ */
