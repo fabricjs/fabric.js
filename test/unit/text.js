@@ -49,7 +49,8 @@
     'skewX':                      0,
     'skewY':                      0,
     'transformMatrix':            null,
-    'charSpacing':                0
+    'charSpacing':                0,
+    'styles':                     null
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
@@ -200,7 +201,7 @@
   });
 
   test('fabric.Text.fromElement', function() {
-    ok(typeof fabric.Text.fromElement == 'function');
+    ok(typeof fabric.Text.fromElement === 'function');
 
     var elText = fabric.document.createElement('text');
     elText.textContent = 'x';
@@ -214,7 +215,7 @@
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       left: 4.5,
-      top: -5.75,
+      top: -6.13,
       width: 8,
       height: 18.08,
       fontSize: 16,
@@ -255,7 +256,7 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -18.54,
+      top:              -21.51,
       width:            CHAR_WIDTH,
       height:           138.99,
       fill:             'rgb(255,255,255)',

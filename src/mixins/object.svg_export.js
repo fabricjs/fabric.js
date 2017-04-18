@@ -1,5 +1,6 @@
 /* _TO_SVG_START_ */
 (function() {
+  var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   function getSvgColorString(prop, value) {
     if (!value) {
@@ -55,6 +56,41 @@
         filter,
         visibility
       ].join('');
+    },
+
+    /**
+     * Returns styles-string for svg-export
+     * @param {Boolean} skipShadow a boolean to skip shadow filter output
+     * @return {String}
+     */
+    getSvgSpanStyles: function(style) {
+      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + strokeWidth + '; ' : '',
+          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
+          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
+          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
+          fill = style.fill ? getSvgColorString('fill', style.fill) : '',
+          stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+          textDecoration = this.getSvgTextDecoration(style);
+
+      return [
+        stroke,
+        strokeWidth,
+        fontFamily,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        textDecoration,
+        fill,
+      ].join('');
+    },
+
+    getSvgTextDecoration: function(style) {
+      if ('overline' in style || 'underline' in style || 'linethrough' in style) {
+        return 'text-decoration: ' + (style.overline ? 'overline ' : '') +
+          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '') + ';';
+      }
+      return '';
     },
 
     /**

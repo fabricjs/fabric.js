@@ -91,23 +91,11 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-
-      var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
-        visible: true,
-        fill: this.fill,
-        stroke: this.stroke,
-        type: 'text',
-        getSvgFilter: fabric.Object.prototype.getSvgFilter
-      }, styleDecl));
+      var fillStyles = this.getSvgSpanStyles(styleDecl, false);
 
       return [
         '\t\t\t<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ',
-          (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ' : ''),
-          (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : ''),
-          (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : ''),
-          (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : ''),
-          (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : ''),
         'style="', fillStyles, '">',
         fabric.util.string.escapeXml(_char),
         '</tspan>\n'

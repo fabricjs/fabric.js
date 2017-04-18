@@ -38,24 +38,25 @@
     ok(cObj.hasStateChanged(), 'it detects changes in extra props');
     equal(cObj._stateProperties.left, 123, 'normal props are still there');
   });
-
+// TODO change to strokedash
   test('saveState with array', function() {
     var cObj = new fabric.Text('Hello');
-    cObj.set('textDecoration', ['underline']);
+    cObj.set('underline', true);
     cObj.setupState();
-    deepEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in state is deepEqual');
-    notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
-    cObj.textDecoration[0] = 'overline';
+    //eqaul(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
+    //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
+    cObj.overline = 'true';
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
 
-    cObj.set('textDecoration', ['underline']);
+    cObj.set('underline', true);
     cObj.saveState();
-    cObj.set('textDecoration', ['underline', 'overline']);
+    cObj.set('overline', true);
     ok(cObj.hasStateChanged(), 'more properties added');
 
-    cObj.set('textDecoration', ['underline', 'overline']);
+    cObj.set('overline', true);
+    cObj.set('underline', true);
     cObj.saveState();
-    cObj.set('textDecoration', ['overline']);
+    cObj.set('underline', false);
     ok(cObj.hasStateChanged(), 'less properties');
   });
 

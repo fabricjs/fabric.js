@@ -1485,14 +1485,15 @@
 
     options.top = options.top || 0;
     options.left = options.left || 0;
-    if ('textDecoration' in parsedAttributes) {
-      if (parsedAttributes.indexOf('underline') !== -1) {
+    if (parsedAttributes.textDecoration) {
+      var textDecoration = parsedAttributes.textDecoration;
+      if (textDecoration.indexOf('underline') !== -1) {
         options.underline = true;
       }
-      if (parsedAttributes.indexOf('overline') !== -1) {
+      if (textDecoration.indexOf('overline') !== -1) {
         options.overline = true;
       }
-      if (parsedAttributes.indexOf('line-through') !== -1) {
+      if (textDecoration.indexOf('line-through') !== -1) {
         options.linethrough = true;
       }
       delete options.textDecoration;

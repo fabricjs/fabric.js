@@ -433,12 +433,15 @@
   // });
 
   test('insertNewlineStyleObject', function() {
-    var iText = new fabric.IText('test\n');
+    var iText = new fabric.IText('test\n2');
 
     equal(typeof iText.insertNewlineStyleObject, 'function');
 
     iText.insertNewlineStyleObject(0, 4, true);
-    deepEqual(iText.styles, { '1': { '0': { } } });
+    deepEqual(iText.styles, { }, 'does not insert empty styles');
+    iText.styles = { 1: { 0: { fill: 'blue' } } };
+    iText.insertNewlineStyleObject(0, 4, true);
+    deepEqual(iText.styles, { 2: { 0: { fill: 'blue' } } }, 'correctly shift styles');
   });
 
   test('shiftLineStyles', function() {
@@ -543,19 +546,6 @@
 
     equal(iText.findLineBoundaryRight(3), 16); // 'tes|t'
     equal(iText.findLineBoundaryRight(17), 20); // '|qux'
-  });
-
-  test('getNumNewLinesInSelectedText', function() {
-    var iText = new fabric.IText('test foo bar-baz\nqux');
-
-    equal(typeof iText.getNumNewLinesInSelectedText, 'function');
-
-    equal(iText.getNumNewLinesInSelectedText(), 0);
-
-    iText.selectionStart = 0;
-    iText.selectionEnd = 20;
-
-    equal(iText.getNumNewLinesInSelectedText(), 1);
   });
 
   test('getSelectionStyles with no arguments', function() {
@@ -748,7 +738,8 @@
           0: { fill: 'red' },
           1: { fill: 'green' }
         }
-      }
+      },
+      fill: '#333',
     });
 
     equal(typeof iText.getCurrentCharColor, 'function');
