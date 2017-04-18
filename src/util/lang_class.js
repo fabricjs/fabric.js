@@ -52,16 +52,16 @@
 
   function callSuper(methodName) {
     var parentMethod = null,
-        currentContext = this;
+        _this = this;
 
     // climb prototype chain to find method not equal to callee's method
-    while (currentContext.constructor.superclass) {
-      var superClassMethod = currentContext.constructor.superclass.prototype[methodName];
-      if (currentContext[methodName] !== superClassMethod) {
+    while (_this.constructor.superclass) {
+      var superClassMethod = _this.constructor.superclass.prototype[methodName];
+      if (_this[methodName] !== superClassMethod) {
         parentMethod = superClassMethod;
         break;
       }
-      currentContext = currentContext.constructor.superclass.prototype;
+      _this = _this.constructor.superclass.prototype;
     }
 
     if (!parentMethod) {
