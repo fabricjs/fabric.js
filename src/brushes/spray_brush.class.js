@@ -94,7 +94,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
 
         var rect = new fabric.Rect({
           width: sprayChunk[j].width,
-          height: sprayChunk[j].width,
+          height: sprayChunk[j].height,
           left: sprayChunk[j].x + 1,
           top: sprayChunk[j].y + 1,
           originX: 'center',
