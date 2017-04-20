@@ -418,7 +418,6 @@
         selectionStart -= this._textLines[i].length + 1;
       }
       return {
-        
         lineIndex: i - 1,
         charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
       };
@@ -478,21 +477,19 @@
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
-      
+
       var left = Math.round(this._getLeftOffset()),
           top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-     
+
       return {
         left: left,
         top: top,
-        leftOffset: offsets.left + offsets.lineLeft ,
+        leftOffset: offsets.left + offsets.lineLeft,
         topOffset: offsets.top
       };
-    
-    
     },
 
     /**
@@ -545,18 +542,18 @@
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    
     renderCursor: function(boundaries, ctx) {
+
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this.width + boundaries.leftOffset / 2
-                    : + this.width + boundaries.leftOffset / 2,
+                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
+                    : boundaries.leftOffset,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
-          
+
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 

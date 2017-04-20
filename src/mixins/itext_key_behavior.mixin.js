@@ -30,7 +30,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _keysMap:  {
+  _keysMap: {
     8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
