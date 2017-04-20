@@ -18,6 +18,7 @@
     onDeselect: function() {
       this.isEditing && this.exitEditing();
       this.selected = false;
+      this.callSuper('onDeselect');
     },
 
     /**
