@@ -48,14 +48,14 @@
    *   Select line:                    triple click
    * </pre>
    */
-  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
+  fabric.ITextRtl = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
     /**
      * Type of an object
      * @type String
      * @default
      */
-    type: 'i-text',
+    type: 'i-text-rtl',
 
     /**
      * Index where text selection starts (or where cursor is when there is no selection)
@@ -484,14 +484,14 @@
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
+      
+        return {
+          left: left,
+          top: top,
+          leftOffset: -  offsets.left*2,
+          topOffset: offsets.top
+        };
      
-      return {
-        left: left,
-        top: top,
-        leftOffset: offsets.left + offsets.lineLeft ,
-        topOffset: offsets.top
-      };
-    
     
     },
 
@@ -675,10 +675,10 @@
     _renderCharsFast: function(method, ctx, line, left, top) {
 
       if (method === 'fillText' && this.fill) {
-        this.callSuper('_renderChars', method, ctx, line, left, top);
+        this.callSuper('_renderCharsRtl', method, ctx, line, left, top);
       }
       if (method === 'strokeText' && ((this.stroke && this.strokeWidth > 0) || this.skipFillStrokeCheck)) {
-        this.callSuper('_renderChars', method, ctx, line, left, top);
+        this.callSuper('_renderCharsRtl', method, ctx, line, left, top);
       }
     },
 
@@ -1200,7 +1200,7 @@
    * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {fabric.IText} instance of fabric.IText
    */
-  fabric.IText.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
+  fabric.ITextRtl.fromObject = function(object, callback, forceAsync) {
+    return fabric.Object._fromObject('ITextRtl', object, callback, forceAsync, 'text');
   };
 })();

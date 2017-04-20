@@ -64,15 +64,13 @@ var strings = [
     
 ];
 for (let i=0 ; i < strings.length; i++ ) {
-  canvas.add(new fabric.IText(strings[i], {
+  canvas.add(new fabric.ITextRtl(strings[i], {
     left: 500,
     top: 25*i ,
-    fontFamily: 'Hoefler Text',
     fontSize: 18,
     padding: 7,
     textAlign: 'right',
     originX: 'right',
-    //isRTL: true
   }));
 
   let taLines = ta.value.split('\n');

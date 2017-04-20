@@ -3,7 +3,7 @@
 Test it:
 var canvas = new fabric.Canvas('c');
 var example = 'אופיר מה המצב יא גבר? hi ma nishma??'; //'עוד 14 shalom !! עוד עוד'
-var iText9 = new fabric.IText(example, {
+var iText9 = new fabric.ITextRtl(example, {
   left: 500,
   top: 50,
   fontFamily: 'Hoefler Text',
@@ -11,7 +11,6 @@ var iText9 = new fabric.IText(example, {
   padding: 7,
   textAlign: 'right',
   originX: 'right',
-  isRTL: true
 });
 canvas.add(iText9);
 <!-- chat, support -->

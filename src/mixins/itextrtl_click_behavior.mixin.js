@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
+fabric.util.object.extend(fabric.ITextRtl.prototype, /** @lends fabric.IText.prototype */ {
   /**
    * Initializes "dbclick" event handler
    */

@@ -7468,7 +7468,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         noScaleCache: true,
         dirty: false,
         needsItsOwnCache: false,
-        isRTL: true,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
         initialize: function(options) {
@@ -11720,158 +11719,177 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     left += width > 0 ? width : 0;
                 }
             } else {
-                if (this.isRTL) {
-                    var dic = [];
-                    var hebrewCharCodes = [ 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514 ];
-                    var neutralCharCodes = [ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 123, 125 ];
-                    var numbersCharCodes = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 ];
-                    var datesCharCodes = [ 33, 46, 47 ];
-                    if (chars) {
-                        chars = chars.split("");
-                        var temp = chars[0];
-                        var lastDir = hebrewCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "rtl" : neutralCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "special" : numbersCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "number" : "ltr";
-                        for (var i = 1; i < chars.length; i++) {
-                            if (hebrewCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-                                if (lastDir == "rtl") {
-                                    temp += chars[i];
-                                } else {
-                                    dic.push({
-                                        chars: temp,
-                                        dir: lastDir
-                                    });
-                                    temp = chars[i];
-                                    lastDir = "rtl";
-                                }
-                            } else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-                                if (lastDir == "special") {
-                                    temp += chars[i];
-                                } else {
-                                    dic.push({
-                                        chars: temp,
-                                        dir: lastDir
-                                    });
-                                    temp = chars[i];
-                                    lastDir = "special";
-                                }
-                            } else if (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
-                                if (lastDir == "number") {
-                                    temp += chars[i];
-                                } else {
-                                    dic.push({
-                                        chars: temp,
-                                        dir: lastDir
-                                    });
-                                    temp = chars[i];
-                                    lastDir = "number";
-                                }
+                ctx[method](chars, left, top);
+            }
+            this[shortM].toLive && ctx.restore();
+        },
+        _renderCharsRtl: function(method, ctx, chars, left, top) {
+            var shortM = method.slice(0, -4), char, width;
+            if (this[shortM].toLive) {
+                var offsetX = -this.width / 2 + this[shortM].offsetX || 0, offsetY = -this.height / 2 + this[shortM].offsetY || 0;
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
+                left -= offsetX;
+                top -= offsetY;
+            }
+            if (this.charSpacing !== 0) {
+                var additionalSpace = this._getWidthOfCharSpacing();
+                chars = chars.split("");
+                for (var i = 0, len = chars.length; i < len; i++) {
+                    char = chars[i];
+                    width = ctx.measureText(char).width + additionalSpace;
+                    ctx[method](char, left, top);
+                    left += width > 0 ? width : 0;
+                }
+            } else {
+                var dic = [];
+                var hebrewCharCodes = [ 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514 ];
+                var neutralCharCodes = [ 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 123, 125 ];
+                var numbersCharCodes = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 ];
+                var datesCharCodes = [ 33, 46, 47 ];
+                if (chars) {
+                    chars = chars.split("");
+                    var temp = chars[0];
+                    var lastDir = hebrewCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "rtl" : neutralCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "special" : numbersCharCodes.indexOf(chars[0].charCodeAt(0)) > -1 ? "number" : "ltr";
+                    for (var i = 1; i < chars.length; i++) {
+                        if (hebrewCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                            if (lastDir == "rtl") {
+                                temp += chars[i];
                             } else {
-                                if (lastDir == "ltr") {
-                                    temp += chars[i];
-                                } else {
-                                    dic.push({
-                                        chars: temp,
-                                        dir: lastDir
-                                    });
-                                    temp = chars[i];
-                                    lastDir = "ltr";
-                                }
-                            }
-                            if (i == chars.length - 1) {
                                 dic.push({
                                     chars: temp,
                                     dir: lastDir
                                 });
+                                temp = chars[i];
+                                lastDir = "rtl";
                             }
-                        }
-                    }
-                    if (dic) {
-                        console.log(dic);
-                        for (var i = 0; i < dic.length; i++) {
-                            if (dic[i].dir == "number") {
-                                dic[i].dir = "ltr";
-                            }
-                        }
-                        for (var i = 1; i < dic.length - 1; i++) {
-                            if (dic[i].dir == "special") {
-                                if (dic[i - 1].dir == "ltr" && dic[i + 1].dir == "ltr") {
-                                    dic[i].dir = "ltr";
-                                } else {
-                                    dic[i].dir = "rtl";
-                                }
-                            }
-                            if (i == dic.length - 2) {
-                                if (dic[dic.length - 1].dir == "special") {
-                                    dic[dic.length - 1].dir = "rtl";
-                                }
-                            }
-                        }
-                        var newDic = [];
-                        newDic.push(dic[0]);
-                        for (var i = 1; i < dic.length; i++) {
-                            if (dic[i].dir == newDic[newDic.length - 1].dir) {
-                                newDic[newDic.length - 1].chars = newDic[newDic.length - 1].chars.concat(dic[i].chars);
+                        } else if (neutralCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                            if (lastDir == "special") {
+                                temp += chars[i];
                             } else {
-                                newDic.push(dic[i]);
+                                dic.push({
+                                    chars: temp,
+                                    dir: lastDir
+                                });
+                                temp = chars[i];
+                                lastDir = "special";
+                            }
+                        } else if (numbersCharCodes.indexOf(chars[i].charCodeAt(0)) > -1) {
+                            if (lastDir == "number") {
+                                temp += chars[i];
+                            } else {
+                                dic.push({
+                                    chars: temp,
+                                    dir: lastDir
+                                });
+                                temp = chars[i];
+                                lastDir = "number";
+                            }
+                        } else {
+                            if (lastDir == "ltr") {
+                                temp += chars[i];
+                            } else {
+                                dic.push({
+                                    chars: temp,
+                                    dir: lastDir
+                                });
+                                temp = chars[i];
+                                lastDir = "ltr";
                             }
                         }
-                        dic = newDic;
-                        Array.prototype.clean = function(deleteValue) {
-                            for (var i = 0; i < this.length; i++) {
-                                if (this[i] == deleteValue) {
-                                    this.splice(i, 1);
-                                    i--;
-                                }
-                            }
-                            return this;
-                        };
-                        dic.clean(undefined);
-                        for (var i = 0; i < dic.length; i++) {
-                            if (dic[i].dir == "rtl") {
-                                dic[i].chars = dic[i].chars.split("").reverse().join("");
+                        if (i == chars.length - 1) {
+                            dic.push({
+                                chars: temp,
+                                dir: lastDir
+                            });
+                        }
+                    }
+                }
+                if (dic) {
+                    console.log(dic);
+                    for (var i = 0; i < dic.length; i++) {
+                        if (dic[i].dir == "number") {
+                            dic[i].dir = "ltr";
+                        }
+                    }
+                    for (var i = 1; i < dic.length - 1; i++) {
+                        if (dic[i].dir == "special") {
+                            if (dic[i - 1].dir == "ltr" && dic[i + 1].dir == "ltr") {
+                                dic[i].dir = "ltr";
+                            } else {
+                                dic[i].dir = "rtl";
                             }
                         }
-                        String.prototype.replaceAt = function(index, replacement) {
-                            return this.substr(0, index) + replacement + this.substr(index + replacement.length);
-                        };
-                        for (var i = 0; i < dic.length; i++) {
-                            for (var j = 0; j < dic[i].chars.length; j++) {
-                                switch (dic[i].chars[j]) {
-                                  case "{":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, "}");
-                                    break;
-
-                                  case "}":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, "{");
-                                    break;
-
-                                  case "(":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, ")");
-                                    break;
-
-                                  case ")":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, "(");
-                                    break;
-
-                                  case "<":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, ">");
-                                    break;
-
-                                  case ">":
-                                    dic[i].chars = dic[i].chars.replaceAt(j, "<");
-                                    break;
-                                }
-                            }
-                        }
-                        for (var i = dic.length - 1, len = 0; i >= len; i--) {
-                            for (var j = 0; j < dic[i].chars.length; j++) {
-                                width = ctx.measureText(dic[i].chars[j]).width;
-                                ctx[method](dic[i].chars[j], left, top);
-                                left += width > 0 ? width : 0;
+                        if (i == dic.length - 2) {
+                            if (dic[dic.length - 1].dir == "special") {
+                                dic[dic.length - 1].dir = "rtl";
                             }
                         }
                     }
-                } else {
-                    ctx[method](chars, left, top);
+                    var newDic = [];
+                    newDic.push(dic[0]);
+                    for (var i = 1; i < dic.length; i++) {
+                        if (dic[i].dir == newDic[newDic.length - 1].dir) {
+                            newDic[newDic.length - 1].chars = newDic[newDic.length - 1].chars.concat(dic[i].chars);
+                        } else {
+                            newDic.push(dic[i]);
+                        }
+                    }
+                    dic = newDic;
+                    Array.prototype.clean = function(deleteValue) {
+                        for (var i = 0; i < this.length; i++) {
+                            if (this[i] == deleteValue) {
+                                this.splice(i, 1);
+                                i--;
+                            }
+                        }
+                        return this;
+                    };
+                    dic.clean(undefined);
+                    for (var i = 0; i < dic.length; i++) {
+                        if (dic[i].dir == "rtl") {
+                            dic[i].chars = dic[i].chars.split("").reverse().join("");
+                        }
+                    }
+                    String.prototype.replaceAt = function(index, replacement) {
+                        return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+                    };
+                    for (var i = 0; i < dic.length; i++) {
+                        for (var j = 0; j < dic[i].chars.length; j++) {
+                            switch (dic[i].chars[j]) {
+                              case "{":
+                                dic[i].chars = dic[i].chars.replaceAt(j, "}");
+                                break;
+
+                              case "}":
+                                dic[i].chars = dic[i].chars.replaceAt(j, "{");
+                                break;
+
+                              case "(":
+                                dic[i].chars = dic[i].chars.replaceAt(j, ")");
+                                break;
+
+                              case ")":
+                                dic[i].chars = dic[i].chars.replaceAt(j, "(");
+                                break;
+
+                              case "<":
+                                dic[i].chars = dic[i].chars.replaceAt(j, ">");
+                                break;
+
+                              case ">":
+                                dic[i].chars = dic[i].chars.replaceAt(j, "<");
+                                break;
+                            }
+                        }
+                    }
+                    for (var i = dic.length - 1, len = 0; i >= len; i--) {
+                        for (var j = 0; j < dic[i].chars.length; j++) {
+                            width = ctx.measureText(dic[i].chars[j]).width;
+                            ctx[method](dic[i].chars[j], left, top);
+                            left += width > 0 ? width : 0;
+                        }
+                    }
                 }
             }
             this[shortM].toLive && ctx.restore();
@@ -12403,21 +12421,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _getCursorBoundaries: function(chars, typeOfBoundaries) {
             var left = Math.round(this._getLeftOffset()), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(chars, typeOfBoundaries);
-            if (this.isRTL) {
-                return {
-                    left: left,
-                    top: top,
-                    leftOffset: -offsets.left * 2,
-                    topOffset: offsets.top
-                };
-            } else {
-                return {
-                    left: left,
-                    top: top,
-                    leftOffset: offsets.left + offsets.lineLeft,
-                    topOffset: offsets.top
-                };
-            }
+            return {
+                left: left,
+                top: top,
+                leftOffset: offsets.left + offsets.lineLeft,
+                topOffset: offsets.top
+            };
         },
         _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
             if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
@@ -13532,21 +13541,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this._clickHandlerInitialized = true;
         }
     },
-    _keysMap: fabric.IText.prototype.isRTL ? {
-        8: "removeChars",
-        9: "exitEditing",
-        27: "exitEditing",
-        13: "insertNewline",
-        33: "moveCursorUp",
-        34: "moveCursorDown",
-        35: "moveCursorLeft",
-        36: "moveCursorRight",
-        37: "moveCursorRight",
-        38: "moveCursorUp",
-        39: "moveCursorLeft",
-        40: "moveCursorDown",
-        46: "forwardDelete"
-    } : {
+    _keysMap: {
         8: "removeChars",
         9: "exitEditing",
         27: "exitEditing",
@@ -13898,6 +13893,1723 @@ fabric.util.object.extend(fabric.IText.prototype, {
 (function() {
     var toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
     fabric.util.object.extend(fabric.IText.prototype, {
+        _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
+            if (!this._getLineStyle(lineIndex)) {
+                fabric.Text.prototype._setSVGTextLineText.call(this, lineIndex, textSpans, height, textLeftOffset, textTopOffset);
+            } else {
+                this._setSVGTextLineChars(lineIndex, textSpans, height, textLeftOffset, textBgRects);
+            }
+        },
+        _setSVGTextLineChars: function(lineIndex, textSpans, height, textLeftOffset, textBgRects) {
+            var chars = this._textLines[lineIndex], charOffset = 0, lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) - this.width / 2, lineOffset = this._getSVGLineTopOffset(lineIndex), heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+            for (var i = 0, len = chars.length; i < len; i++) {
+                var styleDecl = this._getStyleDeclaration(lineIndex, i) || {};
+                textSpans.push(this._createTextCharSpan(chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
+                var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
+                if (styleDecl.textBackgroundColor) {
+                    textBgRects.push(this._createTextCharBg(styleDecl, lineLeftOffset, lineOffset.lineTop, heightOfLine, charWidth, charOffset));
+                }
+                charOffset += charWidth;
+            }
+        },
+        _getSVGLineTopOffset: function(lineIndex) {
+            var lineTopOffset = 0, lastHeight = 0;
+            for (var j = 0; j < lineIndex; j++) {
+                lineTopOffset += this._getHeightOfLine(this.ctx, j);
+            }
+            lastHeight = this._getHeightOfLine(this.ctx, j);
+            return {
+                lineTop: lineTopOffset,
+                offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
+            };
+        },
+        _createTextCharBg: function(styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset) {
+            return [ '\t\t<rect fill="', styleDecl.textBackgroundColor, '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS), '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS), '"></rect>\n' ].join("");
+        },
+        _createTextCharSpan: function(_char, styleDecl, lineLeftOffset, lineTopOffset, charOffset) {
+            var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
+                visible: true,
+                fill: this.fill,
+                stroke: this.stroke,
+                type: "text",
+                getSvgFilter: fabric.Object.prototype.getSvgFilter
+            }, styleDecl));
+            return [ '\t\t\t<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="', toFixed(lineTopOffset - this.height / 2, NUM_FRACTION_DIGITS), '" ', styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, "'") + '" ' : "", styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : "", styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : "", styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : "", styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : "", 'style="', fillStyles, '">', fabric.util.string.escapeXml(_char), "</tspan>\n" ].join("");
+        }
+    });
+})();
+
+(function() {
+    var clone = fabric.util.object.clone;
+    fabric.ITextRtl = fabric.util.createClass(fabric.Text, fabric.Observable, {
+        type: "i-text-rtl",
+        selectionStart: 0,
+        selectionEnd: 0,
+        selectionColor: "rgba(17,119,255,0.3)",
+        isEditing: false,
+        editable: true,
+        editingBorderColor: "rgba(102,153,255,0.25)",
+        cursorWidth: 2,
+        cursorColor: "#333",
+        cursorDelay: 1e3,
+        cursorDuration: 600,
+        styles: null,
+        caching: true,
+        _reSpace: /\s|\n/,
+        _currentCursorOpacity: 0,
+        _selectionDirection: null,
+        _abortCursorAnimation: false,
+        __widthOfSpace: [],
+        initialize: function(text, options) {
+            this.styles = options ? options.styles || {} : {};
+            this.callSuper("initialize", text, options);
+            this.initBehavior();
+        },
+        _clearCache: function() {
+            this.callSuper("_clearCache");
+            this.__widthOfSpace = [];
+        },
+        isEmptyStyles: function() {
+            if (!this.styles) {
+                return true;
+            }
+            var obj = this.styles;
+            for (var p1 in obj) {
+                for (var p2 in obj[p1]) {
+                    for (var p3 in obj[p1][p2]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
+        setSelectionStart: function(index) {
+            index = Math.max(index, 0);
+            this._updateAndFire("selectionStart", index);
+        },
+        setSelectionEnd: function(index) {
+            index = Math.min(index, this.text.length);
+            this._updateAndFire("selectionEnd", index);
+        },
+        _updateAndFire: function(property, index) {
+            if (this[property] !== index) {
+                this._fireSelectionChanged();
+                this[property] = index;
+            }
+            this._updateTextarea();
+        },
+        _fireSelectionChanged: function() {
+            this.fire("selection:changed");
+            this.canvas && this.canvas.fire("text:selection:changed", {
+                target: this
+            });
+        },
+        getSelectionStyles: function(startIndex, endIndex) {
+            if (arguments.length === 2) {
+                var styles = [];
+                for (var i = startIndex; i < endIndex; i++) {
+                    styles.push(this.getSelectionStyles(i));
+                }
+                return styles;
+            }
+            var loc = this.get2DCursorLocation(startIndex), style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+            return style || {};
+        },
+        setSelectionStyles: function(styles) {
+            if (this.selectionStart === this.selectionEnd) {
+                this._extendStyles(this.selectionStart, styles);
+            } else {
+                for (var i = this.selectionStart; i < this.selectionEnd; i++) {
+                    this._extendStyles(i, styles);
+                }
+            }
+            this._forceClearCache = true;
+            return this;
+        },
+        _extendStyles: function(index, styles) {
+            var loc = this.get2DCursorLocation(index);
+            if (!this._getLineStyle(loc.lineIndex)) {
+                this._setLineStyle(loc.lineIndex, {});
+            }
+            if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
+                this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
+            }
+            fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
+        },
+        _initDimensions: function(ctx) {
+            if (!ctx) {
+                this.clearContextTop();
+            }
+            this.callSuper("_initDimensions", ctx);
+        },
+        render: function(ctx, noTransform) {
+            this.clearContextTop();
+            this.callSuper("render", ctx, noTransform);
+            this.cursorOffsetCache = {};
+            this.renderCursorOrSelection();
+        },
+        _render: function(ctx) {
+            this.callSuper("_render", ctx);
+            this.ctx = ctx;
+        },
+        clearContextTop: function() {
+            if (!this.active || !this.isEditing) {
+                return;
+            }
+            if (this.canvas && this.canvas.contextTop) {
+                var ctx = this.canvas.contextTop;
+                ctx.save();
+                ctx.transform.apply(ctx, this.canvas.viewportTransform);
+                this.transform(ctx);
+                this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+                this._clearTextArea(ctx);
+                ctx.restore();
+            }
+        },
+        renderCursorOrSelection: function() {
+            if (!this.active || !this.isEditing) {
+                return;
+            }
+            var chars = this.text.split(""), boundaries, ctx;
+            if (this.canvas && this.canvas.contextTop) {
+                ctx = this.canvas.contextTop;
+                ctx.save();
+                ctx.transform.apply(ctx, this.canvas.viewportTransform);
+                this.transform(ctx);
+                this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+                this._clearTextArea(ctx);
+            } else {
+                ctx = this.ctx;
+                ctx.save();
+            }
+            if (this.selectionStart === this.selectionEnd) {
+                boundaries = this._getCursorBoundaries(chars, "cursor");
+                this.renderCursor(boundaries, ctx);
+            } else {
+                boundaries = this._getCursorBoundaries(chars, "selection");
+                this.renderSelection(chars, boundaries, ctx);
+            }
+            ctx.restore();
+        },
+        _clearTextArea: function(ctx) {
+            var width = this.width + 4, height = this.height + 4;
+            ctx.clearRect(-width / 2, -height / 2, width, height);
+        },
+        get2DCursorLocation: function(selectionStart) {
+            if (typeof selectionStart === "undefined") {
+                selectionStart = this.selectionStart;
+            }
+            var len = this._textLines.length;
+            for (var i = 0; i < len; i++) {
+                if (selectionStart <= this._textLines[i].length) {
+                    return {
+                        lineIndex: i,
+                        charIndex: selectionStart
+                    };
+                }
+                selectionStart -= this._textLines[i].length + 1;
+            }
+            return {
+                lineIndex: i - 1,
+                charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
+            };
+        },
+        getCurrentCharStyle: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return {
+                fontSize: style && style.fontSize || this.fontSize,
+                fill: style && style.fill || this.fill,
+                textBackgroundColor: style && style.textBackgroundColor || this.textBackgroundColor,
+                textDecoration: style && style.textDecoration || this.textDecoration,
+                fontFamily: style && style.fontFamily || this.fontFamily,
+                fontWeight: style && style.fontWeight || this.fontWeight,
+                fontStyle: style && style.fontStyle || this.fontStyle,
+                stroke: style && style.stroke || this.stroke,
+                strokeWidth: style && style.strokeWidth || this.strokeWidth
+            };
+        },
+        getCurrentCharFontSize: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return style && style.fontSize ? style.fontSize : this.fontSize;
+        },
+        getCurrentCharColor: function(lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+            return style && style.fill ? style.fill : this.cursorColor;
+        },
+        _getCursorBoundaries: function(chars, typeOfBoundaries) {
+            var left = Math.round(this._getLeftOffset()), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(chars, typeOfBoundaries);
+            return {
+                left: left,
+                top: top,
+                leftOffset: -offsets.left * 2,
+                topOffset: offsets.top
+            };
+        },
+        _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+            if (this.cursorOffsetCache && "top" in this.cursorOffsetCache) {
+                return this.cursorOffsetCache;
+            }
+            var lineLeftOffset = 0, lineIndex = 0, charIndex = 0, topOffset = 0, leftOffset = 0, boundaries;
+            for (var i = 0; i < this.selectionStart; i++) {
+                if (chars[i] === "\n") {
+                    leftOffset = 0;
+                    topOffset += this._getHeightOfLine(this.ctx, lineIndex);
+                    lineIndex++;
+                    charIndex = 0;
+                } else {
+                    leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
+                    charIndex++;
+                }
+                lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex));
+            }
+            if (typeOfBoundaries === "cursor") {
+                topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+            }
+            if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
+                leftOffset -= this._getWidthOfCharSpacing();
+            }
+            boundaries = {
+                top: topOffset,
+                left: leftOffset > 0 ? leftOffset : 0,
+                lineLeft: lineLeftOffset
+            };
+            this.cursorOffsetCache = boundaries;
+            return this.cursorOffsetCache;
+        },
+        renderCursor: function(boundaries, ctx) {
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this.width + boundaries.leftOffset / 2 : +this.width + boundaries.leftOffset / 2, multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier;
+            ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
+            ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+            ctx.fillRect(boundaries.left + leftOffset - cursorWidth / 2, boundaries.top + boundaries.topOffset, cursorWidth, charHeight);
+        },
+        renderSelection: function(chars, boundaries, ctx) {
+            ctx.fillStyle = this.selectionColor;
+            var start = this.get2DCursorLocation(this.selectionStart), end = this.get2DCursorLocation(this.selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex;
+            for (var i = startLine; i <= endLine; i++) {
+                var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0, lineHeight = this._getHeightOfLine(this.ctx, i), realLineHeight = 0, boxWidth = 0, line = this._textLines[i];
+                if (i === startLine) {
+                    for (var j = 0, len = line.length; j < len; j++) {
+                        if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
+                            boxWidth += this._getWidthOfChar(ctx, line[j], i, j);
+                        }
+                        if (j < start.charIndex) {
+                            lineOffset += this._getWidthOfChar(ctx, line[j], i, j);
+                        }
+                    }
+                    if (j === line.length) {
+                        boxWidth -= this._getWidthOfCharSpacing();
+                    }
+                } else if (i > startLine && i < endLine) {
+                    boxWidth += this._getLineWidth(ctx, i) || 5;
+                } else if (i === endLine) {
+                    for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
+                        boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
+                    }
+                    if (end.charIndex === line.length) {
+                        boxWidth -= this._getWidthOfCharSpacing();
+                    }
+                }
+                realLineHeight = lineHeight;
+                if (this.lineHeight < 1 || i === endLine && this.lineHeight > 1) {
+                    lineHeight /= this.lineHeight;
+                }
+                ctx.fillRect(boundaries.left + lineOffset, boundaries.top + boundaries.topOffset, boxWidth > 0 ? boxWidth : 0, lineHeight);
+                boundaries.topOffset += realLineHeight;
+            }
+        },
+        _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
+            if (this.isEmptyStyles()) {
+                return this._renderCharsFast(method, ctx, line, left, top);
+            }
+            charOffset = charOffset || 0;
+            var lineHeight = this._getHeightOfLine(ctx, lineIndex), prevStyle, thisStyle, charsToRender = "";
+            ctx.save();
+            top -= lineHeight / this.lineHeight * this._fontSizeFraction;
+            for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
+                prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
+                thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+                if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
+                    this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
+                    charsToRender = "";
+                    prevStyle = thisStyle;
+                }
+                charsToRender += line[i - charOffset];
+            }
+            ctx.restore();
+        },
+        _renderCharsFast: function(method, ctx, line, left, top) {
+            if (method === "fillText" && this.fill) {
+                this.callSuper("_renderCharsRtl", method, ctx, line, left, top);
+            }
+            if (method === "strokeText" && (this.stroke && this.strokeWidth > 0 || this.skipFillStrokeCheck)) {
+                this.callSuper("_renderCharsRtl", method, ctx, line, left, top);
+            }
+        },
+        _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
+            var charWidth, charHeight, shouldFill, shouldStroke, decl = this._getStyleDeclaration(lineIndex, i), offset, textDecoration, chars, additionalSpace, _charWidth;
+            if (decl) {
+                charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
+                shouldStroke = decl.stroke;
+                shouldFill = decl.fill;
+                textDecoration = decl.textDecoration;
+            } else {
+                charHeight = this.fontSize;
+            }
+            shouldStroke = (shouldStroke || this.stroke) && method === "strokeText";
+            shouldFill = (shouldFill || this.fill) && method === "fillText";
+            decl && ctx.save();
+            charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || null);
+            textDecoration = textDecoration || this.textDecoration;
+            if (decl && decl.textBackgroundColor) {
+                this._removeShadow(ctx);
+            }
+            if (this.charSpacing !== 0) {
+                additionalSpace = this._getWidthOfCharSpacing();
+                chars = _char.split("");
+                charWidth = 0;
+                for (var j = 0, len = chars.length, char; j < len; j++) {
+                    char = chars[j];
+                    shouldFill && ctx.fillText(char, left + charWidth, top);
+                    shouldStroke && ctx.strokeText(char, left + charWidth, top);
+                    _charWidth = ctx.measureText(char).width + additionalSpace;
+                    charWidth += _charWidth > 0 ? _charWidth : 0;
+                }
+            } else {
+                shouldFill && ctx.fillText(_char, left, top);
+                shouldStroke && ctx.strokeText(_char, left, top);
+            }
+            if (textDecoration || textDecoration !== "") {
+                offset = this._fontSizeFraction * lineHeight / this.lineHeight;
+                this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
+            }
+            decl && ctx.restore();
+            ctx.translate(charWidth, 0);
+        },
+        _hasStyleChanged: function(prevStyle, thisStyle) {
+            return prevStyle.fill !== thisStyle.fill || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.textDecoration !== thisStyle.textDecoration || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth;
+        },
+        _renderCharDecoration: function(ctx, textDecoration, left, top, offset, charWidth, charHeight) {
+            if (!textDecoration) {
+                return;
+            }
+            var decorationWeight = charHeight / 15, positions = {
+                underline: top + charHeight / 10,
+                "line-through": top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
+                overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
+            }, decorations = [ "underline", "line-through", "overline" ], i, decoration;
+            for (i = 0; i < decorations.length; i++) {
+                decoration = decorations[i];
+                if (textDecoration.indexOf(decoration) > -1) {
+                    ctx.fillRect(left, positions[decoration], charWidth, decorationWeight);
+                }
+            }
+        },
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+            if (!this.isEmptyStyles()) {
+                top += this.fontSize * (this._fontSizeFraction + .03);
+            }
+            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex);
+        },
+        _renderTextDecoration: function(ctx) {
+            if (this.isEmptyStyles()) {
+                return this.callSuper("_renderTextDecoration", ctx);
+            }
+        },
+        _renderTextLinesBackground: function(ctx) {
+            this.callSuper("_renderTextLinesBackground", ctx);
+            var lineTopOffset = 0, heightOfLine, lineWidth, lineLeftOffset, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), colorCache = "", line, _char, style, leftCache, topCache, widthCache, heightCache;
+            ctx.save();
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                heightOfLine = this._getHeightOfLine(ctx, i);
+                line = this._textLines[i];
+                if (line === "" || !this.styles || !this._getLineStyle(i)) {
+                    lineTopOffset += heightOfLine;
+                    continue;
+                }
+                lineWidth = this._getLineWidth(ctx, i);
+                lineLeftOffset = this._getLineLeftOffset(lineWidth);
+                leftCache = topCache = widthCache = heightCache = 0;
+                for (var j = 0, jlen = line.length; j < jlen; j++) {
+                    style = this._getStyleDeclaration(i, j) || {};
+                    if (colorCache !== style.textBackgroundColor) {
+                        if (heightCache && widthCache) {
+                            ctx.fillStyle = colorCache;
+                            ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+                        }
+                        leftCache = topCache = widthCache = heightCache = 0;
+                        colorCache = style.textBackgroundColor || "";
+                    }
+                    if (!style.textBackgroundColor) {
+                        colorCache = "";
+                        continue;
+                    }
+                    _char = line[j];
+                    if (colorCache === style.textBackgroundColor) {
+                        colorCache = style.textBackgroundColor;
+                        if (!leftCache) {
+                            leftCache = leftOffset + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j);
+                        }
+                        topCache = topOffset + lineTopOffset;
+                        widthCache += this._getWidthOfChar(ctx, _char, i, j);
+                        heightCache = heightOfLine / this.lineHeight;
+                    }
+                }
+                if (heightCache && widthCache) {
+                    ctx.fillStyle = colorCache;
+                    ctx.fillRect(leftCache, topCache, widthCache, heightCache);
+                    leftCache = topCache = widthCache = heightCache = 0;
+                }
+                lineTopOffset += heightOfLine;
+            }
+            ctx.restore();
+        },
+        _getCacheProp: function(_char, styleDeclaration) {
+            return _char + styleDeclaration.fontSize + styleDeclaration.fontWeight + styleDeclaration.fontStyle;
+        },
+        _getFontCache: function(fontFamily) {
+            if (!fabric.charWidthsCache[fontFamily]) {
+                fabric.charWidthsCache[fontFamily] = {};
+            }
+            return fabric.charWidthsCache[fontFamily];
+        },
+        _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
+            var charDecl = decl || this._getStyleDeclaration(lineIndex, charIndex), styleDeclaration = clone(charDecl), width, cacheProp, charWidthsCache;
+            this._applyFontStyles(styleDeclaration);
+            charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
+            cacheProp = this._getCacheProp(_char, styleDeclaration);
+            if (!charDecl && charWidthsCache[cacheProp] && this.caching) {
+                return charWidthsCache[cacheProp];
+            }
+            if (typeof styleDeclaration.shadow === "string") {
+                styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
+            }
+            var fill = styleDeclaration.fill || this.fill;
+            ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
+            if (styleDeclaration.stroke) {
+                ctx.strokeStyle = styleDeclaration.stroke && styleDeclaration.stroke.toLive ? styleDeclaration.stroke.toLive(ctx, this) : styleDeclaration.stroke;
+            }
+            ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+            ctx.font = this._getFontDeclaration.call(styleDeclaration);
+            if (styleDeclaration.shadow) {
+                styleDeclaration.scaleX = this.scaleX;
+                styleDeclaration.scaleY = this.scaleY;
+                styleDeclaration.canvas = this.canvas;
+                styleDeclaration.getObjectScaling = this.getObjectScaling;
+                this._setShadow.call(styleDeclaration, ctx);
+            }
+            if (!this.caching || !charWidthsCache[cacheProp]) {
+                width = ctx.measureText(_char).width;
+                this.caching && (charWidthsCache[cacheProp] = width);
+                return width;
+            }
+            return charWidthsCache[cacheProp];
+        },
+        _applyFontStyles: function(styleDeclaration) {
+            if (!styleDeclaration.fontFamily) {
+                styleDeclaration.fontFamily = this.fontFamily;
+            }
+            if (!styleDeclaration.fontSize) {
+                styleDeclaration.fontSize = this.fontSize;
+            }
+            if (!styleDeclaration.fontWeight) {
+                styleDeclaration.fontWeight = this.fontWeight;
+            }
+            if (!styleDeclaration.fontStyle) {
+                styleDeclaration.fontStyle = this.fontStyle;
+            }
+        },
+        _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
+            if (returnCloneOrEmpty) {
+                return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? clone(this.styles[lineIndex][charIndex]) : {};
+            }
+            return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+        },
+        _setStyleDeclaration: function(lineIndex, charIndex, style) {
+            this.styles[lineIndex][charIndex] = style;
+        },
+        _deleteStyleDeclaration: function(lineIndex, charIndex) {
+            delete this.styles[lineIndex][charIndex];
+        },
+        _getLineStyle: function(lineIndex) {
+            return this.styles[lineIndex];
+        },
+        _setLineStyle: function(lineIndex, style) {
+            this.styles[lineIndex] = style;
+        },
+        _deleteLineStyle: function(lineIndex) {
+            delete this.styles[lineIndex];
+        },
+        _getWidthOfChar: function(ctx, _char, lineIndex, charIndex) {
+            if (!this._isMeasuring && this.textAlign === "justify" && this._reSpacesAndTabs.test(_char)) {
+                return this._getWidthOfSpace(ctx, lineIndex);
+            }
+            ctx.save();
+            var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
+            if (this.charSpacing !== 0) {
+                width += this._getWidthOfCharSpacing();
+            }
+            ctx.restore();
+            return width > 0 ? width : 0;
+        },
+        _getHeightOfChar: function(ctx, lineIndex, charIndex) {
+            var style = this._getStyleDeclaration(lineIndex, charIndex);
+            return style && style.fontSize ? style.fontSize : this.fontSize;
+        },
+        _getWidthOfCharsAt: function(ctx, lineIndex, charIndex) {
+            var width = 0, i, _char;
+            for (i = 0; i < charIndex; i++) {
+                _char = this._textLines[lineIndex][i];
+                width += this._getWidthOfChar(ctx, _char, lineIndex, i);
+            }
+            return width;
+        },
+        _measureLine: function(ctx, lineIndex) {
+            this._isMeasuring = true;
+            var width = this._getWidthOfCharsAt(ctx, lineIndex, this._textLines[lineIndex].length);
+            if (this.charSpacing !== 0) {
+                width -= this._getWidthOfCharSpacing();
+            }
+            this._isMeasuring = false;
+            return width > 0 ? width : 0;
+        },
+        _getWidthOfSpace: function(ctx, lineIndex) {
+            if (this.__widthOfSpace[lineIndex]) {
+                return this.__widthOfSpace[lineIndex];
+            }
+            var line = this._textLines[lineIndex], wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0), widthDiff = this.width - wordsWidth, numSpaces = line.length - line.replace(this._reSpacesAndTabs, "").length, width = Math.max(widthDiff / numSpaces, ctx.measureText(" ").width);
+            this.__widthOfSpace[lineIndex] = width;
+            return width;
+        },
+        _getWidthOfWords: function(ctx, line, lineIndex, charOffset) {
+            var width = 0;
+            for (var charIndex = 0; charIndex < line.length; charIndex++) {
+                var _char = line[charIndex];
+                if (!_char.match(/\s/)) {
+                    width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex + charOffset);
+                }
+            }
+            return width;
+        },
+        _getHeightOfLine: function(ctx, lineIndex) {
+            if (this.__lineHeights[lineIndex]) {
+                return this.__lineHeights[lineIndex];
+            }
+            var line = this._textLines[lineIndex], maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
+            for (var i = 1, len = line.length; i < len; i++) {
+                var currentCharHeight = this._getHeightOfChar(ctx, lineIndex, i);
+                if (currentCharHeight > maxHeight) {
+                    maxHeight = currentCharHeight;
+                }
+            }
+            this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
+            return this.__lineHeights[lineIndex];
+        },
+        _getTextHeight: function(ctx) {
+            var lineHeight, height = 0;
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                lineHeight = this._getHeightOfLine(ctx, i);
+                height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+            }
+            return height;
+        },
+        toObject: function(propertiesToInclude) {
+            return fabric.util.object.extend(this.callSuper("toObject", propertiesToInclude), {
+                styles: clone(this.styles, true)
+            });
+        }
+    });
+    fabric.ITextRtl.fromObject = function(object, callback, forceAsync) {
+        return fabric.Object._fromObject("ITextRtl", object, callback, forceAsync, "text");
+    };
+})();
+
+(function() {
+    var clone = fabric.util.object.clone;
+    fabric.util.object.extend(fabric.ITextRtl.prototype, {
+        initBehavior: function() {
+            this.initAddedHandler();
+            this.initRemovedHandler();
+            this.initCursorSelectionHandlers();
+            this.initDoubleClickSimulation();
+            this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+        },
+        onDeselect: function() {
+            this.isEditing && this.exitEditing();
+            this.selected = false;
+        },
+        initAddedHandler: function() {
+            var _this = this;
+            this.on("added", function() {
+                var canvas = _this.canvas;
+                if (canvas) {
+                    if (!canvas._hasITextHandlers) {
+                        canvas._hasITextHandlers = true;
+                        _this._initCanvasHandlers(canvas);
+                    }
+                    canvas._iTextInstances = canvas._iTextInstances || [];
+                    canvas._iTextInstances.push(_this);
+                }
+            });
+        },
+        initRemovedHandler: function() {
+            var _this = this;
+            this.on("removed", function() {
+                var canvas = _this.canvas;
+                if (canvas) {
+                    canvas._iTextInstances = canvas._iTextInstances || [];
+                    fabric.util.removeFromArray(canvas._iTextInstances, _this);
+                    if (canvas._iTextInstances.length === 0) {
+                        canvas._hasITextHandlers = false;
+                        _this._removeCanvasHandlers(canvas);
+                    }
+                }
+            });
+        },
+        _initCanvasHandlers: function(canvas) {
+            canvas._mouseUpITextHandler = function() {
+                if (canvas._iTextInstances) {
+                    canvas._iTextInstances.forEach(function(obj) {
+                        obj.__isMousedown = false;
+                    });
+                }
+            }.bind(this);
+            canvas.on("mouse:up", canvas._mouseUpITextHandler);
+        },
+        _removeCanvasHandlers: function(canvas) {
+            canvas.off("mouse:up", canvas._mouseUpITextHandler);
+        },
+        _tick: function() {
+            this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, "_onTickComplete");
+        },
+        _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
+            var tickState;
+            tickState = {
+                isAborted: false,
+                abort: function() {
+                    this.isAborted = true;
+                }
+            };
+            obj.animate("_currentCursorOpacity", targetOpacity, {
+                duration: duration,
+                onComplete: function() {
+                    if (!tickState.isAborted) {
+                        obj[completeMethod]();
+                    }
+                },
+                onChange: function() {
+                    if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
+                        obj.renderCursorOrSelection();
+                    }
+                },
+                abort: function() {
+                    return tickState.isAborted;
+                }
+            });
+            return tickState;
+        },
+        _onTickComplete: function() {
+            var _this = this;
+            if (this._cursorTimeout1) {
+                clearTimeout(this._cursorTimeout1);
+            }
+            this._cursorTimeout1 = setTimeout(function() {
+                _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, "_tick");
+            }, 100);
+        },
+        initDelayedCursor: function(restart) {
+            var _this = this, delay = restart ? 0 : this.cursorDelay;
+            this.abortCursorAnimation();
+            this._currentCursorOpacity = 1;
+            this._cursorTimeout2 = setTimeout(function() {
+                _this._tick();
+            }, delay);
+        },
+        abortCursorAnimation: function() {
+            var shouldClear = this._currentTickState || this._currentTickCompleteState;
+            this._currentTickState && this._currentTickState.abort();
+            this._currentTickCompleteState && this._currentTickCompleteState.abort();
+            clearTimeout(this._cursorTimeout1);
+            clearTimeout(this._cursorTimeout2);
+            this._currentCursorOpacity = 0;
+            if (shouldClear) {
+                this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
+            }
+        },
+        selectAll: function() {
+            this.selectionStart = 0;
+            this.selectionEnd = this.text.length;
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        },
+        getSelectedText: function() {
+            return this.text.slice(this.selectionStart, this.selectionEnd);
+        },
+        findWordBoundaryLeft: function(startFrom) {
+            var offset = 0, index = startFrom - 1;
+            if (this._reSpace.test(this.text.charAt(index))) {
+                while (this._reSpace.test(this.text.charAt(index))) {
+                    offset++;
+                    index--;
+                }
+            }
+            while (/\S/.test(this.text.charAt(index)) && index > -1) {
+                offset++;
+                index--;
+            }
+            return startFrom - offset;
+        },
+        findWordBoundaryRight: function(startFrom) {
+            var offset = 0, index = startFrom;
+            if (this._reSpace.test(this.text.charAt(index))) {
+                while (this._reSpace.test(this.text.charAt(index))) {
+                    offset++;
+                    index++;
+                }
+            }
+            while (/\S/.test(this.text.charAt(index)) && index < this.text.length) {
+                offset++;
+                index++;
+            }
+            return startFrom + offset;
+        },
+        findLineBoundaryLeft: function(startFrom) {
+            var offset = 0, index = startFrom - 1;
+            while (!/\n/.test(this.text.charAt(index)) && index > -1) {
+                offset++;
+                index--;
+            }
+            return startFrom - offset;
+        },
+        findLineBoundaryRight: function(startFrom) {
+            var offset = 0, index = startFrom;
+            while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
+                offset++;
+                index++;
+            }
+            return startFrom + offset;
+        },
+        getNumNewLinesInSelectedText: function() {
+            var selectedText = this.getSelectedText(), numNewLines = 0;
+            for (var i = 0, len = selectedText.length; i < len; i++) {
+                if (selectedText[i] === "\n") {
+                    numNewLines++;
+                }
+            }
+            return numNewLines;
+        },
+        searchWordBoundary: function(selectionStart, direction) {
+            var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart, _char = this.text.charAt(index), reNonWord = /[ \n\.,;!\?\-]/;
+            while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
+                index += direction;
+                _char = this.text.charAt(index);
+            }
+            if (reNonWord.test(_char) && _char !== "\n") {
+                index += direction === 1 ? 0 : 1;
+            }
+            return index;
+        },
+        selectWord: function(selectionStart) {
+            selectionStart = selectionStart || this.selectionStart;
+            var newSelectionStart = this.searchWordBoundary(selectionStart, -1), newSelectionEnd = this.searchWordBoundary(selectionStart, 1);
+            this.selectionStart = newSelectionStart;
+            this.selectionEnd = newSelectionEnd;
+            this._fireSelectionChanged();
+            this._updateTextarea();
+            this.renderCursorOrSelection();
+        },
+        selectLine: function(selectionStart) {
+            selectionStart = selectionStart || this.selectionStart;
+            var newSelectionStart = this.findLineBoundaryLeft(selectionStart), newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+            this.selectionStart = newSelectionStart;
+            this.selectionEnd = newSelectionEnd;
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        },
+        enterEditing: function(e) {
+            if (this.isEditing || !this.editable) {
+                return;
+            }
+            if (this.canvas) {
+                this.exitEditingOnOthers(this.canvas);
+            }
+            this.isEditing = true;
+            this.initHiddenTextarea(e);
+            this.hiddenTextarea.focus();
+            this._updateTextarea();
+            this._saveEditingProps();
+            this._setEditingProps();
+            this._textBeforeEdit = this.text;
+            this._tick();
+            this.fire("editing:entered");
+            this._fireSelectionChanged();
+            if (!this.canvas) {
+                return this;
+            }
+            this.canvas.fire("text:editing:entered", {
+                target: this
+            });
+            this.initMouseMoveHandler();
+            this.canvas.renderAll();
+            return this;
+        },
+        exitEditingOnOthers: function(canvas) {
+            if (canvas._iTextInstances) {
+                canvas._iTextInstances.forEach(function(obj) {
+                    obj.selected = false;
+                    if (obj.isEditing) {
+                        obj.exitEditing();
+                    }
+                });
+            }
+        },
+        initMouseMoveHandler: function() {
+            this.canvas.on("mouse:move", this.mouseMoveHandler);
+        },
+        mouseMoveHandler: function(options) {
+            if (!this.__isMousedown || !this.isEditing) {
+                return;
+            }
+            var newSelectionStart = this.getSelectionStartFromPointer(options.e), currentStart = this.selectionStart, currentEnd = this.selectionEnd;
+            if ((newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd) && (currentStart === newSelectionStart || currentEnd === newSelectionStart)) {
+                return;
+            }
+            if (newSelectionStart > this.__selectionStartOnMouseDown) {
+                this.selectionStart = this.__selectionStartOnMouseDown;
+                this.selectionEnd = newSelectionStart;
+            } else {
+                this.selectionStart = newSelectionStart;
+                this.selectionEnd = this.__selectionStartOnMouseDown;
+            }
+            if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
+                this.restartCursorIfNeeded();
+                this._fireSelectionChanged();
+                this._updateTextarea();
+                this.renderCursorOrSelection();
+            }
+        },
+        _setEditingProps: function() {
+            this.hoverCursor = "text";
+            if (this.canvas) {
+                this.canvas.defaultCursor = this.canvas.moveCursor = "text";
+            }
+            this.borderColor = this.editingBorderColor;
+            this.hasControls = this.selectable = false;
+            this.lockMovementX = this.lockMovementY = true;
+        },
+        _updateTextarea: function() {
+            if (!this.hiddenTextarea || this.inCompositionMode) {
+                return;
+            }
+            this.cursorOffsetCache = {};
+            this.hiddenTextarea.value = this.text;
+            this.hiddenTextarea.selectionStart = this.selectionStart;
+            this.hiddenTextarea.selectionEnd = this.selectionEnd;
+            if (this.selectionStart === this.selectionEnd) {
+                var style = this._calcTextareaPosition();
+                this.hiddenTextarea.style.left = style.left;
+                this.hiddenTextarea.style.top = style.top;
+                this.hiddenTextarea.style.fontSize = style.fontSize;
+            }
+        },
+        _calcTextareaPosition: function() {
+            if (!this.canvas) {
+                return {
+                    x: 1,
+                    y: 1
+                };
+            }
+            var chars = this.text.split(""), boundaries = this._getCursorBoundaries(chars, "cursor"), cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) : boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
+                x: boundaries.left + leftOffset,
+                y: boundaries.top + boundaries.topOffset + charHeight
+            }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;
+            p = fabric.util.transformPoint(p, m);
+            p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+            if (p.x < 0) {
+                p.x = 0;
+            }
+            if (p.x > maxWidth) {
+                p.x = maxWidth;
+            }
+            if (p.y < 0) {
+                p.y = 0;
+            }
+            if (p.y > maxHeight) {
+                p.y = maxHeight;
+            }
+            p.x += this.canvas._offset.left;
+            p.y += this.canvas._offset.top;
+            return {
+                left: p.x + "px",
+                top: p.y + "px",
+                fontSize: charHeight
+            };
+        },
+        _saveEditingProps: function() {
+            this._savedProps = {
+                hasControls: this.hasControls,
+                borderColor: this.borderColor,
+                lockMovementX: this.lockMovementX,
+                lockMovementY: this.lockMovementY,
+                hoverCursor: this.hoverCursor,
+                defaultCursor: this.canvas && this.canvas.defaultCursor,
+                moveCursor: this.canvas && this.canvas.moveCursor
+            };
+        },
+        _restoreEditingProps: function() {
+            if (!this._savedProps) {
+                return;
+            }
+            this.hoverCursor = this._savedProps.overCursor;
+            this.hasControls = this._savedProps.hasControls;
+            this.borderColor = this._savedProps.borderColor;
+            this.lockMovementX = this._savedProps.lockMovementX;
+            this.lockMovementY = this._savedProps.lockMovementY;
+            if (this.canvas) {
+                this.canvas.defaultCursor = this._savedProps.defaultCursor;
+                this.canvas.moveCursor = this._savedProps.moveCursor;
+            }
+        },
+        exitEditing: function() {
+            var isTextChanged = this._textBeforeEdit !== this.text;
+            this.selected = false;
+            this.isEditing = false;
+            this.selectable = true;
+            this.selectionEnd = this.selectionStart;
+            if (this.hiddenTextarea) {
+                this.hiddenTextarea.blur && this.hiddenTextarea.blur();
+                this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
+                this.hiddenTextarea = null;
+            }
+            this.abortCursorAnimation();
+            this._restoreEditingProps();
+            this._currentCursorOpacity = 0;
+            this.fire("editing:exited");
+            isTextChanged && this.fire("modified");
+            if (this.canvas) {
+                this.canvas.off("mouse:move", this.mouseMoveHandler);
+                this.canvas.fire("text:editing:exited", {
+                    target: this
+                });
+                isTextChanged && this.canvas.fire("object:modified", {
+                    target: this
+                });
+            }
+            return this;
+        },
+        _removeExtraneousStyles: function() {
+            for (var prop in this.styles) {
+                if (!this._textLines[prop]) {
+                    delete this.styles[prop];
+                }
+            }
+        },
+        _removeCharsFromTo: function(start, end) {
+            while (end !== start) {
+                this._removeSingleCharAndStyle(start + 1);
+                end--;
+            }
+            this.selectionStart = start;
+            this.selectionEnd = start;
+        },
+        _removeSingleCharAndStyle: function(index) {
+            var isBeginningOfLine = this.text[index - 1] === "\n", indexStyle = isBeginningOfLine ? index : index - 1;
+            this.removeStyleObject(isBeginningOfLine, indexStyle);
+            this.text = this.text.slice(0, index - 1) + this.text.slice(index);
+            this._textLines = this._splitTextIntoLines();
+        },
+        insertChars: function(_chars, useCopiedStyle) {
+            var style;
+            if (this.selectionEnd - this.selectionStart > 1) {
+                this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+            }
+            if (!useCopiedStyle && this.isEmptyStyles()) {
+                this.insertChar(_chars, false);
+                return;
+            }
+            for (var i = 0, len = _chars.length; i < len; i++) {
+                if (useCopiedStyle) {
+                    style = fabric.util.object.clone(fabric.copiedTextStyle[i], true);
+                }
+                this.insertChar(_chars[i], i < len - 1, style);
+            }
+        },
+        insertChar: function(_char, skipUpdate, styleObject) {
+            var isEndOfLine = this.text[this.selectionStart] === "\n";
+            this.text = this.text.slice(0, this.selectionStart) + _char + this.text.slice(this.selectionEnd);
+            this._textLines = this._splitTextIntoLines();
+            this.insertStyleObjects(_char, isEndOfLine, styleObject);
+            this.selectionStart += _char.length;
+            this.selectionEnd = this.selectionStart;
+            if (skipUpdate) {
+                return;
+            }
+            this._updateTextarea();
+            this.setCoords();
+            this._fireSelectionChanged();
+            this.fire("changed");
+            this.restartCursorIfNeeded();
+            if (this.canvas) {
+                this.canvas.fire("text:changed", {
+                    target: this
+                });
+                this.canvas.renderAll();
+            }
+        },
+        restartCursorIfNeeded: function() {
+            if (!this._currentTickState || this._currentTickState.isAborted || !this._currentTickCompleteState || this._currentTickCompleteState.isAborted) {
+                this.initDelayedCursor();
+            }
+        },
+        insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+            this.shiftLineStyles(lineIndex, +1);
+            if (!this.styles[lineIndex + 1]) {
+                this.styles[lineIndex + 1] = {};
+            }
+            var currentCharStyle = {}, newLineStyles = {};
+            if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
+                currentCharStyle = this.styles[lineIndex][charIndex - 1];
+            }
+            if (isEndOfLine) {
+                newLineStyles[0] = clone(currentCharStyle);
+                this.styles[lineIndex + 1] = newLineStyles;
+            } else {
+                for (var index in this.styles[lineIndex]) {
+                    if (parseInt(index, 10) >= charIndex) {
+                        newLineStyles[parseInt(index, 10) - charIndex] = this.styles[lineIndex][index];
+                        delete this.styles[lineIndex][index];
+                    }
+                }
+                this.styles[lineIndex + 1] = newLineStyles;
+            }
+            this._forceClearCache = true;
+        },
+        insertCharStyleObject: function(lineIndex, charIndex, style) {
+            var currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = clone(currentLineStyles);
+            if (charIndex === 0 && !style) {
+                charIndex = 1;
+            }
+            for (var index in currentLineStylesCloned) {
+                var numericIndex = parseInt(index, 10);
+                if (numericIndex >= charIndex) {
+                    currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
+                    if (!currentLineStylesCloned[numericIndex - 1]) {
+                        delete currentLineStyles[numericIndex];
+                    }
+                }
+            }
+            this.styles[lineIndex][charIndex] = style || clone(currentLineStyles[charIndex - 1]);
+            this._forceClearCache = true;
+        },
+        insertStyleObjects: function(_chars, isEndOfLine, styleObject) {
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex;
+            if (!this._getLineStyle(lineIndex)) {
+                this._setLineStyle(lineIndex, {});
+            }
+            if (_chars === "\n") {
+                this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
+            } else {
+                this.insertCharStyleObject(lineIndex, charIndex, styleObject);
+            }
+        },
+        shiftLineStyles: function(lineIndex, offset) {
+            var clonedStyles = clone(this.styles);
+            for (var line in this.styles) {
+                var numericLine = parseInt(line, 10);
+                if (numericLine > lineIndex) {
+                    this.styles[numericLine + offset] = clonedStyles[numericLine];
+                    if (!clonedStyles[numericLine - offset]) {
+                        delete this.styles[numericLine];
+                    }
+                }
+            }
+        },
+        removeStyleObject: function(isBeginningOfLine, index) {
+            var cursorLocation = this.get2DCursorLocation(index), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex;
+            this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
+        },
+        _getTextOnPreviousLine: function(lIndex) {
+            return this._textLines[lIndex - 1];
+        },
+        _removeStyleObject: function(isBeginningOfLine, cursorLocation, lineIndex, charIndex) {
+            if (isBeginningOfLine) {
+                var textOnPreviousLine = this._getTextOnPreviousLine(cursorLocation.lineIndex), newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
+                if (!this.styles[lineIndex - 1]) {
+                    this.styles[lineIndex - 1] = {};
+                }
+                for (charIndex in this.styles[lineIndex]) {
+                    this.styles[lineIndex - 1][parseInt(charIndex, 10) + newCharIndexOnPrevLine] = this.styles[lineIndex][charIndex];
+                }
+                this.shiftLineStyles(cursorLocation.lineIndex, -1);
+            } else {
+                var currentLineStyles = this.styles[lineIndex];
+                if (currentLineStyles) {
+                    delete currentLineStyles[charIndex];
+                }
+                var currentLineStylesCloned = clone(currentLineStyles);
+                for (var i in currentLineStylesCloned) {
+                    var numericIndex = parseInt(i, 10);
+                    if (numericIndex >= charIndex && numericIndex !== 0) {
+                        currentLineStyles[numericIndex - 1] = currentLineStylesCloned[numericIndex];
+                        delete currentLineStyles[numericIndex];
+                    }
+                }
+            }
+        },
+        insertNewline: function() {
+            this.insertChars("\n");
+        },
+        setSelectionStartEndWithShift: function(start, end, newSelection) {
+            if (newSelection <= start) {
+                if (end === start) {
+                    this._selectionDirection = "left";
+                } else if (this._selectionDirection === "right") {
+                    this._selectionDirection = "left";
+                    this.selectionEnd = start;
+                }
+                this.selectionStart = newSelection;
+            } else if (newSelection > start && newSelection < end) {
+                if (this._selectionDirection === "right") {
+                    this.selectionEnd = newSelection;
+                } else {
+                    this.selectionStart = newSelection;
+                }
+            } else {
+                if (end === start) {
+                    this._selectionDirection = "right";
+                } else if (this._selectionDirection === "left") {
+                    this._selectionDirection = "right";
+                    this.selectionStart = end;
+                }
+                this.selectionEnd = newSelection;
+            }
+        },
+        setSelectionInBoundaries: function() {
+            var length = this.text.length;
+            if (this.selectionStart > length) {
+                this.selectionStart = length;
+            } else if (this.selectionStart < 0) {
+                this.selectionStart = 0;
+            }
+            if (this.selectionEnd > length) {
+                this.selectionEnd = length;
+            } else if (this.selectionEnd < 0) {
+                this.selectionEnd = 0;
+            }
+        }
+    });
+})();
+
+fabric.util.object.extend(fabric.ITextRtl.prototype, {
+    initDoubleClickSimulation: function() {
+        this.__lastClickTime = +new Date();
+        this.__lastLastClickTime = +new Date();
+        this.__lastPointer = {};
+        this.on("mousedown", this.onMouseDown.bind(this));
+    },
+    onMouseDown: function(options) {
+        this.__newClickTime = +new Date();
+        var newPointer = this.canvas.getPointer(options.e);
+        if (this.isTripleClick(newPointer)) {
+            this.fire("tripleclick", options);
+            this._stopEvent(options.e);
+        } else if (this.isDoubleClick(newPointer)) {
+            this.fire("dblclick", options);
+            this._stopEvent(options.e);
+        }
+        this.__lastLastClickTime = this.__lastClickTime;
+        this.__lastClickTime = this.__newClickTime;
+        this.__lastPointer = newPointer;
+        this.__lastIsEditing = this.isEditing;
+        this.__lastSelected = this.selected;
+    },
+    isDoubleClick: function(newPointer) {
+        return this.__newClickTime - this.__lastClickTime < 500 && this.__lastPointer.x === newPointer.x && this.__lastPointer.y === newPointer.y && this.__lastIsEditing;
+    },
+    isTripleClick: function(newPointer) {
+        return this.__newClickTime - this.__lastClickTime < 500 && this.__lastClickTime - this.__lastLastClickTime < 500 && this.__lastPointer.x === newPointer.x && this.__lastPointer.y === newPointer.y;
+    },
+    _stopEvent: function(e) {
+        e.preventDefault && e.preventDefault();
+        e.stopPropagation && e.stopPropagation();
+    },
+    initCursorSelectionHandlers: function() {
+        this.initMousedownHandler();
+        this.initMouseupHandler();
+        this.initClicks();
+    },
+    initClicks: function() {
+        this.on("dblclick", function(options) {
+            this.selectWord(this.getSelectionStartFromPointer(options.e));
+        });
+        this.on("tripleclick", function(options) {
+            this.selectLine(this.getSelectionStartFromPointer(options.e));
+        });
+    },
+    initMousedownHandler: function() {
+        this.on("mousedown", function(options) {
+            if (!this.editable) {
+                return;
+            }
+            var pointer = this.canvas.getPointer(options.e);
+            console.log(options.e);
+            this.__mousedownX = pointer.x;
+            this.__mousedownY = pointer.y;
+            this.__isMousedown = true;
+            if (this.selected) {
+                this.setCursorByClick(options.e);
+            }
+            if (this.isEditing) {
+                this.__selectionStartOnMouseDown = this.selectionStart;
+                if (this.selectionStart === this.selectionEnd) {
+                    this.abortCursorAnimation();
+                }
+                this.renderCursorOrSelection();
+            }
+        });
+    },
+    _isObjectMoved: function(e) {
+        var pointer = this.canvas.getPointer(e);
+        return this.__mousedownX !== pointer.x || this.__mousedownY !== pointer.y;
+    },
+    initMouseupHandler: function() {
+        this.on("mouseup", function(options) {
+            this.__isMousedown = false;
+            if (!this.editable || this._isObjectMoved(options.e)) {
+                return;
+            }
+            if (this.__lastSelected && !this.__corner) {
+                this.enterEditing(options.e);
+                if (this.selectionStart === this.selectionEnd) {
+                    this.initDelayedCursor(true);
+                } else {
+                    this.renderCursorOrSelection();
+                }
+            }
+            this.selected = true;
+        });
+    },
+    setCursorByClick: function(e) {
+        var newSelection = this.getSelectionStartFromPointer(e), start = this.selectionStart, end = this.selectionEnd;
+        if (e.shiftKey) {
+            this.setSelectionStartEndWithShift(start, end, newSelection);
+        } else {
+            this.selectionStart = newSelection;
+            this.selectionEnd = newSelection;
+        }
+        if (this.isEditing) {
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        }
+    },
+    getSelectionStartFromPointer: function(e) {
+        var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, newSelectionStart, line;
+        for (var i = 0, len = this._textLines.length; i < len; i++) {
+            line = this._textLines[i];
+            height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
+            var widthOfLine = this._getLineWidth(this.ctx, i), lineLeftOffset = this._getLineLeftOffset(widthOfLine);
+            width = lineLeftOffset * this.scaleX;
+            for (var j = 0, jlen = line.length; j < jlen; j++) {
+                prevWidth = width;
+                width += this._getWidthOfChar(this.ctx, line[j], i, this.flipX ? jlen - j : j) * this.scaleX;
+                if (height <= mouseOffset.y || width <= mouseOffset.x) {
+                    charIndex++;
+                    continue;
+                }
+                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i, jlen);
+            }
+            if (mouseOffset.y < height) {
+                return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex + i - 1, jlen);
+            }
+        }
+        if (typeof newSelectionStart === "undefined") {
+            return this.text.length;
+        }
+    },
+    _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+        var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth, distanceBtwNextCharAndCursor = width - mouseOffset.x, offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1, newSelectionStart = index + offset;
+        if (this.flipX) {
+            newSelectionStart = jlen - newSelectionStart;
+        }
+        if (newSelectionStart > this.text.length) {
+            newSelectionStart = this.text.length;
+        }
+        return newSelectionStart;
+    }
+});
+
+fabric.util.object.extend(fabric.ITextRtl.prototype, {
+    initHiddenTextarea: function() {
+        this.hiddenTextarea = fabric.document.createElement("textarea");
+        this.hiddenTextarea.setAttribute("autocapitalize", "off");
+        var style = this._calcTextareaPosition();
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + ";" + " opacity: 0; width: 0px; height: 0px; z-index: -999;";
+        fabric.document.body.appendChild(this.hiddenTextarea);
+        fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "input", this.onInput.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "copy", this.copy.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "cut", this.cut.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "paste", this.paste.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "compositionstart", this.onCompositionStart.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "compositionupdate", this.onCompositionUpdate.bind(this));
+        fabric.util.addListener(this.hiddenTextarea, "compositionend", this.onCompositionEnd.bind(this));
+        if (!this._clickHandlerInitialized && this.canvas) {
+            fabric.util.addListener(this.canvas.upperCanvasEl, "click", this.onClick.bind(this));
+            this._clickHandlerInitialized = true;
+        }
+    },
+    _keysMap: {
+        8: "removeChars",
+        9: "exitEditing",
+        27: "exitEditing",
+        13: "insertNewline",
+        33: "moveCursorUp",
+        34: "moveCursorDown",
+        35: "moveCursorLeft",
+        36: "moveCursorRight",
+        37: "moveCursorRight",
+        38: "moveCursorUp",
+        39: "moveCursorLeft",
+        40: "moveCursorDown",
+        46: "forwardDelete"
+    },
+    _ctrlKeysMapUp: {
+        67: "copy",
+        88: "cut"
+    },
+    _ctrlKeysMapDown: {
+        65: "selectAll"
+    },
+    onClick: function() {
+        this.hiddenTextarea && this.hiddenTextarea.focus();
+    },
+    onKeyDown: function(e) {
+        if (!this.isEditing) {
+            return;
+        }
+        if (e.keyCode in this._keysMap) {
+            this[this._keysMap[e.keyCode]](e);
+        } else if (e.keyCode in this._ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
+            this[this._ctrlKeysMapDown[e.keyCode]](e);
+        } else {
+            return;
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        if (e.keyCode >= 33 && e.keyCode <= 40) {
+            this.clearContextTop();
+            this.renderCursorOrSelection();
+        } else {
+            this.canvas && this.canvas.renderAll();
+        }
+    },
+    onKeyUp: function(e) {
+        if (!this.isEditing || this._copyDone) {
+            this._copyDone = false;
+            return;
+        }
+        if (e.keyCode in this._ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
+            this[this._ctrlKeysMapUp[e.keyCode]](e);
+        } else {
+            return;
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        this.canvas && this.canvas.renderAll();
+    },
+    onInput: function(e) {
+        if (!this.isEditing || this.inCompositionMode) {
+            return;
+        }
+        var offset = this.selectionStart || 0, offsetEnd = this.selectionEnd || 0, textLength = this.text.length, newTextLength = this.hiddenTextarea.value.length, diff, charsToInsert, start;
+        if (newTextLength > textLength) {
+            start = this._selectionDirection === "left" ? offsetEnd : offset;
+            diff = newTextLength - textLength;
+            charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
+        } else {
+            diff = newTextLength - textLength + offsetEnd - offset;
+            charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+        }
+        this.insertChars(charsToInsert);
+        e.stopPropagation();
+    },
+    onCompositionStart: function() {
+        this.inCompositionMode = true;
+        this.prevCompositionLength = 0;
+        this.compositionStart = this.selectionStart;
+    },
+    onCompositionEnd: function() {
+        this.inCompositionMode = false;
+    },
+    onCompositionUpdate: function(e) {
+        var data = e.data;
+        this.selectionStart = this.compositionStart;
+        this.selectionEnd = this.selectionEnd === this.selectionStart ? this.compositionStart + this.prevCompositionLength : this.selectionEnd;
+        this.insertChars(data, false);
+        this.prevCompositionLength = data.length;
+    },
+    forwardDelete: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            if (this.selectionStart === this.text.length) {
+                return;
+            }
+            this.moveCursorRight(e);
+        }
+        this.removeChars(e);
+    },
+    copy: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            return;
+        }
+        var selectedText = this.getSelectedText(), clipboardData = this._getClipboardData(e);
+        if (clipboardData) {
+            clipboardData.setData("text", selectedText);
+        }
+        fabric.copiedText = selectedText;
+        fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        this._copyDone = true;
+    },
+    paste: function(e) {
+        var copiedText = null, clipboardData = this._getClipboardData(e), useCopiedStyle = true;
+        if (clipboardData) {
+            copiedText = clipboardData.getData("text").replace(/\r/g, "");
+            if (!fabric.copiedTextStyle || fabric.copiedText !== copiedText) {
+                useCopiedStyle = false;
+            }
+        } else {
+            copiedText = fabric.copiedText;
+        }
+        if (copiedText) {
+            this.insertChars(copiedText, useCopiedStyle);
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    },
+    cut: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            return;
+        }
+        this.copy(e);
+        this.removeChars(e);
+    },
+    _getClipboardData: function(e) {
+        return e && e.clipboardData || fabric.window.clipboardData;
+    },
+    _getWidthBeforeCursor: function(lineIndex, charIndex) {
+        var textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex), widthOfLine = this._getLineWidth(this.ctx, lineIndex), widthBeforeCursor = this._getLineLeftOffset(widthOfLine), _char;
+        for (var i = 0, len = textBeforeCursor.length; i < len; i++) {
+            _char = textBeforeCursor[i];
+            widthBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
+        }
+        return widthBeforeCursor;
+    },
+    getDownCursorOffset: function(e, isRight) {
+        var selectionProp = this._getSelectionForOffset(e, isRight), cursorLocation = this.get2DCursorLocation(selectionProp), lineIndex = cursorLocation.lineIndex;
+        if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
+            return this.text.length - selectionProp;
+        }
+        var charIndex = cursorLocation.charIndex, widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex), indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor), textAfterCursor = this._textLines[lineIndex].slice(charIndex);
+        return textAfterCursor.length + indexOnOtherLine + 2;
+    },
+    _getSelectionForOffset: function(e, isRight) {
+        if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
+            return this.selectionEnd;
+        } else {
+            return this.selectionStart;
+        }
+    },
+    getUpCursorOffset: function(e, isRight) {
+        var selectionProp = this._getSelectionForOffset(e, isRight), cursorLocation = this.get2DCursorLocation(selectionProp), lineIndex = cursorLocation.lineIndex;
+        if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+            return -selectionProp;
+        }
+        var charIndex = cursorLocation.charIndex, widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex), indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor), textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex);
+        return -this._textLines[lineIndex - 1].length + indexOnOtherLine - textBeforeCursor.length;
+    },
+    _getIndexOnLine: function(lineIndex, width) {
+        var widthOfLine = this._getLineWidth(this.ctx, lineIndex), textOnLine = this._textLines[lineIndex], lineLeftOffset = this._getLineLeftOffset(widthOfLine), widthOfCharsOnLine = lineLeftOffset, indexOnLine = 0, foundMatch;
+        for (var j = 0, jlen = textOnLine.length; j < jlen; j++) {
+            var _char = textOnLine[j], widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+            widthOfCharsOnLine += widthOfChar;
+            if (widthOfCharsOnLine > width) {
+                foundMatch = true;
+                var leftEdge = widthOfCharsOnLine - widthOfChar, rightEdge = widthOfCharsOnLine, offsetFromLeftEdge = Math.abs(leftEdge - width), offsetFromRightEdge = Math.abs(rightEdge - width);
+                indexOnLine = offsetFromRightEdge < offsetFromLeftEdge ? j : j - 1;
+                break;
+            }
+        }
+        if (!foundMatch) {
+            indexOnLine = textOnLine.length - 1;
+        }
+        return indexOnLine;
+    },
+    moveCursorDown: function(e) {
+        if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+            return;
+        }
+        this._moveCursorUpOrDown("Down", e);
+    },
+    moveCursorUp: function(e) {
+        if (this.selectionStart === 0 && this.selectionEnd === 0) {
+            return;
+        }
+        this._moveCursorUpOrDown("Up", e);
+    },
+    _moveCursorUpOrDown: function(direction, e) {
+        var action = "get" + direction + "CursorOffset", offset = this[action](e, this._selectionDirection === "right");
+        if (e.shiftKey) {
+            this.moveCursorWithShift(offset);
+        } else {
+            this.moveCursorWithoutShift(offset);
+        }
+        if (offset !== 0) {
+            this.setSelectionInBoundaries();
+            this.abortCursorAnimation();
+            this._currentCursorOpacity = 1;
+            this.initDelayedCursor();
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        }
+    },
+    moveCursorWithShift: function(offset) {
+        var newSelection = this._selectionDirection === "left" ? this.selectionStart + offset : this.selectionEnd + offset;
+        this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
+        return offset !== 0;
+    },
+    moveCursorWithoutShift: function(offset) {
+        if (offset < 0) {
+            this.selectionStart += offset;
+            this.selectionEnd = this.selectionStart;
+        } else {
+            this.selectionEnd += offset;
+            this.selectionStart = this.selectionEnd;
+        }
+        return offset !== 0;
+    },
+    moveCursorLeft: function(e) {
+        if (this.selectionStart === 0 && this.selectionEnd === 0) {
+            return;
+        }
+        this._moveCursorLeftOrRight("Left", e);
+    },
+    _move: function(e, prop, direction) {
+        var newValue;
+        if (e.altKey) {
+            newValue = this["findWordBoundary" + direction](this[prop]);
+        } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
+            newValue = this["findLineBoundary" + direction](this[prop]);
+        } else {
+            this[prop] += direction === "Left" ? -1 : 1;
+            return true;
+        }
+        if (typeof newValue !== undefined && this[prop] !== newValue) {
+            this[prop] = newValue;
+            return true;
+        }
+    },
+    _moveLeft: function(e, prop) {
+        return this._move(e, prop, "Left");
+    },
+    _moveRight: function(e, prop) {
+        return this._move(e, prop, "Right");
+    },
+    moveCursorLeftWithoutShift: function(e) {
+        var change = true;
+        this._selectionDirection = "left";
+        if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
+            change = this._moveLeft(e, "selectionStart");
+        }
+        this.selectionEnd = this.selectionStart;
+        return change;
+    },
+    moveCursorLeftWithShift: function(e) {
+        if (this._selectionDirection === "right" && this.selectionStart !== this.selectionEnd) {
+            return this._moveLeft(e, "selectionEnd");
+        } else if (this.selectionStart !== 0) {
+            this._selectionDirection = "left";
+            return this._moveLeft(e, "selectionStart");
+        }
+    },
+    moveCursorRight: function(e) {
+        if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+            return;
+        }
+        this._moveCursorLeftOrRight("Right", e);
+    },
+    _moveCursorLeftOrRight: function(direction, e) {
+        var actionName = "moveCursor" + direction + "With";
+        this._currentCursorOpacity = 1;
+        if (e.shiftKey) {
+            actionName += "Shift";
+        } else {
+            actionName += "outShift";
+        }
+        if (this[actionName](e)) {
+            this.abortCursorAnimation();
+            this.initDelayedCursor();
+            this._fireSelectionChanged();
+            this._updateTextarea();
+        }
+    },
+    moveCursorRightWithShift: function(e) {
+        if (this._selectionDirection === "left" && this.selectionStart !== this.selectionEnd) {
+            return this._moveRight(e, "selectionStart");
+        } else if (this.selectionEnd !== this.text.length) {
+            this._selectionDirection = "right";
+            return this._moveRight(e, "selectionEnd");
+        }
+    },
+    moveCursorRightWithoutShift: function(e) {
+        var changed = true;
+        this._selectionDirection = "right";
+        if (this.selectionStart === this.selectionEnd) {
+            changed = this._moveRight(e, "selectionStart");
+            this.selectionEnd = this.selectionStart;
+        } else {
+            this.selectionStart = this.selectionEnd;
+        }
+        return changed;
+    },
+    removeChars: function(e) {
+        if (this.selectionStart === this.selectionEnd) {
+            this._removeCharsNearCursor(e);
+        } else {
+            this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+        }
+        this.set("dirty", true);
+        this.setSelectionEnd(this.selectionStart);
+        this._removeExtraneousStyles();
+        this.canvas && this.canvas.renderAll();
+        this.setCoords();
+        this.fire("changed");
+        this.canvas && this.canvas.fire("text:changed", {
+            target: this
+        });
+    },
+    _removeCharsNearCursor: function(e) {
+        if (this.selectionStart === 0) {
+            return;
+        }
+        if (e.metaKey) {
+            var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
+            this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
+            this.setSelectionStart(leftLineBoundary);
+        } else if (e.altKey) {
+            var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
+            this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
+            this.setSelectionStart(leftWordBoundary);
+        } else {
+            this._removeSingleCharAndStyle(this.selectionStart);
+            this.setSelectionStart(this.selectionStart - 1);
+        }
+    }
+});
+
+(function() {
+    var toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    fabric.util.object.extend(fabric.ITextRtl.prototype, {
         _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
             if (!this._getLineStyle(lineIndex)) {
                 fabric.Text.prototype._setSVGTextLineText.call(this, lineIndex, textSpans, height, textLeftOffset, textTopOffset);

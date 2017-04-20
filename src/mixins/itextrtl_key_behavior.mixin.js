@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
+fabric.util.object.extend(fabric.ITextRtl.prototype, /** @lends fabric.IText.prototype */ {
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
@@ -30,18 +30,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _keysMap:  {
+  //TODO: change it
+  _keysMap: {
     8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
     13: 'insertNewline',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorRight',
-    36: 'moveCursorLeft',
-    37: 'moveCursorLeft',
+    35: 'moveCursorLeft',
+    36: 'moveCursorRight',
+    37: 'moveCursorRight',
     38: 'moveCursorUp',
-    39: 'moveCursorRight',
+    39: 'moveCursorLeft',
     40: 'moveCursorDown',
     46: 'forwardDelete'
   },
