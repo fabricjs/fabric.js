@@ -475,6 +475,21 @@
 
   });
 
+  test('removeChars - should call _splitTextIntoLines() only once when removing multiple chars', function () {
+    var iText = new fabric.IText('test foo bar\nbaz');
+    iText.selectionStart = 0;
+    iText.selectionEnd   = 6;
+    var _splitTextIntoLinesBackup = fabric.IText.prototype._splitTextIntoLines;
+    var _splitTextIntoLinesCallCounter = 0;
+    fabric.IText.prototype._splitTextIntoLines = function () {
+      _splitTextIntoLinesCallCounter++;
+    }
+    iText.removeChars();
+    
+    equal(_splitTextIntoLinesCallCounter, 1);
+    fabric.IText.prototype._splitTextIntoLines = _splitTextIntoLinesBackup;
+  });
+
   test('selectWord', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 

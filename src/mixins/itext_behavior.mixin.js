@@ -584,21 +584,24 @@
      */
     _removeCharsFromTo: function(start, end) {
       while (end !== start) {
-        this._removeSingleCharAndStyle(start + 1);
+        this._removeSingleCharAndStyle(start + 1, Math.abs(end - start) === 1);
         end--;
       }
       this.selectionStart = start;
       this.selectionEnd = start;
     },
 
-    _removeSingleCharAndStyle: function(index) {
+    _removeSingleCharAndStyle: function(index, shouldRewrapLines) {
+      shouldRewrapLines = typeof shouldRewrapLines === 'undefined' ? true : shouldRewrapLines;
       var isBeginningOfLine = this.text[index - 1] === '\n',
           indexStyle        = isBeginningOfLine ? index : index - 1;
       this.removeStyleObject(isBeginningOfLine, indexStyle);
       this.text = this.text.slice(0, index - 1) +
         this.text.slice(index);
 
-      this._textLines = this._splitTextIntoLines();
+      if (shouldRewrapLines) {
+        this._textLines = this._splitTextIntoLines();
+      }
     },
 
     /**
