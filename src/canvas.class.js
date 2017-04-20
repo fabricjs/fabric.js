@@ -1136,16 +1136,16 @@
         if (this._hoveredTarget !== target) {
           if (this._hoveredTarget) {
             this.fire('mouse:out', { target: this._hoveredTarget, e: e });
-            this._hoveredTarget.fire('mouseout');
+            this._hoveredTarget.fire('mouseout', { e: e });
           }
           this.fire('mouse:over', { target: target, e: e });
-          target.fire('mouseover');
+          target.fire('mouseover', { e: e });
           this._hoveredTarget = target;
         }
       }
       else if (this._hoveredTarget) {
         this.fire('mouse:out', { target: this._hoveredTarget, e: e });
-        this._hoveredTarget.fire('mouseout');
+        this._hoveredTarget.fire('mouseout', { e: e });
         this._hoveredTarget = null;
       }
     },
