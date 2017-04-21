@@ -204,6 +204,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
+      e.preventDefault();
       this.__onMouseDown(e);
 
       addListener(fabric.document, 'touchend', this._onMouseUp, { passive: false });
