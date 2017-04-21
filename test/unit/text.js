@@ -6,6 +6,10 @@
     return new fabric.Text(text || 'x');
   }
 
+  function removeTranslate(str) {
+    return str.replace(/translate\(.*?\)/, '');
+  }
+
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
@@ -53,8 +57,8 @@
     'styles':                     null
   };
 
-  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
-  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-50" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t\t<tspan x="30" y="12.6" fill="rgb(0,0,0)">y</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.57" >x</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x=\"-60\" y=\"-13.65\" >xxxxxx</tspan>\n\t\t\t<tspan x=\"-60\" y=\"38.78\" >x </tspan>\n\t\t\t<tspan x=\"40\" y=\"38.78\" >y</tspan>\n\t\t</text>\n\t</g>\n';
 
   test('constructor', function() {
     ok(fabric.Text);
@@ -309,10 +313,6 @@
   test('toSVG', function() {
     var text = new fabric.Text('x');
 
-    function removeTranslate(str) {
-      return str.replace(/translate\(.*?\)/, '');
-    }
-
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
@@ -325,15 +325,10 @@
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"')));
   });
   test('toSVG justified', function() {
-    var text = new fabric.Text('x y');
+    var text = new fabric.Text('xxxxxx\nx y', {
+      textAlign: 'justify',
+    });
 
-    function removeTranslate(str) {
-      return str.replace(/translate\(.*?\)/, '');
-    }
-
-    // temp workaround for text objects not obtaining width under node
-    text.width = 100;
-    text.textAlign = 'justify';
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
 

@@ -20,6 +20,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionend', this.onCompositionEnd.bind(this));
@@ -122,18 +124,20 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    e.stopPropagation();
+    var fromPaste = this.fromPaste;
+    this.fromPaste = false;
+    e && e.stopPropagation();
     if (!this.isEditing) {
       return;
     }
     // decisions about style changes.
-    var nextText = this._splitTextIntoLines(e.target.value).graphemeText,
+    var nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText,
         charCount = this._text.length,
         nextCharCount = nextText.length,
         removedText, insertedText,
         charDiff = nextCharCount - charCount;
 
-    if (e.target.value === '') {
+    if (this.hiddenTextarea.value === '') {
       this.styles = { };
       this.updateFromTextArea();
       this.fire('changed');
@@ -150,8 +154,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else if (nextCharCount < charCount) {
       removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
     }
-    var textareaSelection =
-      this.fromStringToGraphemeSelection(e.target.selectionStart, e.target.selectionEnd, e.target.value);
+    var textareaSelection = this.fromStringToGraphemeSelection(
+      this.hiddenTextarea.selectionStart,
+      this.hiddenTextarea.selectionEnd,
+      this.hiddenTextarea.value
+    );
     insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
       if (this.selectionStart !== this.selectionEnd) {
@@ -166,7 +173,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
-      this.insertNewStyleBlock(insertedText, this.selectionStart);
+      console.log(insertedText, fromPaste, fabric.copiedText, fabric.copiedTextStyle)
+      if (fromPaste && insertedText.join('') === fabric.copiedText) {
+        this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
+      }
+      else {
+        this.insertNewStyleBlock(insertedText, this.selectionStart);
+      }
     }
     this.updateFromTextArea();
     this.fire('changed');
@@ -202,64 +215,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Copies selected text
    * @param {Event} e Event object
    */
-  copy: function(e) {
+  copy: function() {
     if (this.selectionStart === this.selectionEnd) {
       //do not cut-copy if no selection
       return;
     }
-    var selectedText = this.getSelectedText(),
-        clipboardData = this._getClipboardData(e);
-
-    // Check for backward compatibility with old browsers
-    if (clipboardData) {
-      clipboardData.setData('text', selectedText);
-    }
+    var selectedText = this.getSelectedText();
 
     fabric.copiedText = selectedText;
     fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
-    e.stopImmediatePropagation();
-    e.preventDefault();
     this._copyDone = true;
   },
 
-  // /**
-  //  * Pastes text
-  //  * @param {Event} e Event object
-  //  */
-  // paste: function(e) {
-  //   var copiedText = null,
-  //       clipboardData = this._getClipboardData(e),
-  //       useCopiedStyle = true;
-  //
-  //   // Check for backward compatibility with old browsers
-  //   if (clipboardData) {
-  //     copiedText = clipboardData.getData('text').replace(/\r/g, '');
-  //     if (!fabric.copiedTextStyle || fabric.copiedText !== copiedText) {
-  //       useCopiedStyle = false;
-  //     }
-  //   }
-  //   else {
-  //     copiedText = fabric.copiedText;
-  //   }
-  //
-  //   if (copiedText) {
-  //     this.insertChars(copiedText, useCopiedStyle);
-  //   }
-  //   e.stopImmediatePropagation();
-  //   e.preventDefault();
-  // },
-
   /**
-   * Cuts text
+   * Pastes text
    * @param {Event} e Event object
    */
-  cut: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      return;
-    }
-
-    this.copy(e);
-    //this.removeChars(e);
+  paste: function() {
+    this.fromPaste = true;
   },
 
   /**

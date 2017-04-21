@@ -91,12 +91,13 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-      var fillStyles = this.getSvgSpanStyles(styleDecl, false);
+      var styleProps = this.getSvgSpanStyles(styleDecl, false),
+          fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
 
       return [
         '\t\t\t<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ',
-        'style="', fillStyles, '">',
+        fillStyles, '>',
         fabric.util.string.escapeXml(_char),
         '</tspan>\n'
       ].join('');

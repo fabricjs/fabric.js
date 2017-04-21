@@ -802,24 +802,24 @@
     equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
   });
 
-  test('measuring width of words', function () {
-    var ctx = canvas.getContext('2d');
-    var text = 'test foo bar';
-    var iText = new fabric.IText(text, {
-      styles: {
-        0: {
-          9: { fontWeight: 'bold' },
-          10: { fontWeight: 'bold' },
-          11: { fontWeight: 'bold' },
-        }
-      }
-    });
-
-    var textSplitted = text.split(' ');
-    var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
-    var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
-
-    notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
-  });
+  // test('measuring width of words', function () {
+  //   var ctx = canvas.getContext('2d');
+  //   var text = 'test foo bar';
+  //   var iText = new fabric.IText(text, {
+  //     styles: {
+  //       0: {
+  //         9: { fontWeight: 'bold' },
+  //         10: { fontWeight: 'bold' },
+  //         11: { fontWeight: 'bold' },
+  //       }
+  //     }
+  //   });
+  //
+  //   var textSplitted = text.split(' ');
+  //   var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
+  //   var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
+  //
+  //   notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
+  // });
 
 })();
