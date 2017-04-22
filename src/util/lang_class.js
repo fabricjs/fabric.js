@@ -61,6 +61,7 @@
         parentMethod = superClassMethod;
         break;
       }
+      // eslint-disable-next-line
       _this = _this.constructor.superclass.prototype;
     }
 
