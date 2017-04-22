@@ -1,5 +1,6 @@
 /* _TO_SVG_START_ */
 (function() {
+  var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   function getSvgColorString(prop, value) {
     if (!value) {
@@ -19,6 +20,8 @@
       return str;
     }
   }
+
+  var toFixed = fabric.util.toFixed;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
@@ -56,6 +59,41 @@
     },
 
     /**
+     * Returns styles-string for svg-export
+     * @param {Boolean} skipShadow a boolean to skip shadow filter output
+     * @return {String}
+     */
+    getSvgSpanStyles: function(style) {
+      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
+          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
+          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
+          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
+          fill = style.fill ? getSvgColorString('fill', style.fill) : '',
+          stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+          textDecoration = this.getSvgTextDecoration(style);
+
+      return [
+        stroke,
+        strokeWidth,
+        fontFamily,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        textDecoration,
+        fill,
+      ].join('');
+    },
+
+    getSvgTextDecoration: function(style) {
+      if ('overline' in style || 'underline' in style || 'linethrough' in style) {
+        return 'text-decoration: ' + (style.overline ? 'overline ' : '') +
+          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '') + ';';
+      }
+      return '';
+    },
+
+    /**
      * Returns filter for svg shadow
      * @return {String}
      */
@@ -79,8 +117,7 @@
       if (this.group && this.group.type === 'path-group') {
         return '';
       }
-      var toFixed = fabric.util.toFixed,
-          angle = this.getAngle(),
+      var angle = this.getAngle(),
           skewX = (this.getSkewX() % 360),
           skewY = (this.getSkewY() % 360),
           center = this.getCenterPoint(),
@@ -128,6 +165,23 @@
      */
     getSvgTransformMatrix: function() {
       return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ') ' : '';
+    },
+
+    _setSVGBg: function(textBgRects) {
+      if (this.backgroundColor) {
+        textBgRects.push(
+          '\t\t<rect ',
+            this._getFillAttributes(this.backgroundColor),
+            ' x="',
+            toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+            '" y="',
+            toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+            '" width="',
+            toFixed(this.width, NUM_FRACTION_DIGITS),
+            '" height="',
+            toFixed(this.height, NUM_FRACTION_DIGITS),
+          '"></rect>\n');
+      }
     },
 
     /**

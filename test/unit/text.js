@@ -6,6 +6,10 @@
     return new fabric.Text(text || 'x');
   }
 
+  function removeTranslate(str) {
+    return str.replace(/translate\(.*?\)/, '');
+  }
+
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
@@ -37,9 +41,11 @@
     'fontSize':                  40,
     'fontWeight':                'normal',
     'fontFamily':                'Times New Roman',
-    'fontStyle':                 '',
+    'fontStyle':                 'normal',
     'lineHeight':                1.16,
-    'textDecoration':            '',
+    'underline':                 false,
+    'overline':                  false,
+    'linethrough':               false,
     'textAlign':                 'left',
     'textBackgroundColor':       '',
     'fillRule':                  'nonzero',
@@ -47,11 +53,12 @@
     'skewX':                      0,
     'skewY':                      0,
     'transformMatrix':            null,
-    'charSpacing':                0
+    'charSpacing':                0,
+    'styles':                     null
   };
 
-  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t</text>\n\t</g>\n';
-  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-50" y="12.6" fill="rgb(0,0,0)">x</tspan>\n\t\t\t<tspan x="30" y="12.6" fill="rgb(0,0,0)">y</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.57" >x</tspan>\n\t\t</text>\n\t</g>\n';
+  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x=\"-60\" y=\"-13.65\" >xxxxxx</tspan>\n\t\t\t<tspan x=\"-60\" y=\"38.78\" >x </tspan>\n\t\t\t<tspan x=\"40\" y=\"38.78\" >y</tspan>\n\t\t</text>\n\t</g>\n';
 
   test('constructor', function() {
     ok(fabric.Text);
@@ -77,10 +84,10 @@
     var fontDecl = text._getFontDeclaration();
     ok(typeof fontDecl == 'string', 'it returns a string');
     if (fabric.isLikelyNode) {
-      equal(fontDecl, 'normal  40px "Times New Roman"');
+      equal(fontDecl, 'normal normal 40px "Times New Roman"');
     }
     else {
-      equal(fontDecl, ' normal 40px Times New Roman');
+      equal(fontDecl, 'normal normal 40px Times New Roman');
     }
 
   });
@@ -113,10 +120,10 @@
     var text = createTextObject();
     text.text = 'text with one line';
     text.lineHeight = 2;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height;
     text.lineHeight = 0.5;
-    text._initDimensions();
+    text.initDimensions();
     var heightNew = text.height;
     equal(height, heightNew, 'text height does not change with one single line');
   });
@@ -125,7 +132,7 @@
     var text = createTextObject();
     text.text = 'text with\ntwo lines';
     text.lineHeight = 0.1;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height,
         minimumHeight = text.fontSize * text._fontSizeMult;
     equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
@@ -198,7 +205,7 @@
   });
 
   test('fabric.Text.fromElement', function() {
-    ok(typeof fabric.Text.fromElement == 'function');
+    ok(typeof fabric.Text.fromElement === 'function');
 
     var elText = fabric.document.createElement('text');
     elText.textContent = 'x';
@@ -212,7 +219,7 @@
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       left: 4.5,
-      top: -5.75,
+      top: -6.13,
       width: 8,
       height: 18.08,
       fontSize: 16,
@@ -253,7 +260,7 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -18.54,
+      top:              -21.51,
       width:            CHAR_WIDTH,
       height:           138.99,
       fill:             'rgb(255,255,255)',
@@ -268,7 +275,7 @@
       fontStyle:        'italic',
       fontWeight:       'bold',
       fontSize:         123,
-      textDecoration:   'underline',
+      underline:        true,
       originX:          'center'
     });
 
@@ -306,10 +313,6 @@
   test('toSVG', function() {
     var text = new fabric.Text('x');
 
-    function removeTranslate(str) {
-      return str.replace(/translate\(.*?\)/, '');
-    }
-
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
@@ -322,15 +325,10 @@
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"')));
   });
   test('toSVG justified', function() {
-    var text = new fabric.Text('x y');
+    var text = new fabric.Text('xxxxxx\nx y', {
+      textAlign: 'justify',
+    });
 
-    function removeTranslate(str) {
-      return str.replace(/translate\(.*?\)/, '');
-    }
-
-    // temp workaround for text objects not obtaining width under node
-    text.width = 100;
-    text.textAlign = 'justify';
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
 

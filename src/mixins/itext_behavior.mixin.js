@@ -172,7 +172,7 @@
      */
     selectAll: function() {
       this.selectionStart = 0;
-      this.selectionEnd = this.text.length;
+      this.selectionEnd = this._text.length;
       this._fireSelectionChanged();
       this._updateTextarea();
     },
@@ -182,7 +182,7 @@
      * @return {String}
      */
     getSelectedText: function() {
-      return this.text.slice(this.selectionStart, this.selectionEnd);
+      return this._text.slice(this.selectionStart, this.selectionEnd).join('');
     },
 
     /**
@@ -194,13 +194,13 @@
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
-      if (this._reSpace.test(this.text.charAt(index))) {
-        while (this._reSpace.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this._text[index])) {
+        while (this._reSpace.test(this._text[index])) {
           offset++;
           index--;
         }
       }
-      while (/\S/.test(this.text.charAt(index)) && index > -1) {
+      while (/\S/.test(this._text[index]) && index > -1) {
         offset++;
         index--;
       }
@@ -217,13 +217,13 @@
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
-      if (this._reSpace.test(this.text.charAt(index))) {
-        while (this._reSpace.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this._text[index])) {
+        while (this._reSpace.test(this._text[index])) {
           offset++;
           index++;
         }
       }
-      while (/\S/.test(this.text.charAt(index)) && index < this.text.length) {
+      while (/\S/.test(this._text[index]) && index < this.text.length) {
         offset++;
         index++;
       }
@@ -239,7 +239,7 @@
     findLineBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
-      while (!/\n/.test(this.text.charAt(index)) && index > -1) {
+      while (!/\n/.test(this._text[index]) && index > -1) {
         offset++;
         index--;
       }
@@ -255,28 +255,12 @@
     findLineBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
 
-      while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
+      while (!/\n/.test(this._text[index]) && index < this.text.length) {
         offset++;
         index++;
       }
 
       return startFrom + offset;
-    },
-
-    /**
-     * Returns number of newlines in selected text
-     * @return {Number} Number of newlines in selected text
-     */
-    getNumNewLinesInSelectedText: function() {
-      var selectedText = this.getSelectedText(),
-          numNewLines  = 0;
-
-      for (var i = 0, len = selectedText.length; i < len; i++) {
-        if (selectedText[i] === '\n') {
-          numNewLines++;
-        }
-      }
-      return numNewLines;
     },
 
     /**
@@ -349,6 +333,7 @@
 
       this.initHiddenTextarea(e);
       this.hiddenTextarea.focus();
+      this.hiddenTextarea.value = this.text;
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
@@ -435,21 +420,75 @@
     },
 
     /**
+     * convert from textarea to grapheme indexes
+     */
+    fromStringToGraphemeSelection: function(start, end, text) {
+      var smallerTextStart = text.slice(0, start),
+          graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+      if (start === end) {
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+      }
+      var smallerTextEnd = text.slice(start, end),
+          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
+    },
+
+    /**
+     * convert from fabric to textarea values
+     */
+    fromGraphemeToStringSelection: function(start, end, _text) {
+      var smallerTextStart = _text.slice(0, start),
+          graphemeStart = smallerTextStart.join('').length;
+      if (start === end) {
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+      }
+      var smallerTextEnd = _text.slice(start, end),
+          graphemeEnd = smallerTextEnd.join('').length;
+      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
+    },
+
+    /**
      * @private
      */
     _updateTextarea: function() {
-      if (!this.hiddenTextarea || this.inCompositionMode) {
+      this.cursorOffsetCache = { };
+      if (!this.hiddenTextarea) {
+        return;
+      }
+      if (!this.inCompositionMode) {
+        var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
+        this.hiddenTextarea.selectionStart = newSelection.selectionStart;
+        this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
+      }
+      this.updateTextareaPosition();
+    },
+
+    /**
+     * @private
+     */
+    updateFromTextArea: function() {
+      if (!this.hiddenTextarea) {
         return;
       }
       this.cursorOffsetCache = { };
-      this.hiddenTextarea.value = this.text;
-      this.hiddenTextarea.selectionStart = this.selectionStart;
-      this.hiddenTextarea.selectionEnd = this.selectionEnd;
+      this.text = this.hiddenTextarea.value;
+      var newSelection = this.fromStringToGraphemeSelection(
+        this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
+      this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
+      if (!this.inCompositionMode) {
+        this.selectionStart = newSelection.selectionStart;
+      }
+      this.updateTextareaPosition();
+    },
+
+    /**
+     * @private
+     */
+    updateTextareaPosition: function() {
       if (this.selectionStart === this.selectionEnd) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
-        this.hiddenTextarea.style.fontSize = style.fontSize;
       }
     },
 
@@ -461,12 +500,12 @@
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var chars = this.text.split(''),
-          boundaries = this._getCursorBoundaries(chars, 'cursor'),
-          cursorLocation = this.get2DCursorLocation(),
+      var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart,
+          boundaries = this._getCursorBoundaries(desiredPostion),
+          cursorLocation = this.get2DCursorLocation(desiredPostion),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
-          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') * this.lineHeight,
           leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
           p = {
@@ -479,7 +518,6 @@
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
-
       if (p.x < 0) {
         p.x = 0;
       }
@@ -497,7 +535,7 @@
       p.x += this.canvas._offset.left;
       p.y += this.canvas._offset.top;
 
-      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight };
+      return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight + 'px', charHeight: charHeight };
     },
 
     /**
@@ -580,77 +618,80 @@
     },
 
     /**
-     * @private
+     * remove and reflow a style block from start to end.
+     * @param {Number} start linear start position for removal (included in removal)
+     * @param {Number} end linear end position for removal ( excluded from removal )
      */
-    _removeCharsFromTo: function(start, end) {
-      while (end !== start) {
-        this._removeSingleCharAndStyle(start + 1);
-        end--;
-      }
-      this.selectionStart = start;
-      this.selectionEnd = start;
-    },
-
-    _removeSingleCharAndStyle: function(index) {
-      var isBeginningOfLine = this.text[index - 1] === '\n',
-          indexStyle        = isBeginningOfLine ? index : index - 1;
-      this.removeStyleObject(isBeginningOfLine, indexStyle);
-      this.text = this.text.slice(0, index - 1) +
-        this.text.slice(index);
-
-      this._textLines = this._splitTextIntoLines();
-    },
-
-    /**
-     * Inserts characters where cursor is (replacing selection if one exists)
-     * @param {String} _chars Characters to insert
-     * @param {Boolean} useCopiedStyle use fabric.copiedTextStyle
-     */
-    insertChars: function(_chars, useCopiedStyle) {
-      var style;
-
-      if (this.selectionEnd - this.selectionStart > 1) {
-        this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-      }
-      //short circuit for block paste
-      if (!useCopiedStyle && this.isEmptyStyles()) {
-        this.insertChar(_chars, false);
-        return;
-      }
-      for (var i = 0, len = _chars.length; i < len; i++) {
-        if (useCopiedStyle) {
-          style = fabric.util.object.clone(fabric.copiedTextStyle[i], true);
+    removeStyleFromTo: function(start, end) {
+      var cursorStart = this.get2DCursorLocation(start, true),
+          cursorEnd = this.get2DCursorLocation(end, true),
+          lineStart = cursorStart.lineIndex,
+          charStart = cursorStart.charIndex,
+          lineEnd = cursorEnd.lineIndex,
+          charEnd = cursorEnd.charIndex,
+          i, styleObj;
+      if (lineStart !== lineEnd) {
+        // step1 remove the trailing of lineStart
+        if (this.styles[lineStart]) {
+          for (i = charStart; i < this._textLines[lineStart].length; i++) {
+            delete this.styles[lineStart][i];
+          }
         }
-        this.insertChar(_chars[i], i < len - 1, style);
+        // step2 move the trailing of lineEnd to lineStart if needed
+        if (this.styles[lineEnd]) {
+          for (i = charEnd; i < this._textLines[lineEnd].length; i++) {
+            styleObj = this.styles[lineEnd][i];
+            if (styleObj) {
+              this.styles[lineStart] || (this.styles[lineStart] = { });
+              this.styles[lineStart][charStart + i - charEnd] = styleObj;
+            }
+          }
+        }
+        // step3 detects lines will be completely removed.
+        for (i = lineStart + 1; i <= lineEnd; i++) {
+          delete this.styles[i];
+        }
+        // step4 shift remaining lines.
+        this.shiftLineStyles(lineEnd, lineStart - lineEnd);
+      }
+      else {
+        // remove and shift left on the same line
+        if (this.styles[lineStart]) {
+          styleObj = this.styles[lineStart];
+          var diff = charEnd - charStart;
+          for (i = charStart; i < charEnd; i++) {
+            delete styleObj[i];
+          }
+          for (i = charEnd; i < this._textLines[lineStart].length; i++) {
+            //shifting
+            if (styleObj[i]) {
+              styleObj[i - diff] = styleObj[i];
+              delete styleObj[i];
+            }
+          }
+        }
       }
     },
 
     /**
-     * Inserts a character where cursor is
-     * @param {String} _char Characters to insert
-     * @param {Boolean} skipUpdate trigger rendering and updates at the end of text insert
-     * @param {Object} styleObject Style to be inserted for the new char
+     * Shifts line styles up or down
+     * @param {Number} lineIndex Index of a line
+     * @param {Number} offset Can any number?
      */
-    insertChar: function(_char, skipUpdate, styleObject) {
-      var isEndOfLine = this.text[this.selectionStart] === '\n';
-      this.text = this.text.slice(0, this.selectionStart) +
-        _char + this.text.slice(this.selectionEnd);
-      this._textLines = this._splitTextIntoLines();
-      this.insertStyleObjects(_char, isEndOfLine, styleObject);
-      this.selectionStart += _char.length;
-      this.selectionEnd = this.selectionStart;
-      if (skipUpdate) {
-        return;
+    shiftLineStyles: function(lineIndex, offset) {
+      // shift all line styles by 1 upward
+      // do not clone deep. we need new array, not new style objects
+      var clonedStyles = clone(this.styles);
+      for (var line in this.styles) {
+        var numericLine = parseInt(line, 10);
+        if (numericLine > lineIndex) {
+          this.styles[numericLine + offset] = clonedStyles[numericLine];
+          if (!clonedStyles[numericLine - offset]) {
+            delete this.styles[numericLine];
+          }
+        }
       }
-      this._updateTextarea();
-      this.setCoords();
-      this._fireSelectionChanged();
-      this.fire('changed');
-      this.restartCursorIfNeeded();
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.renderAll();
-      }
+      //TODO: evaluate if delete old style lines with offset -1
     },
 
     restartCursorIfNeeded: function() {
@@ -665,39 +706,50 @@
      * Inserts new style object
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
-     * @param {Boolean} isEndOfLine True if it's end of line
+     * @param {Number} qty number of lines to add
+     * @param {Array} copiedStyle Array of objects styles
      */
-    insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+    insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
+      var currentCharStyle,
+          newLineStyles = {},
+          somethingAdded = false;
 
-      this.shiftLineStyles(lineIndex, +1);
-
-      var currentCharStyle = {},
-          newLineStyles    = {};
-
+      qty || (qty = 1);
+      this.shiftLineStyles(lineIndex, qty);
       if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
         currentCharStyle = this.styles[lineIndex][charIndex - 1];
       }
 
-      // if there's nothing after cursor,
-      // we clone current char style onto the next (otherwise empty) line
-      if (isEndOfLine && currentCharStyle) {
-        newLineStyles[0] = clone(currentCharStyle);
-        this.styles[lineIndex + 1] = newLineStyles;
-      }
-      // otherwise we clone styles of all chars
-      // after cursor onto the next line, from the beginning
-      else {
-        var somethingAdded = false;
-        for (var index in this.styles[lineIndex]) {
-          var numIndex = parseInt(index, 10);
-          if (numIndex >= charIndex) {
-            somethingAdded = true;
-            newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
-            // remove lines from the previous line since they're on a new line now
-            delete this.styles[lineIndex][index];
-          }
+      // we clone styles of all chars
+      // after cursor onto the last line
+      for (var index in this.styles[lineIndex]) {
+        var numIndex = parseInt(index, 10);
+        if (numIndex >= charIndex) {
+          somethingAdded = true;
+          newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
+          // remove lines from the previous line since they're on a new line now
+          delete this.styles[lineIndex][index];
         }
-        somethingAdded && (this.styles[lineIndex + 1] = newLineStyles);
+      }
+      if (somethingAdded) {
+        this.styles[lineIndex + qty] = newLineStyles;
+      }
+      else {
+        delete this.styles[lineIndex + qty];
+      }
+      // for the other lines
+      // we clone current char style onto the next (otherwise empty) line
+      while (qty > 1) {
+        qty--;
+        if (copiedStyle[qty]) {
+          this.styles[lineIndex + qty] = { 0: clone(copiedStyle[qty]) };
+        }
+        else if (currentCharStyle) {
+          this.styles[lineIndex + qty] = { 0: clone(currentCharStyle) };
+        }
+        else {
+          delete this.styles[lineIndex + qty];
+        }
       }
       this._forceClearCache = true;
     },
@@ -706,137 +758,72 @@
      * Inserts style object for a given line/char index
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
-     * @param {Object} [style] Style object to insert, if given
+     * @param {Number} quantity number Style object to insert, if given
+     * @param {Array} copiedStyle array of style objecs
      */
-    insertCharStyleObject: function(lineIndex, charIndex, style) {
+    insertCharStyleObject: function(lineIndex, charIndex, quantity, copiedStyle) {
 
       var currentLineStyles       = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
-      if (charIndex === 0 && !style) {
-        charIndex = 1;
-      }
-
-      // shift all char styles by 1 forward
+      quantity || (quantity = 1);
+      // shift all char styles by quantity forward
       // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
       for (var index in currentLineStylesCloned) {
         var numericIndex = parseInt(index, 10);
-
         if (numericIndex >= charIndex) {
-          currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
-
+          currentLineStyles[numericIndex + quantity] = currentLineStylesCloned[numericIndex];
           // only delete the style if there was nothing moved there
-          if (!currentLineStylesCloned[numericIndex - 1]) {
+          if (!currentLineStylesCloned[numericIndex - quantity]) {
             delete currentLineStyles[numericIndex];
           }
         }
       }
-      var newStyle = style || currentLineStyles[charIndex - 1];
-      newStyle && (this.styles[lineIndex][charIndex] = newStyle);
       this._forceClearCache = true;
+      if (!currentLineStyles) {
+        return;
+      }
+      if (copiedStyle) {
+        while (quantity--) {
+          this.styles[lineIndex][charIndex + quantity] = clone(copiedStyle[quantity]);
+        }
+        return;
+      }
+      var newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
+      while (newStyle && quantity--) {
+        this.styles[lineIndex][charIndex + quantity] = clone(newStyle);
+      }
     },
 
     /**
      * Inserts style object(s)
-     * @param {String} _chars Characters at the location where style is inserted
-     * @param {Boolean} isEndOfLine True if it's end of line
-     * @param {Object} [styleObject] Style to insert
+     * @param {Array} insertedText Characters at the location where style is inserted
+     * @param {Number} start True if it's end of line
      */
-    insertStyleObjects: function(_chars, isEndOfLine, styleObject) {
-      // removed shortcircuit over isEmptyStyles
-
-      var cursorLocation = this.get2DCursorLocation(),
-          lineIndex      = cursorLocation.lineIndex,
-          charIndex      = cursorLocation.charIndex;
-
-      if (!this._getLineStyle(lineIndex)) {
-        this._setLineStyle(lineIndex, {});
-      }
-
-      if (_chars === '\n') {
-        this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
-      }
-      else {
-        this.insertCharStyleObject(lineIndex, charIndex, styleObject);
-      }
-    },
-
-    /**
-     * Shifts line styles up or down
-     * @param {Number} lineIndex Index of a line
-     * @param {Number} offset Can be -1 or +1
-     */
-    shiftLineStyles: function(lineIndex, offset) {
-      // shift all line styles by 1 upward
-      var clonedStyles = clone(this.styles);
-      for (var line in this.styles) {
-        var numericLine = parseInt(line, 10);
-        if (numericLine > lineIndex) {
-          this.styles[numericLine + offset] = clonedStyles[numericLine];
-          if (!clonedStyles[numericLine - offset]) {
-            delete this.styles[numericLine];
+    insertNewStyleBlock: function(insertedText, start, copiedStyle) {
+      var cursorLoc = this.get2DCursorLocation(start, true),
+          addingNewLines = 0, addingChars = 0;
+      for (var i = 0; i < insertedText.length; i++) {
+        if (insertedText[i] === '\n') {
+          if (addingChars) {
+            this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars, copiedStyle);
+            copiedStyle = copiedStyle && copiedStyle.slice(addingChars);
+            addingChars = 0;
           }
+          addingNewLines++;
         }
-      }
-      //TODO: evaluate if delete old style lines with offset -1
-    },
-
-    /**
-     * Removes style object
-     * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
-     * @param {Number} [index] Optional index. When not given, current selectionStart is used.
-     */
-    removeStyleObject: function(isBeginningOfLine, index) {
-
-      var cursorLocation = this.get2DCursorLocation(index),
-          lineIndex      = cursorLocation.lineIndex,
-          charIndex      = cursorLocation.charIndex;
-
-      this._removeStyleObject(isBeginningOfLine, cursorLocation, lineIndex, charIndex);
-    },
-
-    _getTextOnPreviousLine: function(lIndex) {
-      return this._textLines[lIndex - 1];
-    },
-
-    _removeStyleObject: function(isBeginningOfLine, cursorLocation, lineIndex, charIndex) {
-
-      if (isBeginningOfLine) {
-        var textOnPreviousLine     = this._getTextOnPreviousLine(cursorLocation.lineIndex),
-            newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
-
-        if (!this.styles[lineIndex - 1]) {
-          this.styles[lineIndex - 1] = {};
-        }
-        for (charIndex in this.styles[lineIndex]) {
-          this.styles[lineIndex - 1][parseInt(charIndex, 10) + newCharIndexOnPrevLine]
-            = this.styles[lineIndex][charIndex];
-        }
-        this.shiftLineStyles(cursorLocation.lineIndex, -1);
-      }
-      else {
-        var currentLineStyles = this.styles[lineIndex];
-
-        if (currentLineStyles) {
-          delete currentLineStyles[charIndex];
-        }
-        var currentLineStylesCloned = clone(currentLineStyles);
-        // shift all styles by 1 backwards
-        for (var i in currentLineStylesCloned) {
-          var numericIndex = parseInt(i, 10);
-          if (numericIndex >= charIndex && numericIndex !== 0) {
-            currentLineStyles[numericIndex - 1] = currentLineStylesCloned[numericIndex];
-            delete currentLineStyles[numericIndex];
+        else {
+          if (addingNewLines) {
+            this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines, copiedStyle);
+            copiedStyle = copiedStyle && copiedStyle.slice(addingNewLines);
+            addingNewLines = 0;
           }
+          addingChars++;
         }
       }
-    },
-
-    /**
-     * Inserts new line
-     */
-    insertNewline: function() {
-      this.insertChars('\n');
+      addingChars && this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars, copiedStyle);
+      addingNewLines && this.insertNewlineStyleObject(
+        cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines, copiedStyle);
     },
 
     /**
