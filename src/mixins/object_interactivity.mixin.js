@@ -109,12 +109,14 @@
      * Draws a colored layer behind the object, inside its selection borders.
      * Requires public options: padding, selectionBackgroundColor
      * this function is called when the context is transformed
+     * has checks to be skipped when the object is on a staticCanvas
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || this.group || !this.active) {
+      if (!this.selectionBackgroundColor || this.group || !this.active ||
+        (this.canvas && !this.canvas.interactive)) {
         return this;
       }
       ctx.save();
