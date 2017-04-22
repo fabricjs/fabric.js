@@ -307,13 +307,29 @@
       this.caching = parentCache;
       if (parentCache) {
         for (var i = 0, len = this._objects.length; i < len; i++) {
-          if (this._objects[i].shadow) {
+          if (this._objects[i].willDrawShadow()) {
             this.caching = false;
             return false;
           }
         }
       }
       return parentCache;
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      if (this.shadow) {
+        return true;
+      }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        if (this._objects[i].willDrawShadow()) {
+          return true;
+        }
+      }
+      return false;
     },
 
     /**

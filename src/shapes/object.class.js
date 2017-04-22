@@ -1155,7 +1155,6 @@
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.shouldCache()) {
-        console.log(this.name, 'IS CACHICNG');
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
         }
@@ -1167,7 +1166,6 @@
         this.drawCacheOnCanvas(ctx);
       }
       else {
-        console.log(this.name, 'IS NOT');
         this.drawObject(ctx, noTransform);
         if (noTransform && this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
@@ -1188,6 +1186,15 @@
     shouldCache: function() {
       return this.objectCaching &&
       (!this.group || this.needsItsOwnCache || !this.group.caching);
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * used by Group.shouldCache to know if child has a shadow recursively
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      return !!this.shadow;
     },
 
     /**
