@@ -3,7 +3,6 @@
   var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   function getSvgColorString(prop, value) {
-    console.log(prop, value)
     if (!value) {
       return prop + ': none; ';
     }
