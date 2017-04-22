@@ -1185,7 +1185,7 @@
      */
     shouldCache: function() {
       return this.objectCaching &&
-      (!this.group || this.needsItsOwnCache || !this.group.caching);
+      (!this.group || this.needsItsOwnCache || !this.group.isCaching());
     },
 
     /**
