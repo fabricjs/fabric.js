@@ -606,7 +606,6 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect5 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1, rect2]),
         group2 = new fabric.Group([rect3, rect4]),
         group3 = new fabric.Group([group, group2]);
@@ -629,7 +628,6 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        rect5 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         group = new fabric.Group([rect1, rect2], { objectCaching: true}),
         group2 = new fabric.Group([rect3, rect4], { objectCaching: true}),
         group3 = new fabric.Group([group, group2], { objectCaching: true});
@@ -639,7 +637,7 @@
     equal(rect3.shouldCache(), false, 'rect3 will not cache because is drawing on parent2 group cache');
 
     group2.shadow = {};
-    rect1.shadow = {}
+    rect1.shadow = {};
 
     equal(group3.shouldCache(), false, 'group3 will cache because children have shadow');
     equal(group2.shouldCache(), true, 'group2 will cache because is not drawing on parent group3 cache and no children have shadow');
