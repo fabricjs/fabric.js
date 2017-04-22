@@ -298,6 +298,8 @@
    */
   fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
 
+  // TODO extend to the svg 1.0 color aka css3 colors.
+
   /**
    * Map of the 17 basic color names with HEX code
    * @static
@@ -306,24 +308,24 @@
    * @see: http://www.w3.org/TR/CSS2/syndata.html#color-units
    */
   fabric.Color.colorNameMap = {
-    aqua:    '#00FFFF',
-    black:   '#000000',
-    blue:    '#0000FF',
-    fuchsia: '#FF00FF',
-    gray:    '#808080',
-    grey:    '#808080',
-    green:   '#008000',
-    lime:    '#00FF00',
-    maroon:  '#800000',
-    navy:    '#000080',
-    olive:   '#808000',
-    orange:  '#FFA500',
-    purple:  '#800080',
-    red:     '#FF0000',
-    silver:  '#C0C0C0',
-    teal:    '#008080',
-    white:   '#FFFFFF',
-    yellow:  '#FFFF00'
+    aqua:      '#00FFFF',
+    black:     '#000000',
+    blue:      '#0000FF',
+    fuchsia:   '#FF00FF',
+    gray:      '#808080',
+    grey:      '#808080',
+    green:     '#008000',
+    lime:      '#00FF00',
+    maroon:    '#800000',
+    navy:      '#000080',
+    olive:     '#808000',
+    orange:    '#FFA500',
+    purple:    '#800080',
+    red:       '#FF0000',
+    silver:    '#C0C0C0',
+    teal:      '#008080',
+    white:     '#FFFFFF',
+    yellow:    '#FFFF00'
   };
 
   /**

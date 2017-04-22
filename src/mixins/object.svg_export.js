@@ -3,6 +3,7 @@
   var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   function getSvgColorString(prop, value) {
+    console.log(prop, value)
     if (!value) {
       return prop + ': none; ';
     }
@@ -64,7 +65,7 @@
      * @return {String}
      */
     getSvgSpanStyles: function(style) {
-      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + strokeWidth + '; ' : '',
+      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
           fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
           fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
           fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
