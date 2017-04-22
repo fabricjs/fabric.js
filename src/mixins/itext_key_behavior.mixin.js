@@ -173,7 +173,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
-      console.log(insertedText, fromPaste, fabric.copiedText, fabric.copiedTextStyle)
       if (fromPaste && insertedText.join('') === fabric.copiedText) {
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }

@@ -1154,7 +1154,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
+      if (this.shouldCache()) {
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
         }
@@ -1173,6 +1173,28 @@
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    /**
+     * Decide if the object should cache or not.
+     * objectCaching is a global flag, wins over everything
+     * needsItsOwnCache should be used when the object drawing method requires
+     * a cache step. None of the fabric classes requires it.
+     * Generally you do not cache objects in groups because the group outside is cached.
+     * @return {Boolean}
+     */
+    shouldCache: function() {
+      return this.objectCaching &&
+      (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * used by Group.shouldCache to know if child has a shadow recursively
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      return !!this.shadow;
     },
 
     /**
