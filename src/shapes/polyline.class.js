@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -125,20 +126,25 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [], addTransform,
+      var points = [], diffX, diffY,
           markup = this._createBaseSVGMarkup();
 
-      for (var i = 0, len = this.points.length; i < len; i++) {
-        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
-      }
       if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
+        diffX = this.pathOffset.x;
+        diffY = this.pathOffset.y;
+      }
+
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(
+          toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',',
+          toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
+        );
       }
       markup.push(
         '<', this.type, ' ', this.getSvgId(),
           'points="', points.join(''),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(), addTransform,
+          '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(),
         '"/>\n'
       );
