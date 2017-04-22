@@ -71,6 +71,8 @@
   }
   /* _FROM_SVG_END_ */
 
+  var clone = fabric.util.object.clone;
+
   /**
    * Gradient class
    * @class fabric.Gradient
@@ -169,11 +171,11 @@
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
-      var coords = fabric.util.object.clone(this.coords),
-          markup, commonAttributes, colorStops = this.colorStops,
+      var coords = clone(this.coords, true),
+          markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2;
       // colorStops must be sorted ascending
-      this.colorStops.sort(function(a, b) {
+      colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
 
@@ -221,7 +223,8 @@
       if (this.type === 'radial') {
         if (needsSwap) {
           // svg goes from internal to external radius. if radius are inverted, swap color stops.
-          colorStops = colorStops.concat().reverse();
+          colorStops = colorStops.concat();
+          colorStops.reverse();
           for (var i = 0; i < colorStops.length; i++) {
             colorStops[i].offset = 1 - colorStops[i].offset;
           }
