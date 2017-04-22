@@ -1296,11 +1296,9 @@
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform
-          || (this.group && this.group !== this.canvas.getActiveGroup())) {
+    _renderControls: function(ctx) {
+      if (!this.active || (this.group && this.group !== this.canvas.getActiveGroup())) {
         return;
       }
 

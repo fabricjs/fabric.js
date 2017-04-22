@@ -267,6 +267,24 @@
     },
 
     /**
+     * Returns object representation of an instance, in dataless mode.
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toDatalessObject: function(propertiesToInclude) {
+      var objsToObject = this.getObjects().map(function(obj) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        var _obj = obj.toDatalessObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        return _obj;
+      });
+      return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
+        objects: objsToObject
+      });
+    },
+
+    /**
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
