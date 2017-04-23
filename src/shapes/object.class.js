@@ -1105,6 +1105,17 @@
     },
 
     /**
+     * Sets sourcePath of an object
+     * @param {String} value Value to set sourcePath to
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setSourcePath: function(value) {
+      this.sourcePath = value;
+      return this;
+    },
+
+    /**
      * Retrieves viewportTransform from Object's canvas if possible
      * @method getViewportTransform
      * @memberOf fabric.Object.prototype
