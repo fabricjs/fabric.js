@@ -1,6 +1,6 @@
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-beta0' };
+var fabric = fabric || { version: '2.0.0-beta1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
