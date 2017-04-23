@@ -149,16 +149,6 @@
     equal(0.123, cObj.getOpacity());
   });
 
-  test('setSourcePath', function() {
-    var cObj = new fabric.Object();
-    var SRC_PATH = 'http://example.com/';
-
-    ok(typeof cObj.setSourcePath == 'function');
-
-    cObj.setSourcePath(SRC_PATH);
-    equal(cObj.get('sourcePath'), SRC_PATH);
-  });
-
   test('stateProperties', function() {
     var cObj = new fabric.Object();
     ok(cObj.stateProperties);

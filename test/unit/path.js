@@ -140,7 +140,7 @@
       deepEqual(path.toDatalessObject(), REFERENCE_PATH_OBJECT);
 
       var src = 'http://example.com/';
-      path.setSourcePath(src);
+      path.sourcePath = src;
       deepEqual(path.toDatalessObject(), fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
         path: src
       }));

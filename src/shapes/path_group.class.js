@@ -54,12 +54,8 @@
       }
       this.setOptions(options);
       this.setCoords();
-      if (options.sourcePath) {
-        this.setSourcePath(options.sourcePath);
-      }
       if (this.objectCaching) {
         this._createCacheCanvas();
-        this.setupState({ propertySet: 'cacheProperties' });
       }
     },
 
@@ -258,7 +254,6 @@
   fabric.PathGroup.fromObject = function(object, callback) {
     var originalPaths = object.paths;
     delete object.paths;
-    // remove this pattern from 2.0 accepts only object
     if (typeof originalPaths === 'string') {
       fabric.loadSVGFromURL(originalPaths, function (elements) {
         var pathUrl = originalPaths;
