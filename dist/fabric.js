@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-beta0' };
+var fabric = fabric || { version: '2.0.0-beta1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1649,7 +1649,7 @@ fabric.CommonMethods = {
   function getWholeChar(str, i) {
     var code = str.charCodeAt(i);
 
-    if (Number.isNaN(code)) {
+    if (isNaN(code)) {
       return ''; // Position not found
     }
     if (code < 0xD800 || code > 0xDFFF) {
@@ -1761,6 +1761,7 @@ fabric.CommonMethods = {
         parentMethod = superClassMethod;
         break;
       }
+      // eslint-disable-next-line
       _this = _this.constructor.superclass.prototype;
     }
 
@@ -5222,6 +5223,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   }
   /* _FROM_SVG_END_ */
 
+  var clone = fabric.util.object.clone;
+
   /**
    * Gradient class
    * @class fabric.Gradient
@@ -5320,11 +5323,11 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
-      var coords = fabric.util.object.clone(this.coords),
-          markup, commonAttributes, colorStops = this.colorStops,
+      var coords = clone(this.coords, true),
+          markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2;
       // colorStops must be sorted ascending
-      this.colorStops.sort(function(a, b) {
+      colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
 
@@ -5372,7 +5375,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       if (this.type === 'radial') {
         if (needsSwap) {
           // svg goes from internal to external radius. if radius are inverted, swap color stops.
-          colorStops = colorStops.concat().reverse();
+          colorStops = colorStops.concat();
+          colorStops.reverse();
           for (var i = 0; i < colorStops.length; i++) {
             colorStops[i].offset = 1 - colorStops[i].offset;
           }
@@ -12617,7 +12621,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
+      if (this.shouldCache()) {
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
         }
@@ -12636,6 +12640,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    /**
+     * Decide if the object should cache or not.
+     * objectCaching is a global flag, wins over everything
+     * needsItsOwnCache should be used when the object drawing method requires
+     * a cache step. None of the fabric classes requires it.
+     * Generally you do not cache objects in groups because the group outside is cached.
+     * @return {Boolean}
+     */
+    shouldCache: function() {
+      return this.objectCaching &&
+      (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * used by Group.shouldCache to know if child has a shadow recursively
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      return !!this.shadow;
     },
 
     /**
@@ -12759,11 +12785,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _renderControls: function(ctx, noTransform) {
-      if (!this.active || noTransform
-          || (this.group && this.group !== this.canvas.getActiveGroup())) {
+    _renderControls: function(ctx) {
+      if (!this.active || (this.group && this.group !== this.canvas.getActiveGroup())) {
         return;
       }
 
@@ -14629,12 +14653,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Draws a colored layer behind the object, inside its selection borders.
      * Requires public options: padding, selectionBackgroundColor
      * this function is called when the context is transformed
+     * has checks to be skipped when the object is on a staticCanvas
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || this.group || !this.active) {
+      if (!this.selectionBackgroundColor || this.group || !this.active ||
+        (this.canvas && !this.canvas.interactive)) {
         return this;
       }
       ctx.save();
@@ -16306,7 +16332,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -16425,20 +16452,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [], addTransform,
+      var points = [], diffX, diffY,
           markup = this._createBaseSVGMarkup();
 
-      for (var i = 0, len = this.points.length; i < len; i++) {
-        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
-      }
       if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
+        diffX = this.pathOffset.x;
+        diffY = this.pathOffset.y;
+      }
+
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(
+          toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',',
+          toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
+        );
       }
       markup.push(
         '<', this.type, ' ', this.getSvgId(),
           'points="', points.join(''),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(), addTransform,
+          '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(),
         '"/>\n'
       );
@@ -18179,6 +18211,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * Returns object representation of an instance, in dataless mode.
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toDatalessObject: function(propertiesToInclude) {
+      var objsToObject = this.getObjects().map(function(obj) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        var _obj = obj.toDatalessObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        return _obj;
+      });
+      return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
+        objects: objsToObject
+      });
+    },
+
+    /**
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
@@ -18186,6 +18236,52 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._transformDone = true;
       this.callSuper('render', ctx);
       this._transformDone = false;
+    },
+
+    /**
+     * Decide if the object should cache or not.
+     * objectCaching is a global flag, wins over everything
+     * needsItsOwnCache should be used when the object drawing method requires
+     * a cache step. None of the fabric classes requires it.
+     * Generally you do not cache objects in groups because the group outside is cached.
+     * @return {Boolean}
+     */
+    shouldCache: function() {
+      var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+      this.caching = parentCache;
+      if (parentCache) {
+        for (var i = 0, len = this._objects.length; i < len; i++) {
+          if (this._objects[i].willDrawShadow()) {
+            this.caching = false;
+            return false;
+          }
+        }
+      }
+      return parentCache;
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      if (this.shadow) {
+        return true;
+      }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        if (this._objects[i].willDrawShadow()) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
+     * Check if this group or its parent group are caching, recursively up
+     * @return {Boolean}
+     */
+    isCaching: function() {
+      return this.caching || this.group && this.group.isCaching();
     },
 
     /**
@@ -24795,7 +24891,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
-      console.log(insertedText, fromPaste, fabric.copiedText, fabric.copiedTextStyle)
       if (fromPaste && insertedText.join('') === fabric.copiedText) {
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }
