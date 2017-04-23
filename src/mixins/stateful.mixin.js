@@ -57,6 +57,9 @@
     hasStateChanged: function(propertySet) {
       propertySet = propertySet || originalSet;
       propertySet = '_' + propertySet;
+      if (!Object.keys(this[propertySet]).length) {
+        return true;
+      }
       return !_isEqual(this[propertySet], this, true);
     },
 
