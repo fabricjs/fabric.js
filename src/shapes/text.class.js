@@ -862,18 +862,18 @@
      * @param {String} [previousChar] previous char
      * @param {Object} [prevCharStyle] style of previous char
      */
-    _measureChar: function(char, charStyle, previousChar, prevCharStyle) {
+    _measureChar: function(_char, charStyle, previousChar, prevCharStyle) {
       // first i try to return from cache
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
-          previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + char,
+          previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
           fontMultiplier = charStyle.fontSize / CACHE_FONT_SIZE, kernedWidth;
 
       if (previousChar && fontCache[previousChar]) {
         previousWidth = fontCache[previousChar];
       }
-      if (fontCache[char]) {
-        kernedWidth = width = fontCache[char];
+      if (fontCache[_char]) {
+        kernedWidth = width = fontCache[_char];
       }
       if (stylesAreEqual && fontCache[couple]) {
         coupleWidth = fontCache[couple];
@@ -885,8 +885,8 @@
         this._setTextStyles(ctx, charStyle, true);
       }
       if (!width) {
-        kernedWidth = width = ctx.measureText(char).width;
-        fontCache[char] = width;
+        kernedWidth = width = ctx.measureText(_char).width;
+        fontCache[_char] = width;
       }
       if (!previousWidth && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
@@ -900,7 +900,7 @@
         // try to fix a MS browsers oddity
         if (kernedWidth > width) {
           var diff = kernedWidth - width;
-          fontCache[char] = kernedWidth;
+          fontCache[_char] = kernedWidth;
           fontCache[couple] += diff;
           width = kernedWidth;
         }
