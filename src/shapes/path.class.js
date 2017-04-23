@@ -105,12 +105,8 @@
 
       this._setPositionDimensions(options);
 
-      if (options.sourcePath) {
-        this.setSourcePath(options.sourcePath);
-      }
       if (this.objectCaching) {
         this._createCacheCanvas();
-        this.setupState({ propertySet: 'cacheProperties' });
       }
     },
 
