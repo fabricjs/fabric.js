@@ -718,11 +718,11 @@
         additionalSpace = this._getWidthOfCharSpacing();
         chars = _char.split('');
         charWidth = 0;
-        for (var j = 0, len = chars.length, char; j < len; j++) {
-          char = chars[j];
-          shouldFill && ctx.fillText(char, left + charWidth, top);
-          shouldStroke && ctx.strokeText(char, left + charWidth, top);
-          _charWidth = ctx.measureText(char).width + additionalSpace;
+        for (var j = 0, len = chars.length, jChar; j < len; j++) {
+          jChar = chars[j];
+          shouldFill && ctx.fillText(jChar, left + charWidth, top);
+          shouldStroke && ctx.strokeText(jChar, left + charWidth, top);
+          _charWidth = ctx.measureText(jChar).width + additionalSpace;
           charWidth += _charWidth > 0 ? _charWidth : 0;
         }
       }

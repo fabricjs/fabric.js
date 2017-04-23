@@ -477,7 +477,7 @@
      */
     _renderChars: function(method, ctx, chars, left, top) {
       // remove Text word from method var
-      var shortM = method.slice(0, -4), char, width;
+      var shortM = method.slice(0, -4), _char, width;
       if (this[shortM].toLive) {
         var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
             offsetY = -this.height / 2 + this[shortM].offsetY || 0;
@@ -491,8 +491,8 @@
         chars = chars.split('');
         for (var i = 0, len = chars.length; i < len; i++) {
           char = chars[i];
-          width = ctx.measureText(char).width + additionalSpace;
-          ctx[method](char, left, top);
+          width = ctx.measureText(_char).width + additionalSpace;
+          ctx[method](_char, left, top);
           left += width > 0 ? width : 0;
         }
       }
