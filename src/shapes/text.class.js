@@ -5,7 +5,7 @@
   var fabric = global.fabric || (global.fabric = { }),
       clone = fabric.util.object.clone,
       MIN_TEXT_WIDTH = 2,
-      CACHE_FONT_SIZE = 40;
+      CACHE_FONT_SIZE = 200;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -640,9 +640,9 @@
      * @param {String} [charStyle.fontWeight] Font weight
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
-    _setTextStyles: function(ctx, charStyle) {
+    _setTextStyles: function(ctx, charStyle, forMeasuring) {
       ctx.textBaseline = 'alphabetic';
-      ctx.font = this._getFontDeclaration(charStyle);
+      ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
     },
 
     /**
@@ -870,34 +870,42 @@
           fontMultiplier = charStyle.fontSize / CACHE_FONT_SIZE, kernedWidth;
 
       if (previousChar && fontCache[previousChar]) {
-        previousWidth = fontCache[previousChar] * fontMultiplier;
+        previousWidth = fontCache[previousChar];
       }
       if (fontCache[char]) {
-        kernedWidth = width = fontCache[char] * fontMultiplier;
+        kernedWidth = width = fontCache[char];
       }
       if (stylesAreEqual && fontCache[couple]) {
-        coupleWidth = fontCache[couple] * fontMultiplier;
+        coupleWidth = fontCache[couple];
         kernedWidth = coupleWidth - previousWidth;
       }
       if (!width || !previousWidth || !coupleWidth) {
         var ctx = this.getMeasuringContext();
-        this._setTextStyles(ctx, charStyle);
+        // send a TRUE to specify measuring font size CACHE_FONT_SIZE
+        this._setTextStyles(ctx, charStyle, true);
       }
       if (!width) {
         kernedWidth = width = ctx.measureText(char).width;
-        fontCache[char] = width / fontMultiplier;
+        fontCache[char] = width;
       }
       if (!previousWidth && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth / fontMultiplier;
+        fontCache[previousChar] = previousWidth;
       }
       if (stylesAreEqual && !coupleWidth) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
-        fontCache[couple] = coupleWidth / fontMultiplier;
+        fontCache[couple] = coupleWidth;
         kernedWidth = coupleWidth - previousWidth;
+        // try to fix a MS browsers oddity
+        if (kernedWidth > width) {
+          var diff = kernedWidth - width;
+          fontCache[char] = kernedWidth;
+          fontCache[couple] += diff;
+          width = kernedWidth;
+        }
       }
-      return { width: width, kernedWidth: kernedWidth };
+      return { width: width * fontMultiplier, kernedWidth: kernedWidth * fontMultiplier };
     },
 
     /**
@@ -1352,13 +1360,13 @@
      * @param {Object} [styleObject] object
      * @returns {String} font declaration formatted for canvas context.
      */
-    _getFontDeclaration: function(styleObject) {
+    _getFontDeclaration: function(styleObject, forMeasuring) {
       var style = styleObject || this;
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
-        style.fontSize + 'px',
+        forMeasuring ? CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + style.fontFamily + '"') : style.fontFamily)
       ].join(' ');
     },
