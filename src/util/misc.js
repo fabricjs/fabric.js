@@ -392,7 +392,7 @@
       object = new fabric.PathGroup(elements, options);
 
       if (typeof path !== 'undefined') {
-        object.setSourcePath(path);
+        object.sourcePath = path;
       }
       return object;
     },

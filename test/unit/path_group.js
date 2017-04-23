@@ -166,7 +166,7 @@
     getPathGroupObject(function(pathGroup) {
       ok(typeof pathGroup.toDatalessObject == 'function');
 
-      pathGroup.setSourcePath('http://example.com/');
+      pathGroup.sourcePath = 'http://example.com/';
       var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
         'paths': 'http://example.com/',
         'sourcePath': 'http://example.com/'

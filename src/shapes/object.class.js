@@ -792,9 +792,9 @@
      * When set to `true`, object's cache will be rerendered next render call.
      * since 1.7.0
      * @type Boolean
-     * @default false
+     * @default true
      */
-    dirty:                false,
+    dirty:                true,
 
     /**
      * When set to `true`, force the object to have its own cache, even if it is inside a group
@@ -839,7 +839,6 @@
       }
       if (this.objectCaching) {
         this._createCacheCanvas();
-        this.setupState({ propertySet: 'cacheProperties' });
       }
     },
 
@@ -848,6 +847,7 @@
      * @private
      */
     _createCacheCanvas: function() {
+      this._cacheProperties = {};
       this._cacheCanvas = fabric.document.createElement('canvas');
       this._cacheContext = this._cacheCanvas.getContext('2d');
       this._updateCacheCanvas();
@@ -1102,17 +1102,6 @@
      */
     setOnGroup: function() {
       // implemented by sub-classes, as needed.
-    },
-
-    /**
-     * Sets sourcePath of an object
-     * @param {String} value Value to set sourcePath to
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    setSourcePath: function(value) {
-      this.sourcePath = value;
-      return this;
     },
 
     /**
