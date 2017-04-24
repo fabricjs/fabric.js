@@ -1,3 +1,7 @@
+**Version 1.7.11**
+
+- Hotfix: restore path-groups ability to render [#3877](https://github.com/kangax/fabric.js/pull/3877)
+
 **Version 1.7.10**
 
 - Fix: correct svg export for radial gradients [#3807](https://github.com/kangax/fabric.js/pull/3807)
