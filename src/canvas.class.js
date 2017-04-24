@@ -976,13 +976,6 @@
           angle = radiansToDegrees(curAngle - lastAngle + t.theta),
           hasRoated = true;
 
-      // normalize angle to positive value
-      if (angle < 0) {
-        angle = 360 + angle;
-      }
-
-      angle %= 360;
-
       if (t.target.snapAngle > 0) {
         var snapAngle  = t.target.snapAngle,
             snapThreshold  = t.target.snapThreshold || snapAngle,
@@ -995,13 +988,21 @@
         else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
           angle = rightAngleLocked;
         }
-
-        if (t.target.angle === angle) {
-          hasRoated = false;
-        }
       }
 
-      t.target.angle = angle;
+      // normalize angle to positive value
+      if (angle < 0) {
+        angle = 360 + angle;
+      }
+      angle %= 360;
+
+      if (t.target.angle === angle) {
+        hasRoated = false;
+      }
+      else {
+        t.target.angle = angle;
+      }
+
       return hasRoated;
     },
 
