@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.10"
+    version: "1.7.11"
 };
 
 if (typeof exports !== "undefined") {
@@ -8614,6 +8614,33 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 this.paths[i].render(ctx, true);
             }
             ctx.restore();
+        },
+        shouldCache: function() {
+            var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+            this.caching = parentCache;
+            if (parentCache) {
+                for (var i = 0, len = this.paths.length; i < len; i++) {
+                    if (this.paths[i].willDrawShadow()) {
+                        this.caching = false;
+                        return false;
+                    }
+                }
+            }
+            return parentCache;
+        },
+        willDrawShadow: function() {
+            if (this.shadow) {
+                return true;
+            }
+            for (var i = 0, len = this.paths.length; i < len; i++) {
+                if (this.paths[i].willDrawShadow()) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        isCaching: function() {
+            return this.caching || this.group && this.group.isCaching();
         },
         isCacheDirty: function() {
             if (this.callSuper("isCacheDirty")) {
