@@ -976,8 +976,6 @@
           angle = radiansToDegrees(curAngle - lastAngle + t.theta),
           hasRoated = true;
 
-
-
       if (t.target.snapAngle > 0) {
         var snapAngle  = t.target.snapAngle,
             snapThreshold  = t.target.snapThreshold || snapAngle,
