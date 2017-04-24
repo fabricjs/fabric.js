@@ -490,7 +490,7 @@
         var additionalSpace = this._getWidthOfCharSpacing();
         chars = chars.split('');
         for (var i = 0, len = chars.length; i < len; i++) {
-          char = chars[i];
+          _char = chars[i];
           width = ctx.measureText(_char).width + additionalSpace;
           ctx[method](_char, left, top);
           left += width > 0 ? width : 0;
