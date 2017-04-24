@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.9"
+    version: "1.7.10"
 };
 
 if (typeof exports !== "undefined") {
@@ -414,7 +414,7 @@ fabric.CommonMethods = {
             var object;
             object = new fabric.PathGroup(elements, options);
             if (typeof path !== "undefined") {
-                object.setSourcePath(path);
+                object.sourcePath = path;
             }
             return object;
         },
@@ -990,8 +990,19 @@ fabric.CommonMethods = {
     };
     function Subclass() {}
     function callSuper(methodName) {
-        var fn = this.constructor.superclass.prototype[methodName];
-        return arguments.length > 1 ? fn.apply(this, slice.call(arguments, 1)) : fn.call(this);
+        var parentMethod = null, _this = this;
+        while (_this.constructor.superclass) {
+            var superClassMethod = _this.constructor.superclass.prototype[methodName];
+            if (_this[methodName] !== superClassMethod) {
+                parentMethod = superClassMethod;
+                break;
+            }
+            _this = _this.constructor.superclass.prototype;
+        }
+        if (!parentMethod) {
+            return console.log("tried to callSuper " + methodName + ", method not found in prototype chain", this);
+        }
+        return arguments.length > 1 ? parentMethod.apply(this, slice.call(arguments, 1)) : parentMethod.call(this);
     }
     function createClass() {
         var parent = null, properties = slice.call(arguments, 0);
@@ -2881,6 +2892,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             r2: el.getAttribute("r") || "50%"
         };
     }
+    var clone = fabric.util.object.clone;
     fabric.Gradient = fabric.util.createClass({
         offsetX: 0,
         offsetY: 0,
@@ -2911,7 +2923,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             for (var position in colorStops) {
                 var color = new fabric.Color(colorStops[position]);
                 this.colorStops.push({
-                    offset: position,
+                    offset: parseFloat(position),
                     color: color.toRgb(),
                     opacity: color.getAlpha()
                 });
@@ -2931,13 +2943,13 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return object;
         },
         toSVG: function(object) {
-            var coords = fabric.util.object.clone(this.coords), markup, commonAttributes;
-            this.colorStops.sort(function(a, b) {
+            var coords = clone(this.coords, true), markup, commonAttributes, colorStops = clone(this.colorStops, true), needsSwap = coords.r1 > coords.r2;
+            colorStops.sort(function(a, b) {
                 return a.offset - b.offset;
             });
             if (!(object.group && object.group.type === "path-group")) {
                 for (var prop in coords) {
-                    if (prop === "x1" || prop === "x2" || prop === "r2") {
+                    if (prop === "x1" || prop === "x2") {
                         coords[prop] += this.offsetX - object.width / 2;
                     } else if (prop === "y1" || prop === "y2") {
                         coords[prop] += this.offsetY - object.height / 2;
@@ -2951,10 +2963,27 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             if (this.type === "linear") {
                 markup = [ "<linearGradient ", commonAttributes, ' x1="', coords.x1, '" y1="', coords.y1, '" x2="', coords.x2, '" y2="', coords.y2, '">\n' ];
             } else if (this.type === "radial") {
-                markup = [ "<radialGradient ", commonAttributes, ' cx="', coords.x2, '" cy="', coords.y2, '" r="', coords.r2, '" fx="', coords.x1, '" fy="', coords.y1, '">\n' ];
+                markup = [ "<radialGradient ", commonAttributes, ' cx="', needsSwap ? coords.x1 : coords.x2, '" cy="', needsSwap ? coords.y1 : coords.y2, '" r="', needsSwap ? coords.r1 : coords.r2, '" fx="', needsSwap ? coords.x2 : coords.x1, '" fy="', needsSwap ? coords.y2 : coords.y1, '">\n' ];
             }
-            for (var i = 0; i < this.colorStops.length; i++) {
-                markup.push("<stop ", 'offset="', this.colorStops[i].offset * 100 + "%", '" style="stop-color:', this.colorStops[i].color, this.colorStops[i].opacity !== null ? ";stop-opacity: " + this.colorStops[i].opacity : ";", '"/>\n');
+            if (this.type === "radial") {
+                if (needsSwap) {
+                    colorStops = colorStops.concat();
+                    colorStops.reverse();
+                    for (var i = 0; i < colorStops.length; i++) {
+                        colorStops[i].offset = 1 - colorStops[i].offset;
+                    }
+                }
+                var minRadius = Math.min(coords.r1, coords.r2);
+                if (minRadius > 0) {
+                    var maxRadius = Math.max(coords.r1, coords.r2), percentageShift = minRadius / maxRadius;
+                    for (var i = 0; i < colorStops.length; i++) {
+                        colorStops[i].offset += percentageShift * (1 - colorStops[i].offset);
+                    }
+                }
+            }
+            for (var i = 0; i < colorStops.length; i++) {
+                var colorStop = colorStops[i];
+                markup.push("<stop ", 'offset="', colorStop.offset * 100 + "%", '" style="stop-color:', colorStop.color, colorStop.opacity !== null ? ";stop-opacity: " + colorStop.opacity : ";", '"/>\n');
             }
             markup.push(this.type === "linear" ? "</linearGradient>\n" : "</radialGradient>\n");
             return markup.join("");
@@ -2983,7 +3012,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 if (typeof opacity !== "undefined") {
                     color = new fabric.Color(color).setAlpha(opacity).toRgba();
                 }
-                gradient.addColorStop(parseFloat(offset), color);
+                gradient.addColorStop(offset, color);
             }
             return gradient;
         }
@@ -4729,10 +4758,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 return false;
             }
             var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta), hasRoated = true;
-            if (angle < 0) {
-                angle = 360 + angle;
-            }
-            angle %= 360;
             if (t.target.snapAngle > 0) {
                 var snapAngle = t.target.snapAngle, snapThreshold = t.target.snapThreshold || snapAngle, rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle, leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
                 if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
@@ -4740,11 +4765,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
                     angle = rightAngleLocked;
                 }
-                if (t.target.angle === angle) {
-                    hasRoated = false;
-                }
             }
-            t.target.angle = angle;
+            if (angle < 0) {
+                angle = 360 + angle;
+            }
+            angle %= 360;
+            if (t.target.angle === angle) {
+                hasRoated = false;
+            } else {
+                t.target.angle = angle;
+            }
             return hasRoated;
         },
         setCursor: function(value) {
@@ -4819,13 +4849,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                             target: this._hoveredTarget,
                             e: e
                         });
-                        this._hoveredTarget.fire("mouseout");
+                        this._hoveredTarget.fire("mouseout", {
+                            e: e
+                        });
                     }
                     this.fire("mouse:over", {
                         target: target,
                         e: e
                     });
-                    target.fire("mouseover");
+                    target.fire("mouseover", {
+                        e: e
+                    });
                     this._hoveredTarget = target;
                 }
             } else if (this._hoveredTarget) {
@@ -4833,7 +4867,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                     target: this._hoveredTarget,
                     e: e
                 });
-                this._hoveredTarget.fire("mouseout");
+                this._hoveredTarget.fire("mouseout", {
+                    e: e
+                });
                 this._hoveredTarget = null;
             }
         },
@@ -5670,7 +5706,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 target.set("active", false);
                 if (activeGroup.size() === 1) {
                     this.discardActiveGroup(e);
-                    this.setActiveObject(activeGroup.item(0));
+                    this.setActiveObject(activeGroup.item(0), e);
                     return;
                 }
             } else {
@@ -5686,7 +5722,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this._activeObject && target !== this._activeObject) {
                 var group = this._createGroup(target);
                 group.addWithUpdate();
-                this.setActiveGroup(group);
+                this.setActiveGroup(group, e);
                 this._activeObject = null;
                 this.fire("selection:created", {
                     target: group,
@@ -5714,7 +5750,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 this.setActiveGroup(group, e);
                 group.saveCoords();
                 this.fire("selection:created", {
-                    target: group
+                    target: group,
+                    e: e
                 });
                 this.renderAll();
             }
@@ -5997,7 +6034,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         objectCaching: objectCaching,
         statefullCache: false,
         noScaleCache: true,
-        dirty: false,
+        dirty: true,
         needsItsOwnCache: false,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "skewX skewY").split(" "),
         cacheProperties: ("fill stroke strokeWidth strokeDashArray width height stroke strokeWidth strokeDashArray" + " strokeLineCap strokeLineJoin strokeMiterLimit fillRule backgroundColor").split(" "),
@@ -6008,12 +6045,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             if (this.objectCaching) {
                 this._createCacheCanvas();
-                this.setupState({
-                    propertySet: "cacheProperties"
-                });
             }
         },
         _createCacheCanvas: function() {
+            this._cacheProperties = {};
             this._cacheCanvas = fabric.document.createElement("canvas");
             this._cacheContext = this._cacheCanvas.getContext("2d");
             this._updateCacheCanvas();
@@ -6197,7 +6232,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 ctx.transform.apply(ctx, this.transformMatrix);
             }
             this.clipTo && fabric.util.clipContext(this, ctx);
-            if (this.objectCaching && (!this.group || this.needsItsOwnCache)) {
+            if (this.shouldCache()) {
                 if (!this._cacheCanvas) {
                     this._createCacheCanvas();
                 }
@@ -6219,6 +6254,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             this.clipTo && ctx.restore();
             ctx.restore();
+        },
+        shouldCache: function() {
+            return this.objectCaching && (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+        },
+        willDrawShadow: function() {
+            return !!this.shadow;
         },
         drawObject: function(ctx, noTransform) {
             this._renderBackground(ctx);
@@ -6284,8 +6325,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 alternative && alternative(ctx);
             }
         },
-        _renderControls: function(ctx, noTransform) {
-            if (!this.active || noTransform || this.group && this.group !== this.canvas.getActiveGroup()) {
+        _renderControls: function(ctx) {
+            if (!this.active || this.group && this.group !== this.canvas.getActiveGroup()) {
                 return;
             }
             var vpt = this.getViewportTransform(), matrix = this.calcTransformMatrix(), options;
@@ -6652,7 +6693,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         },
         _getLeftTopCoords: function() {
             return this.translateToOriginPoint(this.getCenterPoint(), "left", "top");
-        }
+        },
+        onDeselect: function() {}
     });
 })();
 
@@ -6844,6 +6886,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _calcRotateMatrix: function() {
             if (this.angle) {
                 var theta = degreesToRadians(this.angle), cos = Math.cos(theta), sin = Math.sin(theta);
+                if (cos === 6.123233995736766e-17 || cos === -1.8369701987210297e-16) {
+                    cos = 0;
+                }
                 return [ cos, sin, -sin, cos, 0, 0 ];
             }
             return fabric.iMatrix.concat();
@@ -7036,6 +7081,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
         hasStateChanged: function(propertySet) {
             propertySet = propertySet || originalSet;
             propertySet = "_" + propertySet;
+            if (!Object.keys(this[propertySet]).length) {
+                return true;
+            }
             return !_isEqual(this[propertySet], this, true);
         },
         saveState: function(options) {
@@ -7120,7 +7168,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
         },
         drawSelectionBackground: function(ctx) {
-            if (!this.selectionBackgroundColor || this.group || !this.active) {
+            if (!this.selectionBackgroundColor || this.group || !this.active || this.canvas && !this.canvas.interactive) {
                 return this;
             }
             ctx.save();
@@ -7837,7 +7885,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, min = fabric.util.array.min, max = fabric.util.array.max, toFixed = fabric.util.toFixed;
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, min = fabric.util.array.min, max = fabric.util.array.max, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
     if (fabric.Polyline) {
         fabric.warn("fabric.Polyline is already defined");
         return;
@@ -7879,14 +7927,15 @@ fabric.util.object.extend(fabric.Object.prototype, {
             });
         },
         toSVG: function(reviver) {
-            var points = [], addTransform, markup = this._createBaseSVGMarkup();
-            for (var i = 0, len = this.points.length; i < len; i++) {
-                points.push(toFixed(this.points[i].x, 2), ",", toFixed(this.points[i].y, 2), " ");
-            }
+            var points = [], diffX, diffY, markup = this._createBaseSVGMarkup();
             if (!(this.group && this.group.type === "path-group")) {
-                addTransform = " translate(" + -this.pathOffset.x + ", " + -this.pathOffset.y + ") ";
+                diffX = this.pathOffset.x;
+                diffY = this.pathOffset.y;
             }
-            markup.push("<", this.type, " ", this.getSvgId(), 'points="', points.join(""), '" style="', this.getSvgStyles(), '" transform="', this.getSvgTransform(), addTransform, " ", this.getSvgTransformMatrix(), '"/>\n');
+            for (var i = 0, len = this.points.length; i < len; i++) {
+                points.push(toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ",", toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), " ");
+            }
+            markup.push("<", this.type, " ", this.getSvgId(), 'points="', points.join(""), '" style="', this.getSvgStyles(), '" transform="', this.getSvgTransform(), " ", this.getSvgTransformMatrix(), '"/>\n');
             return reviver ? reviver(markup.join("")) : markup.join("");
         },
         commonRender: function(ctx, noTransform) {
@@ -8017,14 +8066,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 this.path = this._parsePath();
             }
             this._setPositionDimensions(options);
-            if (options.sourcePath) {
-                this.setSourcePath(options.sourcePath);
-            }
             if (this.objectCaching) {
                 this._createCacheCanvas();
-                this.setupState({
-                    propertySet: "cacheProperties"
-                });
             }
         },
         _setPositionDimensions: function(options) {
@@ -8528,14 +8571,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
             this.setOptions(options);
             this.setCoords();
-            if (options.sourcePath) {
-                this.setSourcePath(options.sourcePath);
-            }
             if (this.objectCaching) {
                 this._createCacheCanvas();
-                this.setupState({
-                    propertySet: "cacheProperties"
-                });
             }
         },
         parseDimensionsFromPaths: function(options) {
@@ -8702,7 +8739,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
             for (var i = this._objects.length; i--; ) {
                 this._objects[i].group = this;
             }
-            this.originalState = {};
             if (options.originX) {
                 this.originX = options.originX;
             }
@@ -8817,10 +8853,49 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 objects: objsToObject
             });
         },
+        toDatalessObject: function(propertiesToInclude) {
+            var objsToObject = this.getObjects().map(function(obj) {
+                var originalDefaults = obj.includeDefaultValues;
+                obj.includeDefaultValues = obj.group.includeDefaultValues;
+                var _obj = obj.toDatalessObject(propertiesToInclude);
+                obj.includeDefaultValues = originalDefaults;
+                return _obj;
+            });
+            return extend(this.callSuper("toDatalessObject", propertiesToInclude), {
+                objects: objsToObject
+            });
+        },
         render: function(ctx) {
             this._transformDone = true;
             this.callSuper("render", ctx);
             this._transformDone = false;
+        },
+        shouldCache: function() {
+            var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+            this.caching = parentCache;
+            if (parentCache) {
+                for (var i = 0, len = this._objects.length; i < len; i++) {
+                    if (this._objects[i].willDrawShadow()) {
+                        this.caching = false;
+                        return false;
+                    }
+                }
+            }
+            return parentCache;
+        },
+        willDrawShadow: function() {
+            if (this.shadow) {
+                return true;
+            }
+            for (var i = 0, len = this._objects.length; i < len; i++) {
+                if (this._objects[i].willDrawShadow()) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        isCaching: function() {
+            return this.caching || this.group && this.group.isCaching();
         },
         drawObject: function(ctx) {
             for (var i = 0, len = this._objects.length; i < len; i++) {
@@ -10276,7 +10351,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return maxWidth;
         },
         _renderChars: function(method, ctx, chars, left, top) {
-            var shortM = method.slice(0, -4), char, width;
+            var shortM = method.slice(0, -4), _char, width;
             if (this[shortM].toLive) {
                 var offsetX = -this.width / 2 + this[shortM].offsetX || 0, offsetY = -this.height / 2 + this[shortM].offsetY || 0;
                 ctx.save();
@@ -10289,8 +10364,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 chars = chars.split("");
                 for (var i = 0, len = chars.length; i < len; i++) {
                     char = chars[i];
-                    width = ctx.measureText(char).width + additionalSpace;
-                    ctx[method](char, left, top);
+                    width = ctx.measureText(_char).width + additionalSpace;
+                    ctx[method](_char, left, top);
                     left += width > 0 ? width : 0;
                 }
             } else {
@@ -10957,11 +11032,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 additionalSpace = this._getWidthOfCharSpacing();
                 chars = _char.split("");
                 charWidth = 0;
-                for (var j = 0, len = chars.length, char; j < len; j++) {
-                    char = chars[j];
-                    shouldFill && ctx.fillText(char, left + charWidth, top);
-                    shouldStroke && ctx.strokeText(char, left + charWidth, top);
-                    _charWidth = ctx.measureText(char).width + additionalSpace;
+                for (var j = 0, len = chars.length, jChar; j < len; j++) {
+                    jChar = chars[j];
+                    shouldFill && ctx.fillText(jChar, left + charWidth, top);
+                    shouldStroke && ctx.strokeText(jChar, left + charWidth, top);
+                    _charWidth = ctx.measureText(jChar).width + additionalSpace;
                     charWidth += _charWidth > 0 ? _charWidth : 0;
                 }
             } else {
@@ -11226,6 +11301,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         onDeselect: function() {
             this.isEditing && this.exitEditing();
             this.selected = false;
+            this.callSuper("onDeselect");
         },
         initAddedHandler: function() {
             var _this = this;

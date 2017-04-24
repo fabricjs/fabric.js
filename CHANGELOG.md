@@ -1,3 +1,16 @@
+**Version 1.7.10**
+
+- Fix: correct svg export for radial gradients [#3807](https://github.com/kangax/fabric.js/pull/3807)
+- Fix: Update fireout events to export the event object [#3853](https://github.com/kangax/fabric.js/pull/3853)
+- Fix: Improve callSuper to avoid infinite loops (not all of them) [#3844](https://github.com/kangax/fabric.js/pull/3844)
+- Fix: avoid selectionBackgroundColor leak on toDataUrl [#3862](https://github.com/kangax/fabric.js/pull/3862)
+- Fix: toDatelessObject for Group [#3863](https://github.com/kangax/fabric.js/pull/3863)
+- Improvement: better caching logic for groups [#3864](https://github.com/kangax/fabric.js/pull/3864)
+- Fix: correct svg gradient export for radial in polygons [#3866](https://github.com/kangax/fabric.js/pull/3866)
+- Fix: First draw could be empty for some objects [#3870](https://github.com/kangax/fabric.js/pull/3870)
+- Fix: Always send event data to object:selected [#3871](https://github.com/kangax/fabric.js/pull/3871)
+- Improvement: reduce angle calculation error [#3872](https://github.com/kangax/fabric.js/pull/3872)
+
 **Version 1.7.9**
 
 - Fix: Avoid textarea wrapping from chome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
