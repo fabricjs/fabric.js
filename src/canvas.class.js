@@ -1601,11 +1601,13 @@
      * @private
      */
     _drawObjectsControls: function(ctx) {
+      var object;
       for (var i = 0, len = this._objects.length; i < len; ++i) {
-        if (!this._objects[i] || !this._objects[i].active) {
+        object = this._objects[i];
+        if (!object || !object.active) {
           continue;
         }
-        this._objects[i]._renderControls(ctx);
+        object._renderControls(ctx);
       }
     },
 
