@@ -1308,11 +1308,7 @@
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderControls: function(ctx) {
-      if (!this.active || (this.group && this.group !== this.canvas.getActiveGroup())) {
-        return;
-      }
-
+    _renderControls: function(ctx, borderStyle, controlStyle) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
           options;
@@ -1327,13 +1323,13 @@
       }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
-        this.drawBordersInGroup(ctx, options);
+        this.hasBorders || borderStyle && this.drawBordersInGroup(ctx, options, borderStyle);
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
-        this.drawBorders(ctx);
+        this.hasBorders || borderStyle && this.drawBorders(ctx, borderStyle);
       }
-      this.drawControls(ctx);
+      this.hasControls || controlStyle && this.drawControls(ctx, controlStyle);
       ctx.restore();
     },
 

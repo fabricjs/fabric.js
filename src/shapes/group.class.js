@@ -378,10 +378,11 @@
      */
     _renderControls: function(ctx, noTransform) {
       ctx.save();
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       this.callSuper('_renderControls', ctx, noTransform);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i]._renderControls(ctx);
+      if (this.canvas && this === this.canvas.getActiveGroup()) {
+        for (var i = 0, len = this._objects.length; i < len; i++) {
+          this._objects[i]._renderControls(ctx);
+        }
       }
       ctx.restore();
     },

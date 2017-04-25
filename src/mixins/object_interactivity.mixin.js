@@ -140,10 +140,6 @@
      * @chainable
      */
     drawBorders: function(ctx) {
-      if (!this.hasBorders) {
-        return this;
-      }
-
       var wh = this._calculateCurrentDimensions(),
           strokeWidth = 1 / this.borderScaleFactor,
           width = wh.x + strokeWidth,
@@ -185,10 +181,6 @@
      * @chainable
      */
     drawBordersInGroup: function(ctx, options) {
-      if (!this.hasBorders) {
-        return this;
-      }
-
       var p = this._getNonTransformedDimensions(),
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
@@ -220,10 +212,6 @@
      * @chainable
      */
     drawControls: function(ctx) {
-      if (!this.hasControls) {
-        return this;
-      }
-
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
