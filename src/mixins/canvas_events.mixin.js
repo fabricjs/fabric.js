@@ -11,7 +11,12 @@
         tl: 7 // nw
       },
       addListener = fabric.util.addListener,
-      removeListener = fabric.util.removeListener;
+      removeListener = fabric.util.removeListener,
+      RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1;
+
+  function checkClick(e, value) {
+    return 'which' in e ? e.which === value : e.button === value - 1;
+  }
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
@@ -303,14 +308,32 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-      var target, searchTarget = true, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+
+      var target;
+      // if right/middle click just fire events and return
+      // target undefined will make the _handleEvent search the target
+      if (checkClick(e, RIGHT_CLICK)) {
+        if (this.fireRightClick) {
+          this._handleEvent(e, 'up', target, RIGHT_CLICK);
+        }
+        return;
+      }
+
+      if (checkClick(e, MIDDLE_CLICK)) {
+        if (this.fireMiddleClick) {
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
+        }
+        return;
+      }
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
         return;
       }
+
+      var searchTarget = true, transform = this._currentTransform,
+          groupSelector = this._groupSelector,
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
         this._finalizeCurrentTransform();
@@ -352,15 +375,16 @@
     },
 
     /**
+     * @private
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
      * @param {fabric.Object} targetObj receiving event
      */
-    _handleEvent: function(e, eventType, targetObj) {
+    _handleEvent: function(e, eventType, targetObj, button) {
       var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
           targets = this.targets || [],
-          options = { e: e, target: target, subTargets: targets };
+          options = { e: e, target: target, subTargets: targets, button: button || LEFT_CLICK };
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
@@ -466,18 +490,16 @@
       var target = this.findTarget(e);
 
       // if right click just fire events
-      var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
-      if (isRightClick) {
+      if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'down', target ? target : null);
+          this._handleEvent(e, 'down', target ? target : null, RIGHT_CLICK);
         }
         return;
       }
 
-      var isMiddleClick  = 'which' in e ? e.which === 2 : e.button === 1;
-      if (isMiddleClick) {
+      if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'down', target ? target : null);
+          this._handleEvent(e, 'down', target ? target : null, MIDDLE_CLICK);
         }
         return;
       }
