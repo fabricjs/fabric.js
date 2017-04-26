@@ -309,27 +309,29 @@
      */
     __onMouseUp: function (e) {
 
-      if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._onMouseUpInDrawingMode(e);
-        return;
-      }
-
-      // if right click just fire events and return
+      var target;
+      // if right/middle click just fire events and return
+      // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target ? target : null, RIGHT_CLICK);
+          this._handleEvent(e, 'up', target, RIGHT_CLICK);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target ? target : null, MIDDLE_CLICK);
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
         }
         return;
       }
 
-      var target, searchTarget = true, transform = this._currentTransform,
+      if (this.isDrawingMode && this._isCurrentlyDrawing) {
+        this._onMouseUpInDrawingMode(e);
+        return;
+      }
+
+      var searchTarget = true, transform = this._currentTransform,
           groupSelector = this._groupSelector,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
@@ -485,16 +487,6 @@
      */
     __onMouseDown: function (e) {
 
-      if (this.isDrawingMode) {
-        this._onMouseDownInDrawingMode(e);
-        return;
-      }
-
-      // ignore if some object is being transformed at this moment
-      if (this._currentTransform) {
-        return;
-      }
-
       var target = this.findTarget(e);
 
       // if right click just fire events
@@ -512,6 +504,15 @@
         return;
       }
 
+      if (this.isDrawingMode) {
+        this._onMouseDownInDrawingMode(e);
+        return;
+      }
+
+      // ignore if some object is being transformed at this moment
+      if (this._currentTransform) {
+        return;
+      }
 
       // save pointer for check in __onMouseUp event
       var pointer = this.getPointer(e, true);
