@@ -1384,9 +1384,9 @@
         currentActiveObject.fire('deselected', { e: e });
       }
       this._setActiveObject(object);
-      this.renderAll();
       this.fire('object:selected', { target: object, e: e });
       object.fire('selected', { e: e });
+      this.renderAll();
       return this;
     },
 
