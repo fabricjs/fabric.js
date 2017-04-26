@@ -20,7 +20,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__newClickTime = +new Date();
     var newPointer = this.canvas.getPointer(options.e);
 
-    if (this.isTripleClick(newPointer)) {
+    if (this.isTripleClick(newPointer, options.e)) {
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
     }
@@ -83,7 +83,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   initMousedownHandler: function() {
     this.on('mousedown', function(options) {
-      if (!this.editable) {
+      if (!this.editable || (options.e.button && options.e.button !== 1)) {
         return;
       }
       var pointer = this.canvas.getPointer(options.e);
@@ -121,7 +121,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initMouseupHandler: function() {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
-      if (!this.editable || this._isObjectMoved(options.e)) {
+      if (!this.editable || this._isObjectMoved(options.e) || (options.e.button && options.e.button !== 1)) {
         return;
       }
 
