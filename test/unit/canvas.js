@@ -1768,5 +1768,5 @@
     canvas.__onMouseDown(e);
     deepEqual(canvas._groupSelector, expectedGroupSelector, 'with object non selectable groupSelector is started');
     canvas.__onMouseUp(e);
-  })
+  });
 })();
