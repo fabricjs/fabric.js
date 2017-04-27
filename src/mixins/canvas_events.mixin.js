@@ -522,11 +522,20 @@
           shouldGroup = this._shouldGroup(e, target);
 
       if (this._shouldClearSelection(e, target)) {
-        this._clearSelection(e, target, pointer);
+        this.deactivateAllWithDispatch(e);
       }
       else if (shouldGroup) {
         this._handleGrouping(e, target);
         target = this.getActiveGroup();
+      }
+
+      if (this.selection && (!target || !target.selectable)) {
+        this._groupSelector = {
+          ex: pointer.x,
+          ey: pointer.y,
+          top: 0,
+          left: 0
+        };
       }
 
       if (target) {
@@ -559,25 +568,6 @@
         this.onBeforeScaleRotate(target);
       }
 
-    },
-
-    /**
-     * @private
-     */
-    _clearSelection: function(e, target, pointer) {
-      this.deactivateAllWithDispatch(e);
-
-      if (target && target.selectable) {
-        this.setActiveObject(target, e);
-      }
-      else if (this.selection) {
-        this._groupSelector = {
-          ex: pointer.x,
-          ey: pointer.y,
-          top: 0,
-          left: 0
-        };
-      }
     },
 
     /**
