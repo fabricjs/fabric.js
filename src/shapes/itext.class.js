@@ -264,7 +264,7 @@
       }
 
       var loc = this.get2DCursorLocation(startIndex),
-        style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+          style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
 
       return style || {};
     },
@@ -370,7 +370,7 @@
         return;
       }
       var chars = this.text.split(''),
-        boundaries, ctx;
+          boundaries, ctx;
       if (this.canvas && this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
@@ -479,10 +479,10 @@
       // leftOffset/topOffset are offset from that left/top point of a text box
 
       var left = Math.round(this._getLeftOffset()),
-        top = this._getTopOffset(),
+          top = this._getTopOffset(),
 
-        offsets = this._getCursorBoundariesOffsets(
-          chars, typeOfBoundaries);
+          offsets = this._getCursorBoundariesOffsets(
+                      chars, typeOfBoundaries);
 
       return {
         left: left,
@@ -500,11 +500,11 @@
         return this.cursorOffsetCache;
       }
       var lineLeftOffset = 0,
-        lineIndex = 0,
-        charIndex = 0,
-        topOffset = 0,
-        leftOffset = 0,
-        boundaries;
+          lineIndex = 0,
+          charIndex = 0,
+          topOffset = 0,
+          leftOffset = 0,
+          boundaries;
 
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
@@ -545,12 +545,12 @@
     renderCursor: function(boundaries, ctx) {
 
       var cursorLocation = this.get2DCursorLocation(),
-        lineIndex = cursorLocation.lineIndex,
-        charIndex = cursorLocation.charIndex,
-        charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
-        leftOffset = boundaries.leftOffset,
-        multiplier = this.scaleX * this.canvas.getZoom(),
-        cursorWidth = this.cursorWidth / multiplier;
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex,
+          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
+          leftOffset = boundaries.leftOffset,
+          multiplier = this.scaleX * this.canvas.getZoom(),
+          cursorWidth = this.cursorWidth / multiplier;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
@@ -573,13 +573,13 @@
       ctx.fillStyle = this.selectionColor;
 
       var start = this.get2DCursorLocation(this.selectionStart),
-        end = this.get2DCursorLocation(this.selectionEnd),
-        startLine = start.lineIndex,
-        endLine = end.lineIndex;
+          end = this.get2DCursorLocation(this.selectionEnd),
+          startLine = start.lineIndex,
+          endLine = end.lineIndex;
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0,
-          lineHeight = this._getHeightOfLine(this.ctx, i),
-          realLineHeight = 0, boxWidth = 0, line = this._textLines[i];
+            lineHeight = this._getHeightOfLine(this.ctx, i),
+            realLineHeight = 0, boxWidth = 0, line = this._textLines[i];
 
         if (i === startLine) {
           for (var j = 0, len = line.length; j < len; j++) {
@@ -639,9 +639,9 @@
 
       // set proper line offset
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
-        prevStyle,
-        thisStyle,
-        charsToRender = '';
+          prevStyle,
+          thisStyle,
+          charsToRender = '';
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
@@ -690,8 +690,8 @@
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var charWidth, charHeight, shouldFill, shouldStroke,
-        decl = this._getStyleDeclaration(lineIndex, i),
-        offset, textDecoration, chars, additionalSpace, _charWidth;
+          decl = this._getStyleDeclaration(lineIndex, i),
+          offset, textDecoration, chars, additionalSpace, _charWidth;
 
       if (decl) {
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
@@ -747,14 +747,14 @@
      */
     _hasStyleChanged: function(prevStyle, thisStyle) {
       return (prevStyle.fill !== thisStyle.fill ||
-        prevStyle.fontSize !== thisStyle.fontSize ||
-        prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
-        prevStyle.textDecoration !== thisStyle.textDecoration ||
-        prevStyle.fontFamily !== thisStyle.fontFamily ||
-        prevStyle.fontWeight !== thisStyle.fontWeight ||
-        prevStyle.fontStyle !== thisStyle.fontStyle ||
-        prevStyle.stroke !== thisStyle.stroke ||
-        prevStyle.strokeWidth !== thisStyle.strokeWidth
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
+              prevStyle.textDecoration !== thisStyle.textDecoration ||
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.fontWeight !== thisStyle.fontWeight ||
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth
       );
     },
 
@@ -769,12 +769,12 @@
       }
 
       var decorationWeight = charHeight / 15,
-        positions = {
-          underline: top + charHeight / 10,
-          'line-through': top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
-          overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
-        },
-        decorations = ['underline', 'line-through', 'overline'], i, decoration;
+          positions = {
+            underline: top + charHeight / 10,
+            'line-through': top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
+            overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
+          },
+          decorations = ['underline', 'line-through', 'overline'], i, decoration;
 
       for (i = 0; i < decorations.length; i++) {
         decoration = decorations[i];
@@ -821,12 +821,12 @@
       this.callSuper('_renderTextLinesBackground', ctx);
 
       var lineTopOffset = 0, heightOfLine,
-        lineWidth, lineLeftOffset,
-        leftOffset = this._getLeftOffset(),
-        topOffset = this._getTopOffset(),
-        colorCache = '',
-        line, _char, style, leftCache,
-        topCache, widthCache, heightCache;
+          lineWidth, lineLeftOffset,
+          leftOffset = this._getLeftOffset(),
+          topOffset = this._getTopOffset(),
+          colorCache = '',
+          line, _char, style, leftCache,
+          topCache, widthCache, heightCache;
       ctx.save();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this._getHeightOfLine(ctx, i);
@@ -884,9 +884,9 @@
      */
     _getCacheProp: function(_char, styleDeclaration) {
       return _char +
-        styleDeclaration.fontSize +
-        styleDeclaration.fontWeight +
-        styleDeclaration.fontStyle;
+             styleDeclaration.fontSize +
+             styleDeclaration.fontWeight +
+             styleDeclaration.fontStyle;
     },
 
     /**
@@ -911,8 +911,8 @@
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
       var charDecl = decl || this._getStyleDeclaration(lineIndex, charIndex),
-        styleDeclaration = clone(charDecl),
-        width, cacheProp, charWidthsCache;
+          styleDeclaration = clone(charDecl),
+          width, cacheProp, charWidthsCache;
 
       this._applyFontStyles(styleDeclaration);
       charWidthsCache = this._getFontCache(styleDeclaration.fontFamily);
@@ -1110,10 +1110,10 @@
         return this.__widthOfSpace[lineIndex];
       }
       var line = this._textLines[lineIndex],
-        wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
-        widthDiff = this.width - wordsWidth,
-        numSpaces = line.length - line.replace(this._reSpacesAndTabs, '').length,
-        width = Math.max(widthDiff / numSpaces, ctx.measureText(' ').width);
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex, 0),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = line.length - line.replace(this._reSpacesAndTabs, '').length,
+          width = Math.max(widthDiff / numSpaces, ctx.measureText(' ').width);
       this.__widthOfSpace[lineIndex] = width;
       return width;
     },
@@ -1149,7 +1149,7 @@
       }
 
       var line = this._textLines[lineIndex],
-        maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
+          maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
 
       for (var i = 1, len = line.length; i < len; i++) {
         var currentCharHeight = this._getHeightOfChar(ctx, lineIndex, i);

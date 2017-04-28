@@ -3,9 +3,9 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-    toFixed = fabric.util.toFixed,
-    NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-    MIN_TEXT_WIDTH = 2;
+      toFixed = fabric.util.toFixed,
+      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      MIN_TEXT_WIDTH = 2;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -480,7 +480,7 @@
       var shortM = method.slice(0, -4), _char, width;
       if (this[shortM].toLive) {
         var offsetX = -this.width / 2 + this[shortM].offsetX || 0,
-          offsetY = -this.height / 2 + this[shortM].offsetY || 0;
+            offsetY = -this.height / 2 + this[shortM].offsetY || 0;
         ctx.save();
         ctx.translate(offsetX, offsetY);
         left -= offsetX;
@@ -525,12 +525,12 @@
 
       // stretch the line
       var words = line.split(/\s+/),
-        charOffset = 0,
-        wordsWidth = this._getWidthOfWords(ctx, words.join(' '), lineIndex, 0),
-        widthDiff = this.width - wordsWidth,
-        numSpaces = words.length - 1,
-        spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
-        leftOffset = 0, word;
+          charOffset = 0,
+          wordsWidth = this._getWidthOfWords(ctx, words.join(' '), lineIndex, 0),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
+          leftOffset = 0, word;
 
       for (var i = 0, len = words.length; i < len; i++) {
         while (line[charOffset] === ' ' && charOffset < line.length) {
@@ -594,10 +594,10 @@
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this._getHeightOfLine(ctx, i),
-          maxHeight = heightOfLine / this.lineHeight,
-          lineWidth = this._getLineWidth(ctx, i),
-          leftOffset = this._getLineLeftOffset(lineWidth),
-          withBreak = lineIndexesWithBreak.indexOf(i) > -1 || i === len - 1;
+            maxHeight = heightOfLine / this.lineHeight,
+            lineWidth = this._getLineWidth(ctx, i),
+            leftOffset = this._getLineLeftOffset(lineWidth),
+            withBreak = lineIndexesWithBreak.indexOf(i) > -1 || i === len - 1;
         this._renderTextLine(
           method,
           ctx,
@@ -669,7 +669,7 @@
         return;
       }
       var lineTopOffset = 0, heightOfLine,
-        lineWidth, lineLeftOffset, originalFill = ctx.fillStyle;
+          lineWidth, lineLeftOffset, originalFill = ctx.fillStyle;
 
       ctx.fillStyle = this.textBackgroundColor;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -773,8 +773,8 @@
      */
     _measureLine: function(ctx, lineIndex) {
       var line = this._textLines[lineIndex],
-        width = ctx.measureText(line).width,
-        additionalSpace = 0, charCount, finalWidth;
+          width = ctx.measureText(line).width,
+          additionalSpace = 0, charCount, finalWidth;
       if (this.charSpacing !== 0) {
         charCount = line.split('').length;
         additionalSpace = (charCount - 1) * this._getWidthOfCharSpacing();
@@ -792,12 +792,12 @@
         return;
       }
       var halfOfVerticalBox = this.height / 2,
-        _this = this, offsets = [];
+          _this = this, offsets = [];
 
       /** @ignore */
       function renderLinesAtOffset(offsets) {
         var i, lineHeight = 0, len, j, oLen, lineWidth,
-          lineLeftOffset, heightOfLine;
+            lineLeftOffset, heightOfLine;
 
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
@@ -904,8 +904,8 @@
         this.ctx = fabric.util.createCanvasElement().getContext('2d');
       }
       var markup = this._createBaseSVGMarkup(),
-        offsets = this._getSVGLeftTopOffsets(this.ctx),
-        textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
+          offsets = this._getSVGLeftTopOffsets(this.ctx),
+          textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
       this._wrapSVGTextAndBg(markup, textAndBg);
 
       return reviver ? reviver(markup.join('')) : markup.join('');
@@ -916,8 +916,8 @@
      */
     _getSVGLeftTopOffsets: function(ctx) {
       var lineTop = this._getHeightOfLine(ctx, 0),
-        textLeft = -this.width / 2,
-        textTop = 0;
+          textLeft = -this.width / 2,
+          textTop = 0;
 
       return {
         textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
@@ -931,21 +931,21 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg) {
       var noShadow = true, filter = this.getSvgFilter(),
-        style = filter === '' ? '' : ' style="' + filter + '"';
+          style = filter === '' ? '' : ' style="' + filter + '"';
 
       markup.push(
         '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
-        style, '>\n',
-        textAndBg.textBgRects.join(''),
-        '\t\t<text ',
-        (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
-        (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
-        (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
-        (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
-        (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
-        'style="', this.getSvgStyles(noShadow), '" >\n',
-        textAndBg.textSpans.join(''),
-        '\t\t</text>\n',
+          style, '>\n',
+          textAndBg.textBgRects.join(''),
+          '\t\t<text ',
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+            (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
+            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
+            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
+            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
+            'style="', this.getSvgStyles(noShadow), '" >\n',
+            textAndBg.textSpans.join(''),
+          '\t\t</text>\n',
         '\t</g>\n'
       );
     },
@@ -958,8 +958,8 @@
      */
     _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
       var textSpans = [],
-        textBgRects = [],
-        height = 0;
+          textBgRects = [],
+          height = 0;
       // bounding-box background
       this._setSVGBg(textBgRects);
 
@@ -988,14 +988,14 @@
       }
       textSpans.push(
         '\t\t\t<tspan x="',
-        toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
-        'y="',
-        toFixed(yPos, NUM_FRACTION_DIGITS),
-        '" ',
-        // doing this on <tspan> elements since setting opacity
-        // on containing <text> one doesn't work in Illustrator
-        this._getFillAttributes(this.fill), '>',
-        fabric.util.string.escapeXml(this._textLines[i]),
+          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
+          'y="',
+          toFixed(yPos, NUM_FRACTION_DIGITS),
+          '" ',
+          // doing this on <tspan> elements since setting opacity
+          // on containing <text> one doesn't work in Illustrator
+          this._getFillAttributes(this.fill), '>',
+          fabric.util.string.escapeXml(this._textLines[i]),
         '</tspan>\n'
       );
     },
@@ -1006,13 +1006,13 @@
       this._setTextStyles(ctx);
 
       var line = this._textLines[i],
-        words = line.split(/\s+/),
-        wordsWidth = this._getWidthOfWords(ctx, words.join('')),
-        widthDiff = this.width - wordsWidth,
-        numSpaces = words.length - 1,
-        spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
-        word, attributes = this._getFillAttributes(this.fill),
-        len;
+          words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, words.join('')),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
+          word, attributes = this._getFillAttributes(this.fill),
+          len;
 
       textLeftOffset += this._getLineLeftOffset(this._getLineWidth(ctx, i));
 
@@ -1020,14 +1020,14 @@
         word = words[i];
         textSpans.push(
           '\t\t\t<tspan x="',
-          toFixed(textLeftOffset, NUM_FRACTION_DIGITS), '" ',
-          'y="',
-          toFixed(yPos, NUM_FRACTION_DIGITS),
-          '" ',
-          // doing this on <tspan> elements since setting opacity
-          // on containing <text> one doesn't work in Illustrator
-          attributes, '>',
-          fabric.util.string.escapeXml(word),
+            toFixed(textLeftOffset, NUM_FRACTION_DIGITS), '" ',
+            'y="',
+            toFixed(yPos, NUM_FRACTION_DIGITS),
+            '" ',
+            // doing this on <tspan> elements since setting opacity
+            // on containing <text> one doesn't work in Illustrator
+            attributes, '>',
+            fabric.util.string.escapeXml(word),
           '</tspan>\n'
         );
         textLeftOffset += this._getWidthOfWords(ctx, word) + spaceWidth;
@@ -1037,15 +1037,15 @@
     _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
       textBgRects.push(
         '\t\t<rect ',
-        this._getFillAttributes(this.textBackgroundColor),
-        ' x="',
-        toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
-        '" y="',
-        toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
-        '" width="',
-        toFixed(this._getLineWidth(this.ctx, i), NUM_FRACTION_DIGITS),
-        '" height="',
-        toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, NUM_FRACTION_DIGITS),
+          this._getFillAttributes(this.textBackgroundColor),
+          ' x="',
+          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
+          '" y="',
+          toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
+          '" width="',
+          toFixed(this._getLineWidth(this.ctx, i), NUM_FRACTION_DIGITS),
+          '" height="',
+          toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, NUM_FRACTION_DIGITS),
         '"></rect>\n');
     },
 
@@ -1053,15 +1053,15 @@
       if (this.backgroundColor) {
         textBgRects.push(
           '\t\t<rect ',
-          this._getFillAttributes(this.backgroundColor),
-          ' x="',
-          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
-          '" y="',
-          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
-          '" width="',
-          toFixed(this.width, NUM_FRACTION_DIGITS),
-          '" height="',
-          toFixed(this.height, NUM_FRACTION_DIGITS),
+            this._getFillAttributes(this.backgroundColor),
+            ' x="',
+            toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+            '" y="',
+            toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+            '" width="',
+            toFixed(this.width, NUM_FRACTION_DIGITS),
+            '" height="',
+            toFixed(this.height, NUM_FRACTION_DIGITS),
           '"></rect>\n');
       }
     },
@@ -1203,16 +1203,16 @@
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-      textHeightScaleFactor = text.getHeight() / text.height,
-      lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
-      scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getHeight() + scaledDiff,
-      offX = 0;
+        textHeightScaleFactor = text.getHeight() / text.height,
+        lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
+        scaledDiff = lineHeightDiff * textHeightScaleFactor,
+        textHeight = text.getHeight() + scaledDiff,
+        offX = 0;
     /*
-     Adjust positioning:
-     x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-     top/left properties in Fabric correspond to center point of text bounding box
-     */
+      Adjust positioning:
+        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+        top/left properties in Fabric correspond to center point of text bounding box
+    */
     if (text.originX === 'left') {
       offX = text.getWidth() / 2;
     }
