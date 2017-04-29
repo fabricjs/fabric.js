@@ -1769,4 +1769,28 @@
     deepEqual(canvas._groupSelector, expectedGroupSelector, 'with object non selectable groupSelector is started');
     canvas.__onMouseUp(e);
   });
+
+  test('mouse:down and group selector isClick = true', function() {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var isClick = false;
+    canvas.on('mouse:up', function(opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseUp(e);
+    equal(isClick, true, 'without moving the pointer, the click is true');
+  });
+
+  test('mouse:down and group selector isClick = false', function() {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function(opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    equal(isClick, false, 'moving the pointer, the click is false');
+  });
 })();
