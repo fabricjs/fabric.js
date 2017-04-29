@@ -357,21 +357,10 @@
       if (target) {
         target.isMoving = false;
       }
-
-      this._handleCursorAndEvent(e, target, 'up');
+      this._setCursorFromEvent(e, target);
+      this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
       target && (target.__corner = 0);
       shouldRender && this.renderAll();
-    },
-
-    /**
-     * set cursor for mouse up and handle mouseUp event
-     * @param {Event} e event from mouse
-     * @param {fabric.Object} target receiving event
-     * @param {String} eventType event to fire (up, down or move)
-     */
-    _handleCursorAndEvent: function(e, target, eventType) {
-      this._setCursorFromEvent(e, target);
-      this._handleEvent(e, eventType, target ? target : null);
     },
 
     /**
@@ -380,11 +369,19 @@
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
      * @param {fabric.Object} targetObj receiving event
+     * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
+     * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
      */
-    _handleEvent: function(e, eventType, targetObj, button) {
+    _handleEvent: function(e, eventType, targetObj, button, isClick) {
       var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
           targets = this.targets || [],
-          options = { e: e, target: target, subTargets: targets, button: button || LEFT_CLICK };
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+            button: button || LEFT_CLICK,
+            isClick: isClick || false
+          };
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
