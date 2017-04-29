@@ -1308,17 +1308,15 @@
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderControls: function(ctx) {
-      if (!this.active || (this.group && this.group !== this.canvas.getActiveGroup())) {
-        return;
-      }
-
+    _renderControls: function(ctx, bordersStyle, controlsStyle) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
           options;
       matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
       options = fabric.util.qrDecompose(matrix);
-
+      if (controlsStyle && bordersStyle) {
+        bordersStyle.hasRotatingPoint = controlsStyle.hasRotatingPoint;
+      }
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
@@ -1327,13 +1325,13 @@
       }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
-        this.drawBordersInGroup(ctx, options);
+        (this.hasBorders || bordersStyle) && this.drawBordersInGroup(ctx, options, bordersStyle);
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
-        this.drawBorders(ctx);
+        (this.hasBorders || bordersStyle) && this.drawBorders(ctx, bordersStyle);
       }
-      this.drawControls(ctx);
+      (this.hasControls || controlsStyle) && this.drawControls(ctx, controlsStyle);
       ctx.restore();
     },
 
