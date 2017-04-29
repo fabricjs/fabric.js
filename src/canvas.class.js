@@ -1133,10 +1133,12 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var overOpt = { e: e, target: target, previousTarget: this._hoveredTarget },
-          outOpt = { e: e, target: this._hoveredTarget, nextTarget: target },
-          hoveredTarget = this._hoveredTarget;
-      this._hoveredTarget = target;
+      var overOpt, outOpt, hoveredTarget = this._hoveredTarget;
+      if (hoveredTarget !== target) {
+        overOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
+        outOpt = { e: e, target: this._hoveredTarget, nextTarget: target };
+        this._hoveredTarget = target;
+      }
       if (target) {
         if (hoveredTarget !== target) {
           if (hoveredTarget) {
