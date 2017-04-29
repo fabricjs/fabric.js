@@ -228,7 +228,6 @@
           methodName = controlsStyle.transparentCorners || this.transparentCorners ? 'stroke' : 'fill';
 
       ctx.save();
-      console.log(controlsStyle.cornerColor)
       ctx.strokeStyle = ctx.fillStyle = controlsStyle.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
         ctx.strokeStyle = controlsStyle.cornerStrokeColor || this.cornerStrokeColor;
