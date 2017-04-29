@@ -222,13 +222,14 @@
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          scaleOffset = this.cornerSize,
+          scaleOffset = controlsStyle.cornerSize || this.cornerSize,
           left = -(width + scaleOffset) / 2,
           top = -(height + scaleOffset) / 2,
           methodName = controlsStyle.transparentCorners || this.transparentCorners ? 'stroke' : 'fill';
 
       ctx.save();
-      ctx.strokeStyle = ctx.fillStyle = controlsStyle.conerColor || this.cornerColor;
+      console.log(controlsStyle.cornerColor)
+      ctx.strokeStyle = ctx.fillStyle = controlsStyle.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
         ctx.strokeStyle = controlsStyle.cornerStrokeColor || this.cornerStrokeColor;
       }
@@ -292,12 +293,13 @@
     /**
      * @private
      */
-    _drawControl: function(control, ctx, methodName, left, top) {
+    _drawControl: function(control, ctx, methodName, left, top, controlStyle) {
+      controlStyle = controlStyle || {};
       if (!this.isControlVisible(control)) {
         return;
       }
       var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-      switch (this.cornerStyle) {
+      switch (controlStyle.cornerStyle || this.cornerStyle) {
         case 'circle':
           ctx.beginPath();
           ctx.arc(left + size / 2, top + size / 2, size / 2, 0, 2 * Math.PI, false);
