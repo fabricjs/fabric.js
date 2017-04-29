@@ -1307,16 +1307,15 @@
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} [styleOverride] properties to override the object style
      */
-    _renderControls: function(ctx, bordersStyle, controlsStyle) {
+    _renderControls: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
           options;
+      styleOverride = styleOverride || { };
       matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
       options = fabric.util.qrDecompose(matrix);
-      if (controlsStyle && bordersStyle) {
-        bordersStyle.hasRotatingPoint = controlsStyle.hasRotatingPoint;
-      }
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
@@ -1325,13 +1324,13 @@
       }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
-        (this.hasBorders || bordersStyle) && this.drawBordersInGroup(ctx, options, bordersStyle);
+        (this.hasBorders || styleOverride.hasBorders) && this.drawBordersInGroup(ctx, options, styleOverride);
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
-        (this.hasBorders || bordersStyle) && this.drawBorders(ctx, bordersStyle);
+        (this.hasBorders || styleOverride.hasBorders) && this.drawBorders(ctx, styleOverride);
       }
-      (this.hasControls || controlsStyle) && this.drawControls(ctx, controlsStyle);
+      (this.hasControls || styleOverride.hasControls) && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },
 
