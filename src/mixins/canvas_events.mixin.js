@@ -357,22 +357,10 @@
       if (target) {
         target.isMoving = false;
       }
-
-      this._handleCursorAndEvent(e, target, 'up', LEFT_CLICK, isClick);
+      this._setCursorFromEvent(e, target);
+      this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
       target && (target.__corner = 0);
       shouldRender && this.renderAll();
-    },
-
-    /**
-     * @private
-     * set cursor for mouse up and handle mouseUp event
-     * @param {Event} e event from mouse
-     * @param {fabric.Object} target receiving event
-     * @param {String} eventType event to fire (up, down or move)
-     */
-    _handleCursorAndEvent: function(e, target, eventType, button, isClick) {
-      this._setCursorFromEvent(e, target);
-      this._handleEvent(e, eventType, target ? target : null, LEFT_CLICK, isClick);
     },
 
     /**
