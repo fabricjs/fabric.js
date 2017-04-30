@@ -526,7 +526,7 @@
         target = this.getActiveGroup();
       }
 
-      if (this.selection && (!target || !target.selectable)) {
+      if (this.selection && (!target || (!target.selectable && !target.isEditing))) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
