@@ -1768,9 +1768,14 @@
     canvas.__onMouseDown(e);
     deepEqual(canvas._groupSelector, expectedGroupSelector, 'with object non selectable groupSelector is started');
     canvas.__onMouseUp(e);
+    rect.isEditing = true;
+    canvas.__onMouseUp(e);
+    canvas.__onMouseDown(e);
+    deepEqual(canvas._groupSelector, null, 'with object editing, groupSelector is not started');
+    canvas.__onMouseUp(e);
   });
 
-  test('mouse:down and group selector isClick = true', function() {
+  test('mouse:up isClick = true', function() {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
@@ -1781,7 +1786,7 @@
     equal(isClick, true, 'without moving the pointer, the click is true');
   });
 
-  test('mouse:down and group selector isClick = false', function() {
+  test('mouse:up isClick = false', function() {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
     var isClick = true;
