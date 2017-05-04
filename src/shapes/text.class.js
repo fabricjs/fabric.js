@@ -510,15 +510,15 @@
      * @param {Number} left Left position of text
      * @param {Number} top Top position of text
      * @param {Number} lineIndex Index of a line in a text
-     * @param {Boolean} withBreak Detects if line contains line break at the end or it's the last line in text
+     * @param {Boolean} isLastLine Detects if the line is last in the text
      */
-    _renderTextLine: function(method, ctx, line, left, top, lineIndex, withBreak) {
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
       // lift the line by quarter of fontSize
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
       var lineWidth = this._getLineWidth(ctx, lineIndex);
-      if (this.textAlign !== 'justify' || this.width < lineWidth || withBreak) {
+      if (this.textAlign !== 'justify' || this.width < lineWidth || isLastLine) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
@@ -590,14 +590,12 @@
 
       var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
 
-      var lineIndexesWithBreak = this._getLineIndexesWithBreak();
-
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight,
             lineWidth = this._getLineWidth(ctx, i),
             leftOffset = this._getLineLeftOffset(lineWidth),
-            withBreak = lineIndexesWithBreak.indexOf(i) > -1 || i === len - 1;
+            isLastLine = i === len - 1;
         this._renderTextLine(
           method,
           ctx,
@@ -605,7 +603,7 @@
           left + leftOffset,
           top + lineHeights + maxHeight,
           i,
-          withBreak
+          isLastLine
         );
         lineHeights += heightOfLine;
       }
@@ -1105,33 +1103,6 @@
      */
     complexity: function() {
       return 1;
-    },
-
-    /**
-     * Returns array of line indexes where line break at the end.
-     *
-     * @return {Array} The array of line indexes with line break at the end.
-     * @private
-     */
-    _getLineIndexesWithBreak: function() {
-      var splitLines = this.text.split(this._reNewline);
-      if (splitLines.length < 2) {
-        return [];
-      }
-      var i = 0;
-      var result = [];
-      for (var sl = 0; sl < splitLines.length; sl++) {
-        var currentSplitLineLength = splitLines[sl].length;
-        var compiledLine = '';
-        for (i; i < this._textLines.length; i++) {
-          compiledLine += this._textLines[i];
-          if (compiledLine.length > currentSplitLineLength) {
-            result.push(i - 1);
-            break;
-          }
-        }
-      }
-      return result;
     }
   });
 
