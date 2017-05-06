@@ -95,7 +95,6 @@
       }
 
       this.setCoords();
-      this.saveCoords();
     },
 
     /**
@@ -462,27 +461,6 @@
      */
     destroy: function() {
       return this._restoreObjectsState();
-    },
-
-    /**
-     * Saves coordinates of this instance (to be used together with `hasMoved`)
-     * @saveCoords
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    saveCoords: function() {
-      this._originalLeft = this.get('left');
-      this._originalTop = this.get('top');
-      return this;
-    },
-
-    /**
-     * Checks whether this group was moved (since `saveCoords` was called last)
-     * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
-     */
-    hasMoved: function() {
-      return this._originalLeft !== this.get('left') ||
-             this._originalTop !== this.get('top');
     },
 
     /**
