@@ -126,6 +126,7 @@
         });
         group.addWithUpdate();
         this.setActiveGroup(group, e);
+        group.saveCoords();
         this.fire('selection:created', { target: group, e: e });
         this.renderAll();
       }
