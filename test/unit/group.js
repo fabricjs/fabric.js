@@ -601,6 +601,28 @@
     equal(dataless.objects[0].paths, 'sourcePath', 'the paths have been changed with the sourcePath');
   });
 
+  test('group addWithUpdate', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
+        group = new fabric.Group([rect1]);
+
+    var coords = group.oCoords;
+    group.addWithUpdate(rect2);
+    var newCoords = group.oCoords;
+    notEqual(coords, newCoords, 'object coords have been recalculated - add');
+  });
+
+  test('group removeWithUpdate', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
+        group = new fabric.Group([rect1, rect2]);
+
+    var coords = group.oCoords;
+    group.removeWithUpdate(rect2);
+    var newCoords = group.oCoords;
+    notEqual(coords, newCoords, 'object coords have been recalculated - remove');
+  });
+
   test('group willDrawShadow', function() {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
