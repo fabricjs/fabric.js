@@ -374,15 +374,16 @@
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
+     * @param {Object} [styleOverride] properties to override the object style
+     * @param {Object} [childrenOverride] properties to override the children overrides
      */
-    _renderControls: function(ctx, noTransform) {
+    _renderControls: function(ctx, styleOverride, childrenOverride) {
       ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      this.callSuper('_renderControls', ctx, noTransform);
+      this.callSuper('_renderControls', ctx, styleOverride);
       if (this.canvas && this === this.canvas.getActiveGroup()) {
         for (var i = 0, len = this._objects.length; i < len; i++) {
-          this._objects[i]._renderControls(ctx);
+          this._objects[i]._renderControls(ctx, childrenOverride);
         }
       }
       ctx.restore();
