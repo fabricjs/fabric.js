@@ -202,7 +202,7 @@ var filesToInclude = [
   'src/shapes/image.class.js',
 
   ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
-
+  ifSpecifiedInclude('image_filters', 'src/filters/2d_backend.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/base_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/brightness_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/convolute_filter.class.js'),
