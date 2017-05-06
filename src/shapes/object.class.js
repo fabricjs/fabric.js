@@ -929,7 +929,7 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group && !this.group._transformDone && this.group === this.canvas._activeGroup) {
+      if (this.group && !this.group._transformDone) {
         this.group.transform(ctx);
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -1045,6 +1045,18 @@
         scaleY *= scaling.scaleY;
       }
       return { scaleX: scaleX, scaleY: scaleY };
+    },
+
+    /**
+     * Return the object opacity counting also the group property
+     * @return {Object} object with scaleX and scaleY properties
+     */
+    getObjectOpacity: function() {
+      var opacity = this.opacity;
+      if (this.group) {
+        opacity *= this.group.getObjectOpacity();
+      }
+      return opacity;
     },
 
     /**
@@ -1258,7 +1270,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setOpacity: function(ctx) {
-      ctx.globalAlpha *= this.opacity;
+      if (this.group && !this.group.transformDone) {
+        ctx.globalAlpha = this.getObjectOpacity();
+      }
+      else {
+        ctx.globalAlpha *= this.opacity;
+      }
     },
 
     _setStrokeStyles: function(ctx, decl) {
