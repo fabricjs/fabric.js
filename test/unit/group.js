@@ -305,30 +305,6 @@
     equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
   });
 
-  test('saveCoords', function() {
-    var group = makeGroupWith2Objects();
-
-    ok(typeof group.saveCoords == 'function');
-    equal(group.saveCoords(), group, 'should be chainable');
-  });
-
-  test('hasMoved', function() {
-    var group = makeGroupWith2Objects();
-
-    ok(typeof group.hasMoved == 'function');
-    equal(group.hasMoved(), false);
-
-    function moveBy10(value) {
-      return value + 10;
-    }
-    group.set('left', moveBy10);
-    equal(group.hasMoved(), true);
-    group.saveCoords();
-    equal(group.hasMoved(), false);
-    group.set('top', moveBy10);
-    equal(group.hasMoved(), true);
-  });
-
   test('setObjectCoords', function(){
     var group = makeGroupWith2Objects();
 
