@@ -190,6 +190,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   applyTo: function(options) {
     if (options.webgl) {
+      console.log('applying', this.type, this[this.mainParameter])
       this._setupFrameBuffer(options);
       this.applyToWebGL(options);
       this._swapTextures(options);

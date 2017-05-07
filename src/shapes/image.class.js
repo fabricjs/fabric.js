@@ -122,6 +122,14 @@
     objectCaching: false,
 
     /**
+     * key used to retrieve the texture representing this image
+     * since 2.0.0
+     * @type String
+     * @default
+     */
+    cacheKey: '',
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -134,6 +142,7 @@
       this.resizeFilters = [];
       this.callSuper('initialize', options);
       this._initElement(element, options, callback);
+      this.cacheKey = 'texture' + fabric.Object.__uid++;
     },
 
     /**
@@ -371,76 +380,67 @@
     },
 
     /**
-     * Applies filters assigned to this image (from "filters" array)
+     * Applies filters assigned to this image (from "filters" array) or from filter param
      * @method applyFilters
-     * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @param {Array} filters to be applied
-     * @param {fabric.Image} imgElement image to filter ( default to this._element )
-     * @param {Boolean} forResizing
-     * @return {CanvasElement} canvasEl to be drawn immediately
+     * @param {Boolean} forResizing specify if the filter operation is a resize operation
+     * @return {thisArg} return the fabric.Image object
      * @chainable
      */
-    applyFilters: function(callback, filters, imgElement, forResizing) {
+    applyFilters: function(filters, forResizing) {
 
       filters = filters || this.filters;
-      imgElement = imgElement || this._originalElement;
 
-      if (!imgElement) {
-        return;
-      }
-
-      var replacement = fabric.util.createImage(),
-          retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
+      var retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
           minimumScale = this.minimumScaleTrigger / retinaScaling,
-          _this = this, scaleX, scaleY;
+          scaleX, scaleY, imgElement = this._originalElement,
+          sourceWidth = imgElement.naturalWidth || imgElement.width,
+          sourceHeight = imgElement.naturalHeight || imgElement.height;
 
       if (filters.length === 0) {
-        this._element = imgElement;
-        callback && callback(this);
-        return imgElement;
+        this._element = this._originalElement;
+        return this;
       }
 
-      var canvasEl = fabric.util.createCanvasElement();
-      canvasEl.width = imgElement.width;
-      canvasEl.height = imgElement.height;
-      canvasEl.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+      if (this._element === this._originalElement) {
+        // if the element is the same we need to create a new element
+        var canvasEl = fabric.util.createCanvasElement();
+        canvasEl.width = imgElement.width;
+        canvasEl.height = imgElement.height;
+        this._element = canvasEl;
+      }
+      else {
+        this._element.getContext('2d').clearRect(0, 0, sourceWidth, sourceHeight);
+      }
 
-      filters.forEach(function(filter) {
-        if (!filter) {
-          return;
-        }
-        if (forResizing) {
-          scaleX = _this.scaleX < minimumScale ? _this.scaleX : 1;
-          scaleY = _this.scaleY < minimumScale ? _this.scaleY : 1;
-          if (scaleX * retinaScaling < 1) {
-            scaleX *= retinaScaling;
-          }
-          if (scaleY * retinaScaling < 1) {
-            scaleY *= retinaScaling;
-          }
-        }
-        else {
-          scaleX = filter.scaleX;
-          scaleY = filter.scaleY;
-        }
-        filter.applyTo(canvasEl, scaleX, scaleY);
-        if (!forResizing && filter.type === 'Resize') {
-          _this.width *= filter.scaleX;
-          _this.height *= filter.scaleY;
-        }
-      });
-
-      /** @ignore */
-      replacement.width = canvasEl.width;
-      replacement.height = canvasEl.height;
-      replacement.onload = function() {
-        _this._element = replacement;
-        !forResizing && (_this._filteredEl = replacement);
-        callback && callback(_this);
-        replacement.onload = canvasEl = null;
-      };
-      replacement.src = canvasEl.toDataURL('image/png');
-      return canvasEl;
+      // if (forResizing) {
+      //   // see what to do with resizeFilters
+      //   if (forResizing) {
+      //     scaleX = this.scaleX < minimumScale ? this.scaleX : 1;
+      //     scaleY = this.scaleY < minimumScale ? this.scaleY : 1;
+      //     if (scaleX * retinaScaling < 1) {
+      //       scaleX *= retinaScaling;
+      //     }
+      //     if (scaleY * retinaScaling < 1) {
+      //       scaleY *= retinaScaling;
+      //     }
+      //   }
+      //   else {
+      //     scaleX = filter.scaleX;
+      //     scaleY = filter.scaleY;
+      //   }
+      //   filter.applyTo(canvasEl, scaleX, scaleY);
+      //   if (!forResizing && filter.type === 'Resize') {
+      //     this.width *= filter.scaleX;
+      //     this.height *= filter.scaleY;
+      //   }
+      // }
+      if (!fabric.filterBackend) {
+        fabric.filterBackend = fabric.initFilterBackend();
+      }
+      fabric.filterBackend.applyFilters(
+        filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
+      return this;
     },
 
     /**

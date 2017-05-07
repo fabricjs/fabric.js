@@ -13,8 +13,9 @@
     var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     var isSupported = false;
     // eslint-disable-next-line
-    if (gl != null) {
-      isSupported = gl.getParameter(gl.MAX_TEXTURE_SIZE) >= tileSize;
+    if (gl) {
+      fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      isSupported = fabric.maxTextureSize >= tileSize;
     }
     this.isSupported = isSupported;
     return isSupported;
@@ -29,13 +30,14 @@
     if (options.tileSize) {
       this.tileSize = options.tileSize;
     }
-    this.setupGLContext();
+    this.setupGLContext(this.tileSize, this.tileSize);
     this.captureGPUInfo();
   };
 
   WebglFilterBackend.prototype = /** @lends fabric.WebglFilterBackend.prototype */ {
 
     tileSize: 2048,
+
     /**
      * Setup a WebGL context suitable for filtering, and bind any needed event handlers.
      */
@@ -82,7 +84,7 @@
     applyFilters: function(filters, source, width, height, targetCanvas, cacheKey) {
       var gl = this.gl;
       var cachedTexture;
-      if (!cacheKey) {
+      if (cacheKey) {
         cachedTexture = this.getCachedTexture(cacheKey, source);
       }
       var pipelineState = {
@@ -109,6 +111,7 @@
       gl.deleteTexture(pipelineState.sourceTexture);
       gl.deleteTexture(pipelineState.targetTexture);
       gl.deleteFramebuffer(tempFbo);
+      console.log(targetCanvas, gl)
       targetCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
       return targetCanvas;
     },
