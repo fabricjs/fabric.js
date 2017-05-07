@@ -269,7 +269,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @return {Object} Object representation of an instance
    */
   toObject: function() {
-    return { type: this.type };
+    var object = { type: this.type }, mainP = this.mainParameter;
+    if (mainP) {
+      object[mainP] = this[mainP];
+    }
+    return object;
   },
 
   /**

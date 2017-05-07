@@ -1,5 +1,7 @@
 (function() {
 
+  'use strict';
+
   /**
    * Indicate whether this filtering backend is supported by the user's browser.
    * @param {Number} tileSize check if the tileSize is supported
