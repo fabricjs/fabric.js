@@ -68,9 +68,10 @@
       if (this.brightness === 0) {
         return;
       }
+      console.log(this.brightness)
       var imageData = options.imageData,
           data = imageData.data, i,
-          brightness = Math.Round(this.brightness * 255);
+          brightness = Math.round(this.brightness * 255);
       for (i = 0; i < data.length; i += 4) {
         data[i] = data[i] + brightness;
         data[i + 1] = data[i + 1] + brightness;

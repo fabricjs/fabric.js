@@ -105,13 +105,12 @@
       };
       var tempFbo = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
-      filters.forEach(function(filter) { filter.applyTo(pipelineState); });
+      filters.forEach(function(filter) { filter && filter.applyTo(pipelineState); });
       this.copyGLTo2D(gl.canvas, targetCanvas);
       gl.bindTexture(gl.TEXTURE_2D, null);
       gl.deleteTexture(pipelineState.sourceTexture);
       gl.deleteTexture(pipelineState.targetTexture);
       gl.deleteFramebuffer(tempFbo);
-      console.log(targetCanvas, gl)
       targetCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
       return targetCanvas;
     },
