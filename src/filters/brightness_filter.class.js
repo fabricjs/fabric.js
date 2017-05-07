@@ -18,7 +18,7 @@
    *   brightness: 200
    * });
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
   filters.Brightness = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
 
@@ -68,7 +68,6 @@
       if (this.brightness === 0) {
         return;
       }
-      console.log(this.brightness)
       var imageData = options.imageData,
           data = imageData.data, i,
           brightness = Math.round(this.brightness * 255);

@@ -9156,6 +9156,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
         },
         applyFilters: function(filters, forResizing) {
             filters = filters || this.filters;
+            filters = filters.filter(function(filter) {
+                return filter;
+            });
             var retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio, minimumScale = this.minimumScaleTrigger / retinaScaling, scaleX, scaleY, imgElement = this._originalElement, sourceWidth = imgElement.naturalWidth || imgElement.width, sourceHeight = imgElement.naturalHeight || imgElement.height;
             if (filters.length === 0) {
                 this._element = this._originalElement;
@@ -9172,9 +9175,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
             if (!fabric.filterBackend) {
                 fabric.filterBackend = fabric.initFilterBackend();
             }
-            filters = filters.filter(function(filter) {
-                return filter;
-            });
             fabric.filterBackend.applyFilters(filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
             return this;
         },
@@ -9728,7 +9728,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (this.brightness === 0) {
                 return;
             }
-            console.log(this.brightness);
             var imageData = options.imageData, data = imageData.data, i, brightness = Math.round(this.brightness * 255);
             for (i = 0; i < data.length; i += 4) {
                 data[i] = data[i] + brightness;
@@ -9854,21 +9853,30 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
     filters.Invert = createClass(filters.BaseFilter, {
         type: "Invert",
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i;
-            for (i = 0; i < iLen; i += 4) {
+        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform int uInvert;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "if (uInvert == 1) {\n" + "gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n" + "} else {\n" + "gl_FragColor = color;\n" + "}\n" + "}",
+        invert: 1,
+        mainParameter: "invert",
+        applyTo2d: function(options) {
+            if (!this.invert) {
+                return;
+            }
+            var imageData = options.imageData, data = imageData.data, i, len = data.length;
+            for (i = 0; i < len; i += 4) {
                 data[i] = 255 - data[i];
                 data[i + 1] = 255 - data[i + 1];
                 data[i + 2] = 255 - data[i + 2];
             }
-            context.putImageData(imageData, 0, 0);
+        },
+        getUniformLocations: function(gl, program) {
+            return {
+                uInvert: gl.getUniformLocation(program, "uInvert")
+            };
+        },
+        sendUniformData: function(gl, uniformLocations) {
+            gl.uniform1i(uniformLocations.uInvert, this.invert);
         }
     });
-    fabric.Image.filters.Invert.fromObject = function(object, callback) {
-        object = object || {};
-        object.type = "Invert";
-        return fabric.Image.filters.BaseFilter.fromObject(object, callback);
-    };
+    fabric.Image.filters.Invert.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {
@@ -10474,23 +10482,27 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, filters = fabric.Image.filters, createClass = fabric.util.createClass;
     filters.Contrast = createClass(filters.BaseFilter, {
         type: "Contrast",
-        initialize: function(options) {
-            options = options || {};
-            this.contrast = options.contrast || 0;
-        },
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, contrastF = 259 * (this.contrast + 255) / (255 * (259 - this.contrast));
-            for (var i = 0, len = data.length; i < len; i += 4) {
+        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform float uContrast;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));\n" + "color.rgb = contrastF * (color.rgb - 0.5) + 0.5;\n" + "gl_FragColor = color;\n" + "}",
+        contrast: 0,
+        mainParameter: "contrast",
+        applyTo2d: function(options) {
+            if (this.contrast === 0) {
+                return;
+            }
+            var imageData = options.imageData, i, len, data = imageData.data, len = data.length, contrast = Math.floor(this.contrast * 255), contrastF = 259 * (contrast + 255) / (255 * (259 - contrast));
+            for (i = 0; i < len; i += 4) {
                 data[i] = contrastF * (data[i] - 128) + 128;
                 data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
                 data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
             }
-            context.putImageData(imageData, 0, 0);
         },
-        toObject: function() {
-            return extend(this.callSuper("toObject"), {
-                contrast: this.contrast
-            });
+        getUniformLocations: function(gl, program) {
+            return {
+                uContrast: gl.getUniformLocation(program, "uContrast")
+            };
+        },
+        sendUniformData: function(gl, uniformLocations) {
+            gl.uniform1f(uniformLocations.uContrast, this.contrast);
         }
     });
     fabric.Image.filters.Contrast.fromObject = fabric.Image.filters.BaseFilter.fromObject;
@@ -10498,27 +10510,31 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.Saturate = createClass(filters.BaseFilter, {
-        type: "Saturate",
-        initialize: function(options) {
-            options = options || {};
-            this.saturate = options.saturate || 0;
-        },
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, max, adjust = -this.saturate * .01;
-            for (var i = 0, len = data.length; i < len; i += 4) {
+    var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
+    filters.Saturation = createClass(filters.BaseFilter, {
+        type: "Saturation",
+        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform float uSaturation;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "float rgMax = max(color.r, color.g);\n" + "float rgbMax = max(rgMax, color.b);\n" + "color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;\n" + "color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;\n" + "color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;\n" + "gl_FragColor = color;\n" + "}",
+        saturation: 0,
+        mainParameter: "saturation",
+        applyTo2d: function(options) {
+            if (this.saturation === 0) {
+                return;
+            }
+            var imageData = options.imageData, data = imageData.data, len = data.length, adjust = -this.saturation, i, max;
+            for (i = 0; i < len; i += 4) {
                 max = Math.max(data[i], data[i + 1], data[i + 2]);
                 data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
                 data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
                 data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
             }
-            context.putImageData(imageData, 0, 0);
         },
-        toObject: function() {
-            return extend(this.callSuper("toObject"), {
-                saturate: this.saturate
-            });
+        getUniformLocations: function(gl, program) {
+            return {
+                uSaturation: gl.getUniformLocation(program, "uSaturation")
+            };
+        },
+        sendUniformData: function(gl, uniformLocations) {
+            gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
         }
     });
     fabric.Image.filters.Saturate.fromObject = fabric.Image.filters.BaseFilter.fromObject;

@@ -390,7 +390,7 @@
     applyFilters: function(filters, forResizing) {
 
       filters = filters || this.filters;
-
+      filters = filters.filter(function(filter) { return filter; });
       var retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
           minimumScale = this.minimumScaleTrigger / retinaScaling,
           scaleX, scaleY, imgElement = this._originalElement,
@@ -438,7 +438,6 @@
       if (!fabric.filterBackend) {
         fabric.filterBackend = fabric.initFilterBackend();
       }
-      filters = filters.filter(function(filter) { return filter; });
       fabric.filterBackend.applyFilters(
         filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
       return this;
