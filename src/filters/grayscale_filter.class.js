@@ -15,7 +15,7 @@
    * @example
    * var filter = new fabric.Image.filters.Grayscale();
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
   filters.Grayscale = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Grayscale.prototype */ {
 
@@ -26,29 +26,70 @@
      */
     type: 'Grayscale',
 
+    fragmentSource: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'uniform int uMode;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+        'if (uMode == 1) {\n' +
+          'float average = (color.r + color.b + color.g) / 3.0;\n' +
+          'color = vec4(average, average, average, color.a);\n' +
+        '}\n' +
+        'gl_FragColor = color;\n' +
+      '}',
+
+    /**
+     * Grayscale mode, between 'average' and ...
+     * @param {String} type
+     * @default
+     */
+    mode: 'average',
+
+    mainParameter: 'mode',
+
     /**
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Grayscale.prototype
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          len = imageData.width * imageData.height * 4,
-          index = 0,
-          average;
-
-      while (index < len) {
-        average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-        data[index]     = average;
-        data[index + 1] = average;
-        data[index + 2] = average;
-        index += 4;
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, i,
+          len = data.length, value;
+      for (i = 0; i < len; i += 4) {
+        if (this.mode === 'average') {
+          value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        }
+        data[i] = value;
+        data[i + 1] = value;
+        data[i + 2] = value;
       }
+    },
 
-      context.putImageData(imageData, 0, 0);
-    }
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uMode: gl.getUniformLocation(program, 'uMode'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      // default average mode.
+      var mode = 1;
+      gl.uniform1i(uniformLocations.uMode, mode);
+    },
   });
 
   /**
@@ -58,10 +99,6 @@
    * @param {function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Grayscale} Instance of fabric.Image.filters.Grayscale
    */
-  fabric.Image.filters.Grayscale.fromObject = function(object, callback) {
-    object = object || { };
-    object.type = 'Grayscale';
-    return fabric.Image.filters.BaseFilter.fromObject(object, callback);
-  };
+  fabric.Image.filters.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -9829,23 +9829,31 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
     filters.Grayscale = createClass(filters.BaseFilter, {
         type: "Grayscale",
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, len = imageData.width * imageData.height * 4, index = 0, average;
-            while (index < len) {
-                average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-                data[index] = average;
-                data[index + 1] = average;
-                data[index + 2] = average;
-                index += 4;
+        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform int uMode;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "if (uMode == 1) {\n" + "float average = (color.r + color.b + color.g) / 3.0;\n" + "color = vec4(average, average, average, color.a);\n" + "}\n" + "gl_FragColor = color;\n" + "}",
+        mode: "average",
+        mainParameter: "mode",
+        applyTo2d: function(options) {
+            var imageData = options.imageData, data = imageData.data, i, len = data.length, value;
+            for (i = 0; i < len; i += 4) {
+                if (this.mode === "average") {
+                    value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                }
+                data[i] = value;
+                data[i + 1] = value;
+                data[i + 2] = value;
             }
-            context.putImageData(imageData, 0, 0);
+        },
+        getUniformLocations: function(gl, program) {
+            return {
+                uMode: gl.getUniformLocation(program, "uMode")
+            };
+        },
+        sendUniformData: function(gl, uniformLocations) {
+            var mode = 1;
+            gl.uniform1i(uniformLocations.uMode, mode);
         }
     });
-    fabric.Image.filters.Grayscale.fromObject = function(object, callback) {
-        object = object || {};
-        object.type = "Grayscale";
-        return fabric.Image.filters.BaseFilter.fromObject(object, callback);
-    };
+    fabric.Image.filters.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {
