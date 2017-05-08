@@ -265,6 +265,19 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   },
 
   /**
+   * If needed by a 2d filter, this functions can create an helper canvas to be used
+   * remember that options.targetCanvas is available for use till end of chain.
+   */
+  createHelpLayer: function(options) {
+    if (!options.helpLayer) {
+      var helpLayer = document.createElement('canvas');
+      helpLayer.width = options.sourceWidth;
+      helpLayer.height = options.sourceHeight;
+      options.helpLayer = helpLayer;
+    }
+  },
+
+  /**
    * Returns object representation of an instance
    * @return {Object} Object representation of an instance
    */

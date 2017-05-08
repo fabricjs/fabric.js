@@ -27,7 +27,7 @@
    *   color: 'rgba(53, 21, 176, 0.5)'
    * });
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
   filters.Tint = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
 
@@ -38,6 +38,24 @@
      */
     type: 'Tint',
 
+    color: 'rgb(0, 0, 255)',
+
+    opacity: '0.25',
+
+    /**
+     * Fragment source for the Tint program
+     */
+    fragmentSource: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'uniform vec4 uColor;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'vec3 uColorMult = uColor.rgb * uColor.a;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+        'color.rgb *= (1.0 - uColor.a);\n' +
+        'color.rgb += uColorMult;\n' +
+        'gl_FragColor = color;\n' +
+      '}',
     /**
      * Constructor
      * @memberOf fabric.Image.filters.Tint.prototype
@@ -46,36 +64,32 @@
      * @param {Number} [options.opacity] Opacity value that controls the tint effect's transparency (0..1)
      */
     initialize: function(options) {
-      options = options || { };
-
-      this.color = options.color || '#000000';
-      this.opacity = typeof options.opacity !== 'undefined'
-                      ? options.opacity
-                      : new fabric.Color(this.color).getAlpha();
+      this.callSuper('initialize', options);
+      if (typeof options.opacity !== 'undefined') {
+        this.opacity = new fabric.Color(this.color).getAlpha();
+      }
     },
 
     /**
-     * Applies filter to canvas element
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i,
-          tintR, tintG, tintB,
-          r, g, b, alpha1,
-          source;
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, i, len = data.length,
+          source = new fabric.Color(this.color).getSource(),
+          tintR, tintG, tintB, opacity = this.opacity, alpha1,
+          r, g, b;
 
-      source = new fabric.Color(this.color).getSource();
-
-      tintR = source[0] * this.opacity;
-      tintG = source[1] * this.opacity;
-      tintB = source[2] * this.opacity;
+      tintR = source[0] * opacity;
+      tintG = source[1] * opacity;
+      tintB = source[2] * opacity;
 
       alpha1 = 1 - this.opacity;
 
-      for (i = 0; i < iLen; i += 4) {
+      for (i = 0; i < len; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
@@ -85,8 +99,44 @@
         data[i + 1] = tintG + g * alpha1;
         data[i + 2] = tintB + b * alpha1;
       }
+      // keep the approach that is faster on higher res.
+      // var ctx = options.ctx,
+      //     w = options.sourceWidth, h = options.sourceHeight;
+      //     console.log(w,h);
+      // ctx.putImageData(options.imageData, 0, 0);
+      // ctx.globalAlpha = this.opacity;
+      // ctx.fillStyle = this.color;
+      // ctx.fillRect(0, 0, w, h);
+      // options.imageData = ctx.getImageData(0, 0, w, h);
+      // ctx.globalAlpha = 1;
+      // ctx.clearRect(0, 0, w, h);
+    },
 
-      context.putImageData(imageData, 0, 0);
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uColor: gl.getUniformLocation(program, 'uColor'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      var source = new fabric.Color(this.color).getSource();
+      source[0] /= 255;
+      source[1] /= 255;
+      source[2] /= 255;
+      source[3] = this.opacity;
+      gl.uniform4fv(uniformLocations.uColor, source);
     },
 
     /**
