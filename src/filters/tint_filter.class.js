@@ -65,7 +65,7 @@
      */
     initialize: function(options) {
       this.callSuper('initialize', options);
-      if (typeof options.opacity !== 'undefined') {
+      if (typeof options.opacity === 'undefined') {
         this.opacity = new fabric.Color(this.color).getAlpha();
       }
     },
