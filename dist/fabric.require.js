@@ -11806,7 +11806,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     }
                 }
                 if (dic) {
-                    console.log(dic);
                     for (var i = 0; i < dic.length; i++) {
                         if (dic[i].dir == "number") {
                             dic[i].dir = "ltr";
@@ -12460,7 +12459,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return this.cursorOffsetCache;
         },
         renderCursor: function(boundaries, ctx) {
-            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this.width + boundaries.leftOffset / 2 : +this.width + boundaries.leftOffset / 2, multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier;
+            var cursorLocation = this.get2DCursorLocation(), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getCurrentCharFontSize(lineIndex, charIndex), leftOffset = lineIndex === 0 && charIndex === 0 ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)) : boundaries.leftOffset, multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier;
             ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
             ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
             ctx.fillRect(boundaries.left + leftOffset - cursorWidth / 2, boundaries.top + boundaries.topOffset, cursorWidth, charHeight);
@@ -13434,7 +13433,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 return;
             }
             var pointer = this.canvas.getPointer(options.e);
-            console.log(options.e);
             this.__mousedownX = pointer.x;
             this.__mousedownY = pointer.y;
             this.__isMousedown = true;
@@ -15151,7 +15149,6 @@ fabric.util.object.extend(fabric.ITextRtl.prototype, {
                 return;
             }
             var pointer = this.canvas.getPointer(options.e);
-            console.log(options.e);
             this.__mousedownX = pointer.x;
             this.__mousedownY = pointer.y;
             this.__isMousedown = true;

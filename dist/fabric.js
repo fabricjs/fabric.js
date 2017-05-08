@@ -11909,7 +11909,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   fabric.Element = fabric.Canvas;
 })();
 
-
 (function() {
 
   var cursorOffset = {
@@ -15276,7 +15275,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   fabric.Object.__uid = 0;
 
 })(typeof exports !== 'undefined' ? exports : this);
-
 
 (function() {
 
@@ -23877,7 +23875,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
           }
           if (dic) {
-            console.log(dic);
             //dates
             for (var i=0; i < dic.length; i++) {
                if (dic[i].dir == 'number') {
@@ -25102,7 +25099,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         selectionStart -= this._textLines[i].length + 1;
       }
       return {
-        
         lineIndex: i - 1,
         charIndex: this._textLines[i - 1].length < selectionStart ? this._textLines[i - 1].length : selectionStart
       };
@@ -25162,21 +25158,19 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
-      
+
       var left = Math.round(this._getLeftOffset()),
           top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries);
-     
+
       return {
         left: left,
         top: top,
-        leftOffset: offsets.left + offsets.lineLeft ,
+        leftOffset: offsets.left + offsets.lineLeft,
         topOffset: offsets.top
       };
-    
-    
     },
 
     /**
@@ -25229,18 +25223,18 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    
     renderCursor: function(boundaries, ctx) {
+
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this.width + boundaries.leftOffset / 2
-                    : + this.width + boundaries.leftOffset / 2,
+                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
+                    : boundaries.leftOffset,
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier;
-          
+
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
 
@@ -25888,7 +25882,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
   };
 })();
-
 
 (function() {
 
@@ -26878,7 +26871,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return;
       }
       var pointer = this.canvas.getPointer(options.e);
-      console.log(options.e);
+
       this.__mousedownX = pointer.x;
       this.__mousedownY = pointer.y;
       this.__isMousedown = true;
@@ -27025,7 +27018,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 });
 
-
 fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
   /**
@@ -27058,7 +27050,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _keysMap:  {
+  _keysMap: {
     8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
@@ -27684,7 +27676,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
   }
 });
-
 
 /* _TO_SVG_START_ */
 (function() {
@@ -29993,7 +29984,6 @@ fabric.util.object.extend(fabric.ITextRtl.prototype, /** @lends fabric.IText.pro
         return;
       }
       var pointer = this.canvas.getPointer(options.e);
-      console.log(options.e);
       this.__mousedownX = pointer.x;
       this.__mousedownY = pointer.y;
       this.__isMousedown = true;
