@@ -49,9 +49,10 @@
     mainParameter: 'mode',
 
     /**
-     * Applies filter to canvas element
-     * @memberOf fabric.Image.filters.Grayscale.prototype
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8Array to be filtered.
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,

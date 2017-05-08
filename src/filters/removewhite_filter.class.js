@@ -48,17 +48,15 @@
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, i,
           threshold = this.threshold,
           distance = this.distance,
           limit = 255 - threshold,
           abs = Math.abs,
           r, g, b;
-
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (i = 0; i < data.length; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
@@ -73,8 +71,6 @@
           data[i + 3] = 0;
         }
       }
-
-      context.putImageData(imageData, 0, 0);
     },
 
     /**

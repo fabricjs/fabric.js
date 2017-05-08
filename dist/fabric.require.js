@@ -9719,6 +9719,49 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 (function(global) {
     "use strict";
     var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
+    filters.ColorMatrix = createClass(filters.BaseFilter, {
+        type: "ColorMatrix",
+        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "varying vec2 vTexCoord;\n" + "uniform mat4 uColorMatrix;\n" + "uniform vec4 uConstants;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color *= uColorMatrix;\n" + "color += uConstants;\n" + "gl_FragColor = color;\n" + "}",
+        matrix: [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ],
+        mainParameter: "matrix",
+        colorsOnly: true,
+        applyTo2d: function(options) {
+            var imageData = options.imageData, data = imageData.data, iLen = data.length, m = this.matrix, r, g, b, a, i, colorsOnly = this.colorsOnly;
+            for (i = 0; i < iLen; i += 4) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                if (colorsOnly) {
+                    data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
+                    data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
+                    data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+                } else {
+                    a = data[i + 3];
+                    data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
+                    data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
+                    data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
+                    data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
+                }
+            }
+        },
+        getUniformLocations: function(gl, program) {
+            return {
+                uColorMatrix: gl.getUniformLocation(program, "uColorMatrix"),
+                uConstants: gl.getUniformLocation(program, "uConstants")
+            };
+        },
+        sendUniformData: function(gl, uniformLocations) {
+            var m = this.matrix, matrix = [ m[0], m[1], m[2], m[3], m[5], m[6], m[7], m[8], m[10], m[11], m[12], m[13], m[15], m[16], m[17], m[18] ], constants = [ m[4], m[9], m[14], m[19] ];
+            gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
+            gl.uniform4fv(uniformLocations.uConstants, constants);
+        }
+    });
+    fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
+    var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
     filters.Brightness = createClass(filters.BaseFilter, {
         type: "Brightness",
         fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform float uBrightness;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color.rgb += uBrightness;\n" + "gl_FragColor = color;\n" + "}",
@@ -9728,8 +9771,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (this.brightness === 0) {
                 return;
             }
-            var imageData = options.imageData, data = imageData.data, i, brightness = Math.round(this.brightness * 255);
-            for (i = 0; i < data.length; i += 4) {
+            var imageData = options.imageData, data = imageData.data, i, len = data.length, brightness = Math.round(this.brightness * 255);
+            for (i = 0; i < len; i += 4) {
                 data[i] = data[i] + brightness;
                 data[i + 1] = data[i + 1] + brightness;
                 data[i + 2] = data[i + 2] + brightness;
@@ -10005,9 +10048,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.threshold = options.threshold || 30;
             this.distance = options.distance || 20;
         },
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, threshold = this.threshold, distance = this.distance, limit = 255 - threshold, abs = Math.abs, r, g, b;
-            for (var i = 0, len = data.length; i < len; i += 4) {
+        applyTo2d: function(options) {
+            var imageData = options.imageData, data = imageData.data, i, threshold = this.threshold, distance = this.distance, limit = 255 - threshold, abs = Math.abs, r, g, b;
+            for (i = 0; i < data.length; i += 4) {
                 r = data[i];
                 g = data[i + 1];
                 b = data[i + 2];
@@ -10015,7 +10058,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     data[i + 3] = 0;
                 }
             }
-            context.putImageData(imageData, 0, 0);
         },
         toObject: function() {
             return extend(this.callSuper("toObject"), {
@@ -10030,49 +10072,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 (function(global) {
     "use strict";
     var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.Sepia = createClass(filters.BaseFilter, {
+    filters.Sepia = createClass(filters.ColorMatrix, {
         type: "Sepia",
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, avg;
-            for (i = 0; i < iLen; i += 4) {
-                avg = .3 * data[i] + .59 * data[i + 1] + .11 * data[i + 2];
-                data[i] = avg + 100;
-                data[i + 1] = avg + 50;
-                data[i + 2] = avg + 255;
-            }
-            context.putImageData(imageData, 0, 0);
-        }
+        matrix: [ .3, .59, .11, 0, .392156, .3, .59, .11, 0, .196078, .3, .59, .11, 0, 1, 0, 0, 0, 1, 0 ],
+        colorsOnly: true
     });
-    fabric.Image.filters.Sepia.fromObject = function(object, callback) {
-        object = object || {};
-        object.type = "Sepia";
-        return new fabric.Image.filters.BaseFilter.fromObject(object, callback);
-    };
+    fabric.Image.filters.Sepia.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {
     "use strict";
     var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.Sepia2 = createClass(filters.BaseFilter, {
+    filters.Sepia2 = createClass(filters.ColorMatrix, {
         type: "Sepia2",
-        applyTo: function(canvasEl) {
-            var context = canvasEl.getContext("2d"), imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height), data = imageData.data, iLen = data.length, i, r, g, b;
-            for (i = 0; i < iLen; i += 4) {
-                r = data[i];
-                g = data[i + 1];
-                b = data[i + 2];
-                data[i] = (r * .393 + g * .769 + b * .189) / 1.351;
-                data[i + 1] = (r * .349 + g * .686 + b * .168) / 1.203;
-                data[i + 2] = (r * .272 + g * .534 + b * .131) / 2.14;
-            }
-            context.putImageData(imageData, 0, 0);
-        }
+        matrix: [ .393, .769, .189, 0, 0, .349, .686, .168, 0, 0, .272, .534, .131, 0, 0, 0, 0, 0, 1, 0 ],
+        colorsOnly: true
     });
-    fabric.Image.filters.Sepia2.fromObject = function(object, callback) {
-        object = object || {};
-        object.type = "Sepia2";
-        return new fabric.Image.filters.BaseFilter.fromObject(object, callback);
-    };
+    fabric.Image.filters.Sepia2.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {
@@ -10447,42 +10463,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
     });
     fabric.Image.filters.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-})(typeof exports !== "undefined" ? exports : this);
-
-(function(global) {
-    "use strict";
-    var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.ColorMatrix = createClass(filters.BaseFilter, {
-        type: "ColorMatrix",
-        fragmentSource: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "varying vec2 vTexCoord;\n" + "uniform mat4 uColorMatrix;\n" + "uniform vec4 uConstants;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color *= uColorMatrix;\n" + "color += uConstants;\n" + "gl_FragColor = color;\n" + "}",
-        matrix: [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ],
-        mainParameter: "matrix",
-        applyTo2d: function(options) {
-            var imageData = options.imageData, data = imageData.data, iLen = data.length, m = this.matrix, r, g, b, a, i;
-            for (i = 0; i < iLen; i += 4) {
-                r = data[i];
-                g = data[i + 1];
-                b = data[i + 2];
-                a = data[i + 3];
-                data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
-                data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
-                data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
-                data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
-            }
-        },
-        getUniformLocations: function(gl, program) {
-            return {
-                uColorMatrix: gl.getUniformLocation(program, "uColorMatrix"),
-                uConstants: gl.getUniformLocation(program, "uConstants")
-            };
-        },
-        sendUniformData: function(gl, uniformLocations) {
-            var m = this.matrix, matrix = [ m[0], m[1], m[2], m[3], m[5], m[6], m[7], m[8], m[10], m[11], m[12], m[13], m[15], m[16], m[17], m[18] ], constants = [ m[4], m[9], m[14], m[19] ];
-            gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
-            gl.uniform4fv(uniformLocations.uConstants, constants);
-        }
-    });
-    fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {

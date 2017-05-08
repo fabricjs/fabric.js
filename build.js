@@ -205,6 +205,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/webgl_backend.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/2d_backend.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/base_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/colormatrix_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/brightness_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/convolute_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/gradienttransparency_filter.class.js'),
@@ -220,7 +221,6 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/multiply_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blend_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'src/filters/colormatrix_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),
 

@@ -20080,6 +20080,155 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       createClass = fabric.util.createClass;
 
   /**
+   * Color Matrix filter class
+   * @class fabric.Image.filters.ColorMatrix
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.ColorMatrix#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
+   * @see {@Link http://www.webwasp.co.uk/tutorials/219/Color_Matrix_Filter.php}
+   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl}
+   * @example <caption>Kodachrome filter</caption>
+   * var filter = new fabric.Image.filters.ColorMatrix({
+   *  matrix: [
+       1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
+       -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
+       -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
+       0, 0, 0, 1, 0
+      ]
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters();
+   */
+  filters.ColorMatrix = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
+
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'ColorMatrix',
+
+    fragmentSource: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'uniform mat4 uColorMatrix;\n' +
+      'uniform vec4 uConstants;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+        'color *= uColorMatrix;\n' +
+        'color += uConstants;\n' +
+        'gl_FragColor = color;\n' +
+      '}',
+
+    /**
+     * Colormatrix for pixels.
+     * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
+     * outside the -1, 1 range.
+     * 0.0039215686 is the part of 1 that get translated to 1 in 2d
+     * @param {Array} matrix array of 20 numbers.
+     * @default
+     */
+    matrix: [
+      1, 0, 0, 0, 0,
+      0, 1, 0, 0, 0,
+      0, 0, 1, 0, 0,
+      0, 0, 0, 1, 0
+    ],
+
+    mainParameter: 'matrix',
+
+    /**
+     * Lock the colormatrix on the color part, skipping alpha, manly for non webgl scenario
+     * to save some calculation
+     */
+    colorsOnly: true,
+
+    /**
+     * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8Array to be filtered.
+     */
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data,
+          iLen = data.length,
+          m = this.matrix,
+          r, g, b, a, i, colorsOnly = this.colorsOnly;
+
+      for (i = 0; i < iLen; i += 4) {
+        r = data[i];
+        g = data[i + 1];
+        b = data[i + 2];
+        if (colorsOnly) {
+          data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
+          data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
+          data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+        }
+        else {
+          a = data[i + 3];
+          data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
+          data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
+          data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
+          data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
+        }
+      }
+    },
+
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
+        uConstants: gl.getUniformLocation(program, 'uConstants'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      var m = this.matrix,
+          matrix = [
+            m[0], m[1], m[2], m[3],
+            m[5], m[6], m[7], m[8],
+            m[10], m[11], m[12], m[13],
+            m[15], m[16], m[17], m[18]
+          ],
+          constants = [m[4], m[9], m[14], m[19]];
+      gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
+      gl.uniform4fv(uniformLocations.uConstants, constants);
+    },
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] function to invoke after filter creation
+   * @return {fabric.Image.filters.ColorMatrix} Instance of fabric.Image.filters.ColorMatrix
+   */
+  fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  'use strict';
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
+
+  /**
    * Brightness filter class
    * @class fabric.Image.filters.Brightness
    * @memberOf fabric.Image.filters
@@ -20142,9 +20291,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
       }
       var imageData = options.imageData,
-          data = imageData.data, i,
+          data = imageData.data, i, len = data.length,
           brightness = Math.round(this.brightness * 255);
-      for (i = 0; i < data.length; i += 4) {
+      for (i = 0; i < len; i += 4) {
         data[i] = data[i] + brightness;
         data[i + 1] = data[i + 1] + brightness;
         data[i + 2] = data[i + 2] + brightness;
@@ -20481,9 +20630,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     mainParameter: 'mode',
 
     /**
-     * Applies filter to canvas element
-     * @memberOf fabric.Image.filters.Grayscale.prototype
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8Array to be filtered.
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
@@ -20997,17 +21147,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Applies filter to canvas element
      * @param {Object} canvasEl Canvas element to apply filter to
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, i,
           threshold = this.threshold,
           distance = this.distance,
           limit = 255 - threshold,
           abs = Math.abs,
           r, g, b;
-
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (i = 0; i < data.length; i += 4) {
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
@@ -21022,8 +21170,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           data[i + 3] = 0;
         }
       }
-
-      context.putImageData(imageData, 0, 0);
     },
 
     /**
@@ -21067,9 +21213,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @example
    * var filter = new fabric.Image.filters.Sepia();
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
-  filters.Sepia = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Sepia.prototype */ {
+
+  filters.Sepia = createClass(filters.ColorMatrix, /** @lends fabric.Image.filters.Sepia.prototype */ {
 
     /**
      * Filter type
@@ -21078,26 +21225,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     type: 'Sepia',
 
+    matrix: [
+      0.3, 0.59, 0.11, 0, 0.392156,
+      0.3, 0.59, 0.11, 0, 0.196078,
+      0.3, 0.59, 0.11, 0, 1,
+      0, 0, 0, 1, 0
+    ],
+
     /**
-     * Applies filter to canvas element
-     * @memberOf fabric.Image.filters.Sepia.prototype
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Lock the colormatrix on the color part, skipping alpha
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, avg;
-
-      for (i = 0; i < iLen; i += 4) {
-        avg = 0.3  * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
-        data[i] = avg + 100;
-        data[i + 1] = avg + 50;
-        data[i + 2] = avg + 255;
-      }
-
-      context.putImageData(imageData, 0, 0);
-    }
+    colorsOnly: true,
   });
 
   /**
@@ -21107,11 +21245,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Sepia} Instance of fabric.Image.filters.Sepia
    */
-  fabric.Image.filters.Sepia.fromObject = function(object, callback) {
-    object = object || { };
-    object.type = 'Sepia';
-    return new fabric.Image.filters.BaseFilter.fromObject(object, callback);
-  };
+  fabric.Image.filters.Sepia.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -21128,14 +21262,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * Sepia2 filter class
    * @class fabric.Image.filters.Sepia2
    * @memberOf fabric.Image.filters
-   * @extends fabric.Image.filters.BaseFilter
+   * @extends fabric.Image.filters.ColorMatrix
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Sepia2();
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
-  filters.Sepia2 = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Sepia2.prototype */ {
+
+  filters.Sepia2 = createClass(filters.ColorMatrix, /** @lends fabric.Image.filters.Sepia2.prototype */ {
 
     /**
      * Filter type
@@ -21145,28 +21280,24 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     type: 'Sepia2',
 
     /**
-     * Applies filter to canvas element
-     * @memberOf fabric.Image.filters.Sepia.prototype
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Colormatrix for sepia tone effect.
+     * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
+     * outside the -1, 1 range.
+     * 0.0039215686 is the part of 1 that get translated to 1 in 2d
+     * @param {Array} matrix array of 20 numbers.
+     * @default
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          iLen = data.length, i, r, g, b;
+    matrix: [
+      0.393, 0.769, 0.189, 0, 0,
+      0.349, 0.686, 0.168, 0, 0,
+      0.272, 0.534, 0.131, 0, 0,
+      0, 0, 0, 1, 0
+    ],
 
-      for (i = 0; i < iLen; i += 4) {
-        r = data[i];
-        g = data[i + 1];
-        b = data[i + 2];
-
-        data[i] = (r * 0.393 + g * 0.769 + b * 0.189 ) / 1.351;
-        data[i + 1] = (r * 0.349 + g * 0.686 + b * 0.168 ) / 1.203;
-        data[i + 2] = (r * 0.272 + g * 0.534 + b * 0.131 ) / 2.140;
-      }
-
-      context.putImageData(imageData, 0, 0);
-    }
+    /**
+     * Lock the colormatrix on the color part, skipping alpha
+     */
+    colorsOnly: true,
   });
 
   /**
@@ -21176,11 +21307,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @param {Function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Sepia2} Instance of fabric.Image.filters.Sepia2
    */
-  fabric.Image.filters.Sepia2.fromObject = function(object, callback) {
-    object = object || { };
-    object.type = 'Sepia2';
-    return new fabric.Image.filters.BaseFilter.fromObject(object, callback);
-  };
+  fabric.Image.filters.Sepia2.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -21912,143 +22039,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    */
   fabric.Image.filters.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
-})(typeof exports !== 'undefined' ? exports : this);
-
-
-(function(global) {
-
-  'use strict';
-
-  var fabric  = global.fabric || (global.fabric = { }),
-      filters = fabric.Image.filters,
-      createClass = fabric.util.createClass;
-
-  /**
-   * Color Matrix filter class
-   * @class fabric.Image.filters.ColorMatrix
-   * @memberOf fabric.Image.filters
-   * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.ColorMatrix#initialize} for constructor definition
-   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@Link http://www.webwasp.co.uk/tutorials/219/Color_Matrix_Filter.php}
-   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl}
-   * @example <caption>Kodachrome filter</caption>
-   * var filter = new fabric.Image.filters.ColorMatrix({
-   *  matrix: [
-       1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
-       -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
-       -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
-       0, 0, 0, 1, 0
-      ]
-   * });
-   * object.filters.push(filter);
-   * object.applyFilters();
-   */
-  filters.ColorMatrix = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
-
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'ColorMatrix',
-
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'uniform mat4 uColorMatrix;\n' +
-      'uniform vec4 uConstants;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'color *= uColorMatrix;\n' +
-        'color += uConstants;\n' +
-        'gl_FragColor = color;\n' +
-      '}',
-
-    /**
-     * Colormatrix for pixels.
-     * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
-     * outside the -1, 1 range.
-     * 0.0039215686 is the part of 1 that get translated to 1 in 2d
-     * @param {Array} matrix array of 20 numbers.
-     * @default
-     */
-    matrix: [
-      1, 0, 0, 0, 0,
-      0, 1, 0, 0, 0,
-      0, 0, 1, 0, 0,
-      0, 0, 0, 1, 0
-    ],
-
-    mainParameter: 'matrix',
-
-    /**
-     * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
-     *
-     * @param {Object} options
-     * @param {ImageData} options.imageData The Uint8Array to be filtered.
-     */
-    applyTo2d: function(options) {
-      var imageData = options.imageData,
-          data = imageData.data,
-          iLen = data.length,
-          m = this.matrix,
-          r, g, b, a, i;
-
-      for (i = 0; i < iLen; i += 4) {
-        r = data[i];
-        g = data[i + 1];
-        b = data[i + 2];
-        a = data[i + 3];
-
-        data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
-        data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
-        data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
-        data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
-      }
-    },
-
-    /**
-     * Return WebGL uniform locations for this filter's shader.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {WebGLShaderProgram} program This filter's compiled shader program.
-     */
-    getUniformLocations: function(gl, program) {
-      return {
-        uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
-        uConstants: gl.getUniformLocation(program, 'uConstants'),
-      };
-    },
-
-    /**
-     * Send data from this filter to its shader program's uniforms.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
-     */
-    sendUniformData: function(gl, uniformLocations) {
-      var m = this.matrix,
-          matrix = [
-            m[0], m[1], m[2], m[3],
-            m[5], m[6], m[7], m[8],
-            m[10], m[11], m[12], m[13],
-            m[15], m[16], m[17], m[18]
-          ],
-          constants = [m[4], m[9], m[14], m[19]];
-      gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
-      gl.uniform4fv(uniformLocations.uConstants, constants);
-    },
-  });
-
-  /**
-   * Returns filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @param {function} [callback] function to invoke after filter creation
-   * @return {fabric.Image.filters.ColorMatrix} Instance of fabric.Image.filters.ColorMatrix
-   */
-  fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== 'undefined' ? exports : this);
 
 
