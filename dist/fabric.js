@@ -20768,6 +20768,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             data[i + 1] = Math.max(g, tg);
             data[i + 2] = Math.max(b, tb);
             break;
+          case 'overlay': 
+            data[i] = tr < 128 ? (2 * r * tr / 255) : (255 - 2 * (255 - r) * (255 - tr) / 255);
+            data[i+1] = tg < 128 ? (2 * g * tg / 255) : (255 - 2 * (255 - g) * (255 - tg) / 255);
+            data[i+2] = tb < 128 ? (2 * b * tb / 255) : (255 - 2 * (255 - b) * (255 - tb) / 255);
+            break;    
         }
       }
 
