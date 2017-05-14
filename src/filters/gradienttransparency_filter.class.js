@@ -43,21 +43,20 @@
     },
 
     /**
-     * Applies filter to canvas element
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, i, len = data.length,
           threshold = this.threshold,
           total = data.length;
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (var i = 0; i < len; i += 4) {
         data[i + 3] = threshold + 255 * (total - i) / total;
       }
-
-      context.putImageData(imageData, 0, 0);
     },
 
     /**
