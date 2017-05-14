@@ -44,15 +44,16 @@
       'uniform float uHeight;\n' +
       'varying vec2 vTexCoord;\n' +
       'void main() {\n' +
-        'float posX = vTexCoord.x * uWidth;\n' +
-        'float posY = vTexCoord.y * uHeight;\n' +
-        'int modX = mod(int(posX), int(uBlocksize));\n' +
-        'int modY = mod(int(posY), int(uBlocksize));\n' +
-        'vec2 squareCoords = vec2((posX - modX) / uWidth, (posY - modY) / uHeight);\n' +
+        'float blockW = uBlocksize / uWidth;\n' +
+        'float blockH = uBlocksize / uHeight;\n' +
+        'int posX = int(vTexCoord.x / blockW);\n' +
+        'int posY = int(vTexCoord.y / blockH);\n' +
+        'float fposX = float(posX);\n' +
+        'float fposX = float(posY);\n' +
+        'vec2 squareCoords = vec2(fposX * blockW, fposX * blockH);\n' +
         'vec4 color = texture2D(uTexture, squareCoords);\n' +
         'gl_FragColor = color;\n' +
       '}',
-
 
     /**
      * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
