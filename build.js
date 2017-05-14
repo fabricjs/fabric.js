@@ -208,7 +208,6 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/colormatrix_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/brightness_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/convolute_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'src/filters/gradienttransparency_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/grayscale_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/invert_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/mask_filter.class.js'),
