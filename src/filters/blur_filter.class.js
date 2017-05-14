@@ -60,9 +60,6 @@
     mainParameter: 'blur',
 
     applyTo: function(options) {
-      if (!this.blur) {
-        return;
-      }
       if (options.webgl) {
         // this aspectRatio is used to give the same blur to vertical and horizontal
         this.aspectRatio = options.sourceWidth / options.sourceHeight;
@@ -126,7 +123,7 @@
           blurScale = this.aspectRatio;
         }
       }
-      blur = blurScale * this.blur * 0.06;
+      blur = blurScale * this.blur * 0.12;
       if (this.horizontal) {
         delta[0] = blur;
       }
