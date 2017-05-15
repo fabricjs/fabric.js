@@ -100,7 +100,7 @@ fabric.Collection = {
    */
   getObjects: function(type) {
     if (typeof type === 'undefined') {
-      return this._objects;
+      return this._objects.slice(0);
     }
     return this._objects.filter(function(o) {
       return o.type === type;
