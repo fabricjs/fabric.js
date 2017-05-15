@@ -25,6 +25,25 @@
 
     type: 'Blur',
 
+/*
+'gl_FragColor = vec4(0.0);',
+'gl_FragColor += texture2D(texture, vTexCoord + -7 * uDelta)*0.0044299121055113265;',
+'gl_FragColor += texture2D(texture, vTexCoord + -6 * uDelta)*0.00895781211794;',
+'gl_FragColor += texture2D(texture, vTexCoord + -5 * uDelta)*0.0215963866053;',
+'gl_FragColor += texture2D(texture, vTexCoord + -4 * uDelta)*0.0443683338718;',
+'gl_FragColor += texture2D(texture, vTexCoord + -3 * uDelta)*0.0776744219933;',
+'gl_FragColor += texture2D(texture, vTexCoord + -2 * uDelta)*0.115876621105;',
+'gl_FragColor += texture2D(texture, vTexCoord + -1 * uDelta)*0.147308056121;',
+'gl_FragColor += texture2D(texture, vTexCoord              )*0.159576912161;',
+'gl_FragColor += texture2D(texture, vTexCoord + 1 * uDelta)*0.147308056121;',
+'gl_FragColor += texture2D(texture, vTexCoord + 2 * uDelta)*0.115876621105;',
+'gl_FragColor += texture2D(texture, vTexCoord + 3 * uDelta)*0.0776744219933;',
+'gl_FragColor += texture2D(texture, vTexCoord + 4 * uDelta)*0.0443683338718;',
+'gl_FragColor += texture2D(texture, vTexCoord + 5 * uDelta)*0.0215963866053;',
+'gl_FragColor += texture2D(texture, vTexCoord + 6 * uDelta)*0.00895781211794;',
+'gl_FragColor += texture2D(texture, vTexCoord + 7 * uDelta)*0.0044299121055113265;',
+*/
+
     /* eslint-disable max-len */
     fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
