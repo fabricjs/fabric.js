@@ -83,7 +83,13 @@
       this.set('y1', points[1]);
       this.set('x2', points[2]);
       this.set('y2', points[3]);
-
+      var count = 'arrows' in options ? options.arrows : 0;
+      this.headlen = 'headLength' in options ? options.headLength : 10;
+      if (count >= 2 || count <= -2) {
+        this.arrows = 2;
+      } else if (count === 1 || count === -1) {
+        this.arrows =  count;
+      }
       this._setWidthHeight(options);
     },
 
@@ -162,7 +168,7 @@
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-
+      
       if (noTransform) {
         //  Line coords are distances from left-top of canvas to origin of line.
         //  To render line in a path-group, we need to translate them to
@@ -179,8 +185,28 @@
         // move from center (of virtual box) to its left/top corner
         // we can't assume x1, y1 is top left and x2, y2 is bottom right
         var p = this.calcLinePoints();
-        ctx.moveTo(p.x1, p.y1);
-        ctx.lineTo(p.x2, p.y2);
+        var p = this.calcLinePoints();
+        var fromx = p.x1;
+        var tox = p.x2;
+        var fromy = p.y1;
+        var toy = p.y2;
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(tox, toy);
+        if(this.arrows){
+          var angle = Math.atan2(toy-fromy,tox-fromx);
+          if(this.arrows >=2 || this.arrows <= -2 || this.arrows <= -1) {
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(fromx+this.headlen*Math.cos(angle-Math.PI/6),fromy+this.headlen*Math.sin(angle-Math.PI/6));
+		        ctx.moveTo(fromx, fromy);
+		        ctx.lineTo(fromx+this.headlen*Math.cos(angle+Math.PI/6),fromy+this.headlen*Math.sin(angle+Math.PI/6));
+          }
+          if(this.arrows >=2 || this.arrows <= -2 ||this.arrows >= 1){
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox-this.headlen*Math.cos(angle-Math.PI/6),toy-this.headlen*Math.sin(angle-Math.PI/6));
+		        ctx.moveTo(tox, toy);
+		        ctx.lineTo(tox-this.headlen*Math.cos(angle+Math.PI/6),toy-this.headlen*Math.sin(angle+Math.PI/6));
+          }
+        }
       }
 
       ctx.lineWidth = this.strokeWidth;
