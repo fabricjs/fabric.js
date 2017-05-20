@@ -59,13 +59,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * Compile this filter's shader program.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context to use for shader compilation.
+   * @param {String} fragmentSource fragmentShader source for compilation
+   * @param {String} vertexSource vertexShader source for compilation
    */
-  createProgram: function(gl) {
+  createProgram: function(gl, fragmentSource, vertexSource) {
     if (!this.vertexSource || !this.fragmentSource) {
       return;
     }
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, this.vertexSource);
+    gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
@@ -76,7 +78,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
 
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, this.fragmentSource);
+    gl.shaderSource(fragmentShader, fragmentSource || this.fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
@@ -162,9 +164,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
     gl.finish();
-    if (!options.programCache.hasOwnProperty(this.type)) {
-      options.programCache[this.type] = this.createProgram(options.context);
-    }
   },
 
   _swapTextures: function(options) {
@@ -200,6 +199,19 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   },
 
   /**
+   * Retrieves the cached shader.
+   * @param {Object} options
+   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+   */
+  retrieveShader: function(options) {
+    if (!options.programCache.hasOwnProperty(this.type)) {
+      options.programCache[this.type] = this.createProgram(options.context);
+    }
+    return options.programCache[this.type];
+  },
+
+  /**
    * Apply this filter using webgl.
    *
    * @param {Object} options
@@ -213,7 +225,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   applyToWebGL: function(options) {
     var gl = options.context;
-    var shader = options.programCache[this.type];
+    var shader = this.retrieveShader(options);
     if (options.pass === 0 && options.originalTexture) {
       gl.bindTexture(gl.TEXTURE_2D, options.originalTexture);
     }

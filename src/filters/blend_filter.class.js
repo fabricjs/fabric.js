@@ -23,27 +23,122 @@
    * });
 
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
+   * canvas.renderAll();
    */
 
   filters.Blend = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */ {
     type: 'Blend',
 
-    initialize: function(options) {
-      options = options || {};
-      this.color = options.color || '#000';
-      this.image = options.image || false;
-      this.mode = options.mode || 'multiply';
-      this.alpha = options.alpha || 1;
+    color: '#000',
+
+    /**
+     * apply the blend mode with another picture instead of a color.
+     * take precedence over the color.
+     * @param {Image} image
+     **/
+    image: false,
+
+    /**
+     * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
+     * darken, lighten, overlay, exclusion.
+     **/
+    mode: 'multiply',
+
+    /**
+     * Needed to send webgl an integer.
+     **/
+    modesMap: {
+      multipy: 0,
+      add: 1,
+      diff: 2,
+      difference: 2,
+      screen: 3,
+      subtract: 4,
+      darken: 5,
+      lighten: 6,
+      overlay: 7,
+      exclusion: 8,
     },
 
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
+    alpha: 1,
+
+    /**
+     * Fragment source for the Multiply program
+     */
+    shaders: {
+      multiply: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'color.rgb *= uColor.rgb;\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      screen: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'static vec3 one = vec3(1.0, 1.0, 1.0);\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'color.rgb = one - (one - color.rgb) * (one - uColor.rgb);\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      add: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb += uColor.rgb;\n' +
+        '}',
+      diff: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb = abs(gl_FragColor.rgb - uColor.rgb);\n' +
+      '}',
+      subtract: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb -= uColor.rgb;\n' +
+        '}',
+    },
+
+
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var cacheKey = this.type + '_' + this.mode;
+      var shaderSource = this.shaders[this.mode];
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+      }
+      return options.programCache[cacheKey];
+    },
+
+    /**
+     * Apply the Blend operation to a Uint8ClampedArray representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
+     */
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          data = imageData.data, iLen = data.length,
           tr, tg, tb,
           r, g, b,
-          _r, _g, _b,
           source,
           isImage = false;
 
@@ -63,13 +158,12 @@
       else {
         // Blend color
         source = new fabric.Color(this.color).getSource();
-
         tr = source[0] * this.alpha;
         tg = source[1] * this.alpha;
         tb = source[2] * this.alpha;
       }
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
         g = data[i + 1];
@@ -93,9 +187,9 @@
             data[i + 2] = 1 - (1 - b) * (1 - tb);
             break;
           case 'add':
-            data[i] = Math.min(255, r + tr);
-            data[i + 1] = Math.min(255, g + tg);
-            data[i + 2] = Math.min(255, b + tb);
+            data[i] = r + tr;
+            data[i + 1] = g + tg;
+            data[i + 2] = b + tb;
             break;
           case 'diff':
           case 'difference':
@@ -104,13 +198,9 @@
             data[i + 2] = Math.abs(b - tb);
             break;
           case 'subtract':
-            _r = r - tr;
-            _g = g - tg;
-            _b = b - tb;
-
-            data[i] = (_r < 0) ? 0 : _r;
-            data[i + 1] = (_g < 0) ? 0 : _g;
-            data[i + 2] = (_b < 0) ? 0 : _b;
+            data[i] = r - tr;
+            data[i + 1] = g - tg;
+            data[i + 2] = b - tb;
             break;
           case 'darken':
             data[i] = Math.min(r, tr);
@@ -122,10 +212,47 @@
             data[i + 1] = Math.max(g, tg);
             data[i + 2] = Math.max(b, tb);
             break;
+          case 'overlay':
+            data[i] = tr < 128 ? (2 * r * tr / 255) : (255 - 2 * (255 - r) * (255 - tr) / 255);
+            data[i + 1] = tg < 128 ? (2 * g * tg / 255) : (255 - 2 * (255 - g) * (255 - tg) / 255);
+            data[i + 2] = tb < 128 ? (2 * b * tb / 255) : (255 - 2 * (255 - b) * (255 - tb) / 255);
+            break;
+          case 'exclusion':
+            data[i] = tr + r - ((2 * tr * r) / 255);
+            data[i + 1] = tg + g - ((2 * tg * g) / 255);
+            data[i + 2] = tb + b - ((2 * tb * b) / 255);
+            break;
         }
       }
+    },
 
-      context.putImageData(imageData, 0, 0);
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uColor: gl.getUniformLocation(program, 'uColor'),
+        uMode: gl.getUniformLocation(program, 'uMode'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      var source = new fabric.Color(this.color).getSource();
+      source[0] /= 255;
+      source[1] /= 255;
+      source[2] /= 255;
+      var mode = this.modesMap[this.mode];
+      gl.uniform4fv(uniformLocations.uColor, source);
+      gl.uniform1i(uniformLocations.uMode, mode);
     },
 
     /**
