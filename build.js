@@ -213,7 +213,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/mask_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/noise_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/pixelate_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'src/filters/removewhite_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/removecolor_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/sepia_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blendcolor_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
