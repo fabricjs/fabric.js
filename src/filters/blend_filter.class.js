@@ -7,7 +7,7 @@
 
   /**
    * Color Blend filter class
-   * @class fabric.Image.filter.Blend
+   * @class fabric.Image.filter.BlendColor
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
    * @example
@@ -16,19 +16,18 @@
    *  mode: 'multiply'
    * });
    *
-   * var filter = new fabric.Image.filters.Blend({
+   * var filter = new fabric.Image.filters.BlendColor({
    *  image: fabricImageObject,
    *  mode: 'multiply',
    *  alpha: 0.5
    * });
-
    * object.filters.push(filter);
    * object.applyFilters();
    * canvas.renderAll();
    */
 
-  filters.Blend = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */ {
-    type: 'Blend',
+  filters.BlendColor = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Blend.prototype */ {
+    type: 'BlendColor',
 
     color: '#000',
 
@@ -41,25 +40,9 @@
 
     /**
      * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
-     * darken, lighten, overlay, exclusion.
+     * darken, lighten, overlay, exclusion, tint.
      **/
     mode: 'multiply',
-
-    /**
-     * Needed to send webgl an integer.
-     **/
-    modesMap: {
-      multipy: 0,
-      add: 1,
-      diff: 2,
-      difference: 2,
-      screen: 3,
-      subtract: 4,
-      darken: 5,
-      lighten: 6,
-      overlay: 7,
-      exclusion: 8,
-    },
 
     alpha: 1,
 
@@ -80,10 +63,9 @@
         'uniform sampler2D uTexture;\n' +
         'uniform vec4 uColor;\n' +
         'varying vec2 vTexCoord;\n' +
-        'static vec3 one = vec3(1.0, 1.0, 1.0);\n' +
         'void main() {\n' +
           'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-          'color.rgb = one - (one - color.rgb) * (one - uColor.rgb);\n' +
+          'color.rgb = 1.0 - (1.0 - color.rgb) * (1.0 - uColor.rgb);\n' +
           'gl_FragColor = color;\n' +
         '}',
       add: 'precision highp float;\n' +
@@ -110,8 +92,62 @@
           'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
           'gl_FragColor.rgb -= uColor.rgb;\n' +
         '}',
+      lighten: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n' +
+        '}',
+      darken: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n' +
+        '}',
+      exclusion: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n' +
+        '}',
+      overlay: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'if (uColor.r < 0.5) {\n' +
+            'gl_FragColor.r *= 2.0 * uColor.r;\n' +
+          '} else {\n' +
+            'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
+          '}\n' +
+          'if (uColor.g < 0.5) {\n' +
+            'gl_FragColor.g *= 2.0 * uColor.g;\n' +
+          '} else {\n' +
+            'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
+          '}\n' +
+          'if (uColor.b < 0.5) {\n' +
+            'gl_FragColor.b *= 2.0 * uColor.b;\n' +
+          '} else {\n' +
+            'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
+          '}\n' +
+        '}',
+      tint: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
+          'gl_FragColor.rgb += uColor.rgb;\n' +
+        '}'
     },
-
 
     /**
      * Retrieves the cached shader.
@@ -139,41 +175,18 @@
           data = imageData.data, iLen = data.length,
           tr, tg, tb,
           r, g, b,
-          source,
-          isImage = false;
+          source, alpha1 = 1 - this.alpha;
 
-      if (this.image) {
-        // Blend images
-        isImage = true;
-
-        var _el = fabric.util.createCanvasElement();
-        _el.width = this.image.width;
-        _el.height = this.image.height;
-
-        var tmpCanvas = new fabric.StaticCanvas(_el);
-        tmpCanvas.add(this.image);
-        var context2 =  tmpCanvas.getContext('2d');
-        source = context2.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height).data;
-      }
-      else {
-        // Blend color
-        source = new fabric.Color(this.color).getSource();
-        tr = source[0] * this.alpha;
-        tg = source[1] * this.alpha;
-        tb = source[2] * this.alpha;
-      }
+      source = new fabric.Color(this.color).getSource();
+      tr = source[0] * this.alpha;
+      tg = source[1] * this.alpha;
+      tb = source[2] * this.alpha;
 
       for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
-
-        if (isImage) {
-          tr = source[i] * this.alpha;
-          tg = source[i + 1] * this.alpha;
-          tb = source[i + 2] * this.alpha;
-        }
 
         switch (this.mode) {
           case 'multiply':
@@ -182,9 +195,9 @@
             data[i + 2] = b * tb / 255;
             break;
           case 'screen':
-            data[i] = 1 - (1 - r) * (1 - tr);
-            data[i + 1] = 1 - (1 - g) * (1 - tg);
-            data[i + 2] = 1 - (1 - b) * (1 - tb);
+            data[i] = 255 - (255 - r) * (255 - tr) / 255;
+            data[i + 1] = 255 - (255 - g) * (255 - tg) / 255;
+            data[i + 2] = 255 - (255 - b) * (255 - tb) / 255;
             break;
           case 'add':
             data[i] = r + tr;
@@ -222,6 +235,10 @@
             data[i + 1] = tg + g - ((2 * tg * g) / 255);
             data[i + 2] = tb + b - ((2 * tb * b) / 255);
             break;
+          case 'tint':
+            data[i] = tr + r * alpha1;
+            data[i + 1] = tg + g * alpha1;
+            data[i + 2] = tb + b * alpha1;
         }
       }
     },
@@ -235,7 +252,6 @@
     getUniformLocations: function(gl, program) {
       return {
         uColor: gl.getUniformLocation(program, 'uColor'),
-        uMode: gl.getUniformLocation(program, 'uMode'),
       };
     },
 
@@ -247,12 +263,11 @@
      */
     sendUniformData: function(gl, uniformLocations) {
       var source = new fabric.Color(this.color).getSource();
-      source[0] /= 255;
-      source[1] /= 255;
-      source[2] /= 255;
-      var mode = this.modesMap[this.mode];
+      source[0] = this.alpha * source[0] / 255;
+      source[1] = this.alpha * source[1] / 255;
+      source[2] = this.alpha * source[2] / 255;
+      source[3] = this.alpha;
       gl.uniform4fv(uniformLocations.uColor, source);
-      gl.uniform1i(uniformLocations.uMode, mode);
     },
 
     /**
@@ -262,7 +277,6 @@
     toObject: function() {
       return {
         color: this.color,
-        image: this.image,
         mode: this.mode,
         alpha: this.alpha
       };
@@ -274,8 +288,8 @@
    * @static
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Blend} Instance of fabric.Image.filters.Blend
+   * @return {fabric.Image.filters.BlendColor} Instance of fabric.Image.filters.Blend
    */
-  fabric.Image.filters.Blend.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+  fabric.Image.filters.BlendColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

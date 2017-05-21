@@ -46,12 +46,12 @@
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
    */
-  fabric.Image.filters.ComposedFilter.fromObject = function(object, callback) {
+  fabric.Image.filters.Composed.fromObject = function(object, callback) {
     var filters = object.subFilters || [],
         subFilters = filters.map(function(filter) {
           return new fabric.Image.filters[filter.type](filter);
         }),
-        instance = new fabric.Image.filters.ComposedFilter({ subFilters: subFilters });
+        instance = new fabric.Image.filters.Composed({ subFilters: subFilters });
     callback && callback(instance);
     return instance;
   };

@@ -10197,30 +10197,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 (function(global) {
     "use strict";
     var fabric = global.fabric, filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.Blend = createClass(filters.BaseFilter, {
-        type: "Blend",
+    filters.BlendColor = createClass(filters.BaseFilter, {
+        type: "BlendColor",
         color: "#000",
         image: false,
         mode: "multiply",
-        modesMap: {
-            multipy: 0,
-            add: 1,
-            diff: 2,
-            difference: 2,
-            screen: 3,
-            subtract: 4,
-            darken: 5,
-            lighten: 6,
-            overlay: 7,
-            exclusion: 8
-        },
         alpha: 1,
         shaders: {
             multiply: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color.rgb *= uColor.rgb;\n" + "gl_FragColor = color;\n" + "}",
-            screen: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "static vec3 one = vec3(1.0, 1.0, 1.0);\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color.rgb = one - (one - color.rgb) * (one - uColor.rgb);\n" + "gl_FragColor = color;\n" + "}",
+            screen: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "color.rgb = 1.0 - (1.0 - color.rgb) * (1.0 - uColor.rgb);\n" + "gl_FragColor = color;\n" + "}",
             add: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb += uColor.rgb;\n" + "}",
             diff: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb = abs(gl_FragColor.rgb - uColor.rgb);\n" + "}",
-            subtract: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb -= uColor.rgb;\n" + "}"
+            subtract: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb -= uColor.rgb;\n" + "}",
+            lighten: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n" + "}",
+            darken: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n" + "}",
+            exclusion: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n" + "}",
+            overlay: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "if (uColor.r < 0.5) {\n" + "gl_FragColor.r *= 2.0 * uColor.r;\n" + "} else {\n" + "gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n" + "}\n" + "if (uColor.g < 0.5) {\n" + "gl_FragColor.g *= 2.0 * uColor.g;\n" + "} else {\n" + "gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n" + "}\n" + "if (uColor.b < 0.5) {\n" + "gl_FragColor.b *= 2.0 * uColor.b;\n" + "} else {\n" + "gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n" + "}\n" + "}",
+            tint: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "void main() {\n" + "gl_FragColor = texture2D(uTexture, vTexCoord);\n" + "gl_FragColor.rgb *= (1.0 - uColor.a);\n" + "gl_FragColor.rgb += uColor.rgb;\n" + "}"
         },
         retrieveShader: function(options) {
             var cacheKey = this.type + "_" + this.mode;
@@ -10231,31 +10224,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return options.programCache[cacheKey];
         },
         applyTo2d: function(options) {
-            var imageData = options.imageData, data = imageData.data, iLen = data.length, tr, tg, tb, r, g, b, source, isImage = false;
-            if (this.image) {
-                isImage = true;
-                var _el = fabric.util.createCanvasElement();
-                _el.width = this.image.width;
-                _el.height = this.image.height;
-                var tmpCanvas = new fabric.StaticCanvas(_el);
-                tmpCanvas.add(this.image);
-                var context2 = tmpCanvas.getContext("2d");
-                source = context2.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height).data;
-            } else {
-                source = new fabric.Color(this.color).getSource();
-                tr = source[0] * this.alpha;
-                tg = source[1] * this.alpha;
-                tb = source[2] * this.alpha;
-            }
+            var imageData = options.imageData, data = imageData.data, iLen = data.length, tr, tg, tb, r, g, b, source, alpha1 = 1 - this.alpha;
+            source = new fabric.Color(this.color).getSource();
+            tr = source[0] * this.alpha;
+            tg = source[1] * this.alpha;
+            tb = source[2] * this.alpha;
             for (var i = 0; i < iLen; i += 4) {
                 r = data[i];
                 g = data[i + 1];
                 b = data[i + 2];
-                if (isImage) {
-                    tr = source[i] * this.alpha;
-                    tg = source[i + 1] * this.alpha;
-                    tb = source[i + 2] * this.alpha;
-                }
                 switch (this.mode) {
                   case "multiply":
                     data[i] = r * tr / 255;
@@ -10264,9 +10241,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     break;
 
                   case "screen":
-                    data[i] = 1 - (1 - r) * (1 - tr);
-                    data[i + 1] = 1 - (1 - g) * (1 - tg);
-                    data[i + 2] = 1 - (1 - b) * (1 - tb);
+                    data[i] = 255 - (255 - r) * (255 - tr) / 255;
+                    data[i + 1] = 255 - (255 - g) * (255 - tg) / 255;
+                    data[i + 2] = 255 - (255 - b) * (255 - tb) / 255;
                     break;
 
                   case "add":
@@ -10311,34 +10288,36 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                     data[i + 1] = tg + g - 2 * tg * g / 255;
                     data[i + 2] = tb + b - 2 * tb * b / 255;
                     break;
+
+                  case "tint":
+                    data[i] = tr + r * alpha1;
+                    data[i + 1] = tg + g * alpha1;
+                    data[i + 2] = tb + b * alpha1;
                 }
             }
         },
         getUniformLocations: function(gl, program) {
             return {
-                uColor: gl.getUniformLocation(program, "uColor"),
-                uMode: gl.getUniformLocation(program, "uMode")
+                uColor: gl.getUniformLocation(program, "uColor")
             };
         },
         sendUniformData: function(gl, uniformLocations) {
             var source = new fabric.Color(this.color).getSource();
-            source[0] /= 255;
-            source[1] /= 255;
-            source[2] /= 255;
-            var mode = this.modesMap[this.mode];
+            source[0] = this.alpha * source[0] / 255;
+            source[1] = this.alpha * source[1] / 255;
+            source[2] = this.alpha * source[2] / 255;
+            source[3] = this.alpha;
             gl.uniform4fv(uniformLocations.uColor, source);
-            gl.uniform1i(uniformLocations.uMode, mode);
         },
         toObject: function() {
             return {
                 color: this.color,
-                image: this.image,
                 mode: this.mode,
                 alpha: this.alpha
             };
         }
     });
-    fabric.Image.filters.Blend.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+    fabric.Image.filters.BlendColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== "undefined" ? exports : this);
 
 (function(global) {
@@ -10728,10 +10707,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             });
         }
     });
-    fabric.Image.filters.ComposedFilter.fromObject = function(object, callback) {
+    fabric.Image.filters.Composed.fromObject = function(object, callback) {
         var filters = object.subFilters || [], subFilters = filters.map(function(filter) {
             return new fabric.Image.filters[filter.type](filter);
-        }), instance = new fabric.Image.filters.ComposedFilter({
+        }), instance = new fabric.Image.filters.Composed({
             subFilters: subFilters
         });
         callback && callback(instance);
