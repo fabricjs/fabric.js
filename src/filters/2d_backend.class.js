@@ -43,5 +43,12 @@
       filters.forEach(function(filter) { filter.applyTo(pipelineState); });
       ctx.putImageData(pipelineState.imageData, 0, 0);
     },
+
+    getHelpLayer: function() {
+      if (!this.helpLayer) {
+        this.helpLayer = document.createElement('canvas');
+      }
+      return this.helpLayer;
+    }
   };
 })();

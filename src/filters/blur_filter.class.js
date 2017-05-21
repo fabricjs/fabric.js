@@ -98,7 +98,52 @@
     },
 
     applyTo2d: function(options) {
-      // options.imageData = simpleBlur(this.blur * 0.06 * 0.3, options.imageData);
+      options.helpLayer = fabric.filterBackend.getHelpLayer();
+      options.imageData = this.simpleBlur(options);
+    },
+
+    simpleBlur: function(options) {
+      var canvas1 = options.targetCanvas,
+          ctx1 = options.ctx,
+          nSamples = 15,
+          width = canvas1.width,
+          height = canvas1.height,
+          random, percent, j, i,
+          canvas2 = options.helpLayer,
+          ctx2 = canvas2.getContext('2d'),
+          blur = this.blur * 0.06 * 0.3;
+
+      // TODO commented code should be used once the bug in chrome is fixed.
+      if (canvas2.width !== canvas1.width || canvas2.height !== canvas1.height) {
+        canvas2.width = canvas1.width;
+        canvas2.height = canvas1.height;
+      }
+      // load first canvas
+      ctx1.putImageData(options.imageData, 0, 0);
+      for (i = -nSamples; i <= nSamples; i++) {
+        random = (Math.random() - 0.5) / 4;
+        percent = i / nSamples;
+        j = blur * percent * width + random;
+        ctx2.globalAlpha = 1 - Math.abs(percent);
+        ctx2.drawImage(canvas1, j, random);
+        ctx1.drawImage(canvas2, 0, 0);
+        ctx2.globalAlpha = 1;
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+      }
+      for (i = -nSamples; i <= nSamples; i++) {
+        random = (Math.random() - 0.5) / 4;
+        percent = i / nSamples;
+        j = blur * percent * height + random;
+        ctx2.globalAlpha = 1 - Math.abs(percent);
+        ctx2.drawImage(canvas1, random, j);
+        ctx1.drawImage(canvas2, 0, 0);
+        ctx2.globalAlpha = 1;
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+      }
+      var newImageData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
+      ctx1.globalAlpha = 1;
+      ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+      return newImageData;
     },
 
     /**
@@ -159,65 +204,3 @@
   filters.Blur.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);
-
-/*
-import { isChrome } from 'app/lib/Util';
-
-const canvas1 = document.createElement('canvas');
-const canvas2 = document.createElement('canvas');
-const ctx1 = canvas1.getContext('2d');
-const ctx2 = canvas2.getContext('2d');
-const nSamples = 15;
-
-export function simpleBlur(blur, imageData) {
-  const width = imageData.width;
-  const height = imageData.height;
-  const _isChrome = isChrome();
-  // TODO commented code should be used once the bug in chrome is fixed.
-  if (_isChrome) {
-    canvas1.width = 1;
-    canvas1.height = 1;
-    canvas2.width = 1;
-    canvas2.height = 1;
-  }
-  if (canvas1.width !== imageData.width || canvas1.height !== imageData.height || _isChrome) {
-    canvas1.width = imageData.width;
-    canvas1.height = imageData.height;
-    canvas2.width = imageData.width;
-    canvas2.height = imageData.height;
-  } else {
-    // clean from old run
-    ctx1.globalAlpha = 1;
-    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
-    ctx2.globalAlpha = 1;
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-  }
-  // load first canvas
-  ctx1.putImageData(imageData, 0, 0);
-  for (let i = -nSamples; i <= nSamples; i++) {
-    const random = (Math.random() - 0.5) / 4;
-    const percent = i / nSamples;
-    const j = blur * percent * width + random;
-    ctx2.globalAlpha = 1 - Math.abs(percent);
-    ctx2.drawImage(canvas1, j, random);
-    ctx1.drawImage(canvas2, 0, 0);
-    ctx2.globalAlpha = 1;
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-  }
-  for (let i = -nSamples; i <= nSamples; i++) {
-    const random = (Math.random() - 0.5) / 4;
-    const percent = i / nSamples;
-    const h = blur * percent * height + random;
-    ctx2.globalAlpha = 1 - Math.abs(percent);
-    ctx2.drawImage(canvas1, random, h);
-    ctx1.drawImage(canvas2, 0, 0);
-    ctx2.globalAlpha = 1;
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-  }
-  const newImageData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
-  ctx1.globalAlpha = 1;
-  ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
-  return newImageData;
-}
-
-*/
