@@ -162,8 +162,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     else {
       // draw last filter on canvas and not to framebuffer.
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.finish();
     }
-    gl.finish();
   },
 
   _swapTextures: function(options) {
