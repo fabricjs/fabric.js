@@ -103,7 +103,7 @@
     },
 
     simpleBlur: function(options) {
-      var canvas1 = options.targetCanvas,
+      var canvas1 = options.canvasEl,
           ctx1 = options.ctx,
           nSamples = 15,
           width = canvas1.width,
@@ -111,7 +111,7 @@
           random, percent, j, i,
           canvas2 = options.helpLayer,
           ctx2 = canvas2.getContext('2d'),
-          blur = this.blur * 0.06 * 0.3;
+          blur = this.blur * 0.06 * 0.5;
 
       // TODO commented code should be used once the bug in chrome is fixed.
       if (canvas2.width !== canvas1.width || canvas2.height !== canvas1.height) {
