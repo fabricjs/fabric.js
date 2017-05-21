@@ -48,8 +48,8 @@
         'int posX = int(vTexCoord.x / blockW);\n' +
         'int posY = int(vTexCoord.y / blockH);\n' +
         'float fposX = float(posX);\n' +
-        'float fposX = float(posY);\n' +
-        'vec2 squareCoords = vec2(fposX * blockW, fposX * blockH);\n' +
+        'float fposY = float(posY);\n' +
+        'vec2 squareCoords = vec2(fposX * blockW, fposY * blockH);\n' +
         'vec4 color = texture2D(uTexture, squareCoords);\n' +
         'gl_FragColor = color;\n' +
       '}',

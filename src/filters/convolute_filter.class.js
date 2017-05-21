@@ -101,7 +101,13 @@
             '}\n' +
           '}\n' +
         '}\n' +
-        'gl_FragColor = color;\n' +
+        'if (uOpaque == 1) {\n' +
+          'gl_FragColor = color;\n' +
+        '} else {\n' +
+          'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
+          'gl_FragColor = color;\n' +
+          'gl_FragColor.a = alpha;\n' +
+        '}\n' +
       '}',
 
     /**

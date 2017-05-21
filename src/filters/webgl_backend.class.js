@@ -27,7 +27,7 @@
    * WebGL filter backend.
    */
   function WebglFilterBackend(options) {
-    if (options.tileSize) {
+    if (options && options.tileSize) {
       this.tileSize = options.tileSize;
     }
     this.setupGLContext(this.tileSize, this.tileSize);
