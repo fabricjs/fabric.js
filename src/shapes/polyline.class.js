@@ -126,7 +126,9 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [], diffX, diffY,
+      var points = [],
+          diffX = 0,
+          diffY = 0,
           markup = this._createBaseSVGMarkup();
 
       if (!(this.group && this.group.type === 'path-group')) {
