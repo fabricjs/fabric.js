@@ -44,6 +44,7 @@
     setupGLContext: function(width, height) {
       this.dispose();
       this.createWebGLCanvas(width, height);
+      // eslint-disable-next-line
       this.squareVertices = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
     },
 

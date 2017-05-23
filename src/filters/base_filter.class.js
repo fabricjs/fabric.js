@@ -101,7 +101,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
 
     var attributeLocations = this.getAttributeLocations(gl, program);
-    var uniformLocations = this.getUniformLocations(gl, program);
+    var uniformLocations = this.getUniformLocations(gl, program) || { };
+    uniformLocations.uWidth = gl.getUniformLocation(program, 'uWidth');
+    uniformLocations.uHeigth = gl.getUniformLocation(program, 'uHeight');
     return {
       program: program,
       attributeLocations: attributeLocations,
@@ -175,6 +177,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   },
 
   /**
+   * Intentionally left blank, to be overridden in custom filters
+   * @param {Object} options
+   **/
+  isNeutralState: function(/* options */) {
+    return false;
+  },
+
+  /**
    * Apply this filter to the input image data provided.
    *
    * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
@@ -189,6 +199,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   applyTo: function(options) {
     if (options.webgl) {
+      if (options.passes > 1 && this.isNeutralState(options)) {
+        // avoid doing something that we do not need
+        return;
+      }
       this._setupFrameBuffer(options);
       this.applyToWebGL(options);
       this._swapTextures(options);
@@ -235,8 +249,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     gl.useProgram(shader.program);
     this.sendAttributeData(gl, shader.attributeLocations, options.squareVertices);
 
-    gl.uniform1f(gl.getUniformLocation(shader.program, 'uWidth'), options.sourceWidth);
-    gl.uniform1f(gl.getUniformLocation(shader.program, 'uHeight'), options.sourceHeight);
+    gl.uniform1f(shader.uniformLocations.uWidth, options.sourceWidth);
+    gl.uniform1f(shader.uniformLocations.uHeight, options.sourceHeight);
 
     this.sendUniformData(gl, shader.uniformLocations);
     gl.viewport(0, 0, options.sourceWidth, options.sourceHeight);
