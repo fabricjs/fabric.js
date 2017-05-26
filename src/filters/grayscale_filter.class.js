@@ -26,18 +26,35 @@
      */
     type: 'Grayscale',
 
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform int uMode;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'if (uMode == 1) {\n' +
+    shaders: {
+      average: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
           'float average = (color.r + color.b + color.g) / 3.0;\n' +
-          'color = vec4(average, average, average, color.a);\n' +
-        '}\n' +
-        'gl_FragColor = color;\n' +
-      '}',
+          'gl_FragColor = vec4(average, average, average, color.a);\n' +
+        '}',
+      lightness: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform int uMode;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 col = texture2D(uTexture, vTexCoord);\n' +
+          'float average = (max(max(col.r, col.g),col.b) + min(min(col.r, col.g),col.b)) / 2.0;\n' +
+          'gl_FragColor = vec4(average, average, average, col.a);\n' +
+        '}',
+      luminosity: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform int uMode;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 col = texture2D(uTexture, vTexCoord);\n' +
+          'float average = 0.21 * col.r + 0.72 * col.g + 0.07 * col.b;\n' +
+          'gl_FragColor = vec4(average, average, average, col.a);\n' +
+        '}',
+    },
+
 
     /**
      * Grayscale mode, between 'average' and ...
@@ -57,15 +74,38 @@
     applyTo2d: function(options) {
       var imageData = options.imageData,
           data = imageData.data, i,
-          len = data.length, value;
+          len = data.length, value,
+          mode = this.mode;
       for (i = 0; i < len; i += 4) {
-        if (this.mode === 'average') {
+        if (mode === 'average') {
           value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        }
+        else if (mode === 'lightness') {
+          value = (Math.min(data[i], data[i + 1], data[i + 2]) +
+            Math.max(data[i], data[i + 1], data[i + 2])) / 2;
+        }
+        else if (mode === 'luminosity') {
+          value = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
         }
         data[i] = value;
         data[i + 1] = value;
         data[i + 2] = value;
       }
+    },
+
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var cacheKey = this.type + '_' + this.mode;
+      var shaderSource = this.shaders[this.mode];
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+      }
+      return options.programCache[cacheKey];
     },
 
     /**
