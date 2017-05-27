@@ -136,12 +136,12 @@
      * @param {function} [callback] callback function to call after eventual filters applied.
      * @return {fabric.Image} thisArg
      */
-    initialize: function(element, options, callback) {
+    initialize: function(element, options) {
       options || (options = { });
       this.filters = [];
       this.resizeFilters = [];
       this.callSuper('initialize', options);
-      this._initElement(element, options, callback);
+      this._initElement(element, options);
       this.cacheKey = 'texture' + fabric.Object.__uid++;
     },
 
@@ -158,36 +158,21 @@
      * If filters defined they are applied to new image.
      * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
      * @param {HTMLImageElement} element
-     * @param {Function} [callback] Callback is invoked when all filters have been applied and new image is generated
      * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    setElement: function(element, callback, options) {
-
-      var _callback, _this;
-
+    setElement: function(element, options) {
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
 
-      if (this.resizeFilters.length === 0) {
-        _callback = callback;
+      if (this.resizeFilters.length !== 0) {
+        this.applyFilters(this.resizeFilters, this._filteredEl || this._originalElement, true);
       }
-      else {
-        _this = this;
-        _callback = function() {
-          _this.applyFilters(callback, _this.resizeFilters, _this._filteredEl || _this._originalElement, true);
-        };
-      }
-
       if (this.filters.length !== 0) {
-        this.applyFilters(_callback);
+        this.applyFilters();
       }
-      else if (_callback) {
-        _callback(this);
-      }
-
       return this;
     },
 
@@ -367,8 +352,10 @@
      */
     setSrc: function(src, callback, options) {
       fabric.util.loadImage(src, function(img) {
-        return this.setElement(img, callback, options);
+        this.setElement(img, options);
+        callback(this);
       }, this, options && options.crossOrigin);
+      return this;
     },
 
     /**
@@ -387,20 +374,18 @@
      * @return {thisArg} return the fabric.Image object
      * @chainable
      */
-    applyFilters: function(filters, forResizing) {
+    applyFilters: function(filters /*, forResizing */) {
 
-      filters = filters || this.filters;
+      filters = filters || this.filters || [];
       filters = filters.filter(function(filter) { return filter; });
-      var retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
-          minimumScale = this.minimumScaleTrigger / retinaScaling,
-          scaleX, scaleY, imgElement = this._originalElement,
-          sourceWidth = imgElement.naturalWidth || imgElement.width,
-          sourceHeight = imgElement.naturalHeight || imgElement.height;
-
       if (filters.length === 0) {
         this._element = this._originalElement;
         return this;
       }
+
+      var imgElement = this._originalElement,
+          sourceWidth = imgElement.naturalWidth || imgElement.width,
+          sourceHeight = imgElement.naturalHeight || imgElement.height;
 
       if (this._element === this._originalElement) {
         // if the element is the same we need to create a new element
@@ -410,9 +395,13 @@
         this._element = canvasEl;
       }
       else {
+        // clear the existing element to get new filter data
         this._element.getContext('2d').clearRect(0, 0, sourceWidth, sourceHeight);
       }
 
+      // retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
+      // minimumScale = this.minimumScaleTrigger / retinaScaling,
+      // scaleX, scaleY,
       // if (forResizing) {
       //   // see what to do with resizeFilters
       //   if (forResizing) {
@@ -463,7 +452,7 @@
       if (this.isMoving === false && this.resizeFilters.length && this._needsResize()) {
         this._lastScaleX = this.scaleX;
         this._lastScaleY = this.scaleY;
-        elementToDraw = this.applyFilters(null, this.resizeFilters, this._filteredEl || this._originalElement, true);
+        elementToDraw = this.applyFilters(this.resizeFilters);
       }
       else {
         elementToDraw = this._element;
@@ -537,8 +526,8 @@
      * @param {HTMLImageElement|String} element The element representing the image
      * @param {Object} [options] Options object
      */
-    _initElement: function(element, options, callback) {
-      this.setElement(fabric.util.getById(element), callback, options);
+    _initElement: function(element, options) {
+      this.setElement(fabric.util.getById(element), options);
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
 
@@ -620,7 +609,8 @@
         object.filters = filters || [];
         fabric.Image.prototype._initFilters.call(object, object.resizeFilters, function(resizeFilters) {
           object.resizeFilters = resizeFilters || [];
-          return new fabric.Image(img, object, callback);
+          var image = new fabric.Image(img, object);
+          callback(image);
         });
       });
     }, null, object.crossOrigin);

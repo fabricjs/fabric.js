@@ -8,6 +8,9 @@
    * @returns {Boolean} Whether the user's browser supports WebGL.
    */
   fabric.isWebglSupported = function(tileSize) {
+    if (fabric.isLikelyNode) {
+      return false;
+    }
     tileSize = tileSize || fabric.WebglFilterBackend.prototype.tileSize;
     var canvas = document.createElement('canvas');
     var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
