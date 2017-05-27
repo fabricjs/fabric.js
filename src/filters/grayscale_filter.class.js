@@ -26,7 +26,7 @@
      */
     type: 'Grayscale',
 
-    shaders: {
+    fragmentSource: {
       average: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'varying vec2 vTexCoord;\n' +
@@ -101,7 +101,7 @@
      */
     retrieveShader: function(options) {
       var cacheKey = this.type + '_' + this.mode;
-      var shaderSource = this.shaders[this.mode];
+      var shaderSource = this.fragmentSource[this.mode];
       if (!options.programCache.hasOwnProperty(cacheKey)) {
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }

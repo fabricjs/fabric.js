@@ -39,12 +39,12 @@
     fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
       'uniform float uBlocksize;\n' +
-      'uniform float uWidth;\n' +
-      'uniform float uHeight;\n' +
+      'uniform float uStepW;\n' +
+      'uniform float uStepH;\n' +
       'varying vec2 vTexCoord;\n' +
       'void main() {\n' +
-        'float blockW = uBlocksize / uWidth;\n' +
-        'float blockH = uBlocksize / uHeight;\n' +
+        'float blockW = uBlocksize * uStepW;\n' +
+        'float blockH = uBlocksize * uStepW;\n' +
         'int posX = int(vTexCoord.x / blockW);\n' +
         'int posY = int(vTexCoord.y / blockH);\n' +
         'float fposX = float(posX);\n' +

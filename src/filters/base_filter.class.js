@@ -249,8 +249,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     gl.useProgram(shader.program);
     this.sendAttributeData(gl, shader.attributeLocations, options.squareVertices);
 
-    gl.uniform1f(shader.uniformLocations.uWidth, options.sourceWidth);
-    gl.uniform1f(shader.uniformLocations.uHeight, options.sourceHeight);
+    gl.uniform1f(shader.uniformLocations.uStepW, 1 / options.sourceWidth);
+    gl.uniform1f(shader.uniformLocations.uStepH, 1 / options.sourceHeight);
 
     this.sendUniformData(gl, shader.uniformLocations);
     gl.viewport(0, 0, options.sourceWidth, options.sourceHeight);

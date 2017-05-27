@@ -49,7 +49,7 @@
     /**
      * Fragment source for the Multiply program
      */
-    shaders: {
+    fragmentSource: {
       multiply: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform vec4 uColor;\n' +
@@ -157,7 +157,7 @@
      */
     retrieveShader: function(options) {
       var cacheKey = this.type + '_' + this.mode;
-      var shaderSource = this.shaders[this.mode];
+      var shaderSource = this.fragmentSource[this.mode];
       if (!options.programCache.hasOwnProperty(cacheKey)) {
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }

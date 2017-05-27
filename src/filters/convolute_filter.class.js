@@ -71,44 +71,147 @@
      */
     matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
 
-    padder: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-
     /**
      * Fragment source for the brightness program
      */
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform float uMatrix[81];\n' +
-      'uniform float uWidth;\n' +
-      'uniform float uHeight;\n' +
-      'uniform int uOpaque;\n' +
-      'uniform float uSize;\n' +
-      'uniform float uHalfSize;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-        'vec4 color = vec4(0, 0, 0, 1);\n' +
-        'float stepW = 1.0 / uWidth;\n' +
-        'float stepH = 1.0 / uHeight;\n' +
-        'for (float h = 0.0; h < 9.0; h+=1.0) {\n' +
-          'for (float w = 0.0; w < 9.0; w+=1.0) {\n' +
-            'if (h < uSize && w < uSize) {\n' +
-              'vec2 matrixPos = vec2(stepW * (w - uHalfSize), stepH * (h - uHalfSize));\n' +
-              'if (uOpaque == 1) {\n' +
-                'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];\n' +
-              '} else {\n' +
-                'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];\n' +
-              '}\n' +
+    fragmentSource: {
+      Convolute_3_1: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[9];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 0);\n' +
+          'for (float h = 0.0; h < 3.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 3.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 1), uStepH * (h - 1));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 3.0 + w)];\n' +
             '}\n' +
           '}\n' +
-        '}\n' +
-        'if (uOpaque == 1) {\n' +
           'gl_FragColor = color;\n' +
-        '} else {\n' +
+        '}',
+      Convolute_3_0: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[9];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 1);\n' +
+          'for (float h = 0.0; h < 3.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 3.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 1.0), uStepH * (h - 1.0));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 3.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
           'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
           'gl_FragColor = color;\n' +
           'gl_FragColor.a = alpha;\n' +
-        '}\n' +
-      '}',
+        '}',
+      Convolute_5_1: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[25];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 0);\n' +
+          'for (float h = 0.0; h < 5.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 5.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 5.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      Convolute_5_0: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[25];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 1);\n' +
+          'for (float h = 0.0; h < 5.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 5.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 5.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
+          'gl_FragColor = color;\n' +
+          'gl_FragColor.a = alpha;\n' +
+        '}',
+      Convolute_7_1: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[49];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 0);\n' +
+          'for (float h = 0.0; h < 7.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 7.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 7.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      Convolute_7_0: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[49];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 1);\n' +
+          'for (float h = 0.0; h < 7.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 7.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 7.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
+          'gl_FragColor = color;\n' +
+          'gl_FragColor.a = alpha;\n' +
+        '}',
+      Convolute_9_1: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[81];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 0);\n' +
+          'for (float h = 0.0; h < 9.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 9.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      Convolute_9_0: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform float uMatrix[81];\n' +
+        'uniform float uStepW;\n' +
+        'uniform float uStepH;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = vec4(0, 0, 0, 1);\n' +
+          'for (float h = 0.0; h < 9.0; h+=1.0) {\n' +
+            'for (float w = 0.0; w < 9.0; w+=1.0) {\n' +
+              'vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];\n' +
+            '}\n' +
+          '}\n' +
+          'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
+          'gl_FragColor = color;\n' +
+          'gl_FragColor.a = alpha;\n' +
+        '}',
+    },
 
     /**
      * Constructor
@@ -117,6 +220,23 @@
      * @param {Boolean} [options.opaque=false] Opaque value (true/false)
      * @param {Array} [options.matrix] Filter matrix
      */
+
+
+    /**
+    * Retrieves the cached shader.
+    * @param {Object} options
+    * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+    * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+    */
+    retrieveShader: function(options) {
+      var size = Math.sqrt(this.matrix.length);
+      var cacheKey = this.type + '_' + size + '_' + this.opaque ? 1 : 0;
+      var shaderSource = this.fragmentSource[cacheKey];
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+      }
+      return options.programCache[cacheKey];
+    },
 
     /**
      * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
@@ -205,19 +325,7 @@
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
     sendUniformData: function(gl, uniformLocations) {
-      var matrix = [], origMatrix = this.matrix, mLength = origMatrix.length,
-          side = Math.sqrt(mLength), j = 0, i = 0, padder = this.padder;
-      for (i = 0; i < mLength; i += side) {
-        matrix = matrix.concat(origMatrix.slice(i, i + side), padder.slice(0, 9 - side));
-        j += 9;
-      }
-      for (;j < 81; j += 9) {
-        matrix = matrix.concat(padder);
-      }
-      gl.uniform1fv(uniformLocations.uMatrix, matrix);
-      gl.uniform1i(uniformLocations.uOpaque, this.opaque);
-      gl.uniform1f(uniformLocations.uHalfSize, Math.floor(side / 2));
-      gl.uniform1f(uniformLocations.uSize, side);
+      gl.uniform1fv(uniformLocations.uMatrix, this.matrix);
     },
 
     /**

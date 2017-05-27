@@ -3,7 +3,7 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
-      sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin,
+      sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,
       ceil = Math.ceil,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
@@ -56,6 +56,60 @@
      */
     lanczosLobes: 3,
 
+    // vertexSource: 'attribute vec2 aPosition;\n' +
+    //   'attribute vec2 aTexCoord;\n' +
+    //   'uniform float uStepW;\n' +
+    //   'uniform float uStepH;\n' +
+    //   'varying vec2 centerTextureCoordinate;\n' +
+    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
+    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
+    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
+    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
+    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
+    //   'void main() {\n' +
+    //       'vec2 firstOffset = vec2(uStepW, uStepH);\n' +
+    //       'vec2 secondOffset = vec2(2.0 * uStepW, 2.0 * uStepH);\n' +
+    //       'vec2 thirdOffset = vec2(3.0 * uStepW, 3.0 * uStepH);\n' +
+    //       'vec2 fourthOffset = vec2(4.0 * uStepW, 4.0 * uStepH);\n' +
+    //       'centerTextureCoordinate = aTexCoord;\n' +
+    //       'oneStepLeftTextureCoordinate = aTexCoord - firstOffset;\n' +
+    //       'twoStepsLeftTextureCoordinate = aTexCoord - secondOffset;\n' +
+    //       'threeStepsLeftTextureCoordinate = aTexCoord - thirdOffset;\n' +
+    //       'fourStepsLeftTextureCoordinate = aTexCoord - fourthOffset;\n' +
+    //       'oneStepRightTextureCoordinate = aTexCoord + firstOffset;\n' +
+    //       'twoStepsRightTextureCoordinate = aTexCoord + secondOffset;\n' +
+    //       'threeStepsRightTextureCoordinate = aTexCoord + thirdOffset;\n' +
+    //       'fourStepsRightTextureCoordinate = aTexCoord + fourthOffset;\n' +
+    //       'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
+    //   '}',
+    //
+    // fragmentSource: 'precision highp float;\n' +
+    //   'varying vec2 centerTextureCoordinate;\n' +
+    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
+    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
+    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
+    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
+    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
+    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
+    //   'uniform sampler2d uTexture;\n' +
+    //   'void main() {\n' +
+    //     'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
+    //     'color += texture2D(uTexture, oneStepLeftTextureCoordinate) * 0.27667;\n' +
+    //     'color += texture2D(uTexture, oneStepRightTextureCoordinate) * 0.27667;\n' +
+    //     'color += texture2D(uTexture, twoStepsLeftTextureCoordinate) * 0.08074;\n' +
+    //     'color += texture2D(uTexture, twoStepsRightTextureCoordinate) * 0.08074;\n' +
+    //     'color += texture2D(uTexture, threeStepsLeftTextureCoordinate) * -0.02612;\n' +
+    //     'color += texture2D(uTexture, threeStepsRightTextureCoordinate) * -0.02612;\n' +
+    //     'color += texture2D(uTexture, fourStepsLeftTextureCoordinate) * -0.02143;\n' +
+    //     'color += texture2D(uTexture, fourStepsRightTextureCoordinate) * -0.02143;\n' +
+    //     'gl_FragColor = color;\n' +
+    //   '}',
+
     /**
      * Applies filter to canvas element
      * @memberOf fabric.Image.filters.Resize.prototype
@@ -63,7 +117,10 @@
      * @param {Number} scaleX
      * @param {Number} scaleY
      */
-    applyTo: function(canvasEl, scaleX, scaleY) {
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          scaleX = options.scaleX, scaleY = options.scaleY,
+          data = imageData.data;
       if (scaleX === 1 && scaleY === 1) {
         return;
       }
@@ -71,25 +128,23 @@
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
 
-      var oW = canvasEl.width, oH = canvasEl.height,
+      var oW = data.width, oH = data.height,
           dW = round(oW * scaleX), dH = round(oH * scaleY),
           imageData;
 
       if (this.resizeType === 'sliceHack') {
-        imageData = this.sliceByTwo(canvasEl, oW, oH, dW, dH);
+        imageData = this.sliceByTwo(options, oW, oH, dW, dH);
       }
-      if (this.resizeType === 'hermite') {
-        imageData = this.hermiteFastResize(canvasEl, oW, oH, dW, dH);
+      else if (this.resizeType === 'hermite') {
+        imageData = this.hermiteFastResize(options, oW, oH, dW, dH);
       }
-      if (this.resizeType === 'bilinear') {
-        imageData = this.bilinearFiltering(canvasEl, oW, oH, dW, dH);
+      else if (this.resizeType === 'bilinear') {
+        imageData = this.bilinearFiltering(options, oW, oH, dW, dH);
       }
-      if (this.resizeType === 'lanczos') {
-        imageData = this.lanczosResize(canvasEl, oW, oH, dW, dH);
+      else if (this.resizeType === 'lanczos') {
+        imageData = this.lanczosResize(options, oW, oH, dW, dH);
       }
-      canvasEl.width = dW;
-      canvasEl.height = dH;
-      canvasEl.getContext('2d').putImageData(imageData, 0, 0);
+      options.imageData = imageData;
     },
 
     /**
@@ -101,53 +156,49 @@
      * @param {Number} dH Destination Height
      * @returns {ImageData}
      */
-    sliceByTwo: function(canvasEl, oW, oH, dW, dH) {
-      var context = canvasEl.getContext('2d'), imageData,
-          multW = 0.5, multH = 0.5, signW = 1, signH = 1,
-          doneW = false, doneH = false, stepW = oW, stepH = oH,
-          tmpCanvas = fabric.util.createCanvasElement(),
-          tmpCtx = tmpCanvas.getContext('2d');
+    sliceByTwo: function(options, oW, oH, dW, dH) {
+      var imageData = options.imageData,
+          mult = 0.5, doneW = false, doneH = false, stepW = oW * mult,
+          stepH = oH * mult, resources = fabric.filterBackend.resources,
+          tmpCanvas, ctx, sX = 0, sY = 0, dX = oW, dY = 0;
+      if (!resources.sliceByTwo) {
+        resources.sliceByTwo = document.createElement('canvas');
+      }
+      tmpCanvas = resources.sliceByTwo;
+      if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {
+        tmpCanvas.width = oW * 1.5;
+        tmpCanvas.height = oH;
+      }
+      ctx = tmpCanvas.getContext('2d');
+      ctx.clearRect(0, 0, oW * 1.5, oH);
+      ctx.putImageData(imageData, 0, 0);
+
       dW = floor(dW);
       dH = floor(dH);
-      tmpCanvas.width = max(dW, oW);
-      tmpCanvas.height = max(dH, oH);
-
-      if (dW > oW) {
-        multW = 2;
-        signW = -1;
-      }
-      if (dH > oH) {
-        multH = 2;
-        signH = -1;
-      }
-      imageData = context.getImageData(0, 0, oW, oH);
-      canvasEl.width = max(dW, oW);
-      canvasEl.height = max(dH, oH);
-      context.putImageData(imageData, 0, 0);
 
       while (!doneW || !doneH) {
         oW = stepW;
         oH = stepH;
-        if (dW * signW < floor(stepW * multW * signW)) {
-          stepW = floor(stepW * multW);
+        if (dW < floor(stepW * mult)) {
+          stepW = floor(stepW * mult);
         }
         else {
           stepW = dW;
           doneW = true;
         }
-        if (dH * signH < floor(stepH * multH * signH)) {
-          stepH = floor(stepH * multH);
+        if (dH < floor(stepH * mult)) {
+          stepH = floor(stepH * mult);
         }
         else {
           stepH = dH;
           doneH = true;
         }
-        imageData = context.getImageData(0, 0, oW, oH);
-        tmpCtx.putImageData(imageData, 0, 0);
-        context.clearRect(0, 0, stepW, stepH);
-        context.drawImage(tmpCanvas, 0, 0, oW, oH, 0, 0, stepW, stepH);
+        ctx.drawImage(tmpCanvas, sX, sY, oW, oH, dX, dY, stepW, stepH);
+        sX = dX;
+        sY = dY;
+        dY += stepH;
       }
-      return context.getImageData(0, 0, dW, dH);
+      return ctx.getImageData(sX, sY, dW, dH);
     },
 
     /**
@@ -159,7 +210,7 @@
      * @param {Number} dH Destination Height
      * @returns {ImageData}
      */
-    lanczosResize: function(canvasEl, oW, oH, dW, dH) {
+    lanczosResize: function(options, oW, oH, dW, dH) {
 
       function lanczosCreate(lobes) {
         return function(x) {
@@ -226,10 +277,9 @@
         }
       }
 
-      var context = canvasEl.getContext('2d'),
-          srcImg = context.getImageData(0, 0, oW, oH),
-          destImg = context.getImageData(0, 0, dW, dH),
-          srcData = srcImg.data, destData = destImg.data,
+      var srcData = options.imageData.data,
+          destImg = options.ctx.creteImageData(dW, dH),
+          destData = destImg.data,
           lanczos = lanczosCreate(this.lanczosLobes),
           ratioX = this.rcpScaleX, ratioY = this.rcpScaleY,
           rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY,
@@ -249,12 +299,12 @@
      * @param {Number} dH Destination Height
      * @returns {ImageData}
      */
-    bilinearFiltering: function(canvasEl, oW, oH, dW, dH) {
+    bilinearFiltering: function(options, oW, oH, dW, dH) {
       var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
           color, offset = 0, origPix, ratioX = this.rcpScaleX,
-          ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
-          w4 = 4 * (oW - 1), img = context.getImageData(0, 0, oW, oH),
-          pixels = img.data, destImage = context.getImageData(0, 0, dW, dH),
+          ratioY = this.rcpScaleY,
+          w4 = 4 * (oW - 1), img = options.imageData,
+          pixels = img.data, destImage = options.ctx.createImageData(dW, dH),
           destPixels = destImage.data;
       for (i = 0; i < dH; i++) {
         for (j = 0; j < dW; j++) {
@@ -287,13 +337,12 @@
      * @param {Number} dH Destination Height
      * @returns {ImageData}
      */
-    hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
+    hermiteFastResize: function(options, oW, oH, dW, dH) {
       var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY,
           ratioWHalf = ceil(ratioW / 2),
           ratioHHalf = ceil(ratioH / 2),
-          context = canvasEl.getContext('2d'),
-          img = context.getImageData(0, 0, oW, oH), data = img.data,
-          img2 = context.getImageData(0, 0, dW, dH), data2 = img2.data;
+          img = options.imageData, data = img.data,
+          img2 = options.ctx.createimageData(dW, dH), data2 = img2.data;
       for (var j = 0; j < dH; j++) {
         for (var i = 0; i < dW; i++) {
           var x2 = (i + j * dW) * 4, weight = 0, weights = 0, weightsAlpha = 0,
