@@ -98,28 +98,36 @@
     },
 
     applyTo2d: function(options) {
-      options.helpLayer = fabric.filterBackend.getHelpLayer();
+      // paint canvasEl with current image data.
+      //options.ctx.putImageData(options.imageData, 0, 0);
       options.imageData = this.simpleBlur(options);
     },
 
     simpleBlur: function(options) {
-      var canvas1 = options.canvasEl,
-          ctx1 = options.ctx,
-          nSamples = 15,
-          width = canvas1.width,
-          height = canvas1.height,
-          random, percent, j, i,
-          canvas2 = options.helpLayer,
+      var resources = fabric.filterBackend.resources, canvas1, canvas2,
+          width = options.imageData.width,
+          height = options.imageData.height;
+
+      if (!resources.blurLayer1) {
+        resources.blurLayer1 = document.createElement('canvas');
+        resources.blurLayer2 = document.createElement('canvas');
+      }
+      canvas1 = resources.blurLayer1;
+      canvas2 = resources.blurLayer2;
+      if (canvas1.width !== width || canvas1.height !== height) {
+        canvas2.width = canvas1.width = width;
+        canvas2.height = canvas1.height = height;
+      }
+      var ctx1 = canvas1.getContext('2d'),
           ctx2 = canvas2.getContext('2d'),
+          nSamples = 15,
+          random, percent, j, i,
           blur = this.blur * 0.06 * 0.5;
 
-      // TODO commented code should be used once the bug in chrome is fixed.
-      if (canvas2.width !== canvas1.width || canvas2.height !== canvas1.height) {
-        canvas2.width = canvas1.width;
-        canvas2.height = canvas1.height;
-      }
       // load first canvas
       ctx1.putImageData(options.imageData, 0, 0);
+      ctx2.clearRect(0, 0, width, height);
+
       for (i = -nSamples; i <= nSamples; i++) {
         random = (Math.random() - 0.5) / 4;
         percent = i / nSamples;
@@ -140,7 +148,8 @@
         ctx2.globalAlpha = 1;
         ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
       }
-      var newImageData = ctx1.getImageData(0, 0, canvas1.width, canvas1.height);
+      options.ctx.drawImage(canvas1, 0, 0);
+      var newImageData = options.ctx.getImageData(0, 0, canvas1.width, canvas1.height);
       ctx1.globalAlpha = 1;
       ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
       return newImageData;
