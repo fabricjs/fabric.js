@@ -39,7 +39,12 @@
         '}\n' +
       '}',
 
-    invert: 1,
+    /**
+     * Filter invert. if false, does nothing
+     * @param {Boolean} invert
+     * @default
+     */
+    invert: true,
 
     mainParameter: 'invert',
 

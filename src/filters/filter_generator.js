@@ -71,9 +71,14 @@
       matrix: matrices[key],
 
       /**
+       * Lock the matrix export for this kind of static, parameterless filters.
+       */
+      mainParameter: false,
+      /**
        * Lock the colormatrix on the color part, skipping alpha
        */
       colorsOnly: true,
+
     });
     fabric.Image.filters[key].fromObject = fabric.Image.filters.BaseFilter.fromObject;
   }

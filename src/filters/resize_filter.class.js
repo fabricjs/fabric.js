@@ -119,8 +119,7 @@
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
-          scaleX = options.scaleX, scaleY = options.scaleY,
-          data = imageData.data;
+          scaleX = this.scaleX, scaleY = this.scaleY;
       if (scaleX === 1 && scaleY === 1) {
         return;
       }
@@ -128,23 +127,23 @@
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
 
-      var oW = data.width, oH = data.height,
+      var oW = imageData.width, oH = imageData.height,
           dW = round(oW * scaleX), dH = round(oH * scaleY),
-          imageData;
+          newData;
 
       if (this.resizeType === 'sliceHack') {
-        imageData = this.sliceByTwo(options, oW, oH, dW, dH);
+        newData = this.sliceByTwo(options, oW, oH, dW, dH);
       }
       else if (this.resizeType === 'hermite') {
-        imageData = this.hermiteFastResize(options, oW, oH, dW, dH);
+        newData = this.hermiteFastResize(options, oW, oH, dW, dH);
       }
       else if (this.resizeType === 'bilinear') {
-        imageData = this.bilinearFiltering(options, oW, oH, dW, dH);
+        newData = this.bilinearFiltering(options, oW, oH, dW, dH);
       }
       else if (this.resizeType === 'lanczos') {
-        imageData = this.lanczosResize(options, oW, oH, dW, dH);
+        newData = this.lanczosResize(options, oW, oH, dW, dH);
       }
-      options.imageData = imageData;
+      options.imageData = newData;
     },
 
     /**

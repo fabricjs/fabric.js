@@ -44,8 +44,8 @@
       '}',
 
     /**
-     * Gamma array value, from -1 to 1.
-     * @param {Number} brightness
+     * Gamma array value, from 0.01 to 2.2.
+     * @param {Array} gamma
      * @default
      */
     gamma: [1, 1, 1],
@@ -70,8 +70,11 @@
           bInv = 1 / gamma[2], i;
 
       if (!this.rVals) {
+        // eslint-disable-next-line
         this.rVals = new Uint8Array(256);
+        // eslint-disable-next-line
         this.gVals = new Uint8Array(256);
+        // eslint-disable-next-line
         this.bVals = new Uint8Array(256);
       }
 

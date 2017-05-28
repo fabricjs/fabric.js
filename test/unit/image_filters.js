@@ -12,7 +12,10 @@
 
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
-      IMG_HEIGHT  = 110;
+      IMG_HEIGHT  = 110,
+      canvas = fabric.isLikelyNode ? new (require(fabric.canvasModule))() : fabric.document.createElement('canvas'),
+      context = canvas.getContext('2d');
+
 
   // var REFERENCE_IMG_OBJECT = {
   //   'type':               'image',
@@ -50,6 +53,23 @@
 
   function _createImageElement() {
     return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+  }
+
+  function _createImageData(context) {
+    var imageData = context.createImageData(3, 1);
+    imageData.data[0] = 200;
+    imageData.data[1] = 100;
+    imageData.data[2] = 50;
+    imageData.data[3] = 1;
+    imageData.data[4] = 30;
+    imageData.data[5] = 255;
+    imageData.data[6] = 10;
+    imageData.data[7] = 1;
+    imageData.data[8] = 255;
+    imageData.data[9] = 255;
+    imageData.data[10] = 3;
+    imageData.data[11] = 1;
+    return imageData;
   }
 
   function _createImageObject(width, height, callback) {
@@ -94,18 +114,29 @@
     equal(filter.type, 'Brightness');
     equal(filter.brightness, 0);
 
-    var filter2 = new fabric.Image.filters.Brightness({brightness: 30});
-    equal(filter2.brightness, 30);
+    var filter2 = new fabric.Image.filters.Brightness({brightness: 0.12});
+    equal(filter2.brightness, 0.12);
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Brightness();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values', function() {
+    var filter = new fabric.Image.filters.Brightness({brightness: 0.2});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [251, 151, 101, 1, 81, 255, 61, 1, 255, 255, 54, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Brightness();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Brightness","brightness":0}');
@@ -118,7 +149,7 @@
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Brightness();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Brightness","brightness":0}');
@@ -137,6 +168,312 @@
     deepEqual(fabric.Image.filters.Brightness.fromObject(object), filter);
   });
 
+  QUnit.module('fabric.Image.filters.ColorMatrix');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.ColorMatrix);
+
+    var filter = new fabric.Image.filters.ColorMatrix();
+    ok(filter instanceof fabric.Image.filters.ColorMatrix, 'should inherit from fabric.Image.filters.ColorMatrix');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.ColorMatrix();
+
+    equal(filter.type, 'ColorMatrix');
+    deepEqual(filter.matrix, [
+      1, 0, 0, 0, 0,
+      0, 1, 0, 0, 0,
+      0, 0, 1, 0, 0,
+      0, 0, 0, 1, 0
+    ]);
+
+    var filter2 = new fabric.Image.filters.ColorMatrix({matrix: [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ]});
+    deepEqual(filter2.matrix, [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ]);
+  });
+
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.ColorMatrix();
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values', function() {
+    var filter = new fabric.Image.filters.ColorMatrix({matrix: [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ]});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [151, 76, 255, 1, 255, 36, 106, 1, 255, 28, 255, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.ColorMatrix();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0]}');
+
+    filter.matrix = [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ];
+
+    object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0]}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.ColorMatrix();
+    ok(typeof filter.toJSON === 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0]}');
+
+    filter.matrix = [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ];
+
+    json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0]}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.ColorMatrix();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.ColorMatrix.fromObject(object), filter);
+  });
+
+
+  QUnit.module('fabric.Image.filters.Contrast');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.Contrast);
+
+    var filter = new fabric.Image.filters.Contrast();
+    ok(filter instanceof fabric.Image.filters.Contrast, 'should inherit from fabric.Image.filters.Contrast');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.Contrast();
+
+    equal(filter.type, 'Contrast');
+    equal(filter.contrast, 0);
+
+    var filter2 = new fabric.Image.filters.Contrast({contrast: 0.12});
+    equal(filter2.contrast, 0.12);
+  });
+
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.Contrast();
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values', function() {
+    var filter = new fabric.Image.filters.Contrast({contrast: 0.2});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [236, 86, 11, 1, 0, 255, 0, 1, 255, 255, 0, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.Contrast();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Contrast","contrast":0}');
+
+    filter.contrast = 100;
+
+    object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Contrast","contrast":100}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Contrast();
+    ok(typeof filter.toJSON === 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Contrast","contrast":0}');
+
+    filter.contrast = 100;
+
+    json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Contrast","contrast":100}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.Contrast();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Contrast.fromObject(object), filter);
+  });
+
+  QUnit.module('fabric.Image.filters.Saturation');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.Saturation);
+
+    var filter = new fabric.Image.filters.Saturation();
+    ok(filter instanceof fabric.Image.filters.Saturation, 'should inherit from fabric.Image.filters.Saturation');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.Saturation();
+
+    equal(filter.type, 'Saturation');
+    equal(filter.saturation, 0);
+
+    var filter2 = new fabric.Image.filters.Saturation({saturation: 0.12});
+    equal(filter2.saturation, 0.12);
+  });
+
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.Saturation();
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values Saturation', function() {
+    var filter = new fabric.Image.filters.Saturation({saturation: 0.2});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [200, 80, 20, 1, 0, 255, 0, 1, 255, 255, 0, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.Saturation();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Saturation","saturation":0}');
+
+    filter.saturation = 100;
+
+    object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Saturation","saturation":100}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Saturation();
+    ok(typeof filter.toJSON === 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Saturation","saturation":0}');
+
+    filter.saturation = 100;
+
+    json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Saturation","saturation":100}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.Saturation();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Saturation.fromObject(object), filter);
+  });
+
+  QUnit.module('fabric.Image.filters.Gamma');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.Gamma);
+
+    var filter = new fabric.Image.filters.Gamma();
+    ok(filter instanceof fabric.Image.filters.Gamma, 'should inherit from fabric.Image.filters.Gamma');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.Gamma();
+
+    equal(filter.type, 'Gamma');
+    deepEqual(filter.gamma, [1, 1, 1]);
+
+    var filter2 = new fabric.Image.filters.Gamma({gamma: [0.1, 0.5, 1.3]});
+    deepEqual(filter2.gamma, [0.1, 0.5, 1.3]);
+  });
+
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.Gamma();
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values', function() {
+    var filter = new fabric.Image.filters.Gamma({gamma: [0.1, 0.5, 1.3]});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [22, 39, 72, 1, 0, 255, 21, 1, 255, 255, 8, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.Gamma();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Gamma","gamma":[1,1,1]}');
+
+    filter.gamma = [0.1, 0.5, 1.3];
+
+    object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Gamma","gamma":[0.1,0.5,1.3]}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Gamma();
+    ok(typeof filter.toJSON === 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Gamma","gamma":[1,1,1]}');
+
+    filter.gamma = [1.5, 1.5, 1.5];
+
+    json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Gamma","gamma":[1.5,1.5,1.5]}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.Gamma();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Gamma.fromObject(object), filter);
+  });
 
   QUnit.module('fabric.Image.filters.Convolute');
 
@@ -151,7 +488,7 @@
     var filter = new fabric.Image.filters.Convolute();
 
     equal(filter.type, 'Convolute');
-    equal(filter.opaque, undefined);
+    equal(filter.opaque, false);
     deepEqual(filter.matrix, [0,0,0,0,1,0,0,0,0]);
 
     var filter2 = new fabric.Image.filters.Convolute({opaque: 0.5, matrix: [1,-1,1,0,1,0,0,0,0]});
@@ -159,14 +496,14 @@
     deepEqual(filter2.matrix, [1,-1,1,0,1,0,0,0,0]);
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Convolute();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Convolute({opaque: 1});
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
@@ -174,7 +511,7 @@
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Convolute({opaque: 1});
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
@@ -187,55 +524,6 @@
 
     deepEqual(fabric.Image.filters.Convolute.fromObject(object), filter);
   });
-
-  QUnit.module('fabric.Image.filters.GradientTransparency');
-
-  test('constructor', function() {
-    ok(fabric.Image.filters.GradientTransparency);
-
-    var filter = new fabric.Image.filters.GradientTransparency();
-    ok(filter instanceof fabric.Image.filters.GradientTransparency, 'should inherit from fabric.Image.filters.GradientTransparency');
-  });
-
-  test('properties', function() {
-    var filter = new fabric.Image.filters.GradientTransparency();
-
-    equal(filter.type, 'GradientTransparency');
-    equal(filter.threshold, 100);
-
-    var filter2 = new fabric.Image.filters.GradientTransparency({threshold: 50});
-    equal(filter2.threshold, 50);
-  });
-
-  test('applyTo', function() {
-    var filter = new fabric.Image.filters.GradientTransparency();
-    ok(typeof filter.applyTo == 'function');
-  });
-
-  test('toObject', function() {
-    var filter = new fabric.Image.filters.GradientTransparency();
-    ok(typeof filter.toObject == 'function');
-
-    var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"GradientTransparency","threshold":100}');
-  });
-
-  test('toJSON', function() {
-    var filter = new fabric.Image.filters.GradientTransparency();
-    ok(typeof filter.toJSON == 'function');
-
-    var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"GradientTransparency","threshold":100}');
-  });
-
-  test('fromObject', function() {
-    var filter = new fabric.Image.filters.GradientTransparency();
-
-    var object = filter.toObject();
-
-    deepEqual(fabric.Image.filters.GradientTransparency.fromObject(object), filter);
-  });
-
 
   QUnit.module('fabric.Image.filters.Grayscale');
 
@@ -252,25 +540,57 @@
     equal(filter.type, 'Grayscale');
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Grayscale();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values Grayscale average', function() {
+    var filter = new fabric.Image.filters.Grayscale({mode: 'average'});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [117, 117, 117, 1, 98, 98, 98, 1, 171, 171, 171, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('applyTo2d values Grayscale lightness', function() {
+    var filter = new fabric.Image.filters.Grayscale({mode: 'lightness'});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [125, 125, 125, 1, 132, 132, 132, 1, 129, 129, 129, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('applyTo2d values Grayscale luminosity', function() {
+    var filter = new fabric.Image.filters.Grayscale({mode: 'luminosity'});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [118, 118, 118, 1, 191, 191, 191, 1, 237, 237, 237, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
   });
 
   test('toObject', function() {
-    var filter = new fabric.Image.filters.Grayscale();
-    ok(typeof filter.toObject == 'function');
-
+    var filter = new fabric.Image.filters.Grayscale({ mode: 'lightness'});
+    ok(typeof filter.toObject === 'function');
     var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"Grayscale"}');
+    equal(JSON.stringify(object), '{"type":"Grayscale","mode":"lightness"}');
   });
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Grayscale();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"Grayscale"}');
+    equal(JSON.stringify(json), '{"type":"Grayscale","mode":"average"}');
   });
 
   test('fromObject', function() {
@@ -297,25 +617,36 @@
     equal(filter.type, 'Invert');
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Invert();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values Invert', function() {
+    var filter = new fabric.Image.filters.Invert();
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [55, 155, 205, 1, 225, 0, 245, 1, 0, 0, 252, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Invert();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"Invert"}');
+    equal(JSON.stringify(object), '{"type":"Invert","invert":true}');
   });
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Invert();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"Invert"}');
+    equal(JSON.stringify(json), '{"type":"Invert","invert":true}');
   });
 
   test('fromObject', function() {
@@ -346,14 +677,14 @@
     equal(filter2.noise, 200);
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Noise();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Noise();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Noise","noise":0}');
@@ -366,7 +697,7 @@
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Noise();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Noise","noise":0}');
@@ -405,14 +736,25 @@
     equal(filter2.blocksize, 8);
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Pixelate();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values Pixelate', function() {
+    var filter = new fabric.Image.filters.Pixelate({blocksize: 2});
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [200, 100, 50, 1, 200, 100, 50, 1, 255, 255, 3, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Pixelate();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Pixelate","blocksize":4}');
@@ -420,7 +762,7 @@
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Pixelate();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Pixelate","blocksize":4}');
@@ -435,101 +777,67 @@
   });
 
 
-  QUnit.module('fabric.Image.filters.RemoveWhite');
+  QUnit.module('fabric.Image.filters.RemoveColor');
 
   test('constructor', function() {
-    ok(fabric.Image.filters.RemoveWhite);
+    ok(fabric.Image.filters.RemoveColor);
 
-    var filter = new fabric.Image.filters.RemoveWhite();
-    ok(filter instanceof fabric.Image.filters.RemoveWhite, 'should inherit from fabric.Image.filters.RemoveWhite');
+    var filter = new fabric.Image.filters.RemoveColor();
+    ok(filter instanceof fabric.Image.filters.RemoveColor, 'should inherit from fabric.Image.filters.RemoveColor');
   });
 
   test('properties', function() {
-    var filter = new fabric.Image.filters.RemoveWhite();
+    var filter = new fabric.Image.filters.RemoveColor();
 
-    equal(filter.type, 'RemoveWhite');
-    equal(filter.threshold, 30);
-    equal(filter.distance, 20);
+    equal(filter.type, 'RemoveColor');
+    equal(filter.distance, 0.02);
+    equal(filter.color, '#FFFFFF');
 
-    var filter2 = new fabric.Image.filters.RemoveWhite({threshold: 10, distance: 60});
-    equal(filter2.threshold, 10);
-    equal(filter2.distance, 60);
+    var filter2 = new fabric.Image.filters.RemoveColor({distance: 0.6, color: '#FF0000'});
+    equal(filter2.distance, 0.6);
+    equal(filter2.color, '#FF0000');
   });
 
-  test('applyTo', function() {
-    var filter = new fabric.Image.filters.RemoveWhite();
-    ok(typeof filter.applyTo == 'function');
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.RemoveColor();
+    ok(typeof filter.applyTo2d === 'function');
   });
 
-  test('toObject', function() {
-    var filter = new fabric.Image.filters.RemoveWhite();
-    ok(typeof filter.toObject == 'function');
-
-    var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"RemoveWhite","threshold":30,"distance":20}');
-  });
-
-  test('toJSON', function() {
-    var filter = new fabric.Image.filters.RemoveWhite();
-    ok(typeof filter.toJSON == 'function');
-
-    var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"RemoveWhite","threshold":30,"distance":20}');
-  });
-
-  test('fromObject', function() {
-    var filter = new fabric.Image.filters.RemoveWhite();
-
-    var object = filter.toObject();
-
-    deepEqual(fabric.Image.filters.RemoveWhite.fromObject(object), filter);
-  });
-
-
-  QUnit.module('fabric.Image.filters.Sepia2');
-
-  test('constructor', function() {
-    ok(fabric.Image.filters.Sepia2);
-
-    var filter = new fabric.Image.filters.Sepia2();
-    ok(filter instanceof fabric.Image.filters.Sepia2, 'should inherit from fabric.Image.filters.Sepia2');
-  });
-
-  test('properties', function() {
-    var filter = new fabric.Image.filters.Sepia2();
-
-    equal(filter.type, 'Sepia2');
-  });
-
-  test('applyTo', function() {
-    var filter = new fabric.Image.filters.Sepia2();
-    ok(typeof filter.applyTo == 'function');
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.RemoveColor({ color: '#C86432' });
+    ok(typeof filter.applyTo2d === 'function');
+    var options = { imageData: _createImageData(context) };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [200, 100, 50, 0, 30, 255, 10, 1, 255, 255, 3, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
   });
 
   test('toObject', function() {
-    var filter = new fabric.Image.filters.Sepia2();
-    ok(typeof filter.toObject == 'function');
+    var filter = new fabric.Image.filters.RemoveColor();
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"Sepia2"}');
+    equal(JSON.stringify(object), '{"type":"RemoveColor","color":"#FFFFFF","distance":0.02}');
   });
 
   test('toJSON', function() {
-    var filter = new fabric.Image.filters.Sepia2();
-    ok(typeof filter.toJSON == 'function');
+    var filter = new fabric.Image.filters.RemoveColor({ color: 'blue'});
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"Sepia2"}');
+    equal(JSON.stringify(json), '{"type":"RemoveColor","color":"blue","distance":0.02}');
   });
 
   test('fromObject', function() {
-    var filter = new fabric.Image.filters.Sepia2();
+    var filter = new fabric.Image.filters.RemoveColor();
 
     var object = filter.toObject();
 
-    deepEqual(fabric.Image.filters.Sepia2.fromObject(object), filter);
+    deepEqual(fabric.Image.filters.RemoveColor.fromObject(object), filter);
   });
-
 
   QUnit.module('fabric.Image.filters.Sepia');
 
@@ -538,22 +846,22 @@
 
     var filter = new fabric.Image.filters.Sepia();
     ok(filter instanceof fabric.Image.filters.Sepia, 'should inherit from fabric.Image.filters.Sepia');
+    ok(filter instanceof fabric.Image.filters.ColorMatrix, 'should inherit from fabric.Image.filters.ColorMatrix');
   });
 
   test('properties', function() {
     var filter = new fabric.Image.filters.Sepia();
-
     equal(filter.type, 'Sepia');
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Sepia();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Sepia();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Sepia"}');
@@ -561,7 +869,7 @@
 
   test('toJSON', function() {
     var filter = new fabric.Image.filters.Sepia();
-    ok(typeof filter.toJSON == 'function');
+    ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Sepia"}');
@@ -573,145 +881,6 @@
     var object = filter.toObject();
 
     deepEqual(fabric.Image.filters.Sepia.fromObject(object), filter);
-  });
-
-
-  QUnit.module('fabric.Image.filters.Tint');
-
-  test('constructor', function() {
-    ok(fabric.Image.filters.Tint);
-
-    var filter = new fabric.Image.filters.Tint();
-    ok(filter instanceof fabric.Image.filters.Tint, 'should inherit from fabric.Image.filters.Tint');
-  });
-
-  test('properties', function() {
-    var filter = new fabric.Image.filters.Tint();
-
-    equal(filter.type, 'Tint');
-
-    equal(filter.color, '#000000');
-    equal(filter.opacity, 1);
-
-    var filter2 = new fabric.Image.filters.Tint({color: 'rgba(0,0,255,0.5)', opacity: 0.2});
-    equal(filter2.color, 'rgba(0,0,255,0.5)');
-    equal(filter2.opacity, 0.2);
-
-    var filter3 = new fabric.Image.filters.Tint({color: 'rgba(0,0,255,0.5)'});
-    equal(filter3.color, 'rgba(0,0,255,0.5)');
-    equal(filter3.opacity, 0.5);
-  });
-
-  test('applyTo', function() {
-    var filter = new fabric.Image.filters.Tint();
-    ok(typeof filter.applyTo == 'function');
-  });
-
-  test('toObject', function() {
-    var filter = new fabric.Image.filters.Tint();
-    ok(typeof filter.toObject == 'function');
-
-    var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"Tint","color":"#000000","opacity":1}');
-
-    filter.color = '#FF00FF';
-    filter.opacity = 0.2;
-    equal(JSON.stringify(filter.toObject()), '{"type":"Tint","color":"#FF00FF","opacity":0.2}');
-  });
-
-  test('toJSON', function() {
-    var filter = new fabric.Image.filters.Tint();
-    ok(typeof filter.toJSON == 'function');
-
-    var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"Tint","color":"#000000","opacity":1}');
-
-    filter.color = '#FF00FF';
-    filter.opacity = 0.2;
-    equal(JSON.stringify(filter.toJSON()), '{"type":"Tint","color":"#FF00FF","opacity":0.2}');
-  });
-
-  test('fromObject', function() {
-    var filter = new fabric.Image.filters.Tint();
-
-    var object = filter.toObject();
-    deepEqual(fabric.Image.filters.Tint.fromObject(object), filter);
-
-    filter.color = '#FF0000';
-    filter.opacity = 0.8;
-    deepEqual(fabric.Image.filters.Tint.fromObject(filter.toObject()), filter);
-  });
-
-  QUnit.module('fabric.Image.filters.Mask');
-
-  test('constructor', function() {
-    ok(fabric.Image.filters.Mask);
-
-    var filter = new fabric.Image.filters.Mask();
-    ok(filter instanceof fabric.Image.filters.Mask, 'should inherit from fabric.Image.filters.Mask');
-  });
-
-  asyncTest('properties', function() {
-    var filter = new fabric.Image.filters.Mask();
-
-    equal(filter.type, 'Mask');
-    equal(filter.mask, undefined);
-    equal(filter.channel, 0);
-
-    createImageObject(function(image) {
-      var filter2 = new fabric.Image.filters.Mask({mask: image, channel: 2});
-      equal(filter2.mask, image);
-      equal(filter2.channel, 2);
-
-      start();
-    });
-  });
-
-  test('applyTo', function() {
-    var filter = new fabric.Image.filters.Mask();
-    ok(typeof filter.applyTo == 'function');
-  });
-
-  asyncTest('toObject', function() {
-    createImageObject(function(image) {
-      var filter = new fabric.Image.filters.Mask({mask: image});
-      ok(typeof filter.toObject == 'function');
-
-      var object = filter.toObject(),
-          maskObj = object.mask;
-
-      // workaround for node-canvas sometimes producing images with width/height and sometimes not
-      if (maskObj.width === 0) {
-        maskObj.width = IMG_WIDTH;
-      }
-      if (maskObj.height === 0) {
-        maskObj.height = IMG_HEIGHT;
-      }
-      equal(JSON.stringify(object), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
-
-      start();
-    });
-  });
-
-  asyncTest('toJSON', function() {
-    createImageObject(function(image) {
-      var filter = new fabric.Image.filters.Mask({mask: image});
-      ok(typeof filter.toJSON == 'function');
-
-      var json = filter.toJSON(),
-          maskObj = json.mask;
-
-      // workaround for node-canvas sometimes producing images with width/height and sometimes not
-      if (maskObj.width === 0) {
-        maskObj.width = IMG_WIDTH;
-      }
-      if (maskObj.height === 0) {
-        maskObj.height = IMG_HEIGHT;
-      }
-      equal(JSON.stringify(json), '{"type":"Mask","mask":' + JSON.stringify(maskObj) + ',"channel":0}');
-
-      start();
-    });
   });
 
   QUnit.module('fabric.Image.filters.Resize');
@@ -740,14 +909,14 @@
 
   });
 
-  test('applyTo', function() {
+  test('applyTo2d', function() {
     var filter = new fabric.Image.filters.Resize();
-    ok(typeof filter.applyTo == 'function');
+    ok(typeof filter.applyTo2d === 'function');
   });
 
   test('toObject', function() {
     var filter = new fabric.Image.filters.Resize();
-    ok(typeof filter.toObject == 'function');
+    ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Resize","scaleX":0,"scaleY":0,"resizeType":"hermite","lanczosLobes":3}');
