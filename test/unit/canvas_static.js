@@ -96,7 +96,6 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,

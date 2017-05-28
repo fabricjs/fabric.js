@@ -52,7 +52,12 @@
         ctx: ctx,
       };
       filters.forEach(function(filter) { filter.applyTo(pipelineState); });
+      if (pipelineState.imageData.width !== sourceWidth || pipelineState.imageData.height !== sourceHeight) {
+        targetCanvas.width = pipelineState.imageData.width;
+        targetCanvas.height = pipelineState.imageData.height;
+      }
       ctx.putImageData(pipelineState.imageData, 0, 0);
+      return pipelineState;
     },
 
   };

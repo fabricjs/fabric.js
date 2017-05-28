@@ -42,6 +42,17 @@
     tileSize: 2048,
 
     /**
+     * Experimental. This object is a sort of repository of help layers used to avoid
+     * of recreating them during frequent filtering. If you are previewing a filter with
+     * a slider you problably do not want to create help layers every filter step.
+     * in this object there will be appended some canvases, created once, resized sometimes
+     * cleared never. Clearing is left to the developer.
+     **/
+    resources: {
+
+    },
+
+    /**
      * Setup a WebGL context suitable for filtering, and bind any needed event handlers.
      */
     setupGLContext: function(width, height) {
@@ -116,7 +127,7 @@
       gl.deleteTexture(pipelineState.targetTexture);
       gl.deleteFramebuffer(tempFbo);
       targetCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
-      return targetCanvas;
+      return pipelineState;
     },
 
     /**

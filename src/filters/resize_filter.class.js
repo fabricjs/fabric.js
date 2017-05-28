@@ -119,7 +119,8 @@
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
-          scaleX = this.scaleX, scaleY = this.scaleY;
+          scaleX = options.scaleX || this.scaleX,
+          scaleY = options.scaleY || this.scaleY;
       if (scaleX === 1 && scaleY === 1) {
         return;
       }
