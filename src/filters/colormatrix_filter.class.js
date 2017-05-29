@@ -72,6 +72,16 @@
     colorsOnly: true,
 
     /**
+     * Constructor
+     * @param {Object} [options] Options object
+     */
+    initialize: function(options) {
+      this.callSuper('initialize', options);
+      // create a new array instead mutating the prototype with push
+      this.matrix = this.matrix.slice(0);
+    },
+
+    /**
      * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
      *
      * @param {Object} options

@@ -19,6 +19,16 @@
     subFilters: [],
 
     /**
+     * Constructor
+     * @param {Object} [options] Options object
+     */
+    initialize: function(options) {
+      this.callSuper('initialize', options);
+      // create a new array instead mutating the prototype with push
+      this.subFilters = this.subFilters.slice(0);
+    },
+
+    /**
      * Apply this container's filters to the input image provided.
      *
      * @param {Object} options

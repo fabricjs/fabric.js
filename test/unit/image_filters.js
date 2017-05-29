@@ -168,6 +168,80 @@
     deepEqual(fabric.Image.filters.Brightness.fromObject(object), filter);
   });
 
+  QUnit.module('fabric.Image.filters.Composed');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.Composed);
+
+    var filter = new fabric.Image.filters.Composed();
+    ok(filter instanceof fabric.Image.filters.Composed, 'should inherit from fabric.Image.filters.Composed');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.Composed();
+
+    equal(filter.type, 'Composed');
+
+  });
+
+  test('has not applyTo2d', function() {
+    var filter = new fabric.Image.filters.Composed();
+    ok(typeof filter.applyTo2d === 'undefined');
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.Composed();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Composed","subFilters":[]}');
+
+  });
+
+  test('toObject with subfilters', function() {
+    var filter = new fabric.Image.filters.Composed();
+    var brightness = new fabric.Image.filters.Brightness();
+    var contrast = new fabric.Image.filters.Contrast();
+    filter.subFilters.push(brightness);
+    filter.subFilters.push(contrast);
+    var contrastObj = contrast.toObject();
+    var brightnessObj = brightness.toObject();
+    var object = filter.toObject();
+    equal(object.subFilters.length, 2, 'there are 2 subfilters')
+    deepEqual(object.subFilters[0], brightnessObj, 'the first subfilter has been serialized')
+    deepEqual(object.subFilters[1], contrastObj, 'the second subfilter has been serialized')
+  });
+
+  test('toJSON', function() {
+    var filter2 = new fabric.Image.filters.Composed();
+    ok(typeof filter2.toJSON === 'function');
+
+    var json = filter2.toJSON();
+    equal(JSON.stringify(json), '{"type":"Composed","subFilters":[]}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.Composed();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Composed.fromObject(object), filter);
+  });
+
+  test('fromObject with subfilters', function() {
+    var filter = new fabric.Image.filters.Composed();
+    var brightness = new fabric.Image.filters.Brightness();
+    var contrast = new fabric.Image.filters.Contrast();
+    filter.subFilters.push(brightness);
+    filter.subFilters.push(contrast);
+    var toObject = filter.toObject();
+    var newFilter = fabric.Image.filters.Composed.fromObject(toObject);
+    ok(newFilter instanceof fabric.Image.filters.Composed, 'should inherit from fabric.Image.filters.Composed');
+    ok(newFilter.subFilters[0] instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Brightness');
+    ok(newFilter.subFilters[1] instanceof fabric.Image.filters.Contrast, 'should inherit from fabric.Image.filters.Contrast');
+  });
+
+
   QUnit.module('fabric.Image.filters.ColorMatrix');
 
   test('constructor', function() {
