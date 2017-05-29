@@ -269,7 +269,7 @@ else if (buildSh) {
   path = '../fabricjs.com/build/files/' + fileName + '.min.js';
   fs.appendFile('build.sh',
     'echo "' + escapedHeader + '" > ' + path + ' && cat ' +
-    minFilesStr + ' >> ' + path + '\n')
+    minFilesStr + ' >> ' + path + '\n');
 }
 else {
   // change the current working directory
