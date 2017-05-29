@@ -207,9 +207,9 @@
     var contrastObj = contrast.toObject();
     var brightnessObj = brightness.toObject();
     var object = filter.toObject();
-    equal(object.subFilters.length, 2, 'there are 2 subfilters')
-    deepEqual(object.subFilters[0], brightnessObj, 'the first subfilter has been serialized')
-    deepEqual(object.subFilters[1], contrastObj, 'the second subfilter has been serialized')
+    equal(object.subFilters.length, 2, 'there are 2 subfilters');
+    deepEqual(object.subFilters[0], brightnessObj, 'the first subfilter has been serialized');
+    deepEqual(object.subFilters[1], contrastObj, 'the second subfilter has been serialized');
   });
 
   test('toJSON', function() {
