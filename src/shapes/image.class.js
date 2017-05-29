@@ -96,6 +96,20 @@
     _lastScaleY: 1,
 
     /**
+     * private
+     * contains last value of scaling applied by the apply filter chain
+     * @type Number
+     */
+    _filterScalingX: 1,
+
+    /**
+     * private
+     * contains last value of scaling applied by the apply filter chain
+     * @type Number
+     */
+    _filterScalingY: 1,
+
+    /**
      * minimum scale factor under which any resizeFilter is triggered to resize the image
      * 0 will disable the automatic resize. 1 will trigger automatically always.
      * number bigger than 1 are not implemented yet.
@@ -243,15 +257,10 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var filters = [],
-          scaleX = 1, scaleY = 1;
+      var filters = [];
 
       this.filters.forEach(function(filterObj) {
         if (filterObj) {
-          if (filterObj.type === 'Resize') {
-            scaleX *= filterObj.scaleX;
-            scaleY *= filterObj.scaleY;
-          }
           filters.push(filterObj.toObject());
         }
       });
@@ -266,8 +275,8 @@
       if (this.resizeFilter) {
         object.resizeFilter = this.resizeFilter.toObject();
       }
-      object.width /= scaleX;
-      object.height /= scaleY;
+      object.width /= this._filterScalingX;
+      object.height /= this._filterScalingY;
 
       return object;
     },
@@ -421,6 +430,8 @@
       filters = filters.filter(function(filter) { return filter; });
       if (filters.length === 0) {
         this._element = this._originalElement;
+        this._filterScalingX = 1;
+        this._filterScalingY = 1;
         return this;
       }
 
@@ -445,6 +456,8 @@
       fabric.filterBackend.applyFilters(
         filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
       if (this.width !== this._element.width || this.height !== this._element.height) {
+        this._filterScalingX = this._element.width / this.width;
+        this._filterScalingY = this._element.height / this.height;
         this.width = this._element.width;
         this.height = this._element.height;
       }

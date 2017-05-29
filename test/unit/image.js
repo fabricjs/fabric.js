@@ -190,8 +190,8 @@
         ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         equal(filterFromObj.scaleY, 0.2);
         equal(filterFromObj.scaleX, 0.2);
-        equal(_imageFromObject.width, width / 5, 'on image reload width is halved again');
-        equal(_imageFromObject.height, height / 5, 'on image reload width is halved again');
+        equal(_imageFromObject.width, Math.floor(width / 5), 'on image reload width is halved again');
+        equal(_imageFromObject.height, Math.floor(height / 5), 'on image reload width is halved again');
         start();
       });
     });
