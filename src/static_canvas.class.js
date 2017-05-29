@@ -167,6 +167,8 @@
 
     /**
      * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
+     * @type Boolean
+     * @default
      */
     enableRetinaScaling: true,
 
@@ -188,6 +190,8 @@
      * If One of the corner of the bounding box of the object is on the canvas
      * the objects get rendered.
      * @memberOf fabric.StaticCanvas.prototype
+     * @type Boolean
+     * @default
      */
     skipOffscreen: true,
 

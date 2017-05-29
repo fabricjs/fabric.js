@@ -41,7 +41,6 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'resizeFilters':            [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
@@ -72,10 +71,10 @@
           elImage.width = width;
           elImage.height = height;
         }
-        return new fabric.Image(elImage, options, callback);
+        callback(new fabric.Image(elImage, options));
       }
       else {
-        return new fabric.Image(elImage, options, callback);
+        callback(new fabric.Image(elImage, options));
       }
     });
   }
@@ -156,14 +155,14 @@
     createImageObject(function(image) {
       ok(typeof image.toObject == 'function');
       var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
-      image.resizeFilters.push(filter);
-      ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      image.resizeFilter = filter;
+      ok(image.resizeFilter instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       var toObject = image.toObject();
-      deepEqual(toObject.resizeFilters[0], filter.toObject());
+      deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
       fabric.Image.fromObject(toObject, function(imageFromObject) {
-        var filterFromObj = imageFromObject.resizeFilters[0];
-        deepEqual(filterFromObj, filter);
+        var filterFromObj = imageFromObject.resizeFilter;
         ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        deepEqual(filterFromObj, filter,  'the filter has been restored');
         equal(filterFromObj.scaleX, 0.3);
         equal(filterFromObj.scaleY, 0.3);
         equal(filterFromObj.resizeType, 'bilinear');
@@ -174,27 +173,26 @@
 
   asyncTest('toObject with applied resize filter', function() {
     createImageObject(function(image) {
-      ok(typeof image.toObject == 'function');
+      ok(typeof image.toObject === 'function');
       var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2});
       image.filters.push(filter);
       var width = image.width, height = image.height;
       ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-      image.applyFilters(function() {
-        equal(image.width, width / 5, 'width should be a fifth');
-        equal(image.height, height / 5, 'height should a fifth');
-        var toObject = image.toObject();
-        deepEqual(toObject.filters[0], filter.toObject());
-        equal(toObject.width, width, 'width is stored as before filters');
-        equal(toObject.height, height, 'height is stored as before filters');
-        fabric.Image.fromObject(toObject, function(_imageFromObject) {
-          var filterFromObj = _imageFromObject.filters[0];
-          ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-          equal(filterFromObj.scaleY, 0.2);
-          equal(filterFromObj.scaleX, 0.2);
-          equal(_imageFromObject.width, width / 5, 'on image reload width is halved again');
-          equal(_imageFromObject.height, height / 5, 'on image reload width is halved again');
-          start();
-        });
+      image.applyFilters();
+      equal(image.width, Math.floor(width / 5), 'width should be a fifth');
+      equal(image.height, Math.floor(height / 5), 'height should a fifth');
+      var toObject = image.toObject();
+      deepEqual(toObject.filters[0], filter.toObject());
+      equal(toObject.width, width, 'width is stored as before filters');
+      equal(toObject.height, height, 'height is stored as before filters');
+      fabric.Image.fromObject(toObject, function(_imageFromObject) {
+        var filterFromObj = _imageFromObject.filters[0];
+        ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        equal(filterFromObj.scaleY, 0.2);
+        equal(filterFromObj.scaleX, 0.2);
+        equal(_imageFromObject.width, Math.floor(width / 5), 'on image reload width is halved again');
+        equal(_imageFromObject.height, Math.floor(height / 5), 'on image reload width is halved again');
+        start();
       });
     });
   });
