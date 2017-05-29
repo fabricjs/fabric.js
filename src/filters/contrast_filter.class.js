@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -19,7 +18,7 @@
    *   contrast: 40
    * });
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
   filters.Contrast = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Contrast.prototype */ {
 
@@ -30,45 +29,71 @@
      */
     type: 'Contrast',
 
+    fragmentSource: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'uniform float uContrast;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+        'float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));\n' +
+        'color.rgb = contrastF * (color.rgb - 0.5) + 0.5;\n' +
+        'gl_FragColor = color;\n' +
+      '}',
+
+    contrast: 0,
+
+    mainParameter: 'contrast',
+
     /**
      * Constructor
      * @memberOf fabric.Image.filters.Contrast.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.contrast=0] Value to contrast the image up (-255...255)
+     * @param {Number} [options.contrast=0] Value to contrast the image up (-1...1)
      */
-    initialize: function(options) {
-      options = options || { };
-      this.contrast = options.contrast || 0;
-    },
 
-    /**
-     * Applies filter to canvas element
-     * @param {Object} canvasEl Canvas element to apply filter to
-     */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          contrastF = 259 * (this.contrast + 255) / (255 * (259 - this.contrast));
+     /**
+      * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
+      *
+      * @param {Object} options
+      * @param {ImageData} options.imageData The Uint8Array to be filtered.
+      */
+    applyTo2d: function(options) {
+      if (this.contrast === 0) {
+        return;
+      }
+      var imageData = options.imageData, i, len,
+          data = imageData.data, len = data.length,
+          contrast = Math.floor(this.contrast * 255),
+          contrastF = 259 * (contrast + 255) / (255 * (259 - contrast));
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (i = 0; i < len; i += 4) {
         data[i] = contrastF * (data[i] - 128) + 128;
         data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
         data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
       }
-
-      context.putImageData(imageData, 0, 0);
     },
 
     /**
-     * Returns object representation of an instance
-     * @return {Object} Object representation of an instance
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        contrast: this.contrast
-      });
-    }
+    getUniformLocations: function(gl, program) {
+      return {
+        uContrast: gl.getUniformLocation(program, 'uContrast'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      gl.uniform1f(uniformLocations.uContrast, this.contrast);
+    },
   });
 
   /**

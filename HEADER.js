@@ -68,6 +68,25 @@ fabric.canvasModule = 'canvas-prebuilt';
 fabric.charWidthsCache = { };
 
 /**
+ * if webgl is enabled and available, textureSize will determine the size
+ * of the canvas backend
+ * @since 2.0.0
+ * @type Number
+ * @default
+ */
+fabric.textureSize = 2048;
+
+/**
+ * Enable webgl for filtering picture is available
+ * A filtering backend will be initialized, this will both take memory and
+ * time since a default 2048x2048 canvas will be created for the gl context
+ * @since 2.0.0
+ * @type Boolean
+ * @default
+ */
+fabric.enableGLFiltering = true;
+
+/**
  * Device Pixel Ratio
  * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
  */
@@ -75,3 +94,14 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
                           fabric.window.webkitDevicePixelRatio ||
                           fabric.window.mozDevicePixelRatio ||
                           1;
+
+fabric.initFilterBackend = function() {
+  if (fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize) && fabric.enableGLFiltering) {
+    console.log('max texture size: ' + fabric.maxTextureSize);
+    return (new fabric.WebglFilterBackend({ tileSize: fabric.textureSize }));
+
+  }
+  else if (fabric.Canvas2dFilterBackend) {
+    return (new fabric.Canvas2dFilterBackend());
+  }
+};
