@@ -1,18 +1,18 @@
 (function() {
 
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path; };
-    var imgEl = _createImageElement();
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
-  }
+  // function getAbsolutePath(path) {
+  //   var isAbsolute = /^https?:/.test(path);
+  //   if (isAbsolute) { return path; };
+  //   var imgEl = _createImageElement();
+  //   imgEl.src = path;
+  //   var src = imgEl.src;
+  //   imgEl = null;
+  //   return src;
+  // }
 
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_WIDTH   = 276,
-      IMG_HEIGHT  = 110,
+  var // IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      // IMG_WIDTH   = 276,
+      // IMG_HEIGHT  = 110,
       canvas = fabric.isLikelyNode ? new (require(fabric.canvasModule))() : fabric.document.createElement('canvas'),
       context = canvas.getContext('2d');
 
@@ -51,9 +51,9 @@
   //   'filters':            []
   // };
 
-  function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  }
+  // function _createImageElement() {
+  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+  // }
 
   function _createImageData(context) {
     var imageData = context.createImageData(3, 1);
@@ -72,32 +72,32 @@
     return imageData;
   }
 
-  function _createImageObject(width, height, callback) {
-    var elImage = _createImageElement();
-    elImage.width = width;
-    elImage.height = height;
-    setSrc(elImage, IMG_SRC, function() {
-      callback(new fabric.Image(elImage));
-    });
-  }
+  // function _createImageObject(width, height, callback) {
+  //   var elImage = _createImageElement();
+  //   elImage.width = width;
+  //   elImage.height = height;
+  //   setSrc(elImage, IMG_SRC, function() {
+  //     callback(new fabric.Image(elImage));
+  //   });
+  // }
 
   // function createImageObject(callback) {
   //   return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
   // }
 
-  function setSrc(img, src, callback) {
-    if (fabric.isLikelyNode) {
-      require('fs').readFile(src, function(err, imgData) {
-        if (err) { throw err; };
-        img.src = imgData;
-        callback && callback();
-      });
-    }
-    else {
-      img.src = src;
-      callback && callback();
-    }
-  }
+  // function setSrc(img, src, callback) {
+  //   if (fabric.isLikelyNode) {
+  //     require('fs').readFile(src, function(err, imgData) {
+  //       if (err) { throw err; };
+  //       img.src = imgData;
+  //       callback && callback();
+  //     });
+  //   }
+  //   else {
+  //     img.src = src;
+  //     callback && callback();
+  //   }
+  // }
 
   QUnit.module('fabric.Image.filters.Brightness');
 
