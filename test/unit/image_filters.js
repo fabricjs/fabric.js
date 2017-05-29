@@ -81,9 +81,9 @@
     });
   }
 
-  function createImageObject(callback) {
-    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
-  }
+  // function createImageObject(callback) {
+  //   return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
+  // }
 
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
