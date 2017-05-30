@@ -388,9 +388,22 @@
      */
     groupSVGElements: function(elements, options, path) {
       var object;
-
+      if (elements.lenght === 1) {
+        return elements[0];
+      }
+      if (options) {
+        if (options.width && options.height) {
+          options.centerPoint = {
+            x: options.width / 2,
+            y: options.height / 2
+          };
+        }
+        else {
+          delete options.width;
+          delete options.height;
+        }
+      }
       object = new fabric.Group(elements, options);
-
       if (typeof path !== 'undefined') {
         object.sourcePath = path;
       }

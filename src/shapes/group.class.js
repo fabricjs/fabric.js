@@ -86,11 +86,20 @@
       if (isAlreadyGrouped) {
         // do not change coordinate of objects enclosed in a group,
         // because objects coordinate system have been group coodinate system already.
-        this._updateObjectsCoords(true);
+        var object;
+        for (var i = this._objects.length; i--; ) {
+          object = this._objects[i];
+          object.__origHasControls = object.hasControls;
+          object.hasControls = false;
+        }
       }
       else {
-        this._calcBounds();
-        this._updateObjectsCoords();
+        var center = options && options.centerPoint;
+        // if coming from svg i do not want to calc bounds.
+        // i assume width and height are passed along options
+        center || this._calcBounds();
+        this._updateObjectsCoords(center);
+        delete options.centerPont;
         this.callSuper('initialize', options);
       }
 
@@ -101,10 +110,10 @@
      * @private
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
-    _updateObjectsCoords: function(skipCoordsChange) {
-      var center = this.getCenterPoint();
+    _updateObjectsCoords: function(center) {
+      var center = center || this.getCenterPoint();
       for (var i = this._objects.length; i--; ){
-        this._updateObjectCoords(this._objects[i], center, skipCoordsChange);
+        this._updateObjectCoords(this._objects[i], center);
       }
     },
 
@@ -112,16 +121,11 @@
      * @private
      * @param {Object} object
      * @param {fabric.Point} center, current center of group.
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of object dose not change
      */
-    _updateObjectCoords: function(object, center, skipCoordsChange) {
+    _updateObjectCoords: function(object, center) {
       // do not display corners of objects enclosed in a group
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
-
-      if (skipCoordsChange) {
-        return;
-      }
 
       var objectLeft = object.getLeft(),
           objectTop = object.getTop(),
