@@ -516,12 +516,13 @@
     var group1;
     fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
       group1 = fabric.util.groupSVGElements(objects, options);
+      ok(group1 instanceof fabric.Group);
+      start();
     });
 
-    setTimeout(function() {
-      ok(group1 instanceof fabric.PathGroup);
-      start();
-    }, 2000);
+    // setTimeout(function() {
+    //
+    // }, 2000);
   });
 
   asyncTest('fabric.util.groupSVGElements #2', function() {
@@ -529,12 +530,13 @@
     var group2;
     fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
       group2 = fabric.util.groupSVGElements(objects, options);
+      ok(group2 instanceof fabric.Group);
+      start();
     });
 
-    setTimeout(function() {
-      ok(group2 instanceof fabric.PathGroup);
-      start();
-    }, 2000);
+    // setTimeout(function() {
+    //
+    // }, 2000);
   });
 
   test('Array.prototype.indexOf', function() {

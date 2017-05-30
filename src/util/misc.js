@@ -384,12 +384,12 @@
      * @param {Array} elements SVG elements to group
      * @param {Object} [options] Options object
      * @param {String} path Value to set sourcePath to
-     * @return {fabric.Object|fabric.PathGroup}
+     * @return {fabric.Object|fabric.Group}
      */
     groupSVGElements: function(elements, options, path) {
       var object;
 
-      object = new fabric.PathGroup(elements, options);
+      object = new fabric.Group(elements, options);
 
       if (typeof path !== 'undefined') {
         object.sourcePath = path;
