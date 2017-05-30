@@ -611,9 +611,6 @@
      */
     _render: function(ctx) {
       this._setTextStyles(ctx);
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(this.left, this.top);
-      }
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
       this._renderText(ctx);

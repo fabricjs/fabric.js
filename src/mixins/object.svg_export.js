@@ -114,9 +114,6 @@
      * @return {String}
      */
     getSvgTransform: function() {
-      if (this.group && this.group.type === 'path-group') {
-        return '';
-      }
       var angle = this.getAngle(),
           skewX = (this.getSkewX() % 360),
           skewY = (this.getSkewY() % 360),
@@ -124,7 +121,7 @@
 
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
-          translatePart = this.type === 'path-group' ? '' : 'translate(' +
+          translatePart = 'translate(' +
                             toFixed(center.x, NUM_FRACTION_DIGITS) +
                             ' ' +
                             toFixed(center.y, NUM_FRACTION_DIGITS) +
@@ -146,13 +143,13 @@
 
           skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
 
-          addTranslateX = this.type === 'path-group' ? this.width : 0,
 
-          flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
 
-          addTranslateY = this.type === 'path-group' ? this.height : 0,
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
 
-          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
+
+
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
 
       return [
         translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
