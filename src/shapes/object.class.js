@@ -767,7 +767,7 @@
 
     /**
      * When `true`, object properties are checked for cache invalidation. In some particular
-     * situation you may want this to be disabled ( spray brush, very big pathgroups, groups)
+     * situation you may want this to be disabled ( spray brush, very big, groups)
      * or if your application does not allow you to modify properties for groups child you want
      * to disable it for groups.
      * default to false
@@ -1132,9 +1132,8 @@
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       // do not render if width/height are zeros or object is not visible
       if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
@@ -1146,9 +1145,7 @@
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
       this.drawSelectionBackground(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
+      this.transform(ctx);
       this._setOpacity(ctx);
       this._setShadow(ctx, this);
       if (this.transformMatrix) {
@@ -1159,16 +1156,16 @@
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
         }
-        if (this.isCacheDirty(noTransform)) {
+        if (this.isCacheDirty()) {
           this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-          this.drawObject(this._cacheContext, noTransform);
+          this.drawObject(this._cacheContext);
           this.dirty = false;
         }
         this.drawCacheOnCanvas(ctx);
       }
       else {
-        this.drawObject(ctx, noTransform);
-        if (noTransform && this.objectCaching && this.statefullCache) {
+        this.drawObject(ctx);
+        if (this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
         }
       }
@@ -1201,13 +1198,12 @@
     /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    drawObject: function(ctx, noTransform) {
+    drawObject: function(ctx) {
       this._renderBackground(ctx);
       this._setStrokeStyles(ctx, this);
       this._setFillStyles(ctx, this);
-      this._render(ctx, noTransform);
+      this._render(ctx);
     },
 
     /**

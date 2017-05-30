@@ -290,10 +290,6 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
           preserveAspectRatio = 'none', filtered = true;
-      if (this.group && this.group.type === 'path-group') {
-        x = this.left;
-        y = this.top;
-      }
       if (this.alignX !== 'none' && this.alignY !== 'none') {
         preserveAspectRatio = 'x' + this.alignX + 'Y' + this.alignY + ' ' + this.meetOrSlice;
       }
@@ -467,13 +463,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
-      var x, y, imageMargins = this._findMargins(), elementToDraw;
-
-      x = (noTransform ? this.left : -this.width / 2);
-      y = (noTransform ? this.top : -this.height / 2);
+    _render: function(ctx) {
+      var x = -this.width / 2, y = -this.height / 2, imageMargins = this._findMargins(), elementToDraw;
 
       if (this.meetOrSlice === 'slice') {
         ctx.beginPath();

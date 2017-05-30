@@ -1374,9 +1374,8 @@
     /**
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       // do not render if object is not visible
       if (!this.visible) {
         return;
@@ -1387,7 +1386,7 @@
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
       }
-      this.callSuper('render', ctx, noTransform);
+      this.callSuper('render', ctx);
     },
 
     /**

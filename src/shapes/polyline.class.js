@@ -126,13 +126,8 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [], diffX, diffY,
+      var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
           markup = this._createBaseSVGMarkup();
-
-      if (!(this.group && this.group.type === 'path-group')) {
-        diffX = this.pathOffset.x;
-        diffY = this.pathOffset.y;
-      }
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(
@@ -157,12 +152,11 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    commonRender: function(ctx, noTransform) {
+    commonRender: function(ctx) {
       var point, len = this.points.length,
-          x = noTransform ? 0 : this.pathOffset.x,
-          y = noTransform ? 0 : this.pathOffset.y;
+          x = this.pathOffset.x,
+          y = this.pathOffset.y;
 
       if (!len || isNaN(this.points[len - 1].y)) {
         // do not draw if no points or odd points
@@ -181,10 +175,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
-      if (!this.commonRender(ctx, noTransform)) {
+    _render: function(ctx) {
+      if (!this.commonRender(ctx)) {
         return;
       }
       this._renderFill(ctx);
