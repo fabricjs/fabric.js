@@ -1543,19 +1543,20 @@
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        top/left properties in Fabric correspond to center point of text bounding box
+        fabric output by default at top, left.
     */
-    if (text.originX === 'left') {
+    if (text.originX === 'center') {
       offX = text.getWidth() / 2;
     }
     if (text.originX === 'right') {
-      offX = -text.getWidth() / 2;
+      offX = text.getWidth();
     }
     text.set({
-      left: text.getLeft() + offX,
-      top: text.getTop() - textHeight / 2 + text.fontSize * (0.18 + text._fontSizeFraction) / text.lineHeight /* 0.3 is the old lineHeight */
+      left: text.getLeft() - offX,
+      top: text.getTop() - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
     });
-
+    text.originX = 'left';
+    text.originY = 'top';
     return text;
   };
   /* _FROM_SVG_END_ */
