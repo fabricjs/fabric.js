@@ -46,9 +46,9 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   }
   else {
     var obj = klass.fromElement(el, this.options);
-    obj._removeTransformMatrix();
     this.resolveGradient(obj, 'fill');
     this.resolveGradient(obj, 'stroke');
+    obj._removeTransformMatrix();
     this.reviver && this.reviver(el, obj);
     this.instances[index] = obj;
     this.checkIfDone();
@@ -58,9 +58,9 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
-    obj._removeTransformMatrix();
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
+    obj._removeTransformMatrix();
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();

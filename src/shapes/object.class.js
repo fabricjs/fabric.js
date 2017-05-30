@@ -1392,12 +1392,12 @@
         return;
       }
       var transform = filler.gradientTransform || filler.patternTransform;
-      if (transform) {
-        ctx.transform.apply(ctx, transform);
-      }
       var offsetX = -this.width / 2 + filler.offsetX || 0,
           offsetY = -this.height / 2 + filler.offsetY || 0;
       ctx.translate(offsetX, offsetY);
+      if (transform) {
+        ctx.transform.apply(ctx, transform);
+      }
     },
 
     /**
