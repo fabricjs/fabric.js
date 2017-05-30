@@ -19,7 +19,6 @@ testrunner.run({
       './test/unit/polyline.js',
       './test/unit/polygon.js',
       './test/unit/path.js',
-      './test/unit/path_group.js',
       './test/unit/observable.js',
       './test/unit/object.js',
       './test/unit/text.js',

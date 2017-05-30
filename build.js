@@ -197,7 +197,6 @@ var filesToInclude = [
   'src/shapes/polyline.class.js',
   'src/shapes/polygon.class.js',
   'src/shapes/path.class.js',
-  'src/shapes/path_group.class.js',
   'src/shapes/group.class.js',
   'src/shapes/image.class.js',
 
