@@ -388,7 +388,7 @@
      */
     groupSVGElements: function(elements, options, path) {
       var object;
-      if (elements.lenght === 1) {
+      if (elements.length === 1) {
         return elements[0];
       }
       if (options) {

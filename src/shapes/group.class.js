@@ -277,13 +277,19 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
-      var objsToObject = this.getObjects().map(function(obj) {
-        var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = obj.group.includeDefaultValues;
-        var _obj = obj.toDatalessObject(propertiesToInclude);
-        obj.includeDefaultValues = originalDefaults;
-        return _obj;
-      });
+      var objsToObject, sourcePath = this.sourcePath;
+      if (sourcePath) {
+        objsToObject = sourcePath;
+      }
+      else {
+        objsToObject = this.getObjects().map(function(obj) {
+          var originalDefaults = obj.includeDefaultValues;
+          obj.includeDefaultValues = obj.group.includeDefaultValues;
+          var _obj = obj.toDatalessObject(propertiesToInclude);
+          obj.includeDefaultValues = originalDefaults;
+          return _obj;
+        });
+      }
       return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
         objects: objsToObject
       });
