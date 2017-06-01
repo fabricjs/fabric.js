@@ -981,8 +981,8 @@
         doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
-      fabric.parseSVGDocument(doc.documentElement, function (results, _options) {
-        callback(results, _options);
+      fabric.parseSVGDocument(doc.documentElement, function (results, _options, elements) {
+        callback(results, _options, elements);
       }, reviver, options);
     }
   });
