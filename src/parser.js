@@ -643,9 +643,9 @@
     fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
     // Precedence of rules:   style > class > attribute
-    fabric.parseElements(elements, function(instances) {
+    fabric.parseElements(elements, function(instances, elements) {
       if (callback) {
-        callback(instances, options);
+        callback(instances, options, elements);
       }
     }, clone(options), reviver, parsingOptions);
   };
@@ -950,8 +950,8 @@
           callback && callback(null);
         }
 
-        fabric.parseSVGDocument(xml.documentElement, function (results, _options) {
-          callback && callback(results, _options);
+        fabric.parseSVGDocument(xml.documentElement, function (results, _options, elements) {
+          callback && callback(results, _options, elements);
         }, reviver, options);
       }
     },
