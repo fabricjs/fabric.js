@@ -136,20 +136,26 @@
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} bordersStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBorders: function(ctx, bordersStyle) {
-      bordersStyle = bordersStyle || {};
+    drawBorders: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
       var wh = this._calculateCurrentDimensions(),
           strokeWidth = 1 / this.borderScaleFactor,
           width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth;
+          height = wh.y + strokeWidth,
+          drawRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
+            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+              styleOverride.hasControls : this.hasControls,
+          rotatingPointOffset = typeof styleOverride.rotatingPointOffset !== 'undefined' ?
+            styleOverride.rotatingPointOffset : this.rotatingPointOffset;
 
       ctx.save();
-      ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
-      this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
+      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
 
       ctx.strokeRect(
         -width / 2,
@@ -158,14 +164,13 @@
         height
       );
 
-      if (bordersStyle.hasRotatingPoint ||
-        this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
+      if (drawRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && hasControls) {
 
         var rotateHeight = -height / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
+        ctx.lineTo(0, rotateHeight - rotatingPointOffset);
         ctx.closePath();
         ctx.stroke();
       }
