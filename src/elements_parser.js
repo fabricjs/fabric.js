@@ -86,6 +86,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       // eslint-disable-next-line no-eq-null, eqeqeq
       return el != null;
     });
-    this.callback(this.instances);
+    this.callback(this.instances, this.elements);
   }
 };
