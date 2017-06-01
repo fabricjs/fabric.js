@@ -23,14 +23,10 @@
      * @private
      */
     _getSVGLeftTopOffsets: function() {
-      var lineTop = this.getHeightOfLine(0),
-          textLeft = -this.width / 2,
-          textTop = -this.height / 2;
-
       return {
-        textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
-        textTop: textTop + (this.group && this.group.type === 'path-group' ? -this.top : 0),
-        lineTop: lineTop
+        textLeft: -this.width / 2,
+        textTop: -this.height / 2,
+        lineTop: this.getHeightOfLine(0)
       };
     },
 

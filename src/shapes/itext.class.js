@@ -282,11 +282,10 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       this.clearContextTop();
-      this.callSuper('render', ctx, noTransform);
+      this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
       this.cursorOffsetCache = { };

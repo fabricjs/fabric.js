@@ -28,10 +28,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
-      if (!this.commonRender(ctx, noTransform)) {
+    _render: function(ctx) {
+      if (!this.commonRender(ctx)) {
         return;
       }
       ctx.closePath();

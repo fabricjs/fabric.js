@@ -100,10 +100,6 @@
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
-        if (this.group && this.group.type === 'path-group') {
-          x = this.left + this.radius;
-          y = this.top + this.radius;
-        }
         markup.push(
           '<circle ', this.getSvgId(),
             'cx="' + x + '" cy="' + y + '" ',
@@ -139,12 +135,11 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
-      ctx.arc(noTransform ? this.left + this.radius : 0,
-              noTransform ? this.top + this.radius : 0,
+      ctx.arc(0,
+              0,
               this.radius,
               this.startAngle,
               this.endAngle, false);
@@ -205,14 +200,11 @@
       throw new Error('value of `r` attribute is required and can not be negative');
     }
 
-    parsedAttributes.left = parsedAttributes.left || 0;
-    parsedAttributes.top = parsedAttributes.top || 0;
-
-    var obj = new fabric.Circle(extend(parsedAttributes, options));
-
-    obj.left -= obj.radius;
-    obj.top -= obj.radius;
-    return obj;
+    parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.radius;
+    parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
+    parsedAttributes.originX = 'left';
+    parsedAttributes.originY = 'top';
+    return new fabric.Circle(extend(parsedAttributes, options));
   };
 
   /**
