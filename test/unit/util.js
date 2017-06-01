@@ -2,8 +2,6 @@
 
   QUnit.module('fabric.util');
 
-  function K (x) { return x; }
-
   function _createImageElement() {
     return fabric.isLikelyNode
             ? new (require(fabric.canvasModule).Image)()
