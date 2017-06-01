@@ -1325,8 +1325,10 @@
     _renderControls: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
-          options;
+          options, drawBorders, drawControls;
       styleOverride = styleOverride || { };
+      drawBorders = typeof styleOverride.hasBorders !== 'undefined' ? styleOverride.hasBorders : this.hasBorders;
+      drawControls = typeof styleOverride.hasControls !== 'undefined' ? styleOverride.hasControls : this.hasControls;
       matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
       options = fabric.util.qrDecompose(matrix);
       ctx.save();
@@ -1337,13 +1339,13 @@
       }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
-        (this.hasBorders || styleOverride.hasBorders) && this.drawBordersInGroup(ctx, options, styleOverride);
+        drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
-        (this.hasBorders || styleOverride.hasBorders) && this.drawBorders(ctx, styleOverride);
+        drawBorders && this.drawBorders(ctx, styleOverride);
       }
-      (this.hasControls || styleOverride.hasControls) && this.drawControls(ctx, styleOverride);
+      drawControls && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },
 
