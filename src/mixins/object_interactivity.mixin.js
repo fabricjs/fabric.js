@@ -185,12 +185,12 @@
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
-     * @param {Object} bordersStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBordersInGroup: function(ctx, options, bordersStyle) {
-      bordersStyle = bordersStyle || {};
+    drawBordersInGroup: function(ctx, options, styleOverride) {
+      styleOverride = styleOverride || {};
       var p = this._getNonTransformedDimensions(),
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
@@ -199,8 +199,8 @@
           height = wh.y + strokeWidth;
 
       ctx.save();
-      this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
-      ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
+      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
 
       ctx.strokeRect(
         -width / 2,
@@ -218,75 +218,79 @@
      * Requires public properties: width, height
      * Requires public options: cornerSize, padding
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} controlsStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawControls: function(ctx, controlsStyle) {
-      controlsStyle = controlsStyle || {};
+    drawControls: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          scaleOffset = controlsStyle.cornerSize || this.cornerSize,
+          scaleOffset = styleOverride.cornerSize || this.cornerSize,
           left = -(width + scaleOffset) / 2,
           top = -(height + scaleOffset) / 2,
-          methodName = controlsStyle.transparentCorners || this.transparentCorners ? 'stroke' : 'fill';
+          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+            styleOverride.transparentCorners : this.transparentCorners,
+          hasRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
+            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
+          methodName = transparentCorners ? 'stroke' : 'fill';
 
       ctx.save();
-      ctx.strokeStyle = ctx.fillStyle = controlsStyle.cornerColor || this.cornerColor;
+      ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
-        ctx.strokeStyle = controlsStyle.cornerStrokeColor || this.cornerStrokeColor;
+        ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
       }
-      this._setLineDash(ctx, controlsStyle.cornerDashArray || this.cornerDashArray, null);
+      this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
 
       // top-left
       this._drawControl('tl', ctx, methodName,
         left,
-        top, controlsStyle);
+        top, styleOverride);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
         left + width,
-        top, controlsStyle);
+        top, styleOverride);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
         left,
-        top + height, controlsStyle);
+        top + height, styleOverride);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
         left + width,
-        top + height, controlsStyle);
+        top + height, styleOverride);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
           left + width / 2,
-          top, controlsStyle);
+          top, styleOverride);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
           left + width / 2,
-          top + height, controlsStyle);
+          top + height, styleOverride);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
           left + width,
-          top + height / 2, controlsStyle);
+          top + height / 2, styleOverride);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
           left,
-          top + height / 2, controlsStyle);
+          top + height / 2, styleOverride);
       }
 
       // middle-top-rotate
-      if (controlsStyle.hasRotatingPoint || this.hasRotatingPoint) {
+      if (hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
           left + width / 2,
-          top - this.rotatingPointOffset, controlsStyle);
+          top - this.rotatingPointOffset, styleOverride);
       }
 
       ctx.restore();
@@ -297,13 +301,13 @@
     /**
      * @private
      */
-    _drawControl: function(control, ctx, methodName, left, top, controlStyle) {
-      controlStyle = controlStyle || {};
+    _drawControl: function(control, ctx, methodName, left, top, styleOverride) {
+      styleOverride = styleOverride || {};
       if (!this.isControlVisible(control)) {
         return;
       }
       var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-      switch (controlStyle.cornerStyle || this.cornerStyle) {
+      switch (styleOverride.cornerStyle || this.cornerStyle) {
         case 'circle':
           ctx.beginPath();
           ctx.arc(left + size / 2, top + size / 2, size / 2, 0, 2 * Math.PI, false);
