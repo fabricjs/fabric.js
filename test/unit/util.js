@@ -2,8 +2,6 @@
 
   QUnit.module('fabric.util');
 
-  function K (x) { return x; }
-
   function _createImageElement() {
     return fabric.isLikelyNode
             ? new (require(fabric.canvasModule).Image)()
@@ -516,12 +514,9 @@
     var group1;
     fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
       group1 = fabric.util.groupSVGElements(objects, options);
-    });
-
-    setTimeout(function() {
-      ok(group1 instanceof fabric.PathGroup);
+      ok(group1 instanceof fabric.Polygon, 'it returns just the first element in case is just one');
       start();
-    }, 2000);
+    });
   });
 
   asyncTest('fabric.util.groupSVGElements #2', function() {
@@ -529,145 +524,9 @@
     var group2;
     fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
       group2 = fabric.util.groupSVGElements(objects, options);
-    });
-
-    setTimeout(function() {
-      ok(group2 instanceof fabric.PathGroup);
+      ok(group2 instanceof fabric.Group);
       start();
-    }, 2000);
-  });
-
-  test('Array.prototype.indexOf', function() {
-
-    // borrowed from Prototype.js
-    equal(-1, [].indexOf(1));
-    equal(-1, [0].indexOf(1));
-    equal(0, [1].indexOf(1));
-    equal(1, [0,1,2].indexOf(1));
-    equal(0, [1,2,1].indexOf(1));
-    equal(2, [1,2,1].indexOf(1, -1));
-    equal(1, [undefined,null].indexOf(null));
-
-    // ES5 compatibility tests.
-    var undef;
-    var array = [1, 2, 3, 4, 5, undef, 6, 7, 1, 2, 3];
-
-    equal(2, array.indexOf(3, -47), 'large negative value for fromIndex');
-    equal(10, array.indexOf(3, 4));
-    equal(10, array.indexOf(3, -5));
-    equal(2, array.indexOf(3, {}), 'nonsensical value for fromIndex');
-    equal(2, array.indexOf(3, ''), 'nonsensical value for fromIndex');
-    equal(-1, array.indexOf(3, 41), 'fromIndex value larger than the length of the array');
-  });
-
-  test('Array.prototype.forEach', function() {
-    ok(typeof Array.prototype.forEach === 'function');
-
-    var arr = [1,2,3];
-    var result = [];
-
-    arr.forEach(function(val, index, arr) {
-      result.push(val, index, arr);
     });
-
-    deepEqual(result, [1, 0, arr, 2, 1, arr, 3, 2, arr]);
-  });
-
-  test('Array.prototype.map', function() {
-
-    ok(typeof Array.prototype.map === 'function');
-
-    // borrowed from Prototype.js but modified to conform to standard
-
-    deepEqual([2,4,6], [1,2,3].map(function(x) { return x * 2; }));
-
-    var x = [1,2,3,4];
-    delete x[1];
-    delete x[3];
-    deepEqual([1, undefined, 3, undefined], x.map(K));
-    deepEqual(4, x.map(K).length);
-
-    var traversed = [];
-    x.map(function(val) {
-      traversed.push(val);
-    });
-    deepEqual([1, 3], traversed);
-    equal(2, traversed.length);
-  });
-
-  test('Array.prototype.every', function() {
-
-    ok(typeof Array.prototype.every === 'function');
-
-    // borrowed from Prototype.js but modified to conform to standard
-    ok([].every(K));
-
-    ok([true, true, true].every(K));
-    ok(![true, false, false].every(K));
-    ok(![false, false, false].every(K));
-
-    ok([1,2,3,4,5].every(function(value) {
-      return value > 0;
-    }));
-    ok(![1,2,3,4,5].every(function(value) {
-      return value > 1;
-    }));
-
-    var x = [1,2,3], traversed = [];
-    delete x[1];
-    x.every(function(val) { traversed.push(val); return true; });
-
-    deepEqual([1, 3], traversed);
-    equal(2, traversed.length);
-  });
-
-  test('Array.prototype.some', function() {
-    ok(typeof Array.prototype.some === 'function');
-
-    // borrowed from Prototype.js but modified to conform to standard
-    ok(!([].some(K)));
-
-    ok([true, true, true].some(K));
-    ok([true, false, false].some(K));
-    ok(![false, false, false].some(K));
-
-    ok([1,2,3,4,5].some(function(value) {
-      return value > 2;
-    }));
-    ok(![1,2,3,4,5].some(function(value) {
-      return value > 5;
-    }));
-
-    var x = [1,2,3], traversed = [];
-    delete x[1];
-    x.some(function(val) { traversed.push(val); });
-
-    deepEqual([1, 3], traversed);
-    equal(2, traversed.length);
-  });
-
-  test('Array.prototype.filter', function() {
-    ok(typeof Array.prototype.filter === 'function');
-
-    var arr = [1,2,3,4,5];
-    deepEqual([3,4,5], arr.filter(function(val){ return val > 2; }));
-    deepEqual([], arr.filter(function(val){ return val > 5; }));
-    deepEqual([1,2], arr.filter(function(val){ return val <= 2; }));
-  });
-
-  test('Array.prototype.reduce', function() {
-    ok(typeof Array.prototype.reduce === 'function');
-
-    var arr = [1,2,3,4,5];
-    equal(15,
-      arr.reduce(function(memo, val) { return memo + val; }), 0);
-
-    deepEqual(['1!', '2!', '3!', '4!', '5!'],
-      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo; }, []));
-
-    arr = 'foobar'.split('');
-    equal('f0o1o2b3a4r5',
-      arr.reduce(function(memo, val, index) { return memo + val + index; }, ''));
   });
 
   test('fabric.util.createClass', function() {

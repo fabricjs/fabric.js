@@ -179,14 +179,12 @@
         return a.offset - b.offset;
       });
 
-      if (!(object.group && object.group.type === 'path-group')) {
-        for (var prop in coords) {
-          if (prop === 'x1' || prop === 'x2') {
-            coords[prop] += this.offsetX - object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += this.offsetY - object.height / 2;
-          }
+      for (var prop in coords) {
+        if (prop === 'x1' || prop === 'x2') {
+          coords[prop] += this.offsetX - object.width / 2;
+        }
+        else if (prop === 'y1' || prop === 'y2') {
+          coords[prop] += this.offsetY - object.height / 2;
         }
       }
 
@@ -260,25 +258,13 @@
     /**
      * Returns an instance of CanvasGradient
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Object} object
      * @return {CanvasGradient}
      */
-    toLive: function(ctx, object) {
-      var gradient, prop, coords = fabric.util.object.clone(this.coords);
+    toLive: function(ctx) {
+      var gradient, coords = fabric.util.object.clone(this.coords);
 
       if (!this.type) {
         return;
-      }
-
-      if (object.group && object.group.type === 'path-group') {
-        for (prop in coords) {
-          if (prop === 'x1' || prop === 'x2') {
-            coords[prop] += -this.offsetX + object.width / 2;
-          }
-          else if (prop === 'y1' || prop === 'y2') {
-            coords[prop] += -this.offsetY + object.height / 2;
-          }
-        }
       }
 
       if (this.type === 'linear') {
@@ -391,6 +377,7 @@
       if (gradientTransform || ellipseMatrix !== '') {
         gradient.gradientTransform = fabric.parseTransformAttribute((gradientTransform || '') + ellipseMatrix);
       }
+
       return gradient;
     },
     /* _FROM_SVG_END_ */

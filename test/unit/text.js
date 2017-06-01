@@ -218,15 +218,15 @@
     // text.width = CHAR_WIDTH;
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 4.5,
-      top: -6.13,
+      left: 0,
+      top: -14.59,
       width: 8,
       height: 18.08,
       fontSize: 16,
       originX: 'left'
     });
 
-    deepEqual(text.toObject(), expectedObject);
+    deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
   });
 
   test('fabric.Text.fromElement with custom attributes', function() {
@@ -260,7 +260,7 @@
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
       left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -21.51,
+      top:              -82.43,
       width:            CHAR_WIDTH,
       height:           138.99,
       fill:             'rgb(255,255,255)',
@@ -276,7 +276,7 @@
       fontWeight:       'bold',
       fontSize:         123,
       underline:        true,
-      originX:          'center'
+      originX:          'left'
     });
 
     deepEqual(textWithAttrs.toObject(), expectedObject);

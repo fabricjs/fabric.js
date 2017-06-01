@@ -162,11 +162,6 @@
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
 
-      if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
-      }
-
       ctx.beginPath();
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -516,9 +511,7 @@
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-      if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      }
+      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       markup.push(
         '<path ', this.getSvgId(),
           'd="', path,
@@ -945,6 +938,8 @@
    */
   fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+    parsedAttributes.originX = 'left';
+    parsedAttributes.originY = 'top';
     callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */

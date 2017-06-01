@@ -570,11 +570,11 @@
   test('group toDatalessObject', function() {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        pathGroup = new fabric.PathGroup([rect1, rect2], { sourcePath: 'sourcePath'}),
+        pathGroup = new fabric.Group([rect1, rect2], { sourcePath: 'sourcePath'}),
         group = new fabric.Group([pathGroup]),
         dataless = group.toDatalessObject();
 
-    equal(dataless.objects[0].paths, 'sourcePath', 'the paths have been changed with the sourcePath');
+    equal(dataless.objects[0].objects, 'sourcePath', 'the paths have been changed with the sourcePath');
   });
 
   test('group addWithUpdate', function() {

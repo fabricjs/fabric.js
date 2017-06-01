@@ -81,9 +81,8 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
 
       // optimize 1x1 case (used in spray brush)
       if (this.width === 1 && this.height === 1) {
@@ -95,8 +94,8 @@
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
-          x = noTransform ? this.left : -this.width / 2,
-          y = noTransform ? this.top : -this.height / 2,
+          x = -this.width / 2,
+          y = -this.height / 2,
           isRounded = rx !== 0 || ry !== 0,
           /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
           k = 1 - 0.5522847498;
@@ -156,11 +155,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = this.left, y = this.top;
-      if (!(this.group && this.group.type === 'path-group')) {
-        x = -this.width / 2;
-        y = -this.height / 2;
-      }
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
         '<rect ', this.getSvgId(),
           'x="', x, '" y="', y,
@@ -203,6 +198,8 @@
 
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top  = parsedAttributes.top  || 0;
+    parsedAttributes.originX = 'left';
+    parsedAttributes.originY = 'top';
     var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
     return rect;

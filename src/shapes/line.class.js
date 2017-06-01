@@ -158,22 +158,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
-
-      if (noTransform) {
-        //  Line coords are distances from left-top of canvas to origin of line.
-        //  To render line in a path-group, we need to translate them to
-        //  distances from center of path-group to center of line.
-        var cp = this.getCenterPoint(),
-            offset = this.strokeWidth / 2;
-        ctx.translate(
-          cp.x - (this.strokeLineCap === 'butt' && this.height === 0 ? 0 : offset),
-          cp.y - (this.strokeLineCap === 'butt' && this.width === 0 ? 0 : offset)
-        );
-      }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
         // move from center (of virtual box) to its left/top corner
@@ -204,6 +191,19 @@
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, p.x1, p.y1, p.x2, p.y2, this.strokeDashArray);
       ctx.closePath();
+    },
+
+    /**
+     * This function is an helper for svg import. it returns the center of the object in the svg
+     * untransformed coordinates
+     * @private
+     * @return {Object} center point from element coordinates
+     */
+    _findCenterFromElement: function() {
+      return {
+        x: (this.x1 + this.x2) / 2,
+        y: (this.y1 + this.y2) / 2,
+      };
     },
 
     /**
@@ -261,11 +261,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(),
-          p = { x1: this.x1, x2: this.x2, y1: this.y1, y2: this.y2 };
-
-      if (!(this.group && this.group.type === 'path-group')) {
-        p = this.calcLinePoints();
-      }
+          p = this.calcLinePoints();
       markup.push(
         '<line ', this.getSvgId(),
           'x1="', p.x1,

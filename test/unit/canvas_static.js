@@ -680,13 +680,13 @@
         image = new fabric.Image({width: 0, height: 0}),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
-        pathGroup = new fabric.PathGroup([path2, path3]);
+        pathGroup = new fabric.Group([path2, path3]);
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
 
     var reviverCount = 0,
-        len = canvas.size() + group.size() + pathGroup.paths.length;
+        len = canvas.size() + group.size() + pathGroup.size();
 
     function reviver(svg) {
       reviverCount++;
@@ -699,7 +699,7 @@
     canvas.renderOnAddRemove = true;
   });
 
-  test('toSVG with reviver', function() {
+  test('toSVG with reviver 2', function() {
     ok(typeof canvas.toSVG == 'function');
     canvas.clear();
 
@@ -718,14 +718,14 @@
         imageOL = new fabric.Image({width: 0, height: 0}),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
-        pathGroup = new fabric.PathGroup([path2, path3]);
+        pathGroup = new fabric.Group([path2, path3]);
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
     canvas.setBackgroundImage(imageBG);
     canvas.setOverlayImage(imageOL);
     var reviverCount = 0,
-        len = canvas.size() + group.size() + pathGroup.paths.length;
+        len = canvas.size() + group.size() + pathGroup.size();
 
     function reviver(svg) {
       reviverCount++;
@@ -756,12 +756,12 @@
         image = new fabric.Image({width: 0, height: 0}),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
-        pathGroup = new fabric.PathGroup([path2, path3]);
+        pathGroup = new fabric.Group([path2, path3]);
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
     var reviverCount = 0,
-        len = canvas.size() + group.size() + pathGroup.paths.length;
+        len = canvas.size() + group.size() + pathGroup.size();
 
     function reviver(svg) {
       reviverCount++;
