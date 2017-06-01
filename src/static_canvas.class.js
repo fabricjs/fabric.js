@@ -529,7 +529,7 @@
      * @return {Number}
      */
     getWidth: function () {
-      return this.width;
+      return this.width / this.viewportTransform[0];
     },
 
     /**
@@ -537,7 +537,7 @@
      * @return {Number}
      */
     getHeight: function () {
-      return this.height;
+      return this.height / this.viewportTransform[3];
     },
 
     /**
