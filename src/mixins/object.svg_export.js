@@ -143,11 +143,7 @@
 
           skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
 
-
-
           flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
-
-
 
           flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
 
