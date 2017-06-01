@@ -274,7 +274,7 @@
      * @private
      */
     initDimensions: function() {
-      this.abortCursorAnimation();
+      this.isEditing && this.initDelayedCursor();
       this.clearContextTop();
       this.callSuper('initDimensions');
     },
