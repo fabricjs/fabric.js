@@ -9032,7 +9032,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 ctx.rect(x, y, this.width, this.height);
                 ctx.clip();
             }
-            if (this.isMoving === false && this.resizeFilters.length && this._needsResize()) {
+            if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
                 this._lastScaleX = this.scaleX;
                 this._lastScaleY = this.scaleY;
                 this.applyResizeFilters();
