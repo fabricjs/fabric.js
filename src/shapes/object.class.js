@@ -475,6 +475,20 @@
     cornerStyle:          'rect',
 
     /**
+     * Draw custom control shapes, control in the corners and rotation-control.
+     * @since 1.6.4
+     * @type Object
+     * @example <caption>custom control shapes on all the corners</caption>
+     * drawCustomControlShape: {
+     *   bl: function(ctx: Object, left: number, top: number){},
+     *   br: function(ctx: Object, left: number, top: number){},
+     *   tl: function(ctx: Object, left: number, top: number){},
+     *   tr: function(ctx: Object, left: number, top: number){},
+     * }
+     */
+    drawCustomControlShape:   {},
+
+    /**
      * Array specifying dash pattern of an object's control (hasBorder must be true)
      * @since 1.6.2
      * @type Array
