@@ -23,6 +23,7 @@ var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var sourceMap = 'sourcemap' in buildArgsAsObject;
+var noJSDOM = 'no-jsdom' in buildArgsAsObject;
 
 // set amdLib var to encourage later support of other AMD systems
 var amdLib = requirejs;
@@ -99,6 +100,9 @@ function appendFileContents(fileNames, callback) {
       if (noSVGImport) {
         strData = strData.replace(/\/\* _FROM_SVG_START_ \*\/[\s\S]*?\/\* _FROM_SVG_END_ \*\//g, '');
       }
+      if (noJSDOM) {
+        strData = strData.replace(/\/\* _JSDOM_START_ \*\/[\s\S]*?\/\* _JSDOM_END_ \*\//g, '');
+      }      
       distFileContents += ('\n' + strData + '\n');
       readNextFile();
     });
