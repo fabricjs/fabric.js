@@ -102,7 +102,7 @@
     // Listeners are allowed to add or remove events, including for the event
     // they were triggered for. Therefore, we need to shallowly clone the listeners
     // array to avoid it being mutated during iteration.
-    var shallowClonedListeners = slice(listenersForEvent);
+    var shallowClonedListeners = [].slice.call(listenersForEvent);
     for (var i = 0; i < shallowClonedListeners.length; i++) {
         shallowClonedListeners[i].call(this, options || {});
     }
