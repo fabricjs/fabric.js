@@ -837,9 +837,6 @@
       if (options) {
         this.setOptions(options);
       }
-      if (this.objectCaching) {
-        this._createCacheCanvas();
-      }
     },
 
     /**
