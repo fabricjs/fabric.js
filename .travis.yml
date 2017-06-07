@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "7"
+  - "8"
   - "6"
   - "4"
 script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
