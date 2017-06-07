@@ -797,16 +797,6 @@
     dirty:                true,
 
     /**
-     * When set to `true`, force the object to have its own cache, even if it is inside a group
-     * it may be needed when your object behave in a particular way on the cache and always needs
-     * its own isolated canvas to render correctly.
-     * since 1.7.5
-     * @type Boolean
-     * @default false
-     */
-    needsItsOwnCache: false,
-
-    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -1171,6 +1161,18 @@
     },
 
     /**
+     * When set to `true`, force the object to have its own cache, even if it is inside a group
+     * it may be needed when your object behave in a particular way on the cache and always needs
+     * its own isolated canvas to render correctly.
+     * Created to be overridden
+     * since 1.7.12
+     * @returns false
+     */
+    needsItsOwnCache: function() {
+      return false;
+    },
+
+    /**
      * Decide if the object should cache or not.
      * objectCaching is a global flag, wins over everything
      * needsItsOwnCache should be used when the object drawing method requires
@@ -1180,7 +1182,7 @@
      */
     shouldCache: function() {
       return this.objectCaching &&
-      (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+      (!this.group || this.needsItsOwnCache() || !this.group.isCaching());
     },
 
     /**
