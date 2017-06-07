@@ -3732,9 +3732,9 @@ if (typeof console !== 'undefined') {
     fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
     // Precedence of rules:   style > class > attribute
-    fabric.parseElements(elements, function(instances) {
+    fabric.parseElements(elements, function(instances, elements) {
       if (callback) {
-        callback(instances, options);
+        callback(instances, options, elements);
       }
     }, clone(options), reviver, parsingOptions);
   };
@@ -4039,8 +4039,8 @@ if (typeof console !== 'undefined') {
           callback && callback(null);
         }
 
-        fabric.parseSVGDocument(xml.documentElement, function (results, _options) {
-          callback && callback(results, _options);
+        fabric.parseSVGDocument(xml.documentElement, function (results, _options, elements) {
+          callback && callback(results, _options, elements);
         }, reviver, options);
       }
     },
@@ -4070,8 +4070,8 @@ if (typeof console !== 'undefined') {
         doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
-      fabric.parseSVGDocument(doc.documentElement, function (results, _options) {
-        callback(results, _options);
+      fabric.parseSVGDocument(doc.documentElement, function (results, _options, elements) {
+        callback(results, _options, elements);
       }, reviver, options);
     }
   });
@@ -4167,7 +4167,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       // eslint-disable-next-line no-eq-null, eqeqeq
       return el != null;
     });
-    this.callback(this.instances);
+    this.callback(this.instances, this.elements);
   }
 };
 
@@ -9705,7 +9705,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _createUpperCanvas: function () {
       var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
 
-      this.upperCanvasEl = this._createCanvasElement();
+      // there is no need to create a new upperCanvas element if we have already one.
+      this.upperCanvasEl = this.upperCanvasEl || this._createCanvasElement();
       fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
       this.wrapperEl.appendChild(this.upperCanvasEl);
@@ -10178,7 +10179,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _initEventListeners: function () {
-
+      // in case we initialized the class twice. This should not happen normally
+      // but in some kind of applications where the canvas element may be changed
+      // this is a workaround to having double listeners.
+      this.removeListeners();
       this._bindEvents();
 
       addListener(fabric.window, 'resize', this._onResize);
@@ -10208,6 +10212,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _bindEvents: function() {
+      if (this.eventsBinded) {
+        // for any reason we pass here twice we do not want to bind events twice.
+        return;
+      }
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
@@ -10221,6 +10229,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onMouseOut = this._onMouseOut.bind(this);
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
+      this.eventsBinded = true;
     },
 
     /**
@@ -10909,7 +10918,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      if (!target || !target.selectable) {
+      if (!target) {
         this.setCursor(this.defaultCursor);
         return false;
       }
@@ -12846,8 +12855,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     _renderControls: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
-          options;
+          options, drawBorders, drawControls;
       styleOverride = styleOverride || { };
+      drawBorders = typeof styleOverride.hasBorders !== 'undefined' ? styleOverride.hasBorders : this.hasBorders;
+      drawControls = typeof styleOverride.hasControls !== 'undefined' ? styleOverride.hasControls : this.hasControls;
       matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
       options = fabric.util.qrDecompose(matrix);
       ctx.save();
@@ -12858,13 +12869,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       if (this.group && this.group === this.canvas.getActiveGroup()) {
         ctx.rotate(degreesToRadians(options.angle));
-        (this.hasBorders || styleOverride.hasBorders) && this.drawBordersInGroup(ctx, options, styleOverride);
+        drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
       else {
         ctx.rotate(degreesToRadians(this.angle));
-        (this.hasBorders || styleOverride.hasBorders) && this.drawBorders(ctx, styleOverride);
+        drawBorders && this.drawBorders(ctx, styleOverride);
       }
-      (this.hasControls || styleOverride.hasControls) && this.drawControls(ctx, styleOverride);
+      drawControls && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },
 
@@ -14763,20 +14774,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} bordersStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBorders: function(ctx, bordersStyle) {
-      bordersStyle = bordersStyle || {};
+    drawBorders: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
       var wh = this._calculateCurrentDimensions(),
           strokeWidth = 1 / this.borderScaleFactor,
           width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth;
+          height = wh.y + strokeWidth,
+          drawRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
+            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+              styleOverride.hasControls : this.hasControls,
+          rotatingPointOffset = typeof styleOverride.rotatingPointOffset !== 'undefined' ?
+            styleOverride.rotatingPointOffset : this.rotatingPointOffset;
 
       ctx.save();
-      ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
-      this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
+      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
 
       ctx.strokeRect(
         -width / 2,
@@ -14785,14 +14802,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         height
       );
 
-      if (bordersStyle.hasRotatingPoint ||
-        this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
+      if (drawRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && hasControls) {
 
         var rotateHeight = -height / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
+        ctx.lineTo(0, rotateHeight - rotatingPointOffset);
         ctx.closePath();
         ctx.stroke();
       }
@@ -14807,12 +14823,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
-     * @param {Object} bordersStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBordersInGroup: function(ctx, options, bordersStyle) {
-      bordersStyle = bordersStyle || {};
+    drawBordersInGroup: function(ctx, options, styleOverride) {
+      styleOverride = styleOverride || {};
       var p = this._getNonTransformedDimensions(),
           matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX),
           wh = fabric.util.transformPoint(p, matrix),
@@ -14821,8 +14837,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height = wh.y + strokeWidth;
 
       ctx.save();
-      this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
-      ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
+      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
 
       ctx.strokeRect(
         -width / 2,
@@ -14840,75 +14856,79 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Requires public properties: width, height
      * Requires public options: cornerSize, padding
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} controlsStyle object to override the object style
+     * @param {Object} styleOverride object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawControls: function(ctx, controlsStyle) {
-      controlsStyle = controlsStyle || {};
+    drawControls: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
       var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          scaleOffset = controlsStyle.cornerSize || this.cornerSize,
+          scaleOffset = styleOverride.cornerSize || this.cornerSize,
           left = -(width + scaleOffset) / 2,
           top = -(height + scaleOffset) / 2,
-          methodName = controlsStyle.transparentCorners || this.transparentCorners ? 'stroke' : 'fill';
+          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+            styleOverride.transparentCorners : this.transparentCorners,
+          hasRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
+            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
+          methodName = transparentCorners ? 'stroke' : 'fill';
 
       ctx.save();
-      ctx.strokeStyle = ctx.fillStyle = controlsStyle.cornerColor || this.cornerColor;
+      ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
-        ctx.strokeStyle = controlsStyle.cornerStrokeColor || this.cornerStrokeColor;
+        ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
       }
-      this._setLineDash(ctx, controlsStyle.cornerDashArray || this.cornerDashArray, null);
+      this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
 
       // top-left
       this._drawControl('tl', ctx, methodName,
         left,
-        top, controlsStyle);
+        top, styleOverride);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
         left + width,
-        top, controlsStyle);
+        top, styleOverride);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
         left,
-        top + height, controlsStyle);
+        top + height, styleOverride);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
         left + width,
-        top + height, controlsStyle);
+        top + height, styleOverride);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
           left + width / 2,
-          top, controlsStyle);
+          top, styleOverride);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
           left + width / 2,
-          top + height, controlsStyle);
+          top + height, styleOverride);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
           left + width,
-          top + height / 2, controlsStyle);
+          top + height / 2, styleOverride);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
           left,
-          top + height / 2, controlsStyle);
+          top + height / 2, styleOverride);
       }
 
       // middle-top-rotate
-      if (controlsStyle.hasRotatingPoint || this.hasRotatingPoint) {
+      if (hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
           left + width / 2,
-          top - this.rotatingPointOffset, controlsStyle);
+          top - this.rotatingPointOffset, styleOverride);
       }
 
       ctx.restore();
@@ -14919,13 +14939,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      */
-    _drawControl: function(control, ctx, methodName, left, top, controlStyle) {
-      controlStyle = controlStyle || {};
+    _drawControl: function(control, ctx, methodName, left, top, styleOverride) {
+      styleOverride = styleOverride || {};
       if (!this.isControlVisible(control)) {
         return;
       }
       var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-      switch (controlStyle.cornerStyle || this.cornerStyle) {
+      switch (styleOverride.cornerStyle || this.cornerStyle) {
         case 'circle':
           ctx.beginPath();
           ctx.arc(left + size / 2, top + size / 2, size / 2, 0, 2 * Math.PI, false);
@@ -24433,7 +24453,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     initDimensions: function() {
-      this.abortCursorAnimation();
+      this.isEditing && this.initDelayedCursor();
       this.clearContextTop();
       this.callSuper('initDimensions');
     },
@@ -26791,7 +26811,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.__skipDimension) {
         return;
       }
-      this.initDelayedCursor();
+      this.isEditing && this.initDelayedCursor();
       this.clearContextTop();
       this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
@@ -27393,3 +27413,4 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 
 })();
+

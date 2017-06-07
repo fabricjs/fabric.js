@@ -2058,9 +2058,9 @@ if (typeof console !== "undefined") {
         }
         fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
         fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-        fabric.parseElements(elements, function(instances) {
+        fabric.parseElements(elements, function(instances, elements) {
             if (callback) {
-                callback(instances, options);
+                callback(instances, options, elements);
             }
         }, clone(options), reviver, parsingOptions);
     };
@@ -2223,8 +2223,8 @@ if (typeof console !== "undefined") {
                 if (!xml || !xml.documentElement) {
                     callback && callback(null);
                 }
-                fabric.parseSVGDocument(xml.documentElement, function(results, _options) {
-                    callback && callback(results, _options);
+                fabric.parseSVGDocument(xml.documentElement, function(results, _options, elements) {
+                    callback && callback(results, _options, elements);
                 }, reviver, options);
             }
         },
@@ -2241,8 +2241,8 @@ if (typeof console !== "undefined") {
                 doc.async = "false";
                 doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ""));
             }
-            fabric.parseSVGDocument(doc.documentElement, function(results, _options) {
-                callback(results, _options);
+            fabric.parseSVGDocument(doc.documentElement, function(results, _options, elements) {
+                callback(results, _options, elements);
             }, reviver, options);
         }
     });
@@ -2329,7 +2329,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         this.instances = this.instances.filter(function(el) {
             return el != null;
         });
-        this.callback(this.instances);
+        this.callback(this.instances, this.elements);
     }
 };
 
@@ -4860,7 +4860,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _createUpperCanvas: function() {
             var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, "");
-            this.upperCanvasEl = this._createCanvasElement();
+            this.upperCanvasEl = this.upperCanvasEl || this._createCanvasElement();
             fabric.util.addClass(this.upperCanvasEl, "upper-canvas " + lowerCanvasClass);
             this.wrapperEl.appendChild(this.upperCanvasEl);
             this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
@@ -5140,6 +5140,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
     fabric.util.object.extend(fabric.Canvas.prototype, {
         cursorMap: [ "n-resize", "ne-resize", "e-resize", "se-resize", "s-resize", "sw-resize", "w-resize", "nw-resize" ],
         _initEventListeners: function() {
+            this.removeListeners();
             this._bindEvents();
             addListener(fabric.window, "resize", this._onResize);
             addListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
@@ -5163,6 +5164,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         _bindEvents: function() {
+            if (this.eventsBinded) {
+                return;
+            }
             this._onMouseDown = this._onMouseDown.bind(this);
             this._onMouseMove = this._onMouseMove.bind(this);
             this._onMouseUp = this._onMouseUp.bind(this);
@@ -5176,6 +5180,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._onMouseOut = this._onMouseOut.bind(this);
             this._onMouseEnter = this._onMouseEnter.bind(this);
             this._onContextMenu = this._onContextMenu.bind(this);
+            this.eventsBinded = true;
         },
         removeListeners: function() {
             removeListener(fabric.window, "resize", this._onResize);
@@ -5572,7 +5577,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         _setCursorFromEvent: function(e, target) {
-            if (!target || !target.selectable) {
+            if (!target) {
                 this.setCursor(this.defaultCursor);
                 return false;
             }
@@ -6261,8 +6266,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
         },
         _renderControls: function(ctx, styleOverride) {
-            var vpt = this.getViewportTransform(), matrix = this.calcTransformMatrix(), options;
+            var vpt = this.getViewportTransform(), matrix = this.calcTransformMatrix(), options, drawBorders, drawControls;
             styleOverride = styleOverride || {};
+            drawBorders = typeof styleOverride.hasBorders !== "undefined" ? styleOverride.hasBorders : this.hasBorders;
+            drawControls = typeof styleOverride.hasControls !== "undefined" ? styleOverride.hasControls : this.hasControls;
             matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
             options = fabric.util.qrDecompose(matrix);
             ctx.save();
@@ -6273,12 +6280,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             if (this.group && this.group === this.canvas.getActiveGroup()) {
                 ctx.rotate(degreesToRadians(options.angle));
-                (this.hasBorders || styleOverride.hasBorders) && this.drawBordersInGroup(ctx, options, styleOverride);
+                drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
             } else {
                 ctx.rotate(degreesToRadians(this.angle));
-                (this.hasBorders || styleOverride.hasBorders) && this.drawBorders(ctx, styleOverride);
+                drawBorders && this.drawBorders(ctx, styleOverride);
             }
-            (this.hasControls || styleOverride.hasControls) && this.drawControls(ctx, styleOverride);
+            drawControls && this.drawControls(ctx, styleOverride);
             ctx.restore();
         },
         _setShadow: function(ctx) {
@@ -7148,66 +7155,66 @@ fabric.util.object.extend(fabric.Object.prototype, {
             ctx.restore();
             return this;
         },
-        drawBorders: function(ctx, bordersStyle) {
-            bordersStyle = bordersStyle || {};
-            var wh = this._calculateCurrentDimensions(), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth, height = wh.y + strokeWidth;
+        drawBorders: function(ctx, styleOverride) {
+            styleOverride = styleOverride || {};
+            var wh = this._calculateCurrentDimensions(), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth, height = wh.y + strokeWidth, drawRotatingPoint = typeof styleOverride.hasRotatingPoint !== "undefined" ? styleOverride.hasRotatingPoint : this.hasRotatingPoint, hasControls = typeof styleOverride.hasControls !== "undefined" ? styleOverride.hasControls : this.hasControls, rotatingPointOffset = typeof styleOverride.rotatingPointOffset !== "undefined" ? styleOverride.rotatingPointOffset : this.rotatingPointOffset;
             ctx.save();
-            ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
-            this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
+            ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
+            this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
             ctx.strokeRect(-width / 2, -height / 2, width, height);
-            if (bordersStyle.hasRotatingPoint || this.hasRotatingPoint && this.isControlVisible("mtr") && !this.get("lockRotation") && this.hasControls) {
+            if (drawRotatingPoint && this.isControlVisible("mtr") && !this.get("lockRotation") && hasControls) {
                 var rotateHeight = -height / 2;
                 ctx.beginPath();
                 ctx.moveTo(0, rotateHeight);
-                ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
+                ctx.lineTo(0, rotateHeight - rotatingPointOffset);
                 ctx.closePath();
                 ctx.stroke();
             }
             ctx.restore();
             return this;
         },
-        drawBordersInGroup: function(ctx, options, bordersStyle) {
-            bordersStyle = bordersStyle || {};
+        drawBordersInGroup: function(ctx, options, styleOverride) {
+            styleOverride = styleOverride || {};
             var p = this._getNonTransformedDimensions(), matrix = fabric.util.customTransformMatrix(options.scaleX, options.scaleY, options.skewX), wh = fabric.util.transformPoint(p, matrix), strokeWidth = 1 / this.borderScaleFactor, width = wh.x + strokeWidth, height = wh.y + strokeWidth;
             ctx.save();
-            this._setLineDash(ctx, bordersStyle.borderDashArray || this.borderDashArray, null);
-            ctx.strokeStyle = bordersStyle.borderColor || this.borderColor;
+            this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
+            ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
             ctx.strokeRect(-width / 2, -height / 2, width, height);
             ctx.restore();
             return this;
         },
-        drawControls: function(ctx, controlsStyle) {
-            controlsStyle = controlsStyle || {};
-            var wh = this._calculateCurrentDimensions(), width = wh.x, height = wh.y, scaleOffset = controlsStyle.cornerSize || this.cornerSize, left = -(width + scaleOffset) / 2, top = -(height + scaleOffset) / 2, methodName = controlsStyle.transparentCorners || this.transparentCorners ? "stroke" : "fill";
+        drawControls: function(ctx, styleOverride) {
+            styleOverride = styleOverride || {};
+            var wh = this._calculateCurrentDimensions(), width = wh.x, height = wh.y, scaleOffset = styleOverride.cornerSize || this.cornerSize, left = -(width + scaleOffset) / 2, top = -(height + scaleOffset) / 2, transparentCorners = typeof styleOverride.transparentCorners !== "undefined" ? styleOverride.transparentCorners : this.transparentCorners, hasRotatingPoint = typeof styleOverride.hasRotatingPoint !== "undefined" ? styleOverride.hasRotatingPoint : this.hasRotatingPoint, methodName = transparentCorners ? "stroke" : "fill";
             ctx.save();
-            ctx.strokeStyle = ctx.fillStyle = controlsStyle.cornerColor || this.cornerColor;
+            ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
             if (!this.transparentCorners) {
-                ctx.strokeStyle = controlsStyle.cornerStrokeColor || this.cornerStrokeColor;
+                ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
             }
-            this._setLineDash(ctx, controlsStyle.cornerDashArray || this.cornerDashArray, null);
-            this._drawControl("tl", ctx, methodName, left, top, controlsStyle);
-            this._drawControl("tr", ctx, methodName, left + width, top, controlsStyle);
-            this._drawControl("bl", ctx, methodName, left, top + height, controlsStyle);
-            this._drawControl("br", ctx, methodName, left + width, top + height, controlsStyle);
+            this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
+            this._drawControl("tl", ctx, methodName, left, top, styleOverride);
+            this._drawControl("tr", ctx, methodName, left + width, top, styleOverride);
+            this._drawControl("bl", ctx, methodName, left, top + height, styleOverride);
+            this._drawControl("br", ctx, methodName, left + width, top + height, styleOverride);
             if (!this.get("lockUniScaling")) {
-                this._drawControl("mt", ctx, methodName, left + width / 2, top, controlsStyle);
-                this._drawControl("mb", ctx, methodName, left + width / 2, top + height, controlsStyle);
-                this._drawControl("mr", ctx, methodName, left + width, top + height / 2, controlsStyle);
-                this._drawControl("ml", ctx, methodName, left, top + height / 2, controlsStyle);
+                this._drawControl("mt", ctx, methodName, left + width / 2, top, styleOverride);
+                this._drawControl("mb", ctx, methodName, left + width / 2, top + height, styleOverride);
+                this._drawControl("mr", ctx, methodName, left + width, top + height / 2, styleOverride);
+                this._drawControl("ml", ctx, methodName, left, top + height / 2, styleOverride);
             }
-            if (controlsStyle.hasRotatingPoint || this.hasRotatingPoint) {
-                this._drawControl("mtr", ctx, methodName, left + width / 2, top - this.rotatingPointOffset, controlsStyle);
+            if (hasRotatingPoint) {
+                this._drawControl("mtr", ctx, methodName, left + width / 2, top - this.rotatingPointOffset, styleOverride);
             }
             ctx.restore();
             return this;
         },
-        _drawControl: function(control, ctx, methodName, left, top, controlStyle) {
-            controlStyle = controlStyle || {};
+        _drawControl: function(control, ctx, methodName, left, top, styleOverride) {
+            styleOverride = styleOverride || {};
             if (!this.isControlVisible(control)) {
                 return;
             }
             var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-            switch (controlStyle.cornerStyle || this.cornerStyle) {
+            switch (styleOverride.cornerStyle || this.cornerStyle) {
               case "circle":
                 ctx.beginPath();
                 ctx.arc(left + size / 2, top + size / 2, size / 2, 0, 2 * Math.PI, false);
@@ -11298,7 +11305,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             return this;
         },
         initDimensions: function() {
-            this.abortCursorAnimation();
+            this.isEditing && this.initDelayedCursor();
             this.clearContextTop();
             this.callSuper("initDimensions");
         },
@@ -12709,7 +12716,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             if (this.__skipDimension) {
                 return;
             }
-            this.initDelayedCursor();
+            this.isEditing && this.initDelayedCursor();
             this.clearContextTop();
             this._clearCache();
             this.dynamicMinWidth = 0;
