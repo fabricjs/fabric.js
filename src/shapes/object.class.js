@@ -797,16 +797,6 @@
     dirty:                true,
 
     /**
-     * When set to `true`, force the object to have its own cache, even if it is inside a group
-     * it may be needed when your object behave in a particular way on the cache and always needs
-     * its own isolated canvas to render correctly.
-     * since 1.7.5
-     * @type Boolean
-     * @default false
-     */
-    needsItsOwnCache: false,
-
-    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -837,9 +827,6 @@
       if (options) {
         this.setOptions(options);
       }
-      if (this.objectCaching) {
-        this._createCacheCanvas();
-      }
     },
 
     /**
@@ -847,6 +834,7 @@
      * @private
      */
     _createCacheCanvas: function() {
+      console.trace()
       this._cacheProperties = {};
       this._cacheCanvas = fabric.document.createElement('canvas');
       this._cacheContext = this._cacheCanvas.getContext('2d');
@@ -1154,7 +1142,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
-      if (this.shouldCache()) {
+      if (this.shouldCache(noTransform)) {
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
         }
@@ -1176,16 +1164,30 @@
     },
 
     /**
+     * When returns `true`, force the object to have its own cache, even if it is inside a group
+     * it may be needed when your object behave in a particular way on the cache and always needs
+     * its own isolated canvas to render correctly.
+     * This function is created to be subclassed by custom classes.
+     * since 1.7.12
+     * @type function
+     * @return false
+     */
+    needsItsOwnCache: function() {
+      return false;
+    },
+
+    /**
      * Decide if the object should cache or not.
      * objectCaching is a global flag, wins over everything
      * needsItsOwnCache should be used when the object drawing method requires
      * a cache step. None of the fabric classes requires it.
      * Generally you do not cache objects in groups because the group outside is cached.
+     * @param {Boolean} noTransform if rendereing in pathGroup, caching is not supported at object level
      * @return {Boolean}
      */
-    shouldCache: function() {
-      return this.objectCaching &&
-      (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+    shouldCache: function(noTransform) {
+      return !noTransform && this.objectCaching &&
+      (!this.group || this.needsItsOwnCache() || !this.group.isCaching());
     },
 
     /**

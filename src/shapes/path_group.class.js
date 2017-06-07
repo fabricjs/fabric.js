@@ -54,9 +54,6 @@
       }
       this.setOptions(options);
       this.setCoords();
-      if (this.objectCaching) {
-        this._createCacheCanvas();
-      }
     },
 
     /**
@@ -112,7 +109,7 @@
      * @return {Boolean}
      */
     shouldCache: function() {
-      var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache || !this.group.isCaching());
+      var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache() || !this.group.isCaching());
       this.caching = parentCache;
       if (parentCache) {
         for (var i = 0, len = this.paths.length; i < len; i++) {
