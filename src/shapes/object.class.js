@@ -834,7 +834,6 @@
      * @private
      */
     _createCacheCanvas: function() {
-      console.trace()
       this._cacheProperties = {};
       this._cacheCanvas = fabric.document.createElement('canvas');
       this._cacheContext = this._cacheCanvas.getContext('2d');
