@@ -36,7 +36,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,gestures",
-    "build:watch": "onchange 'src/**/**' 'test/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
+    "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
     "build_export": "npm run build && npm run export_dist_to_site",
     "test": "node test.js",
@@ -47,7 +47,7 @@
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
   "optionalDependencies": {
-    "canvas-prebuilt": "1.6.5-prerelease.1",
+    "canvas": "1.6.x",
     "jsdom": "9.x.x",
     "xmldom": "0.1.x"
   },
