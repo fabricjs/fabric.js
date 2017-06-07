@@ -1849,8 +1849,8 @@
       c._onContextMenu
     ]
     // initialize canvas more than once
-    c.initialize(el);
-    c.initialize(el);
+    c.initialize(el2);
+    c.initialize(el2);
     var eventsArray2 = [
       c._onMouseDown,
       c._onMouseMove,
