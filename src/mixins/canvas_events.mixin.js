@@ -43,7 +43,7 @@
       // in case we initialized the class twice. This should not happen normally
       // but in some kind of applications where the canvas element may be changed
       // this is a workaround to having double listeners.
-      // this.removeListeners();
+      //this.removeListeners();
       this._bindEvents();
 
       addListener(fabric.window, 'resize', this._onResize);
@@ -73,10 +73,10 @@
      * @private
      */
     _bindEvents: function() {
-      if (this.eventsBinded) {
-        // for any reason we pass here twice we do not want to bind events twice.
-        return;
-      }
+      // if (this.eventsBinded) {
+      //   // for any reason we pass here twice we do not want to bind events twice.
+      //   return;
+      // }
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
@@ -90,7 +90,7 @@
       this._onMouseOut = this._onMouseOut.bind(this);
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
-      this.eventsBinded = true;
+      //this.eventsBinded = true;
     },
 
     /**
