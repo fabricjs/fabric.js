@@ -104,10 +104,6 @@
       }
 
       this._setPositionDimensions(options);
-
-      if (this.objectCaching) {
-        this._createCacheCanvas();
-      }
     },
 
     /**
