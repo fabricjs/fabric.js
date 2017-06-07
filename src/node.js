@@ -150,8 +150,6 @@
     canvasEl.width = nodeCanvas.width;
     canvasEl.height = nodeCanvas.height;
     options = options || { };
-    options.nodeCanvas = nodeCanvas;
-    options.nodeCacheCanvas = nodeCacheCanvas;
     var FabricCanvas = fabric.Canvas || fabric.StaticCanvas,
         fabricCanvas = new FabricCanvas(canvasEl, options);
     fabricCanvas.nodeCanvas = nodeCanvas;

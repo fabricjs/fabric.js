@@ -1277,7 +1277,8 @@
     _createUpperCanvas: function () {
       var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
 
-      this.upperCanvasEl = this._createCanvasElement();
+      // there is no need to create a new upperCanvas element if we have already one.
+      this.upperCanvasEl = this.upperCanvasEl || this._createCanvasElement();
       fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
       this.wrapperEl.appendChild(this.upperCanvasEl);
