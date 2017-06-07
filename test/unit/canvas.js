@@ -1847,7 +1847,7 @@
       c._onMouseOut,
       c._onMouseEnter,
       c._onContextMenu
-    ]
+    ];
     // initialize canvas more than once
     c.initialize(el2);
     c.initialize(el2);
@@ -1865,7 +1865,7 @@
       c._onMouseOut,
       c._onMouseEnter,
       c._onContextMenu
-    ]
+    ];
     deepEqual(eventsArray, eventsArray2, 'after first initialize, functions do not change.');
   });
 
@@ -1928,7 +1928,7 @@
       equal(counter, 1, 'listener executed once');
       fabric.Canvas.prototype._onMouseUp = originalMouseUp;
       start();
-    }, 200)
+    }, 200);
   });
 
   test('avoid multiple registration - mouseout', function() {
