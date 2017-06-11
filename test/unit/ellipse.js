@@ -119,20 +119,20 @@
     elEllipse.setAttribute('stroke-linejoin', strokeLineJoin);
     elEllipse.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
-    var oEllipse = fabric.Ellipse.fromElement(elEllipse);
-    ok(oEllipse instanceof fabric.Ellipse);
-
-    equal(oEllipse.get('rx'), rx);
-    equal(oEllipse.get('ry'), ry);
-    equal(oEllipse.get('left'), left - rx);
-    equal(oEllipse.get('top'), top - ry);
-    equal(oEllipse.get('fill'), fill);
-    equal(oEllipse.get('opacity'), opacity);
-    equal(oEllipse.get('strokeWidth'), strokeWidth);
-    deepEqual(oEllipse.get('strokeDashArray'), strokeDashArray);
-    equal(oEllipse.get('strokeLineCap'), strokeLineCap);
-    equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
-    equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+    fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
+      ok(oEllipse instanceof fabric.Ellipse);
+      equal(oEllipse.get('rx'), rx);
+      equal(oEllipse.get('ry'), ry);
+      equal(oEllipse.get('left'), left - rx);
+      equal(oEllipse.get('top'), top - ry);
+      equal(oEllipse.get('fill'), fill);
+      equal(oEllipse.get('opacity'), opacity);
+      equal(oEllipse.get('strokeWidth'), strokeWidth);
+      deepEqual(oEllipse.get('strokeDashArray'), strokeDashArray);
+      equal(oEllipse.get('strokeLineCap'), strokeLineCap);
+      equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
+      equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+    });
   });
 
   asyncTest('fromObject', function() {

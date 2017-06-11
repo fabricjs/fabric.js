@@ -22,7 +22,7 @@ testrunner.run({
       './test/unit/observable.js',
       './test/unit/object.js',
       './test/unit/text.js',
-      // './test/unit/util.js',
+      './test/unit/util.js',
       './test/unit/image.js',
       './test/unit/image_filters.js',
       './test/unit/group.js',

@@ -221,20 +221,20 @@
    * Returns fabric.Polyline instance from an SVG element
    * @static
    * @memberOf fabric.Polyline
-   * @param {SVGElement} element Element to parse
+   * @param {SVGElement} element Element to parser
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Polyline} Instance of fabric.Polyline
    */
-  fabric.Polyline.fromElement = function(element, options) {
+  fabric.Polyline.fromElement = function(element, callback, options) {
     if (!element) {
-      return null;
+      return callback(null);
     }
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
-    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
+    callback(new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 

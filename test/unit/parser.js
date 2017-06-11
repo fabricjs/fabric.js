@@ -101,7 +101,7 @@
   });
 
   asyncTest('parseElements', function() {
-    ok(fabric.parseElements);
+    ok(typeof fabric.parseElements === 'function');
 
     function getOptions(options) {
       return fabric.util.object.extend(fabric.util.object.clone({
@@ -115,26 +115,13 @@
       fabric.util.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
       fabric.util.makeElement('inexistent', getOptions())
     ];
+    fabric.parseElements(elements, function(parsedElements) {
+      ok(parsedElements[0] instanceof fabric.Rect);
+      ok(parsedElements[1] instanceof fabric.Circle);
+      ok(parsedElements[2] instanceof fabric.Path);
+      setTimeout(start, 1000);
+    });
 
-    var parsedElements, error;
-    try {
-      fabric.parseElements(elements, function(instances) {
-        parsedElements = instances;
-      });
-    }
-    catch (err) {
-      error = err;
-    }
-    ok(error === undefined, 'No error is raised');
-
-    setTimeout(function() {
-      if (parsedElements) {
-        ok(parsedElements[0] instanceof fabric.Rect);
-        ok(parsedElements[1] instanceof fabric.Circle);
-        ok(parsedElements[2] instanceof fabric.Path);
-      }
-      start();
-    }, 1000);
   });
 
   test('parseStyleAttribute', function() {
@@ -420,7 +407,7 @@
 
   // asyncTest('parseSVGDocument', function() {
   //   ok(fabric.parseSVGDocument);
-
+  //
   //   var data;
   //   fabric.util.request('../fixtures/path.svg', {
   //     method: 'get',
@@ -438,15 +425,15 @@
   //       });
   //     }
   //   });
-
+  //
   //   setTimeout(function() {
   //     equal(typeof data, 'object');
-
+  //
   //     if (data) {
   //       equal(data.length, 1);
-
+  //
   //       var path = data[0];
-
+  //
   //       ok(path instanceof fabric.Path);
   //       equal(JSON.stringify(path), EXPECTED_PATH_JSON);
   //     }
@@ -456,7 +443,7 @@
 
   // https://github.com/kangax/fabric.js/issues/25
   // asyncTest('parsing one element should not "leak" its "fill" value onto parsing of following element', function() {
-
+  //
   //   var objects;
   //   fabric.util.request('../fixtures/svg_with_rect.svg', {
   //     method: 'get',
@@ -468,12 +455,12 @@
   //       });
   //     }
   //   });
-
+  //
   //   setTimeout(function() {
   //     if (objects) {
   //       equal(objects[1].fill, 'green');
   //     }
-
+  //
   //     start();
   //   }, 1500);
   // });
@@ -486,10 +473,10 @@
       var opacityValue = Math.random().toFixed(2);
 
       el.setAttribute('opacity', opacityValue);
-      var obj = fabric.Rect.fromElement(el);
-
-      equal(obj.opacity, parseFloat(opacityValue),
-        'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+      fabric.Rect.fromElement(el, function(obj) {
+        equal(obj.opacity, parseFloat(opacityValue),
+          'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+      });
     }
   });
 
@@ -499,10 +486,10 @@
 
     el.setAttribute('fill-opacity', opacityValue);
     el.setAttribute('fill', '#FF0000');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+          equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+            'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
   test('fill-opacity attribute without fill attribute', function() {
@@ -510,10 +497,10 @@
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+      equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
   test('fill-opacity attribute with fill none', function() {
@@ -522,9 +509,9 @@
 
     el.setAttribute('fill-opacity', opacityValue);
     el.setAttribute('fill', 'none');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, '', 'fill should stay empty');
+    fabric.Rect.fromElement(el, function(obj) {
+      equal(obj.fill, '', 'fill should stay empty');
+    });
   });
 
   test('stroke-opacity attribute with stroke attribute', function() {
@@ -533,10 +520,10 @@
 
     el.setAttribute('stroke-opacity', opacityValue);
     el.setAttribute('stroke', '#FF0000');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+      equal(obj.stroke, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
   test('stroke-opacity attribute without stroke attribute', function() {
@@ -544,9 +531,9 @@
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, null, 'Default stroke is null');
+    fabric.Rect.fromElement(el, function(obj) {
+      equal(obj.stroke, null, 'Default stroke is null');
+    });
   });
 
   test('stroke-opacity attribute with stroke none', function() {
@@ -555,9 +542,9 @@
 
     el.setAttribute('stroke-opacity', opacityValue);
     el.setAttribute('stroke', 'none');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, '', 'stroke should stay empty');
+    fabric.Rect.fromElement(el, function(obj) {
+      equal(obj.stroke, '', 'stroke should stay empty');
+    });
   });
 
   test('getCssRule', function() {

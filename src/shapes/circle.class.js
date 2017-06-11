@@ -188,10 +188,10 @@
    * @memberOf fabric.Circle
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {fabric.Circle} Instance of fabric.Circle
    */
-  fabric.Circle.fromElement = function(element, options) {
+  fabric.Circle.fromElement = function(element, callback, options) {
     options || (options = { });
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
@@ -204,7 +204,7 @@
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
     parsedAttributes.originX = 'left';
     parsedAttributes.originY = 'top';
-    return new fabric.Circle(extend(parsedAttributes, options));
+    callback(new fabric.Circle(extend(parsedAttributes, options)));
   };
 
   /**

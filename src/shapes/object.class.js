@@ -1482,7 +1482,9 @@
       if (this.constructor.fromObject) {
         this.constructor.fromObject(objectForm, callback);
       }
-      callback(new fabric.Object(objectForm));
+      else {
+        fabric.Object._fromObject('Object', objectForm, callback);
+      }
     },
 
     /**

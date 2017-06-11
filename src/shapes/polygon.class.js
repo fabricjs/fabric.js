@@ -62,12 +62,12 @@
    * @static
    * @memberOf fabric.Polygon
    * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Polygon} Instance of fabric.Polygon
    */
-  fabric.Polygon.fromElement = function(element, options) {
+  fabric.Polygon.fromElement = function(element, callback, options) {
     if (!element) {
-      return null;
+      return callback(null);
     }
 
     options || (options = { });
@@ -75,7 +75,7 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    return new fabric.Polygon(points, extend(parsedAttributes, options));
+    callback(new fabric.Polygon(points, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 

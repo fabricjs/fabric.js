@@ -294,9 +294,9 @@
    * @memberOf fabric.Line
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
-   * @return {fabric.Line} instance of fabric.Line
+   * @param {Function} [callback] callback function invoked after parsing
    */
-  fabric.Line.fromElement = function(element, options) {
+  fabric.Line.fromElement = function(element, callback, options) {
     options = options || { };
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
@@ -307,7 +307,7 @@
         ];
     options.originX = 'left';
     options.originY = 'top';
-    return new fabric.Line(points, extend(parsedAttributes, options));
+    callback(new fabric.Line(points, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 

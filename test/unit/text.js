@@ -212,23 +212,18 @@
     var elText = fabric.document.createElement('text');
     elText.textContent = 'x';
 
-    var text = fabric.Text.fromElement(elText);
-
-    ok(text instanceof fabric.Text);
-
-    // temp workaround for text objects not obtaining width under node
-    // text.width = CHAR_WIDTH;
-
-    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 0,
-      top: -14.59,
-      width: 8,
-      height: 18.08,
-      fontSize: 16,
-      originX: 'left'
+    fabric.Text.fromElement(elText, function(text) {
+      ok(text instanceof fabric.Text);
+      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+        left: 0,
+        top: -14.59,
+        width: 8,
+        height: 18.08,
+        fontSize: 16,
+        originX: 'left'
+      });
+      deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
-
-    deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
   });
 
   test('fabric.Text.fromElement with custom attributes', function() {
@@ -253,39 +248,42 @@
     elTextWithAttrs.setAttribute('text-decoration', 'underline');
     elTextWithAttrs.setAttribute('text-anchor', 'middle');
 
-    var textWithAttrs = fabric.Text.fromElement(elTextWithAttrs);
-    // temp workaround for text objects not obtaining width under node
-    textWithAttrs.width = CHAR_WIDTH;
+    fabric.Text.fromElement(elTextWithAttrs, function(textWithAttrs) {
+      // temp workaround for text objects not obtaining width under node
+      textWithAttrs.width = CHAR_WIDTH;
 
-    ok(textWithAttrs instanceof fabric.Text);
+      ok(textWithAttrs instanceof fabric.Text);
 
-    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      /* left varies slightly due to node-canvas rendering */
-      left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top:              -82.43,
-      width:            CHAR_WIDTH,
-      height:           138.99,
-      fill:             'rgb(255,255,255)',
-      opacity:          0.45,
-      stroke:           'blue',
-      strokeWidth:      3,
-      strokeDashArray:  [5, 2],
-      strokeLineCap:    'round',
-      strokeLineJoin:   'bevil',
-      strokeMiterLimit: 5,
-      fontFamily:       'Monaco',
-      fontStyle:        'italic',
-      fontWeight:       'bold',
-      fontSize:         123,
-      underline:        true,
-      originX:          'left'
+      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+        /* left varies slightly due to node-canvas rendering */
+        left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
+        top:              -82.43,
+        width:            CHAR_WIDTH,
+        height:           138.99,
+        fill:             'rgb(255,255,255)',
+        opacity:          0.45,
+        stroke:           'blue',
+        strokeWidth:      3,
+        strokeDashArray:  [5, 2],
+        strokeLineCap:    'round',
+        strokeLineJoin:   'bevil',
+        strokeMiterLimit: 5,
+        fontFamily:       'Monaco',
+        fontStyle:        'italic',
+        fontWeight:       'bold',
+        fontSize:         123,
+        underline:        true,
+        originX:          'left'
+      });
+
+      deepEqual(textWithAttrs.toObject(), expectedObject);
     });
-
-    deepEqual(textWithAttrs.toObject(), expectedObject);
   });
 
   test('empty fromElement', function() {
-    ok(fabric.Text.fromElement() === null);
+    fabric.Text.fromElement(null, function(text) {
+      equal(text, null)
+    });
   });
 
   test('dimensions after text change', function() {

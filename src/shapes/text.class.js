@@ -1476,12 +1476,12 @@
    * @static
    * @memberOf fabric.Text
    * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Text} Instance of fabric.Text
    */
-  fabric.Text.fromElement = function(element, options) {
+  fabric.Text.fromElement = function(element, callback, options) {
     if (!element) {
-      return null;
+      return callback(null);
     }
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
@@ -1557,7 +1557,7 @@
     });
     text.originX = 'left';
     text.originY = 'top';
-    return text;
+    callback(text);
   };
   /* _FROM_SVG_END_ */
 
