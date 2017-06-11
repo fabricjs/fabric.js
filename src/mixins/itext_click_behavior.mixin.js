@@ -24,22 +24,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
     }
-    else if (this.isDoubleClick(newPointer)) {
-      this.fire('dblclick', options);
-      this._stopEvent(options.e);
-    }
-
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
     this.__lastIsEditing = this.isEditing;
     this.__lastSelected = this.selected;
-  },
-
-  isDoubleClick: function(newPointer) {
-    return this.__newClickTime - this.__lastClickTime < 500 &&
-        this.__lastPointer.x === newPointer.x &&
-        this.__lastPointer.y === newPointer.y && this.__lastIsEditing;
   },
 
   isTripleClick: function(newPointer) {
@@ -70,7 +59,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes double and triple click event handlers
    */
   initClicks: function() {
-    this.on('dblclick', function(options) {
+    this.on('mousedblclick', function(options) {
       this.selectWord(this.getSelectionStartFromPointer(options.e));
     });
     this.on('tripleclick', function(options) {

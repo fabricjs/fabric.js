@@ -50,6 +50,7 @@
 
       // mouse events
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
       addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
@@ -90,6 +91,7 @@
       this._onMouseOut = this._onMouseOut.bind(this);
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
+      this._onDoubleClick = this._onDoubleClick.bind(this);
       this.eventsBinded = true;
     },
 
@@ -105,7 +107,7 @@
       removeListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       removeListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       removeListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-
+      removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
@@ -216,9 +218,17 @@
      * @private
      * @param {Event} e Event object fired on mousedown
      */
+    _onDoubleClick: function (e) {
+      var target;
+      this._handleEvent(e, 'dblclick', target);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
-
       addListener(fabric.document, 'touchend', this._onMouseUp, { passive: false });
       addListener(fabric.document, 'touchmove', this._onMouseMove, { passive: false });
 
