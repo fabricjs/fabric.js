@@ -401,16 +401,11 @@
   asyncTest('fabric.loadSVGFromString', function() {
     equal('function', typeof fabric.loadSVGFromString);
 
-    var loadedObjects = [];
-    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(loadedObjects) {
       ok(loadedObjects[0] instanceof fabric.Polygon);
       equal('red', loadedObjects[0].fill);
-      start();
-    }, 1000);
+      setTimeout(start, 1000);
+    });
   });
 
   asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {

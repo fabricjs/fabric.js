@@ -394,11 +394,9 @@
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Textbox instance is created
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Textbox} instance of fabric.Textbox
    */
-  fabric.Textbox.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Textbox', object, callback, forceAsync, 'text');
+  fabric.Textbox.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Textbox', object, callback, 'text');
   };
 
   /**

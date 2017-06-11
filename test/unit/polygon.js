@@ -78,14 +78,16 @@
     deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Polygon.fromObject == 'function');
-    var polygon = fabric.Polygon.fromObject(REFERENCE_OBJECT);
-    ok(polygon instanceof fabric.Polygon);
-    deepEqual(polygon.toObject(), REFERENCE_OBJECT);
+    fabric.Polygon.fromObject(REFERENCE_OBJECT, function(polygon) {
+      ok(polygon instanceof fabric.Polygon);
+      deepEqual(polygon.toObject(), REFERENCE_OBJECT);
+      start();
+    });
   });
 
-  test('fromElement', function() {
+  test('fromElement without points', function() {
     ok(typeof fabric.Polygon.fromElement == 'function');
 
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
@@ -93,28 +95,35 @@
 
     var elPolygonWithoutPoints = fabric.document.createElement('polygon');
 
-    deepEqual(fabric.Polygon.fromElement(elPolygonWithoutPoints).toObject(), empty_object);
+    fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
+      deepEqual(polygon.toObject(), empty_object);
+    });
+  });
 
+  test('fromElement with empty points', function() {
     var elPolygonWithEmptyPoints = fabric.document.createElement('polygon');
     elPolygonWithEmptyPoints.setAttribute('points', '');
+    var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
+    empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
+    fabric.Polygon.fromElement(elPolygonWithEmptyPoints, function(polygon) {
+      deepEqual(polygon.toObject(), empty_object);
+    });
+  });
 
-    deepEqual(fabric.Polygon.fromElement(elPolygonWithEmptyPoints).toObject(), empty_object);
-
+  test('fromElement with empty points', function() {
     var elPolygon = fabric.document.createElement('polygon');
-
     elPolygon.setAttribute('points', '10,12 20,22');
+    fabric.Polygon.fromElement(elPolygon, function(polygon) {
+      ok(polygon instanceof fabric.Polygon);
+      var expected = fabric.util.object.extend(
+        fabric.util.object.clone(REFERENCE_OBJECT), {
+          points: [{ x: 10, y: 12 }, { x: 20, y: 22 }]
+        });
+      deepEqual(polygon.toObject(), expected);
+    });
+  });
 
-    var polygon = fabric.Polygon.fromElement(elPolygon);
-
-    ok(polygon instanceof fabric.Polygon);
-
-    var expected = fabric.util.object.extend(
-      fabric.util.object.clone(REFERENCE_OBJECT), {
-        points: [{ x: 10, y: 12 }, { x: 20, y: 22 }]
-      });
-
-    deepEqual(polygon.toObject(), expected);
-
+  test('fromElement with empty points', function() {
     var elPolygonWithAttrs = fabric.document.createElement('polygon');
     elPolygonWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolygonWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
@@ -126,34 +135,35 @@
     elPolygonWithAttrs.setAttribute('stroke-linecap', 'round');
     elPolygonWithAttrs.setAttribute('stroke-linejoin', 'bevil');
     elPolygonWithAttrs.setAttribute('stroke-miterlimit', '5');
-
-    var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
-    var expectedPoints = [
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 }
-    ];
-
-    deepEqual(polygonWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
-      'width':            20,
-      'height':           20,
-      'fill':             'rgb(255,255,255)',
-      'stroke':           'blue',
-      'strokeWidth':      3,
-      'strokeDashArray':  [5, 2],
-      'strokeLineCap':    'round',
-      'strokeLineJoin':   'bevil',
-      'strokeMiterLimit': 5,
-      'opacity':          0.34,
-      'points':           expectedPoints,
-      'top':              10,
-      'left':             10,
-      'transformMatrix':  [2, 0, 0, 2, -10, -20]
-    }));
-
-    deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
-
-    equal(fabric.Polygon.fromElement(), null);
+    fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
+      var expectedPoints = [
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+        { x: 30, y: 30 },
+        { x: 10, y: 10 }
+      ];
+      deepEqual(polygonWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
+        'width':            20,
+        'height':           20,
+        'fill':             'rgb(255,255,255)',
+        'stroke':           'blue',
+        'strokeWidth':      3,
+        'strokeDashArray':  [5, 2],
+        'strokeLineCap':    'round',
+        'strokeLineJoin':   'bevil',
+        'strokeMiterLimit': 5,
+        'opacity':          0.34,
+        'points':           expectedPoints,
+        'top':              10,
+        'left':             10,
+        'transformMatrix':  [2, 0, 0, 2, -10, -20]
+      }));
+      deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
+    });
+  });
+  test('fromElement with null', function() {
+    fabric.Polygon.fromElement(null, function(polygon) {
+      equal(polygon, null);
+    });
   });
 })();

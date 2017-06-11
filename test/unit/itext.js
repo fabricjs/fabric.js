@@ -92,13 +92,13 @@
     equal(lastInstance, iText);
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.IText.fromObject == 'function');
-
-    var iText = fabric.IText.fromObject(ITEXT_OBJECT);
-
-    ok(iText instanceof fabric.IText);
-    deepEqual(ITEXT_OBJECT, iText.toObject());
+    fabric.IText.fromObject(ITEXT_OBJECT, function(iText) {
+      ok(iText instanceof fabric.IText);
+      deepEqual(ITEXT_OBJECT, iText.toObject());
+      start();
+    });
   });
 
   test('lineHeight with single line', function() {

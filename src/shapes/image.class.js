@@ -664,8 +664,8 @@
    * Returns {@link fabric.Image} instance from an SVG element
    * @static
    * @param {SVGElement} element Element to parse
-   * @param {Function} callback Callback to execute when fabric.Image object is created
    * @param {Object} [options] Options object
+   * @param {Function} callback Callback to execute when fabric.Image object is created
    * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
@@ -681,21 +681,5 @@
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
   /* _FROM_SVG_END_ */
-
-  /**
-   * Indicates that instances of this type are async
-   * @static
-   * @type Boolean
-   * @default
-   */
-  fabric.Image.async = true;
-
-  /**
-   * Indicates compression level used when generating PNG under Node (in applyFilters). Any of 0-9
-   * @static
-   * @type Number
-   * @default
-   */
-  fabric.Image.pngCompression = 1;
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -71,11 +71,13 @@
     deepEqual(LINE_OBJECT, line.toObject());
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Line.fromObject == 'function');
-    var line = fabric.Line.fromObject(LINE_OBJECT);
-    ok(line instanceof fabric.Line);
-    deepEqual(LINE_OBJECT, line.toObject());
+    fabric.Line.fromObject(LINE_OBJECT, function(line) {
+      ok(line instanceof fabric.Line);
+      deepEqual(LINE_OBJECT, line.toObject());
+      start();
+    });
   });
 
   test('fromElement', function() {
@@ -104,28 +106,29 @@
     lineEl.setAttribute('stroke-linejoin', strokeLineJoin);
     lineEl.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
-    var oLine = fabric.Line.fromElement(lineEl);
-    ok(oLine instanceof fabric.Line);
+    fabric.Line.fromElement(lineEl, function(oLine) {
+      ok(oLine instanceof fabric.Line);
 
-    equal(oLine.get('x1'), x1);
-    equal(oLine.get('y1'), y1);
-    equal(oLine.get('x2'), x2);
-    equal(oLine.get('y2'), y2);
-    equal(oLine.get('stroke'), stroke);
-    equal(oLine.get('strokeWidth'), strokeWidth);
-    deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
-    equal(oLine.get('strokeLineCap'), strokeLineCap);
-    equal(oLine.get('strokeLineJoin'), strokeLineJoin);
-    equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
+      equal(oLine.get('x1'), x1);
+      equal(oLine.get('y1'), y1);
+      equal(oLine.get('x2'), x2);
+      equal(oLine.get('y2'), y2);
+      equal(oLine.get('stroke'), stroke);
+      equal(oLine.get('strokeWidth'), strokeWidth);
+      deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
+      equal(oLine.get('strokeLineCap'), strokeLineCap);
+      equal(oLine.get('strokeLineJoin'), strokeLineJoin);
+      equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-    var lineElWithMissingAttributes = fabric.document.createElement('line');
-    lineElWithMissingAttributes.setAttribute('x1', 10);
-    lineElWithMissingAttributes.setAttribute('y1', 20);
+      var lineElWithMissingAttributes = fabric.document.createElement('line');
+      lineElWithMissingAttributes.setAttribute('x1', 10);
+      lineElWithMissingAttributes.setAttribute('y1', 20);
 
-    oLine = fabric.Line.fromElement(lineElWithMissingAttributes);
-
-    equal(oLine.get('x2'), 0, 'missing attributes count as 0 values');
-    equal(oLine.get('y2'), 0, 'missing attributes count as 0 values');
+      fabric.Line.fromElement(lineElWithMissingAttributes, function(oLine2) {
+        equal(oLine2.get('x2'), 0, 'missing attributes count as 0 values');
+        equal(oLine2.get('y2'), 0, 'missing attributes count as 0 values');
+      });
+    });
   });
 
   test('straight lines may have 0 width or heigth', function() {
@@ -150,9 +153,9 @@
   test('stroke-width in a style', function() {
     var lineEl = fabric.document.createElement('line');
     lineEl.setAttribute('style', 'stroke-width:4');
-
-    var oLine = fabric.Line.fromElement(lineEl);
-    ok(4, oLine.strokeWidth);
+    fabric.Line.fromElement(lineEl, function(oLine) {
+      ok(4, oLine.strokeWidth);
+    });
   });
 
   // this isn't implemented yet, so disabling for now

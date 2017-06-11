@@ -168,9 +168,10 @@
    * @memberOf fabric.Ellipse
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @return {fabric.Ellipse}
    */
-  fabric.Ellipse.fromElement = function(element, options) {
+  fabric.Ellipse.fromElement = function(element, callback, options) {
     options || (options = { });
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
@@ -179,7 +180,7 @@
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
     parsedAttributes.originX = 'left';
     parsedAttributes.originY = 'top';
-    return new fabric.Ellipse(extend(parsedAttributes, options));
+    callback(new fabric.Ellipse(extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 
@@ -189,11 +190,10 @@
    * @memberOf fabric.Ellipse
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {fabric.Ellipse}
    */
-  fabric.Ellipse.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Ellipse', object, callback, forceAsync);
+  fabric.Ellipse.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Ellipse', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

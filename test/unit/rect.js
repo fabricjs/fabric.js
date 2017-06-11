@@ -68,30 +68,34 @@
     deepEqual(object, REFERENCE_RECT);
   });
 
-  test('fabric.Rect.fromObject', function() {
+  asyncTest('fabric.Rect.fromObject', function() {
     ok(typeof fabric.Rect.fromObject == 'function');
 
-    var rect = fabric.Rect.fromObject(REFERENCE_RECT);
-    ok(rect instanceof fabric.Rect);
-    deepEqual(rect.toObject(), REFERENCE_RECT);
+    fabric.Rect.fromObject(REFERENCE_RECT, function(rect) {
+      ok(rect instanceof fabric.Rect);
+      deepEqual(rect.toObject(), REFERENCE_RECT);
 
-    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-    expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
-    expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
-    rect = fabric.Rect.fromObject(expectedObject);
-    ok(rect.fill instanceof fabric.Gradient);
-    ok(rect.stroke instanceof fabric.Gradient);
+      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+      expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+      expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+      fabric.Rect.fromObject(expectedObject, function(rect2) {
+        ok(rect2.fill instanceof fabric.Gradient);
+        ok(rect2.stroke instanceof fabric.Gradient);
+        start();
+      });
+    });
   });
 
   test('fabric.Rect.fromElement', function() {
     ok(typeof fabric.Rect.fromElement == 'function');
 
     var elRect = fabric.document.createElement('rect');
-    var rect = fabric.Rect.fromElement(elRect);
-    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-    expectedObject.visible = false;
-    ok(rect instanceof fabric.Rect);
-    deepEqual(rect.toObject(), expectedObject);
+    fabric.Rect.fromElement(elRect, function(rect) {
+      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+      expectedObject.visible = false;
+      ok(rect instanceof fabric.Rect);
+      deepEqual(rect.toObject(), expectedObject);
+    });
   });
 
   test('fabric.Rect.fromElement with custom attributes', function() {
@@ -113,38 +117,40 @@
     elRectWithAttrs.setAttribute('stroke-miterlimit', 5);
     //elRectWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
 
-    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
-    ok(rectWithAttrs instanceof fabric.Rect);
-
-    var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
-      left:             10,
-      top:              20,
-      width:            222,
-      height:           333,
-      fill:             'rgb(255,255,255)',
-      opacity:          0.45,
-      stroke:           'blue',
-      strokeWidth:      3,
-      strokeDashArray:  [5, 2],
-      strokeLineCap:    'round',
-      strokeLineJoin:   'bevil',
-      strokeMiterLimit: 5,
-      rx:               11,
-      ry:               12
+    fabric.Rect.fromElement(elRectWithAttrs, function(rectWithAttrs) {
+      ok(rectWithAttrs instanceof fabric.Rect);
+      var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
+        left:             10,
+        top:              20,
+        width:            222,
+        height:           333,
+        fill:             'rgb(255,255,255)',
+        opacity:          0.45,
+        stroke:           'blue',
+        strokeWidth:      3,
+        strokeDashArray:  [5, 2],
+        strokeLineCap:    'round',
+        strokeLineJoin:   'bevil',
+        strokeMiterLimit: 5,
+        rx:               11,
+        ry:               12
+      });
+      deepEqual(rectWithAttrs.toObject(), expectedObject);
     });
-    deepEqual(rectWithAttrs.toObject(), expectedObject);
   });
 
   test('empty fromElement', function() {
-    ok(fabric.Rect.fromElement() === null);
+    fabric.Rect.fromElement(null, function(rect) {
+      equal(rect, null);
+    });
   });
 
   test('clone with rounded corners', function() {
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
-    var clone = rect.clone();
-
-    equal(clone.get('rx'), rect.get('rx'));
-    equal(clone.get('ry'), rect.get('ry'));
+    rect.clone(function(clone) {
+      equal(clone.get('rx'), rect.get('rx'));
+      equal(clone.get('ry'), rect.get('ry'));
+    });
   });
 
   test('toSVG with rounded corners', function() {
