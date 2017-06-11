@@ -282,7 +282,7 @@
 
   test('empty fromElement', function() {
     fabric.Text.fromElement(null, function(text) {
-      equal(text, null)
+      equal(text, null);
     });
   });
 

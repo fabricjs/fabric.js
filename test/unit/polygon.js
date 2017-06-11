@@ -113,7 +113,7 @@
   test('fromElement with empty points', function() {
     var elPolygon = fabric.document.createElement('polygon');
     elPolygon.setAttribute('points', '10,12 20,22');
-    var polygon = fabric.Polygon.fromElement(elPolygon, function(polygon) {
+    fabric.Polygon.fromElement(elPolygon, function(polygon) {
       ok(polygon instanceof fabric.Polygon);
       var expected = fabric.util.object.extend(
         fabric.util.object.clone(REFERENCE_OBJECT), {
@@ -135,7 +135,7 @@
     elPolygonWithAttrs.setAttribute('stroke-linecap', 'round');
     elPolygonWithAttrs.setAttribute('stroke-linejoin', 'bevil');
     elPolygonWithAttrs.setAttribute('stroke-miterlimit', '5');
-    var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
+    fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
       var expectedPoints = [
         { x: 10, y: 10 },
         { x: 20, y: 20 },

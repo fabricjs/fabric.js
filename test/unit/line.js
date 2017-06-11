@@ -73,7 +73,7 @@
 
   asyncTest('fromObject', function() {
     ok(typeof fabric.Line.fromObject == 'function');
-    var line = fabric.Line.fromObject(LINE_OBJECT, function(line) {
+    fabric.Line.fromObject(LINE_OBJECT, function(line) {
       ok(line instanceof fabric.Line);
       deepEqual(LINE_OBJECT, line.toObject());
       start();

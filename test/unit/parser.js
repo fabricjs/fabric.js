@@ -473,6 +473,7 @@
       var opacityValue = Math.random().toFixed(2);
 
       el.setAttribute('opacity', opacityValue);
+      // eslint-disable-next-line
       fabric.Rect.fromElement(el, function(obj) {
         equal(obj.opacity, parseFloat(opacityValue),
           'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
@@ -487,8 +488,8 @@
     el.setAttribute('fill-opacity', opacityValue);
     el.setAttribute('fill', '#FF0000');
     fabric.Rect.fromElement(el, function(obj) {
-          equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
-            'opacity should be parsed correctly from "opacity" attribute of rect element');
+      equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
     });
   });
 
