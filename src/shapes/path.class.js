@@ -912,7 +912,21 @@
    * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    */
   fabric.Path.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Path', object, callback, forceAsync, 'path');
+    if (typeof object.path === 'string') {
+      var pathUrl = object.path;
+      fabric.loadSVGFromURL(pathUrl, function (elements) {
+        var path = elements[0];
+        delete object.path;
+
+        path.setOptions(object);
+        path.setSourcePath(pathUrl);
+
+        callback && callback(path);
+      });
+    }
+    else {
+      return fabric.Object._fromObject('Path', object, callback, forceAsync, 'path');
+    }
   };
 
   /* _FROM_SVG_START_ */
