@@ -909,9 +909,8 @@
    * @memberOf fabric.Path
    * @param {Object} object
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    */
-  fabric.Path.fromObject = function(object, callback, forceAsync) {
+  fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
       var pathUrl = object.path;
       fabric.loadSVGFromURL(pathUrl, function (elements) {
@@ -925,7 +924,7 @@
       });
     }
     else {
-      return fabric.Object._fromObject('Path', object, callback, forceAsync, 'path');
+      fabric.Object._fromObject('Path', object, callback, 'path');
     }
   };
 

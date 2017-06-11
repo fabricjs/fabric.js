@@ -105,11 +105,9 @@
    * @memberOf fabric.Triangle
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Triangle}
    */
-  fabric.Triangle.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Triangle', object, callback, forceAsync);
+  fabric.Triangle.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Triangle', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

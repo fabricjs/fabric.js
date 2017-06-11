@@ -317,21 +317,15 @@
    * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Line} instance of fabric.Line
    */
-  fabric.Line.fromObject = function(object, callback, forceAsync) {
+  fabric.Line.fromObject = function(object, callback) {
     function _callback(instance) {
       delete instance.points;
       callback && callback(instance);
     };
     var options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    var line = fabric.Object._fromObject('Line', options, _callback, forceAsync, 'points');
-    if (line) {
-      delete line.points;
-    }
-    return line;
+    fabric.Object._fromObject('Line', options, _callback, 'points');
   };
 
   /**

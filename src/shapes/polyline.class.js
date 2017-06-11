@@ -244,11 +244,9 @@
    * @memberOf fabric.Polyline
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Polyline} Instance of fabric.Polyline
    */
-  fabric.Polyline.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Polyline', object, callback, forceAsync, 'points');
+  fabric.Polyline.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Polyline', object, callback, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -312,8 +312,7 @@
 
       var enlivenedObjects = [],
           numLoadedObjects = 0,
-          numTotalObjects = objects.length,
-          forceAsync = true;
+          numTotalObjects = objects.length;
 
       if (!numTotalObjects) {
         callback && callback(enlivenedObjects);
@@ -331,7 +330,7 @@
           error || (enlivenedObjects[index] = obj);
           reviver && reviver(o, obj, error);
           onLoaded();
-        }, forceAsync);
+        });
       });
     },
 

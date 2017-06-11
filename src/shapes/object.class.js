@@ -1867,26 +1867,19 @@
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
-  fabric.Object._fromObject = function(className, object, callback, forceAsync, extraParam) {
+  fabric.Object._fromObject = function(className, object, callback, extraParam) {
     var klass = fabric[className];
     object = clone(object, true);
-    if (forceAsync) {
-      fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
-        if (typeof patterns[0] !== 'undefined') {
-          object.fill = patterns[0];
-        }
-        if (typeof patterns[1] !== 'undefined') {
-          object.stroke = patterns[1];
-        }
-        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
-        callback && callback(instance);
-      });
-    }
-    else {
+    fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
+      if (typeof patterns[0] !== 'undefined') {
+        object.fill = patterns[0];
+      }
+      if (typeof patterns[1] !== 'undefined') {
+        object.stroke = patterns[1];
+      }
       var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
       callback && callback(instance);
-      return instance;
-    }
+    });
   };
 
   /**
