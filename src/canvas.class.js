@@ -1396,7 +1396,7 @@
       this._setActiveObject(object);
       this.fire('object:selected', { target: object, e: e });
       object.fire('selected', { e: e });
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
