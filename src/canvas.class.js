@@ -45,7 +45,7 @@
      */
     initialize: function(el, options) {
       options || (options = { });
-
+      this.renderAndResetBound = this.renderAndReset.bind(this);
       this._initStatic(el, options);
       this._initInteractive();
       this._createCacheCanvas();

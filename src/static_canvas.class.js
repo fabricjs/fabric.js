@@ -40,8 +40,8 @@
      */
     initialize: function(el, options) {
       options || (options = { });
-      this._initStatic(el, options);
       this.renderAndResetBound = this.renderAndReset.bind(this);
+      this._initStatic(el, options);
     },
 
     /**
