@@ -40,7 +40,7 @@
      */
     initialize: function(el, options) {
       options || (options = { });
-
+      this.renderAndResetBound = this.renderAndReset.bind(this);
       this._initStatic(el, options);
     },
 
@@ -819,6 +819,31 @@
     },
 
     /**
+     * Function created to be instance bound at initialization
+     * used in requestAnimationFrame rendering
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    renderAndReset: function() {
+      this.renderAll();
+      this.isRendering = false;
+    },
+
+    /**
+     * Append a renderAll request to next animation frame.
+     * a boolean flag will avoid appending more.
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    requestRenderAll: function () {
+      if (!this.isRendering) {
+        this.isRendering = true;
+        fabric.util.requestAnimFrame(this.renderAndResetBound);
+      }
+      return this;
+    },
+
+    /**
      * Calculate the position of the 4 corner of canvas with current viewportTransform.
      * helps to determinate when an object is in the current rendering viewport using
      * object absolute coordinates ( aCoords )
@@ -1424,7 +1449,8 @@
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      return this.renderAll && this.renderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -1452,7 +1478,8 @@
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      return this.renderAll && this.renderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**

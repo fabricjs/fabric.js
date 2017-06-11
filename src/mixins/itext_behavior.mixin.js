@@ -347,7 +347,7 @@
       }
       this.canvas.fire('text:editing:entered', { target: this });
       this.initMouseMoveHandler();
-      this.canvas.renderAll();
+      this.canvas.requestRenderAll();
       return this;
     },
 

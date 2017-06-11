@@ -64,7 +64,7 @@
 
       this._setCenterToOrigin(t.target);
 
-      this.renderAll();
+      this.requestRenderAll();
       t.action = 'drag';
     },
 

@@ -120,7 +120,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.renderAll();
+    this.canvas.requestRenderAll();
   },
 
   /**

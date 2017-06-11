@@ -123,7 +123,7 @@
         group.addWithUpdate();
         this.setActiveGroup(group, e);
         this.fire('selection:created', { target: group, e: e });
-        this.renderAll();
+        this.requestRenderAll();
       }
     },
 

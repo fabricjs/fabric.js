@@ -368,7 +368,7 @@
       this._setCursorFromEvent(e, target);
       this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
       target && (target.__corner = 0);
-      shouldRender && this.renderAll();
+      shouldRender && this.requestRenderAll();
     },
 
     /**
@@ -447,7 +447,7 @@
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject(e).renderAll();
+      this.discardActiveObject(e).requestRenderAll();
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
@@ -559,7 +559,7 @@
       }
       this._handleEvent(e, 'down', target ? target : null);
       // we must renderAll so that we update the visuals
-      shouldRender && this.renderAll();
+      shouldRender && this.requestRenderAll();
     },
 
     /**
@@ -681,7 +681,7 @@
       this._beforeScaleTransform(e, transform);
       this._performTransformAction(e, transform, pointer);
 
-      transform.actionPerformed && this.renderAll();
+      transform.actionPerformed && this.requestRenderAll();
     },
 
     /**
