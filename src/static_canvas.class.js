@@ -599,7 +599,7 @@
       this.calcOffset();
 
       if (!options.cssOnly) {
-        this.requestRenderAll();
+        this.renderAll();
       }
 
       return this;
@@ -676,7 +676,7 @@
         activeGroup.setCoords(ingoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
-      this.requestRenderAll();
+      this.renderAll();
       return this;
     },
 
@@ -803,7 +803,7 @@
       }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
-      this.requestRenderAll();
+      this.renderAll();
       return this;
     },
 
@@ -1056,7 +1056,7 @@
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
-      this.requestRenderAll();
+      this.renderAll();
       return this;
     },
 
@@ -1449,7 +1449,8 @@
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      return this.requestRenderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -1477,7 +1478,8 @@
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      return this.requestRenderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -1515,7 +1517,8 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      return this.requestRenderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -1582,7 +1585,8 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      return this.requestRenderAll();
+      this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -1624,7 +1628,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.requestRenderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**

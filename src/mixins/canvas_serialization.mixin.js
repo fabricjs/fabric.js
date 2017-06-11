@@ -91,7 +91,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var cbIfLoaded = function () {
       if (loaded.backgroundImage && loaded.overlayImage && loaded.backgroundColor && loaded.overlayColor) {
-        _this.requestRenderAll();
+        _this.renderAll();
         callback && callback();
       }
     };
@@ -215,7 +215,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     clone.clipTo = this.clipTo;
     if (this.backgroundImage) {
       clone.setBackgroundImage(this.backgroundImage.src, function() {
-        clone.requestRenderAll();
+        clone.renderAll();
         callback && callback(clone);
       });
       clone.backgroundImageOpacity = this.backgroundImageOpacity;

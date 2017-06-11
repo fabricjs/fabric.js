@@ -12,7 +12,7 @@
     }
   });
 
-  collection.requestRenderAll = function() {
+  collection.renderAll = function() {
     this.rendered++;
   };
 

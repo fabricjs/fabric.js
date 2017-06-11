@@ -21,7 +21,7 @@ fabric.Collection = {
         this._onObjectAdded(arguments[i]);
       }
     }
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
@@ -43,7 +43,7 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
@@ -68,7 +68,7 @@ fabric.Collection = {
       }
     }
 
-    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
+    this.renderOnAddRemove && somethingRemoved && this.renderAll();
     return this;
   },
 
