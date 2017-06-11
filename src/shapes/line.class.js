@@ -294,9 +294,9 @@
    * @memberOf fabric.Line
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
-   * @return {fabric.Line} instance of fabric.Line
+   * @param {Function} [callback] callback function invoked after parsing
    */
-  fabric.Line.fromElement = function(element, options) {
+  fabric.Line.fromElement = function(element, callback, options) {
     options = options || { };
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
@@ -307,7 +307,7 @@
         ];
     options.originX = 'left';
     options.originY = 'top';
-    return new fabric.Line(points, extend(parsedAttributes, options));
+    callback(new fabric.Line(points, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 
@@ -317,21 +317,15 @@
    * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Line} instance of fabric.Line
    */
-  fabric.Line.fromObject = function(object, callback, forceAsync) {
+  fabric.Line.fromObject = function(object, callback) {
     function _callback(instance) {
       delete instance.points;
       callback && callback(instance);
     };
     var options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    var line = fabric.Object._fromObject('Line', options, _callback, forceAsync, 'points');
-    if (line) {
-      delete line.points;
-    }
-    return line;
+    fabric.Object._fromObject('Line', options, _callback, 'points');
   };
 
   /**

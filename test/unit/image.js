@@ -266,7 +266,6 @@
   asyncTest('clone', function() {
     createImageObject(function(image) {
       ok(typeof image.clone == 'function');
-
       image.clone(function(clone) {
         ok(clone instanceof fabric.Image);
         deepEqual(clone.toObject(), image.toObject());

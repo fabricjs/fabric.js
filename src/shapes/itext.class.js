@@ -564,10 +564,8 @@
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.IText} instance of fabric.IText
    */
-  fabric.IText.fromObject = function(object, callback, forceAsync) {
+  fabric.IText.fromObject = function(object, callback) {
     parseDecoration(object);
     if (object.styles) {
       for (var i in object.styles) {
@@ -576,6 +574,6 @@
         }
       }
     }
-    return fabric.Object._fromObject('IText', object, callback, forceAsync, 'text');
+    fabric.Object._fromObject('IText', object, callback, 'text');
   };
 })();

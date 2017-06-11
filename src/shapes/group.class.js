@@ -612,13 +612,4 @@
     });
   };
 
-  /**
-   * Indicates that instances of this type are async
-   * @static
-   * @memberOf fabric.Group
-   * @type Boolean
-   * @default
-   */
-  fabric.Group.async = true;
-
 })(typeof exports !== 'undefined' ? exports : this);

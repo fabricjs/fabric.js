@@ -534,18 +534,18 @@
   test('clone', function() {
     var cObj = new fabric.Object({ left: 123, top: 456, opacity: 0.66 });
     ok(typeof cObj.clone == 'function');
-    var clone = cObj.clone();
+    cObj.clone(function(clone) {
+      equal(clone.get('left'), 123);
+      equal(clone.get('top'), 456);
+      equal(clone.get('opacity'), 0.66);
 
-    equal(clone.get('left'), 123);
-    equal(clone.get('top'), 456);
-    equal(clone.get('opacity'), 0.66);
+      // augmenting clone properties should not affect original instance
+      clone.set('left', 12).set('scaleX', 2.5).setAngle(33);
 
-    // augmenting clone properties should not affect original instance
-    clone.set('left', 12).set('scaleX', 2.5).setAngle(33);
-
-    equal(cObj.get('left'), 123);
-    equal(cObj.get('scaleX'), 1);
-    equal(cObj.getAngle(), 0);
+      equal(cObj.get('left'), 123);
+      equal(cObj.get('scaleX'), 1);
+      equal(cObj.getAngle(), 0);
+    });
   });
 
   asyncTest('cloneAsImage', function() {

@@ -122,14 +122,11 @@
     });
   });
 
-  asyncTest('path array not shared when cloned', function() {
+  test('path array not shared when cloned', function() {
     makePathObject(function(originalPath) {
       originalPath.clone(function(clonedPath) {
-
         clonedPath.path[0][1] = 200;
         equal(originalPath.path[0][1], 100);
-
-        start();
       });
     });
   });

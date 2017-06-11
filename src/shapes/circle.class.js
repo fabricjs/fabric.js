@@ -188,10 +188,10 @@
    * @memberOf fabric.Circle
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {fabric.Circle} Instance of fabric.Circle
    */
-  fabric.Circle.fromElement = function(element, options) {
+  fabric.Circle.fromElement = function(element, callback, options) {
     options || (options = { });
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
@@ -204,7 +204,7 @@
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
     parsedAttributes.originX = 'left';
     parsedAttributes.originY = 'top';
-    return new fabric.Circle(extend(parsedAttributes, options));
+    callback(new fabric.Circle(extend(parsedAttributes, options)));
   };
 
   /**
@@ -221,11 +221,10 @@
    * @memberOf fabric.Circle
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
    * @return {Object} Instance of fabric.Circle
    */
-  fabric.Circle.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Circle', object, callback, forceAsync);
+  fabric.Circle.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Circle', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

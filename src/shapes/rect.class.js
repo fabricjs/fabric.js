@@ -185,12 +185,12 @@
    * @static
    * @memberOf fabric.Rect
    * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Rect} Instance of fabric.Rect
    */
-  fabric.Rect.fromElement = function(element, options) {
+  fabric.Rect.fromElement = function(element, callback, options) {
     if (!element) {
-      return null;
+      return callback(null);
     }
     options = options || { };
 
@@ -202,7 +202,7 @@
     parsedAttributes.originY = 'top';
     var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
-    return rect;
+    callback(rect);
   };
   /* _FROM_SVG_END_ */
 
@@ -212,11 +212,9 @@
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {Object} instance of fabric.Rect
    */
-  fabric.Rect.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Rect', object, callback, forceAsync);
+  fabric.Rect.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Rect', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
