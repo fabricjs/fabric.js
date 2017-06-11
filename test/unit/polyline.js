@@ -77,11 +77,13 @@
     deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Polyline.fromObject == 'function');
-    var polyline = fabric.Polyline.fromObject(REFERENCE_OBJECT);
-    ok(polyline instanceof fabric.Polyline);
-    deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+    abric.Polyline.fromObject(REFERENCE_OBJECT, function(polyline) {
+      ok(polyline instanceof fabric.Polyline);
+      deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+      start();
+    });
   });
 
   test('fromElement', function() {

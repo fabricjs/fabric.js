@@ -135,7 +135,7 @@
     equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Ellipse == 'function');
 
     var left    = 112,
@@ -144,20 +144,24 @@
         ry      = 14.78,
         fill    = 'ff5555';
 
-    var ellipse = fabric.Ellipse.fromObject({
+    fabric.Ellipse.fromObject({
       left: left, top: top, rx: rx, ry: ry, fill: fill
+    }, function(ellipse) {
+      ok(ellipse instanceof fabric.Ellipse);
+
+      equal(ellipse.get('left'), left);
+      equal(ellipse.get('top'), top);
+      equal(ellipse.get('rx'), rx);
+      equal(ellipse.get('ry'), ry);
+      equal(ellipse.get('fill'), fill);
+
+      var expected = ellipse.toObject();
+      fabric.Ellipse.fromObject(expected, function(actual) {
+        deepEqual(actual.toObject(), expected);
+        start();
+      });
     });
-    ok(ellipse instanceof fabric.Ellipse);
 
-    equal(ellipse.get('left'), left);
-    equal(ellipse.get('top'), top);
-    equal(ellipse.get('rx'), rx);
-    equal(ellipse.get('ry'), ry);
-    equal(ellipse.get('fill'), fill);
 
-    var expected = ellipse.toObject();
-    var actual = fabric.Ellipse.fromObject(expected).toObject();
-
-    deepEqual(actual, expected);
   });
 })();

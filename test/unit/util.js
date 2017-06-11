@@ -400,38 +400,23 @@
 
   asyncTest('fabric.loadSVGFromString', function() {
     equal('function', typeof fabric.loadSVGFromString);
-
-    var loadedObjects = [];
     fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
-      ok(loadedObjects[0] instanceof fabric.Polygon);
-      equal('red', loadedObjects[0].fill);
+      ok(objects[0] instanceof fabric.Polygon);
+      equal('red', objects[0].fill);
       start();
-    }, 1000);
+    });
   });
 
   asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
-    var loadedObjects = [];
     fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
-      ok(loadedObjects[0] instanceof fabric.Polygon);
-      equal('red', loadedObjects[0] && loadedObjects[0].fill);
+      ok(objects[0] instanceof fabric.Polygon);
+      equal('red', objects[0] && objects[0].fill);
       start();
-    }, 1000);
+    });
   });
 
   asyncTest('fabric.util.loadImage', function() {
     ok(typeof fabric.util.loadImage == 'function');
-
-    var callbackInvoked = false,
-        objectPassedToCallback;
-
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
       start();
@@ -439,20 +424,12 @@
     }
 
     fabric.util.loadImage(IMG_URL, function(obj) {
-      callbackInvoked = true;
-      objectPassedToCallback = obj;
-    });
-
-    setTimeout(function() {
-      ok(callbackInvoked, 'callback should be invoked');
-
-      if (objectPassedToCallback) {
-        var oImg = new fabric.Image(objectPassedToCallback);
+      if (obj) {
+        var oImg = new fabric.Image(obj);
         ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
       }
-
       start();
-    }, 2000);
+    });
   });
 
   asyncTest('fabric.util.loadImage with no args', function() {

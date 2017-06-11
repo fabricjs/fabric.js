@@ -78,11 +78,13 @@
     deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Polygon.fromObject == 'function');
-    var polygon = fabric.Polygon.fromObject(REFERENCE_OBJECT);
-    ok(polygon instanceof fabric.Polygon);
-    deepEqual(polygon.toObject(), REFERENCE_OBJECT);
+    fabric.Polygon.fromObject(REFERENCE_OBJECT, function(polygon) {
+      ok(polygon instanceof fabric.Polygon);
+      deepEqual(polygon.toObject(), REFERENCE_OBJECT);
+      start();
+    });
   });
 
   test('fromElement', function() {

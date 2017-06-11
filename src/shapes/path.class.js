@@ -953,13 +953,4 @@
   };
   /* _FROM_SVG_END_ */
 
-  /**
-   * Indicates that instances of this type are async
-   * @static
-   * @memberOf fabric.Path
-   * @type Boolean
-   * @default
-   */
-  fabric.Path.async = true;
-
 })(typeof exports !== 'undefined' ? exports : this);

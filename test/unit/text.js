@@ -198,10 +198,12 @@
     equal(text.getText(), 'bar');
   });
 
-  test('fabric.Text.fromObject', function(){
+  asyncTest('fabric.Text.fromObject', function(){
     ok(typeof fabric.Text.fromObject == 'function');
-    var text = fabric.Text.fromObject(REFERENCE_TEXT_OBJECT);
-    deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
+    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT, function(text) {
+      deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
+      start();
+    });
   });
 
   test('fabric.Text.fromElement', function() {

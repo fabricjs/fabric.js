@@ -68,19 +68,22 @@
     deepEqual(object, REFERENCE_RECT);
   });
 
-  test('fabric.Rect.fromObject', function() {
+  asyncTest('fabric.Rect.fromObject', function() {
     ok(typeof fabric.Rect.fromObject == 'function');
 
-    var rect = fabric.Rect.fromObject(REFERENCE_RECT);
-    ok(rect instanceof fabric.Rect);
-    deepEqual(rect.toObject(), REFERENCE_RECT);
+    fabric.Rect.fromObject(REFERENCE_RECT, function(rect) {
+      ok(rect instanceof fabric.Rect);
+      deepEqual(rect.toObject(), REFERENCE_RECT);
 
-    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-    expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
-    expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
-    rect = fabric.Rect.fromObject(expectedObject);
-    ok(rect.fill instanceof fabric.Gradient);
-    ok(rect.stroke instanceof fabric.Gradient);
+      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+      expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+      expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+      fabric.Rect.fromObject(expectedObject, function(rect2) {
+        ok(rect2.fill instanceof fabric.Gradient);
+        ok(rect2.stroke instanceof fabric.Gradient);
+        start();
+      });
+    });
   });
 
   test('fabric.Rect.fromElement', function() {
@@ -139,12 +142,13 @@
     ok(fabric.Rect.fromElement() === null);
   });
 
-  test('clone with rounded corners', function() {
+  asyncTest('clone with rounded corners', function() {
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
-    var clone = rect.clone();
-
-    equal(clone.get('rx'), rect.get('rx'));
-    equal(clone.get('ry'), rect.get('ry'));
+    rect.clone(function(clone) {
+      equal(clone.get('rx'), rect.get('rx'));
+      equal(clone.get('ry'), rect.get('ry'));
+      start();
+    });
   });
 
   test('toSVG with rounded corners', function() {
