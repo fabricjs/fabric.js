@@ -37,6 +37,7 @@
    * @fires mouseover
    * @fires mouseout
    * @fires mousewheel
+   * @fires mousedblclick
    */
   fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
 
