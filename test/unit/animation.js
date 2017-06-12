@@ -2,13 +2,12 @@
   QUnit.module('fabric.util.animate');
 
   asyncTest('animateColor', function() {
-    var lastColor
     function testing(val) {
       notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
     }
     ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor('red', 'blue', 16, {
-      onComplete: function(val) {
+      onComplete: function() {
         // animate color need some fixing
         // equal(val, 'rgba(0,0,255,1)', 'color is blue')
         start();

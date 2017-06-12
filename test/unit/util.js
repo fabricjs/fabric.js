@@ -440,7 +440,6 @@
     }
 
     fabric.util.loadImage(IMG_URL, function(obj) {
-      callbackInvoked = true;
       if (obj) {
         var oImg = new fabric.Image(obj);
         ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
@@ -450,8 +449,6 @@
   });
 
   asyncTest('fabric.util.loadImage with no args', function() {
-    var callbackInvoked = false;
-
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
       expect(0);
@@ -466,8 +463,6 @@
   });
 
   asyncTest('fabric.util.loadImage with crossOrigin', function() {
-    var callbackInvoked = false;
-
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
       expect(0);
@@ -484,9 +479,6 @@
 
 
   asyncTest('fabric.util.loadImage with url for a non exsiting image', function() {
-    var callbackInvoked = false;
-    var hadError = false;
-
     fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
       equal(error, true, 'callback should be invoked with error set to true');
       start();
@@ -844,8 +836,8 @@
 
   test('drawArc', function() {
     ok(typeof fabric.util.drawArc == 'function');
-    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
-    var ctx = canvas.contextContainer
+    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(null, {enableRetinaScaling: false});
+    var ctx = canvas.contextContainer;
     fabric.util.drawArc(ctx, 0, 0, [
       50,
       30,
@@ -875,6 +867,6 @@
       { x: 100.00000000000003, y: 19.99999999999999 },
       { x: 147.19721858646224, y: 100 }
     ];
-    deepEqual(bounds, expectedBounds, 'bounds are')
+    deepEqual(bounds, expectedBounds, 'bounds are as expected');
   });
 })();
