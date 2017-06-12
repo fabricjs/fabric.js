@@ -3,6 +3,7 @@ var testrunner = require('qunit');
 testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
+testrunner.options.log.coverage = true;
 
 testrunner.options.coverage = true;
 testrunner.options.maxBlockDuration = 120000;
@@ -11,6 +12,7 @@ testrunner.run({
     deps: "./test/fixtures/test_script.js",
     code: "./dist/fabric.js",
     tests: [
+      './test/unit/animation.js',
       './test/unit/rect.js',
       './test/unit/ellipse.js',
       './test/unit/color.js',
