@@ -133,6 +133,15 @@
     equal(camelize('--double'), 'Double');
   });
 
+  test('fabric.util.string.graphemeSplit', function() {
+    var gSplit = fabric.util.string.graphemeSplit;
+
+    ok(typeof gSplit === 'function');
+
+    deepEqual(gSplit('foo'), ['f', 'o', 'o'], 'normal test get splitted by char');
+    deepEqual(gSplit('f🙂o'), ['f', '🙂', 'o'], 'normal test get splitted by char');
+  });
+
   test('fabric.util.string.escapeXml', function() {
     var escapeXml = fabric.util.string.escapeXml;
 
@@ -429,10 +438,7 @@
   });
 
   asyncTest('fabric.util.loadImage', function() {
-    ok(typeof fabric.util.loadImage == 'function');
-
-    var callbackInvoked = false,
-        objectPassedToCallback;
+    ok(typeof fabric.util.loadImage === 'function');
 
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
@@ -441,25 +447,15 @@
     }
 
     fabric.util.loadImage(IMG_URL, function(obj) {
-      callbackInvoked = true;
-      objectPassedToCallback = obj;
-    });
-
-    setTimeout(function() {
-      ok(callbackInvoked, 'callback should be invoked');
-
-      if (objectPassedToCallback) {
-        var oImg = new fabric.Image(objectPassedToCallback);
+      if (obj) {
+        var oImg = new fabric.Image(obj);
         ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
       }
-
       start();
-    }, 2000);
+    });
   });
 
   asyncTest('fabric.util.loadImage with no args', function() {
-    var callbackInvoked = false;
-
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
       expect(0);
@@ -468,30 +464,32 @@
     }
 
     fabric.util.loadImage('', function() {
-      callbackInvoked = true;
-    });
-
-    setTimeout(function() {
-      ok(callbackInvoked, 'callback should be invoked');
+      ok(1, 'callback should be invoked');
       start();
-    }, 1000);
+    });
+  });
+
+  asyncTest('fabric.util.loadImage with crossOrigin', function() {
+    if (IMG_URL.indexOf('/home/travis') === 0) {
+      // image can not be accessed on travis so we're returning early
+      expect(0);
+      start();
+      return;
+    }
+
+    fabric.util.loadImage(IMG_URL, function(img) {
+      equal(img.src || img._src, IMG_URL, 'src is set');
+      // equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
+      start();
+    }, null, 'anonymous');
   });
 
 
   asyncTest('fabric.util.loadImage with url for a non exsiting image', function() {
-    var callbackInvoked = false;
-    var hadError = false;
-
     fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
-      callbackInvoked = true;
-      hadError = error;
-    });
-
-    setTimeout(function() {
-      ok(callbackInvoked, 'callback should be invoked');
-      equal(hadError, true, 'callback should be invoked with error set to true');
+      equal(error, true, 'callback should be invoked with error set to true');
       start();
-    }, 1000);
+    });
   });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
@@ -732,17 +730,21 @@
     });
   }
 
-  // test('fabric.util.request', function() {
-  // });
+  test('fabric.util.request', function() {
+    ok(typeof fabric.util.request === 'function', 'fabric.util.request is a function');
+  });
 
-  // test('fabric.util.getPointer', function() {
-  // });
+  test('fabric.util.getPointer', function() {
+    ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
+  });
 
-  // test('fabric.util.addListener', function() {
-  // });
+  test('fabric.util.addListener', function() {
+    ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
+  });
 
-  // test('fabric.util.removeListener', function() {
-  // });
+  test('fabric.util.removeListener', function() {
+    ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
+  });
 
   test('fabric.util.drawDashedLine', function() {
     ok(typeof fabric.util.drawDashedLine === 'function');
@@ -955,6 +957,11 @@
 
   test('parseUnit', function() {
     ok(typeof fabric.util.parseUnit == 'function');
+    equal(Math.round(fabric.util.parseUnit('30mm'), 0), 113, '30mm is pixels');
+    equal(Math.round(fabric.util.parseUnit('30cm'), 0), 1134, '30cm is pixels');
+    equal(Math.round(fabric.util.parseUnit('30in'), 0), 2880, '30in is pixels');
+    equal(Math.round(fabric.util.parseUnit('30pt'), 0), 40, '30mm is pixels');
+    equal(Math.round(fabric.util.parseUnit('30pc'), 0), 480, '30mm is pixels');
   });
 
   test('createCanvasElement', function() {
@@ -971,5 +978,41 @@
 
   test('qrDecompose', function() {
     ok(typeof fabric.util.qrDecompose == 'function');
+  });
+
+  test('drawArc', function() {
+    ok(typeof fabric.util.drawArc == 'function');
+    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(null, {enableRetinaScaling: false});
+    var ctx = canvas.contextContainer;
+    fabric.util.drawArc(ctx, 0, 0, [
+      50,
+      30,
+      0,
+      1,
+      1,
+      100,
+      100,
+    ]);
+    fabric.util.drawArc(ctx, 0, 0, [
+      50,
+      30,
+      0,
+      1,
+      1,
+      100,
+      100,
+    ]);
+  });
+
+  test('get bounds of arc', function() {
+    ok(typeof fabric.util.getBoundsOfArc == 'function');
+    var bounds = fabric.util.getBoundsOfArc(0, 0, 50, 30, 0, 1, 1, 100, 100);
+    var expectedBounds = [
+      { x: 0, y: -8.318331151877368 },
+      { x: 133.33333333333331, y: 19.99999999999999 },
+      { x: 100.00000000000003, y: 19.99999999999999 },
+      { x: 147.19721858646224, y: 100 }
+    ];
+    deepEqual(bounds, expectedBounds, 'bounds are as expected');
   });
 })();

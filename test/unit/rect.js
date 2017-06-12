@@ -83,6 +83,17 @@
     ok(rect.stroke instanceof fabric.Gradient);
   });
 
+  asyncTest('fabric.Rect.fromObject with pattern fill', function() {
+    var fillObj = {
+      type: 'pattern',
+      source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
+    };
+    fabric.Rect.fromObject({ fill: fillObj }, function(rect) {
+      ok(rect.fill instanceof fabric.Pattern);
+      start();
+    });
+  });
+
   test('fabric.Rect.fromElement', function() {
     ok(typeof fabric.Rect.fromElement == 'function');
 
