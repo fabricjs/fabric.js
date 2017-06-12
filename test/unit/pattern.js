@@ -95,8 +95,11 @@
 
   test('toLive', function() {
     var pattern = createPattern();
-
-    ok(typeof pattern.toLive == 'function');
+    var el = fabric.document.createElement('canvas');
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    ok(typeof pattern.toLive === 'function');
+    var created = pattern.toLive(canvas.contextContainer);
+    equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');
   });
 
   test('pattern serialization / deserialization (function)', function() {
@@ -142,5 +145,14 @@
 
     // TODO: test toSVG
   });
+
+  test('initPattern from object', function() {
+    var fillObj = {
+      type: 'pattern',
+      source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
+    }
+    var obj = new fabric.Object({ fill: fillObj });
+    ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
+  })
 
 })();

@@ -175,15 +175,21 @@
   });
 
   test('toLive linearGradient', function() {
+    var el = fabric.document.createElement('canvas');
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
     var gradient = createLinearGradient();
-
-    ok(typeof gradient.toLive == 'function');
+    ok(typeof gradient.toLive === 'function');
+    var gradientCtx = gradient.toLive(canvas.contextContainer);
+    equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
   });
 
   test('toLive radialGradient', function() {
+    var el = fabric.document.createElement('canvas');
+    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
     var gradient = createRadialGradient();
-
-    ok(typeof gradient.toLive == 'function');
+    ok(typeof gradient.toLive === 'function');
+    var gradientCtx = gradient.toLive(canvas.contextContainer);
+    equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
   });
 
   test('fromElement linearGradient', function() {

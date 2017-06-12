@@ -1486,6 +1486,44 @@
     deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
   });
 
+  test('_isRetinaScaling', function() {
+    canvas.enableRetinaScaling = true;
+    fabric.devicePixelRatio = 2;
+    var isScaling = canvas._isRetinaScaling();
+    equal(isScaling, true, 'retina > 1 and enabled');
+
+    canvas.enableRetinaScaling = false;
+    fabric.devicePixelRatio = 2;
+    var isScaling = canvas._isRetinaScaling();
+    equal(isScaling, false, 'retina > 1 and disabled');
+
+    canvas.enableRetinaScaling = false;
+    fabric.devicePixelRatio = 1;
+    var isScaling = canvas._isRetinaScaling();
+    equal(isScaling, false, 'retina = 1 and disabled');
+
+    canvas.enableRetinaScaling = true;
+    fabric.devicePixelRatio = 1;
+    var isScaling = canvas._isRetinaScaling();
+    equal(isScaling, false, 'retina = 1 and enabled');
+  });
+
+  test('getRetinaScaling', function() {
+    canvas.enableRetinaScaling = true;
+    fabric.devicePixelRatio = 1;
+    var scaling = canvas.getRetinaScaling();
+    equal(scaling, 1, 'retina is devicePixelRatio');
+
+    fabric.devicePixelRatio = 2;
+    var scaling = canvas.getRetinaScaling();
+    equal(scaling, 2, 'retina is devicePixelRatio');
+
+    fabric.devicePixelRatio = 2;
+    canvas.enableRetinaScaling = false;
+    var scaling = canvas.getRetinaScaling();
+    equal(scaling, 1, 'retina is disabled, 1');
+  });
+
   //how to test with an exception?
   /*asyncTest('options in setBackgroundImage from invalid URL', function() {
     canvas.backgroundImage = null;
