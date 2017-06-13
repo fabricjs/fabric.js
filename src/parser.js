@@ -645,7 +645,7 @@
     // Precedence of rules:   style > class > attribute
     fabric.parseElements(elements, function(instances, elements) {
       if (callback) {
-        callback(instances, options, elements);
+        callback(instances, options, elements, descendants);
       }
     }, clone(options), reviver, parsingOptions);
   };
@@ -950,8 +950,8 @@
           callback && callback(null);
         }
 
-        fabric.parseSVGDocument(xml.documentElement, function (results, _options, elements) {
-          callback && callback(results, _options, elements);
+        fabric.parseSVGDocument(xml.documentElement, function (results, _options, elements, allElements) {
+          callback && callback(results, _options, elements, allElements);
         }, reviver, options);
       }
     },
@@ -981,8 +981,8 @@
         doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
-      fabric.parseSVGDocument(doc.documentElement, function (results, _options, elements) {
-        callback(results, _options, elements);
+      fabric.parseSVGDocument(doc.documentElement, function (results, _options, elements, allElements) {
+        callback(results, _options, elements, allElements);
       }, reviver, options);
     }
   });
