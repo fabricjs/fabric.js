@@ -228,7 +228,7 @@
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
       return fabric.util.resolveNamespace(namespace)[type];
     },
-    
+
      /**
      * Returns array of attributes for given svg that fabric parses
      * @memberOf fabric.util
@@ -241,7 +241,7 @@
         'style',
         'id',
         'class'
-     ];
+      ];
       switch (type) {
         case 'linearGradient':
           attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
