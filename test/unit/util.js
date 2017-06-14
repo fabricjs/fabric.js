@@ -133,15 +133,6 @@
     equal(camelize('--double'), 'Double');
   });
 
-  test('fabric.util.string.graphemeSplit', function() {
-    var gSplit = fabric.util.string.graphemeSplit;
-
-    ok(typeof gSplit === 'function');
-
-    deepEqual(gSplit('foo'), ['f', 'o', 'o'], 'normal test get splitted by char');
-    deepEqual(gSplit('f🙂o'), ['f', '🙂', 'o'], 'normal test get splitted by char');
-  });
-
   test('fabric.util.string.escapeXml', function() {
     var escapeXml = fabric.util.string.escapeXml;
 

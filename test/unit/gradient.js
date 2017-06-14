@@ -179,7 +179,7 @@
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
     var gradient = createLinearGradient();
     ok(typeof gradient.toLive === 'function');
-    var gradientCtx = gradient.toLive(canvas.contextContainer);
+    var gradientCtx = gradient.toLive(canvas.contextContainer, {});
     equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
   });
 
@@ -188,7 +188,7 @@
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
     var gradient = createRadialGradient();
     ok(typeof gradient.toLive === 'function');
-    var gradientCtx = gradient.toLive(canvas.contextContainer);
+    var gradientCtx = gradient.toLive(canvas.contextContainer, {});
     equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
   });
 
