@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.12"
+    version: "1.7.13"
 };
 
 if (typeof exports !== "undefined") {
@@ -2751,7 +2751,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return this;
         }
     };
-    fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
+    fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/;
     fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
     fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
     fabric.Color.colorNameMap = {
@@ -5868,23 +5868,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return;
         }
         var serialized = typeof json === "string" ? JSON.parse(json) : fabric.util.object.clone(json);
-        this.clear();
-        var _this = this;
-        this._enlivenObjects(serialized.objects, function() {
+        var _this = this, renderOnAddRemove = this.renderOnAddRemove;
+        this.renderOnAddRemove = false;
+        this._enlivenObjects(serialized.objects, function(enlivenedObjects) {
+            _this.clear();
             _this._setBgOverlay(serialized, function() {
+                enlivenedObjects.forEach(function(obj, index) {
+                    _this.insertAt(obj, index);
+                });
+                _this.renderOnAddRemove = renderOnAddRemove;
                 delete serialized.objects;
                 delete serialized.backgroundImage;
                 delete serialized.overlayImage;
                 delete serialized.background;
                 delete serialized.overlay;
                 _this._setOptions(serialized);
+                _this.renderAll();
                 callback && callback();
             });
         }, reviver);
         return this;
     },
     _setBgOverlay: function(serialized, callback) {
-        var _this = this, loaded = {
+        var loaded = {
             backgroundColor: false,
             overlayColor: false,
             backgroundImage: false,
@@ -5896,7 +5902,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         }
         var cbIfLoaded = function() {
             if (loaded.backgroundImage && loaded.overlayImage && loaded.backgroundColor && loaded.overlayColor) {
-                _this.renderAll();
                 callback && callback();
             }
         };
@@ -5926,19 +5931,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         }
     },
     _enlivenObjects: function(objects, callback, reviver) {
-        var _this = this;
         if (!objects || objects.length === 0) {
-            callback && callback();
+            callback && callback([]);
             return;
         }
-        var renderOnAddRemove = this.renderOnAddRemove;
-        this.renderOnAddRemove = false;
         fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
-            enlivenedObjects.forEach(function(obj, index) {
-                _this.insertAt(obj, index);
-            });
-            _this.renderOnAddRemove = renderOnAddRemove;
-            callback && callback();
+            callback && callback(enlivenedObjects);
         }, null, reviver);
     },
     _toDataURL: function(format, callback) {
@@ -6079,7 +6077,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _updateCacheCanvas: function() {
             if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
                 var action = this.canvas._currentTransform.action;
-                if (action.slice(0, 5) === "scale") {
+                if (action.slice && action.slice(0, 5) === "scale") {
                     return false;
                 }
             }
@@ -8068,9 +8066,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         cacheProperties: cacheProperties,
         initialize: function(path, options) {
             options = options || {};
-            if (options) {
-                this.setOptions(options);
-            }
+            this.callSuper("initialize", options);
             if (!path) {
                 path = [];
             }
@@ -8547,7 +8543,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 var pathUrl = object.path;
                 path = elements[0];
                 delete object.path;
-                fabric.util.object.extend(path, object);
+                path.setOptions(object);
                 path.setSourcePath(pathUrl);
                 callback && callback(path);
             });
