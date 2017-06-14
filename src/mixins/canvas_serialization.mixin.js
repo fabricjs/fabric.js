@@ -53,9 +53,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     this.renderOnAddRemove = false;
 
     this._enlivenObjects(serialized.objects, function (enlivenedObjects) {
+      _this.clear();
       _this._setBgOverlay(serialized, function () {
-        _this.clear();
-
         enlivenedObjects.forEach(function(obj, index) {
           // we splice the array just in case some custom classes restored from JSON
           // will add more object to canvas at canvas init.
