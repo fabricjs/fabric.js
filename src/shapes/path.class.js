@@ -79,10 +79,7 @@
      */
     initialize: function(path, options) {
       options = options || { };
-
-      if (options) {
-        this.setOptions(options);
-      }
+      this.callSuper('initialize', options);
 
       if (!path) {
         path = [];
