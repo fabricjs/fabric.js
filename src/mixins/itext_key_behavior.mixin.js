@@ -9,6 +9,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
     this.hiddenTextarea.setAttribute('spellcheck', 'false');
+    this.hiddenTextarea.setAttribute('data-fabric-hiddentextarea', '');
 
     var style = this._calcTextareaPosition();
     this.hiddenTextarea.style.cssText = 'white-space: nowrap; position: absolute; top: ' + style.top +
