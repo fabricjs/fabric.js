@@ -105,8 +105,8 @@
     getUniformLocations: function(gl, program) {
       return {
         uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
-        uWidth: gl.getUniformLocation(program, 'uWidth'),
-        uHeight: gl.getUniformLocation(program, 'uHeight'),
+        uStepW: gl.getUniformLocation(program, 'uStepW'),
+        uStepH: gl.getUniformLocation(program, 'uStepH'),
       };
     },
 
