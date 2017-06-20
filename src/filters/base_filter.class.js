@@ -102,8 +102,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     var attributeLocations = this.getAttributeLocations(gl, program);
     var uniformLocations = this.getUniformLocations(gl, program) || { };
-    uniformLocations.uWidth = gl.getUniformLocation(program, 'uWidth');
-    uniformLocations.uHeight = gl.getUniformLocation(program, 'uHeight');
+    uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
+    uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
     return {
       program: program,
       attributeLocations: attributeLocations,
