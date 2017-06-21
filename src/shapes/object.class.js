@@ -1387,24 +1387,6 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Object} filler fabric.Pattern or fabric.Gradient
-     */
-    _applyPatternGradientTransform: function(ctx, filler) {
-      if (!filler.toLive) {
-        return;
-      }
-      var transform = filler.gradientTransform || filler.patternTransform;
-      var offsetX = -this.width / 2 + filler.offsetX || 0,
-          offsetY = -this.height / 2 + filler.offsetY || 0;
-      ctx.translate(offsetX, offsetY);
-      if (transform) {
-        ctx.transform.apply(ctx, transform);
-      }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
       if (!this.fill) {
@@ -1412,7 +1394,6 @@
       }
 
       ctx.save();
-      this._applyPatternGradientTransform(ctx, this.fill);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1433,7 +1414,6 @@
 
       ctx.save();
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      this._applyPatternGradientTransform(ctx, this.stroke);
       ctx.stroke();
       ctx.restore();
     },

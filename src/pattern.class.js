@@ -152,7 +152,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to create pattern
      * @return {CanvasPattern}
      */
-    toLive: function(ctx) {
+    toLive: function(ctx, object) {
       var source = typeof this.source === 'function' ? this.source() : this.source;
 
       // if the image failed to load, return, and allow rest to continue loading
@@ -169,7 +169,18 @@
           return '';
         }
       }
-      return ctx.createPattern(source, this.repeat);
+      var transform = this.patternTransform;
+      var offsetX = -object.width / 2 + this.offsetX || 0,
+          offsetY = -object.height / 2 + this.offsetY || 0;
+      ctx.save();
+      ctx.translate(offsetX, offsetY);
+      if (transform) {
+        ctx.transform.apply(ctx, transform);
+      }
+
+      var pattern = ctx.createPattern(source, this.repeat);
+      ctx.restore();
+      return pattern;
     }
   });
 })();
