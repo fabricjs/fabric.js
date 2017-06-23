@@ -276,6 +276,7 @@
      */
     toObject: function() {
       return {
+        type: this.type,
         color: this.color,
         mode: this.mode,
         alpha: this.alpha
