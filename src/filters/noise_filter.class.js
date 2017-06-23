@@ -36,7 +36,7 @@
      */
     fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
-      'uniform float uHeight;\n' +
+      'uniform float uStepH;\n' +
       'uniform float uNoise;\n' +
       'uniform float uSeed;\n' +
       'varying vec2 vTexCoord;\n' +
@@ -45,7 +45,7 @@
       '}\n' +
       'void main() {\n' +
         'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'color.rgb += (0.5 - rand(vTexCoord, uSeed, uHeight / 10.0)) * uNoise;\n' +
+        'color.rgb += (0.5 - rand(vTexCoord, uSeed, 0.1 / uStepH)) * uNoise;\n' +
         'gl_FragColor = color;\n' +
       '}',
 
