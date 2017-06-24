@@ -30,7 +30,7 @@
   }
 
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push('path', 'fillRule');
+  stateProperties.push('path');
 
   var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
   cacheProperties.push('path', 'fillRule');
