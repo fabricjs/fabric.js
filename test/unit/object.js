@@ -1165,7 +1165,7 @@
   });
 
   test('isCacheDirty statefullCache disabled', function() {
-    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
@@ -1177,7 +1177,7 @@
   });
 
   test('isCacheDirty statefullCache enabled', function() {
-    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     object.statefullCache = true;

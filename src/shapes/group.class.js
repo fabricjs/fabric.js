@@ -55,6 +55,13 @@
     subTargetCheck: false,
 
     /**
+     * Groups are container, do not render anything on theyr own, ence no cache properties
+     * @type Boolean
+     * @default
+     */
+    cacheProperties: [],
+
+    /**
      * Constructor
      * @param {Object} objects Group objects
      * @param {Object} [options] Options object
@@ -365,8 +372,11 @@
       }
       for (var i = 0, len = this._objects.length; i < len; i++) {
         if (this._objects[i].isCacheDirty(true)) {
-          var dim = this._getNonTransformedDimensions();
-          this._cacheContext.clearRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
+          if (this._cacheCanvas) {
+            // if this group has not a cache canvas there is nothing to clean
+            var x = this.cacheWidth / this.zoomX, y = this.cacheHeight / this.zoomY;
+            this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
+          }
           return true;
         }
       }
