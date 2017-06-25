@@ -519,6 +519,9 @@
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
+    // specify that the group is caching or the test will fail under node since the
+    // object caching is disabled by default
+    g1.ownCaching = true;
     equal(g1.dirty, false, 'Group has no dirty flag set');
     obj.set('angle', 5);
     equal(obj.dirty, false, 'Obj has dirty flag still false');
