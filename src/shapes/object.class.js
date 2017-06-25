@@ -9,7 +9,8 @@
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
-      objectCaching = !fabric.isLikelyNode;
+      objectCaching = !fabric.isLikelyNode,
+      ALIASING_LIMIT = 2;
 
   if (fabric.Object) {
     return;
@@ -861,16 +862,22 @@
           maximumSide = fabric.cacheSideLimit,
           width = dims.width, height = dims.height,
           ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide),
-          capValue = fabric.util.capValue, max = fabric.cacheSideLimit, min = fabric.minCacheSideLimit,
+          capValue = fabric.util.capValue, max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit,
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
-        dims.zoomX /= dims.width / x;
+        dims.zoomX /= width / x;
         dims.width = x;
       }
+      else if (width < min) {
+        dims.width = min;
+      }
       if (height > y) {
-        dims.zoomY /= dims.height / y;
+        dims.zoomY /= height / y;
         dims.height = y;
+      }
+      else if (height < min) {
+        dims.height = min;
       }
       return dims;
     },
@@ -894,8 +901,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
-        width: width + 2,
-        height: height + 2,
+        width: width + ALIASING_LIMIT,
+        height: height + ALIASING_LIMIT,
         zoomX: zoomX,
         zoomY: zoomY
       };

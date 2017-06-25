@@ -77,7 +77,7 @@ fabric.perfLimitSizeTotal = 2097152;
  * @type Number
  * @default
  */
-fabric.cacheSideLimit = 4096;
+fabric.maxCacheSideLimit = 4096;
 
 /**
  * Lowest pixel limit for cache canvases, set at 256PX
