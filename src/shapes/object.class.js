@@ -846,27 +846,33 @@
      * and each side do not cross fabric.cacheSideLimit
      * those numbers are configurable so that you can get as much detail as you want
      * making bargain with performances.
-     * @private
+     * @param {Object} dims
+     * @param {Object} dims.width width of canvas
+     * @param {Object} dims.height height of canvas
+     * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
       var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
           maximumSide = fabric.cacheSideLimit,
           width = dims.width, height = dims.height,
-          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide);
-      if (width > limitedDims.x) {
-        dims.zoomX /= dims.width / limitedDims.x;
-        dims.width = limitedDims.x;
+          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide),
+          capValue = fabric.util.capValue, max = fabric.cacheSideLimit, min = fabric.minCacheSideLimit,
+          x = capValue(min, limitedDims.x, max),
+          y = capValue(min, limitedDims.y, max);
+      if (width > x) {
+        dims.zoomX /= dims.width / x;
+        dims.width = x;
       }
-      if (height > limitedDims.y) {
-        dims.zoomY /= dims.height / limitedDims.y;
-        dims.height = limitedDims.y;
+      if (height > y) {
+        dims.zoomY /= dims.height / y;
+        dims.height = y;
       }
-      return {
-        width: dims.width,
-        height: dims.height,
-        zoomX: dims.zoomX,
-        zoomY: dims.zoomY,
-      };
+      return dims;
     },
 
     /**
