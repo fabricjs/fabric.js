@@ -884,7 +884,7 @@
   });
 
   test('fabric.util.limitDimsByArea ar < 1', function() {
-    var dims = fabric.util.limitDimsByArea(1/3, 10000);
+    var dims = fabric.util.limitDimsByArea(1 / 3, 10000);
     equal(dims.x, 57);
     equal(dims.y, 173);
   });
