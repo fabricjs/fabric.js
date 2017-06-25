@@ -690,6 +690,25 @@
       else if (fabric.charWidthsCache[fontFamily]) {
         delete fabric.charWidthsCache[fontFamily];
       }
+    },
+
+    /**
+     * Clear char widths cache for a font family.
+     * @memberOf fabric.util
+     * @param {Number} ar aspect ratio
+     * @param {Number} maximumArea Maximum area you want to achieve
+     * @param {Number} maximumSide biggest side allowed
+     * @return {Object.x} Limited dimensions by X
+     * @return {Object.y} Limited dimensions by Y
+     */
+    limitDimsByArea: function(ar, maximumArea) {
+      var roughWidth = Math.sqrt(maximumArea * ar),
+          perfLimitSizeY = Math.floor(maximumArea / roughWidth);
+      return { x: Math.floor(roughWidth), y: perfLimitSizeY };
+    },
+
+    capValue: function(min, value, max) {
+      return Math.max(min, Math.min(value, max));
     }
   };
 

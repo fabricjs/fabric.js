@@ -62,6 +62,31 @@ fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)';
 fabric.fontPaths = { };
 fabric.iMatrix = [1, 0, 0, 1, 0, 0];
 fabric.canvasModule = 'canvas';
+
+/**
+ * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
+ * @since 1.7.14
+ * @type Number
+ * @default
+ */
+fabric.perfLimitSizeTotal = 2097152;
+
+/**
+ * Pixel limit for cache canvases width or height. IE fixes the maximum at 5000
+ * @since 1.7.14
+ * @type Number
+ * @default
+ */
+fabric.cacheSideLimit = 4096;
+
+/**
+ * Lowest pixel limit for cache canvases, set at 256PX
+ * @since 1.7.14
+ * @type Number
+ * @default
+ */
+fabric.minCacheSideLimit = 256;
+
 /**
  * Cache Object for widths of chars in text rendering.
  */

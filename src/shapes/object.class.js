@@ -842,6 +842,34 @@
     },
 
     /**
+     * Limit the cache dimensions so that X * Y do not cross fabric.perfLimitSizeTotal
+     * and each side do not cross fabric.cacheSideLimit
+     * those numbers are configurable so that you can get as much detail as you want
+     * making bargain with performances.
+     * @private
+     */
+    _limitCacheSize: function(dims) {
+      var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
+          maximumSide = fabric.cacheSideLimit,
+          width = dims.width, height = dims.height,
+          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide);
+      if (width > limitedDims.x) {
+        dims.zoomX /= dims.width / limitedDims.x;
+        dims.width = limitedDims.x;
+      }
+      if (height > limitedDims.y) {
+        dims.zoomY /= dims.height / limitedDims.y;
+        dims.height = limitedDims.y;
+      }
+      return {
+        width: dims.width,
+        height: dims.height,
+        zoomX: dims.zoomX,
+        zoomY: dims.zoomY,
+      };
+    },
+
+    /**
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
      * @private
@@ -880,17 +908,25 @@
           return false;
         }
       }
-      var dims = this._getCacheCanvasDimensions(),
+      var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           width = dims.width, height = dims.height,
-          zoomX = dims.zoomX, zoomY = dims.zoomY;
-
-      if (width !== this.cacheWidth || height !== this.cacheHeight) {
-        this._cacheCanvas.width = Math.ceil(width);
-        this._cacheCanvas.height = Math.ceil(height);
+          zoomX = dims.zoomX, zoomY = dims.zoomY,
+          dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
+          zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
+          shouldRedraw = dimensionsChanged || zoomChanged;
+      if (shouldRedraw) {
+        if (dimensionsChanged) {
+          this._cacheCanvas.width = Math.ceil(width);
+          this._cacheCanvas.height = Math.ceil(height);
+          this.cacheWidth = width;
+          this.cacheHeight = height;
+        }
+        else {
+          this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
+          this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
+        }
         this._cacheContext.translate(width / 2, height / 2);
         this._cacheContext.scale(zoomX, zoomY);
-        this.cacheWidth = width;
-        this.cacheHeight = height;
         this.zoomX = zoomX;
         this.zoomY = zoomY;
         return true;
