@@ -996,7 +996,7 @@
   });
 
   test('get bounds of arc', function() {
-    ok(typeof fabric.util.getBoundsOfArc == 'function');
+    ok(typeof fabric.util.getBoundsOfArc === 'function');
     var bounds = fabric.util.getBoundsOfArc(0, 0, 50, 30, 0, 1, 1, 100, 100);
     var expectedBounds = [
       { x: 0, y: -8.318331151877368 },
@@ -1005,5 +1005,42 @@
       { x: 147.19721858646224, y: 100 }
     ];
     deepEqual(bounds, expectedBounds, 'bounds are as expected');
+  });
+
+  test('fabric.util.limitDimsByArea', function() {
+    ok(typeof fabric.util.limitDimsByArea === 'function');
+    var dims = fabric.util.limitDimsByArea(1, 10000);
+    equal(dims.x, 100);
+    equal(dims.y, 100);
+  });
+
+  test('fabric.util.limitDimsByArea ar > 1', function() {
+    var dims = fabric.util.limitDimsByArea(3, 10000);
+    equal(dims.x, 173);
+    equal(dims.y, 57);
+  });
+
+  test('fabric.util.limitDimsByArea ar < 1', function() {
+    var dims = fabric.util.limitDimsByArea(1 / 3, 10000);
+    equal(dims.x, 57);
+    equal(dims.y, 173);
+  });
+
+  test('fabric.util.capValue ar < 1', function() {
+    ok(typeof fabric.util.capValue === 'function');
+    var val = fabric.util.capValue(3, 10, 70);
+    equal(val, 10, 'value is not capped');
+  });
+
+  test('fabric.util.capValue ar < 1', function() {
+    ok(typeof fabric.util.capValue === 'function');
+    var val = fabric.util.capValue(3, 1, 70);
+    equal(val, 3, 'min cap');
+  });
+
+  test('fabric.util.capValue ar < 1', function() {
+    ok(typeof fabric.util.capValue === 'function');
+    var val = fabric.util.capValue(3, 80, 70);
+    equal(val, 70, 'max cap');
   });
 })();

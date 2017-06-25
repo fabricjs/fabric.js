@@ -9,7 +9,8 @@
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
-      objectCaching = !fabric.isLikelyNode;
+      objectCaching = !fabric.isLikelyNode,
+      ALIASING_LIMIT = 2;
 
   if (fabric.Object) {
     return;
@@ -841,6 +842,46 @@
     },
 
     /**
+     * Limit the cache dimensions so that X * Y do not cross fabric.perfLimitSizeTotal
+     * and each side do not cross fabric.cacheSideLimit
+     * those numbers are configurable so that you can get as much detail as you want
+     * making bargain with performances.
+     * @param {Object} dims
+     * @param {Object} dims.width width of canvas
+     * @param {Object} dims.height height of canvas
+     * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     */
+    _limitCacheSize: function(dims) {
+      var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
+          maximumSide = fabric.cacheSideLimit,
+          width = dims.width, height = dims.height,
+          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide),
+          capValue = fabric.util.capValue, max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit,
+          x = capValue(min, limitedDims.x, max),
+          y = capValue(min, limitedDims.y, max);
+      if (width > x) {
+        dims.zoomX /= width / x;
+        dims.width = x;
+      }
+      else if (width < min) {
+        dims.width = min;
+      }
+      if (height > y) {
+        dims.zoomY /= height / y;
+        dims.height = y;
+      }
+      else if (height < min) {
+        dims.height = min;
+      }
+      return dims;
+    },
+
+    /**
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
      * @private
@@ -859,8 +900,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
-        width: width + 2,
-        height: height + 2,
+        width: width + ALIASING_LIMIT,
+        height: height + ALIASING_LIMIT,
         zoomX: zoomX,
         zoomY: zoomY
       };
@@ -879,17 +920,25 @@
           return false;
         }
       }
-      var dims = this._getCacheCanvasDimensions(),
+      var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           width = dims.width, height = dims.height,
-          zoomX = dims.zoomX, zoomY = dims.zoomY;
-
-      if (width !== this.cacheWidth || height !== this.cacheHeight) {
-        this._cacheCanvas.width = Math.ceil(width);
-        this._cacheCanvas.height = Math.ceil(height);
+          zoomX = dims.zoomX, zoomY = dims.zoomY,
+          dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
+          zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
+          shouldRedraw = dimensionsChanged || zoomChanged;
+      if (shouldRedraw) {
+        if (dimensionsChanged) {
+          this._cacheCanvas.width = Math.ceil(width);
+          this._cacheCanvas.height = Math.ceil(height);
+          this.cacheWidth = width;
+          this.cacheHeight = height;
+        }
+        else {
+          this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
+          this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
+        }
         this._cacheContext.translate(width / 2, height / 2);
         this._cacheContext.scale(zoomX, zoomY);
-        this.cacheWidth = width;
-        this.cacheHeight = height;
         this.zoomX = zoomX;
         this.zoomY = zoomY;
         return true;

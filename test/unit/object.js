@@ -49,6 +49,9 @@
 
   QUnit.module('fabric.Object', {
     teardown: function() {
+      fabric.perfLimitSizeTotal = 2097152;
+      fabric.maxCacheSideLimit = 4096;
+      fabric.minCacheSideLimit = 256;
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
@@ -1205,6 +1208,9 @@
   });
 
   test('_updateCacheCanvas check if cache canvas should be updated', function() {
+    fabric.perfLimitSizeTotal = 10000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 1;
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     object._createCacheCanvas();
     equal(object.cacheWidth, 12, 'current cache dimensions are saved');
@@ -1219,6 +1225,108 @@
     equal(object.cacheWidth, 6, 'current cache dimensions is updated');
     object.strokeWidth = 2;
     equal(object._updateCacheCanvas(), true, 'if strokeWidth change, it returns true');
+  });
+
+  test('_limitCacheSize limit min to 256', function() {
+    fabric.perfLimitSizeTotal = 10000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, 256, 'width gets minimum to the cacheSideLimit');
+    equal(dims.height, 256, 'height gets minimum to the cacheSideLimit');
+    equal(zoomX, dims.zoomX, 'zoom factor X does not need a change');
+    equal(zoomY, dims.zoomY, 'zoom factor Y does not need a change');
+  });
+
+  test('_limitCacheSize does not limit if not necessary', function() {
+    fabric.perfLimitSizeTotal = 1000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 400, height: 400, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, 402, 'width is in the middle of limits');
+    equal(dims.height, 402, 'height is in the middle of limits');
+    equal(zoomX, dims.zoomX, 'zoom factor X does not need a change');
+    equal(zoomY, dims.zoomY, 'zoom factor Y does not need a change');
+  });
+
+  test('_limitCacheSize does cap up minCacheSideLimit', function() {
+    fabric.perfLimitSizeTotal = 10000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 400, height: 400, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var width = dims.width;
+    var height = dims.height;
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, 256, 'width is capped to min');
+    equal(dims.height, 256, 'height is capped to min');
+    equal(zoomX * dims.width / width, dims.zoomX, 'zoom factor X gets updated to represent the shrink');
+    equal(zoomY * dims.height / height, dims.zoomY, 'zoom factor Y gets updated to represent the shrink');
+  });
+
+  test('_limitCacheSize does cap up if necessary', function() {
+    fabric.perfLimitSizeTotal = 1000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 2046, height: 2046, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var width = dims.width;
+    var height = dims.height;
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, 1000, 'width is capped to max allowed by area');
+    equal(dims.height, 1000, 'height is capped to max allowed by area');
+    equal(zoomX * dims.width / width, dims.zoomX, 'zoom factor X gets updated to represent the shrink');
+    equal(zoomY * dims.height / height, dims.zoomY, 'zoom factor Y gets updated to represent the shrink');
+  });
+
+  test('_limitCacheSize does cap up if necessary to maxCacheSideLimit', function() {
+    fabric.perfLimitSizeTotal = 100000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 8192, height: 8192, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, fabric.maxCacheSideLimit, 'width is capped to max allowed by fabric');
+    equal(dims.height, fabric.maxCacheSideLimit, 'height is capped to max allowed by fabric');
+    equal(dims.zoomX, zoomX * 4096 / 8194, 'zoom factor X gets updated to represent the shrink');
+    equal(dims.zoomY, zoomY * 4096 / 8194, 'zoom factor Y gets updated to represent the shrink');
+  });
+
+  test('_limitCacheSize does cap up if necessary to maxCacheSideLimit, different AR', function() {
+    fabric.perfLimitSizeTotal = 100000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
+    var object = new fabric.Object({ width: 16384, height: 8192, strokeWidth: 0 });
+    var dims = object._getCacheCanvasDimensions();
+    var width = dims.width;
+    var height = dims.height;
+    var zoomX = dims.zoomX;
+    var zoomY = dims.zoomY;
+    var limitedDims = object._limitCacheSize(dims);
+    equal(dims, limitedDims, 'object is mutated');
+    equal(dims.width, fabric.maxCacheSideLimit, 'width is capped to max allowed by fabric');
+    equal(dims.height, fabric.maxCacheSideLimit, 'height is capped to max allowed by fabric');
+    equal(dims.zoomX, zoomX * fabric.maxCacheSideLimit / width, 'zoom factor X gets updated to represent the shrink');
+    equal(dims.zoomY, zoomY * fabric.maxCacheSideLimit / height, 'zoom factor Y gets updated to represent the shrink');
   });
 
   test('_setShadow', function(){
