@@ -313,7 +313,7 @@
     },
 
     /**
-     * Decide if the object should cache or not.
+     * Decide if the object should cache or not. Create its own cache level
      * objectCaching is a global flag, wins over everything
      * needsItsOwnCache should be used when the object drawing method requires
      * a cache step. None of the fabric classes requires it.
@@ -321,17 +321,17 @@
      * @return {Boolean}
      */
     shouldCache: function() {
-      var parentCache = this.objectCaching && (!this.group || this.needsItsOwnCache() || !this.group.isCaching());
-      this.caching = parentCache;
-      if (parentCache) {
+      var ownCache = this.objectCaching && (!this.group || this.needsItsOwnCache() || !this.group.isOnACache());
+      this.ownCaching = ownCache;
+      if (ownCache) {
         for (var i = 0, len = this._objects.length; i < len; i++) {
           if (this._objects[i].willDrawShadow()) {
-            this.caching = false;
+            this.ownCaching = false;
             return false;
           }
         }
       }
-      return parentCache;
+      return ownCache;
     },
 
     /**
@@ -354,8 +354,8 @@
      * Check if this group or its parent group are caching, recursively up
      * @return {Boolean}
      */
-    isCaching: function() {
-      return this.caching || this.group && this.group.isCaching();
+    isOnACache: function() {
+      return this.ownCaching || (this.group && this.group.isOnACache());
     },
 
     /**
@@ -413,11 +413,6 @@
      * @private
      */
     _renderObject: function(object, ctx) {
-      // do not render if object is not visible
-      if (!object.visible) {
-        return;
-      }
-
       var originalHasRotatingPoint = object.hasRotatingPoint;
       object.hasRotatingPoint = false;
       object.render(ctx);
