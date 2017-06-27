@@ -949,10 +949,8 @@
           this.cacheHeight = height;
           this.cacheTranslationX = (width + additionalWidth) / 2;
           this.cacheTranslationY = (height + additionalHeight) / 2;
-          console.log('resized', this._cacheCanvas.width, this._cacheCanvas.height)
         }
         else {
-          console.log('not resized')
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
           this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
         }
