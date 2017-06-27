@@ -1,3 +1,10 @@
+**Version 1.7.14**
+
+- Improvement: Avoid cache canvas to resize each mouse move step. [#4037](https://github.com/kangax/fabric.js/pull/4037)
+- Improvement: Make cache canvas limited in size. [#4035](https://github.com/kangax/fabric.js/pull/4035)
+- Fix: Make groups and statefull cache work. [#4032](https://github.com/kangax/fabric.js/pull/4032)
+- Add: Marked the hiddentextarea from itext so that custom projects can recognize it. [#4022](https://github.com/kangax/fabric.js/pull/4022)
+
 **Version 1.7.13**
 
 - Fix: Try to minimize delay in loadFroJson [#4007](https://github.com/kangax/fabric.js/pull/4007)
