@@ -1357,5 +1357,5 @@
     equal(object.willDrawShadow(), false, 'object will not drawShadow');
     object.shadow.offsetX = 1;
     equal(object.willDrawShadow(), true, 'object will drawShadow');
-  })
+  });
 })();
