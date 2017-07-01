@@ -637,13 +637,13 @@
     group3.shadow = { offsetX: 0, offsetY: 0 };
     equal(group3.willDrawShadow(), false, 'group will NOT cast shadow because group itself has shadow but not offsets');
     group3.shadow = { offsetX: 2, offsetY: 0 };
-    equal(group3.willDrawShadow(), false, 'group will cast shadow because group itself has shadow and one offsetX different than 0');
+    equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetX different than 0');
     group3.shadow = { offsetX: 0, offsetY: 2 };
-    equal(group3.willDrawShadow(), false, 'group will cast shadow because group itself has shadow and one offsetY different than 0');
+    equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetY different than 0');
     group3.shadow = { offsetX: -2, offsetY: 0 };
-    equal(group3.willDrawShadow(), false, 'group will cast shadow because group itself has shadow and one offsetX different than 0');
+    equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetX different than 0');
     group3.shadow = { offsetX: 0, offsetY: -2 };
-    equal(group3.willDrawShadow(), false, 'group will cast shadow because group itself has shadow and one offsetY different than 0');
+    equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetY different than 0');
   });
 
   test('group shouldCache', function() {
