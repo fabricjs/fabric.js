@@ -6850,14 +6850,14 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeGroup = this._activeGroup, object, ignoreVpt = false, skipAbsolute = true;
+      var activeGroup = this._activeGroup, object, ingoreVpt = false, skipAbsolute = true;
       this.viewportTransform = vpt;
       for (var i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords(ignoreVpt, skipAbsolute);
+        object.group || object.setCoords(ingoreVpt, skipAbsolute);
       }
       if (activeGroup) {
-        activeGroup.setCoords(ignoreVpt, skipAbsolute);
+        activeGroup.setCoords(ingoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
       this.renderAll();
@@ -12654,6 +12654,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (shouldResizeCanvas) {
           this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
           this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
+          this.cacheWidth = width;
+          this.cacheHeight = height;
           this.cacheTranslationX = (width + additionalWidth) / 2;
           this.cacheTranslationY = (height + additionalHeight) / 2;
         }
@@ -12661,8 +12663,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
           this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
         }
-        this.cacheWidth = width;
-        this.cacheHeight = height;
         this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
         this._cacheContext.scale(zoomX, zoomY);
         this.zoomX = zoomX;
@@ -12981,7 +12981,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Boolean}
      */
     willDrawShadow: function() {
-      return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
+      return !!this.shadow;
     },
 
     /**
@@ -18611,7 +18611,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     willDrawShadow: function() {
       if (this.shadow) {
-        return this.callSuper('willDrawShadow');
+        return true;
       }
       for (var i = 0, len = this._objects.length; i < len; i++) {
         if (this._objects[i].willDrawShadow()) {
@@ -25389,17 +25389,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * For functionalities on keyDown
-   * Map a special key to a function of the instance/prototype
-   * If you need different behaviour for ESC or TAB or arrows, you have to change
-   * this map setting the name of a function that you build on the fabric.Itext or
-   * your prototype.
-   * the map change will affect all Instances unless you need for only some text Instances
-   * in that case you have to clone this object and assign your Instance.
-   * this.keysMap = fabric.util.object.clone(this.keysMap);
-   * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
+   * @private
    */
-  keysMap: {
+  _keysMap: {
     8:  'removeChars',
     9:  'exitEditing',
     27: 'exitEditing',
@@ -25416,17 +25408,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * For functionalities on keyUp + ctrl || cmd
+   * @private
    */
-  ctrlKeysMapUp: {
+  _ctrlKeysMapUp: {
     67: 'copy',
     88: 'cut'
   },
 
   /**
-   * For functionalities on keyDown + ctrl || cmd
+   * @private
    */
-  ctrlKeysMapDown: {
+  _ctrlKeysMapDown: {
     65: 'selectAll'
   },
 
@@ -25443,11 +25435,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
-    if (e.keyCode in this.keysMap) {
-      this[this.keysMap[e.keyCode]](e);
+    if (e.keyCode in this._keysMap) {
+      this[this._keysMap[e.keyCode]](e);
     }
-    else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapDown[e.keyCode]](e);
+    else if ((e.keyCode in this._ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      this[this._ctrlKeysMapDown[e.keyCode]](e);
     }
     else {
       return;
@@ -25475,8 +25467,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._copyDone = false;
       return;
     }
-    if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapUp[e.keyCode]](e);
+    if ((e.keyCode in this._ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      this[this._ctrlKeysMapUp[e.keyCode]](e);
     }
     else {
       return;
