@@ -49,11 +49,6 @@
     /**
      * Override standard Object class values
      */
-    lockScalingY: true,
-
-    /**
-     * Override standard Object class values
-     */
     lockScalingFlip: true,
 
     /**
@@ -73,7 +68,6 @@
     initialize: function(text, options) {
 
       this.callSuper('initialize', text, options);
-      this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
       this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
       // add width to this list of props that effect line wrapping.
       this._dimensionAffectingProps.push('width');
@@ -354,25 +348,6 @@
       return newText;
     },
 
-    /**
-     * When part of a group, we don't want the Textbox's scale to increase if
-     * the group's increases. That's why we reduce the scale of the Textbox by
-     * the amount that the group's increases. This is to maintain the effective
-     * scale of the Textbox at 1, so that font-size values make sense. Otherwise
-     * the same font-size value would result in different actual size depending
-     * on the value of the scale.
-     * @param {String} key
-     * @param {*} value
-     */
-    setOnGroup: function(key, value) {
-      if (key === 'scaleX') {
-        this.set('scaleX', Math.abs(1 / value));
-        this.set('width', (this.get('width') * value) /
-          (typeof this.__oldScaleX === 'undefined' ? 1 : this.__oldScaleX));
-        this.__oldScaleX = value;
-      }
-    },
-
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
     },
@@ -398,23 +373,4 @@
   fabric.Textbox.fromObject = function(object, callback) {
     return fabric.Object._fromObject('Textbox', object, callback, 'text');
   };
-
-  /**
-   * Returns the default controls visibility required for Textboxes.
-   * @returns {Object}
-   */
-  fabric.Textbox.getTextboxControlVisibility = function() {
-    return {
-      tl: false,
-      tr: false,
-      br: false,
-      bl: false,
-      ml: true,
-      mt: false,
-      mr: true,
-      mb: false,
-      mtr: true
-    };
-  };
-
 })(typeof exports !== 'undefined' ? exports : this);
