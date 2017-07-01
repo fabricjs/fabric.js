@@ -1360,4 +1360,11 @@
     equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
     equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
   });
+
+  test('willDrawShadow', function() {
+    var object = new fabric.Object({ shadow: { offsetX: 0, offsetY: 0 }});
+    equal(object.willDrawShadow(), false, 'object will not drawShadow');
+    object.shadow.offsetX = 1;
+    equal(object.willDrawShadow(), true, 'object will drawShadow');
+  });
 })();

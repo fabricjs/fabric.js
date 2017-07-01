@@ -944,8 +944,6 @@
         if (shouldResizeCanvas) {
           this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
           this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
-          this.cacheWidth = width;
-          this.cacheHeight = height;
           this.cacheTranslationX = (width + additionalWidth) / 2;
           this.cacheTranslationY = (height + additionalHeight) / 2;
         }
@@ -953,6 +951,8 @@
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
           this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
         }
+        this.cacheWidth = width;
+        this.cacheHeight = height;
         this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
         this._cacheContext.scale(zoomX, zoomY);
         this.zoomX = zoomX;
@@ -1271,7 +1271,7 @@
      * @return {Boolean}
      */
     willDrawShadow: function() {
-      return !!this.shadow;
+      return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
     },
 
     /**
