@@ -1268,7 +1268,7 @@
      * @return {Boolean}
      */
     willDrawShadow: function() {
-      return !!this.shadow && this.shadow.offsetX !== 0 && this.shadow.offsetY !== 0;
+      return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
     },
 
     /**
