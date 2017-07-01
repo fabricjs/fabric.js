@@ -34,6 +34,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
    * If you need different behaviour for ESC or TAB or arrows, you have to change
    * this map setting the name of a function that you build on the fabric.Itext or
@@ -57,7 +58,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * @private
+   * For functionalities on keyUp + ctrl || cmd
    */
   ctrlKeysMapUp: {
     67: 'copy',
@@ -65,7 +66,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * @private
+   * For functionalities on keyDown + ctrl || cmd
    */
   ctrlKeysMapDown: {
     65: 'selectAll'
