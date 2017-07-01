@@ -3468,14 +3468,14 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return this.viewportTransform[0];
         },
         setViewportTransform: function(vpt) {
-            var activeGroup = this._activeGroup, object, ingoreVpt = false, skipAbsolute = true;
+            var activeGroup = this._activeGroup, object, ignoreVpt = false, skipAbsolute = true;
             this.viewportTransform = vpt;
             for (var i = 0, len = this._objects.length; i < len; i++) {
                 object = this._objects[i];
-                object.group || object.setCoords(ingoreVpt, skipAbsolute);
+                object.group || object.setCoords(ignoreVpt, skipAbsolute);
             }
             if (activeGroup) {
-                activeGroup.setCoords(ingoreVpt, skipAbsolute);
+                activeGroup.setCoords(ignoreVpt, skipAbsolute);
             }
             this.calcViewportBoundaries();
             this.renderAll();
@@ -6128,14 +6128,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 if (shouldResizeCanvas) {
                     this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
                     this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
-                    this.cacheWidth = width;
-                    this.cacheHeight = height;
                     this.cacheTranslationX = (width + additionalWidth) / 2;
                     this.cacheTranslationY = (height + additionalHeight) / 2;
                 } else {
                     this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
                     this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
                 }
+                this.cacheWidth = width;
+                this.cacheHeight = height;
                 this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
                 this._cacheContext.scale(zoomX, zoomY);
                 this.zoomX = zoomX;
@@ -6327,7 +6327,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return !noTransform && this.objectCaching && (!this.group || this.needsItsOwnCache() || !this.group.isCaching());
         },
         willDrawShadow: function() {
-            return !!this.shadow;
+            return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
         },
         drawObject: function(ctx, noTransform) {
             this._renderBackground(ctx);
@@ -8984,7 +8984,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         },
         willDrawShadow: function() {
             if (this.shadow) {
-                return true;
+                return this.callSuper("willDrawShadow");
             }
             for (var i = 0, len = this._objects.length; i < len; i++) {
                 if (this._objects[i].willDrawShadow()) {
@@ -12132,7 +12132,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this._clickHandlerInitialized = true;
         }
     },
-    _keysMap: {
+    keysMap: {
         8: "removeChars",
         9: "exitEditing",
         27: "exitEditing",
@@ -12147,11 +12147,11 @@ fabric.util.object.extend(fabric.IText.prototype, {
         40: "moveCursorDown",
         46: "forwardDelete"
     },
-    _ctrlKeysMapUp: {
+    ctrlKeysMapUp: {
         67: "copy",
         88: "cut"
     },
-    _ctrlKeysMapDown: {
+    ctrlKeysMapDown: {
         65: "selectAll"
     },
     onClick: function() {
@@ -12161,10 +12161,10 @@ fabric.util.object.extend(fabric.IText.prototype, {
         if (!this.isEditing) {
             return;
         }
-        if (e.keyCode in this._keysMap) {
-            this[this._keysMap[e.keyCode]](e);
-        } else if (e.keyCode in this._ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-            this[this._ctrlKeysMapDown[e.keyCode]](e);
+        if (e.keyCode in this.keysMap) {
+            this[this.keysMap[e.keyCode]](e);
+        } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
+            this[this.ctrlKeysMapDown[e.keyCode]](e);
         } else {
             return;
         }
@@ -12182,8 +12182,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this._copyDone = false;
             return;
         }
-        if (e.keyCode in this._ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
-            this[this._ctrlKeysMapUp[e.keyCode]](e);
+        if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
+            this[this.ctrlKeysMapUp[e.keyCode]](e);
         } else {
             return;
         }
