@@ -1,3 +1,8 @@
+**Version 1.7.15**
+
+- Improvement: Made iText keymap public. [#4053](https://github.com/kangax/fabric.js/pull/4053)
+- Improvement: Fix a bug in updateCacheCanvas that was returning always true [#4051](https://github.com/kangax/fabric.js/pull/4051)
+
 **Version 1.7.14**
 
 - Improvement: Avoid cache canvas to resize each mouse move step. [#4037](https://github.com/kangax/fabric.js/pull/4037)
