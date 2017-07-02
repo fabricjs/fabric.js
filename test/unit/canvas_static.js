@@ -102,9 +102,8 @@
     'crossOrigin':              '',
     'skewX':                    0,
     'skewY':                    0,
-    'alignX':                   'none',
-    'alignY':                   'none',
-    'meetOrSlice':              'meet'
+    'cropX':                    0,
+    'cropY':                    0
   };
 
   function _createImageElement() {
@@ -1028,7 +1027,7 @@
   asyncTest('loadFromJSON with image background and color', function() {
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":"","alignX":"none","alignY":"none","meetOrSlice":"meet"}');
+    serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}');
     canvas.loadFromJSON(serialized, function() {
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(canvas.backgroundColor, 'green');
