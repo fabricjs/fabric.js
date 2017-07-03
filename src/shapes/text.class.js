@@ -1461,10 +1461,10 @@
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        textHeightScaleFactor = text.height / text.height,
+        textHeightScaleFactor = text.getScaledHeight() / text.height,
         lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
         scaledDiff = lineHeightDiff * textHeightScaleFactor,
-        textHeight = text.height + scaledDiff,
+        textHeight = text.getScaledHeight() + scaledDiff,
         offX = 0;
     /*
       Adjust positioning:
@@ -1472,10 +1472,10 @@
         fabric output by default at top, left.
     */
     if (text.originX === 'center') {
-      offX = text.width / 2;
+      offX = text.getScaledWidth() / 2;
     }
     if (text.originX === 'right') {
-      offX = text.width;
+      offX = text.getScaledWidth();
     }
     text.set({
       left: text.left - offX,

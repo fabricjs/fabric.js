@@ -297,7 +297,7 @@
 
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
 
-    text.setFontFamily('"Arial Black", Arial');
+    text.set('fontFamily', '"Arial Black", Arial');
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
