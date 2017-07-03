@@ -670,6 +670,31 @@
     equal(rect3.shouldCache(), false, 'rect3 will not cache because group2 is caching');
 
   });
+
+  test('useSetOnGroup', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        group = new fabric.Group([rect1, rect2]),
+
+    var count = 0;
+    var inspectKey = '';
+    var inspectValue = '';
+    rect1.setOnGroup = function(key, value) {
+      count++;
+      inspectKey = key;
+      inspectValue = key;
+    }
+
+    group.set('fill', 'red');
+    equal(count, 0, 'setOnGroup has not been called');
+    equal(inspectKey, '', 'setOnGroup has not been called');
+    equal(inspectValue, '', 'setOnGroup has not been called');
+    group.useSetOnGroup = true;
+    group.set('fill', 'red');
+    equal(count, 1, 'setOnGroup has been called');
+    equal(inspectKey, 'fill', 'setOnGroup has been called');
+    equal(inspectValue, 'red', 'setOnGroup has been called');
+  });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),
