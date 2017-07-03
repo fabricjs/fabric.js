@@ -332,4 +332,58 @@
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
 
+  test('text styleHas', function() {
+    var text = new fabric.Text('xxxxxx\nx y');
+    text.styles = { };
+    ok(typeof text.styleHas === 'function');
+    equal(text.styleHas('stroke'), false, 'the text style has no stroke');
+    text.styles = { 1: { 0: { stroke: 'red' }}};
+    equal(text.styleHas('stroke'), true, 'the text style has stroke');
+  });
+
+  test('text cleanStyle', function() {
+    var text = new fabric.Text('xxxxxx\nx y');
+    text.styles = { 1: { 0: { stroke: 'red' }}};
+    text.stroke = 'red'
+    ok(typeof text.cleanStyle === 'function');
+    text.cleanStyle('stroke');
+    equal(text.styles[1], undefined, 'the style has been cleaned since stroke was equal to text property');
+    text.styles = { 1: { 0: { stroke: 'blue' }}};
+    text.stroke = 'red'
+    text.cleanStyle('stroke');
+    equal(text.styles[1][0].stroke, 'blue', 'nothing to clean, style untouched');
+  });
+
+  test('text cleanStyle with empty styles', function() {
+    var text = new fabric.Text('xxxxxx\nx y');
+    text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
+    text.cleanStyle('any');
+    equal(text.styles[1], undefined, 'the style has been cleaned since there were no usefull informations');
+    equal(text.styles[2], undefined, 'the style has been cleaned since there were no usefull informations');
+    equal(text.styles[3], undefined, 'the style has been cleaned since there were no usefull informations');
+  });
+
+  test('text cleanStyle with full style', function() {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    text.fill = 'black';
+    text.cleanStyle('fill');
+    equal(text.fill, 'blue', 'the fill has been changed to blue');
+    equal(text.styles[0], undefined, 'all the style has been removed');
+  });
+
+  test('text removeStyle with some style', function() {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    ok(typeof text.removeStyle === 'function');
+    text.fill = 'red';
+    text.removeStyle('fill');
+    equal(text.fill, 'red', 'the fill has not been changed');
+    equal(text.styles[0][0].stroke, 'black', 'the non fill part of the style is still there');
+    equal(text.styles[0][0].fill, undefined, 'the fill part of the style has been removed');
+    text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    text.removeStyle('fill');
+    equal(text.styles[0], undefined, 'the styles got empty and has been removed');
+  });
+
 })();
