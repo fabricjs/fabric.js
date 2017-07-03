@@ -826,9 +826,9 @@
     ok(typeof fabric.util.createImage == 'function');
   });
 
-  test('createAccessors', function() {
-    ok(typeof fabric.util.createAccessors == 'function');
-  });
+  // test('createAccessors', function() {
+  //   ok(typeof fabric.util.createAccessors == 'function');
+  // });
 
   test('qrDecompose', function() {
     ok(typeof fabric.util.qrDecompose == 'function');

@@ -1320,8 +1320,8 @@
         'class': this.containerClass
       });
       fabric.util.setStyle(this.wrapperEl, {
-        width: this.getWidth() + 'px',
-        height: this.getHeight() + 'px',
+        width: this.width + 'px',
+        height: this.height + 'px',
         position: 'relative'
       });
       fabric.util.makeElementUnselectable(this.wrapperEl);
@@ -1332,8 +1332,8 @@
      * @param {HTMLElement} element canvas element to apply styles on
      */
     _applyCanvasStyle: function (element) {
-      var width = this.getWidth() || element.width,
-          height = this.getHeight() || element.height;
+      var width = this.width || element.width,
+          height = this.height || element.height;
 
       fabric.util.setStyle(element, {
         position: 'absolute',

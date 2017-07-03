@@ -55,10 +55,10 @@
      */
     __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
-      var origWidth = this.getWidth(),
-          origHeight = this.getHeight(),
-          scaledWidth = (cropping.width || this.getWidth()) * multiplier,
-          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
+      var origWidth = this.width,
+          origHeight = this.height,
+          scaledWidth = (cropping.width || this.width) * multiplier,
+          scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,

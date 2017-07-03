@@ -71,7 +71,7 @@
 
     cObj.set('fill', '#FF0000');
     cObj.setupState();
-    cObj.setFill(gradient);
+    cObj.set('fill', gradient);
     ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
     cObj.saveState();
     gradient.type = 'radial';

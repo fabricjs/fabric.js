@@ -286,16 +286,15 @@
      * Returns width of an object bounding box counting transformations
      * @return {Number} width value
      */
-    getWidth: function() {
+    getScaledWidth: function() {
       return this._getTransformedDimensions().x;
     },
 
     /**
      * Returns height of an object bounding box counting transformations
-     * to be renamed in 2.0
      * @return {Number} height value
      */
-    getHeight: function() {
+    getScaledHeight: function() {
       return this._getTransformedDimensions().y;
     },
 
@@ -345,7 +344,7 @@
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getScaledWidth();
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -357,7 +356,7 @@
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getScaledHeight();
       return this.scale(value / this.height / boundingRectFactor);
     },
 

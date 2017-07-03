@@ -46,16 +46,16 @@
     equal(circle.getRadiusX(), 10);
     equal(circle.getRadiusY(), 10);
 
-    equal(circle.getWidth(), 20);
-    equal(circle.getHeight(), 20);
+    equal(circle.width, 20);
+    equal(circle.height, 20);
 
     equal(circle, circle.setRadius(20));
 
     equal(circle.getRadiusX(), 20);
     equal(circle.getRadiusY(), 20);
 
-    equal(circle.getWidth(), 40);
-    equal(circle.getHeight(), 40);
+    equal(circle.width, 40);
+    equal(circle.height, 40);
   });
 
   test('set radius', function() {
@@ -66,8 +66,8 @@
     equal(circle.getRadiusX(), 20);
     equal(circle.getRadiusY(), 20);
 
-    equal(circle.getWidth(), 40);
-    equal(circle.getHeight(), 40);
+    equal(circle.width, 40);
+    equal(circle.height, 40);
   });
 
   test('complexity', function() {
@@ -225,8 +225,10 @@
     circle.scale(2);
 
     circle.clone(function(clone) {
-      equal(clone.getWidth(), 40);
-      equal(clone.getHeight(), 40);
+      equal(clone.width, 20);
+      equal(clone.getScaledWidth(), 40);
+      equal(clone.height, 20);
+      equal(clone.getScaledHeight(), 40);
       equal(clone.radius, 10);
     });
   });

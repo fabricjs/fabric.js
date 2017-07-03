@@ -26,7 +26,7 @@
 
     setTimeout(function() {
 
-      equal(40, Math.round(object.getLeft()), 'left has been animated to 40');
+      equal(40, Math.round(object.left), 'left has been animated to 40');
       start();
 
     }, 1000);
@@ -40,7 +40,7 @@
 
     setTimeout(function() {
 
-      equal(Math.round(object.getLeft()), 60, 'left has been increased by 40');
+      equal(Math.round(object.left), 60, 'left has been increased by 40');
       start();
 
     }, 1000);
@@ -68,7 +68,7 @@
 
     setTimeout(function() {
 
-      equal(Math.round(object.getLeft()), -20, 'left has been decreased by 40');
+      equal(Math.round(object.left), -20, 'left has been decreased by 40');
       start();
 
     }, 1000);
@@ -84,7 +84,7 @@
 
     setTimeout(function() {
 
-      equal(40, Math.round(object.getLeft()));
+      equal(40, Math.round(object.left));
       start();
 
     }, 1000);

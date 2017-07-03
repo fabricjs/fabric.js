@@ -691,15 +691,15 @@
     var rect = makeRect({ angle: 10 });
     canvas.add(rect);
     equal(canvas.straightenObject(rect), canvas, 'should be chainable');
-    equal(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
+    equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.setAngle('60');
     canvas.straightenObject(rect);
-    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 60)');
+    equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
 
     rect.setAngle('100');
     canvas.straightenObject(rect);
-    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
+    equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
   });
 
   test('toJSON', function() {
@@ -2099,7 +2099,7 @@
     ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'actionIsDisabled is a function');
     var key = canvas.altActionKey;
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
     };
     var e = { };
@@ -2115,7 +2115,7 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: false,
     };
     var e = { };
@@ -2125,7 +2125,7 @@
     var target = {
       lockScalingX: true,
       hasRotatingPoint: true,
-      getAngle: function() { return 0; }
+      angle: 0
     };
     equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
@@ -2138,7 +2138,7 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockScalingY: true
     };
@@ -2153,7 +2153,7 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockScalingY: true,
       lockScalingX: true
@@ -2169,7 +2169,7 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockRotation: true
     };
@@ -2184,7 +2184,7 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'action is disabled');
 
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockSkewingX: true,
       lockSkewingY: true
@@ -2201,7 +2201,7 @@
 
     e[key] = true;
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockSkewingY: true
     };
@@ -2217,7 +2217,7 @@
 
     e[key] = true;
     var target = {
-      getAngle: function() { return 0; },
+      angle: 0,
       hasRotatingPoint: true,
       lockSkewingX: true
     };
