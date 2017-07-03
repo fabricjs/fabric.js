@@ -1,5 +1,9 @@
 (function() {
 
+  function noop() {
+    return false;
+  }
+
   /**
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
@@ -20,8 +24,9 @@
       var start = timestamp || +new Date(),
           duration = options.duration || 500,
           finish = start + duration, time,
-          onChange = options.onChange || function() { },
-          abort = options.abort || function() { return false; },
+          onChange = options.onChange || noop,
+          abort = options.abort || noop,
+          onComplete = options.onComplete || noop,
           easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;},
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
@@ -30,13 +35,16 @@
       options.onStart && options.onStart();
 
       (function tick(ticktime) {
-        time = ticktime || +new Date();
-        var currentTime = time > finish ? duration : (time - start);
         if (abort()) {
-          options.onComplete && options.onComplete();
+          onComplete();
           return;
         }
-        onChange(easing(currentTime, startValue, byValue, duration));
+        time = ticktime || +new Date();
+        var currentTime = time > finish ? duration : (time - start),
+            timePerc = currentTime / duration,
+            current = easing(currentTime, startValue, byValue, duration),
+            valuePerc = Math.abs((current - startValue) / byValue);
+        onChange(current, valuePerc, timePerc);
         if (time > finish) {
           options.onComplete && options.onComplete();
           return;
