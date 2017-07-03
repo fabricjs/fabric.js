@@ -1989,9 +1989,8 @@
   test('actionIsDisabled ', function() {
     ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
     var key = canvas.altActionKey;
-    var target = {
-
-    };
+    var key2 = canvas.uniScaleKey;
+    var target = new fabric.Object();
     var e = { };
     e[key] = false;
     equal(!!canvas.actionIsDisabled('mt', target, e), false, 'action is not disabled');
@@ -2003,105 +2002,96 @@
     equal(!!canvas.actionIsDisabled('bl', target, e), false, 'action is not disabled');
     equal(!!canvas.actionIsDisabled('br', target, e), false, 'action is not disabled');
     equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'action is not disabled');
-    var target = {
-      lockScalingX: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
-    var target = {
-      lockScalingY: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
-    var target = {
-      lockScalingY: true,
-      lockScalingX: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
-    var target = {
-      lockRotation: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), true, 'mtr action is disabled');
-    var target = {
-      lockSkewingX: true,
-      lockSkewingY: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+    target = new fabric.Object();
+    target.lockScalingX = true;
+
+    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled lockScalingX');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockScalingX');
+    target = new fabric.Object();
+    target.lockScalingY = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is not disabled lockScalingY');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabledlockScalingY');
+    target = new fabric.Object();
+    target.lockScalingY = true;
+    target.lockScalingX = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled scaling locked');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled scaling locked');
+    target = new fabric.Object();
+    target.lockRotation = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockRotation');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), true, 'mtr action is disabled lockRotation');
+    target = new fabric.Object();
+    target.lockSkewingX = true;
+    target.lockSkewingY = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewing');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewing');
+    e[key] = true;
+    target = new fabric.Object();
+    target.lockSkewingY = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingY');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingY');
 
     e[key] = true;
-    var target = {
-      lockSkewingY: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
-
-    e[key] = true;
-    var target = {
-      lockSkewingX: true
-    };
-    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
-    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
-    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
-    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
-    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
-    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
-    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
-    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
-    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+    target = new fabric.Object();
+    target.lockSkewingX = true;
+    equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingX');
+    equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingX');
   });
 
   test('getCornerCursor ', function() {
     ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'actionIsDisabled is a function');
     var key = canvas.altActionKey;
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-    };
+    var key2 = canvas.uniScaleKey;
+    var target = new fabric.Object();
     var e = { };
     e[key] = false;
     equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
@@ -2114,81 +2104,82 @@
     equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
-    var target = {
-      angle: 0,
-      hasRotatingPoint: false,
-    };
+    target = new fabric.Object();
+    target.hasRotatingPoint = false;
     var e = { };
     e[key] = false;
     equal(canvas.getCornerCursor('mtr', target, e), 'default', 'action is not disabled');
 
-    var target = {
-      lockScalingX: true,
-      hasRotatingPoint: true,
-      angle: 0
-    };
-    equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    target = new fabric.Object();
+    target.lockScalingX = true;
+    equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockScalingX');
+    equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockScalingX');
+    equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingX');
+    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingX');
+    e[key2] = true;
+    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingX key2');
+    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingX key2');
+    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingX key2');
+    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingX key2');
 
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockScalingY: true
-    };
-    equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    var e = { };
+    target = new fabric.Object();
+    target.lockScalingY = true;
+    equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled lockScalingY');
+    equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled lockScalingY');
+    equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingY');
+    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingY');
+    e[key2] = true;
+    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingY key2');
+    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingY key2');
+    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingY key2');
+    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingY key2');
 
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockScalingY: true,
-      lockScalingX: true
-    };
-    equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled');
-    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    var e = { };
+    target = new fabric.Object();
+    target.lockScalingY = true;
+    target.lockScalingX = true;
+    equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling');
+    equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScaling');
+    e[key2] = true;
+    equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
+    equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling key2');
+    equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
+    equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling key2');
 
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockRotation: true
-    };
-    equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'action is disabled');
+    var e = { };
+    target = new fabric.Object();
+    target.lockRotation = true;
+    equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockRotation');
+    equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'action is disabled lockRotation');
 
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockSkewingX: true,
-      lockSkewingY: true
-    };
+    target = new fabric.Object();
+    target.lockSkewingX = true;
+    target.lockSkewingY = true;
     equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
@@ -2200,11 +2191,8 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     e[key] = true;
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockSkewingY: true
-    };
+    target = new fabric.Object();
+    target.lockSkewingY = true;
     equal(canvas.getCornerCursor('mt', target, e), 'e-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('mb', target, e), 'w-resize', 'action is not disabled');
     equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
@@ -2216,11 +2204,8 @@
     equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     e[key] = true;
-    var target = {
-      angle: 0,
-      hasRotatingPoint: true,
-      lockSkewingX: true
-    };
+    target = new fabric.Object();
+    target.lockSkewingX = true;
     equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
     equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
     equal(canvas.getCornerCursor('ml', target, e), 'n-resize', 'action is not disabled');
