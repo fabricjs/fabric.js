@@ -1673,7 +1673,7 @@
     }
   });
 
-  fabric.createNamedAccessors && fabric.util.createAccessors(fabric.Object);
+  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
   /**
    * Alias for {@link fabric.Object.prototype.setAngle}

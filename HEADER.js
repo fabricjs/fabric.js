@@ -112,15 +112,6 @@ fabric.textureSize = 2048;
 fabric.enableGLFiltering = true;
 
 /**
- * Enable named accessors creation at initialization time
- * This will create a setter and a getter for each stateProperty of the object
- * @since 2.0.0
- * @type Boolean
- * @default
- */
-fabric.createNamedAccessors = false;
-
-/**
  * Device Pixel Ratio
  * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
  */

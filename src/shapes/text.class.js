@@ -1498,6 +1498,6 @@
     return fabric.Object._fromObject('Text', object, callback, 'text');
   };
 
-  fabric.createNamedAccessors && fabric.util.createAccessors(fabric.Text);
+  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
 
 })(typeof exports !== 'undefined' ? exports : this);
