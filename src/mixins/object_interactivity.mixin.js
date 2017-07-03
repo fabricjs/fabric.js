@@ -164,7 +164,7 @@
         height
       );
 
-      if (drawRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && hasControls) {
+      if (drawRotatingPoint && this.isControlVisible('mtr') && hasControls) {
 
         var rotateHeight = -height / 2;
 
