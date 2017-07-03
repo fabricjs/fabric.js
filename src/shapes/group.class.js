@@ -236,6 +236,11 @@
     _set: function(key, value) {
       var i = this._objects.length;
 
+      if (key === 'canvas') {
+        while (i--) {
+          this._objects[i].set(key, value);
+        }
+      }
       if (this.useSetOnGroup) {
         while (i--) {
           this._objects[i].setOnGroup(key, value);
