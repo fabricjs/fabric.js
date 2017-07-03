@@ -1989,7 +1989,6 @@
   test('actionIsDisabled ', function() {
     ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
     var key = canvas.altActionKey;
-    var key2 = canvas.uniScaleKey;
     var target = new fabric.Object();
     var e = { };
     e[key] = false;
