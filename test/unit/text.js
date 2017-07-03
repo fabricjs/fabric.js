@@ -344,12 +344,12 @@
   test('text cleanStyle', function() {
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { stroke: 'red' }}};
-    text.stroke = 'red'
+    text.stroke = 'red';
     ok(typeof text.cleanStyle === 'function');
     text.cleanStyle('stroke');
     equal(text.styles[1], undefined, 'the style has been cleaned since stroke was equal to text property');
     text.styles = { 1: { 0: { stroke: 'blue' }}};
-    text.stroke = 'red'
+    text.stroke = 'red';
     text.cleanStyle('stroke');
     equal(text.styles[1][0].stroke, 'blue', 'nothing to clean, style untouched');
   });
