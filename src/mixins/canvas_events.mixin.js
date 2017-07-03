@@ -806,26 +806,40 @@
         this.setCursor(hoverCursor);
       }
       else {
-        this._setCornerCursor(corner, target, e);
+        this.setCursor(this.getCornerCursor(corner, target, e));
       }
-      //actually unclear why it should return something
-      //is never evaluated
-      return true;
     },
 
     /**
      * @private
      */
-    _setCornerCursor: function(corner, target, e) {
-      if (corner in cursorOffset) {
-        this.setCursor(this._getRotatedCornerCursor(corner, target, e));
+    getCornerCursor: function(corner, target, e) {
+      if (this.actionIsDisabled(corner, target, e)) {
+        return this.notAllowedCursor;
+      }
+      else if (corner in cursorOffset) {
+        return this._getRotatedCornerCursor(corner, target, e);
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
-        this.setCursor(this.rotationCursor);
+        return this.rotationCursor;
       }
       else {
-        this.setCursor(this.defaultCursor);
-        return false;
+        return this.defaultCursor;
+      }
+    },
+
+    actionIsDisabled: function(corner, target, e) {
+      if (corner === 'mt' || corner === 'mb') {
+        return e[this.altActionKey] ? target.lockSkewingX : target.lockScalingY;
+      }
+      else if (corner === 'ml' || corner === 'mr') {
+        return e[this.altActionKey] ? target.lockSkewingY : target.lockScalingX;
+      }
+      else if (corner === 'mtr') {
+        return target.lockRotation;
+      }
+      else {
+        return target.lockScalingX && target.lockScalingY;
       }
     },
 

@@ -1984,4 +1984,251 @@
     equal(counter, 1, 'listener on window executed once');
     fabric.Canvas.prototype._onResize = originalResize;
   });
+
+
+    test('actionIsDisabled ', function() {
+      ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
+      var key = canvas.altActionKey;
+      var target = {
+
+      };
+      var e = { };
+      e[key] = false;
+      equal(!!canvas.actionIsDisabled('mt', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'action is not disabled');
+      var target = {
+        lockScalingX: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+      var target = {
+        lockScalingY: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+      var target = {
+        lockScalingY: true,
+        lockScalingX: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+      var target = {
+        lockRotation: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), true, 'mtr action is disabled');
+      var target = {
+        lockSkewingX: true,
+        lockSkewingY: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+
+      e[key] = true;
+      var target = {
+        lockSkewingY: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+
+      e[key] = true;
+      var target = {
+        lockSkewingX: true
+      };
+      equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled');
+      equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled');
+      equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled');
+      equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled');
+      equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled');
+      equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled');
+      equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled');
+      equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled');
+      equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled');
+    });
+
+    test('getCornerCursor ', function() {
+      ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'actionIsDisabled is a function');
+      var key = canvas.altActionKey;
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+      };
+      var e = { };
+      e[key] = false;
+      equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: false,
+      };
+      var e = { };
+      e[key] = false;
+      equal(canvas.getCornerCursor('mtr', target, e), 'default', 'action is not disabled');
+
+      var target = {
+        lockScalingX: true,
+        hasRotatingPoint: true,
+        getAngle: function() { return 0; }
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockScalingY: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockScalingY: true,
+        lockScalingX: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockRotation: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'action is disabled');
+
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockSkewingX: true,
+        lockSkewingY: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      e[key] = true;
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockSkewingY: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'e-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 'w-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+
+      e[key] = true;
+      var target = {
+        getAngle: function() { return 0; },
+        hasRotatingPoint: true,
+        lockSkewingX: true
+      };
+      equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
+      equal(canvas.getCornerCursor('ml', target, e), 'n-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mr', target, e), 's-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
+      equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    });
 })();

@@ -1711,13 +1711,4 @@
     /** @ignore */
     fabric.Canvas.prototype._setCursorFromEvent = function() { };
   }
-
-  /**
-   * @ignore
-   * @class fabric.Element
-   * @alias fabric.Canvas
-   * @deprecated Use {@link fabric.Canvas} instead.
-   * @constructor
-   */
-  fabric.Element = fabric.Canvas;
 })();
