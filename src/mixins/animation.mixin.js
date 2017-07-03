@@ -201,7 +201,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       abort: options.abort && function() {
         return options.abort.call(_this);
       },
-      onChange: function(value) {
+      onChange: function(value, valueProgress, timeProgress) {
         if (propPair) {
           _this[propPair[0]][propPair[1]] = value;
         }
@@ -211,15 +211,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (skipCallbacks) {
           return;
         }
-        options.onChange && options.onChange();
+        options.onChange && options.onChange(value, valueProgress, timeProgress);
       },
-      onComplete: function() {
+      onComplete: function(value, valueProgress, timeProgress) {
         if (skipCallbacks) {
           return;
         }
 
         _this.setCoords();
-        options.onComplete && options.onComplete();
+        options.onComplete && options.onComplete(value, valueProgress, timeProgress);
       }
     });
   }

@@ -36,7 +36,7 @@
 
       (function tick(ticktime) {
         if (abort()) {
-          onComplete();
+          onComplete(endValue, 1, 1);
           return;
         }
         time = ticktime || +new Date();
