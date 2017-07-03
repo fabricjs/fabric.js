@@ -344,7 +344,7 @@
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
-        this._finalizeCurrentTransform();
+        this._finalizeCurrentTransform(e);
         searchTarget = !transform.actionPerformed;
       }
 
@@ -399,8 +399,9 @@
 
     /**
      * @private
+     * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
      */
-    _finalizeCurrentTransform: function() {
+    _finalizeCurrentTransform: function(e) {
 
       var transform = this._currentTransform,
           target = transform.target;
@@ -413,8 +414,8 @@
       this._restoreOriginXY(target);
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
-        this.fire('object:modified', { target: target });
-        target.fire('modified');
+        this.fire('object:modified', { target: target, e: e });
+        target.fire('modified', { e: e });
       }
     },
 
