@@ -25,7 +25,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('left'),
+      startValue: object.left,
       endValue: this.getCenter().left,
       duration: this.FX_DURATION,
       onChange: function(value) {
@@ -60,7 +60,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('top'),
+      startValue: object.top,
       endValue: this.getCenter().top,
       duration: this.FX_DURATION,
       onChange: function(value) {
@@ -95,7 +95,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('opacity'),
+      startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
       onStart: function() {

@@ -3467,7 +3467,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return this;
         },
         calcViewportBoundaries: function() {
-            var points = {}, width = this.getWidth(), height = this.getHeight(), iVpt = invertTransform(this.viewportTransform);
+            var points = {}, width = this.width, height = this.height, iVpt = invertTransform(this.viewportTransform);
             points.tl = transformPoint({
                 x: 0,
                 y: 0
@@ -3534,8 +3534,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         },
         getCenter: function() {
             return {
-                top: this.getHeight() / 2,
-                left: this.getWidth() / 2
+                top: this.height / 2,
+                left: this.width / 2
             };
         },
         centerObjectH: function(object) {
@@ -4896,14 +4896,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 class: this.containerClass
             });
             fabric.util.setStyle(this.wrapperEl, {
-                width: this.getWidth() + "px",
-                height: this.getHeight() + "px",
+                width: this.width + "px",
+                height: this.height + "px",
                 position: "relative"
             });
             fabric.util.makeElementUnselectable(this.wrapperEl);
         },
         _applyCanvasStyle: function(element) {
-            var width = this.getWidth() || element.width, height = this.getHeight() || element.height;
+            var width = this.width || element.width, height = this.height || element.height;
             fabric.util.setStyle(element, {
                 position: "absolute",
                 width: width + "px",
@@ -5638,7 +5638,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         _getRotatedCornerCursor: function(corner, target, e) {
-            var n = Math.round(target.getAngle() % 360 / 45);
+            var n = Math.round(target.angle % 360 / 45);
             if (n < 0) {
                 n += 8;
             }
@@ -5776,7 +5776,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
         },
         __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
-            var origWidth = this.getWidth(), origHeight = this.getHeight(), scaledWidth = (cropping.width || this.getWidth()) * multiplier, scaledHeight = (cropping.height || this.getHeight()) * multiplier, zoom = this.getZoom(), newZoom = zoom * multiplier, vp = this.viewportTransform, translateX = (vp[4] - cropping.left) * multiplier, translateY = (vp[5] - cropping.top) * multiplier, newVp = [ newZoom, 0, 0, newZoom, translateX, translateY ], originalInteractive = this.interactive;
+            var origWidth = this.width, origHeight = this.height, scaledWidth = (cropping.width || this.width) * multiplier, scaledHeight = (cropping.height || this.height) * multiplier, zoom = this.getZoom(), newZoom = zoom * multiplier, vp = this.viewportTransform, translateX = (vp[4] - cropping.left) * multiplier, translateY = (vp[5] - cropping.top) * multiplier, newVp = [ newZoom, 0, 0, newZoom, translateX, translateY ], originalInteractive = this.interactive;
             this.viewportTransform = newVp;
             this.interactive && (this.interactive = false);
             if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
@@ -5914,8 +5914,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
     cloneWithoutData: function(callback) {
         var el = fabric.document.createElement("canvas");
-        el.width = this.getWidth();
-        el.height = this.getHeight();
+        el.width = this.width;
+        el.height = this.height;
         var clone = new fabric.Canvas(el);
         clone.clipTo = this.clipTo;
         if (this.backgroundImage) {
@@ -6118,7 +6118,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
                 scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
                 scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-                angle: toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+                angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
                 flipX: this.flipX,
                 flipY: this.flipY,
                 opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
@@ -6475,12 +6475,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 canvas.backgroundColor = "#fff";
             }
             var origParams = {
-                active: this.get("active"),
-                left: this.getLeft(),
-                top: this.getTop()
+                active: this.active,
+                left: this.left,
+                top: this.top
             };
             this.set("active", false);
-            this.setPositionByOrigin(new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), "center", "center");
+            this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), "center", "center");
             var originalCanvas = this.canvas;
             canvas.add(this);
             var data = canvas.toDataURL(options);
@@ -6689,7 +6689,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this.set("top", position.y);
         },
         adjustPosition: function(to) {
-            var angle = degreesToRadians(this.angle), hypotFull = this.getWidth(), xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull, offsetFrom, offsetTo;
+            var angle = degreesToRadians(this.angle), hypotFull = this.getScaledWidth(), xFull = Math.cos(angle) * hypotFull, yFull = Math.sin(angle) * hypotFull, offsetFrom, offsetTo;
             if (typeof this.originX === "string") {
                 offsetFrom = originXOffset[this.originX];
             } else {
@@ -6852,10 +6852,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             var coords = this.getCoords(absolute, calculate);
             return fabric.util.makeBoundingBoxFromPoints(coords);
         },
-        getWidth: function() {
+        getScaledWidth: function() {
             return this._getTransformedDimensions().x;
         },
-        getHeight: function() {
+        getScaledHeight: function() {
             return this._getTransformedDimensions().y;
         },
         _constrainScale: function(value) {
@@ -6880,11 +6880,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return this.setCoords();
         },
         scaleToWidth: function(value) {
-            var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+            var boundingRectFactor = this.getBoundingRect().width / this.getScaledWidth();
             return this.scale(value / this.width / boundingRectFactor);
         },
         scaleToHeight: function(value) {
-            var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+            var boundingRectFactor = this.getBoundingRect().height / this.getScaledHeight();
             return this.scale(value / this.height / boundingRectFactor);
         },
         calcCoords: function(absolute) {
@@ -7060,7 +7060,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return this.id ? 'id="' + this.id + '" ' : "";
         },
         getSvgTransform: function() {
-            var angle = this.getAngle(), skewX = this.getSkewX() % 360, skewY = this.getSkewY() % 360, center = this.getCenterPoint(), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, translatePart = "translate(" + toFixed(center.x, NUM_FRACTION_DIGITS) + " " + toFixed(center.y, NUM_FRACTION_DIGITS) + ")", anglePart = angle !== 0 ? " rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")" : "", scalePart = this.scaleX === 1 && this.scaleY === 1 ? "" : " scale(" + toFixed(this.scaleX, NUM_FRACTION_DIGITS) + " " + toFixed(this.scaleY, NUM_FRACTION_DIGITS) + ")", skewXPart = skewX !== 0 ? " skewX(" + toFixed(skewX, NUM_FRACTION_DIGITS) + ")" : "", skewYPart = skewY !== 0 ? " skewY(" + toFixed(skewY, NUM_FRACTION_DIGITS) + ")" : "", flipXPart = this.flipX ? " matrix(-1 0 0 1 0 0) " : "", flipYPart = this.flipY ? " matrix(1 0 0 -1 0 0)" : "";
+            var angle = this.angle, skewX = this.skewX % 360, skewY = this.skewY % 360, center = this.getCenterPoint(), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, translatePart = "translate(" + toFixed(center.x, NUM_FRACTION_DIGITS) + " " + toFixed(center.y, NUM_FRACTION_DIGITS) + ")", anglePart = angle !== 0 ? " rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")" : "", scalePart = this.scaleX === 1 && this.scaleY === 1 ? "" : " scale(" + toFixed(this.scaleX, NUM_FRACTION_DIGITS) + " " + toFixed(this.scaleY, NUM_FRACTION_DIGITS) + ")", skewXPart = skewX !== 0 ? " skewX(" + toFixed(skewX, NUM_FRACTION_DIGITS) + ")" : "", skewYPart = skewY !== 0 ? " skewY(" + toFixed(skewY, NUM_FRACTION_DIGITS) + ")" : "", flipXPart = this.flipX ? " matrix(-1 0 0 1 0 0) " : "", flipYPart = this.flipY ? " matrix(1 0 0 -1 0 0)" : "";
             return [ translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart ].join("");
         },
         getSvgTransformMatrix: function() {
@@ -7341,7 +7341,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         callbacks = callbacks || {};
         var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
         fabric.util.animate({
-            startValue: object.get("left"),
+            startValue: object.left,
             endValue: this.getCenter().left,
             duration: this.FX_DURATION,
             onChange: function(value) {
@@ -7360,7 +7360,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         callbacks = callbacks || {};
         var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
         fabric.util.animate({
-            startValue: object.get("top"),
+            startValue: object.top,
             endValue: this.getCenter().top,
             duration: this.FX_DURATION,
             onChange: function(value) {
@@ -7379,7 +7379,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         callbacks = callbacks || {};
         var empty = function() {}, onComplete = callbacks.onComplete || empty, onChange = callbacks.onChange || empty, _this = this;
         fabric.util.animate({
-            startValue: object.get("opacity"),
+            startValue: object.opacity,
             endValue: 0,
             duration: this.FX_DURATION,
             onStart: function() {
@@ -8605,7 +8605,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         _updateObjectCoords: function(object, center) {
             object.__origHasControls = object.hasControls;
             object.hasControls = false;
-            var objectLeft = object.getLeft(), objectTop = object.getTop(), ignoreZoom = true, skipAbsolute = true;
+            var objectLeft = object.left, objectTop = object.top, ignoreZoom = true, skipAbsolute = true;
             object.set({
                 left: objectLeft - center.x,
                 top: objectTop - center.y
@@ -9189,7 +9189,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
 fabric.util.object.extend(fabric.Object.prototype, {
     _getAngleValueForStraighten: function() {
-        var angle = this.getAngle() % 360;
+        var angle = this.angle % 360;
         if (angle > 0) {
             return Math.round((angle - 1) / 90) * 90;
         }
@@ -11303,16 +11303,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             textContent = element.textContent;
         }
         textContent = textContent.replace(/^\s+|\s+$|\n+/g, "").replace(/\s+/g, " ");
-        var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.getHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getHeight() + scaledDiff, offX = 0;
+        var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.height / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.height + scaledDiff, offX = 0;
         if (text.originX === "center") {
-            offX = text.getWidth() / 2;
+            offX = text.width / 2;
         }
         if (text.originX === "right") {
-            offX = text.getWidth();
+            offX = text.width;
         }
         text.set({
-            left: text.getLeft() - offX,
-            top: text.getTop() - (textHeight - text.fontSize * (.18 + text._fontSizeFraction)) / text.lineHeight
+            left: text.left - offX,
+            top: text.top - (textHeight - text.fontSize * (.18 + text._fontSizeFraction)) / text.lineHeight
         });
         text.originX = "left";
         text.originY = "top";

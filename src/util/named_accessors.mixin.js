@@ -1,4 +1,5 @@
 (function() {
+
   /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static

@@ -617,15 +617,15 @@
     var rect = makeRect({ angle: 10 });
     canvas.add(rect);
     equal(canvas.straightenObject(rect), canvas, 'should be chainable');
-    equal(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
+    equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.setAngle('60');
     canvas.straightenObject(rect);
-    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 60)');
+    equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
 
     rect.setAngle('100');
     canvas.straightenObject(rect);
-    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
+    equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
   });
 
   test('toSVG', function() {

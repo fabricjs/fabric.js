@@ -114,9 +114,9 @@
      * @return {String}
      */
     getSvgTransform: function() {
-      var angle = this..angle,
-          skewX = (this.getSkewX() % 360),
-          skewY = (this.getSkewY() % 360),
+      var angle = this.angle,
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
           center = this.getCenterPoint(),
 
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,

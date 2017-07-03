@@ -6878,7 +6878,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * @chainable
      */
     calcViewportBoundaries: function() {
-      var points = { }, width = this.getWidth(), height = this.getHeight(),
+      var points = { }, width = this.width, height = this.height,
           iVpt = invertTransform(this.viewportTransform);
       points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
       points.br = transformPoint({ x: width, y: height }, iVpt);
@@ -6985,8 +6985,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      */
     getCenter: function () {
       return {
-        top: this.getHeight() / 2,
-        left: this.getWidth() / 2
+        top: this.height / 2,
+        left: this.width / 2
       };
     },
 
@@ -9796,8 +9796,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         'class': this.containerClass
       });
       fabric.util.setStyle(this.wrapperEl, {
-        width: this.getWidth() + 'px',
-        height: this.getHeight() + 'px',
+        width: this.width + 'px',
+        height: this.height + 'px',
         position: 'relative'
       });
       fabric.util.makeElementUnselectable(this.wrapperEl);
@@ -9808,8 +9808,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {HTMLElement} element canvas element to apply styles on
      */
     _applyCanvasStyle: function (element) {
-      var width = this.getWidth() || element.width,
-          height = this.getHeight() || element.height;
+      var width = this.width || element.width,
+          height = this.height || element.height;
 
       fabric.util.setStyle(element, {
         position: 'absolute',
@@ -11039,7 +11039,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _getRotatedCornerCursor: function(corner, target, e) {
-      var n = Math.round((target.getAngle() % 360) / 45);
+      var n = Math.round((target.angle % 360) / 45);
 
       if (n < 0) {
         n += 8; // full circle ahead
@@ -11307,10 +11307,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
-      var origWidth = this.getWidth(),
-          origHeight = this.getHeight(),
-          scaledWidth = (cropping.width || this.getWidth()) * multiplier,
-          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
+      var origWidth = this.width,
+          origHeight = this.height,
+          scaledWidth = (cropping.width || this.width) * multiplier,
+          scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
@@ -11581,8 +11581,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   cloneWithoutData: function(callback) {
     var el = fabric.document.createElement('canvas');
 
-    el.width = this.getWidth();
-    el.height = this.getHeight();
+    el.width = this.width;
+    el.height = this.height;
 
     var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;
@@ -11644,260 +11644,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @fires mousedblclick
    */
   fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
-
-    /**
-     * Retrieves object's {@link fabric.Object#clipTo|clipping function}
-     * @method getClipTo
-     * @memberOf fabric.Object.prototype
-     * @return {Function}
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#clipTo|clipping function}
-     * @method setClipTo
-     * @memberOf fabric.Object.prototype
-     * @param {Function} clipTo Clipping function
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#transformMatrix|transformMatrix}
-     * @method getTransformMatrix
-     * @memberOf fabric.Object.prototype
-     * @return {Array} transformMatrix
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#transformMatrix|transformMatrix}
-     * @method setTransformMatrix
-     * @memberOf fabric.Object.prototype
-     * @param {Array} transformMatrix
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#visible|visible} state
-     * @method getVisible
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} True if visible
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#visible|visible} state
-     * @method setVisible
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value visible value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#shadow|shadow}
-     * @method getShadow
-     * @memberOf fabric.Object.prototype
-     * @return {Object} Shadow instance
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#stroke|stroke}
-     * @method getStroke
-     * @memberOf fabric.Object.prototype
-     * @return {String} stroke value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#stroke|stroke}
-     * @method setStroke
-     * @memberOf fabric.Object.prototype
-     * @param {String} value stroke value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#strokeWidth|strokeWidth}
-     * @method getStrokeWidth
-     * @memberOf fabric.Object.prototype
-     * @return {Number} strokeWidth value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#strokeWidth|strokeWidth}
-     * @method setStrokeWidth
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value strokeWidth value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#originX|originX}
-     * @method getOriginX
-     * @memberOf fabric.Object.prototype
-     * @return {String} originX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#originX|originX}
-     * @method setOriginX
-     * @memberOf fabric.Object.prototype
-     * @param {String} value originX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#originY|originY}
-     * @method getOriginY
-     * @memberOf fabric.Object.prototype
-     * @return {String} originY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#originY|originY}
-     * @method setOriginY
-     * @memberOf fabric.Object.prototype
-     * @param {String} value originY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#fill|fill}
-     * @method getFill
-     * @memberOf fabric.Object.prototype
-     * @return {String} Fill value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#fill|fill}
-     * @method setFill
-     * @memberOf fabric.Object.prototype
-     * @param {String} value Fill value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#opacity|opacity}
-     * @method getOpacity
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Opacity value (0-1)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#opacity|opacity}
-     * @method setOpacity
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Opacity value (0-1)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#angle|angle} (in degrees)
-     * @method getAngle
-     * @memberOf fabric.Object.prototype
-     * @return {Number}
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#top|top position}
-     * @method getTop
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Top value (in pixels)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#top|top position}
-     * @method setTop
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Top value (in pixels)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#left|left position}
-     * @method getLeft
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Left value (in pixels)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#left|left position}
-     * @method setLeft
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Left value (in pixels)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#scaleX|scaleX} value
-     * @method getScaleX
-     * @memberOf fabric.Object.prototype
-     * @return {Number} scaleX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#scaleX|scaleX} value
-     * @method setScaleX
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value scaleX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#scaleY|scaleY} value
-     * @method getScaleY
-     * @memberOf fabric.Object.prototype
-     * @return {Number} scaleY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#scaleY|scaleY} value
-     * @method setScaleY
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value scaleY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#flipX|flipX} value
-     * @method getFlipX
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} flipX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#flipX|flipX} value
-     * @method setFlipX
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value flipX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#flipY|flipY} value
-     * @method getFlipY
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} flipY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#flipY|flipY} value
-     * @method setFlipY
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value flipY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
 
     /**
      * Type of an object (rect, circle, path, etc.).
@@ -12624,7 +12370,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
             scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-            angle:                    toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+            angle:                    toFixed(this.angle, NUM_FRACTION_DIGITS),
             flipX:                    this.flipX,
             flipY:                    this.flipY,
             opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
@@ -13220,13 +12966,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       var origParams = {
-        active: this.get('active'),
-        left: this.getLeft(),
-        top: this.getTop()
+        active: this.active,
+        left: this.left,
+        top: this.top
       };
 
       this.set('active', false);
-      this.setPositionByOrigin(new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), 'center', 'center');
+      this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 
       var originalCanvas = this.canvas;
       canvas.add(this);
@@ -13760,7 +13506,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
-          hypotFull = this.getWidth(),
+          hypotFull = this.getScaledWidth(),
           xFull = Math.cos(angle) * hypotFull,
           yFull = Math.sin(angle) * hypotFull,
           offsetFrom, offsetTo;
@@ -14129,16 +13875,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Returns width of an object bounding box counting transformations
      * @return {Number} width value
      */
-    getWidth: function() {
+    getScaledWidth: function() {
       return this._getTransformedDimensions().x;
     },
 
     /**
      * Returns height of an object bounding box counting transformations
-     * to be renamed in 2.0
      * @return {Number} height value
      */
-    getHeight: function() {
+    getScaledHeight: function() {
       return this._getTransformedDimensions().y;
     },
 
@@ -14188,7 +13933,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getScaledWidth();
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -14200,7 +13945,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getScaledHeight();
       return this.scale(value / this.height / boundingRectFactor);
     },
 
@@ -14597,9 +14342,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String}
      */
     getSvgTransform: function() {
-      var angle = this.getAngle(),
-          skewX = (this.getSkewX() % 360),
-          skewY = (this.getSkewY() % 360),
+      var angle = this.angle,
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
           center = this.getCenterPoint(),
 
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
@@ -15205,7 +14950,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('left'),
+      startValue: object.left,
       endValue: this.getCenter().left,
       duration: this.FX_DURATION,
       onChange: function(value) {
@@ -15240,7 +14985,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('top'),
+      startValue: object.top,
       endValue: this.getCenter().top,
       duration: this.FX_DURATION,
       onChange: function(value) {
@@ -15275,7 +15020,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('opacity'),
+      startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
       onStart: function() {
@@ -17976,8 +17721,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
 
-      var objectLeft = object.getLeft(),
-          objectTop = object.getTop(),
+      var objectLeft = object.left,
+          objectTop = object.top,
           ignoreZoom = true, skipAbsolute = true;
 
       object.set({
@@ -19094,7 +18839,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {Number} angle value
    */
   _getAngleValueForStraighten: function() {
-    var angle = this.getAngle() % 360;
+    var angle = this.angle % 360;
     if (angle > 0) {
       return Math.round((angle - 1) / 90) * 90;
     }
@@ -22745,160 +22490,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     _reWords: /\S+/g,
 
     /**
-     * Retrieves object's fontSize
-     * @method getFontSize
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font size (in pixels)
-     */
-
-    /**
-     * Sets object's fontSize
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontSize
-     * @memberOf fabric.Text.prototype
-     * @param {Number} fontSize Font size (in pixels)
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontWeight
-     * @method getFontWeight
-     * @memberOf fabric.Text.prototype
-     * @return {(String|Number)} Font weight
-     */
-
-    /**
-     * Sets object's fontWeight
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontWeight
-     * @memberOf fabric.Text.prototype
-     * @param {(Number|String)} fontWeight Font weight
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontFamily
-     * @method getFontFamily
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font family
-     */
-
-    /**
-     * Sets object's fontFamily
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontFamily
-     * @memberOf fabric.Text.prototype
-     * @param {String} fontFamily Font family
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's text
-     * @method getText
-     * @memberOf fabric.Text.prototype
-     * @return {String} text
-     */
-
-    /**
-     * Sets object's text
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setText
-     * @memberOf fabric.Text.prototype
-     * @param {String} text Text
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's underline
-     * @method getUnderline
-     * @memberOf fabric.Text.prototype
-     * @return {Boolean} underline enabled or disabled
-     */
-
-    /**
-     * Sets object's underline
-     * @method setUnderline
-     * @memberOf fabric.Text.prototype
-     * @param {Boolean} underline Text decoration
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontStyle
-     * @method getFontStyle
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font style
-     */
-
-    /**
-     * Sets object's fontStyle
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontStyle
-     * @memberOf fabric.Text.prototype
-     * @param {String} fontStyle Font style
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's lineHeight
-     * @method getLineHeight
-     * @memberOf fabric.Text.prototype
-     * @return {Number} Line height
-     */
-
-    /**
-     * Sets object's lineHeight
-     * @method setLineHeight
-     * @memberOf fabric.Text.prototype
-     * @param {Number} lineHeight Line height
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's textAlign
-     * @method getTextAlign
-     * @memberOf fabric.Text.prototype
-     * @return {String} Text alignment
-     */
-
-    /**
-     * Sets object's textAlign
-     * @method setTextAlign
-     * @memberOf fabric.Text.prototype
-     * @param {String} textAlign Text alignment
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's textBackgroundColor
-     * @method getTextBackgroundColor
-     * @memberOf fabric.Text.prototype
-     * @return {String} Text background color
-     */
-
-    /**
-     * Sets object's textBackgroundColor
-     * @method setTextBackgroundColor
-     * @memberOf fabric.Text.prototype
-     * @param {String} textBackgroundColor Text background color
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
      * Type of an object
      * @type String
      * @default
@@ -24261,10 +23852,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        textHeightScaleFactor = text.getHeight() / text.height,
+        textHeightScaleFactor = text.height / text.height,
         lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
         scaledDiff = lineHeightDiff * textHeightScaleFactor,
-        textHeight = text.getHeight() + scaledDiff,
+        textHeight = text.height + scaledDiff,
         offX = 0;
     /*
       Adjust positioning:
@@ -24272,14 +23863,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         fabric output by default at top, left.
     */
     if (text.originX === 'center') {
-      offX = text.getWidth() / 2;
+      offX = text.width / 2;
     }
     if (text.originX === 'right') {
-      offX = text.getWidth();
+      offX = text.width;
     }
     text.set({
-      left: text.getLeft() - offX,
-      top: text.getTop() - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
+      left: text.left - offX,
+      top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
     });
     text.originX = 'left';
     text.originY = 'top';
