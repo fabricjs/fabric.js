@@ -491,37 +491,6 @@
     },
 
     /**
-     * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
-     * @static
-     * @memberOf fabric.util
-     * @param {Object} klass "Class" to create accessors for
-     */
-    createAccessors: function(klass) {
-      var proto = klass.prototype, i, propName,
-          capitalizedPropName, setterName, getterName;
-
-      for (i = proto.stateProperties.length; i--; ) {
-
-        propName = proto.stateProperties[i];
-        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1);
-        setterName = 'set' + capitalizedPropName;
-        getterName = 'get' + capitalizedPropName;
-
-        // using `new Function` for better introspection
-        if (!proto[getterName]) {
-          proto[getterName] = (function(property) {
-            return new Function('return this.get("' + property + '")');
-          })(propName);
-        }
-        if (!proto[setterName]) {
-          proto[setterName] = (function(property) {
-            return new Function('value', 'return this.set("' + property + '", value)');
-          })(propName);
-        }
-      }
-    },
-
-    /**
      * @static
      * @memberOf fabric.util
      * @param {fabric.Object} receiver Object implementing `clipTo` method

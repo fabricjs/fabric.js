@@ -143,9 +143,9 @@
 
     text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
 
-    equal(text.getOpacity(), 0.123);
-    equal(text.getFill(), 'red');
-    equal(text.get('fontFamily'), 'blah');
+    equal(text.opacity, 0.123);
+    equal(text.fill, 'red');
+    equal(text.fontFamily, 'blah');
   });
 
   test('get bounding rect after init', function() {
@@ -175,27 +175,6 @@
     equal(text.shadow.offsetX, 10);
     equal(text.shadow.offsetY, 8);
     equal(text.shadow.blur, 2);
-  });
-
-  test('setFontSize', function(){
-    var text = createTextObject();
-    ok(typeof text.setFontSize == 'function');
-    equal(text.setFontSize(12), text, 'should be chainable');
-    equal(text.get('fontSize'), 12);
-  });
-
-  test('getText', function(){
-    var text = createTextObject();
-    ok(typeof text.getText == 'function');
-    equal(text.getText(), 'x');
-    equal(text.getText(), text.get('text'));
-  });
-
-  test('setText', function(){
-    var text = createTextObject();
-    ok(typeof text.setText == 'function');
-    equal(text.setText('bar'), text, 'should be chainable');
-    equal(text.getText(), 'bar');
   });
 
   asyncTest('fabric.Text.fromObject', function(){
@@ -290,7 +269,7 @@
     var text = new fabric.Text('x');
     equal(text.width, CHAR_WIDTH);
 
-    text.setText('xx');
+    text.set('text', 'xx');
     equal(text.width, CHAR_WIDTH * 2);
   });
 
@@ -318,7 +297,7 @@
 
     equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
 
-    text.setFontFamily('"Arial Black", Arial');
+    text.set('fontFamily', '"Arial Black", Arial');
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 

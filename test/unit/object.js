@@ -133,24 +133,24 @@
     equal(88, cObj.get('height'));
   });
 
-  test('Dinamically generated accessors', function() {
-    var cObj = new fabric.Object({ });
-
-    equal('function', typeof cObj.getWidth);
-    equal('function', typeof cObj.setWidth);
-
-    equal('function', typeof cObj.getFill);
-    equal('function', typeof cObj.setFill);
-
-    equal(cObj, cObj.setFill('red'), 'chainable');
-    equal('red', cObj.getFill());
-
-    cObj.setScaleX(2.3);
-    equal(2.3, cObj.getScaleX());
-
-    cObj.setOpacity(0.123);
-    equal(0.123, cObj.getOpacity());
-  });
+  // test('Dinamically generated accessors', function() {
+  //   var cObj = new fabric.Object({ });
+  //
+  //   equal('function', typeof cObj.getWidth);
+  //   equal('function', typeof cObj.setWidth);
+  //
+  //   equal('function', typeof cObj.getFill);
+  //   equal('function', typeof cObj.setFill);
+  //
+  //   equal(cObj, cObj.setFill('red'), 'chainable');
+  //   equal('red', cObj.getFill());
+  //
+  //   cObj.setScaleX(2.3);
+  //   equal(2.3, cObj.getScaleX());
+  //
+  //   cObj.setOpacity(0.123);
+  //   equal(0.123, cObj.getOpacity());
+  // });
 
   test('stateProperties', function() {
     var cObj = new fabric.Object();
@@ -425,22 +425,22 @@
 
   test('getWidth', function() {
     var cObj = new fabric.Object();
-    ok(typeof cObj.getWidth == 'function');
-    equal(cObj.getWidth(), 0 + cObj.strokeWidth);
+    //ok(typeof cObj.getWidth == 'function');
+    equal(cObj.getScaledWidth(), 0 + cObj.strokeWidth);
     cObj.set('width', 123);
-    equal(cObj.getWidth(), 123 + cObj.strokeWidth);
+    equal(cObj.getScaledWidth(), 123 + cObj.strokeWidth);
     cObj.set('scaleX', 2);
-    equal(cObj.getWidth(), 246 + cObj.strokeWidth * 2);
+    equal(cObj.getScaledWidth(), 246 + cObj.strokeWidth * 2);
   });
 
   test('getHeight', function() {
     var cObj = new fabric.Object({strokeWidth: 0});
-    ok(typeof cObj.getHeight == 'function');
-    equal(cObj.getHeight(), 0);
+  //  ok(typeof cObj.getHeight == 'function');
+    equal(cObj.getScaledHeight(), 0);
     cObj.set('height', 123);
-    equal(cObj.getHeight(), 123);
+    equal(cObj.getScaledHeight(), 123);
     cObj.set('scaleY', 2);
-    equal(cObj.getHeight(), 246);
+    equal(cObj.getScaledHeight(), 246);
   });
 
   test('rotate', function() {
@@ -466,7 +466,7 @@
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
     ok(typeof cObj.scaleToWidth == 'function');
     equal(cObj.scaleToWidth(100), cObj, 'chainable');
-    equal(cObj.getWidth(), 100);
+    equal(cObj.getScaledWidth(), 100);
     equal(cObj.get('scaleX'), 100 / 560);
   });
 
@@ -474,7 +474,7 @@
     var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
     ok(typeof cObj.scaleToHeight == 'function');
     equal(cObj.scaleToHeight(100), cObj, 'chainable');
-    equal(cObj.getHeight(), 100);
+    equal(cObj.getScaledHeight(), 100);
     equal(cObj.get('scaleY'), 100 / 560);
   });
 
@@ -494,26 +494,23 @@
 
   test('setOpacity', function() {
     var cObj = new fabric.Object();
-    ok(typeof cObj.setOpacity == 'function');
     equal(cObj.get('opacity'), 1);
-    cObj.setOpacity(0.68);
+    cObj.set('opacity', 0.68);
     equal(cObj.get('opacity'), 0.68);
-    equal(cObj.setOpacity(1), cObj, 'chainable');
+    equal(cObj.set('opacity', 1), cObj, 'chainable');
   });
 
   test('getAngle', function() {
     var cObj = new fabric.Object();
-    ok(typeof cObj.getAngle == 'function');
-    equal(cObj.getAngle(), 0);
+    equal(cObj.get('angle'), 0);
     cObj.rotate(45);
-    equal(cObj.getAngle(), 45);
+    equal(cObj.get('angle'), 45);
   });
 
   test('setAngle', function() {
     var cObj = new fabric.Object();
-    ok(typeof cObj.setAngle == 'function');
     equal(cObj.get('angle'), 0);
-    equal(cObj.setAngle(45), cObj, 'chainable');
+    equal(cObj.set('angle', 45), cObj, 'chainable');
     equal(cObj.get('angle'), 45);
   });
 
@@ -547,7 +544,7 @@
 
       equal(cObj.get('left'), 123);
       equal(cObj.get('scaleX'), 1);
-      equal(cObj.getAngle(), 0);
+      equal(cObj.get('angle'), 0);
     });
   });
 

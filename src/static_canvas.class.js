@@ -851,7 +851,7 @@
      * @chainable
      */
     calcViewportBoundaries: function() {
-      var points = { }, width = this.getWidth(), height = this.getHeight(),
+      var points = { }, width = this.width, height = this.height,
           iVpt = invertTransform(this.viewportTransform);
       points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
       points.br = transformPoint({ x: width, y: height }, iVpt);
@@ -958,8 +958,8 @@
      */
     getCenter: function () {
       return {
-        top: this.getHeight() / 2,
-        left: this.getWidth() / 2
+        top: this.height / 2,
+        left: this.width / 2
       };
     },
 

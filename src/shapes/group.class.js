@@ -130,8 +130,8 @@
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
 
-      var objectLeft = object.getLeft(),
-          objectTop = object.getTop(),
+      var objectLeft = object.left,
+          objectTop = object.top,
           ignoreZoom = true, skipAbsolute = true;
 
       object.set({

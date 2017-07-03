@@ -55,7 +55,6 @@ else if (minifier === 'uglifyjs') {
   mininfierCmd = 'uglifyjs ' + amdUglifyFlags + ' --compress --mangle --output fabric.min.js fabric.js' + sourceMapFlags;
 }
 
-var buildSh = 'build-sh' in buildArgsAsObject;
 var buildMinified = 'build-minified' in buildArgsAsObject;
 
 var includeAllModules = (modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL') || buildMinified;
@@ -131,6 +130,7 @@ var filesToInclude = [
   'src/mixins/collection.mixin.js',
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
+  ifSpecifiedInclude('accessors', 'src/util/named_accessors.js'),
   'src/util/arc.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
@@ -243,31 +243,6 @@ if (buildMinified) {
     var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
     exec('uglifyjs -nc ' + amdUglifyFlags + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
   }
-}
-else if (buildSh) {
-
-  var filesStr = filesToInclude.join(' ');
-  var isBasicBuild = modulesToInclude.length === 0;
-
-  var minFilesStr = filesToInclude
-    .filter(function(f) { return f !== '' })
-    .map(function(fileName) {
-      return 'tmp/' + fileName.replace(/\//g, '^');
-    })
-    .join(' ');
-
-  var fileName = isBasicBuild ? 'fabric' : modulesToInclude.join(',');
-
-  var escapedHeader = distFileContents.replace(/`/g, '\\`');
-  var path = '../fabricjs.com/build/files/' + fileName + '.js';
-  fs.appendFile('build.sh',
-    'echo "' + escapedHeader + '" > ' + path + ' && cat ' +
-    filesStr + ' >> ' + path + '\n');
-
-  path = '../fabricjs.com/build/files/' + fileName + '.min.js';
-  fs.appendFile('build.sh',
-    'echo "' + escapedHeader + '" > ' + path + ' && cat ' +
-    minFilesStr + ' >> ' + path + '\n')
 }
 else {
   // change the current working directory

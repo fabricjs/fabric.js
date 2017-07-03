@@ -108,8 +108,8 @@
     var pattern = new fabric.Pattern({
       source: function() {
         patternSourceCanvas.setDimensions({
-          width: img.getWidth() + padding,
-          height: img.getHeight() + padding
+          width: img.width + padding,
+          height: img.height + padding
         });
         return patternSourceCanvas.getElement();
       },
