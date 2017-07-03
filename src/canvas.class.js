@@ -211,6 +211,14 @@
     rotationCursor:         'crosshair',
 
     /**
+     * Cursor value used for disabled elements ( corners with disabled action )
+     * @type String
+     * @since 2.0.0
+     * @default
+     */
+    notAllowedCursor:         'not-allowed',
+
+    /**
      * Default element class that's given to wrapper (div) element of canvas
      * @type String
      * @default
