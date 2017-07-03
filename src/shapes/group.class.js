@@ -62,6 +62,15 @@
     cacheProperties: [],
 
     /**
+     * setOnGroup is a method used for TextBox that is no more used since 2.0.0 The behavior is still
+     * available setting this boolean to true.
+     * @type Boolean
+     * @since 2.0.0
+     * @default
+     */
+    useSetOnGroup: false,
+
+    /**
      * Constructor
      * @param {Object} objects Group objects
      * @param {Object} [options] Options object
@@ -75,7 +84,6 @@
       // if objects enclosed in a group have been grouped already,
       // we cannot change properties of objects.
       // Thus we need to set options to group without objects,
-      // because delegatedProperties propagate to objects.
       isAlreadyGrouped && this.callSuper('initialize', options);
 
       this._objects = objects || [];
@@ -223,35 +231,12 @@
     },
 
     /**
-     * Properties that are delegated to group objects when reading/writing
-     * @param {Object} delegatedProperties
-     */
-    delegatedProperties: {
-      fill:             true,
-      stroke:           true,
-      strokeWidth:      true,
-      fontFamily:       true,
-      fontWeight:       true,
-      fontSize:         true,
-      fontStyle:        true,
-      lineHeight:       true,
-      textDecoration:   true,
-      textAlign:        true,
-      backgroundColor:  true
-    },
-
-    /**
      * @private
      */
     _set: function(key, value) {
       var i = this._objects.length;
 
-      if (this.delegatedProperties[key] || key === 'canvas') {
-        while (i--) {
-          this._objects[i].set(key, value);
-        }
-      }
-      else {
+      if (this.useSetOnGroup) {
         while (i--) {
           this._objects[i].setOnGroup(key, value);
         }
@@ -595,9 +580,6 @@
         }
       }
       else {
-        if (prop in this.delegatedProperties) {
-          return this._objects[0] && this._objects[0].get(prop);
-        }
         return this[prop];
       }
     }
