@@ -43,260 +43,6 @@
   fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
 
     /**
-     * Retrieves object's {@link fabric.Object#clipTo|clipping function}
-     * @method getClipTo
-     * @memberOf fabric.Object.prototype
-     * @return {Function}
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#clipTo|clipping function}
-     * @method setClipTo
-     * @memberOf fabric.Object.prototype
-     * @param {Function} clipTo Clipping function
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#transformMatrix|transformMatrix}
-     * @method getTransformMatrix
-     * @memberOf fabric.Object.prototype
-     * @return {Array} transformMatrix
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#transformMatrix|transformMatrix}
-     * @method setTransformMatrix
-     * @memberOf fabric.Object.prototype
-     * @param {Array} transformMatrix
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#visible|visible} state
-     * @method getVisible
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} True if visible
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#visible|visible} state
-     * @method setVisible
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value visible value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#shadow|shadow}
-     * @method getShadow
-     * @memberOf fabric.Object.prototype
-     * @return {Object} Shadow instance
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#stroke|stroke}
-     * @method getStroke
-     * @memberOf fabric.Object.prototype
-     * @return {String} stroke value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#stroke|stroke}
-     * @method setStroke
-     * @memberOf fabric.Object.prototype
-     * @param {String} value stroke value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#strokeWidth|strokeWidth}
-     * @method getStrokeWidth
-     * @memberOf fabric.Object.prototype
-     * @return {Number} strokeWidth value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#strokeWidth|strokeWidth}
-     * @method setStrokeWidth
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value strokeWidth value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#originX|originX}
-     * @method getOriginX
-     * @memberOf fabric.Object.prototype
-     * @return {String} originX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#originX|originX}
-     * @method setOriginX
-     * @memberOf fabric.Object.prototype
-     * @param {String} value originX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#originY|originY}
-     * @method getOriginY
-     * @memberOf fabric.Object.prototype
-     * @return {String} originY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#originY|originY}
-     * @method setOriginY
-     * @memberOf fabric.Object.prototype
-     * @param {String} value originY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#fill|fill}
-     * @method getFill
-     * @memberOf fabric.Object.prototype
-     * @return {String} Fill value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#fill|fill}
-     * @method setFill
-     * @memberOf fabric.Object.prototype
-     * @param {String} value Fill value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#opacity|opacity}
-     * @method getOpacity
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Opacity value (0-1)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#opacity|opacity}
-     * @method setOpacity
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Opacity value (0-1)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#angle|angle} (in degrees)
-     * @method getAngle
-     * @memberOf fabric.Object.prototype
-     * @return {Number}
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#top|top position}
-     * @method getTop
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Top value (in pixels)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#top|top position}
-     * @method setTop
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Top value (in pixels)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#left|left position}
-     * @method getLeft
-     * @memberOf fabric.Object.prototype
-     * @return {Number} Left value (in pixels)
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#left|left position}
-     * @method setLeft
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Left value (in pixels)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#scaleX|scaleX} value
-     * @method getScaleX
-     * @memberOf fabric.Object.prototype
-     * @return {Number} scaleX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#scaleX|scaleX} value
-     * @method setScaleX
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value scaleX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#scaleY|scaleY} value
-     * @method getScaleY
-     * @memberOf fabric.Object.prototype
-     * @return {Number} scaleY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#scaleY|scaleY} value
-     * @method setScaleY
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value scaleY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#flipX|flipX} value
-     * @method getFlipX
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} flipX value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#flipX|flipX} value
-     * @method setFlipX
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value flipX value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's {@link fabric.Object#flipY|flipY} value
-     * @method getFlipY
-     * @memberOf fabric.Object.prototype
-     * @return {Boolean} flipY value
-     */
-
-    /**
-     * Sets object's {@link fabric.Object#flipY|flipY} value
-     * @method setFlipY
-     * @memberOf fabric.Object.prototype
-     * @param {Boolean} value flipY value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
      * Type of an object (rect, circle, path, etc.).
      * Note that this property is meant to be read-only and not meant to be modified.
      * If you modify, certain parts of Fabric (such as JSON loading) won't work correctly.
@@ -1021,7 +767,7 @@
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
             scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-            angle:                    toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+            angle:                    toFixed(this..angle, NUM_FRACTION_DIGITS),
             flipX:                    this.flipX,
             flipY:                    this.flipY,
             opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
@@ -1617,13 +1363,13 @@
       }
 
       var origParams = {
-        active: this.get('active'),
-        left: this.getLeft(),
-        top: this.getTop()
+        active: this.active,
+        left: this.left,
+        top: this.top
       };
 
       this.set('active', false);
-      this.setPositionByOrigin(new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), 'center', 'center');
+      this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 
       var originalCanvas = this.canvas;
       canvas.add(this);
@@ -1927,7 +1673,7 @@
     }
   });
 
-  fabric.util.createAccessors(fabric.Object);
+  fabric.createNamedAccessors && fabric.util.createAccessors(fabric.Object);
 
   /**
    * Alias for {@link fabric.Object.prototype.setAngle}

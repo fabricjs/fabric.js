@@ -203,8 +203,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   cloneWithoutData: function(callback) {
     var el = fabric.document.createElement('canvas');
 
-    el.width = this.getWidth();
-    el.height = this.getHeight();
+    el.width = this.width;
+    el.height = this.height;
 
     var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;

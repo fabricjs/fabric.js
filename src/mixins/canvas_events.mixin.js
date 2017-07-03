@@ -847,7 +847,7 @@
      * @private
      */
     _getRotatedCornerCursor: function(corner, target, e) {
-      var n = Math.round((target.getAngle() % 360) / 45);
+      var n = Math.round((target..angle % 360) / 45);
 
       if (n < 0) {
         n += 8; // full circle ahead

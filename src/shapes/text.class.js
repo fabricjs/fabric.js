@@ -99,160 +99,6 @@
     _reWords: /\S+/g,
 
     /**
-     * Retrieves object's fontSize
-     * @method getFontSize
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font size (in pixels)
-     */
-
-    /**
-     * Sets object's fontSize
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontSize
-     * @memberOf fabric.Text.prototype
-     * @param {Number} fontSize Font size (in pixels)
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontWeight
-     * @method getFontWeight
-     * @memberOf fabric.Text.prototype
-     * @return {(String|Number)} Font weight
-     */
-
-    /**
-     * Sets object's fontWeight
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontWeight
-     * @memberOf fabric.Text.prototype
-     * @param {(Number|String)} fontWeight Font weight
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontFamily
-     * @method getFontFamily
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font family
-     */
-
-    /**
-     * Sets object's fontFamily
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontFamily
-     * @memberOf fabric.Text.prototype
-     * @param {String} fontFamily Font family
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's text
-     * @method getText
-     * @memberOf fabric.Text.prototype
-     * @return {String} text
-     */
-
-    /**
-     * Sets object's text
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setText
-     * @memberOf fabric.Text.prototype
-     * @param {String} text Text
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's underline
-     * @method getUnderline
-     * @memberOf fabric.Text.prototype
-     * @return {Boolean} underline enabled or disabled
-     */
-
-    /**
-     * Sets object's underline
-     * @method setUnderline
-     * @memberOf fabric.Text.prototype
-     * @param {Boolean} underline Text decoration
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's fontStyle
-     * @method getFontStyle
-     * @memberOf fabric.Text.prototype
-     * @return {String} Font style
-     */
-
-    /**
-     * Sets object's fontStyle
-     * Does not update the object .width and .height,
-     * call .initDimensions() to update the values.
-     * @method setFontStyle
-     * @memberOf fabric.Text.prototype
-     * @param {String} fontStyle Font style
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's lineHeight
-     * @method getLineHeight
-     * @memberOf fabric.Text.prototype
-     * @return {Number} Line height
-     */
-
-    /**
-     * Sets object's lineHeight
-     * @method setLineHeight
-     * @memberOf fabric.Text.prototype
-     * @param {Number} lineHeight Line height
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's textAlign
-     * @method getTextAlign
-     * @memberOf fabric.Text.prototype
-     * @return {String} Text alignment
-     */
-
-    /**
-     * Sets object's textAlign
-     * @method setTextAlign
-     * @memberOf fabric.Text.prototype
-     * @param {String} textAlign Text alignment
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
-     * Retrieves object's textBackgroundColor
-     * @method getTextBackgroundColor
-     * @memberOf fabric.Text.prototype
-     * @return {String} Text background color
-     */
-
-    /**
-     * Sets object's textBackgroundColor
-     * @method setTextBackgroundColor
-     * @memberOf fabric.Text.prototype
-     * @param {String} textBackgroundColor Text background color
-     * @return {fabric.Text}
-     * @chainable
-     */
-
-    /**
      * Type of an object
      * @type String
      * @default
@@ -1615,10 +1461,10 @@
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     var text = new fabric.Text(textContent, options),
-        textHeightScaleFactor = text.getHeight() / text.height,
+        textHeightScaleFactor = text.height / text.height,
         lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
         scaledDiff = lineHeightDiff * textHeightScaleFactor,
-        textHeight = text.getHeight() + scaledDiff,
+        textHeight = text.height + scaledDiff,
         offX = 0;
     /*
       Adjust positioning:
@@ -1626,14 +1472,14 @@
         fabric output by default at top, left.
     */
     if (text.originX === 'center') {
-      offX = text.getWidth() / 2;
+      offX = text.width / 2;
     }
     if (text.originX === 'right') {
-      offX = text.getWidth();
+      offX = text.width;
     }
     text.set({
-      left: text.getLeft() - offX,
-      top: text.getTop() - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
+      left: text.left - offX,
+      top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
     });
     text.originX = 'left';
     text.originY = 'top';
@@ -1652,6 +1498,6 @@
     return fabric.Object._fromObject('Text', object, callback, 'text');
   };
 
-  fabric.util.createAccessors(fabric.Text);
+  fabric.createNamedAccessors && fabric.util.createAccessors(fabric.Text);
 
 })(typeof exports !== 'undefined' ? exports : this);

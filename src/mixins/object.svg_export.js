@@ -114,7 +114,7 @@
      * @return {String}
      */
     getSvgTransform: function() {
-      var angle = this.getAngle(),
+      var angle = this..angle,
           skewX = (this.getSkewX() % 360),
           skewY = (this.getSkewY() % 360),
           center = this.getCenterPoint(),
