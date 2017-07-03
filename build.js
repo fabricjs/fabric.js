@@ -130,7 +130,7 @@ var filesToInclude = [
   'src/mixins/collection.mixin.js',
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
-  ifSpecifiedInclude('accessors', 'src/util/named_accessors.js'),
+  ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
   'src/util/arc.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
