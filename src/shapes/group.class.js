@@ -11,18 +11,6 @@
     return;
   }
 
-  // lock-related properties, for use in fabric.Group#get
-  // to enable locking behavior on group
-  // when one of its objects has lock-related properties set
-  var _lockProperties = {
-    lockMovementX:  true,
-    lockMovementY:  true,
-    lockRotation:   true,
-    lockScalingX:   true,
-    lockScalingY:   true,
-    lockUniScaling: true
-  };
-
   /**
    * Group class
    * @class fabric.Group
@@ -56,7 +44,7 @@
 
     /**
      * Groups are container, do not render anything on theyr own, ence no cache properties
-     * @type Boolean
+     * @type Array
      * @default
      */
     cacheProperties: [],
@@ -564,30 +552,6 @@
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Returns requested property
-     * @param {String} prop Property to get
-     * @return {*}
-     */
-    get: function(prop) {
-      if (prop in _lockProperties) {
-        if (this[prop]) {
-          return this[prop];
-        }
-        else {
-          for (var i = 0, len = this._objects.length; i < len; i++) {
-            if (this._objects[i][prop]) {
-              return true;
-            }
-          }
-          return false;
-        }
-      }
-      else {
-        return this[prop];
-      }
-    }
   });
 
   /**

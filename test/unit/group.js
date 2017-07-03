@@ -683,7 +683,7 @@
       count++;
       inspectKey = key;
       inspectValue = value;
-    }
+    };
 
     group.set('fill', 'red');
     equal(count, 0, 'setOnGroup has not been called');
