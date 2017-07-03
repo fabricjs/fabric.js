@@ -50,6 +50,9 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
     obj._removeTransformMatrix();
+    if (obj instanceof fabric.Image) {
+      obj.parsePreserveAspectRatioAttribute(el);
+    }
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();

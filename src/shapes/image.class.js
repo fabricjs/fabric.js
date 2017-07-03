@@ -15,9 +15,8 @@
 
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push(
-    'alignX',
-    'alignY',
-    'meetOrSlice'
+    'cropX',
+    'cropY'
   );
 
   /**
@@ -43,33 +42,6 @@
      * @default
      */
     crossOrigin: '',
-
-    /**
-     * AlignX value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element width differs from image width.
-     * @type String
-     * @default
-     */
-    alignX: 'none',
-
-    /**
-     * AlignY value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element height differs from image height.
-     * @type String
-     * @default
-     */
-    alignY: 'none',
-
-    /**
-     * meetOrSlice value, part of preserveAspectRatio  (one of "meet", "slice").
-     * if meet the image is always fully visibile, if slice the viewport is always filled with image.
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * @type String
-     * @default
-     */
-    meetOrSlice: 'meet',
 
     /**
      * Width of a stroke.
@@ -141,6 +113,22 @@
      * @default
      */
     cacheKey: '',
+
+    /**
+     * Image crop in pixels from original image size.
+     * since 2.0.0
+     * @type Number
+     * @default
+     */
+    cropX: 0,
+
+    /**
+     * Image crop in pixels from original image size.
+     * since 2.0.0
+     * @type Number
+     * @default
+     */
+    cropY: 0,
 
     /**
      * Constructor
@@ -267,7 +255,7 @@
       var object = extend(
         this.callSuper(
           'toObject',
-          ['crossOrigin', 'alignX', 'alignY', 'meetOrSlice'].concat(propertiesToInclude)
+          ['crossOrigin', 'cropX', 'cropY'].concat(propertiesToInclude)
         ), {
           src: this.getSrc(),
           filters: filters,
@@ -289,10 +277,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
-          preserveAspectRatio = 'none', filtered = true;
-      if (this.alignX !== 'none' && this.alignY !== 'none') {
-        preserveAspectRatio = 'x' + this.alignX + 'Y' + this.alignY + ' ' + this.meetOrSlice;
-      }
+          filtered = true;
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           '<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(filtered),
@@ -303,7 +288,6 @@
             // so that object's center aligns with container's left/top
             '" width="', this.width,
             '" height="', this.height,
-            '" preserveAspectRatio="', preserveAspectRatio, '"',
           '></image>\n'
       );
 
@@ -465,13 +449,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var x = -this.width / 2, y = -this.height / 2, imageMargins = this._findMargins(), elementToDraw;
-
-      if (this.meetOrSlice === 'slice') {
-        ctx.beginPath();
-        ctx.rect(x, y, this.width, this.height);
-        ctx.clip();
-      }
+      var x = -this.width / 2, y = -this.height / 2, elementToDraw;
 
       if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
         this._lastScaleX = this.scaleX;
@@ -480,12 +458,8 @@
       }
       elementToDraw = this._element;
       elementToDraw && ctx.drawImage(elementToDraw,
-                                     x + imageMargins.marginX,
-                                     y + imageMargins.marginY,
-                                     imageMargins.width,
-                                     imageMargins.height
-                                    );
-
+                                     this.cropX, this.cropY, this.width, this.height,
+                                     x, y, this.width, this.height);
       this._stroke(ctx);
       this._renderStroke(ctx);
     },
@@ -495,40 +469,6 @@
      */
     _needsResize: function() {
       return (this.scaleX !== this._lastScaleX || this.scaleY !== this._lastScaleY);
-    },
-
-    /**
-     * @private
-     */
-    _findMargins: function() {
-      var width = this.width, height = this.height, scales,
-          scale, marginX = 0, marginY = 0;
-
-      if (this.alignX !== 'none' || this.alignY !== 'none') {
-        scales = [this.width / this._element.width, this.height / this._element.height];
-        scale = this.meetOrSlice === 'meet'
-                ? Math.min.apply(null, scales) : Math.max.apply(null, scales);
-        width = this._element.width * scale;
-        height = this._element.height * scale;
-        if (this.alignX === 'Mid') {
-          marginX = (this.width - width) / 2;
-        }
-        if (this.alignX === 'Max') {
-          marginX = this.width - width;
-        }
-        if (this.alignY === 'Mid') {
-          marginY = (this.height - height) / 2;
-        }
-        if (this.alignY === 'Max') {
-          marginY = this.height - height;
-        }
-      }
-      return {
-        width:  width,
-        height: height,
-        marginX: marginX,
-        marginY: marginY
-      };
     },
 
     /**
@@ -599,6 +539,55 @@
             ? this.getElement().height || 0
             : 0);
     },
+
+    parsePreserveAspectRatioAttribute: function() {
+      if (!this.preserveAspectRatio) {
+        return;
+      }
+      var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio),
+          width = this._element.width, height = this._element.height, scale,
+          pWidth = this.width, pHeight = this.height, parsedAttributes = { width: pWidth, height: pHeight };
+      if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
+        if (pAR.meetOrSlice === 'meet') {
+          this.width = width;
+          this.height = height;
+          this.scaleX = this.scaleY = scale = fabric.util.findScaleToFit(this._element, parsedAttributes);
+          if (pAR.alignX === 'Mid') {
+            this.left += (pWidth - width * scale) / 2;
+          }
+          if (pAR.alignX === 'Max') {
+            this.left += pWidth - width * scale;
+          }
+          if (pAR.alignY === 'Mid') {
+            this.top += (pHeight - height * scale) / 2;
+          }
+          if (pAR.alignY === 'Max') {
+            this.top += pHeight - height * scale;
+          }
+        }
+        if (pAR.meetOrSlice === 'slice') {
+          this.scaleX = this.scaleY = scale = fabric.util.findScaleToCover(this._element, parsedAttributes);
+          this.width = pWidth / scale;
+          this.height = pHeight / scale;
+          if (pAR.alignX === 'Mid') {
+            this.cropX = (width - this.width) / 2;
+          }
+          if (pAR.alignX === 'Max') {
+            this.cropX = width - this.width;
+          }
+          if (pAR.alignY === 'Mid') {
+            this.cropY = (height - this.height) / 2;
+          }
+          if (pAR.alignY === 'Max') {
+            this.cropY = height - this.height;
+          }
+        }
+      }
+      else {
+        this.scaleX = pWidth / width;
+        this.scaleY = pHeight / height;
+      }
+    }
   });
 
   /**
@@ -669,13 +658,7 @@
    * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
-        preserveAR;
-
-    if (parsedAttributes.preserveAspectRatio) {
-      preserveAR = fabric.util.parsePreserveAspectRatioAttribute(parsedAttributes.preserveAspectRatio);
-      extend(parsedAttributes, preserveAR);
-    }
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));

@@ -709,6 +709,14 @@
 
     capValue: function(min, value, max) {
       return Math.max(min, Math.min(value, max));
+    },
+
+    findScaleToFit: function(source, destination) {
+      return Math.min(destination.width / source.width, destination.height / source.height);
+    },
+
+    findScaleToCover: function(source, destination) {
+      return Math.max(destination.width / source.width, destination.height / source.height);
     }
   };
 
