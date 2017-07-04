@@ -6,7 +6,7 @@
       createClass = fabric.util.createClass;
 
   /**
-   * Color Blend filter class
+   * Image Blend filter class
    * @class fabric.Image.filter.BlendImage
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
