@@ -429,6 +429,7 @@
     /**
      * Function that determines clipping of an object (context is passed as a first argument)
      * Note that context origin is at the object's center point (not left/top corner)
+     * @deprecated since 2.0.0
      * @type Function
      */
     clipTo:                   null,

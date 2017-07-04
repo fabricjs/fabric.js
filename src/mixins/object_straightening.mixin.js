@@ -69,7 +69,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   straightenObject: function (object) {
     object.straighten();
-    this.renderAll();
+    this.requestRenderAll();
     return this;
   },
 
@@ -81,7 +81,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   fxStraightenObject: function (object) {
     object.fxStraighten({
-      onChange: this.renderAll.bind(this)
+      onChange: this.requestRenderAllBound
     });
     return this;
   }

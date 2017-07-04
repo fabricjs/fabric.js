@@ -41,6 +41,7 @@
     initialize: function(el, options) {
       options || (options = { });
       this.renderAndResetBound = this.renderAndReset.bind(this);
+      this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
 
@@ -98,7 +99,8 @@
     stateful: false,
 
     /**
-     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
+     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
+     * {@link fabric.Collection} should also re-render canvas.
      * Disabling this option could give a great performance boost when adding/removing a lot of objects to/from canvas at once
      * (followed by a manual rendering after addition/deletion)
      * @type Boolean
@@ -109,6 +111,7 @@
     /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * @deprecated since 2.0.0
      * @type Function
      * @default
      */
@@ -201,7 +204,7 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
-      var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
+      var cb = this.requestRenderAllBound;
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -599,7 +602,7 @@
       this.calcOffset();
 
       if (!options.cssOnly) {
-        this.renderAll();
+        this.requestRenderAll();
       }
 
       return this;
@@ -676,7 +679,7 @@
         activeGroup.setCoords(ignoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -803,7 +806,7 @@
       }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -1056,7 +1059,7 @@
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -1449,7 +1452,7 @@
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -1478,7 +1481,7 @@
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -1517,7 +1520,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -1585,7 +1588,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -1628,7 +1631,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      return this.requestRenderAll && this.requestRenderAll();
     },
 
     /**
