@@ -117,7 +117,7 @@
         squareVertices: this.squareVertices,
         programCache: this.programCache,
         pass: 0,
-        backEnd: this
+        filterBackend: this
       };
       var tempFbo = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);

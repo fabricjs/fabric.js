@@ -50,6 +50,7 @@
         originalImageData: originalImageData,
         canvasEl: targetCanvas,
         ctx: ctx,
+        filterBackend: this,
       };
       filters.forEach(function(filter) { filter.applyTo(pipelineState); });
       if (pipelineState.imageData.width !== sourceWidth || pipelineState.imageData.height !== sourceHeight) {

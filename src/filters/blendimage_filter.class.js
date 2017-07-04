@@ -105,7 +105,7 @@
     applyToWebGL: function(options) {
       // load texture to blend.
       var gl = options.context,
-          texture = this.createTexture(options.backEnd, this.image);
+          texture = this.createTexture(options.filterBackend, this.image);
       this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
       this.callSuper('applyToWebGL', options);
       this.unbindAdditionalTexture(gl, gl.TEXTURE1);
@@ -140,27 +140,47 @@
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
+          resources = options.filterBackend.resources,
           data = imageData.data, iLen = data.length,
-          tr, tg, tb,
-          r, g, b,
-          source, alpha1 = 1 - this.alpha;
+          width = options.imageData.width,
+          height = options.imageData.height,
+          tr, tg, tb, ta,
+          r, g, b, a,
+          canvas1, context, image = this.image, blendData;
 
-      source = new fabric.Color(this.color).getSource();
-      tr = source[0] * this.alpha;
-      tg = source[1] * this.alpha;
-      tb = source[2] * this.alpha;
-
+      if (!resources.blendImage) {
+        resources.blendImage = document.createElement('canvas');
+      }
+      canvas1 = resources.blendImage;
+      if (canvas1.width !== width || canvas1.height !== height) {
+        canvas1.width = width;
+        canvas1.height = height;
+      }
+      context = canvas1.getContext('2d');
+      context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
+      context.drawImage(image._element, 0, 0, width, height);
+      blendData = context.getImageData(0, 0, width, height).data;
       for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
         g = data[i + 1];
         b = data[i + 2];
+        a = data[i + 3];
+
+        tr = blendData[i];
+        tg = blendData[i + 1];
+        tb = blendData[i + 2];
+        ta = blendData[i + 3];
 
         switch (this.mode) {
           case 'multiply':
             data[i] = r * tr / 255;
             data[i + 1] = g * tg / 255;
             data[i + 2] = b * tb / 255;
+            data[i + 3] = a * ta / 255;
+            break;
+          case 'mask':
+            data[i + 3] = ta;
             break;
         }
       }
@@ -198,7 +218,7 @@
     toObject: function() {
       return {
         type: this.type,
-        image: this.image.toObject(),
+        image: this.image && this.image.toObject(),
         mode: this.mode,
         alpha: this.alpha
       };
@@ -209,9 +229,15 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
+   * @param {function} callback to be invoked after filter creation
    * @return {fabric.Image.filters.BlendImage} Instance of fabric.Image.filters.BlendImage
    */
-  fabric.Image.filters.BlendImage.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+  fabric.Image.filters.BlendImage.fromObject = function(object, callback) {
+    fabric.Image.fromObject(object.image, function(image) {
+      var options = fabric.util.object.clone(object);
+      options.image = image;
+      callback(new fabric.Image.filters.BlendImage(options));
+    });
+  };
 
 })(typeof exports !== 'undefined' ? exports : this);
