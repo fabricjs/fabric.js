@@ -214,6 +214,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/removecolor_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/filter_generator.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blendcolor_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/blendimage_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),

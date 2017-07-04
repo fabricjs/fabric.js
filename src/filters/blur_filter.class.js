@@ -104,7 +104,7 @@
     },
 
     simpleBlur: function(options) {
-      var resources = fabric.filterBackend.resources, canvas1, canvas2,
+      var resources = options.filterBackend.resources, canvas1, canvas2,
           width = options.imageData.width,
           height = options.imageData.height;
 
