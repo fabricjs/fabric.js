@@ -545,6 +545,7 @@
         isTransparent = fabric.util.isTransparent,
         ctx = canvas.contextContainer;
     canvas.add(group);
+    canvas.renderAll();
     equal(canvas.enableRetinaScaling, false, 'enable retina scaling is off');
     equal(isTransparent(ctx, 0, 0, 0), true, '0,0 is transparent');
     equal(isTransparent(ctx, 1, 1, 0), false, '1,1 is opaque');

@@ -140,7 +140,7 @@ fabric.Collection = {
                 this._onObjectAdded(arguments[i]);
             }
         }
-        this.renderOnAddRemove && this.requestRenderAll();
+        this.renderOnAddRemove && this.renderAll();
         return this;
     },
     insertAt: function(object, index, nonSplicing) {
@@ -151,7 +151,7 @@ fabric.Collection = {
             objects.splice(index, 0, object);
         }
         this._onObjectAdded && this._onObjectAdded(object);
-        this.renderOnAddRemove && this.requestRenderAll();
+        this.renderOnAddRemove && this.renderAll();
         return this;
     },
     remove: function() {
@@ -164,7 +164,7 @@ fabric.Collection = {
                 this._onObjectRemoved && this._onObjectRemoved(arguments[i]);
             }
         }
-        this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
+        this.renderOnAddRemove && somethingRemoved && this.renderAll();
         return this;
     },
     forEachObject: function(callback, context) {
@@ -3178,7 +3178,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         initialize: function(el, options) {
             options || (options = {});
             this.renderAndResetBound = this.renderAndReset.bind(this);
-            this.requestRenderAllBound = this.requestRenderAll.bind(this);
             this._initStatic(el, options);
         },
         backgroundColor: "",
@@ -3200,7 +3199,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         vptCoords: {},
         skipOffscreen: true,
         _initStatic: function(el, options) {
-            var cb = this.requestRenderAllBound;
+            var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
             this._objects = [];
             this._createLowerCanvas(el);
             this._initOptions(options);
@@ -3343,7 +3342,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             this._setImageSmoothing();
             this.calcOffset();
             if (!options.cssOnly) {
-                this.requestRenderAll();
+                this.renderAll();
             }
             return this;
         },
@@ -3382,7 +3381,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 activeGroup.setCoords(ignoreVpt, skipAbsolute);
             }
             this.calcViewportBoundaries();
-            this.requestRenderAll();
+            this.renderAll();
             return this;
         },
         zoomToPoint: function(point, value) {
@@ -3447,7 +3446,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             }
             this.clearContext(this.contextContainer);
             this.fire("canvas:cleared");
-            this.requestRenderAll();
+            this.renderAll();
             return this;
         },
         renderAll: function() {
@@ -3570,7 +3569,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         },
         _centerObject: function(object, center) {
             object.setPositionByOrigin(center, "center", "center");
-            this.requestRenderAll();
+            this.renderAll();
             return this;
         },
         toDatalessJSON: function(propertiesToInclude) {
@@ -3744,7 +3743,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 removeFromArray(this._objects, object);
                 this._objects.unshift(object);
             }
-            this.requestRenderAll && this.requestRenderAll();
+            this.renderAll && this.renderAll();
             return this;
         },
         bringToFront: function(object) {
@@ -3763,7 +3762,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 removeFromArray(this._objects, object);
                 this._objects.push(object);
             }
-            this.requestRenderAll && this.requestRenderAll();
+            this.renderAll && this.renderAll();
             return this;
         },
         sendBackwards: function(object, intersecting) {
@@ -3790,7 +3789,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                     this._objects.splice(newIdx, 0, object);
                 }
             }
-            this.requestRenderAll && this.requestRenderAll();
+            this.renderAll && this.renderAll();
             return this;
         },
         _findNewLowerIndex: function(object, idx, intersecting) {
@@ -3833,7 +3832,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                     this._objects.splice(newIdx, 0, object);
                 }
             }
-            this.requestRenderAll && this.requestRenderAll();
+            this.renderAll && this.renderAll();
             return this;
         },
         _findNewUpperIndex: function(object, idx, intersecting) {
@@ -3855,7 +3854,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         moveTo: function(object, index) {
             removeFromArray(this._objects, object);
             this._objects.splice(index, 0, object);
-            return this.requestRenderAll && this.requestRenderAll();
+            return this.renderAll && this.renderAll();
         },
         dispose: function() {
             this.clear();
@@ -9228,12 +9227,12 @@ fabric.util.object.extend(fabric.Object.prototype, {
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     straightenObject: function(object) {
         object.straighten();
-        this.requestRenderAll();
+        this.renderAll();
         return this;
     },
     fxStraightenObject: function(object) {
         object.fxStraighten({
-            onChange: this.requestRenderAllBound
+            onChange: this.renderAll.bind(this)
         });
         return this;
     }
@@ -9308,8 +9307,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 webgl: true,
                 squareVertices: this.squareVertices,
                 programCache: this.programCache,
-                pass: 0,
-                filterBackend: this
+                pass: 0
             };
             var tempFbo = gl.createFramebuffer();
             gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
@@ -9382,8 +9380,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         createTexture: function(gl, width, height, textureImageSource) {
             var texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             if (textureImageSource) {
@@ -9463,8 +9461,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 originalEl: sourceElement,
                 originalImageData: originalImageData,
                 canvasEl: targetCanvas,
-                ctx: ctx,
-                filterBackend: this
+                ctx: ctx
             };
             filters.forEach(function(filter) {
                 filter.applyTo(pipelineState);
@@ -10164,106 +10161,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric, filters = fabric.Image.filters, createClass = fabric.util.createClass;
-    filters.BlendImage = createClass(filters.BaseFilter, {
-        type: "BlendImage",
-        image: null,
-        mode: "multiply",
-        alpha: 1,
-        vertexSource: "attribute vec2 aPosition;\n" + "attribute vec2 aTexCoord;\n" + "varying vec2 vTexCoord;\n" + "varying vec2 vTexCoord2;\n" + "uniform mat3 uTransformMatrix;\n" + "void main() {\n" + "vTexCoord = aTexCoord;\n" + "vTexCoord2 = (uTransformMatrix * vec3(aTexCoord, 1.0)).xy;\n" + "gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n" + "}",
-        fragmentSource: {
-            multiply: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform sampler2D uImage;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "varying vec2 vTexCoord2;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "vec4 color2 = texture2D(uImage, vTexCoord2);\n" + "color.rgba *= color2.rgba;\n" + "gl_FragColor = color;\n" + "}",
-            mask: "precision highp float;\n" + "uniform sampler2D uTexture;\n" + "uniform sampler2D uImage;\n" + "uniform vec4 uColor;\n" + "varying vec2 vTexCoord;\n" + "varying vec2 vTexCoord2;\n" + "void main() {\n" + "vec4 color = texture2D(uTexture, vTexCoord);\n" + "vec4 color2 = texture2D(uImage, vTexCoord2);\n" + "color.a = color2.a;\n" + "gl_FragColor = color;\n" + "}"
-        },
-        retrieveShader: function(options) {
-            var cacheKey = this.type + "_" + this.mode;
-            var shaderSource = this.fragmentSource[this.mode];
-            if (!options.programCache.hasOwnProperty(cacheKey)) {
-                options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
-            }
-            return options.programCache[cacheKey];
-        },
-        applyToWebGL: function(options) {
-            var gl = options.context, texture = this.createTexture(options.filterBackend, this.image);
-            this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
-            this.callSuper("applyToWebGL", options);
-            this.unbindAdditionalTexture(gl, gl.TEXTURE1);
-        },
-        createTexture: function(backend, image) {
-            return backend.getCachedTexture(image.cacheKey, image._element);
-        },
-        calculateMatrix: function() {
-            var image = this.image, width = image._element.width, height = image._element.height;
-            return [ 1 / image.scaleX, 0, 0, 0, 1 / image.scaleY, 0, -image.left / width, -image.top / height, 1 ];
-        },
-        applyTo2d: function(options) {
-            var imageData = options.imageData, resources = options.filterBackend.resources, data = imageData.data, iLen = data.length, width = options.imageData.width, height = options.imageData.height, tr, tg, tb, ta, r, g, b, a, canvas1, context, image = this.image, blendData;
-            if (!resources.blendImage) {
-                resources.blendImage = document.createElement("canvas");
-            }
-            canvas1 = resources.blendImage;
-            if (canvas1.width !== width || canvas1.height !== height) {
-                canvas1.width = width;
-                canvas1.height = height;
-            }
-            context = canvas1.getContext("2d");
-            context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
-            context.drawImage(image._element, 0, 0, width, height);
-            blendData = context.getImageData(0, 0, width, height).data;
-            for (var i = 0; i < iLen; i += 4) {
-                r = data[i];
-                g = data[i + 1];
-                b = data[i + 2];
-                a = data[i + 3];
-                tr = blendData[i];
-                tg = blendData[i + 1];
-                tb = blendData[i + 2];
-                ta = blendData[i + 3];
-                switch (this.mode) {
-                  case "multiply":
-                    data[i] = r * tr / 255;
-                    data[i + 1] = g * tg / 255;
-                    data[i + 2] = b * tb / 255;
-                    data[i + 3] = a * ta / 255;
-                    break;
-
-                  case "mask":
-                    data[i + 3] = ta;
-                    break;
-                }
-            }
-        },
-        getUniformLocations: function(gl, program) {
-            return {
-                uTransformMatrix: gl.getUniformLocation(program, "uTransformMatrix"),
-                uImage: gl.getUniformLocation(program, "uImage")
-            };
-        },
-        sendUniformData: function(gl, uniformLocations) {
-            var matrix = this.calculateMatrix();
-            gl.uniform1i(uniformLocations.uImage, 1);
-            gl.uniformMatrix3fv(uniformLocations.uTransformMatrix, false, matrix);
-        },
-        toObject: function() {
-            return {
-                type: this.type,
-                image: this.image && this.image.toObject(),
-                mode: this.mode,
-                alpha: this.alpha
-            };
-        }
-    });
-    fabric.Image.filters.BlendImage.fromObject = function(object, callback) {
-        fabric.Image.fromObject(object.image, function(image) {
-            var options = fabric.util.object.clone(object);
-            options.image = image;
-            callback(new fabric.Image.filters.BlendImage(options));
-        });
-    };
-})(typeof exports !== "undefined" ? exports : this);
-
-(function(global) {
-    "use strict";
     var fabric = global.fabric || (global.fabric = {}), pow = Math.pow, floor = Math.floor, sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin, ceil = Math.ceil, filters = fabric.Image.filters, createClass = fabric.util.createClass;
     filters.Resize = createClass(filters.BaseFilter, {
         type: "Resize",
@@ -10555,7 +10452,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             options.imageData = this.simpleBlur(options);
         },
         simpleBlur: function(options) {
-            var resources = options.filterBackend.resources, canvas1, canvas2, width = options.imageData.width, height = options.imageData.height;
+            var resources = fabric.filterBackend.resources, canvas1, canvas2, width = options.imageData.width, height = options.imageData.height;
             if (!resources.blurLayer1) {
                 resources.blurLayer1 = document.createElement("canvas");
                 resources.blurLayer2 = document.createElement("canvas");
