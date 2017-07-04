@@ -285,7 +285,7 @@ fabric.Collection = {
         this._onObjectAdded(arguments[i]);
       }
     }
-    this.renderOnAddRemove && this.renderAll();
+    this.renderOnAddRemove && this.requestRenderAll();
     return this;
   },
 
@@ -307,7 +307,7 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.renderAll();
+    this.renderOnAddRemove && this.requestRenderAll();
     return this;
   },
 
@@ -332,7 +332,7 @@ fabric.Collection = {
       }
     }
 
-    this.renderOnAddRemove && somethingRemoved && this.renderAll();
+    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
     return this;
   },
 
@@ -1029,6 +1029,7 @@ fabric.CommonMethods = {
     /**
      * @static
      * @memberOf fabric.util
+     * @deprecated since 2.0.0
      * @param {fabric.Object} receiver Object implementing `clipTo` method
      * @param {CanvasRenderingContext2D} ctx Context to clip
      */
@@ -6067,6 +6068,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     initialize: function(el, options) {
       options || (options = { });
       this.renderAndResetBound = this.renderAndReset.bind(this);
+      this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
 
@@ -6124,7 +6126,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     stateful: false,
 
     /**
-     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
+     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
+     * {@link fabric.Collection} should also re-render canvas.
      * Disabling this option could give a great performance boost when adding/removing a lot of objects to/from canvas at once
      * (followed by a manual rendering after addition/deletion)
      * @type Boolean
@@ -6135,6 +6138,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * @deprecated since 2.0.0
      * @type Function
      * @default
      */
@@ -6227,7 +6231,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
-      var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
+      var cb = this.requestRenderAllBound;
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -6625,7 +6629,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       this.calcOffset();
 
       if (!options.cssOnly) {
-        this.renderAll();
+        this.requestRenderAll();
       }
 
       return this;
@@ -6702,7 +6706,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         activeGroup.setCoords(ignoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -6829,7 +6833,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -7082,7 +7086,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -7475,7 +7479,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -7504,7 +7508,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -7543,7 +7547,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -7611,7 +7615,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.requestRenderAll && this.requestRenderAll();
       return this;
     },
 
@@ -7654,7 +7658,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      return this.requestRenderAll && this.requestRenderAll();
     },
 
     /**
@@ -12042,6 +12046,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Function that determines clipping of an object (context is passed as a first argument)
      * Note that context origin is at the object's center point (not left/top corner)
+     * @deprecated since 2.0.0
      * @type Function
      */
     clipTo:                   null,
@@ -18913,7 +18918,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   straightenObject: function (object) {
     object.straighten();
-    this.renderAll();
+    this.requestRenderAll();
     return this;
   },
 
@@ -18925,7 +18930,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   fxStraightenObject: function (object) {
     object.fxStraighten({
-      onChange: this.renderAll.bind(this)
+      onChange: this.requestRenderAllBound
     });
     return this;
   }
@@ -19051,6 +19056,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         squareVertices: this.squareVertices,
         programCache: this.programCache,
         pass: 0,
+        filterBackend: this
       };
       var tempFbo = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
@@ -19142,8 +19148,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     createTexture: function(gl, width, height, textureImageSource) {
       var texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       if (textureImageSource) {
@@ -19291,6 +19297,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         originalImageData: originalImageData,
         canvasEl: targetCanvas,
         ctx: ctx,
+        filterBackend: this,
       };
       filters.forEach(function(filter) { filter.applyTo(pipelineState); });
       if (pipelineState.imageData.width !== sourceWidth || pipelineState.imageData.height !== sourceHeight) {
@@ -21061,12 +21068,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
    * @example
-   * var filter = new fabric.Image.filters.Blend({
+   * var filter = new fabric.Image.filters.BlendColor({
    *  color: '#000',
    *  mode: 'multiply'
    * });
    *
-   * var filter = new fabric.Image.filters.BlendColor({
+   * var filter = new fabric.Image.filters.BlendImage({
    *  image: fabricImageObject,
    *  mode: 'multiply',
    *  alpha: 0.5
@@ -21339,9 +21346,254 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @static
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.BlendColor} Instance of fabric.Image.filters.Blend
+   * @return {fabric.Image.filters.BlendColor} Instance of fabric.Image.filters.BlendColor
    */
   fabric.Image.filters.BlendColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+  'use strict';
+
+  var fabric = global.fabric,
+      filters = fabric.Image.filters,
+      createClass = fabric.util.createClass;
+
+  /**
+   * Image Blend filter class
+   * @class fabric.Image.filter.BlendImage
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @example
+   * var filter = new fabric.Image.filters.BlendColor({
+   *  color: '#000',
+   *  mode: 'multiply'
+   * });
+   *
+   * var filter = new fabric.Image.filters.BlendImage({
+   *  image: fabricImageObject,
+   *  mode: 'multiply',
+   *  alpha: 0.5
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters();
+   * canvas.renderAll();
+   */
+
+  filters.BlendImage = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.BlendImage.prototype */ {
+    type: 'BlendImage',
+
+    /**
+     * Color to make the blend operation with. default to a reddish color since black or white
+     * gives always strong result.
+     **/
+    image: null,
+
+    /**
+     * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
+     * darken, lighten, overlay, exclusion, tint.
+     **/
+    mode: 'multiply',
+
+    /**
+     * alpha value. represent the strength of the blend color operation.
+     **/
+    alpha: 1,
+
+    vertexSource: 'attribute vec2 aPosition;\n' +
+      'attribute vec2 aTexCoord;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'varying vec2 vTexCoord2;\n' +
+      'uniform mat3 uTransformMatrix;\n' +
+      'void main() {\n' +
+        'vTexCoord = aTexCoord;\n' +
+        'vTexCoord2 = (uTransformMatrix * vec3(aTexCoord, 1.0)).xy;\n' +
+        'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
+      '}',
+
+    /**
+     * Fragment source for the Multiply program
+     */
+    fragmentSource: {
+      multiply: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform sampler2D uImage;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'varying vec2 vTexCoord2;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
+          'color.rgba *= color2.rgba;\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      mask: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform sampler2D uImage;\n' +
+        'uniform vec4 uColor;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'varying vec2 vTexCoord2;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
+          'color.a = color2.a;\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+    },
+
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var cacheKey = this.type + '_' + this.mode;
+      var shaderSource = this.fragmentSource[this.mode];
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+      }
+      return options.programCache[cacheKey];
+    },
+
+    applyToWebGL: function(options) {
+      // load texture to blend.
+      var gl = options.context,
+          texture = this.createTexture(options.filterBackend, this.image);
+      this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
+      this.callSuper('applyToWebGL', options);
+      this.unbindAdditionalTexture(gl, gl.TEXTURE1);
+    },
+
+    createTexture: function(backend, image) {
+      return backend.getCachedTexture(image.cacheKey, image._element);
+    },
+
+    /**
+     * Calculate a transformMatrix to adapt the image to blend over
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    calculateMatrix: function() {
+      var image = this.image,
+          width = image._element.width,
+          height = image._element.height;
+      return [
+        1 / image.scaleX, 0, 0,
+        0, 1 / image.scaleY, 0,
+        -image.left / width, -image.top / height, 1
+      ];
+    },
+
+    /**
+     * Apply the Blend operation to a Uint8ClampedArray representing the pixels of an image.
+     *
+     * @param {Object} options
+     * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
+     */
+    applyTo2d: function(options) {
+      var imageData = options.imageData,
+          resources = options.filterBackend.resources,
+          data = imageData.data, iLen = data.length,
+          width = options.imageData.width,
+          height = options.imageData.height,
+          tr, tg, tb, ta,
+          r, g, b, a,
+          canvas1, context, image = this.image, blendData;
+
+      if (!resources.blendImage) {
+        resources.blendImage = document.createElement('canvas');
+      }
+      canvas1 = resources.blendImage;
+      if (canvas1.width !== width || canvas1.height !== height) {
+        canvas1.width = width;
+        canvas1.height = height;
+      }
+      context = canvas1.getContext('2d');
+      context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
+      context.drawImage(image._element, 0, 0, width, height);
+      blendData = context.getImageData(0, 0, width, height).data;
+      for (var i = 0; i < iLen; i += 4) {
+
+        r = data[i];
+        g = data[i + 1];
+        b = data[i + 2];
+        a = data[i + 3];
+
+        tr = blendData[i];
+        tg = blendData[i + 1];
+        tb = blendData[i + 2];
+        ta = blendData[i + 3];
+
+        switch (this.mode) {
+          case 'multiply':
+            data[i] = r * tr / 255;
+            data[i + 1] = g * tg / 255;
+            data[i + 2] = b * tb / 255;
+            data[i + 3] = a * ta / 255;
+            break;
+          case 'mask':
+            data[i + 3] = ta;
+            break;
+        }
+      }
+    },
+
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uTransformMatrix: gl.getUniformLocation(program, 'uTransformMatrix'),
+        uImage: gl.getUniformLocation(program, 'uImage'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      var matrix = this.calculateMatrix();
+      gl.uniform1i(uniformLocations.uImage, 1); // texture unit 1.
+      gl.uniformMatrix3fv(uniformLocations.uTransformMatrix, false, matrix);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return {
+        type: this.type,
+        image: this.image && this.image.toObject(),
+        mode: this.mode,
+        alpha: this.alpha
+      };
+    }
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @param {function} callback to be invoked after filter creation
+   * @return {fabric.Image.filters.BlendImage} Instance of fabric.Image.filters.BlendImage
+   */
+  fabric.Image.filters.BlendImage.fromObject = function(object, callback) {
+    fabric.Image.fromObject(object.image, function(image) {
+      var options = fabric.util.object.clone(object);
+      options.image = image;
+      callback(new fabric.Image.filters.BlendImage(options));
+    });
+  };
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -22089,7 +22341,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     },
 
     simpleBlur: function(options) {
-      var resources = fabric.filterBackend.resources, canvas1, canvas2,
+      var resources = options.filterBackend.resources, canvas1, canvas2,
           width = options.imageData.width,
           height = options.imageData.height;
 

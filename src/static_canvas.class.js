@@ -679,7 +679,7 @@
         activeGroup.setCoords(ignoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
-      this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -806,7 +806,7 @@
       }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
-      this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1452,7 +1452,7 @@
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      this.requestRenderAll && this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1481,7 +1481,7 @@
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      this.requestRenderAll && this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1520,7 +1520,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.requestRenderAll && this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1588,7 +1588,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.requestRenderAll && this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1631,7 +1631,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.requestRenderAll && this.requestRenderAll();
+      return this.renderOnAddRemove && this.requestRenderAll();
     },
 
     /**
