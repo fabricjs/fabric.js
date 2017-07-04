@@ -41,6 +41,7 @@
     initialize: function(el, options) {
       options || (options = { });
       this.renderAndResetBound = this.renderAndReset.bind(this);
+      this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
 
@@ -98,9 +99,12 @@
     stateful: false,
 
     /**
-     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
-     * Disabling this option could give a great performance boost when adding/removing a lot of objects to/from canvas at once
-     * (followed by a manual rendering after addition/deletion)
+     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
+     * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
+     * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
+     * since the renders are quequed and executed one per frame.
+     * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
+     * Left default to true to do not break documentation and old app, fiddles.
      * @type Boolean
      * @default
      */
@@ -109,6 +113,7 @@
     /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * @deprecated since 2.0.0
      * @type Function
      * @default
      */
@@ -201,7 +206,7 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
-      var cb = fabric.StaticCanvas.prototype.renderAll.bind(this);
+      var cb = this.requestRenderAllBound;
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -599,7 +604,7 @@
       this.calcOffset();
 
       if (!options.cssOnly) {
-        this.renderAll();
+        this.requestRenderAll();
       }
 
       return this;
@@ -676,7 +681,7 @@
         activeGroup.setCoords(ignoreVpt, skipAbsolute);
       }
       this.calcViewportBoundaries();
-      this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -803,7 +808,7 @@
       }
       this.clearContext(this.contextContainer);
       this.fire('canvas:cleared');
-      this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1056,7 +1061,7 @@
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
-      this.renderAll();
+      this.requestRenderAll();
       return this;
     },
 
@@ -1449,7 +1454,7 @@
         removeFromArray(this._objects, object);
         this._objects.unshift(object);
       }
-      this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1478,7 +1483,7 @@
         removeFromArray(this._objects, object);
         this._objects.push(object);
       }
-      this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1517,7 +1522,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1585,7 +1590,7 @@
           this._objects.splice(newIdx, 0, object);
         }
       }
-      this.renderAll && this.renderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -1628,7 +1633,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      return this.renderOnAddRemove && this.requestRenderAll();
     },
 
     /**
