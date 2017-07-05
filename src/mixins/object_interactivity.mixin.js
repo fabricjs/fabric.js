@@ -115,7 +115,7 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || this.group || !this.active ||
+      if (!this.selectionBackgroundColor || !this.active ||
         (this.canvas && !this.canvas.interactive)) {
         return this;
       }
