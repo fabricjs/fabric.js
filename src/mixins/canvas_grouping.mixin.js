@@ -101,11 +101,10 @@
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.Group(group.reverse(), {
+        group = new fabric.ActiveSelection(group.reverse(), {
           canvas: this
         });
-        group.addWithUpdate();
-        this.setActiveGroup(group, e);
+        this.setActiveObject(group, e);
         this.fire('selection:created', { target: group, e: e });
         this.requestRenderAll();
       }
@@ -137,7 +136,6 @@
             currentObject.containsPoint(selectionX1Y1) ||
             currentObject.containsPoint(selectionX2Y2)
         ) {
-          currentObject.set('active', true);
           group.push(currentObject);
 
           // only add one object if it's a click
@@ -157,14 +155,7 @@
       if (this.selection && this._groupSelector) {
         this._groupSelectedObjects(e);
       }
-
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        activeGroup.setObjectsCoords().setCoords();
-        activeGroup.isMoving = false;
-        this.setCursor(this.defaultCursor);
-      }
-
+      this.setCursor(this.defaultCursor);
       // clear selection and current transformation
       this._groupSelector = null;
       this._currentTransform = null;
