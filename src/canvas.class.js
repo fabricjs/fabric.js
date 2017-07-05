@@ -1418,12 +1418,13 @@
      * @return {fabric.Object} active object
      */
     getActiveObjects: function () {
-      if (this._activeObject) {
-        if (this._activeObject._objects) {
-          return this._activeObject._objects;
+      var active = this._activeObject;
+      if (active) {
+        if (active.type === 'activeSelection' && active._objects) {
+          return active._objects;
         }
         else {
-          return [this._activeObject];
+          return [active];
         }
       }
       return [];
