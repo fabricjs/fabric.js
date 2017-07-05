@@ -201,6 +201,7 @@
       if (typeof childrenOverride.hasRotatingPoint === 'undefined') {
         childrenOverride.hasRotatingPoint = false;
       }
+      childrenOverride.forActiveSelection = true;
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }

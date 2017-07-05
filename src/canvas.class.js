@@ -328,25 +328,20 @@
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
     _chooseObjectsToRender: function() {
-      var activeGroup = this.getActiveGroup(),
-          activeObject = this.getActiveObject(),
+      var activeObjects = this.getActiveObjects(),
           object, objsToRender = [], activeGroupObjects = [];
 
-      if ((activeGroup || activeObject) && !this.preserveObjectStacking) {
+      if (activeObjects.length > 0 && !this.preserveObjectStacking) {
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if ((!activeGroup || !activeGroup.contains(object)) && object !== activeObject) {
+          if (activeObjects.indexOf(object) === -1 ) {
             objsToRender.push(object);
           }
           else {
             activeGroupObjects.push(object);
           }
         }
-        if (activeGroup) {
-          activeGroup._set('_objects', activeGroupObjects);
-          objsToRender.push(activeGroup);
-        }
-        activeObject && objsToRender.push(activeObject);
+        objsToRender.push.apply(objsToRender, activeObjects);
       }
       else {
         objsToRender = this._objects;
@@ -449,7 +444,7 @@
           pointer = point || this.getPointer(e, ignoreZoom),
           xy;
 
-      if (target.group && target.group === this.getActiveGroup()) {
+      if (target.group && target.group === this.getActiveObject()) {
         xy = this._normalizePointer(target.group, pointer);
       }
       else {
@@ -511,16 +506,17 @@
      * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
-      var activeGroup = this.getActiveGroup(),
+      var activeObjects = this.getActiveObjects(),
           activeObject = this.getActiveObject();
 
       return (
         !target
         ||
         (target &&
-          activeGroup &&
-          !activeGroup.contains(target) &&
-          activeGroup !== target &&
+          activeObject &&
+          activeObjects.length > 1 &&
+          activeObjects.indexOf(target) === -1 &&
+          activeObject !== target &&
           !e[this.selectionKey])
         ||
         (target && !target.evented)
@@ -1104,16 +1100,16 @@
 
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
-          activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
+          aObjects = this.getActiveObjects(),
           activeTarget;
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       this.targets = [];
-      if (activeGroup && !skipGroup && activeGroup === this._searchPossibleTargets([activeGroup], pointer)) {
-        this._fireOverOutEvents(activeGroup, e);
-        return activeGroup;
+      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+        this._fireOverOutEvents(activeObject, e);
+        return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
       if (activeObject && activeObject._findTargetCorner(pointer)) {
@@ -1418,6 +1414,22 @@
     },
 
     /**
+     * Returns an array with the current selected objects
+     * @return {fabric.Object} active object
+     */
+    getActiveObjects: function () {
+      if (this._activeObject) {
+        if (this._activeObject._objects) {
+          return this._activeObject._objects;
+        }
+        else {
+          return [this._activeObject];
+        }
+      }
+      return [];
+    },
+
+    /**
      * @private
      * @param {fabric.Object} obj Object that was removed
      */
@@ -1500,22 +1512,14 @@
     },
 
     /**
-     * Returns currently active group
-     * @return {fabric.Group} Current group
-     */
-    getActiveGroup: function () {
-      return this._activeGroup;
-    },
-
-    /**
      * @private
      */
     _discardActiveGroup: function() {
-      var g = this.getActiveGroup();
-      if (g) {
-        g.destroy();
-      }
-      this.setActiveGroup(null);
+      // var g = this.getActiveGroup();
+      // if (g) {
+      //   g.destroy();
+      // }
+      // this.setActiveGroup(null);
     },
 
     /**
@@ -1527,13 +1531,13 @@
      * @chainable
      */
     discardActiveGroup: function (e) {
-      var g = this.getActiveGroup();
-      if (g) {
-        this.fire('before:selection:cleared', { e: e, target: g });
-        this._discardActiveGroup();
-        this.fire('selection:cleared', { e: e });
-      }
-      return this;
+      // var g = this.getActiveGroup();
+      // if (g) {
+      //   this.fire('before:selection:cleared', { e: e, target: g });
+      //   this._discardActiveGroup();
+      //   this.fire('selection:cleared', { e: e });
+      // }
+      // return this;
     },
 
     /**
@@ -1564,15 +1568,7 @@
      * @chainable
      */
     deactivateAllWithDispatch: function (e) {
-      var allObjects = this.getObjects(),
-          i = 0,
-          len = allObjects.length,
-          obj;
-      for ( ; i < len; i++) {
-        obj = allObjects[i];
-        obj && obj.set('active', false);
-      }
-      this.discardActiveGroup(e);
+      // this.discardActiveGroup();
       this.discardActiveObject(e);
       return this;
     },
@@ -1602,7 +1598,7 @@
      * @chainable
      */
     clear: function () {
-      this.discardActiveGroup();
+      // this.discardActiveGroup();
       this.discardActiveObject();
       this.clearContext(this.contextTop);
       return this.callSuper('clear');
