@@ -23,9 +23,9 @@
      * @param {fabric.Object} target
      */
     _handleGrouping: function (e, target) {
-      var activeSelection = this.getActiveObject();
+      var activeObject = this.getActiveObject();
 
-      if (target === activeSelection) {
+      if (target === activeObject) {
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
         // if even object is not found, bail out
@@ -33,7 +33,7 @@
           return;
         }
       }
-      if (activeSelection) {
+      if (activeObject && activeObject.type === 'activeSelection') {
         this._updateActiveSelection(target, e);
       }
       else {
@@ -44,7 +44,7 @@
     /**
      * @private
      */
-    _updateActiveGroup: function(target, e) {
+    _updateActiveSelection: function(target, e) {
       var activeSelection = this.getActiveObject();
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);

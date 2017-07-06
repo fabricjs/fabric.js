@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.ActiveSelection) {
     return;
@@ -52,6 +51,12 @@
       this.setCoords();
     },
 
+    onDeselect: function() {
+      console.log('destroy')
+      this.destroy();
+      return true;
+    },
+
     /**
      * Returns string represenation of a group
      * @return {String}
@@ -61,65 +66,14 @@
     },
 
     /**
-     * Adds an object to a group; Then recalculates group's dimension, position.
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    addWithUpdate: function(object) {
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-      if (object) {
-        this._objects.push(object);
-        object.group = this;
-        object._set('canvas', this.canvas);
-      }
-      this._calcBounds();
-      this._updateObjectsCoords();
-      this.setCoords();
-      this.dirty = true;
-      return this;
-    },
-
-    /**
-     * Removes an object from a group; Then recalculates group's dimension, position.
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    removeWithUpdate: function(object) {
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-      this.remove(object);
-      this._calcBounds();
-      this._updateObjectsCoords();
-      this.setCoords();
-      return this;
-    },
-
-    /**
-     * @private
-     */
-    _onObjectAdded: function(object) {
-      object.group = this;
-      object._set('canvas', this.canvas);
-    },
-
-    /**
-     * @private
-     */
-    _onObjectRemoved: function(object) {
-      delete object.group;
-    },
-
-    /**
      * @private
      */
     _set: function(key, value) {
       var i = this._objects.length;
       if (key === 'canvas') {
         while (i--) {
-          this._objects[i].set(key, value);
+          console.trace();
+          this._objects[i]._set(key, value);
         }
       }
       if (this.useSetOnGroup) {
@@ -127,25 +81,7 @@
           this._objects[i].setOnGroup(key, value);
         }
       }
-      this.callSuper('_set', key, value);
-    },
-
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      var objsToObject = this.getObjects().map(function(obj) {
-        var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = obj.group.includeDefaultValues;
-        var _obj = obj.toObject(propertiesToInclude);
-        obj.includeDefaultValues = originalDefaults;
-        return _obj;
-      });
-      return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: objsToObject
-      });
+      fabric.Object.prototype._set.call(this, key, value);
     },
 
     /**
@@ -219,7 +155,7 @@
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
       delete object.objects;
-      callback && callback(new fabric.Group(enlivenedObjects, object, true));
+      callback && callback(new fabric.ActiveSelection(enlivenedObjects, object, true));
     });
   };
 

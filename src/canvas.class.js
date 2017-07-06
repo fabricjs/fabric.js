@@ -1452,14 +1452,14 @@
      * @private
      */
     _discardActiveObject: function() {
-      var obj = this._activeObject;
+      var obj = this._activeObject, cancel;
       if (obj) {
         obj.set('active', false);
         if (obj.onDeselect && typeof obj.onDeselect === 'function') {
-          obj.onDeselect();
+          cancel = obj.onDeselect();
         }
       }
-      this._activeObject = null;
+      cancel && (this._activeObject = null);
     },
 
     /**
@@ -1483,79 +1483,11 @@
     },
 
     /**
-     * @private
-     * @param {fabric.Group} group
-     */
-    _setActiveGroup: function(group) {
-      this._activeGroup = group;
-      if (group) {
-        group.set('active', true);
-      }
-    },
-
-    /**
-     * Sets active group to a specified one. If the function is called by fabric
-     * as a consequence of a mouse event, the event is passed as a parmater and
-     * sent to the fire function for the custom events. When used as a method the
-     * e param does not have any application.
-     * @param {fabric.Group} group Group to set as a current one
-     * @param {Event} e Event object
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    setActiveGroup: function (group, e) {
-      this._setActiveGroup(group);
-      if (group) {
-        this.fire('object:selected', { target: group, e: e });
-        group.fire('selected', { e: e });
-      }
-      return this;
-    },
-
-    /**
-     * @private
-     */
-    _discardActiveGroup: function() {
-      // var g = this.getActiveGroup();
-      // if (g) {
-      //   g.destroy();
-      // }
-      // this.setActiveGroup(null);
-    },
-
-    /**
-     * Discards currently active group and fire events If the function is called by fabric
-     * as a consequence of a mouse event, the event is passed as a parmater and
-     * sent to the fire function for the custom events. When used as a method the
-     * e param does not have any application.
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    discardActiveGroup: function (e) {
-      // var g = this.getActiveGroup();
-      // if (g) {
-      //   this.fire('before:selection:cleared', { e: e, target: g });
-      //   this._discardActiveGroup();
-      //   this.fire('selection:cleared', { e: e });
-      // }
-      // return this;
-    },
-
-    /**
      * Deactivates all objects on canvas, removing any active group or object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     deactivateAll: function () {
-      var allObjects = this.getObjects(),
-          i = 0,
-          len = allObjects.length,
-          obj;
-      for ( ; i < len; i++) {
-        obj = allObjects[i];
-        obj && obj.set('active', false);
-      }
-      this._discardActiveGroup();
       this._discardActiveObject();
       return this;
     },
@@ -1569,7 +1501,6 @@
      * @chainable
      */
     deactivateAllWithDispatch: function (e) {
-      // this.discardActiveGroup();
       this.discardActiveObject(e);
       return this;
     },
