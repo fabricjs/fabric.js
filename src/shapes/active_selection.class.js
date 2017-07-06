@@ -72,8 +72,7 @@
       var i = this._objects.length;
       if (key === 'canvas') {
         while (i--) {
-          console.trace();
-          this._objects[i]._set(key, value);
+          this._objects[i].set(key, value);
         }
       }
       if (this.useSetOnGroup) {
