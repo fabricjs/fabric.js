@@ -24,7 +24,6 @@
      */
     _handleGrouping: function (e, target) {
       var activeObject = this.getActiveObject();
-
       if (target === activeObject) {
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
@@ -49,8 +48,6 @@
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
         if (activeSelection.size() === 1) {
-          // remove group alltogether if after removal it only contains 1 object
-          this.discardActiveGroup(e);
           // activate last remaining object
           this.setActiveObject(activeSelection.item(0), e);
           return;
@@ -76,7 +73,6 @@
      * @param {Object} target
      */
     _createGroup: function(target) {
-
       var objects = this.getObjects(),
           isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
           groupObjects = isActiveLower

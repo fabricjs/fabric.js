@@ -533,7 +533,6 @@
       // save pointer for check in __onMouseUp event
       var pointer = this.getPointer(e, true);
       this._previousPointer = pointer;
-
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
 

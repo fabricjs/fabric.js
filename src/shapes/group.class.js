@@ -124,6 +124,7 @@
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
+      object.group = this;
       object.setCoords(ignoreZoom, skipAbsolute);
     },
 

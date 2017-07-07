@@ -52,7 +52,6 @@
     },
 
     onDeselect: function() {
-      console.log('destroy')
       this.destroy();
       return true;
     },

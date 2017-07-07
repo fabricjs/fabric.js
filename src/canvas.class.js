@@ -1116,7 +1116,7 @@
         this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
-      if (activeObject && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      if (aObjects.length === 1 && activeObject && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           this._fireOverOutEvents(activeObject, e);
           return activeObject;
