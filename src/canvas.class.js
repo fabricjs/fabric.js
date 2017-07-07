@@ -33,7 +33,7 @@
    * @fires mouse:up
    * @fires mouse:over
    * @fires mouse:out
-   * @fires mouse:doubleclick
+   * @fires mouse:dblclick
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
