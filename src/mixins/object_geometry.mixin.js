@@ -489,7 +489,7 @@
       var skewMatrix,
           scaleX = this.scaleX * (flipping && this.flipX ? -1 : 1),
           scaleY = this.scaleY * (flipping && this.flipY ? -1 : 1),
-          scaleMatrix = [scaleX, 0, 0, scaleY];
+          scaleMatrix = [scaleX, 0, 0, scaleY, 0, 0];
       if (skewX) {
         skewMatrix = [1, 0, Math.tan(degreesToRadians(skewX)), 1];
         scaleMatrix = multiplyMatrices(scaleMatrix, skewMatrix, true);
