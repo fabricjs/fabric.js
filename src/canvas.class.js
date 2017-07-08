@@ -449,7 +449,7 @@
           pointer = point || this.getPointer(e, ignoreZoom),
           xy;
 
-      if (target.group && target.group === this._activeObject) {
+      if (target.group && target.group === this._activeObject && target.group.type === 'activeSelection') {
         xy = this._normalizePointer(target.group, pointer);
       }
       else {
@@ -1111,6 +1111,7 @@
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       this.targets = [];
+
       if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         this._fireOverOutEvents(activeObject, e);
         return activeObject;
@@ -1130,7 +1131,6 @@
           activeTarget = activeObject;
         }
       }
-
       var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
