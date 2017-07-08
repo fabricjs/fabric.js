@@ -749,7 +749,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, ungroupedProps,
 
           object = {
             type:                     this.type,
@@ -784,7 +784,10 @@
           };
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
-
+      if (this.group && this.group.type === 'activeSelection') {
+        ungroupedProps = this.group._getUntrasformedProps(this);
+        extend(object, ungroupedProps);
+      }
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }

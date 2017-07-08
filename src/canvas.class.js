@@ -329,9 +329,11 @@
      */
     _chooseObjectsToRender: function() {
       var activeObjects = this.getActiveObjects(),
-          object, objsToRender = [], activeGroupObjects = [];
+          object, objsToRender, activeGroupObjects;
 
       if (activeObjects.length > 0 && !this.preserveObjectStacking) {
+        objsToRender = [];
+        activeGroupObjects = [];
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
           if (activeObjects.indexOf(object) === -1 ) {
@@ -341,7 +343,10 @@
             activeGroupObjects.push(object);
           }
         }
-        objsToRender.push.apply(objsToRender, activeObjects);
+        if (activeObjects.length > 1) {
+          this._activeObject._objects = activeGroupObjects;
+        }
+        objsToRender.push.apply(objsToRender, activeGroupObjects);
       }
       else {
         objsToRender = this._objects;
@@ -444,7 +449,7 @@
           pointer = point || this.getPointer(e, ignoreZoom),
           xy;
 
-      if (target.group && target.group === this.getActiveObject()) {
+      if (target.group && target.group === this._activeObject) {
         xy = this._normalizePointer(target.group, pointer);
       }
       else {
@@ -507,8 +512,7 @@
      */
     _shouldClearSelection: function (e, target) {
       var activeObjects = this.getActiveObjects(),
-          activeObject = this.getActiveObject();
-console.log(e,target)
+          activeObject = this._activeObject;
       return (
         !target
         ||
@@ -1100,7 +1104,7 @@ console.log(e,target)
 
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
-          activeObject = this.getActiveObject(),
+          activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
           activeTarget;
       // first check current group (if one exists)
@@ -1112,11 +1116,11 @@ console.log(e,target)
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
-      if (aObjects.length === 1 && activeObject && activeObject._findTargetCorner(pointer)) {
+      if (aObjects.length === 1 && activeObject._findTargetCorner(pointer)) {
         this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
-      if (aObjects.length === 1 && activeObject &&
+      if (aObjects.length === 1 &&
         activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           this._fireOverOutEvents(activeObject, e);
@@ -1524,7 +1528,7 @@ console.log(e,target)
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
     drawControls: function(ctx) {
-      var activeObject = this.getActiveObject();
+      var activeObject = this._activeObject;
 
       if (activeObject) {
         activeObject._renderControls(ctx);

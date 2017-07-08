@@ -294,7 +294,7 @@
      * @param {Object} pointer
      */
     _shouldRender: function(target, pointer) {
-      var activeObject = this.getActiveObject();
+      var activeObject = this._activeObject;
 
       if (activeObject && activeObject.isEditing && target === activeObject) {
         // if we mouse up/down over a editing textbox a cursor change,
@@ -536,11 +536,11 @@
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
       if (this._shouldClearSelection(e, target)) {
-        this.deactivateAllWithDispatch(e);
+        this.discardActiveObject(e);
       }
       else if (shouldGroup) {
         this._handleGrouping(e, target);
-        target = this.getActiveObject();
+        target = this._activeObject;
       }
 
       if (this.selection && (!target || (!target.selectable && !target.isEditing))) {
@@ -802,7 +802,7 @@
       }
 
       var hoverCursor = target.hoverCursor || this.hoverCursor,
-          activeSelection = this.getActiveObject(),
+          activeSelection = this._activeObject,
           // only show proper corner when group selection is not active
           corner = target._findTargetCorner
                     && (!activeSelection || (activeSelection.contains && !activeSelection.contains(target)))

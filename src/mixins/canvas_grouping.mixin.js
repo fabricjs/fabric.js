@@ -12,7 +12,7 @@
      * @return {Boolean}
      */
     _shouldGroup: function(e, target) {
-      var activeObject = this.getActiveObject();
+      var activeObject = this._activeObject;
       return e[this.selectionKey] && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
@@ -23,7 +23,7 @@
      * @param {fabric.Object} target
      */
     _handleGrouping: function (e, target) {
-      var activeObject = this.getActiveObject();
+      var activeObject = this._activeObject;
       if (activeObject.__corner !== 0) {
         return;
       }
@@ -47,7 +47,7 @@
      * @private
      */
     _updateActiveSelection: function(target, e) {
-      var activeSelection = this.getActiveObject();
+      var activeSelection = this._activeObject;
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
         if (activeSelection.size() === 1) {
