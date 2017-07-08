@@ -468,18 +468,26 @@
     calcTransformMatrix: function(skipGroup) {
       var center = this.getCenterPoint(),
           translateMatrix = [1, 0, 0, 1, center.x, center.y],
-          rotateMatrix = this._calcRotateMatrix(),
+          rotateMatrix,
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group && !skipGroup ? this.group.calcTransformMatrix() : fabric.iMatrix.concat();
-      matrix = multiplyMatrices(matrix, translateMatrix);
-      matrix = multiplyMatrices(matrix, rotateMatrix);
+          matrix;
+      if (this.group && !skipGroup) {
+        matrix = multiplyMatrices(this.group.calcTransformMatrix(), translateMatrix);
+      }
+      else {
+        matrix = translateMatrix;
+      }
+      if (this.angle) {
+        rotateMatrix = this._calcRotateMatrix();
+        matrix = multiplyMatrices(matrix, rotateMatrix);
+      }
       matrix = multiplyMatrices(matrix, dimensionMatrix);
       return matrix;
     },
 
     _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
-      var skewMatrixX = [1, 0, Math.tan(degreesToRadians(skewX)), 1],
-          skewMatrixY = [1, Math.tan(degreesToRadians(skewY)), 0, 1],
+      var skewMatrixX = [1, 0, skewX ? Math.tan(degreesToRadians(skewX)) : 0, 1],
+          skewMatrixY = [1, skewY ? Math.tan(degreesToRadians(skewY)) : 0, 0, 1],
           scaleX = this.scaleX * (flipping && this.flipX ? -1 : 1),
           scaleY = this.scaleY * (flipping && this.flipY ? -1 : 1),
           scaleMatrix = [scaleX, 0, 0, scaleY],
