@@ -1647,7 +1647,7 @@
      * @returns the original values of instance which were changed
      */
     _realizeGroupTransformOnObject: function(instance) {
-      var layoutProps = ['angle', 'flipX', 'flipY', 'left', 'scaleX', 'scaleY', 'skewX', 'skewY' 'top'];
+      var layoutProps = ['angle', 'flipX', 'flipY', 'left', 'scaleX', 'scaleY', 'skewX', 'skewY', 'top'];
       if (instance.group && instance.group === this.getActiveGroup()) {
         //Copy all the positionally relevant properties across now
         var originalValues = {};
