@@ -274,6 +274,7 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
 - [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, github issues
+- [Shutterstock](http://www.shutterstock.com) for the resources used and the time spent using and improving the library.
 - [And all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
 
 ### MIT License

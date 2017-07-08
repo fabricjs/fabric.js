@@ -1,3 +1,10 @@
+**Version 1.7.16**
+
+- Improvement: Add information to onChange and onComplete animation function [#4068](https://github.com/kangax/fabric.js/pull/4068)
+- Improvement: avoid multiplying identity matrices in calcTransformMatrix function
+- Fix: ativeGroup did not destroy correctly if a toObject was happening
+- Improvement: Pass the event to object:modified when available. [#4061](https://github.com/kangax/fabric.js/pull/4061)
+
 **Version 1.7.15**
 
 - Improvement: Made iText keymap public. [#4053](https://github.com/kangax/fabric.js/pull/4053)
