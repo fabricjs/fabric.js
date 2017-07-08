@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.ActiveSelection) {
     return;
@@ -146,15 +145,6 @@
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
       ctx.restore();
-    },
-
-    /**
-     * @private
-     */
-    _getUntrasformedProps: function(object, parentTransform) {
-      parentTransform = parentTransform || this.calcTransformMatrix();
-      var objTransform = object.calcTransformMatrix();
-      return fabric.util.qrDecompose(fabric.util.multiplyTransformMatrices(parentTransform, objTransform));
     },
   });
 

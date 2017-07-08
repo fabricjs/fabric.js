@@ -1371,8 +1371,15 @@
         if (instance.excludeFromExport) {
           continue;
         }
-        markup.push(instance.toSVG(reviver));
+        this._setSVGObject(markup, instance, reviver);
       }
+    },
+
+    /**
+     * @private
+     */
+    _setSVGObject: function(markup, instance, reviver) {
+      markup.push(instance.toSVG(reviver));
     },
 
     /**

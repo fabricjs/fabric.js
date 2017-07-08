@@ -750,7 +750,7 @@
      */
     toObject: function(propertiesToInclude) {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, ungroupedProps,
-
+          gTransform, oTransform, position,
           object = {
             type:                     this.type,
             originX:                  this.originX,
@@ -784,10 +784,27 @@
           };
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (this.group && this.group.type === 'activeSelection') {
-        ungroupedProps = this.group._getUntrasformedProps(this);
-        extend(object, ungroupedProps);
-      }
+      // if (this.group && this.group.type === 'activeSelection') {
+      //   gTransform = this.group.calcTransformMatrix();
+      //   oTransform = this.calcTransformMatrix(true);
+      //   ungroupedProps = fabric.util.qrDecompose(fabric.util.multiplyTransformMatrices(gTransform, oTransform));
+      //   delete ungroupedProps.translateX;
+      //   delete ungroupedProps.translateY;
+      //   object.flipX = false;
+      //   object.flipY = false;
+      //   extend(object, ungroupedProps);
+      //   if (object.scaleX < 0) {
+      //     object.flipX = true;
+      //     object.scaleX *= -1;
+      //   }
+      //   if (object.scaleY < 0) {
+      //     object.flipY = true;
+      //     object.scaleY *= -1;
+      //   }
+      //   position = fabric.util.transformPoint({ x: this.left, y: this.top }, gTransform);
+      //   object.top = position.y;
+      //   object.left = position.x;
+      // }
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }

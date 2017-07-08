@@ -114,8 +114,7 @@
      * @return {String}
      */
     getSvgTransform: function() {
-      var parentTransform = '',
-          angle = this.angle,
+      var angle = this.angle,
           skewX = (this.skewX % 360),
           skewY = (this.skewY % 360),
           center = this.getCenterPoint(),
@@ -147,11 +146,9 @@
           flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
 
           flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
-      if (this.group && this.group.type === 'activeSelection') {
-        parentTransform = this.group.getSvgTransform() + ' ';
-      }
+
       return [
-        parentTransform, translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
+        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
       ].join('');
     },
 

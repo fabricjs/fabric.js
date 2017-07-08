@@ -1340,7 +1340,7 @@
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
 
-    canvas.setActiveObject(new fabric.Group([rect, circle])).renderAll();
+    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle]));
     var svgWithActiveGroup = canvas.toSVG();
 
     equal(svg, svgWithActiveGroup);

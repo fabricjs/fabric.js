@@ -469,7 +469,7 @@
           translateMatrix = [1, 0, 0, 1, center.x, center.y],
           rotateMatrix = this._calcRotateMatrix(),
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true),
-          matrix = this.group && !skipGroup ? this.group.calcTransformMatrix() : fabric.iMatrix.concat();
+          matrix = this.group && !skipGroup ? this.group.calcTransformMatrix() : fabric.iMatrix;
       matrix = multiplyMatrices(matrix, translateMatrix);
       matrix = multiplyMatrices(matrix, rotateMatrix);
       matrix = multiplyMatrices(matrix, dimensionMatrix);
