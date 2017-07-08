@@ -51,9 +51,14 @@
       this.setCoords();
     },
 
+    /**
+     * If returns true, deselection is cancelled.
+     * @since 2.0.0
+     * @return {Boolean} [cancel]
+     */
     onDeselect: function() {
       this.destroy();
-      return true;
+      return false;
     },
 
     /**

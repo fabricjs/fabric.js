@@ -535,7 +535,6 @@
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
-
       if (this._shouldClearSelection(e, target)) {
         this.deactivateAllWithDispatch(e);
       }
@@ -558,13 +557,11 @@
           this._beforeTransform(e, target);
           this._setupCurrentTransform(e, target);
         }
-        var activeObject = this.getActiveObject();
-        if (target !== activeObject) {
-          this.deactivateAll();
-          if (target.selectable) {
-            activeObject && activeObject.fire('deselected', { e: e });
-            this.setActiveObject(target, e);
-          }
+        if (target.selectable) {
+          this.setActiveObject(target, e);
+        }
+        else {
+          this.discardActiveObject();
         }
       }
       this._handleEvent(e, 'down', target ? target : null);

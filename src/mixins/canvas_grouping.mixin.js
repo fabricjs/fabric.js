@@ -24,10 +24,13 @@
      */
     _handleGrouping: function (e, target) {
       var activeObject = this.getActiveObject();
+      if (activeObject.__corner !== 0) {
+        return;
+      }
       if (target === activeObject) {
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
-        // if even object is not found, bail out
+        // if even object is not found or we are on activeObjectCorner, bail out
         if (!target) {
           return;
         }

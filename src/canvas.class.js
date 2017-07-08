@@ -508,7 +508,7 @@
     _shouldClearSelection: function (e, target) {
       var activeObjects = this.getActiveObjects(),
           activeObject = this.getActiveObject();
-
+console.log(e,target)
       return (
         !target
         ||
@@ -1112,11 +1112,12 @@
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
-      if (activeObject && activeObject._findTargetCorner(pointer)) {
+      if (aObjects.length === 1 && activeObject && activeObject._findTargetCorner(pointer)) {
         this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
-      if (aObjects.length === 1 && activeObject && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      if (aObjects.length === 1 && activeObject &&
+        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           this._fireOverOutEvents(activeObject, e);
           return activeObject;
@@ -1371,41 +1372,6 @@
     },
 
     /**
-     * @private
-     * @param {Object} object
-     */
-    _setActiveObject: function(object) {
-      var obj = this._activeObject;
-      if (obj) {
-        obj.set('active', false);
-        if (object !== obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
-          obj.onDeselect();
-        }
-      }
-      this._activeObject = object;
-      object.set('active', true);
-    },
-
-    /**
-     * Sets given object as the only active object on canvas
-     * @param {fabric.Object} object Object to set as an active one
-     * @param {Event} [e] Event (passed along when firing "object:selected")
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    setActiveObject: function (object, e) {
-      var currentActiveObject = this.getActiveObject();
-      if (currentActiveObject && currentActiveObject !== object) {
-        currentActiveObject.fire('deselected', { e: e });
-      }
-      this._setActiveObject(object);
-      this.fire('object:selected', { target: object, e: e });
-      object.fire('selected', { e: e });
-      this.requestRenderAll();
-      return this;
-    },
-
-    /**
      * Returns currently active object
      * @return {fabric.Object} active object
      */
@@ -1436,7 +1402,7 @@
      */
     _onObjectRemoved: function(obj) {
       // removing active object should fire "selection:cleared" events
-      if (this.getActiveObject() === obj) {
+      if (obj === this._activeObject) {
         this.fire('before:selection:cleared', { target: obj });
         this._discardActiveObject();
         this.fire('selection:cleared', { target: obj });
@@ -1449,17 +1415,56 @@
     },
 
     /**
+     * Sets given object as the only active object on canvas
+     * @param {fabric.Object} object Object to set as an active one
+     * @param {Event} [e] Event (passed along when firing "object:selected")
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setActiveObject: function (object, e) {
+      var currentActiveObject = this._activeObject;
+      if (object === currentActiveObject) {
+        return this;
+      }
+      if (this._setActiveObject(object)) {
+        currentActiveObject && currentActiveObject.fire('deselected', { e: e });
+        this.fire('object:selected', { target: object, e: e });
+        object.fire('selected', { e: e });
+      };
+      return this;
+    },
+
+    /**
+     * @private
+     * @param {Object} object
+     */
+    _setActiveObject: function(object) {
+      var active = this._activeObject;
+      if (active === object) {
+        return false;
+      }
+      if (this._discardActiveObject()) {
+        this._activeObject = object;
+        object.set('active', true);
+        return true;
+      }
+      return false;
+    },
+
+    /**
      * @private
      */
     _discardActiveObject: function() {
-      var obj = this._activeObject, cancel;
-      if (obj) {
-        obj.set('active', false);
-        if (obj.onDeselect && typeof obj.onDeselect === 'function') {
-          cancel = obj.onDeselect();
+      var obj = this._activeObject;
+      if (obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
+        // onDeselect return TRUE to cancel selection;
+        if (obj.onDeselect()) {
+          return false;
         }
+        obj.set('active', false);
+        this._activeObject = null;
       }
-      cancel && (this._activeObject = null);
+      return true;
     },
 
     /**
@@ -1475,33 +1480,11 @@
       var activeObject = this._activeObject;
       if (activeObject) {
         this.fire('before:selection:cleared', { target: activeObject, e: e });
-        this._discardActiveObject();
-        this.fire('selection:cleared', { e: e });
-        activeObject.fire('deselected', { e: e });
+        if (this._discardActiveObject()) {
+          this.fire('selection:cleared', { e: e });
+          activeObject.fire('deselected', { e: e });
+        }
       }
-      return this;
-    },
-
-    /**
-     * Deactivates all objects on canvas, removing any active group or object
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    deactivateAll: function () {
-      this._discardActiveObject();
-      return this;
-    },
-
-    /**
-     * Deactivates all objects and dispatches appropriate events If the function is called by fabric
-     * as a consequence of a mouse event, the event is passed as a parmater and
-     * sent to the fire function for the custom events. When used as a method the
-     * e param does not have any application.
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    deactivateAllWithDispatch: function (e) {
-      this.discardActiveObject(e);
       return this;
     },
 
