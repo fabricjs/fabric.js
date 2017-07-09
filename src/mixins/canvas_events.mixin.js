@@ -802,10 +802,10 @@
       }
 
       var hoverCursor = target.hoverCursor || this.hoverCursor,
-          activeSelection = this._activeObject,
+          activeSelection = this._activeObject && this._activeObject.type === 'activeSelection' ?
+            this._activeObject : null,
           // only show proper corner when group selection is not active
-          corner = target._findTargetCorner
-                    && (!activeSelection || (activeSelection.contains && !activeSelection.contains(target)))
+          corner = (!activeSelection || !activeSelection.contains(target))
                     && target._findTargetCorner(this.getPointer(e, true));
 
       if (!corner) {
