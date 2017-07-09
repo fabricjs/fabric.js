@@ -12,6 +12,7 @@ testrunner.run({
     deps: "./test/fixtures/test_script.js",
     code: "./dist/fabric.js",
     tests: [
+      './test/unit/activeselection.js',
       './test/unit/animation.js',
       './test/unit/rect.js',
       './test/unit/ellipse.js',

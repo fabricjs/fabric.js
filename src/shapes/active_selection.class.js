@@ -10,11 +10,10 @@
 
   /**
    * Group class
-   * @class fabric.Group
-   * @extends fabric.Object
-   * @mixes fabric.Collection
+   * @class fabric.ActiveSelection
+   * @extends fabric.Group
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
-   * @see {@link fabric.Group#initialize} for constructor definition
+   * @see {@link fabric.ActiveSelection#initialize} for constructor definition
    */
   fabric.ActiveSelection = fabric.util.createClass(fabric.Group, /** @lends fabric.ActiveSelection.prototype */ {
 
@@ -27,7 +26,7 @@
 
     /**
      * Constructor
-     * @param {Object} objects Group objects
+     * @param {Object} objects ActiveSelection objects
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
@@ -49,6 +48,36 @@
       this._updateObjectsCoords();
       fabric.Object.prototype.initialize.call(this, options);
       this.setCoords();
+    },
+
+    /**
+     * Change te activeSelection to a normal group,
+     * High level function that automatically adds it to canvas as
+     * active object. no events fired.
+     * @since 2.0.0
+     * @return {fabric.Group}
+     */
+    toGroup: function() {
+      var objects = this._objects;
+      this._objects = [];
+      var options = this.toObject();
+      var newGroup = new fabric.Group([]);
+      newGroup.set(options);
+      newGroup.type = 'group';
+      objects.forEach(function(object) {
+        object.group = newGroup;
+        object.canvas.remove(object);
+      });
+      newGroup._objects = objects;
+      if (!this.canvas) {
+        return newGroup;
+      }
+      var canvas = this.canvas;
+      canvas._activeObject = newGroup;
+      canvas.add(newGroup);
+      newGroup.setCoords();
+      console.log(newGroup)
+      return newGroup;
     },
 
     /**
@@ -149,13 +178,13 @@
   });
 
   /**
-   * Returns {@link fabric.Group} instance from an object representation
+   * Returns {@link fabric.ActiveSelection} instance from an object representation
    * @static
-   * @memberOf fabric.Group
+   * @memberOf fabric.ActiveSelection
    * @param {Object} object Object to create a group from
-   * @param {Function} [callback] Callback to invoke when an group instance is created
+   * @param {Function} [callback] Callback to invoke when an ActiveSelection instance is created
    */
-  fabric.Group.fromObject = function(object, callback) {
+  fabric.ActiveSelection.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
       delete object.objects;
       callback && callback(new fabric.ActiveSelection(enlivenedObjects, object, true));
