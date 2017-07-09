@@ -392,6 +392,43 @@
     },
 
     /**
+     * make a group an active selection, remove the group from canvas
+     * the group has to be on canvas for this to work.
+     * @return {fabric.ActiveSelection} thisArg
+     * @chainable
+     */
+    toActiveSelection: function() {
+      if (!this.canvas) {
+        return;
+      }
+      var objects = this._objects, canvas = this.canvas;
+      this._objects = [];
+      var options = this.toObject();
+      var activeSelection = new fabric.ActiveSelection([]);
+      activeSelection.set(options);
+      activeSelection.type = 'activeSelection';
+      canvas.remove(this);
+      objects.forEach(function(object) {
+        object.group = activeSelection;
+        object.dirty = true;
+        canvas.add(object);
+      });
+      activeSelection._objects = objects;
+      canvas._activeObject = activeSelection;
+      activeSelection.setCoords();
+      return activeSelection;
+    },
+
+    /**
+     * Destroys a group (restoring state of its objects)
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    ungroupOnCanvas: function() {
+      return this._restoreObjectsState();
+    },
+
+    /**
      * Sets coordinates of all objects inside group
      * @return {fabric.Group} thisArg
      * @chainable
