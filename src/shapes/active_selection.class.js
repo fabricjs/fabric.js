@@ -76,7 +76,6 @@
       canvas._activeObject = newGroup;
       canvas.add(newGroup);
       newGroup.setCoords();
-      console.log(newGroup)
       return newGroup;
     },
 
