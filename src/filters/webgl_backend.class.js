@@ -60,6 +60,55 @@
       this.createWebGLCanvas(width, height);
       // eslint-disable-next-line
       this.squareVertices = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
+      this.chooseFastestCopyGLTo2DMethod(width, height);
+    },
+
+    /**
+     * Pick a method to copy data from GL context to 2d canvas.  In some browsers using
+     * putImageData is faster than drawImage for that specific operation.
+     */
+    chooseFastestCopyGLTo2DMethod: function(width, height) {
+      var canMeasurePerf = typeof window.performance !== 'undefined';
+      var canUseImageData;
+      try {
+        new ImageData(1, 1);
+        canUseImageData = true;
+      }
+      catch (e) {
+        canUseImageData = false;
+      }
+      // eslint-disable-next-line no-undef
+      var canUseArrayBuffer = typeof ArrayBuffer !== 'undefined';
+      // eslint-disable-next-line no-undef
+      var canUseUint8Clamped = typeof Uint8ClampedArray !== 'undefined';
+
+      if (!(canMeasurePerf && canUseImageData && canUseArrayBuffer && canUseUint8Clamped)) {
+        return;
+      }
+
+      var targetCanvas = fabric.util.createCanvasElement();
+      // eslint-disable-next-line no-undef
+      var imageBuffer = new ArrayBuffer(width * height * 4);
+      var testContext = { imageBuffer: imageBuffer };
+      var startTime, drawImageTime, putImageDataTime;
+      targetCanvas.width = width;
+      targetCanvas.height = height;
+
+      startTime = window.performance.now();
+      copyGLTo2DDrawImage.call(testContext, this.gl, targetCanvas);
+      drawImageTime = window.performance.now() - startTime;
+
+      startTime = window.performance.now();
+      copyGLTo2DPutImageData.call(testContext, this.gl, targetCanvas);
+      putImageDataTime = window.performance.now() - startTime;
+
+      if (drawImageTime > putImageDataTime) {
+        this.imageBuffer = imageBuffer;
+        this.copyGLTo2D = copyGLTo2DPutImageData;
+      }
+      else {
+        this.copyGLTo2D = copyGLTo2DDrawImage;
+      }
     },
 
     /**
@@ -122,7 +171,7 @@
       var tempFbo = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
       filters.forEach(function(filter) { filter && filter.applyTo(pipelineState); });
-      this.copyGLTo2D(gl.canvas, targetCanvas);
+      this.copyGLTo2D(gl, targetCanvas);
       gl.bindTexture(gl.TEXTURE_2D, null);
       gl.deleteTexture(pipelineState.sourceTexture);
       gl.deleteTexture(pipelineState.targetTexture);
@@ -244,25 +293,6 @@
     },
 
     /**
-     * Copy an input WebGL canvas on to an output 2D canvas.
-     *
-     * The WebGL canvas is assumed to be upside down, with the top-left pixel of the
-     * desired output image appearing in the bottom-left corner of the WebGL canvas.
-     *
-     * @param {HTMLCanvasElement} sourceCanvas The WebGL source canvas to copy from.
-     * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
-     */
-    copyGLTo2D: function(sourceCanvas, targetCanvas) {
-      var ctx = targetCanvas.getContext('2d');
-      ctx.translate(0, targetCanvas.height); // move it down again
-      ctx.scale(1, -1); // vertical flip
-      // where is my image on the big glcanvas?
-      var sourceY = sourceCanvas.height - targetCanvas.height;
-      ctx.drawImage(sourceCanvas, 0, sourceY, targetCanvas.width, targetCanvas.height, 0, 0,
-        targetCanvas.width, targetCanvas.height);
-    },
-
-    /**
      * Clear out cached resources related to a source image that has been
      * filtered previously.
      *
@@ -274,6 +304,8 @@
         delete this.textureCache[cacheKey];
       }
     },
+
+    copyGLTo2D: copyGLTo2DDrawImage,
 
     /**
      * Attempt to extract GPU information strings from a WebGL context.
@@ -304,3 +336,44 @@
     },
   };
 })();
+
+/**
+ * Copy an input WebGL canvas on to an output 2D canvas.
+ *
+ * The WebGL canvas is assumed to be upside down, with the top-left pixel of the
+ * desired output image appearing in the bottom-left corner of the WebGL canvas.
+ *
+ * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
+ * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
+ */
+function copyGLTo2DDrawImage(gl, targetCanvas) {
+  var sourceCanvas = gl.canvas;
+  var ctx = targetCanvas.getContext('2d');
+  ctx.translate(0, targetCanvas.height); // move it down again
+  ctx.scale(1, -1); // vertical flip
+  // where is my image on the big glcanvas?
+  var sourceY = sourceCanvas.height - targetCanvas.height;
+  ctx.drawImage(sourceCanvas, 0, sourceY, targetCanvas.width, targetCanvas.height, 0, 0,
+    targetCanvas.width, targetCanvas.height);
+}
+
+/**
+ * Copy an input WebGL canvas on to an output 2D canvas using 2d canvas' putImageData
+ * API. Measurably faster than using ctx.drawImage in Firefox (version 54 on OSX Sierra).
+ *
+ * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
+ * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
+ */
+function copyGLTo2DPutImageData(gl, targetCanvas) {
+  var ctx = targetCanvas.getContext('2d');
+  var width = targetCanvas.width;
+  var height = targetCanvas.height;
+  var numBytes = width * height * 4;
+  // eslint-disable-next-line no-undef
+  var u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
+  // eslint-disable-next-line no-undef
+  var u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
+  gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, u8);
+  var imgData = new ImageData(u8Clamped, width);
+  ctx.putImageData(imgData, 0, 0);
+}
