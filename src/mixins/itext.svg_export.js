@@ -108,7 +108,8 @@
           charBox, style,
           boxWidth = 0,
           line = this._textLines[lineIndex],
-          timeToRender;
+          timeToRender,
+          realTextTopOffset;
 
       textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
       for (var i = 0, len = line.length - 1; i <= len; i++) {
@@ -130,9 +131,26 @@
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
+        switch (actualStyle['baselineShift']) {
+          case 'super':
+            realTextTopOffset = textTopOffset - (this.fontSize * this.baselineShiftSettings.superPosition / 100);
+            break;
+          case 'sub':
+            realTextTopOffset = textTopOffset + (this.fontSize * this.baselineShiftSettings.subPosition / 100);
+            break;
+          case 'baseline':
+            realTextTopOffset = textTopOffset;
+            break;
+        }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
-          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
+          switch (actualStyle['baselineShift']) {
+            case 'super':
+            case 'sub':
+              style['fontSize'] = style['fontSize'] || this.fontSize;
+              break;
+          }
+          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, realTextTopOffset));
           charsToRender = '';
           actualStyle = nextStyle;
           textLeftOffset += boxWidth;
