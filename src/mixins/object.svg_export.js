@@ -64,9 +64,10 @@
      * @return {String}
      */
     getSvgSpanStyles: function(style) {
-      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
+      var baselineShift = style['baselineShift'] || 'baseline',
+          strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
           fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
+          fontSize = style.fontSize ? 'font-size: ' + (baselineShift === 'baseline' ? style.fontSize : style.fontSize * fabric.Text.prototype.baselineShiftSettings.size / 100) + '; ' : '',
           fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
           fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',

@@ -26,7 +26,8 @@
     'lineHeight',
     'textBackgroundColor',
     'charSpacing',
-    'styles'
+    'styles',
+    'baselineShift'
   );
 
   var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
@@ -43,7 +44,8 @@
     'lineHeight',
     'textBackgroundColor',
     'charSpacing',
-    'styles'
+    'styles',
+    'baselineShift'
   );
   /**
    * Text class
@@ -70,6 +72,7 @@
       'charSpacing',
       'textAlign',
       'styles',
+      'baselineShift'
     ],
 
     /**
@@ -204,6 +207,22 @@
      * @default
      */
     shadow:               null,
+    
+    /**
+     * Sub/superscript.
+     * @type String
+     * @default
+     */
+    baselineShift:       'baseline',
+
+    /**
+     * @private
+     */
+    baselineShiftSettings: {
+      size: 58,
+      superPosition: 33,
+      subPosition: 17
+    },
 
     /**
      * @private
@@ -267,7 +286,8 @@
       'fontStyle',
       'underline',
       'overline',
-      'linethrough'
+      'linethrough',
+      'baselineShift'
     ],
 
     /**
@@ -676,7 +696,7 @@
         fabric.charWidthsCache[fontFamily] = { };
       }
       var cache = fabric.charWidthsCache[fontFamily],
-          cacheProp = decl.fontStyle.toLowerCase() + '_' + decl.fontWeight.toLowerCase();
+          cacheProp = decl.fontStyle.toLowerCase() + '_' + decl.fontWeight.toLowerCase() + '_' + decl.baselineShift.toLowerCase();
       if (!cache[cacheProp]) {
         cache[cacheProp] = { };
       }
@@ -933,7 +953,18 @@
           maxHeight = this.getHeightOfChar(lineIndex, 0);
 
       for (var i = 1, len = line.length; i < len; i++) {
-        var currentCharHeight = this.getHeightOfChar(lineIndex, i);
+        var currentCharHeight = this.getHeightOfChar(lineIndex, i),
+            currentCharBaselineShift = this.getValueOfPropertyAt(lineIndex, i, 'baselineShift');
+        if (currentCharBaselineShift !== 'baseline') {
+          switch (currentCharBaselineShift) {
+            case 'super':
+              currentCharHeight += this.fontSize * this.baselineShiftSettings.superPosition / 100;
+              break;
+            case 'sub':
+              currentCharHeight += this.fontSize * this.baselineShiftSettings.subPosition / 100;
+              break;
+          }
+        }
         if (currentCharHeight > maxHeight) {
           maxHeight = currentCharHeight;
         }
@@ -1047,11 +1078,37 @@
           charsToRender = '',
           charBox,
           boxWidth = 0,
-          timeToRender;
+          timeToRender,
+          realTop,
+          len = line.length - 1,
+          hasSuper = false,
+          hasSub = false;
+
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
-      for (var i = 0, len = line.length - 1; i <= len; i++) {
+      for (var j = 0; j <= len; j++) {
+        if (this.getCompleteStyleDeclaration(lineIndex, j)['baselineShift'] === 'super') {
+          hasSuper = true;
+          if (hasSub) {
+            break;
+          }
+        } else if (this.getCompleteStyleDeclaration(lineIndex, j)['baselineShift'] === 'sub') {
+          hasSub = true;
+          if (hasSuper) {
+            break;
+          }
+        }
+      }
+      if (!(hasSuper && hasSub)) {
+        if (hasSuper) {
+          top += this.fontSize * this.baselineShiftSettings.superPosition / 100 * this._fontSizeFraction / this.lineHeight;
+        }
+        if (hasSub) {
+          top -= this.fontSize * this.baselineShiftSettings.subPosition / 100 * this._fontSizeFraction / this.lineHeight;
+        }
+      }
+      for (var i = 0; i <= len; i++) {
         timeToRender = i === len || this.charSpacing;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
@@ -1070,8 +1127,19 @@
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
+        switch (actualStyle['baselineShift']) {
+          case 'super':
+            realTop = top - (this.fontSize * this.baselineShiftSettings.superPosition / 100);
+            break;
+          case 'sub':
+            realTop = top + (this.fontSize * this.baselineShiftSettings.subPosition / 100);
+            break;
+          case 'baseline':
+            realTop = top;
+            break;
+        }
         if (timeToRender) {
-          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, realTop, lineHeight);
           charsToRender = '';
           actualStyle = nextStyle;
           left += boxWidth;
@@ -1125,7 +1193,8 @@
               prevStyle.fontSize !== thisStyle.fontSize ||
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.baselineShift !== thisStyle.baselineShift
       );
     },
 
@@ -1289,7 +1358,7 @@
         // node-canvas needs "weight style", while browsers need "style weight"
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
-        forMeasuring ? CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
+        forMeasuring ? ( style.baselineShift === 'baseline' ? CACHE_FONT_SIZE : CACHE_FONT_SIZE * this.baselineShiftSettings.size / 100 ) + 'px' : ( style.baselineShift === 'baseline' ? style.fontSize : style.fontSize * this.baselineShiftSettings.size / 100 ) + 'px',
         (fabric.isLikelyNode ? ('"' + style.fontFamily + '"') : style.fontFamily)
       ].join(' ');
     },
