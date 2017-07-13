@@ -131,16 +131,20 @@
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
-        switch (actualStyle['baselineShift']) {
-          case 'super':
-            realTextTopOffset = textTopOffset - (this.fontSize * this.baselineShiftSettings.superPosition / 100);
-            break;
-          case 'sub':
-            realTextTopOffset = textTopOffset + (this.fontSize * this.baselineShiftSettings.subPosition / 100);
-            break;
-          case 'baseline':
-            realTextTopOffset = textTopOffset;
-            break;
+        if(actualStyle) {
+          switch (actualStyle['baselineShift']) {
+            case 'super':
+              realTextTopOffset = textTopOffset - (this.fontSize * this.baselineShiftSettings.superPosition / 100);
+              break;
+            case 'sub':
+              realTextTopOffset = textTopOffset + (this.fontSize * this.baselineShiftSettings.subPosition / 100);
+              break;
+            case 'baseline':
+              realTextTopOffset = textTopOffset;
+              break;
+          }
+        } else {
+          realTextTopOffset = textTopOffset;
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
