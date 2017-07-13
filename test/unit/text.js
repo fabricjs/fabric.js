@@ -54,7 +54,8 @@
     'skewY':                      0,
     'transformMatrix':            null,
     'charSpacing':                0,
-    'styles':                     null
+    'styles':                     null,
+    'baselineShift':              'baseline'
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" >\n\t\t\t<tspan x="-10" y="12.57" >x</tspan>\n\t\t</text>\n\t</g>\n';
@@ -141,11 +142,12 @@
   test('set with "hash"', function() {
     var text = createTextObject();
 
-    text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
+    text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah', baselineShift: 'super' });
 
     equal(text.opacity, 0.123);
     equal(text.fill, 'red');
     equal(text.fontFamily, 'blah');
+    equal(text.baselineShift, 'super');
   });
 
   test('get bounding rect after init', function() {
