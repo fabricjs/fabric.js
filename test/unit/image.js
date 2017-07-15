@@ -207,7 +207,7 @@
   asyncTest('toSVG', function() {
     createImageObject(function(image) {
       ok(typeof image.toSVG === 'function');
-      var expectedSVG = '<g transform="translate(138 55)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110"></image>\n</g>';
+      var expectedSVG = '<g transform="translate(138 55)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110"></image>\n</g>\n';
       equal(image.toSVG(), expectedSVG);
       start();
     });
