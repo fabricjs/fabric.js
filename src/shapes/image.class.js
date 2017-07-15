@@ -288,7 +288,7 @@
             // so that object's center aligns with container's left/top
             '" width="', this.width,
             '" height="', this.height,
-          '></image>\n'
+          '"></image>\n'
       );
 
       if (this.stroke || this.strokeDashArray) {
