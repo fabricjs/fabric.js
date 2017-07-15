@@ -365,4 +365,30 @@
     equal(text.styles[0], undefined, 'the styles got empty and has been removed');
   });
 
+  test('getFontCache works with fontWeight numbers', function() {
+    var text = new fabric.Text('xxx', { fontWeight: 400 });
+    text.initDimensions();
+    var cache = fabric.charWidthsCache[text.fontFamily];
+    var cacheProp = text.fontStyle + '_400';
+    equal(cacheProp in cache, true);
+  });
+
+  test('getFontCache works with fontWeight numbers', function() {
+    var text = new fabric.Text('xxx', { fontWeight: 400 });
+    text.initDimensions();
+    var cache = fabric.charWidthsCache[text.fontFamily];
+    var cacheProp = text.fontStyle + '_400';
+    equal(cacheProp in cache, true, '400 is converted to string');
+  });
+
+  test('getFontCache is case insensitive', function() {
+    var text = new fabric.Text('xxx', { fontWeight: 'BOld', fontStyle: 'NormaL' });
+    text.initDimensions();
+    var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
+    text2.initDimensions();
+    var cache = text.getFontCache();
+    var cache2 = text2.getFontCache();
+    equal(cache, cache2, 'you get the same cache');
+  });
+
 })();
