@@ -920,7 +920,7 @@
         delete object.path;
 
         path.setOptions(object);
-        path.setSourcePath(pathUrl);
+        path.set('sourcePath', pathUrl);
 
         callback && callback(path);
       });
