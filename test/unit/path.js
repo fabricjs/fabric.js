@@ -153,7 +153,16 @@
   });
 
   asyncTest('fromObject', function() {
-    ok(typeof fabric.Path.fromObject == 'function');
+    ok(typeof fabric.Path.fromObject === 'function');
+    fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
+      ok(path instanceof fabric.Path);
+      deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+      start();
+    });
+  });
+
+  asyncTest('fromObject with sourcePath', function() {
+    ok(typeof fabric.Path.fromObject === 'function');
     fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
       ok(path instanceof fabric.Path);
       deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
