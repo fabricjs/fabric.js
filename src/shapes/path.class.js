@@ -473,7 +473,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var o = extend(this.callSuper('toObject', ['sourcePath', 'pathOffset'].concat(propertiesToInclude)), {
+      var o = extend(this.callSuper('toObject', propertiesToInclude), {
         path: this.path.map(function(item) { return item.slice(); }),
         top: this.top,
         left: this.left,
@@ -487,11 +487,10 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
-      var o = this.toObject(propertiesToInclude);
-      if (this.sourcePath) {
-        o.path = this.sourcePath;
+      var o = this.toObject(['sourcePath'].concat(propertiesToInclude));
+      if (o.sourcePath) {
+        delete o.path;
       }
-      delete o.sourcePath;
       return o;
     },
 
@@ -913,15 +912,11 @@
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
    */
   fabric.Path.fromObject = function(object, callback) {
-    if (typeof object.path === 'string') {
-      var pathUrl = object.path;
+    if (typeof object.sourcePath === 'string') {
+      var pathUrl = object.sourcePath;
       fabric.loadSVGFromURL(pathUrl, function (elements) {
         var path = elements[0];
-        delete object.path;
-
         path.setOptions(object);
-        path.set('sourcePath', pathUrl);
-
         callback && callback(path);
       });
     }
