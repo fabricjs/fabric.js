@@ -22,7 +22,6 @@
     'flipY':                    false,
     'opacity':                  1,
     'path':                     [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
-    'pathOffset':               { x: 200, y: 200 },
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
@@ -133,14 +132,20 @@
 
   asyncTest('toDatalessObject', function() {
     makePathObject(function(path) {
-      ok(typeof path.toDatalessObject == 'function');
-      deepEqual(path.toDatalessObject(), REFERENCE_PATH_OBJECT);
+      ok(typeof path.toDatalessObject === 'function');
+      deepEqual(path.toDatalessObject(), REFERENCE_PATH_OBJECT, 'if not sourcePath the object is same');
+      start();
+    });
+  });
 
+  asyncTest('toDatalessObject with sourcePath', function() {
+    makePathObject(function(path) {
       var src = 'http://example.com/';
       path.sourcePath = src;
-      deepEqual(path.toDatalessObject(), fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
-        path: src
-      }));
+      var clonedRef = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+      clonedRef.sourcePath = src;
+      delete clonedRef.path;
+      deepEqual(path.toDatalessObject(), clonedRef, 'if sourcePath the object looses path');
       start();
     });
   });
@@ -171,7 +176,7 @@
   });
 
   asyncTest('fromElement', function() {
-    ok(typeof fabric.Path.fromElement == 'function');
+    ok(typeof fabric.Path.fromElement === 'function');
     var elPath = fabric.document.createElement('path');
 
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
