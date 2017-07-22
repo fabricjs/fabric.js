@@ -599,6 +599,17 @@
     equal(canvas._objects[1], rect1, 'rect1 should be the new second');
     equal(canvas._objects[2], rect2, 'rect2 should be the third object');
     equal(canvas._objects[3], rect4, 'rect4 did not move');
+    canvas.bringForward(group);
+    equal(canvas._objects[0], rect3, 'rect3 should be the new last');
+    equal(canvas._objects[1], rect4, 'rect4 should be the new second');
+    equal(canvas._objects[2], rect1, 'rect1 should be the third object');
+    equal(canvas._objects[3], rect2, 'rect2 is the new top');
+    canvas.bringForward(group);
+    canvas.bringForward(group);
+    equal(canvas._objects[0], rect3, 'rect3 should be the new last');
+    equal(canvas._objects[1], rect4, 'rect4 should be the new second');
+    equal(canvas._objects[2], rect1, 'rect1 is still third');
+    equal(canvas._objects[3], rect2, 'rect2 is still new top');
   });
 
   test('activeGroup sendBackwards', function() {
@@ -618,6 +629,17 @@
     equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
     equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
     equal(canvas._objects[3], rect2, 'rect2 is the new top');
+    canvas.sendBackwards(group);
+    equal(canvas._objects[0], rect3, 'rect3 is  last');
+    equal(canvas._objects[1], rect4, 'rect4 should be shifted down by 1');
+    equal(canvas._objects[2], rect1, 'rect1 should be shifted down by 1');
+    equal(canvas._objects[3], rect2, 'rect2 is still on top');
+    canvas.sendBackwards(group);
+    canvas.sendBackwards(group);
+    equal(canvas._objects[0], rect3, 'rect3 is still last');
+    equal(canvas._objects[1], rect4, 'rect4 should be steady');
+    equal(canvas._objects[2], rect1, 'rect1 should be steady');
+    equal(canvas._objects[3], rect2, 'rect2 is still on top');
   });
 
   test('toDataURL', function() {

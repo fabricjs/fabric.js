@@ -103,7 +103,7 @@
         fabric.util.string.escapeXml(_char),
         '</tspan>\n'
       ].join('');
-    }
+    },
   });
 })();
 /* _TO_SVG_END_ */
