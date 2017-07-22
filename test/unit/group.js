@@ -387,6 +387,17 @@
     });
   });
 
+  asyncTest('fromObject does not delete objects from source', function() {
+    var group = makeGroupWith2ObjectsWithOpacity();
+    var groupObject = group.toObject();
+
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+      equal(newGroupFromObject.objects, undefined, 'the objects array has not been pulled in');
+      notEqual(groupObject.objects, undefined, 'the objects array has not been deleted from object source');
+      start();
+    });
+  });
+
   test('toSVG', function() {
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
