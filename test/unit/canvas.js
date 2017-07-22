@@ -105,7 +105,6 @@
     },
     teardown: function() {
       canvas.clear();
-      canvas.setActiveGroup(null);
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas.calcOffset();
@@ -495,8 +494,8 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.Group([rect1, rect2]);
-    canvas.setActiveGroup(group);
+    var group = new fabric.ActiveSelection([rect1, rect2]);
+    canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
@@ -526,8 +525,8 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    var group = new fabric.Group([rect1, rect2]);
-    canvas.setActiveGroup(group);
+    var group = new fabric.ActiveSelection([rect1, rect2]);
+    canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 8, clientY: 8
     });
@@ -541,7 +540,7 @@
     canvas.preserveObjectStacking = false;
   });
 
-  test('activeGroup sendToBack', function() {
+  test('ActiveSelection sendToBack', function() {
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -550,11 +549,11 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([rect3, rect4]);
-    canvas.setActiveGroup(group);
+    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
+    canvas.setActiveObject(activeSel);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendToBack(group);
+    canvas.sendToBack(activeSel);
     equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     equal(canvas._objects[1], rect4, 'rect3 should be the new second');
     equal(canvas._objects[2], rect1, 'rect1 should be the third object');
@@ -570,11 +569,11 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([rect1, rect2]);
-    canvas.setActiveGroup(group);
+    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
+    canvas.setActiveObject(activeSel);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringToFront(group);
+    canvas.bringToFront(activeSel);
     equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     equal(canvas._objects[1], rect4, 'rect3 should be the new second');
     equal(canvas._objects[2], rect1, 'rect1 should be the third object');
@@ -590,11 +589,11 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([rect1, rect2]);
-    canvas.setActiveGroup(group);
+    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
+    canvas.setActiveObject(activeSel);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringForward(group);
+    canvas.bringForward(activeSel);
     equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     equal(canvas._objects[1], rect1, 'rect1 should be the new second');
     equal(canvas._objects[2], rect2, 'rect2 should be the third object');
@@ -609,11 +608,11 @@
 
     canvas.add(rect1, rect2, rect3, rect4);
 
-    var group = new fabric.Group([rect3, rect4]);
-    canvas.setActiveGroup(group);
+    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
+    canvas.setActiveObject(activeSel);
     equal(canvas._objects[0], rect1, 'rect1 should be last');
     equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendBackwards(group);
+    canvas.sendBackwards(activeSel);
     equal(canvas._objects[0], rect1, 'rect1 is still last');
     equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
     equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
@@ -718,7 +717,7 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    canvas.setActiveGroup(new fabric.Group([rect, circle])).renderAll();
+    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle], { canvas: canvas }));
     var jsonWithActiveGroup = JSON.stringify(canvas);
 
     equal(json, jsonWithActiveGroup);
@@ -979,7 +978,7 @@
     canvas.add(group);
     canvas.renderAll();
 
-    canvas.deactivateAll();
+    canvas._discardActiveObject();
     var json = JSON.stringify( canvas.toDatalessJSON() );
     canvas.clear();
     canvas.loadFromDatalessJSON(json, function() {
@@ -1226,7 +1225,7 @@
 
   test('getActiveObject', function() {
     ok(typeof canvas.getActiveObject == 'function');
-
+    equal(canvas.getActiveObject(), null, 'should initially be null');
     var rect1 = makeRect(),
         rect2 = makeRect();
 
@@ -1239,19 +1238,16 @@
     equal(canvas.getActiveObject(), rect2);
   });
 
-  test('getSetActiveGroup', function() {
-    ok(typeof canvas.getActiveGroup == 'function');
-    ok(typeof canvas.setActiveGroup == 'function');
-
-    equal(canvas.getActiveGroup(), null, 'should initially be null');
+  test('getsetActiveObject', function() {
+    equal(canvas.getActiveObject(), null, 'should initially be null');
 
     var group = new fabric.Group([
       makeRect({ left: 10, top: 10 }),
       makeRect({ left: 20, top: 20 })
     ]);
 
-    equal(canvas.setActiveGroup(group), canvas, 'should be chainable');
-    equal(canvas.getActiveGroup(), group);
+    equal(canvas.setActiveObject(group), canvas, 'should be chainable');
+    equal(canvas.getActiveObject(), group);
   });
 
   test('item', function() {
@@ -1270,28 +1266,25 @@
     equal(canvas.item(0), rect2);
   });
 
-  test('discardActiveGroup', function() {
-    ok(typeof canvas.discardActiveGroup == 'function');
-    var group = new fabric.Group([makeRect(), makeRect()]);
-    canvas.setActiveGroup(group);
-    equal(canvas.discardActiveGroup(), canvas, 'should be chainable');
-    equal(canvas.getActiveGroup(), null, 'removing active group sets it to null');
+  test('discardActiveObject on ActiveSelection', function() {
+    var group = new fabric.ActiveSelection([makeRect(), makeRect()]);
+    canvas.setActiveObject(group);
+    equal(canvas.discardActiveObject(), canvas, 'should be chainable');
+    equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
   });
 
-  test('deactivateAll', function() {
-    ok(typeof canvas.deactivateAll == 'function');
+  test('_discardActiveObject', function() {
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
 
-    canvas.deactivateAll();
+    canvas._discardActiveObject();
     ok(!canvas.item(0).active);
     equal(canvas.getActiveObject(), null);
-    equal(canvas.getActiveGroup(), null);
   });
 
-  test('deactivateAllWithDispatch', function() {
-    ok(typeof canvas.deactivateAllWithDispatch == 'function');
+  test('discardActiveObject', function() {
+    ok(typeof canvas.discardActiveObject == 'function');
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
@@ -1301,7 +1294,7 @@
       makeRect({ left: 20, top: 20 })
     ]);
 
-    canvas.setActiveGroup(group);
+    canvas.setActiveObject(group);
 
     var eventsFired = {
       selectionCleared: false
@@ -1311,10 +1304,10 @@
       eventsFired.selectionCleared = true;
     });
 
-    canvas.deactivateAllWithDispatch();
+    canvas.discardActiveObject();
     ok(!canvas.item(0).active);
     equal(canvas.getActiveObject(), null);
-    equal(canvas.getActiveGroup(), null);
+    equal(canvas.getActiveObject(), null);
 
     for (var prop in eventsFired) {
       ok(eventsFired[prop]);
@@ -1347,7 +1340,7 @@
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
 
-    canvas.setActiveGroup(new fabric.Group([rect, circle])).renderAll();
+    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle]));
     var svgWithActiveGroup = canvas.toSVG();
 
     equal(svg, svgWithActiveGroup);
@@ -1363,13 +1356,13 @@
     equal(canvas._objects[1], rect2);
     equal(canvas._objects[2], circle1);
     equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.Group([rect2, circle2, rect1, circle1]);
+    var aGroup = new fabric.ActiveSelection([rect2, circle2, rect1, circle1]);
     // before rendering objects are ordered in insert order
     equal(aGroup._objects[0], rect2);
     equal(aGroup._objects[1], circle2);
     equal(aGroup._objects[2], rect1);
     equal(aGroup._objects[3], circle1);
-    canvas.setActiveGroup(aGroup).renderAll();
+    canvas.setActiveObject(aGroup).renderAll();
     // after rendering objects are ordered in canvas stack order
     equal(aGroup._objects[0], rect1);
     equal(aGroup._objects[1], rect2);

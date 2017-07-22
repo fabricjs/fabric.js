@@ -17,7 +17,9 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer) {
-      if (!this.hasControls || !this.active) {
+      // objects in group, anykind, are not self modificable,
+      // must not return an hovered corner.
+      if (!this.hasControls || !this.active || this.group) {
         return false;
       }
 
@@ -115,7 +117,7 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || this.group || !this.active ||
+      if (!this.selectionBackgroundColor || !this.active ||
         (this.canvas && !this.canvas.interactive)) {
         return this;
       }
