@@ -817,7 +817,7 @@
   test('space wrap attribute', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux');
     iText.enterEditing();
-    equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
+    equal(iText.hiddenTextarea.getAttribute('wrap'), 'off', 'HiddenTextarea needs wrap off attribute');
   });
 
   // test('measuring width of words', function () {
