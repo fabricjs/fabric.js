@@ -313,7 +313,8 @@ else {
 
       exec(mininfierCmd, function (error, output) {
         if (error) {
-          console.error('Minification failed using', minifier, 'with', mininfierCmd);
+          console.log('Minification failed using', minifier, 'with', mininfierCmd);
+          console.error(error);
           process.exit(1);
         }
         console.log('Minified using', minifier, 'to ' + distributionPath + 'fabric.min.js');

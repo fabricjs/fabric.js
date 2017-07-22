@@ -814,4 +814,31 @@
     notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
   });
 
+  test('space wrap attribute', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+    iText.enterEditing();
+    equal(iText.hiddenTextarea.getAttribute('wrap'), 'off', 'HiddenTextarea needs wrap off attribute');
+  });
+
+  // test('measuring width of words', function () {
+  //   var ctx = canvas.getContext('2d');
+  //   var text = 'test foo bar';
+  //   var iText = new fabric.IText(text, {
+  //     styles: {
+  //       0: {
+  //         9: { fontWeight: 'bold' },
+  //         10: { fontWeight: 'bold' },
+  //         11: { fontWeight: 'bold' },
+  //       }
+  //     }
+  //   });
+  //
+  //   var textSplitted = text.split(' ');
+  //   var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
+  //   var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
+  //
+  //   notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
+  // });
+
+
 })();
