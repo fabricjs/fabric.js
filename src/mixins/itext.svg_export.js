@@ -103,10 +103,9 @@
         fabric.util.string.escapeXml(_char),
         '</tspan>\n'
       ].join('');
-    }
+    },
 
     getSvgStyles: function(skipShadow) {
-
       var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
       return svgStyle + ' white-space: pre;';
     },
