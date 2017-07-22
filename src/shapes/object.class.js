@@ -784,7 +784,6 @@
           };
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
-
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
@@ -1163,7 +1162,7 @@
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       }
-      if (this.group && this.group === this.canvas.getActiveGroup()) {
+      if (styleOverride.forActiveSelection) {
         ctx.rotate(degreesToRadians(options.angle));
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
