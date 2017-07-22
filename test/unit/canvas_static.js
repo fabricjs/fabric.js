@@ -895,6 +895,24 @@
     equal(canvas.toObject().objects.length, 1, 'only one object gets exported');
   });
 
+  test('toObject excludeFromExport bgImage overlay', function() {
+    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    canvas.clear();
+    canvas.backgroundImage = rect;
+    canvas.overlayImage = rect2;
+    canvas.add(rect3);
+    var rectToObject = rect.toObject();
+    var rect2ToObject = rect2.toObject();
+    var canvasToObject = canvas.toObject();
+    deepEqual(canvasToObject.backgroundImage, rectToObject, 'background exported');
+    deepEqual(canvasToObject.overlayImage, rect2ToObject, 'overlay exported');
+    rect.excludeFromExport = true;
+    rect2.excludeFromExport = true;
+    canvasToObject = canvas.toObject();
+    equal(canvasToObject.backgroundImage, undefined, 'background not exported');
+    equal(canvasToObject.overlayImage, undefined, 'overlay not exported');
+  });
+
 
   test('toDatalessObject', function() {
     ok(typeof canvas.toDatalessObject == 'function');

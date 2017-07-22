@@ -802,6 +802,12 @@
     equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
   });
 
+  test('space wrap attribute', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+    iText.enterEditing();
+    equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
+  });
+
   // test('measuring width of words', function () {
   //   var ctx = canvas.getContext('2d');
   //   var text = 'test foo bar';
