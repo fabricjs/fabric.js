@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.16"
+    version: "1.7.17"
 };
 
 if (typeof exports !== "undefined") {
@@ -1101,13 +1101,16 @@ fabric.CommonMethods = {
     var shouldUseAddListenerRemoveListener = areHostMethods(fabric.document.documentElement, "addEventListener", "removeEventListener") && areHostMethods(fabric.window, "addEventListener", "removeEventListener"), shouldUseAttachEventDetachEvent = areHostMethods(fabric.document.documentElement, "attachEvent", "detachEvent") && areHostMethods(fabric.window, "attachEvent", "detachEvent"), listeners = {}, handlers = {}, addListener, removeListener;
     if (shouldUseAddListenerRemoveListener) {
         addListener = function(element, eventName, handler, options) {
-            element.addEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
+            element && element.addEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
         };
         removeListener = function(element, eventName, handler, options) {
-            element.removeEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
+            element && element.removeEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
         };
     } else if (shouldUseAttachEventDetachEvent) {
         addListener = function(element, eventName, handler) {
+            if (!element) {
+                return;
+            }
             var uid = getUniqueId(element);
             setElement(uid, element);
             if (!listeners[uid]) {
@@ -1121,6 +1124,9 @@ fabric.CommonMethods = {
             element.attachEvent("on" + eventName, listener.wrappedHandler);
         };
         removeListener = function(element, eventName, handler) {
+            if (!element) {
+                return;
+            }
             var uid = getUniqueId(element), listener;
             if (listeners[uid] && listeners[uid][eventName]) {
                 for (var i = 0, len = listeners[uid][eventName].length; i < len; i++) {
@@ -1134,6 +1140,9 @@ fabric.CommonMethods = {
         };
     } else {
         addListener = function(element, eventName, handler) {
+            if (!element) {
+                return;
+            }
             var uid = getUniqueId(element);
             if (!handlers[uid]) {
                 handlers[uid] = {};
@@ -1149,6 +1158,9 @@ fabric.CommonMethods = {
             handlers[uid][eventName].push(handler);
         };
         removeListener = function(element, eventName, handler) {
+            if (!element) {
+                return;
+            }
             var uid = getUniqueId(element);
             if (handlers[uid] && handlers[uid][eventName]) {
                 var handlersForEvent = handlers[uid][eventName];
@@ -3696,18 +3708,18 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return object;
         },
         __serializeBgOverlay: function(methodName, propertiesToInclude) {
-            var data = {};
+            var data = {}, bgImage = this.backgroundImage, overlay = this.overlayImage;
             if (this.backgroundColor) {
                 data.background = this.backgroundColor.toObject ? this.backgroundColor.toObject(propertiesToInclude) : this.backgroundColor;
             }
             if (this.overlayColor) {
                 data.overlay = this.overlayColor.toObject ? this.overlayColor.toObject(propertiesToInclude) : this.overlayColor;
             }
-            if (this.backgroundImage) {
-                data.backgroundImage = this._toObject(this.backgroundImage, methodName, propertiesToInclude);
+            if (bgImage && !bgImage.excludeFromExport) {
+                data.backgroundImage = this._toObject(bgImage, methodName, propertiesToInclude);
             }
-            if (this.overlayImage) {
-                data.overlayImage = this._toObject(this.overlayImage, methodName, propertiesToInclude);
+            if (overlay && !overlay.excludeFromExport) {
+                data.overlayImage = this._toObject(overlay, methodName, propertiesToInclude);
             }
             return data;
         },
@@ -3854,17 +3866,18 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             if (!object) {
                 return this;
             }
-            var activeGroup = this._activeGroup, i, obj, idx, newIdx, objs;
+            var activeGroup = this._activeGroup, i, obj, idx, newIdx, objs, objsMoved = 0;
             if (object === activeGroup) {
                 objs = activeGroup._objects;
                 for (i = 0; i < objs.length; i++) {
                     obj = objs[i];
                     idx = this._objects.indexOf(obj);
-                    if (idx !== 0) {
+                    if (idx > 0 + objsMoved) {
                         newIdx = idx - 1;
                         removeFromArray(this._objects, obj);
                         this._objects.splice(newIdx, 0, obj);
                     }
+                    objsMoved++;
                 }
             } else {
                 idx = this._objects.indexOf(object);
@@ -3897,17 +3910,18 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             if (!object) {
                 return this;
             }
-            var activeGroup = this._activeGroup, i, obj, idx, newIdx, objs;
+            var activeGroup = this._activeGroup, i, obj, idx, newIdx, objs, objsMoved = 0;
             if (object === activeGroup) {
                 objs = activeGroup._objects;
                 for (i = objs.length; i--; ) {
                     obj = objs[i];
                     idx = this._objects.indexOf(obj);
-                    if (idx !== this._objects.length - 1) {
+                    if (idx < this._objects.length - 1 - objsMoved) {
                         newIdx = idx + 1;
                         removeFromArray(this._objects, obj);
                         this._objects.splice(newIdx, 0, obj);
                     }
+                    objsMoved++;
                 }
             } else {
                 idx = this._objects.indexOf(object);
@@ -5146,7 +5160,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return this;
         },
         dispose: function() {
-            this.callSuper("dispose");
+            fabric.StaticCanvas.prototype.dispose.call(this);
             var wrapper = this.wrapperEl;
             this.removeListeners();
             wrapper.removeChild(this.upperCanvasEl);
@@ -6601,7 +6615,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return this;
         },
         remove: function() {
-            this.canvas && this.canvas.remove(this);
+            if (this.canvas) {
+                if (this.group && this.group === this.canvas._activeGroup) {
+                    this.group.remove(this);
+                }
+                this.canvas.remove(this);
+            }
             return this;
         },
         getLocalPointer: function(e, pointer) {
@@ -9165,8 +9184,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
     });
     fabric.Group.fromObject = function(object, callback) {
         fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-            delete object.objects;
-            callback && callback(new fabric.Group(enlivenedObjects, object, true));
+            var options = fabric.util.object.clone(object, true);
+            delete options.objects;
+            callback && callback(new fabric.Group(enlivenedObjects, options, true));
         });
     };
     fabric.Group.async = true;
@@ -10709,7 +10729,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _wrapSVGTextAndBg: function(markup, textAndBg) {
             var noShadow = true, filter = this.getSvgFilter(), style = filter === "" ? "" : ' style="' + filter + '"';
-            markup.push("\t<g ", this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"', style, ">\n", textAndBg.textBgRects.join(""), "\t\t<text ", this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, "'") + '" ' : "", this.fontSize ? 'font-size="' + this.fontSize + '" ' : "", this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : "", this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : "", this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : "", 'style="', this.getSvgStyles(noShadow), '" >\n', textAndBg.textSpans.join(""), "\t\t</text>\n", "\t</g>\n");
+            markup.push("\t<g ", this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"', style, ">\n", textAndBg.textBgRects.join(""), '\t\t<text xml:space="preserve" ', this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, "'") + '" ' : "", this.fontSize ? 'font-size="' + this.fontSize + '" ' : "", this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : "", this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : "", this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : "", 'style="', this.getSvgStyles(noShadow), '" >\n', textAndBg.textSpans.join(""), "\t\t</text>\n", "\t</g>\n");
+        },
+        getSvgStyles: function(skipShadow) {
+            var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
+            return svgStyle + " white-space: pre;";
         },
         _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
             var textSpans = [], textBgRects = [], height = 0;
@@ -12133,8 +12157,13 @@ fabric.util.object.extend(fabric.IText.prototype, {
     initHiddenTextarea: function() {
         this.hiddenTextarea = fabric.document.createElement("textarea");
         this.hiddenTextarea.setAttribute("autocapitalize", "off");
+        this.hiddenTextarea.setAttribute("autocorrect", "off");
+        this.hiddenTextarea.setAttribute("autocomplete", "off");
+        this.hiddenTextarea.setAttribute("spellcheck", "false");
+        this.hiddenTextarea.setAttribute("data-fabric-hiddentextarea", "");
+        this.hiddenTextarea.setAttribute("wrap", "off");
         var style = this._calcTextareaPosition();
-        this.hiddenTextarea.style.cssText = "white-space: nowrap; position: absolute; top: " + style.top + "; left: " + style.left + "; opacity: 0; width: 1px; height: 1px; z-index: -999;";
+        this.hiddenTextarea.style.cssText = "position: absolute; top: " + style.top + "; left: " + style.left + "; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;" + " line-height: 1px; paddingｰtop: " + style.fontSize + ";";
         fabric.document.body.appendChild(this.hiddenTextarea);
         fabric.util.addListener(this.hiddenTextarea, "keydown", this.onKeyDown.bind(this));
         fabric.util.addListener(this.hiddenTextarea, "keyup", this.onKeyUp.bind(this));
