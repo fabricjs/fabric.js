@@ -1859,7 +1859,12 @@
      * @chainable
      */
     remove: function() {
-      this.canvas && this.canvas.remove(this);
+      if (this.canvas) {
+        if (this.group && this.group === this.canvas._activeGroup) {
+          this.group.remove(this);
+        }
+        this.canvas.remove(this);
+      }
       return this;
     },
 
