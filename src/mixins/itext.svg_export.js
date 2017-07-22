@@ -41,7 +41,7 @@
         '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
           style, '>\n',
           textAndBg.textBgRects.join(''),
-          '\t\t<text ',
+          '\t\t<text xml:space="preserve" ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
@@ -210,6 +210,12 @@
         lineTop: lineTopOffset,
         offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
       };
+    },
+
+    getSvgStyles: function(skipShadow) {
+
+      var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
+      return svgStyle + ' white-space: pre;';
     },
   });
 })();

@@ -82,17 +82,20 @@
     /** @ignore */
     addListener = function (element, eventName, handler, options) {
       // since ie10 or ie9 can use addEventListener but they do not support options, i need to check
-      element.addEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
+      element && element.addEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
     };
     /** @ignore */
     removeListener = function (element, eventName, handler, options) {
-      element.removeEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
+      element && element.removeEventListener(eventName, handler, shouldUseAttachEventDetachEvent ? false : options);
     };
   }
 
   else if (shouldUseAttachEventDetachEvent) {
     /** @ignore */
     addListener = function (element, eventName, handler) {
+      if (!element) {
+        return;
+      }
       var uid = getUniqueId(element);
       setElement(uid, element);
       if (!listeners[uid]) {
@@ -108,6 +111,9 @@
     };
     /** @ignore */
     removeListener = function (element, eventName, handler) {
+      if (!element) {
+        return;
+      }
       var uid = getUniqueId(element), listener;
       if (listeners[uid] && listeners[uid][eventName]) {
         for (var i = 0, len = listeners[uid][eventName].length; i < len; i++) {
@@ -123,6 +129,9 @@
   else {
     /** @ignore */
     addListener = function (element, eventName, handler) {
+      if (!element) {
+        return;
+      }
       var uid = getUniqueId(element);
       if (!handlers[uid]) {
         handlers[uid] = { };
@@ -139,6 +148,9 @@
     };
     /** @ignore */
     removeListener = function (element, eventName, handler) {
+      if (!element) {
+        return;
+      }
       var uid = getUniqueId(element);
       if (handlers[uid] && handlers[uid][eventName]) {
         var handlersForEvent = handlers[uid][eventName];
