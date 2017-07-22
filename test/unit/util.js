@@ -731,10 +731,14 @@
 
   test('fabric.util.addListener', function() {
     ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
+    fabric.util.addListener(null, 'mouseup');
+    ok(true, 'test did not throw on null element addListener');
   });
 
   test('fabric.util.removeListener', function() {
     ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
+    fabric.util.removeListener(null, 'mouseup');
+    ok(true, 'test did not throw on null element removeListener');
   });
 
   test('fabric.util.drawDashedLine', function() {

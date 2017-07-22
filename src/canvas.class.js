@@ -1573,7 +1573,7 @@
      * @chainable
      */
     dispose: function () {
-      this.callSuper('dispose');
+      fabric.StaticCanvas.prototype.dispose.call(this);
       var wrapper = this.wrapperEl;
       this.removeListeners();
       wrapper.removeChild(this.upperCanvasEl);
