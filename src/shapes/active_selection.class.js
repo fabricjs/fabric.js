@@ -90,7 +90,7 @@
     },
 
     /**
-     * Returns string represenation of a group
+     * Returns string representation of a group
      * @return {String}
      */
     toString: function() {
