@@ -57,7 +57,7 @@
 
 
     /**
-     * Grayscale mode, between 'average', 'lighntess', 'luminosity'
+     * Grayscale mode, between 'average', 'lightness', 'luminosity'
      * @param {String} type
      * @default
      */
