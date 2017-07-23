@@ -36,7 +36,11 @@
 **Version 1.7.16**
 - improvement: added 2 percentage values to fabric.util.animate. [#4068](https://github.com/kangax/fabric.js/pull/4068)
 - Improvement: avoid multiplying identity matrices in calcTransformMatrix function
+<<<<<<< HEAD
 - Fix: activeGroup did not destroy correctly if a toObject was happening
+=======
+- Fix: ativeGroup did not destroy correctly if a toObject was happening
+>>>>>>> e6cb1369da5fcc61e3126d7c94f4cfed275c3a35
 - Improvement: Pass the event to object:modified when available. [#4061](https://github.com/kangax/fabric.js/pull/4061)
 
 
@@ -93,8 +97,13 @@
 
 **Version 1.7.9**
 
+<<<<<<< HEAD
 - Fix: Avoid textarea wrapping from chrome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
 - Fix: double click needed to move cursor when enterEditing is called programmatically [#3804](https://github.com/kangax/fabric.js/pull/3804)
+=======
+- Fix: Avoid textarea wrapping from chome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Fix: double click needed to move cursor when enterEditing is called programatically [#3804](https://github.com/kangax/fabric.js/pull/3804)
+>>>>>>> e6cb1369da5fcc61e3126d7c94f4cfed275c3a35
 - Fix: Style regression when inputing new style objects [#3804](https://github.com/kangax/fabric.js/pull/3804)
 - Add: try to support crossOrigin for svg image tags [#3804](https://github.com/kangax/fabric.js/pull/3804)
 
