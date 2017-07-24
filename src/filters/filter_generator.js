@@ -71,7 +71,7 @@
       matrix: matrices[key],
 
       /**
-       * Lock the matrix export for this kind of static, parameterless filters.
+       * Lock the matrix export for this kind of static, parameter less filters.
        */
       mainParameter: false,
       /**

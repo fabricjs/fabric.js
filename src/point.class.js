@@ -118,7 +118,7 @@
     },
 
     /**
-     * Miltiplies this point by a value and returns a new one
+     * Multiplies this point by a value and returns a new one
      * TODO: rename in scalarMultiply in 2.0
      * @param {Number} scalar
      * @return {fabric.Point}
@@ -128,7 +128,7 @@
     },
 
     /**
-     * Miltiplies this point by a value
+     * Multiplies this point by a value
      * TODO: rename in scalarMultiplyEquals in 2.0
      * @param {Number} scalar
      * @return {fabric.Point} thisArg

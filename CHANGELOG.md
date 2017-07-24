@@ -36,7 +36,7 @@
 **Version 1.7.16**
 - improvement: added 2 percentage values to fabric.util.animate. [#4068](https://github.com/kangax/fabric.js/pull/4068)
 - Improvement: avoid multiplying identity matrices in calcTransformMatrix function
-- Fix: ativeGroup did not destroy correctly if a toObject was happening
+- Fix: activeGroup did not destroy correctly if a toObject was happening
 - Improvement: Pass the event to object:modified when available. [#4061](https://github.com/kangax/fabric.js/pull/4061)
 
 
@@ -93,8 +93,8 @@
 
 **Version 1.7.9**
 
-- Fix: Avoid textarea wrapping from chome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
-- Fix: double click needed to move cursor when enterEditing is called programatically [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Fix: Avoid textarea wrapping from chrome v57+ [#3804](https://github.com/kangax/fabric.js/pull/3804)
+- Fix: double click needed to move cursor when enterEditing is called programmatically [#3804](https://github.com/kangax/fabric.js/pull/3804)
 - Fix: Style regression when inputing new style objects [#3804](https://github.com/kangax/fabric.js/pull/3804)
 - Add: try to support crossOrigin for svg image tags [#3804](https://github.com/kangax/fabric.js/pull/3804)
 
@@ -152,20 +152,20 @@
 - Fix: add 2 extra pixels to cache canvases to avoid aliasing cut [#3596](https://github.com/kangax/fabric.js/pull/3596)
 - Fix: Rerender when deselect an itext editing object [#3594](https://github.com/kangax/fabric.js/pull/3594)
 - Fix: save new state of dimensionProperties at every cache clear [#3595](https://github.com/kangax/fabric.js/pull/3595)
-- Improvement: Better error managment in loadFromJSON [#3586](https://github.com/kangax/fabric.js/pull/3586)
+- Improvement: Better error management in loadFromJSON [#3586](https://github.com/kangax/fabric.js/pull/3586)
 - Improvement: do not reload backgroundImage as an image if is different type [#3550](https://github.com/kangax/fabric.js/pull/3550)
 - Improvement: if a children element is set dirty, set the parent dirty as well. [#3564](https://github.com/kangax/fabric.js/pull/3564)
 
 **Version 1.7.2**
 
 - Fix: Textbox do not use stylemap for line wrapping [#3546](https://github.com/kangax/fabric.js/pull/3546)
-- Fix: Fix for firing object:modfied in macOS sierra [#3539](https://github.com/kangax/fabric.js/pull/3539)
+- Fix: Fix for firing object:modified in macOS sierra [#3539](https://github.com/kangax/fabric.js/pull/3539)
 - Fix: Itext with object caching was not refreshing selection correctly. [#3538](https://github.com/kangax/fabric.js/pull/3538)
 - Fix: stateful now works again with activeGroup and dinamyc swap between stateful false/true. [#3537](https://github.com/kangax/fabric.js/pull/3537)
 - Fix: includeDefaultValues was not applied to child objects of groups and path-groups. [#3497](https://github.com/kangax/fabric.js/pull/3497)
-- Fix: Itext style is cloned on paste action now, allow copie of styles to be independent. [#3502](https://github.com/kangax/fabric.js/pull/3502)
+- Fix: Itext style is cloned on paste action now, allow copy of styles to be independent. [#3502](https://github.com/kangax/fabric.js/pull/3502)
 - Fix: Add subclasses properties to cacheProperties. [#3490](https://github.com/kangax/fabric.js/pull/3490)
-- Add: Shift and Alt key used for transformations are now dinamic. [#3479](https://github.com/kangax/fabric.js/pull/3479)
+- Add: Shift and Alt key used for transformations are now dynamic. [#3479](https://github.com/kangax/fabric.js/pull/3479)
 - Fix: fix to polygon and cache. Added cacheProperties for all classes [#3490](https://github.com/kangax/fabric.js/pull/3490)
 
 **Version 1.7.1**
@@ -205,7 +205,7 @@
 
 - Fix: charspacing, do not get subzero with charwidth.
 - Improvement: add callback support to all object cloning. [#3212](https://github.com/kangax/fabric.js/pull/3212)
-- Improvement: add backgroundColor to all classe [#3248](https://github.com/kangax/fabric.js/pull/3248)
+- Improvement: add backgroundColor to all class [#3248](https://github.com/kangax/fabric.js/pull/3248)
 - Fix: add custom properties to backgroundImage and overlayImage [#3250](https://github.com/kangax/fabric.js/pull/3250)
 - Fix: Object intersection is calculated on boundingBox and boundingRect, intersection is fired if objects are overlapping [#3252](https://github.com/kangax/fabric.js/pull/3252)
 - Change: Restored previous selection behaviour, added key to selection active object under overlaid target [#3254](https://github.com/kangax/fabric.js/pull/3254)
@@ -277,7 +277,7 @@
 - Fix: Allow hoverCursor on non selectable objects, moveCursor does not appear if the object is not moveable.
 Added object.moveCursor to specify a cursor for moving per object. [#2924](https://github.com/kangax/fabric.js/pull/2924)
 - Fix: Add missing stroke.live translation, allow gradientTransform for dashed line. [#2926](https://github.com/kangax/fabric.js/pull/2926)
-- Improvement: Allow customization of keys that iteract with mouse action ( multiselect key, free tranform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
+- Improvement: Allow customization of keys that iteract with mouse action ( multiselect key, free transform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
 - Added: Make iText fires object:modified on text change on exit editing [#2927](https://github.com/kangax/fabric.js/pull/2927)
 - Added: [control customization part 1] cornerDashArray, borderDashArray. Now borderScaleFactor influences both border and controls, changed default corner size to 13 [#2932](https://github.com/kangax/fabric.js/pull/2932)
 - Fix: createSVGFontFacesMarkup was failing to retrieve fonts in style [#2935](https://github.com/kangax/fabric.js/pull/2935)
@@ -415,7 +415,7 @@ BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.rend
 
 **Edge**
 - Added image preserve aspect ratio attributes and functionality (fabric.Image.alignY, fabric.Image.alignY, fabric.Image.meetOrSlic )
-- Added ImageResizeFilters , option to resize dinamically or statically the images using a set of resize filter alghoritms.
+- Added ImageResizeFilters , option to resize dynamically or statically the images using a set of resize filter alghoritms.
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
