@@ -125,6 +125,8 @@ var filesToInclude = [
   'HEADER.js',
 
   ifSpecifiedInclude('gestures', 'lib/event.js'),
+  ifSpecifiedInclude('alignment', 'lib/aligning_guidelines.js'),
+  ifSpecifiedInclude('centering', 'lib/centering_guidelines.js'),
 
   'src/mixins/observable.mixin.js',
   'src/mixins/collection.mixin.js',
