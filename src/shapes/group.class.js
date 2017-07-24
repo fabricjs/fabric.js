@@ -92,7 +92,7 @@
         // i assume width and height are passed along options
         center || this._calcBounds();
         this._updateObjectsCoords(center);
-        delete options.centerPont;
+        delete options.centerPoint;
         this.callSuper('initialize', options);
       }
 
