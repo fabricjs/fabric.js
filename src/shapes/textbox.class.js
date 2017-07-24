@@ -100,7 +100,7 @@
         this._set('width', this.dynamicMinWidth);
       }
       if (this.textAlign === 'justify') {
-        // once text is misured we need to make space fatter to make justified text.
+        // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
       // clear cache and re-calculate height
@@ -330,7 +330,7 @@
 
     /**
     * Gets lines of text to render in the Textbox. This function calculates
-    * text wrapping on the fly everytime it is called.
+    * text wrapping on the fly every time it is called.
     * @param {String} text text to split
     * @returns {Array} Array of lines in the Textbox.
     * @override
