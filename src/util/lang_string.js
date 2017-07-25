@@ -43,7 +43,7 @@
   /**
    * Divide a string in the user perceived single units
    * @memberOf fabric.util.string
-   * @param {String} string String to escape
+   * @param {String} textstring String to escape
    * @return {Array} array containing the graphemes
    */
   function graphemeSplit(textstring) {
