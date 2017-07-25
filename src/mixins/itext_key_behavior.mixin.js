@@ -228,9 +228,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //do not cut-copy if no selection
       return;
     }
-    var selectedText = this.getSelectedText();
 
-    fabric.copiedText = selectedText;
+    fabric.copiedText = this.getSelectedText();
     fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
     this._copyDone = true;
   },
