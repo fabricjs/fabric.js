@@ -889,6 +889,7 @@
         }
         rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
         rules = rules.map(function(rule) { return rule.trim(); });
+        // eslint-disable-next-line no-loop-func
         rules.forEach(function(rule) {
 
           var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),

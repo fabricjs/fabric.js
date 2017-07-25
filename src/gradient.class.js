@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 (function() {
 
   /* _FROM_SVG_START_ */
