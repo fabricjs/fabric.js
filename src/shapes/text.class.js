@@ -424,7 +424,7 @@
       }
       var obj = this.styles, line, lineNum, charNum;
       for (lineNum in obj) {
-        var line = obj[lineNum];
+        line = obj[lineNum];
         for (charNum in line) {
           delete line[charNum][property];
           if (Object.keys(line[charNum]).length === 0) {
