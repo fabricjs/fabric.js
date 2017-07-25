@@ -1,10 +1,11 @@
+/* eslint-disable linebreak-style */
 (function() {
 
   /* _FROM_SVG_START_ */
   function getColorStop(el) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset') || 0,
-        color, colorAlpha, opacity;
+        color, colorAlpha, opacity, i;
 
     // convert percents to absolute values
     offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
@@ -16,7 +17,7 @@
         keyValuePairs.pop();
       }
 
-      for (var i = keyValuePairs.length; i--; ) {
+      for (i = keyValuePairs.length; i--; ) {
 
         var split = keyValuePairs[i].split(/\s*:\s*/),
             key = split[0].trim(),
@@ -171,7 +172,7 @@
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
-      var coords = clone(this.coords, true),
+      var coords = clone(this.coords, true), i,
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2;
       // colorStops must be sorted ascending
@@ -223,7 +224,7 @@
           // svg goes from internal to external radius. if radius are inverted, swap color stops.
           colorStops = colorStops.concat();
           colorStops.reverse();
-          for (var i = 0; i < colorStops.length; i++) {
+          for (i = 0; i < colorStops.length; i++) {
             colorStops[i].offset = 1 - colorStops[i].offset;
           }
         }
@@ -232,13 +233,13 @@
           // i have to shift all colorStops and add new one in 0.
           var maxRadius = Math.max(coords.r1, coords.r2),
               percentageShift = minRadius / maxRadius;
-          for (var i = 0; i < colorStops.length; i++) {
+          for (i = 0; i < colorStops.length; i++) {
             colorStops[i].offset += percentageShift * (1 - colorStops[i].offset);
           }
         }
       }
 
-      for (var i = 0; i < colorStops.length; i++) {
+      for (i = 0; i < colorStops.length; i++) {
         var colorStop = colorStops[i];
         markup.push(
           '<stop ',
@@ -261,7 +262,7 @@
      * @return {CanvasGradient}
      */
     toLive: function(ctx) {
-      var gradient, coords = fabric.util.object.clone(this.coords);
+      var gradient, coords = fabric.util.object.clone(this.coords), i;
 
       if (!this.type) {
         return;
@@ -276,7 +277,7 @@
           coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
       }
 
-      for (var i = 0, len = this.colorStops.length; i < len; i++) {
+      for (i = 0, len = this.colorStops.length; i < len; i++) {
         var color = this.colorStops[i].color,
             opacity = this.colorStops[i].opacity,
             offset = this.colorStops[i].offset;
@@ -344,7 +345,7 @@
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
           gradientTransform = el.getAttribute('gradientTransform'),
           colorStops = [],
-          coords, ellipseMatrix;
+          coords, ellipseMatrix, i;
 
       if (el.nodeName === 'linearGradient' || el.nodeName === 'LINEARGRADIENT') {
         type = 'linear';
@@ -360,7 +361,7 @@
         coords = getRadialCoords(el);
       }
 
-      for (var i = colorStopEls.length; i--; ) {
+      for (i = colorStopEls.length; i--; ) {
         colorStops.push(getColorStop(colorStopEls[i]));
       }
 
