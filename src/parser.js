@@ -1,3 +1,4 @@
+/* eslint-disable */
 (function(global) {
 
   'use strict';
@@ -88,7 +89,7 @@
       }
     }
     else if (attr === 'visible') {
-      value = (!(value === 'none' || value === 'hidden'));
+      value = value !== 'none' && value !== 'hidden';
       // display=none on parent element always takes precedence over child element
       if (parentAttributes && parentAttributes.visible === false) {
         value = false;
@@ -142,8 +143,8 @@
    * @private
    */
   function _getMultipleNodes(doc, nodeNames) {
-    var nodeName, nodeArray = [], nodeList;
-    for (var i = 0; i < nodeNames.length; i++) {
+    var nodeName, nodeArray = [], nodeList, i;
+    for (i = 0; i < nodeNames.length; i++) {
       nodeName = nodeNames[i];
       nodeList = doc.getElementsByTagName(nodeName);
       nodeArray = nodeArray.concat(Array.prototype.slice.call(nodeList));
@@ -388,7 +389,7 @@
   function selectorMatches(element, selector) {
     var nodeName = element.nodeName,
         classNames = element.getAttribute('class'),
-        id = element.getAttribute('id'), matcher;
+        id = element.getAttribute('id'), matcher, i;
     // i check if a selector matches slicing away part from it.
     // if i get empty string i should match
     matcher = new RegExp('^' + nodeName, 'i');
@@ -399,7 +400,7 @@
     }
     if (classNames && selector.length) {
       classNames = classNames.split(' ');
-      for (var i = classNames.length; i--;) {
+      for (i = classNames.length; i--;) {
         matcher = new RegExp('\\.' + classNames[i] + '(?![a-zA-Z\\-]+)', 'i');
         selector = selector.replace(matcher, '');
       }
@@ -612,7 +613,7 @@
 
     parseUseDirectives(doc);
 
-    var svgUid =  fabric.Object.__uid++,
+    var svgUid =  fabric.Object.__uid++, i,
         options = applyViewboxTransform(doc),
         descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
     options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
@@ -623,7 +624,7 @@
       // https://github.com/ajaxorg/node-o3-xml/issues/21
       descendants = doc.selectNodes('//*[name(.)!="svg"]');
       var arr = [];
-      for (var i = 0, len = descendants.length; i < len; i++) {
+      for (i = 0, len = descendants.length; i < len; i++) {
         arr[i] = descendants[i];
       }
       descendants = arr;
@@ -874,11 +875,11 @@
      * @return {Object} CSS rules of this document
      */
     getCSSRules: function(doc) {
-      var styles = doc.getElementsByTagName('style'),
+      var styles = doc.getElementsByTagName('style'), i, len,
           allRules = { }, rules;
 
       // very crude parsing of style contents
-      for (var i = 0, len = styles.length; i < len; i++) {
+      for (i = 0, len = styles.length; i < len; i++) {
         // IE9 doesn't support textContent, but provides text instead.
         var styleContents = styles[i].textContent || styles[i].text;
 
@@ -895,7 +896,7 @@
               ruleObj = { }, declaration = match[2].trim(),
               propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
-          for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
+          for (i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
                 property = pair[0],
                 value = pair[1];
