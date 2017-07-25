@@ -88,7 +88,7 @@
       }
     }
     else if (attr === 'visible') {
-      value = (value === 'none' || value === 'hidden') ? false : true;
+      value = (!(value === 'none' || value === 'hidden'));
       // display=none on parent element always takes precedence over child element
       if (parentAttributes && parentAttributes.visible === false) {
         value = false;
