@@ -168,7 +168,7 @@
       if (this.intersectsWithRect(pointTL, pointBR, true)) {
         return true;
       }
-      // worst case scenario the object is so big that contanins the screen
+      // worst case scenario the object is so big that contains the screen
       var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
       if (this.containsPoint(centerPoint, null, true)) {
         return true;
