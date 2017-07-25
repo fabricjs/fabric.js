@@ -612,7 +612,7 @@
 
     parseUseDirectives(doc);
 
-    var svgUid =  fabric.Object.__uid++, i,
+    var svgUid =  fabric.Object.__uid++, i, len,
         options = applyViewboxTransform(doc),
         descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
     options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
