@@ -230,6 +230,4 @@
 
   fabric.util.getPointer = getPointer;
 
-  fabric.util.object.extend(fabric.util, fabric.Observable);
-
 })();
