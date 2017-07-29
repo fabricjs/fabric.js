@@ -48,7 +48,7 @@
    */
   function graphemeSplit(textstring) {
     var i = 0, graphemes = [];
-    for (var i = 0, chr; i < textstring.length; i++) {
+    for (i = 0, chr; i < textstring.length; i++) {
       if ((chr = getWholeChar(textstring, i)) === false) {
         continue;
       }

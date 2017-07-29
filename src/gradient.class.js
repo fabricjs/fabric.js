@@ -171,7 +171,7 @@
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object) {
-      var coords = clone(this.coords, true), i,
+      var coords = clone(this.coords, true), i, len,
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2;
       // colorStops must be sorted ascending
@@ -223,7 +223,7 @@
           // svg goes from internal to external radius. if radius are inverted, swap color stops.
           colorStops = colorStops.concat();
           colorStops.reverse();
-          for (i = 0; i < colorStops.length; i++) {
+          for (i = 0, len = colorStops.length; i < len; i++) {
             colorStops[i].offset = 1 - colorStops[i].offset;
           }
         }
@@ -232,13 +232,13 @@
           // i have to shift all colorStops and add new one in 0.
           var maxRadius = Math.max(coords.r1, coords.r2),
               percentageShift = minRadius / maxRadius;
-          for (i = 0; i < colorStops.length; i++) {
+          for (i = 0, len = colorStops.length; i < len; i++) {
             colorStops[i].offset += percentageShift * (1 - colorStops[i].offset);
           }
         }
       }
 
-      for (i = 0; i < colorStops.length; i++) {
+      for (i = 0, len = colorStops.length; i < len; i++) {
         var colorStop = colorStops[i];
         markup.push(
           '<stop ',
