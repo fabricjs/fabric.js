@@ -77,7 +77,7 @@
           data = imageData.data, i, len = data.length,
           noise = this.noise, rand;
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
+      for (i = 0, len = data.length; i < len; i += 4) {
 
         rand = (0.5 - Math.random()) * noise;
 

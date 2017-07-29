@@ -1434,7 +1434,7 @@
         currentActiveObject && currentActiveObject.fire('deselected', { e: e });
         this.fire('object:selected', { target: object, e: e });
         object.fire('selected', { e: e });
-      };
+      }
       return this;
     },
 
