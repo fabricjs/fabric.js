@@ -276,11 +276,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
-          filtered = true;
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
-          '\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(filtered),
+          '\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(true),
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -318,6 +317,9 @@
     getSrc: function(filtered) {
       var element = filtered ? this._element : this._originalElement;
       if (element) {
+        if (element.toDataURL) {
+          return element.toDataURL();
+        }
         return fabric.isLikelyNode ? element._src : element.src;
       }
       else {

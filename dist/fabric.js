@@ -4325,7 +4325,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     },
 
     /**
-     * Miltiplies this point by a value and returns a new one
+     * Multiplies this point by a value and returns a new one
      * TODO: rename in scalarMultiply in 2.0
      * @param {Number} scalar
      * @return {fabric.Point}
@@ -4335,7 +4335,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     },
 
     /**
-     * Miltiplies this point by a value
+     * Multiplies this point by a value
      * TODO: rename in scalarMultiplyEquals in 2.0
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
@@ -5018,34 +5018,162 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    */
   fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
 
-  // TODO extend to the svg 1.0 color aka css3 colors.
-
   /**
-   * Map of the 17 basic color names with HEX code
+   * Map of the 148 color names with HEX code
    * @static
    * @field
    * @memberOf fabric.Color
-   * @see: http://www.w3.org/TR/CSS2/syndata.html#color-units
+   * @see: https://www.w3.org/TR/css3-color/#svg-color
    */
   fabric.Color.colorNameMap = {
-    aqua:      '#00FFFF',
-    black:     '#000000',
-    blue:      '#0000FF',
-    fuchsia:   '#FF00FF',
-    gray:      '#808080',
-    grey:      '#808080',
-    green:     '#008000',
-    lime:      '#00FF00',
-    maroon:    '#800000',
-    navy:      '#000080',
-    olive:     '#808000',
-    orange:    '#FFA500',
-    purple:    '#800080',
-    red:       '#FF0000',
-    silver:    '#C0C0C0',
-    teal:      '#008080',
-    white:     '#FFFFFF',
-    yellow:    '#FFFF00'
+    aliceblue:            '#F0F8FF',
+    antiquewhite:         '#FAEBD7',
+    aqua:                 '#00FFFF',
+    aquamarine:           '#7FFFD4',
+    azure:                '#F0FFFF',
+    beige:                '#F5F5DC',
+    bisque:               '#FFE4C4',
+    black:                '#000000',
+    blanchedalmond:       '#FFEBCD',
+    blue:                 '#0000FF',
+    blueviolet:           '#8A2BE2',
+    brown:                '#A52A2A',
+    burlywood:            '#DEB887',
+    cadetblue:            '#5F9EA0',
+    chartreuse:           '#7FFF00',
+    chocolate:            '#D2691E',
+    coral:                '#FF7F50',
+    cornflowerblue:       '#6495ED',
+    cornsilk:             '#FFF8DC',
+    crimson:              '#DC143C',
+    cyan:                 '#00FFFF',
+    darkblue:             '#00008B',
+    darkcyan:             '#008B8B',
+    darkgoldenrod:        '#B8860B',
+    darkgray:             '#A9A9A9',
+    darkgrey:             '#A9A9A9',
+    darkgreen:            '#006400',
+    darkkhaki:            '#BDB76B',
+    darkmagenta:          '#8B008B',
+    darkolivegreen:       '#556B2F',
+    darkorange:           '#FF8C00',
+    darkorchid:           '#9932CC',
+    darkred:              '#8B0000',
+    darksalmon:           '#E9967A',
+    darkseagreen:         '#8FBC8F',
+    darkslateblue:        '#483D8B',
+    darkslategray:        '#2F4F4F',
+    darkslategrey:        '#2F4F4F',
+    darkturquoise:        '#00CED1',
+    darkviolet:           '#9400D3',
+    deeppink:             '#FF1493',
+    deepskyblue:          '#00BFFF',
+    dimgray:              '#696969',
+    dimgrey:              '#696969',
+    dodgerblue:           '#1E90FF',
+    firebrick:            '#B22222',
+    floralwhite:          '#FFFAF0',
+    forestgreen:          '#228B22',
+    fuchsia:              '#FF00FF',
+    gainsboro:            '#DCDCDC',
+    ghostwhite:           '#F8F8FF',
+    gold:                 '#FFD700',
+    goldenrod:            '#DAA520',
+    gray:                 '#808080',
+    grey:                 '#808080',
+    green:                '#008000',
+    greenyellow:          '#ADFF2F',
+    honeydew:             '#F0FFF0',
+    hotpink:              '#FF69B4',
+    indianred:            '#CD5C5C',
+    indigo:               '#4B0082',
+    ivory:                '#FFFFF0',
+    khaki:                '#F0E68C',
+    lavender:             '#E6E6FA',
+    lavenderblush:        '#FFF0F5',
+    lawngreen:            '#7CFC00',
+    lemonchiffon:         '#FFFACD',
+    lightblue:            '#ADD8E6',
+    lightcoral:           '#F08080',
+    lightcyan:            '#E0FFFF',
+    lightgoldenrodyellow: '#FAFAD2',
+    lightgray:            '#D3D3D3',
+    lightgrey:            '#D3D3D3',
+    lightgreen:           '#90EE90',
+    lightpink:            '#FFB6C1',
+    lightsalmon:          '#FFA07A',
+    lightseagreen:        '#20B2AA',
+    lightskyblue:         '#87CEFA',
+    lightslategray:       '#778899',
+    lightslategrey:       '#778899',
+    lightsteelblue:       '#B0C4DE',
+    lightyellow:          '#FFFFE0',
+    lime:                 '#00FF00',
+    limegreen:            '#32CD32',
+    linen:                '#FAF0E6',
+    magenta:              '#FF00FF',
+    maroon:               '#800000',
+    mediumaquamarine:     '#66CDAA',
+    mediumblue:           '#0000CD',
+    mediumorchid:         '#BA55D3',
+    mediumpurple:         '#9370DB',
+    mediumseagreen:       '#3CB371',
+    mediumslateblue:      '#7B68EE',
+    mediumspringgreen:    '#00FA9A',
+    mediumturquoise:      '#48D1CC',
+    mediumvioletred:      '#C71585',
+    midnightblue:         '#191970',
+    mintcream:            '#F5FFFA',
+    mistyrose:            '#FFE4E1',
+    moccasin:             '#FFE4B5',
+    navajowhite:          '#FFDEAD',
+    navy:                 '#000080',
+    oldlace:              '#FDF5E6',
+    olive:                '#808000',
+    olivedrab:            '#6B8E23',
+    orange:               '#FFA500',
+    orangered:            '#FF4500',
+    orchid:               '#DA70D6',
+    palegoldenrod:        '#EEE8AA',
+    palegreen:            '#98FB98',
+    paleturquoise:        '#AFEEEE',
+    palevioletred:        '#DB7093',
+    papayawhip:           '#FFEFD5',
+    peachpuff:            '#FFDAB9',
+    peru:                 '#CD853F',
+    pink:                 '#FFC0CB',
+    plum:                 '#DDA0DD',
+    powderblue:           '#B0E0E6',
+    purple:               '#800080',
+    rebeccapurple:        '#663399',
+    red:                  '#FF0000',
+    rosybrown:            '#BC8F8F',
+    royalblue:            '#4169E1',
+    saddlebrown:          '#8B4513',
+    salmon:               '#FA8072',
+    sandybrown:           '#F4A460',
+    seagreen:             '#2E8B57',
+    seashell:             '#FFF5EE',
+    sienna:               '#A0522D',
+    silver:               '#C0C0C0',
+    skyblue:              '#87CEEB',
+    slateblue:            '#6A5ACD',
+    slategray:            '#708090',
+    slategrey:            '#708090',
+    snow:                 '#FFFAFA',
+    springgreen:          '#00FF7F',
+    steelblue:            '#4682B4',
+    tan:                  '#D2B48C',
+    teal:                 '#008080',
+    thistle:              '#D8BFD8',
+    tomato:               '#FF6347',
+    turquoise:            '#40E0D0',
+    violet:               '#EE82EE',
+    wheat:                '#F5DEB3',
+    white:                '#FFFFFF',
+    whitesmoke:           '#F5F5F5',
+    yellow:               '#FFFF00',
+    yellowgreen:          '#9ACD32'
   };
 
   /**
@@ -8583,7 +8711,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     centeredRotation:       false,
 
     /**
-     * Indicates which key enable centered Transfrom
+     * Indicates which key enable centered Transform
      * values: 'altKey', 'shiftKey', 'ctrlKey'.
      * If `null` or 'none' or any other string that is not a modifier key
      * feature is disabled feature disabled.
@@ -9687,7 +9815,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, normalizedPointer, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
-      // untill we call this function specifically to search inside the activeGroup
+      // until we call this function specifically to search inside the activeGroup
       while (i--) {
         if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
@@ -9844,7 +9972,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Copys the the entire inline style from one element (fromEl) to another (toEl)
+     * Copy the entire inline style from one element (fromEl) to another (toEl)
      * @private
      * @param {Element} fromEl Element style is copied from
      * @param {Element} toEl Element copied style is applied to
@@ -9967,7 +10095,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * Discards currently active object and fire events. If the function is called by fabric
-     * as a consequence of a mouse event, the event is passed as a parmater and
+     * as a consequence of a mouse event, the event is passed as a parameter and
      * sent to the fire function for the custom events. When used as a method the
      * e param does not have any application.
      * @param {event} e
@@ -17591,7 +17719,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // i assume width and height are passed along options
         center || this._calcBounds();
         this._updateObjectsCoords(center);
-        delete options.centerPont;
+        delete options.centerPoint;
         this.callSuper('initialize', options);
       }
 
@@ -18134,7 +18262,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Returns string represenation of a group
+     * Returns string representation of a group
      * @return {String}
      */
     toString: function() {
@@ -18515,11 +18643,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
-          filtered = true;
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
-          '\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(filtered),
+          '\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(true),
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -18557,6 +18684,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     getSrc: function(filtered) {
       var element = filtered ? this._element : this._originalElement;
       if (element) {
+        if (element.toDataURL) {
+          return element.toDataURL();
+        }
         return fabric.isLikelyNode ? element._src : element.src;
       }
       else {
@@ -19399,7 +19529,7 @@ function copyGLTo2DPutImageData(gl, targetCanvas) {
     /**
      * Experimental. This object is a sort of repository of help layers used to avoid
      * of recreating them during frequent filtering. If you are previewing a filter with
-     * a slider you problably do not want to create help layers every filter step.
+     * a slider you probably do not want to create help layers every filter step.
      * in this object there will be appended some canvases, created once, resized sometimes
      * cleared never. Clearing is left to the developer.
      **/
@@ -20466,7 +20596,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 
     /**
-     * Grayscale mode, between 'average', 'lighntess', 'luminosity'
+     * Grayscale mode, between 'average', 'lightness', 'luminosity'
      * @param {String} type
      * @default
      */
@@ -21174,7 +21304,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       matrix: matrices[key],
 
       /**
-       * Lock the matrix export for this kind of static, parameterless filters.
+       * Lock the matrix export for this kind of static, parameter less filters.
        */
       mainParameter: false,
       /**
@@ -23563,10 +23693,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * measure and return the width of a single character.
-     * possibly overridden to accomodate differente measure logic or
+     * possibly overridden to accommodate different measure logic or
      * to hook some external lib for character measurement
      * @private
-     * @param {String} char char to be measured
+     * @param {String} char to be measured
      * @param {Object} charStyle style of char to be measured
      * @param {String} [previousChar] previous char
      * @param {Object} [prevCharStyle] style of previous char
@@ -23662,7 +23792,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
-      // to simplify cursor handling in interactive mdoe.
+      // to simplify cursor handling in interactive mode.
       lineBounds[i] = {
         left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
@@ -23872,7 +24002,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Number} lineIndex
-     * @param {Number} i
+     * @param {Number} charIndex
      * @param {String} _char
      * @param {Number} left Left coordinate
      * @param {Number} top Top coordinate
@@ -23957,7 +24087,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * Measure a single line given its index. Used to calculate the initial
-     * text bouding box. The values are calculated and stored in __lineWidths cache.
+     * text bounding box. The values are calculated and stored in __lineWidths cache.
      * @private
      * @param {Number} lineIndex line number
      * @return {Number} Line width
@@ -26936,7 +27066,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this._set('width', this.dynamicMinWidth);
       }
       if (this.textAlign === 'justify') {
-        // once text is misured we need to make space fatter to make justified text.
+        // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
       // clear cache and re-calculate height
@@ -27166,7 +27296,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     /**
     * Gets lines of text to render in the Textbox. This function calculates
-    * text wrapping on the fly everytime it is called.
+    * text wrapping on the fly every time it is called.
     * @param {String} text text to split
     * @returns {Array} Array of lines in the Textbox.
     * @override
