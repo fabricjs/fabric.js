@@ -819,6 +819,9 @@
      */
     renderAll: function () {
       var canvasToDrawOn = this.contextContainer;
+      if (this.rendering) {
+        fabric.window.cancelAnimationFrame(this.rendering);
+      }
       this.renderCanvas(canvasToDrawOn, this._objects);
       return this;
     },
@@ -830,8 +833,8 @@
      * @chainable
      */
     renderAndReset: function() {
+      this.isRendering = 0;
       this.renderAll();
-      this.isRendering = false;
     },
 
     /**
@@ -842,8 +845,7 @@
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
-        this.isRendering = true;
-        fabric.util.requestAnimFrame(this.renderAndResetBound);
+        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
       }
       return this;
     },

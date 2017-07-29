@@ -404,6 +404,7 @@
       var objects = this._objects, canvas = this.canvas;
       this._objects = [];
       var options = this.toObject();
+      delete options.objects;
       var activeSelection = new fabric.ActiveSelection([]);
       activeSelection.set(options);
       activeSelection.type = 'activeSelection';
@@ -413,6 +414,7 @@
         object.dirty = true;
         canvas.add(object);
       });
+      activeSelection.canvas = canvas;
       activeSelection._objects = objects;
       canvas._activeObject = activeSelection;
       activeSelection.setCoords();
