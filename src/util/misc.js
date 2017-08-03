@@ -686,5 +686,4 @@
       return Math.max(destination.width / source.width, destination.height / source.height);
     }
   };
-  fabric.util.object.extend(fabric.util, fabric.Observable);
 })(typeof exports !== 'undefined' ? exports : this);
