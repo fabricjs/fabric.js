@@ -543,7 +543,8 @@
         target = this._activeObject;
       }
 
-      if (this.selection && (!target || (!target.selectable && !target.isEditing))) {
+      if (this.selection && (!target ||
+        (!target.selectable && !target.isEditing && target !== this._activeObject))) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -553,15 +554,12 @@
       }
 
       if (target) {
-        if (target.selectable && (target.__corner || !shouldGroup)) {
+        if ((target.selectable || target === this._activeObject) && (target.__corner || !shouldGroup)) {
           this._beforeTransform(e, target);
           this._setupCurrentTransform(e, target);
         }
         if (target.selectable) {
           this.setActiveObject(target, e);
-        }
-        else {
-          this.discardActiveObject();
         }
       }
       this._handleEvent(e, 'down', target ? target : null);

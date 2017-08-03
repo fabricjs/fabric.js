@@ -1812,12 +1812,17 @@
     rect.selectable = false;
     canvas.__onMouseUp(e);
     canvas.__onMouseDown(e);
-    deepEqual(canvas._groupSelector, expectedGroupSelector, 'with object non selectable groupSelector is started');
+    deepEqual(canvas._groupSelector, null, 'with object non selectable but already selected groupSelector is not started');
     canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
     rect.isEditing = true;
-    canvas.__onMouseUp(e);
     canvas.__onMouseDown(e);
     deepEqual(canvas._groupSelector, null, 'with object editing, groupSelector is not started');
+    canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
+    rect.isEditing = false;
+    canvas.__onMouseDown(e);
+    deepEqual(canvas._groupSelector, expectedGroupSelector, 'a new groupSelector is created');
     canvas.__onMouseUp(e);
   });
 

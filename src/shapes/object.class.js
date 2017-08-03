@@ -546,6 +546,16 @@
     dirty:                true,
 
     /**
+     * keeps the value of the last hovered coner during mouse move.
+     * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
+     * It should be private, but there is no harm in using it as
+     * a read-only property.
+     * @type number|string|any
+     * @default 0
+     */
+    __corner: 0,
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
