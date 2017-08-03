@@ -58,5 +58,5 @@
     extend: extend,
     clone: clone
   };
-
+  fabric.util.object.extend(fabric.util, fabric.Observable);
 })();
