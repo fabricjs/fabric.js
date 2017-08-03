@@ -762,7 +762,9 @@
      * @param {Array} copiedStyle array of style objecs
      */
     insertCharStyleObject: function(lineIndex, charIndex, quantity, copiedStyle) {
-
+      if (!this.styles) {
+        this.styles = {};
+      }
       var currentLineStyles       = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
@@ -780,13 +782,13 @@
         }
       }
       this._forceClearCache = true;
-      if (!currentLineStyles) {
-        return;
-      }
       if (copiedStyle) {
         while (quantity--) {
           this.styles[lineIndex][charIndex + quantity] = clone(copiedStyle[quantity]);
         }
+        return;
+      }
+      if (!currentLineStyles) {
         return;
       }
       var newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
