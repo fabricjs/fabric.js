@@ -560,9 +560,6 @@
         if (target.selectable) {
           this.setActiveObject(target, e);
         }
-        else {
-          this.discardActiveObject();
-        }
       }
       this._handleEvent(e, 'down', target ? target : null);
       // we must renderAll so that we update the visuals
