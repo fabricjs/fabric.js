@@ -31,7 +31,6 @@
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
-      options = options || { };
 
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
