@@ -252,7 +252,6 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-        originX:          'left'
       });
 
       deepEqual(textWithAttrs.toObject(), expectedObject);

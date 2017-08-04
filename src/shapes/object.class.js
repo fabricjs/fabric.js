@@ -1313,7 +1313,7 @@
      * @return {thisArg}
      */
     _removeTransformMatrix: function() {
-      var center = this._findCenterFromElement();
+      var center = this._findCenterFromElement(), fixedCenter;
       if (this.transformMatrix) {
         var options = fabric.util.qrDecompose(this.transformMatrix);
         this.flipX = false;
@@ -1325,8 +1325,9 @@
         this.skewY = 0;
         center = fabric.util.transformPoint(center, this.transformMatrix);
       }
+      fixedCenter = this.translateToGivenOrigin(center, 'left', 'top', this.originX, this.originY);
       this.transformMatrix = null;
-      this.setPositionByOrigin(center, 'center', 'center');
+      this.setPositionByOrigin(fixedCenter, 'center', 'center');
     },
 
     /**
