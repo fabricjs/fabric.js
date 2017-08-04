@@ -41,7 +41,7 @@
         'stroke-opacity':     'strokeOpacity',
         'stroke-width':       'strokeWidth',
         'text-decoration':    'textDecoration',
-        'text-anchor':        'originX',
+        'text-anchor':        'textAnchor',
         opacity:              'opacity'
       },
 
@@ -100,7 +100,7 @@
         value *= parentAttributes.opacity;
       }
     }
-    else if (attr === 'originX' /* text-anchor */) {
+    else if (attr === 'textAnchor' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
     else {

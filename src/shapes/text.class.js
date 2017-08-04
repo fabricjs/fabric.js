@@ -1410,7 +1410,8 @@
       return callback(null);
     }
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES),
+        parsedAnchor = parsedAttributes.textAnchor || 'left';
     options = fabric.util.object.extend((options ? clone(options) : { }), parsedAttributes);
 
     options.top = options.top || 0;
@@ -1436,10 +1437,6 @@
     }
     if (!('fontSize' in options)) {
       options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
-    }
-
-    if (!options.originX) {
-      options.originX = 'left';
     }
 
     var textContent = '';
@@ -1471,18 +1468,16 @@
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (text.originX === 'center') {
+    if (parsedAnchor === 'center') {
       offX = text.getScaledWidth() / 2;
     }
-    if (text.originX === 'right') {
+    if (parsedAnchor === 'right') {
       offX = text.getScaledWidth();
     }
     text.set({
       left: text.left - offX,
       top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
     });
-    text.originX = 'left';
-    text.originY = 'top';
     callback(text);
   };
   /* _FROM_SVG_END_ */

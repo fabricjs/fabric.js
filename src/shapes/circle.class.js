@@ -202,8 +202,8 @@
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.radius;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
-    parsedAttributes.originX = 'left';
-    parsedAttributes.originY = 'top';
+    // parsedAttributes.originX = 'left';
+    // parsedAttributes.originY = 'top';
     callback(new fabric.Circle(extend(parsedAttributes, options)));
   };
 

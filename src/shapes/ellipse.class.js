@@ -178,8 +178,8 @@
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    parsedAttributes.originX = 'left';
-    parsedAttributes.originY = 'top';
+    // parsedAttributes.originX = 'left';
+    // parsedAttributes.originY = 'top';
     callback(new fabric.Ellipse(extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
