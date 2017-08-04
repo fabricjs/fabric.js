@@ -30,7 +30,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   fragmentSource: 'precision highp float;\n' +
     'varying vec2 vTexCoord;\n' +
-    'uniform sampler2d uTexture;\n' +
+    'uniform sampler2D uTexture;\n' +
     'void main() {\n' +
       'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
     '}',
