@@ -15,10 +15,10 @@
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
-    onDeselect: function() {
+    onDeselect: function(options) {
       this.isEditing && this.exitEditing();
       this.selected = false;
-      this.callSuper('onDeselect');
+      fabric.Object.prototype.onDeselect.call(this, options);
     },
 
     /**

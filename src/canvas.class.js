@@ -25,7 +25,6 @@
    *
    * @fires before:selection:cleared
    * @fires selection:cleared
-   * @fires selection:created
    *
    * @fires path:created
    * @fires mouse:down
@@ -1430,7 +1429,7 @@
       if (object === currentActiveObject) {
         return this;
       }
-      if (this._setActiveObject(object)) {
+      if (this._setActiveObject(object, e)) {
         currentActiveObject && currentActiveObject.fire('deselected', { e: e });
         this.fire('object:selected', { target: object, e: e });
         object.fire('selected', { e: e });
@@ -1440,14 +1439,15 @@
 
     /**
      * @private
-     * @param {Object} object
+     * @param {Object} object to set as active
+     * @param {Event} [e] Event (passed along when firing "object:selected")
      */
-    _setActiveObject: function(object) {
+    _setActiveObject: function(object, e) {
       var active = this._activeObject;
-      if (active === object) {
+      if (active === object || object.onSelect({ e: e })) {
         return false;
       }
-      if (this._discardActiveObject()) {
+      if (this._discardActiveObject(e)) {
         this._activeObject = object;
         object.set('active', true);
         return true;
@@ -1458,11 +1458,11 @@
     /**
      * @private
      */
-    _discardActiveObject: function() {
+    _discardActiveObject: function(e) {
       var obj = this._activeObject;
       if (obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
         // onDeselect return TRUE to cancel selection;
-        if (obj.onDeselect()) {
+        if (obj.onDeselect({ e: e })) {
           return false;
         }
         obj.set('active', false);
@@ -1484,7 +1484,7 @@
       var activeObject = this._activeObject;
       if (activeObject) {
         this.fire('before:selection:cleared', { target: activeObject, e: e });
-        if (this._discardActiveObject()) {
+        if (this._discardActiveObject(e)) {
           this.fire('selection:cleared', { e: e });
           activeObject.fire('deselected', { e: e });
         }
