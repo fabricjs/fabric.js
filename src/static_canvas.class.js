@@ -475,13 +475,13 @@
     /**
      * @private
      */
-    _createCanvasElement: function(canvasEl) {
-      var element = fabric.util.createCanvasElement(canvasEl);
-      if (!element.style) {
-        element.style = { };
-      }
+    _createCanvasElement: function() {
+      var element = fabric.util.createCanvasElement();
       if (!element) {
         throw CANVAS_INIT_ERROR;
+      }
+      if (!element.style) {
+        element.style = { };
       }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
@@ -518,7 +518,12 @@
      * @param {HTMLElement} [canvasEl]
      */
     _createLowerCanvas: function (canvasEl) {
-      this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement(canvasEl);
+      if (typeof canvasEl === 'HTMLCanvasElement') {
+        this.lowerCanvasEl = canvasEl;
+      }
+      else {
+        this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+      }
 
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
 

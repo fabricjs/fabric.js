@@ -466,16 +466,13 @@
     },
 
     /**
-     * Creates canvas element and initializes it via excanvas if necessary
+     * Creates canvas element
      * @static
      * @memberOf fabric.util
-     * @param {CanvasElement} [canvasEl] optional canvas element to initialize;
-     * when not given, element is created implicitly
      * @return {CanvasElement} initialized canvas element
      */
-    createCanvasElement: function(canvasEl) {
-      canvasEl || (canvasEl = fabric.document.createElement('canvas'));
-      return canvasEl;
+    createCanvasElement: function() {
+      return fabric.document.createElement('canvas');
     },
 
     /**
