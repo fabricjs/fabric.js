@@ -584,14 +584,6 @@
     });
   }
 
-  test('fabric.util.request', function() {
-    ok(typeof fabric.util.request === 'function', 'fabric.util.request is a function');
-  });
-
-  test('fabric.util.getPointer', function() {
-    ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
-  });
-
   test('fabric.util.addListener', function() {
     ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
     fabric.util.addListener(null, 'mouseup');
@@ -797,16 +789,37 @@
     deepEqual(m3, [-2, 1, 1.5, -0.5, 1, -2]);
   });
 
+  test('fabric.util.request', function() {
+    ok(typeof fabric.util.request === 'function', 'fabric.util.request is a function');
+  });
+
+  test('fabric.util.getPointer', function() {
+    ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
+  });
+
   test('rotateVector', function() {
     ok(typeof fabric.util.rotateVector == 'function');
   });
 
   test('rotatePoint', function() {
     ok(typeof fabric.util.rotatePoint == 'function');
+    var origin = new fabric.Point(3, 0);
+    var point = new fabric.Point(4, 0);
+    var rotated = fabric.util.rotatePoint(point, origin, Math.PI);
+    equal(Math.round(rotated.x), 2);
+    equal(Math.round(rotated.y), 0);
+    var rotated = fabric.util.rotatePoint(point, origin, Math.PI / 2);
+    equal(Math.round(rotated.x), 3);
+    equal(Math.round(rotated.y), -2);
   });
 
   test('transformPoint', function() {
     ok(typeof fabric.util.transformPoint == 'function');
+    var point = new fabric.Point(2, 2);
+    var matrix = [3, 0, 0, 2, 10, 4];
+    var tp = fabric.util.transformPoint(point, matrix);
+    equal(Math.round(tp.x), 16);
+    equal(Math.round(tp.y), 8);
   });
 
   test('makeBoundingBoxFromPoints', function() {
@@ -823,19 +836,44 @@
   });
 
   test('createCanvasElement', function() {
-    ok(typeof fabric.util.createCanvasElement == 'function');
+    ok(typeof fabric.util.createCanvasElement === 'function');
+    var element = fabric.util.createCanvasElement();
+    ok(element.getContext);
   });
 
   test('createImage', function() {
-    ok(typeof fabric.util.createImage == 'function');
+    ok(typeof fabric.util.createImage === 'function');
+    var element = fabric.util.createImage();
+    equal(element.naturalHeight, 0);
+    equal(element.naturalWidth, 0);
   });
 
   // test('createAccessors', function() {
   //   ok(typeof fabric.util.createAccessors == 'function');
   // });
 
-  test('qrDecompose', function() {
+  test('qrDecompose with identity matrix', function() {
     ok(typeof fabric.util.qrDecompose == 'function');
+    var options = fabric.util.qrDecompose(fabric.iMatrix);
+    equal(options.scaleX, 1, 'imatrix has scale 1');
+    equal(options.scaleY, 1, 'imatrix has scale 1');
+    equal(options.skewX, 0, 'imatrix has skewX 0');
+    equal(options.skewY, 0, 'imatrix has skewY 0');
+    equal(options.angle, 0, 'imatrix has angle 0');
+    equal(options.translateX, 0, 'imatrix has translateX 0');
+    equal(options.translateY, 0, 'imatrix has translateY 0');
+  });
+
+  test('qrDecompose with matrix', function() {
+    ok(typeof fabric.util.qrDecompose == 'function');
+    var options = fabric.util.qrDecompose([2, 0.4, 0.5, 3, 100, 200]);
+    equal(Math.round(options.scaleX, 4), 2, 'imatrix has scale');
+    equal(Math.round(options.scaleY, 4), 3, 'imatrix has scale');
+    equal(Math.round(options.skewX, 4), 28, 'imatrix has skewX');
+    equal(options.skewY, 0, 'imatrix has skewY 0');
+    equal(Math.round(options.angle, 4), 11, 'imatrix has angle 0');
+    equal(options.translateX, 100, 'imatrix has translateX 100');
+    equal(options.translateY, 200, 'imatrix has translateY 200');
   });
 
   test('drawArc', function() {
