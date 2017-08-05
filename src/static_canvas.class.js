@@ -518,7 +518,8 @@
      * @param {HTMLElement} [canvasEl]
      */
     _createLowerCanvas: function (canvasEl) {
-      if (typeof canvasEl === 'HTMLCanvasElement') {
+      // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
+      if (canvasEl.getContext) {
         this.lowerCanvasEl = canvasEl;
       }
       else {
