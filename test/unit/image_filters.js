@@ -341,6 +341,76 @@
     deepEqual(fabric.Image.filters.ColorMatrix.fromObject(object), filter);
   });
 
+  QUnit.module('fabric.Image.filters.HueRotation');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.HueRotation);
+
+    var filter = new fabric.Image.filters.HueRotation();
+    ok(filter instanceof fabric.Image.filters.ColorMatrix, 'should inherit from fabric.Image.filters.ColorMatrix');
+    ok(filter instanceof fabric.Image.filters.HueRotation, 'should inherit from fabric.Image.filters.HueRotation');
+  });
+
+  test('properties', function() {
+    var filter = new fabric.Image.filters.HueRotation();
+
+    equal(filter.type, 'HueRotation');
+    equal(filter.rotation, 0, 'default rotation is 0');
+
+    var filter2 = new fabric.Image.filters.HueRotation({ rotation: 0.5 });
+    equal(filter2.rotation, 0.5, 'rotation is 0.5');
+  });
+
+  test('applyTo2d', function() {
+    var filter = new fabric.Image.filters.HueRotation();
+    ok(typeof filter.applyTo2d === 'function');
+  });
+
+  test('applyTo2d values', function() {
+    var filter = new fabric.Image.filters.HueRotation({ rotation: 0.5 });
+    var options = { imageData: _createImageData(context) };
+    filter.calculateMatrix();
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    var expected = [88, 203, 59, 1, 0, 110, 228, 1, 26, 255, 171, 1];
+    for (var i = 0; i < 12; i++) {
+      equal(data[i], expected[i]);
+    }
+  });
+
+  test('toObject', function() {
+    var filter = new fabric.Image.filters.HueRotation();
+    ok(typeof filter.toObject === 'function');
+
+    var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"HueRotation","rotation":0}');
+
+    filter.rotation = 0.6;
+
+    object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"HueRotation","rotation":0.6}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.HueRotation();
+    ok(typeof filter.toJSON === 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"HueRotation","rotation":0}');
+
+    filter.rotation = 0.3;
+
+    json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"HueRotation","rotation":0.3}');
+  });
+
+  test('fromObject', function() {
+    var filter = new fabric.Image.filters.HueRotation();
+
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.HueRotation.fromObject(object), filter);
+  });
 
   QUnit.module('fabric.Image.filters.Contrast');
 
