@@ -60,7 +60,6 @@
 
     /**
      * Returns styles-string for svg-export
-     * @param {Boolean} skipShadow a boolean to skip shadow filter output
      * @return {String}
      */
     getSvgSpanStyles: function(style) {
@@ -71,7 +70,8 @@
           fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
           stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
-          textDecoration = this.getSvgTextDecoration(style);
+          textDecoration = this.getSvgTextDecoration(style),
+          deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
 
       return [
         stroke,
@@ -82,6 +82,7 @@
         fontWeight,
         textDecoration,
         fill,
+        deltaY,
       ].join('');
     },
 
