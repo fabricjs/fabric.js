@@ -243,6 +243,8 @@
     iText.selectAll();
     equal(iText.selectionStart, 0);
     equal(iText.selectionEnd, 4);
+
+    equal(iText.selectAll(), iText, 'should be chainable');
   });
 
   test('getSelectedText', function() {
@@ -506,6 +508,8 @@
     iText.selectLine(18);
     equal(iText.selectionStart, 17); // |qux|
     equal(iText.selectionEnd, 20);
+
+    equal(iText.selectLine(0), iText, 'should be chainable');
   });
 
   test('findWordBoundaryLeft', function() {

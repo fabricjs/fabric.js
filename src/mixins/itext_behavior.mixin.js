@@ -169,12 +169,15 @@
 
     /**
      * Selects entire text
+     * @return {fabric.IText} thisArg
+     * @chainable
      */
     selectAll: function() {
       this.selectionStart = 0;
       this.selectionEnd = this._text.length;
       this._fireSelectionChanged();
       this._updateTextarea();
+      return this;
     },
 
     /**
@@ -303,6 +306,8 @@
     /**
      * Selects a line based on the index
      * @param {Number} selectionStart Index of a character
+     * @return {fabric.IText} thisArg
+     * @chainable
      */
     selectLine: function(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
@@ -313,6 +318,7 @@
       this.selectionEnd = newSelectionEnd;
       this._fireSelectionChanged();
       this._updateTextarea();
+      return this;
     },
 
     /**
