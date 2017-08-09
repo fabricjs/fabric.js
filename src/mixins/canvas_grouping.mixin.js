@@ -15,11 +15,13 @@
       var activeObject = this._activeObject;
 
       var selectionKeyPressed = false;
-      this.selectionKeys.forEach(function (selectionKey) {
-        if (e[selectionKey]){
-          selectionKeyPressed = true;
-        }
-      });
+      if (this.selectionKeys.isArray()){
+        selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
+          return e[selectionKey];
+        });
+      } else if (e[selectionKeys.toString()]){
+        selectionKeyPressed = true;
+      }
 
       return activeObject && selectionKeyPressed && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
