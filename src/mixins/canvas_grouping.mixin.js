@@ -19,7 +19,7 @@
         selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
           return e[selectionKey];
         });
-      } 
+      }
       else if (e[this.selectionKeys.toString()]){
         selectionKeyPressed = true;
       }
