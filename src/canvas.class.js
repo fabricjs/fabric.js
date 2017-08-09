@@ -514,7 +514,7 @@
           activeObject = this._activeObject;
 
       var selectionKeyPressed = false;
-      if (this.selectionKeys.isArray()){
+      if (Array.isArray(this.selectionKeys)){
         selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
           return e[selectionKey];
         });
