@@ -50,7 +50,7 @@ fabric.enableGLFiltering = true;
 fabric.devicePixelRatio = fabric.window.devicePixelRatio || fabric.window.webkitDevicePixelRatio || fabric.window.mozDevicePixelRatio || 1;
 
 fabric.initFilterBackend = function() {
-    if (fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize) && fabric.enableGLFiltering) {
+    if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {
         console.log("max texture size: " + fabric.maxTextureSize);
         return new fabric.WebglFilterBackend({
             tileSize: fabric.textureSize
@@ -481,9 +481,8 @@ fabric.CommonMethods = {
             }
             ctx.restore();
         },
-        createCanvasElement: function(canvasEl) {
-            canvasEl || (canvasEl = fabric.document.createElement("canvas"));
-            return canvasEl;
+        createCanvasElement: function() {
+            return fabric.document.createElement("canvas");
         },
         createImage: function() {
             return fabric.document.createElement("img");
@@ -1719,7 +1718,7 @@ if (typeof console !== "undefined") {
         "stroke-opacity": "strokeOpacity",
         "stroke-width": "strokeWidth",
         "text-decoration": "textDecoration",
-        "text-anchor": "originX",
+        "text-anchor": "textAnchor",
         opacity: "opacity"
     }, colorAttributes = {
         stroke: "strokeOpacity",
@@ -1761,7 +1760,7 @@ if (typeof console !== "undefined") {
             if (parentAttributes && typeof parentAttributes.opacity !== "undefined") {
                 value *= parentAttributes.opacity;
             }
-        } else if (attr === "originX") {
+        } else if (attr === "textAnchor") {
             value = value === "start" ? "left" : value === "end" ? "right" : "center";
         } else {
             parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
@@ -3416,13 +3415,13 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             this._initPattern(color, property, callback);
             return this;
         },
-        _createCanvasElement: function(canvasEl) {
-            var element = fabric.util.createCanvasElement(canvasEl);
-            if (!element.style) {
-                element.style = {};
-            }
+        _createCanvasElement: function() {
+            var element = fabric.util.createCanvasElement();
             if (!element) {
                 throw CANVAS_INIT_ERROR;
+            }
+            if (!element.style) {
+                element.style = {};
             }
             if (typeof element.getContext === "undefined") {
                 throw CANVAS_INIT_ERROR;
@@ -3443,7 +3442,11 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             this.viewportTransform = this.viewportTransform.slice();
         },
         _createLowerCanvas: function(canvasEl) {
-            this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement(canvasEl);
+            if (canvasEl.getContext) {
+                this.lowerCanvasEl = canvasEl;
+            } else {
+                this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+            }
             fabric.util.addClass(this.lowerCanvasEl, "lower-canvas");
             if (this.interactive) {
                 this._applyCanvasStyle(this.lowerCanvasEl);
@@ -6374,7 +6377,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             this._removeShadow(ctx);
         },
         _setOpacity: function(ctx) {
-            if (this.group && !this.group.transformDone) {
+            if (this.group && !this.group._transformDone) {
                 ctx.globalAlpha = this.getObjectOpacity();
             } else {
                 ctx.globalAlpha *= this.opacity;
@@ -6495,7 +6498,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             };
         },
         _removeTransformMatrix: function() {
-            var center = this._findCenterFromElement();
+            var center = this._findCenterFromElement(), fixedCenter;
             if (this.transformMatrix) {
                 var options = fabric.util.qrDecompose(this.transformMatrix);
                 this.flipX = false;
@@ -6507,8 +6510,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 this.skewY = 0;
                 center = fabric.util.transformPoint(center, this.transformMatrix);
             }
+            fixedCenter = this.translateToGivenOrigin(center, "left", "top", this.originX, this.originY);
             this.transformMatrix = null;
-            this.setPositionByOrigin(center, "center", "center");
+            this.setPositionByOrigin(fixedCenter, "center", "center");
         },
         clone: function(callback, propertiesToInclude) {
             var objectForm = this.toObject(propertiesToInclude);
@@ -7675,8 +7679,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
     fabric.Line.fromElement = function(element, callback, options) {
         options = options || {};
         var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ parsedAttributes.x1 || 0, parsedAttributes.y1 || 0, parsedAttributes.x2 || 0, parsedAttributes.y2 || 0 ];
-        options.originX = "left";
-        options.originY = "top";
         callback(new fabric.Line(points, extend(parsedAttributes, options)));
     };
     fabric.Line.fromObject = function(object, callback) {
@@ -7770,8 +7772,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
         parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.radius;
         parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
-        parsedAttributes.originX = "left";
-        parsedAttributes.originY = "top";
         callback(new fabric.Circle(extend(parsedAttributes, options)));
     };
     function isValidRadius(attributes) {
@@ -7888,8 +7888,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
         parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
         parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-        parsedAttributes.originX = "left";
-        parsedAttributes.originY = "top";
         callback(new fabric.Ellipse(extend(parsedAttributes, options)));
     };
     fabric.Ellipse.fromObject = function(object, callback) {
@@ -7972,8 +7970,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
         parsedAttributes.left = parsedAttributes.left || 0;
         parsedAttributes.top = parsedAttributes.top || 0;
-        parsedAttributes.originX = "left";
-        parsedAttributes.originY = "top";
         var rect = new fabric.Rect(extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
         rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
         callback(rect);
@@ -8628,8 +8624,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
     fabric.Path.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat([ "d" ]);
     fabric.Path.fromElement = function(element, callback, options) {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-        parsedAttributes.originX = "left";
-        parsedAttributes.originY = "top";
         callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
     };
 })(typeof exports !== "undefined" ? exports : this);
@@ -10930,6 +10924,34 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
 (function(global) {
     "use strict";
+    var fabric = global.fabric || (global.fabric = {}), filters = fabric.Image.filters, createClass = fabric.util.createClass;
+    filters.HueRotation = createClass(filters.ColorMatrix, {
+        type: "HueRotation",
+        rotation: 0,
+        mainParameter: "rotation",
+        calculateMatrix: function() {
+            var rad = this.rotation * Math.PI, cos = Math.cos(rad), sin = Math.sin(rad), aThird = 1 / 3, aThirdSqtSin = Math.sqrt(aThird) * sin, OneMinusCos = 1 - cos;
+            this.matrix = [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 ];
+            this.matrix[0] = cos + OneMinusCos / 3;
+            this.matrix[1] = aThird * OneMinusCos - aThirdSqtSin;
+            this.matrix[2] = aThird * OneMinusCos + aThirdSqtSin;
+            this.matrix[5] = aThird * OneMinusCos + aThirdSqtSin;
+            this.matrix[6] = cos + aThird * OneMinusCos;
+            this.matrix[7] = aThird * OneMinusCos - aThirdSqtSin;
+            this.matrix[10] = aThird * OneMinusCos - aThirdSqtSin;
+            this.matrix[11] = aThird * OneMinusCos + aThirdSqtSin;
+            this.matrix[12] = cos + aThird * OneMinusCos;
+        },
+        applyTo: function(options) {
+            this.calculateMatrix();
+            fabric.Image.filters.BaseFilter.prototype.applyTo.call(this, options);
+        }
+    });
+    fabric.Image.filters.HueRotation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+})(typeof exports !== "undefined" ? exports : this);
+
+(function(global) {
+    "use strict";
     var fabric = global.fabric || (global.fabric = {}), clone = fabric.util.object.clone, MIN_TEXT_WIDTH = 2, CACHE_FONT_SIZE = 200;
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
@@ -10970,7 +10992,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         charSpacing: 0,
         styles: null,
         _measuringContext: null,
-        _styleProperties: [ "stroke", "strokeWidth", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough" ],
+        _styleProperties: [ "stroke", "strokeWidth", "fill", "fontFamily", "fontSize", "fontWeight", "fontStyle", "underline", "overline", "linethrough", "textBackgroundColor" ],
         __charBounds: [],
         initialize: function(text, options) {
             this.styles = options ? options.styles || {} : {};
@@ -11596,7 +11618,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         if (!element) {
             return callback(null);
         }
-        var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES), parsedAnchor = parsedAttributes.textAnchor || "left";
         options = fabric.util.object.extend(options ? clone(options) : {}, parsedAttributes);
         options.top = options.top || 0;
         options.left = options.left || 0;
@@ -11622,9 +11644,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         if (!("fontSize" in options)) {
             options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
         }
-        if (!options.originX) {
-            options.originX = "left";
-        }
         var textContent = "";
         if (!("textContent" in element)) {
             if ("firstChild" in element && element.firstChild !== null) {
@@ -11637,18 +11656,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
         textContent = textContent.replace(/^\s+|\s+$|\n+/g, "").replace(/\s+/g, " ");
         var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.getScaledHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getScaledHeight() + scaledDiff, offX = 0;
-        if (text.originX === "center") {
+        if (parsedAnchor === "center") {
             offX = text.getScaledWidth() / 2;
         }
-        if (text.originX === "right") {
+        if (parsedAnchor === "right") {
             offX = text.getScaledWidth();
         }
         text.set({
             left: text.left - offX,
             top: text.top - (textHeight - text.fontSize * (.18 + text._fontSizeFraction)) / text.lineHeight
         });
-        text.originX = "left";
-        text.originY = "top";
         callback(text);
     };
     fabric.Text.fromObject = function(object, callback) {
@@ -11710,15 +11727,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 target: this
             });
         },
-        getSelectionStyles: function(startIndex, endIndex) {
-            if (arguments.length === 2) {
+        getSelectionStyles: function(startIndex, endIndex, complete) {
+            if (endIndex && startIndex !== endIndex) {
                 var styles = [];
                 for (var i = startIndex; i < endIndex; i++) {
-                    styles.push(this.getSelectionStyles(i));
+                    styles.push(this.getSelectionStyles(i, i, complete));
                 }
                 return styles;
             }
-            var loc = this.get2DCursorLocation(startIndex), style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+            var loc = this.get2DCursorLocation(startIndex), style = complete ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex) : this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
             return style || {};
         },
         setSelectionStyles: function(styles) {
@@ -12419,7 +12436,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this.styles) {
                 this.styles = {};
             }
-            var currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = clone(currentLineStyles);
+            var currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = currentLineStyles ? clone(currentLineStyles) : {};
             quantity || (quantity = 1);
             for (var index in currentLineStylesCloned) {
                 var numericIndex = parseInt(index, 10);
@@ -12433,6 +12450,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this._forceClearCache = true;
             if (copiedStyle) {
                 while (quantity--) {
+                    if (!Object.keys(copiedStyle[quantity]).length) {
+                        continue;
+                    }
+                    if (!this.styles[lineIndex]) {
+                        this.styles[lineIndex] = {};
+                    }
                     this.styles[lineIndex][charIndex + quantity] = clone(copiedStyle[quantity]);
                 }
                 return;
@@ -12792,7 +12815,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             return;
         }
         fabric.copiedText = this.getSelectedText();
-        fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
+        fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, false);
         this._copyDone = true;
     },
     paste: function() {

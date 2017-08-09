@@ -766,7 +766,7 @@
         this.styles = {};
       }
       var currentLineStyles       = this.styles[lineIndex],
-          currentLineStylesCloned = clone(currentLineStyles);
+          currentLineStylesCloned = currentLineStyles ? clone(currentLineStyles) : {};
 
       quantity || (quantity = 1);
       // shift all char styles by quantity forward
@@ -784,6 +784,12 @@
       this._forceClearCache = true;
       if (copiedStyle) {
         while (quantity--) {
+          if (!Object.keys(copiedStyle[quantity]).length) {
+            continue;
+          }
+          if (!this.styles[lineIndex]) {
+            this.styles[lineIndex] = {};
+          }
           this.styles[lineIndex][charIndex + quantity] = clone(copiedStyle[quantity]);
         }
         return;

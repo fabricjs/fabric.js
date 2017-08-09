@@ -267,7 +267,8 @@
       'fontStyle',
       'underline',
       'overline',
-      'linethrough'
+      'linethrough',
+      'textBackgroundColor',
     ],
 
     /**
