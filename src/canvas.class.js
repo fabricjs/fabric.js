@@ -518,7 +518,7 @@
         selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
           return e[selectionKey];
         });
-      } else if (e[selectionKeys.toString()]){
+      } else if (e[this.selectionKeys.toString()]){
         selectionKeyPressed = true;
       }
 
