@@ -121,10 +121,9 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
                           1;
 
 fabric.initFilterBackend = function() {
-  if (fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize) && fabric.enableGLFiltering) {
+  if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {
     console.log('max texture size: ' + fabric.maxTextureSize);
     return (new fabric.WebglFilterBackend({ tileSize: fabric.textureSize }));
-
   }
   else if (fabric.Canvas2dFilterBackend) {
     return (new fabric.Canvas2dFilterBackend());
