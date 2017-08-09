@@ -13,7 +13,15 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && e[this.selectionKey] && target && target.selectable && this.selection &&
+
+      var selectionKeyPressed = false;
+      this.selectionKeys.forEach(function (selectionKey) {
+        if (e[selectionKey]){
+          selectionKeyPressed = true;
+        }
+      });
+
+      return activeObject && selectionKeyPressed && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
 

@@ -124,15 +124,15 @@
     selection:              true,
 
     /**
-     * Indicates which key enable multiple click selection
+     * Indicates which keys enable multiple click selection
      * values: 'altKey', 'shiftKey', 'ctrlKey'.
-     * If `null` or 'none' or any other string that is not a modifier key
-     * feature is disabled feature disabled.
+     * If `null` or empty or containing any other string that is not a modifier key
+     * feature is disabled.
      * @since 1.6.2
-     * @type String
+     * @type Array
      * @default
      */
-    selectionKey:           'shiftKey',
+    selectionKeys:           ['shiftKey'],
 
     /**
      * Indicates which key enable alternative selection
@@ -512,6 +512,14 @@
     _shouldClearSelection: function (e, target) {
       var activeObjects = this.getActiveObjects(),
           activeObject = this._activeObject;
+
+      var selectionKeyPressed = false;
+      this.selectionKeys.forEach(function (selectionKey) {
+        if (e[selectionKey]){
+          selectionKeyPressed = true;
+        }
+      });
+
       return (
         !target
         ||
@@ -520,7 +528,7 @@
           activeObjects.length > 1 &&
           activeObjects.indexOf(target) === -1 &&
           activeObject !== target &&
-          !e[this.selectionKey])
+          !selectionKeyPressed)
         ||
         (target && !target.evented)
         ||
