@@ -60,6 +60,7 @@
 
     /**
      * Returns styles-string for svg-export
+     * @param {Object} style the object from which to retrieve style properties
      * @return {String}
      */
     getSvgSpanStyles: function(style) {
@@ -86,6 +87,11 @@
       ].join('');
     },
 
+    /**
+     * Returns text-decoration property for svg-export
+     * @param {Object} style the object from which to retrieve style properties
+     * @return {String}
+     */
     getSvgTextDecoration: function(style) {
       if ('overline' in style || 'underline' in style || 'linethrough' in style) {
         return 'text-decoration: ' + (style.overline ? 'overline ' : '') +
