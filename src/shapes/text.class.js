@@ -1151,11 +1151,20 @@
       return this._setScript(line, char, this.subscript);
     },
 
+    /**
+     * Turns the character into an 'inferior figure' (aka. 'subscript')
+     * @param {Number} line the line number or starting position
+     * @param {Number} char the character number or final position
+     * @param {Object} schema either this.superscript or this.subscript
+     * @returns {Object} this
+     * @private
+     */
     _setScript: function(line, char, schema) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
           baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
       this.setPropertyAt(line, char, 'deltaY', baseline);
       this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
+      return this;
     },
 
     /**
