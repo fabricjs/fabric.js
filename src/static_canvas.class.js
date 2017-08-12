@@ -1070,7 +1070,7 @@
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
-      this.requestRenderAll();
+      this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 

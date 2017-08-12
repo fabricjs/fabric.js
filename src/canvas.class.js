@@ -1032,7 +1032,7 @@
       target.scaleY = 1;
       target.skewX = 0;
       target.skewY = 0;
-      target.setAngle(0);
+      target.rotate(0);
     },
 
     /**

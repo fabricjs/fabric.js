@@ -557,7 +557,7 @@
       target.skewY = 0;
       target.flipX = false;
       target.flipY = false;
-      target.setAngle(0);
+      target.rotate(0);
     },
 
     /**

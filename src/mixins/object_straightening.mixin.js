@@ -18,7 +18,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   straighten: function() {
-    this.setAngle(this._getAngleValueForStraighten());
+    this.rotate(this._getAngleValueForStraighten());
     return this;
   },
 
@@ -43,7 +43,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       endValue: this._getAngleValueForStraighten(),
       duration: this.FX_DURATION,
       onChange: function(value) {
-        _this.setAngle(value);
+        _this.rotate(value);
         onChange();
       },
       onComplete: function() {
