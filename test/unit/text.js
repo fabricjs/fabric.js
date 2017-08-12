@@ -382,4 +382,66 @@
     equal(cache, cache2, 'you get the same cache');
   });
 
+  test('text superscript - single char', function() {
+    var text = new fabric.Text('xxx');
+    var size = text.fontSize;
+    var schema = text.superscript;
+
+    ok(typeof text.setSuperscript === 'function');
+    text.setSuperscript(0, 1);
+
+    equal(text.styles[0][0].fontSize, size, 'character 0: fontSize remained the same');
+    equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize was reduced');
+    equal(text.styles[0][1].deltaY, size * -schema.baseline, 'character 1: deltaY has been set');
+  });
+
+  test('text superscript - same line, many chars', function() {
+    var text = new fabric.Text('xxx');
+    var size = text.fontSize;
+    var schema = text.superscript;
+    text.setSuperscript(0, [1, 2]);
+
+    equal(text.styles[0][0].fontSize, size, 'character 0: fontSize remained the same');
+    equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize was reduced');
+    equal(text.styles[0][1].deltaY, size * -schema.baseline, 'character 1: deltaY has been set');
+
+    equal(text.styles[0][2].fontSize, size * schema.size, 'character 2: fontSize was reduced');
+    equal(text.styles[0][2].deltaY, size * -schema.baseline, 'character 2: deltaY has been set');
+  });
+
+  test('text superscript - many lines', function() {
+    var text = new fabric.Text('xx\nx');
+    var size = text.fontSize;
+    var schema = text.superscript;
+    text.setSuperscript([0, 1], [1, 0]);
+
+    equal(text.styles[0][0].fontSize, size, 'line 0, char 0: fontSize remained the same');
+    equal(text.styles[0][0].deltaY, undefined, 'line 0, char 0: deltaY is not set');
+
+    equal(text.styles[0][1].fontSize, size * schema.size, 'line 0, char 1: fontSize was reduced');
+    equal(text.styles[0][1].deltaY, size * -schema.baseline, 'line 0, char 1: deltaY has been set');
+
+    equal(text.styles[1][0].fontSize, size * schema.size, 'line 1, char 0: fontSize was reduced');
+    equal(text.styles[1][0].deltaY, size * -schema.baseline, 'line 1, char 0: deltaY has been set');
+  });
+
+  test('text subscript - single char', function() {
+    var text = new fabric.Text('xxx');
+    var size = text.fontSize;
+    var schema = text.subscript;
+
+    ok(typeof text.setSubscript === 'function');
+    text.setSubscript(0, 1);
+
+    equal(text.styles[0][0].fontSize, size, 'character 0: fontSize remained the same');
+    equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize was reduced');
+    equal(text.styles[0][1].deltaY, size * -schema.baseline, 'character 1: deltaY has been set');
+  });
+
 })();

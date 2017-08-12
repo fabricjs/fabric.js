@@ -13,6 +13,10 @@
 
       /** @ignore */
       addMethods = function(klass, source, parent) {
+        if (typeof source === 'function') {
+          return source(klass.prototype, klass, parent);
+        }
+
         for (var property in source) {
 
           if (property in klass.prototype &&
