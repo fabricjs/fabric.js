@@ -826,7 +826,7 @@
     renderAll: function () {
       var canvasToDrawOn = this.contextContainer;
       if (this.isRendering) {
-        fabric.window.cancelAnimationFrame(this.isRendering);
+        fabric.util.cancelAnimFrame(this.isRendering);
       }
       this.renderCanvas(canvasToDrawOn, this._objects);
       return this;

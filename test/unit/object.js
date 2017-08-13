@@ -507,7 +507,7 @@
     equal(cObj.get('angle'), 45);
   });
 
-  test('setAngle', function() {
+  test('rotate', function() {
     var cObj = new fabric.Object();
     equal(cObj.get('angle'), 0);
     equal(cObj.set('angle', 45), cObj, 'chainable');
@@ -540,7 +540,7 @@
       equal(clone.get('opacity'), 0.66);
 
       // augmenting clone properties should not affect original instance
-      clone.set('left', 12).set('scaleX', 2.5).setAngle(33);
+      clone.set('left', 12).set('scaleX', 2.5).rotate(33);
 
       equal(cObj.get('left'), 123);
       equal(cObj.get('scaleX'), 1);
@@ -685,27 +685,27 @@
     var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
     ok(typeof object.straighten == 'function');
 
-    object.setAngle(123.456);
+    object.rotate(123.456);
     object.straighten();
     equal(object.get('angle'), 90);
 
-    object.setAngle(97.111);
+    object.rotate(97.111);
     object.straighten();
     equal(object.get('angle'), 90);
 
-    object.setAngle(3.45);
+    object.rotate(3.45);
     object.straighten();
     equal(object.get('angle'), 0);
 
-    object.setAngle(-157);
+    object.rotate(-157);
     object.straighten();
     equal(object.get('angle'), -180);
 
-    object.setAngle(159);
+    object.rotate(159);
     object.straighten();
     equal(object.get('angle'), 180);
 
-    object.setAngle(999);
+    object.rotate(999);
     object.straighten();
     equal(object.get('angle'), 270);
   });

@@ -261,12 +261,14 @@
   // });
   test('copy', function() {
     var event = { stopPropagation: function(){}, preventDefault: function(){} };
-    var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
     iText.selectionStart = 0;
     iText.selectionEnd = 2;
     iText.copy(event);
     equal(fabric.copiedText, 'te', 'it copied first 2 characters');
-    equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
-    equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
+    equal(fabric.copiedTextStyle[0].fill, iText.styles[0][0].fill, 'style is cloned');
+    equal(fabric.copiedTextStyle[1].fill, iText.styles[0][1].fill, 'style is referenced');
+    equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
+    equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
   });
 })();
