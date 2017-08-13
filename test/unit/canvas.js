@@ -714,11 +714,11 @@
     equal(canvas.straightenObject(rect), canvas, 'should be chainable');
     equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
-    rect.setAngle('60');
+    rect.rotate('60');
     canvas.straightenObject(rect);
     equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
 
-    rect.setAngle('100');
+    rect.rotate('100');
     canvas.straightenObject(rect);
     equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
   });
