@@ -722,12 +722,12 @@
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
-      if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
-        currentCharStyle = this.styles[lineIndex][charIndex - 1];
+      if (this.styles[lineIndex]) {
+        currentCharStyle = this.styles[lineIndex][charIndex === 0 ? charIndex : charIndex - 1];
       }
 
       // we clone styles of all chars
-      // after cursor onto the last line
+      // after cursor onto the current line
       for (var index in this.styles[lineIndex]) {
         var numIndex = parseInt(index, 10);
         if (numIndex >= charIndex) {
@@ -747,7 +747,7 @@
       // we clone current char style onto the next (otherwise empty) line
       while (qty > 1) {
         qty--;
-        if (copiedStyle[qty]) {
+        if (copiedStyle && copiedStyle[qty]) {
           this.styles[lineIndex + qty] = { 0: clone(copiedStyle[qty]) };
         }
         else if (currentCharStyle) {
@@ -812,32 +812,31 @@
     /**
      * Inserts style object(s)
      * @param {Array} insertedText Characters at the location where style is inserted
-     * @param {Number} start True if it's end of line
+     * @param {Number} start cursor index for inserting style
+     * @param {Array} [copiedStyle] array of style objects to insert.
      */
     insertNewStyleBlock: function(insertedText, start, copiedStyle) {
       var cursorLoc = this.get2DCursorLocation(start, true),
-          addingNewLines = 0, addingChars = 0;
+          addedLines = [0], linesLenght = 0;
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
-          if (addingChars) {
-            this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars, copiedStyle);
-            copiedStyle = copiedStyle && copiedStyle.slice(addingChars);
-            addingChars = 0;
-          }
-          addingNewLines++;
+          linesLenght++;
+          addedLines[linesLenght] = 0;
         }
         else {
-          if (addingNewLines) {
-            this.insertNewlineStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines, copiedStyle);
-            copiedStyle = copiedStyle && copiedStyle.slice(addingNewLines);
-            addingNewLines = 0;
-          }
-          addingChars++;
+          addedLines[linesLenght]++;
         }
       }
-      addingChars && this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addingChars, copiedStyle);
-      addingNewLines && this.insertNewlineStyleObject(
-        cursorLoc.lineIndex, cursorLoc.charIndex, addingNewLines, copiedStyle);
+      if (addedLines[0] > 0) {
+        this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addedLines[0], copiedStyle);
+        copiedStyle = copiedStyle && copiedStyle.slice(addedLines[0] + 1);
+      }
+      linesLenght && this.insertNewlineStyleObject(
+        cursorLoc.lineIndex, cursorLoc.charIndex + addedLines[0], linesLenght);
+      for (var i = 1; i <= linesLenght; i++) {
+        this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
+        copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
+      }
     },
 
     /**
