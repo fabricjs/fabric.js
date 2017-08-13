@@ -519,7 +519,7 @@
      */
     _createLowerCanvas: function (canvasEl) {
       // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
-      if (canvasEl.getContext) {
+      if (canvasEl && canvasEl.getContext) {
         this.lowerCanvasEl = canvasEl;
       }
       else {
