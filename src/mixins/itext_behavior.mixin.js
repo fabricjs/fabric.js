@@ -664,15 +664,15 @@
         // remove and shift left on the same line
         if (this.styles[lineStart]) {
           styleObj = this.styles[lineStart];
-          var diff = charEnd - charStart;
+          var diff = charEnd - charStart, numericChar, _char;
           for (i = charStart; i < charEnd; i++) {
             delete styleObj[i];
           }
-          for (i = charEnd; i < this._textLines[lineStart].length; i++) {
-            //shifting
-            if (styleObj[i]) {
-              styleObj[i - diff] = styleObj[i];
-              delete styleObj[i];
+          for (_char in this.styles[lineStart]) {
+            numericChar = parseInt(_char, 10);
+            if (_char >= charEnd) {
+              styleObj[numericChar - diff] = styleObj[_char];
+              delete styleObj[_char];
             }
           }
         }
@@ -685,7 +685,7 @@
      * @param {Number} offset Can any number?
      */
     shiftLineStyles: function(lineIndex, offset) {
-      // shift all line styles by 1 upward
+      // shift all line styles by offset upward or downward
       // do not clone deep. we need new array, not new style objects
       var clonedStyles = clone(this.styles);
       for (var line in this.styles) {
@@ -697,7 +697,6 @@
           }
         }
       }
-      //TODO: evaluate if delete old style lines with offset -1
     },
 
     restartCursorIfNeeded: function() {
