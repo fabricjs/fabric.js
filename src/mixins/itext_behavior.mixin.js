@@ -670,7 +670,7 @@
           }
           for (_char in this.styles[lineStart]) {
             numericChar = parseInt(_char, 10);
-            if (_char >= charEnd) {
+            if (numericChar >= charEnd) {
               styleObj[numericChar - diff] = styleObj[_char];
               delete styleObj[_char];
             }
