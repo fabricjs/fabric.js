@@ -77,7 +77,11 @@
     return _requestAnimFrame.apply(fabric.window, arguments);
   }
 
+  function cancelAnimFrame() {
+    return _cancelAnimFrame.apply(fabric.window, arguments);
+  }
+
   fabric.util.animate = animate;
   fabric.util.requestAnimFrame = requestAnimFrame;
-  fabric.util.cancelAnimFrame = _cancelAnimFrame;
+  fabric.util.cancelAnimFrame = cancelAnimFrame;
 })();

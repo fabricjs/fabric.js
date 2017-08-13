@@ -978,9 +978,9 @@
      * @param {String} method Method name ("fillText" or "strokeText")
      */
     _renderTextCommon: function(ctx, method) {
-
-      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
-
+      ctx.save();
+      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset(),
+          offsets = this._applyPatternGradientTransform(ctx, method === 'fillText' ? this.fill : this.stroke);
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
@@ -989,12 +989,13 @@
           method,
           ctx,
           this._textLines[i],
-          left + leftOffset,
-          top + lineHeights + maxHeight,
+          left + leftOffset - offsets.offsetX,
+          top + lineHeights + maxHeight - offsets.offsetY,
           i
         );
         lineHeights += heightOfLine;
       }
+      ctx.restore();
     },
 
     /**

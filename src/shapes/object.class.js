@@ -1246,8 +1246,8 @@
      * @param {Object} filler fabric.Pattern or fabric.Gradient
      */
     _applyPatternGradientTransform: function(ctx, filler) {
-      if (!filler.toLive) {
-        return;
+      if (!filler || !filler.toLive) {
+        return { offsetX: 0, offsetY: 0 };
       }
       var transform = filler.gradientTransform || filler.patternTransform;
       var offsetX = -this.width / 2 + filler.offsetX || 0,
@@ -1256,6 +1256,7 @@
       if (transform) {
         ctx.transform.apply(ctx, transform);
       }
+      return { offsetX: offsetX, offsetY: offsetY };
     },
 
     /**
