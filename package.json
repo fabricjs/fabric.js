@@ -35,7 +35,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "node build.js modules=ALL exclude=json,gestures,accessors",
+    "build": "node build.js modules=ALL exclude=gestures,accessors",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
     "build_export": "npm run build && npm run export_dist_to_site",
