@@ -555,7 +555,7 @@
         if (target.selectable) {
           this.setActiveObject(target, e);
         }
-        if ((target.selectable || target === this._activeObject) && (target.__corner || !shouldGroup)) {
+        if (target === this._activeObject && (target.__corner || !shouldGroup)) {
           this._beforeTransform(e, target);
           this._setupCurrentTransform(e, target);
         }
