@@ -1239,10 +1239,10 @@
     canvas.add(rect1, rect2);
 
     canvas.setActiveObject(rect1);
-    ok(rect1.active);
+    ok(rect1 === canvas._activeObject);
 
     canvas.setActiveObject(rect2);
-    ok(rect2.active);
+    ok(rect2 === canvas._activeObject);
   });
 
   test('getActiveObject', function() {
@@ -1610,7 +1610,7 @@
       clientY: canvasOffset.top + 100,
       target: rect
     };
-    rect.active = true;
+    canvas.setActiveObject(rect)
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
     equal(t.target, rect, 'should have rect as a target');
