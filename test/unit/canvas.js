@@ -1610,7 +1610,7 @@
       clientY: canvasOffset.top + 100,
       target: rect
     };
-    canvas.setActiveObject(rect)
+    canvas.setActiveObject(rect);
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
     equal(t.target, rect, 'should have rect as a target');
