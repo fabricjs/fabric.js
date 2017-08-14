@@ -306,7 +306,7 @@
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.active || !this.isEditing) {
+      if (!this.isEditing) {
         return;
       }
       if (this.canvas && this.canvas.contextTop) {
@@ -324,7 +324,7 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active || !this.isEditing) {
+      if (!this.isEditing) {
         return;
       }
       var boundaries = this._getCursorBoundaries(), ctx;

@@ -1385,12 +1385,10 @@
       }
 
       var origParams = {
-        active: this.active,
         left: this.left,
         top: this.top
       };
 
-      this.set('active', false);
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 
       var originalCanvas = this.canvas;

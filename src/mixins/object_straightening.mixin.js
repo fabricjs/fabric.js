@@ -50,9 +50,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         _this.setCoords();
         onComplete();
       },
-      onStart: function() {
-        _this.set('active', false);
-      }
     });
 
     return this;

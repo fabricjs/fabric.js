@@ -19,7 +19,7 @@
     _findTargetCorner: function(pointer) {
       // objects in group, anykind, are not self modificable,
       // must not return an hovered corner.
-      if (!this.hasControls || !this.active || this.group) {
+      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
 
@@ -117,8 +117,10 @@
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor || !this.active ||
-        (this.canvas && !this.canvas.interactive)) {
+      if (!this.selectionBackgroundColor ||
+        (this.canvas && !this.canvas.interactive) ||
+        (this.canvas && this.canvas._activeObject !== this)
+      ) {
         return this;
       }
       ctx.save();
