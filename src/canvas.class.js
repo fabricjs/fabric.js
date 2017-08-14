@@ -477,9 +477,7 @@
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
-      var hasBorders = target.hasBorders,
-          transparentCorners = target.transparentCorners,
-          ctx = this.contextCache,
+      var ctx = this.contextCache,
           originalColor = target.selectionBackgroundColor;
 
       target.hasBorders = target.transparentCorners = false;
@@ -490,10 +488,11 @@
       target.render(ctx);
       ctx.restore();
 
-      target.active && target._renderControls(ctx);
+      target === this._activeObject && target._renderControls(ctx, {
+        hasBorders: false,
+        transparentCorners: false
+      });
 
-      target.hasBorders = hasBorders;
-      target.transparentCorners = transparentCorners;
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
@@ -1454,7 +1453,6 @@
         return false;
       }
       this._activeObject = object;
-      object.set('active', true);
       return true;
     },
 
@@ -1468,7 +1466,6 @@
         if (obj.onDeselect({ e: e, object: object })) {
           return false;
         }
-        obj.set('active', false);
         this._activeObject = null;
       }
       return true;
