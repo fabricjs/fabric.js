@@ -474,5 +474,61 @@
     });
   });
 
+  test('getStyleAtPosition', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
 
+    equal(typeof iText.getStyleAtPosition, 'function');
+
+    deepEqual(iText.getStyleAtPosition(2), { textDecoration: 'overline' });
+
+    deepEqual(iText.getStyleAtPosition(1), { });
+
+    deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
+  });
+
+  test('getStyleAtPosition complete', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    equal(typeof iText.getStyleAtPosition, 'function');
+
+    deepEqual(iText.getStyleAtPosition(2, true), {
+      stroke: null,
+      strokeWidth: 1,
+      fill: 'rgb(0,0,0)',
+      fontFamily: 'Times New Roman',
+      fontSize: 40,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      underline: false,
+      overline: false,
+      linethrough: false,
+      textBackgroundColor: ''
+    });
+  });
 })();

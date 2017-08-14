@@ -198,7 +198,8 @@
      * Gets style of a current selection/cursor position
      * @param {Number} position  to get styles at
      * @param {Boolean} [complete] full style if true
-     * @return {Object} style Style object at a specified (or current) index
+     * @return {Object} style Style object at a specified index
+     * @private
      */
     getStyleAtPosition: function(position, complete) {
       var loc = this.get2DCursorLocation(position),
