@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=gestures,accessors minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=json,gestures,accessors minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: '2.0.0-beta6' };
@@ -9,6 +9,8 @@ if (typeof exports !== 'undefined') {
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
+  // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
+  window.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present
@@ -49,8 +51,7 @@ fabric.SHARED_ATTRIBUTES = [
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width",
-  "id",
-  "instantiated_by_use"
+  "id"
 ];
 /* _FROM_SVG_END_ */
 
@@ -129,12 +130,6 @@ fabric.initFilterBackend = function() {
     return (new fabric.Canvas2dFilterBackend());
   }
 };
-
-
-if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
-  window.fabric = fabric;
-}
 
 
 (function() {
@@ -767,33 +762,6 @@ fabric.CommonMethods = {
       // capitalize first letter only
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
       return fabric.util.resolveNamespace(namespace)[type];
-    },
-
-     /**
-     * Returns array of attributes for given svg that fabric parses
-     * @memberOf fabric.util
-     * @param {String} type Type of svg element (eg. 'circle')
-     * @return {Array} string names of supported attributes
-     */
-    getSvgAttributes: function(type) {
-      var attributes = [
-        'instantiated_by_use',
-        'style',
-        'id',
-        'class'
-      ];
-      switch (type) {
-        case 'linearGradient':
-          attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
-          break;
-        case 'radialGradient':
-          attributes = attributes.concat(['gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr']);
-          break;
-        case 'stop':
-          attributes = attributes.concat(['offset', 'stop-color', 'stop-opacity']);
-          break;
-      }
-      return attributes;
     },
 
     /**
@@ -3173,11 +3141,10 @@ if (typeof console !== 'undefined') {
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
 
-      svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line',
-      'image', 'text', 'linearGradient', 'radialGradient', 'stop'],
-      svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'],
-      svgInvalidAncestors = ['pattern', 'defs', 'symbol', 'metadata', 'clipPath', 'mask', 'desc'],
-      svgValidParents = ['symbol', 'g', 'a', 'svg'],
+      reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i,
+      reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
+      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata|clipPath|mask)$/i,
+      reAllowedParents = /^(symbol|g|a|svg)$/i,
 
       attributesMap = {
         cx:                   'left',
@@ -3209,11 +3176,6 @@ if (typeof console !== 'undefined') {
         stroke: 'strokeOpacity',
         fill:   'fillOpacity'
       };
-
-  fabric.svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
-  fabric.svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
-  fabric.svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
-  fabric.svgValidParentsRegEx = getSvgRegex(svgValidParents);
 
   fabric.cssRules = { };
   fabric.gradientDefs = { };
@@ -3273,13 +3235,6 @@ if (typeof console !== 'undefined') {
     }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
-  }
-
-   /**
-    * @private
-    */
-  function getSvgRegex(arr) {
-    return new RegExp('^(' + arr.join('|') + ')\\b', 'i');
   }
 
   /**
@@ -3680,7 +3635,7 @@ if (typeof console !== 'undefined') {
         x = element.getAttribute('x') || 0,
         y = element.getAttribute('y') || 0,
         preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '',
-        missingViewBox = (!viewBoxAttr || !fabric.svgViewBoxElementsRegEx.test(element.nodeName)
+        missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.nodeName)
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
@@ -3803,8 +3758,8 @@ if (typeof console !== 'undefined') {
 
     var elements = descendants.filter(function(el) {
       applyViewboxTransform(el);
-      return fabric.svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', '')) &&
-            !hasAncestorWithNodeName(el, fabric.svgInvalidAncestorsRegEx); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+      return reAllowedSVGTagNames.test(el.nodeName.replace('svg:', '')) &&
+            !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
     });
 
     if (!elements || (elements && !elements.length)) {
@@ -3931,7 +3886,7 @@ if (typeof console !== 'undefined') {
         svgUid = element.getAttribute('svgUid');
       }
       // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
-      if (element.parentNode && fabric.svgValidParentsRegEx.test(element.parentNode.nodeName)) {
+      if (element.parentNode && reAllowedParents.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
       fontSize = (parentAttributes && parentAttributes.fontSize ) ||
@@ -3959,7 +3914,7 @@ if (typeof console !== 'undefined') {
         fabric.parseFontDeclaration(normalizedStyle.font, normalizedStyle);
       }
       var mergedAttrs = extend(parentAttributes, normalizedStyle);
-      return fabric.svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
+      return reAllowedParents.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
     },
 
     /**
@@ -9149,7 +9104,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
-      var ctx = this.contextCache,
+      var hasBorders = target.hasBorders,
+          transparentCorners = target.transparentCorners,
+          ctx = this.contextCache,
           originalColor = target.selectionBackgroundColor;
 
       target.hasBorders = target.transparentCorners = false;
@@ -9160,11 +9117,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       target.render(ctx);
       ctx.restore();
 
-      target === this._activeObject && target._renderControls(ctx, {
-        hasBorders: false,
-        transparentCorners: false
-      });
+      target.active && target._renderControls(ctx);
 
+      target.hasBorders = hasBorders;
+      target.transparentCorners = transparentCorners;
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
@@ -10112,32 +10068,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Object} object to set as active
      * @param {Event} [e] Event (passed along when firing "object:selected")
-     * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function(object, e) {
-      if (this._activeObject === object) {
+      var active = this._activeObject;
+      if (active === object || object.onSelect({ e: e })) {
         return false;
       }
-      if (!this._discardActiveObject(e, object)) {
-        return false;
+      if (this._discardActiveObject(e)) {
+        this._activeObject = object;
+        object.set('active', true);
+        return true;
       }
-      if (object.onSelect({ e: e })) {
-        return false;
-      }
-      this._activeObject = object;
-      return true;
+      return false;
     },
 
     /**
      * @private
      */
-    _discardActiveObject: function(e, object) {
+    _discardActiveObject: function(e) {
       var obj = this._activeObject;
-      if (obj) {
+      if (obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
         // onDeselect return TRUE to cancel selection;
-        if (obj.onDeselect({ e: e, object: object })) {
+        if (obj.onDeselect({ e: e })) {
           return false;
         }
+        obj.set('active', false);
         this._activeObject = null;
       }
       return true;
@@ -10612,21 +10567,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __onMouseUp: function (e) {
 
-      var target, searchTarget = true, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+      var target;
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target, RIGHT_CLICK, isClick);
+          this._handleEvent(e, 'up', target, RIGHT_CLICK);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target, MIDDLE_CLICK, isClick);
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
         }
         return;
       }
@@ -10635,6 +10588,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._onMouseUpInDrawingMode(e);
         return;
       }
+
+      var searchTarget = true, transform = this._currentTransform,
+          groupSelector = this._groupSelector,
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
         this._finalizeCurrentTransform(e);
@@ -10837,12 +10794,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       if (target) {
-        if (target.selectable) {
-          this.setActiveObject(target, e);
-        }
-        if (target === this._activeObject && (target.__corner || !shouldGroup)) {
+        if ((target.selectable || target === this._activeObject) && (target.__corner || !shouldGroup)) {
           this._beforeTransform(e, target);
           this._setupCurrentTransform(e, target);
+        }
+        if (target.selectable) {
+          this.setActiveObject(target, e);
         }
       }
       this._handleEvent(e, 'down', target ? target : null);
@@ -12584,6 +12541,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * This callback function is called every time _discardActiveObject or _setActiveObject
+     * try to to deselect this object. If the function returns true, the process is cancelled
+     * @param {Object} [options] options sent from the upper functions
+     * @param {Event} [options.e] event if the process is generated by an event
+     */
+    onDeselect: function() {
+      // implemented by sub-classes, as needed.
+    },
+
+
+    /**
+     * This callback function is called every time _discardActiveObject or _setActiveObject
+     * try to to select this object. If the function returns true, the process is cancelled
+     * @param {Object} [options] options sent from the upper functions
+     * @param {Event} [options.e] event if the process is generated by an event
+     */
+    onSelect: function() {
+      // implemented by sub-classes, as needed.
+    },
+
+
+    /**
      * Retrieves viewportTransform from Object's canvas if possible
      * @method getViewportTransform
      * @memberOf fabric.Object.prototype
@@ -13044,10 +13023,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       var origParams = {
+        active: this.active,
         left: this.left,
         top: this.top
       };
 
+      this.set('active', false);
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 
       var originalCanvas = this.canvas;
@@ -14621,7 +14602,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _findTargetCorner: function(pointer) {
       // objects in group, anykind, are not self modificable,
       // must not return an hovered corner.
-      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
+      if (!this.hasControls || !this.active || this.group) {
         return false;
       }
 
@@ -14719,10 +14700,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     drawSelectionBackground: function(ctx) {
-      if (!this.selectionBackgroundColor ||
-        (this.canvas && !this.canvas.interactive) ||
-        (this.canvas && this.canvas._activeObject !== this)
-      ) {
+      if (!this.selectionBackgroundColor || !this.active ||
+        (this.canvas && !this.canvas.interactive)) {
         return this;
       }
       ctx.save();
@@ -14996,27 +14975,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         };
       }
       return this._controlsVisibility;
-    },
-
-    /**
-     * This callback function is called every time _discardActiveObject or _setActiveObject
-     * try to to deselect this object. If the function returns true, the process is cancelled
-     * @param {Object} [options] options sent from the upper functions
-     * @param {Event} [options.e] event if the process is generated by an event
-     */
-    onDeselect: function() {
-      // implemented by sub-classes, as needed.
-    },
-
-
-    /**
-     * This callback function is called every time _discardActiveObject or _setActiveObject
-     * try to to select this object. If the function returns true, the process is cancelled
-     * @param {Object} [options] options sent from the upper functions
-     * @param {Event} [options.e] event if the process is generated by an event
-     */
-    onSelect: function() {
-      // implemented by sub-classes, as needed.
     }
   });
 })();
@@ -15122,6 +15080,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
+      onStart: function() {
+        object.set('active', false);
+      },
       onChange: function(value) {
         object.set('opacity', value);
         _this.requestRenderAll();
@@ -19110,6 +19071,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         _this.setCoords();
         onComplete();
       },
+      onStart: function() {
+        _this.set('active', false);
+      }
     });
 
     return this;
@@ -24840,7 +24804,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing) {
+      if (!this.active || !this.isEditing) {
         return;
       }
       if (this.canvas && this.canvas.contextTop) {
@@ -24858,7 +24822,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing) {
+      if (!this.active || !this.isEditing) {
         return;
       }
       var boundaries = this._getCursorBoundaries(), ctx;
