@@ -306,31 +306,6 @@
       var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
     },
-    /**
-     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
-     */
-    get2DCursorLocation: function(selectionStart, skipWrapping) {
-      if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
-      }
-      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-      var len = lines.length;
-      for (var i = 0; i < len; i++) {
-        if (selectionStart <= lines[i].length) {
-          return {
-            lineIndex: i,
-            charIndex: selectionStart
-          };
-        }
-        selectionStart -= lines[i].length + 1;
-      }
-      return {
-        lineIndex: i - 1,
-        charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
-      };
-    },
 
     /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
