@@ -8,8 +8,6 @@ if (typeof exports !== 'undefined') {
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
-  // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
-  window.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present

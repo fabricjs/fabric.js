@@ -123,7 +123,7 @@ function ifSpecifiedAMDInclude(amdLib) {
 
 var filesToInclude = [
   'HEADER.js',
-
+  ifSpecifiedInclude('global', 'src/globalFabric.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',
