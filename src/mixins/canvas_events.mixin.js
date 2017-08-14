@@ -327,19 +327,21 @@
      */
     __onMouseUp: function (e) {
 
-      var target;
+      var target, searchTarget = true, transform = this._currentTransform,
+          groupSelector = this._groupSelector,
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target, RIGHT_CLICK);
+          this._handleEvent(e, 'up', target, RIGHT_CLICK, isClick);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK, isClick);
         }
         return;
       }
@@ -348,10 +350,6 @@
         this._onMouseUpInDrawingMode(e);
         return;
       }
-
-      var searchTarget = true, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
         this._finalizeCurrentTransform(e);

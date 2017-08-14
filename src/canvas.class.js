@@ -1441,28 +1441,31 @@
      * @private
      * @param {Object} object to set as active
      * @param {Event} [e] Event (passed along when firing "object:selected")
+     * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function(object, e) {
-      var active = this._activeObject;
-      if (active === object || object.onSelect({ e: e })) {
+      if (this._activeObject === object) {
         return false;
       }
-      if (this._discardActiveObject(e)) {
-        this._activeObject = object;
-        object.set('active', true);
-        return true;
+      if (!this._discardActiveObject(e, object)) {
+        return false;
       }
-      return false;
+      if (object.onSelect({ e: e })) {
+        return false;
+      }
+      this._activeObject = object;
+      object.set('active', true);
+      return true;
     },
 
     /**
      * @private
      */
-    _discardActiveObject: function(e) {
+    _discardActiveObject: function(e, object) {
       var obj = this._activeObject;
-      if (obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
+      if (obj) {
         // onDeselect return TRUE to cancel selection;
-        if (obj.onDeselect({ e: e })) {
+        if (obj.onDeselect({ e: e, object: object })) {
           return false;
         }
         obj.set('active', false);
