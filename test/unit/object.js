@@ -778,17 +778,6 @@
     ok(object2.canvas === canvas);
   });
 
-  test('remove', function() {
-    var object = new fabric.Object();
-
-    ok(typeof object.remove == 'function');
-
-    canvas.add(object);
-    equal(object.remove(), object, 'should be chainable');
-
-    equal(canvas.getObjects().length, 0);
-  });
-
   test('object:removed', function() {
     var object = new fabric.Object();
     var removedEventFired = false;
@@ -796,7 +785,7 @@
     canvas.add(object);
 
     object.on('removed', function(){ removedEventFired = true; });
-    object.remove();
+    canvas.remove(object);
 
     ok(removedEventFired);
   });
