@@ -48,7 +48,8 @@ fabric.SHARED_ATTRIBUTES = [
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width",
-  "id"
+  "id",
+  "instantiated_by_use"
 ];
 /* _FROM_SVG_END_ */
 

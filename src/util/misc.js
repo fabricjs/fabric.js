@@ -229,6 +229,33 @@
       return fabric.util.resolveNamespace(namespace)[type];
     },
 
+     /**
+     * Returns array of attributes for given svg that fabric parses
+     * @memberOf fabric.util
+     * @param {String} type Type of svg element (eg. 'circle')
+     * @return {Array} string names of supported attributes
+     */
+    getSvgAttributes: function(type) {
+      var attributes = [
+        'instantiated_by_use',
+        'style',
+        'id',
+        'class'
+      ];
+      switch (type) {
+        case 'linearGradient':
+          attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
+          break;
+        case 'radialGradient':
+          attributes = attributes.concat(['gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr']);
+          break;
+        case 'stop':
+          attributes = attributes.concat(['offset', 'stop-color', 'stop-opacity']);
+          break;
+      }
+      return attributes;
+    },
+
     /**
      * Returns object of given namespace
      * @memberOf fabric.util
