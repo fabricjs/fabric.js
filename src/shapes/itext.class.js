@@ -224,50 +224,6 @@
     },
 
     /**
-     * Gets style of a current selection/cursor (at the start position)
-     * @param {Number} [startIndex] Start index to get styles at
-     * @param {Number} [endIndex] End index to get styles at
-     * @param {Boolean} [endIndex] End index to get styles at
-     * @return {Object} styles Style object at a specified (or current) index
-     */
-    getSelectionStyles: function(startIndex, endIndex, complete) {
-
-      if (endIndex && startIndex !== endIndex) {
-        var styles = [];
-        for (var i = startIndex; i < endIndex; i++) {
-          styles.push(this.getSelectionStyles(i, i, complete));
-        }
-        return styles;
-      }
-
-      var loc = this.get2DCursorLocation(startIndex),
-          style = complete ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex) :
-            this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
-
-      return style || {};
-    },
-
-    /**
-     * Sets style of a current selection, if no selection exist, do not set anything.
-     * @param {Object} [styles] Styles object
-     * @return {fabric.IText} thisArg
-     * @chainable
-     */
-    setSelectionStyles: function(styles) {
-      if (this.selectionStart === this.selectionEnd) {
-        return this;
-      }
-      else {
-        for (var i = this.selectionStart; i < this.selectionEnd; i++) {
-          this._extendStyles(i, styles);
-        }
-      }
-      /* not included in _extendStyles to avoid clearing cache more than once */
-      this._forceClearCache = true;
-      return this;
-    },
-
-    /**
      * Initialize text dimensions. Render all text on given context
      * or on a offscreen canvas to get the text width with measureText.
      * Updates this.width and this.height with the proper values.
@@ -349,31 +305,6 @@
       // we add 4 pixel, to be sure to do not leave any pixel out
       var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
-    },
-    /**
-     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
-     */
-    get2DCursorLocation: function(selectionStart, skipWrapping) {
-      if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
-      }
-      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-      var len = lines.length;
-      for (var i = 0; i < len; i++) {
-        if (selectionStart <= lines[i].length) {
-          return {
-            lineIndex: i,
-            charIndex: selectionStart
-          };
-        }
-        selectionStart -= lines[i].length + 1;
-      }
-      return {
-        lineIndex: i - 1,
-        charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
-      };
     },
 
     /**
