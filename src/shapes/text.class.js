@@ -176,7 +176,7 @@
      */
     superscript: {
       size:      0.60, // fontSize factor
-      baseline:  0.67  // baseline-shift factor (upwards)
+      baseline:  -0.67  // baseline-shift factor (upwards)
     },
 
     /**
@@ -186,7 +186,7 @@
      */
     subscript: {
       size:      0.62, // fontSize factor
-      baseline: -0.25  // baseline-shift factor (downwards)
+      baseline: 0.25  // baseline-shift factor (downwards)
     },
 
     /**
@@ -855,11 +855,6 @@
      * @return {Number} fontSize of the character
      */
     getHeightOfChar: function(line, char) {
-      var size = this.getValueOfPropertyAt(line, char, '*fontSize');
-      if (typeof size === 'number') {
-        return size;
-      }
-
       return this.getValueOfPropertyAt(line, char, 'fontSize');
     },
 
@@ -1143,7 +1138,7 @@
      * @returns {Object} this
      */
     setSuperscript: function(line, char) {
-      return this.superscript.apply(this, line, char);
+      return this._setScript(line, char, this.superscript);
     },
 
     /**
@@ -1153,7 +1148,23 @@
      * @returns {Object} this
      */
     setSubscript: function(line, char) {
-      return this.subscript.apply(this, line, char);
+      return this._setScript(line, char, this.subscript);
+    },
+
+    /**
+     * Turns the character into an 'inferior figure' (aka. 'subscript')
+     * @param {Number} line the line number or starting position
+     * @param {Number} char the character number or final position
+     * @param {Object} schema either this.superscript or this.subscript
+     * @returns {Object} this
+     * @private
+     */
+    _setScript: function(line, char, schema) {
+      var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
+          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
+      this.setPropertyAt(line, char, 'deltaY', baseline);
+      this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
+      return this;
     },
 
     /**
@@ -1169,7 +1180,7 @@
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.deltaY != thisStyle.deltaY
+              prevStyle.deltaY !== thisStyle.deltaY
       );
     },
 
@@ -1258,6 +1269,10 @@
 
       if (charStyle && typeof charStyle[property] !== 'undefined') {
         return charStyle[property];
+      }
+      if (property === 'deltaY') {
+        // if did not find deltaY in style, return 0
+        return 0;
       }
 
       return this[property];
@@ -1441,87 +1456,6 @@
     complexity: function() {
       return 1;
     }
-  }, function(prototype, Text) {
-    prototype.superscript.apply = prototype.subscript.apply =
-      /**
-       * Mutates the style at given position in 'self' based on values from 'this'
-       * @param {Object} self the object to be mutated
-       * @param {Number} line the line number or the starting position
-       * @param {Number} char the character number or the final position
-       * @returns {Object} self
-       */
-      function(self, line, char) {
-        var schema = this;
-        var apply = function(line, char) {
-          var l = self._textLines[line];
-          if (l == null || typeof l[char] !== 'string') {
-            return self;
-          }
-
-          var size = self.getValueOfPropertyAt(line, char, 'fontSize');
-          if (typeof self.getValueOfPropertyAt(line, char, '*fontSize') !== 'number') {
-            self.setPropertyAt(line, char, '*fontSize', size);
-          }
-
-          var dy = self.getValueOfPropertyAt(line, char, 'deltaY') || 0;
-          self.setPropertyAt(line, char, 'fontSize', size * schema.size);
-          self.setPropertyAt(line, char, 'deltaY', dy + size * -schema.baseline);
-          return self;
-        };
-
-        if (typeof line === 'number') {
-          if (typeof char === 'number') {
-            return apply(line, char);
-          }
-
-          var c1 = char[0], c2 = char[1];
-          if (c1 >= c2) {
-            return self;
-          }
-
-          for (var c = c1; c <= c2; c++) {
-            apply(line, c, this);
-          }
-          return self;
-        }
-
-        var l1 = line[0], C1 = line[1];
-        if (typeof char !== 'object') {
-          return apply(l1, C1);
-        }
-
-        var l2 = char[0], C2 = char[1];
-        if (l1 > l2) {
-          return self;
-        }
-
-        var lines = self._textLines;
-        for (var l = l1; l <= l2; l++) {    // lines
-          line = lines[l];
-          if (line == null) {
-            break;
-          }
-
-          var c1 = 0, c2 = line.length - 1;
-          switch (l) {
-            case l1:
-              c1 = C1;
-              break;
-
-            case l2:
-              c2 = C2;
-          }
-
-          if (l1 == l2 && c1 == c2 || c1 > c2) {
-            break;
-          }
-          for (var c = c1; c <= c2; c++) {  // characters
-            apply(l, c);
-          }
-        }
-
-        return self;
-      };
   });
 
   /* _FROM_SVG_START_ */
