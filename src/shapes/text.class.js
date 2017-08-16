@@ -176,7 +176,7 @@
      */
     superscript: {
       size:      0.60, // fontSize factor
-      baseline:  0.67  // baseline-shift factor (upwards)
+      baseline:  -0.67  // baseline-shift factor (upwards)
     },
 
     /**
@@ -186,7 +186,7 @@
      */
     subscript: {
       size:      0.62, // fontSize factor
-      baseline: -0.25  // baseline-shift factor (downwards)
+      baseline: 0.25  // baseline-shift factor (downwards)
     },
 
     /**
@@ -1161,7 +1161,7 @@
      */
     _setScript: function(line, char, schema) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * -schema.baseline;
+          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
       this.setPropertyAt(line, char, 'deltaY', baseline);
       this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
       return this;
