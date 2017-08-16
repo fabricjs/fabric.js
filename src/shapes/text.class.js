@@ -1161,7 +1161,7 @@
      */
     _setScript: function(line, char, schema) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
+          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * -schema.baseline;
       this.setPropertyAt(line, char, 'deltaY', baseline);
       this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
       return this;
