@@ -72,7 +72,6 @@
       // we cannot change properties of objects.
       // Thus we need to set options to group without objects,
       isAlreadyGrouped && this.callSuper('initialize', options);
-
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
