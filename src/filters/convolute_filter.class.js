@@ -230,7 +230,7 @@
     */
     retrieveShader: function(options) {
       var size = Math.sqrt(this.matrix.length);
-      var cacheKey = this.type + '_' + size + '_' + this.opaque ? 1 : 0;
+      var cacheKey = this.type + '_' + size + '_' + (this.opaque ? 1 : 0);
       var shaderSource = this.fragmentSource[cacheKey];
       if (!options.programCache.hasOwnProperty(cacheKey)) {
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
