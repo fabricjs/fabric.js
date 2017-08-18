@@ -717,9 +717,9 @@
 
     canvas.add(group);
     equal(group.canvas, canvas, 'canvas has been set');
-    group.add(rect1)
+    group.add(rect1);
     equal(group._objects[0].canvas, canvas, 'canvas has been set on object 0');
-    group.addWithUpdate(rect2)
+    group.addWithUpdate(rect2);
     equal(group._objects[1].canvas, canvas, 'canvas has been set on object 0');
   });
 
