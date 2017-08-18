@@ -170,10 +170,11 @@
         strokeLineCap: this.strokeLineCap,
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
-        originX: 'center',
-        originY: 'center'
       });
-
+      if (path.originX !== 'left' || path.originY !== 'top') {
+        var position = new fabric.Point({ x: path.left, y: path.top });
+        position = path.translateToGivenOrigin(position, 'left', 'top', path.originX, path.originY);
+      }
       if (this.shadow) {
         this.shadow.affectStroke = true;
         path.setShadow(this.shadow);
