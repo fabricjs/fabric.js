@@ -430,8 +430,7 @@
      */
     _render: function(ctx) {
       this._renderPathCommands(ctx);
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**

@@ -50,8 +50,7 @@
       ctx.lineTo(widthBy2, heightBy2);
       ctx.closePath();
 
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**

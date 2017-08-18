@@ -179,8 +179,7 @@
       if (!this.commonRender(ctx)) {
         return;
       }
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**

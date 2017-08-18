@@ -253,6 +253,13 @@
     _measuringContext: null,
 
     /**
+     * Determins if the fill or the stroke is drawn first (one of "fill" or "stroke")
+     * @type String
+     * @default
+     */
+    paintFirst:           'fill',
+
+    /**
      * Array of properties that define a style unit.
      * @type {Array}
      * @default
@@ -404,8 +411,13 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderText: function(ctx) {
-      this._renderTextFill(ctx);
-      this._renderTextStroke(ctx);
+      if (this.paintFirst === 'stroke') {
+        this._renderTextStroke(ctx);
+        this._renderTextFill(ctx);
+      } else {
+        this._renderTextFill(ctx);
+        this._renderTextStroke(ctx);
+      }
     },
 
     /**

@@ -143,8 +143,7 @@
               this.radius,
               this.startAngle,
               this.endAngle, false);
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**

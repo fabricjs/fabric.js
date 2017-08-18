@@ -148,8 +148,7 @@
         piBy2,
         false);
       ctx.restore();
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
   });
 

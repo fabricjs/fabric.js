@@ -35,6 +35,7 @@
         'font-size':          'fontSize',
         'font-style':         'fontStyle',
         'font-weight':        'fontWeight',
+        'paint-order':        'paintFirst',
         'stroke-dasharray':   'strokeDashArray',
         'stroke-linecap':     'strokeLineCap',
         'stroke-linejoin':    'strokeLineJoin',
@@ -108,6 +109,17 @@
     }
     else if (attr === 'textAnchor' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
+    }
+    else if (attr === 'paintFirst') {
+      var fillIndex = value.indexOf('fill');
+      var strokeIndex = value.indexOf('stroke');
+      var value = 'fill';
+      if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
+        value = 'stroke';
+      }
+      else if (fillIndex === -1 && strokeIndex > -1) {
+        value = 'stroke';
+      }
     }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
