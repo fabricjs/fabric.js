@@ -82,7 +82,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyDown: function(e) {
-    if (!this.isEditing　|| this.inCompositionMode) {
+    if (!this.isEditing || this.inCompositionMode) {
       return;
     }
     if (e.keyCode in this.keysMap) {
