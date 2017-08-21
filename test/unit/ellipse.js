@@ -50,6 +50,7 @@
       'visible':                  true,
       'backgroundColor':          '',
       'fillRule':                 'nonzero',
+      'paintFirst':               'fill',
       'globalCompositeOperation': 'source-over',
       'clipTo':                   null,
       'transformMatrix':          null

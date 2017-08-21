@@ -30,6 +30,7 @@
     'clipTo':                   null,
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
+    'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
     'skewY':                    0,

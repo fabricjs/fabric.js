@@ -26,6 +26,7 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'fillRule':                 'nonzero',
+    'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
     'rx':                       0,
