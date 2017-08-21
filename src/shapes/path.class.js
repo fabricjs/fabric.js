@@ -490,6 +490,7 @@
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(), addTransform,
           this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
+          this.addPaintOrder(),
         '/>\n'
       );
 
