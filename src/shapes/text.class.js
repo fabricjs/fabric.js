@@ -253,13 +253,6 @@
     _measuringContext: null,
 
     /**
-     * Determins if the fill or the stroke is drawn first (one of "fill" or "stroke")
-     * @type String
-     * @default
-     */
-    paintFirst:           'fill',
-
-    /**
      * Array of properties that define a style unit.
      * @type {Array}
      * @default
