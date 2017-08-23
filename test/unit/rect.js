@@ -190,10 +190,30 @@
     equal(svg, '<rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" style="stroke: rgb(255,0,0); stroke-opacity: 0.5; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(50 50)"/>\n');
   });
 
+  test('toSVG with paintFirst set to stroke', function() {
+    var rect = new fabric.Rect({ width: 100, height: 100, paintFirst: 'stroke' });
+    var svg = rect.toSVG();
+    equal(svg, '<rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(50.5 50.5)" paint-order="stroke" />\n');
+  });
+
   test('toObject without default values', function() {
     var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20 };
     var rect = new fabric.Rect(options);
     rect.includeDefaultValues = false;
     deepEqual(rect.toObject(), options);
+  });
+
+  test('paintFirst life cycle', function( assert ) {
+    var done = assert.async();
+    var svg = '<svg><rect x="10" y="10" height="50" width="55" fill="red" stroke="blue" paint-order="stroke" /></svg>';
+    fabric.loadSVGFromString(svg, function(envlivedObjects) {
+      var rect = envlivedObjects[0];
+      var rectObject = rect.toObject();
+      var rectSvg = rect.toSVG();
+      equal(rect.paintFirst, 'stroke');
+      equal(rectObject.paintFirst, 'stroke');
+      ok(rectSvg.indexOf('paint-order="stroke"') > -1);
+      done();
+    })
   });
 })();
