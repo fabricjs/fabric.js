@@ -170,26 +170,6 @@
     lineHeight:           1.16,
 
     /**
-     * Superscript schema object (based on https://tr.im/subscript_superscript)
-     * @type Object
-     * @default
-     */
-    superscript: {
-      size:      0.60, // fontSize factor
-      baseline:  -0.67  // baseline-shift factor (upwards)
-    },
-
-    /**
-     * Subscript schema object (based on https://tr.im/subscript_superscript)
-     * @type Object
-     * @default
-     */
-    subscript: {
-      size:      0.62, // fontSize factor
-      baseline: 0.25  // baseline-shift factor (downwards)
-    },
-
-    /**
      * Background color of text lines
      * @type String
      * @default
@@ -296,6 +276,22 @@
      * contains characters bounding boxes
      */
     __charBounds: [],
+    
+    /**
+     * The scaling factors to be used upon applying super/subscript styles; when
+     * single-valued then same value applies to both.
+     * @type {Number} [<superscript>, [<subscript>]]
+     * @default
+     */
+    downsizing: [0.6],
+    
+    /**
+     * Amounts relative to current fontSize by which the baseline will be shifted 
+     * upon applying super/subscript styles; the default value has minimum overlap.
+     * @type {Array} [<superscript>, <subscript>]
+     * @default
+     */
+    baselineShift: [-0.35, 0.11],
 
     /**
      * Constructor
@@ -304,8 +300,26 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      this.styles = options ? (options.styles || { }) : { };
       this.text = text;
+      if (options) {
+        this.styles = options.styles || { };
+        var keys = ['size', 'baseline'];
+        ['downsizing', 'baselineShift'].forEach(function(key, i) {
+          var array = this[key].slice();
+          ['super', 'sub'].forEach(function(key, j) {
+            var schema = options[key + 'script'];
+            if (schema) {
+              var value = schema[keys[i]];
+              if (value) {
+                array[j] = value;
+              }
+            }
+          });
+          this[key] = array;
+        }, this);
+      } else {
+        this.styles = { };
+      }
       this.__skipDimension = true;
       this.callSuper('initialize', options);
       this.__skipDimension = false;
@@ -460,13 +474,30 @@
     },
 
     /**
+     * Applies the 'styles' at given character 'index'
      * @private
+     * @param {Number} index
+     * @param {Object|String} styles can also be 'superscript'/'subscript'
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     _extendStyles: function(index, styles) {
-      var loc = this.get2DCursorLocation(index);
-      var decl = this._getStyleDeclaration(loc.lineIndex, loc.charIndex) || {};
-      fabric.util.object.extend(decl, styles);
-      this._setStyleDeclaration(loc.lineIndex, loc.charIndex, decl);
+      var pos = this.get2DCursorLocation(index),
+        line = pos.lineIndex, 
+        char = pos.charIndex;
+      switch (styles) {
+        case 'superscript':
+          this.setSuperscript(line, char);
+          break;
+        case 'subscript':
+          this.setSubscript(line, char);
+          break;
+        default:
+          var decl = this._getStyleDeclaration(line, char) || {};
+          fabric.util.object.extend(decl, styles);
+          this._setStyleDeclaration(line, char, decl);
+      }
+      return this;
     },
 
     /**
@@ -737,12 +768,16 @@
      */
     getCompleteStyleDeclaration: function(lineIndex, charIndex) {
       var style = this._getStyleDeclaration(lineIndex, charIndex) || { },
-          styleObject = { }, prop;
-      for (var i = 0; i < this._styleProperties.length; i++) {
-        prop = this._styleProperties[i];
-        styleObject[prop] = typeof style[prop] === 'undefined' ? this[prop] : style[prop];
+          decl = { }, slate = this._styleProperties;
+      for (var i = 0, len = slate.length; i < len; i++) {
+        var prop = slate[i];
+        if (style[prop] != null) {
+          decl[prop] = style[prop];
+        } else {
+          decl[prop] = prop === 'deltaY' ? 0 : this[prop];
+        }
       }
-      return styleObject;
+      return decl;
     },
 
     /**
@@ -929,7 +964,7 @@
         left: 0,
         height: style.fontSize,
         kernedWidth: kernedWidth,
-        deltaY: style.deltaY || 0,
+        deltaY: style.deltaY,
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
@@ -951,7 +986,6 @@
       var line = this._textLines[lineIndex], maxHeight = 0;
       for (var i = 0, len = line.length; i < len; i++) {
         maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
-        // TODO: Take 'deltaY' into account to avoid overlaps (may require 'allowOverlaps' property)
       }
 
       return this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
@@ -1132,38 +1166,43 @@
     },
 
     /**
-     * Turns the character into a 'superior figure' (aka. 'superscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @returns {Object} this
+     * Turns the character into a 'superior figure' (i.e. 'superscript')
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     setSuperscript: function(line, char) {
-      return this._setScript(line, char, this.superscript);
+      return this._setScript(line, char, 0);
     },
 
     /**
-     * Turns the character into an 'inferior figure' (aka. 'subscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @returns {Object} this
+     * Turns the character into an 'inferior figure' (i.e. 'subscript')
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     setSubscript: function(line, char) {
-      return this._setScript(line, char, this.subscript);
+      return this._setScript(line, char, 1);
     },
 
     /**
-     * Turns the character into an 'inferior figure' (aka. 'subscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @param {Object} schema either this.superscript or this.subscript
-     * @returns {Object} this
+     * Applies 'super/subscript' style at given position
      * @private
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @param {Number} key one of {0, 1}
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
-    _setScript: function(line, char, schema) {
+    _setScript: function(line, char, key) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
-      this.setPropertyAt(line, char, 'deltaY', baseline);
-      this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
+        dy = this.getValueOfPropertyAt(line, char, 'deltaY'),
+        scale = this.downsizing[key] || this.downsizing[0],
+        shift = this.baselineShift[key];
+      this.setPropertyAt(line, char, 'fontSize', fontSize * scale);
+      this.setPropertyAt(line, char, 'deltaY', dy + fontSize * shift);
       return this;
     },
 
@@ -1302,7 +1341,7 @@
         return;
       }
       var heightOfLine,
-          lineLeftOffset,
+          lineLeftOffset, dy, _dy,
           line, lastDecoration,
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(),
@@ -1322,21 +1361,24 @@
         boxWidth = 0;
         lastDecoration = this.getValueOfPropertyAt(i, 0, type);
         lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+        dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentDecoration = this.getValueOfPropertyAt(i, j, type);
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-          if ((currentDecoration !== lastDecoration || currentFill !== lastFill) && boxWidth > 0) {
+          _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
+          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _dy !== dy) && boxWidth > 0) {
             ctx.fillStyle = lastFill;
             lastDecoration && lastFill && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
+              topOffset + dy + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
               boxWidth,
               this.fontSize / 15);
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
             lastFill = currentFill;
+            dy = _dy;
           }
           else {
             boxWidth += charBox.kernedWidth;
@@ -1345,7 +1387,7 @@
         ctx.fillStyle = currentFill;
         currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
-          topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
+          topOffset + dy + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
           boxWidth,
           this.fontSize / 15
         );
@@ -1358,17 +1400,17 @@
 
     /**
      * return font declaration string for canvas context
-     * @param {Object} [styleObject] object
+     * @param {Object} [style] object
      * @returns {String} font declaration formatted for canvas context.
      */
-    _getFontDeclaration: function(styleObject, forMeasuring) {
-      var style = styleObject || this;
+    _getFontDeclaration: function(style, forMeasuring) {
+      var decl = style || this;
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
-        (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
-        (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
-        forMeasuring ? CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + style.fontFamily + '"') : style.fontFamily)
+        (fabric.isLikelyNode ? decl.fontWeight : decl.fontStyle),
+        (fabric.isLikelyNode ? decl.fontStyle : decl.fontWeight),
+        forMeasuring ? CACHE_FONT_SIZE + 'px' : decl.fontSize + 'px',
+        (fabric.isLikelyNode ? ('"' + decl.fontFamily + '"') : decl.fontFamily)
       ].join(' ');
     },
 
