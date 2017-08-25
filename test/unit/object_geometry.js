@@ -389,6 +389,13 @@
   test('_constrainScale', function(){
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     ok(typeof cObj._constrainScale == 'function', '_constrainScale should exist');
+    cObj.set('scaleX', 0);
+    equal(cObj.scaleX, 0.0001);
+    cObj.set('scaleY', 0);
+    equal(cObj.scaleY, 0.0001);
+    cObj.minScaleLimit = 3;
+    cObj.set('scaleY', 0);
+    equal(cObj.scaleY, 3);
   });
 
   test('getCoords return coordinate of object in canvas coordinate.', function() {

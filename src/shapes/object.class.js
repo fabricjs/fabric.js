@@ -360,7 +360,7 @@
      * @type Number
      * @default
      */
-    minScaleLimit:            0.01,
+    minScaleLimit:            0,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
@@ -905,10 +905,6 @@
 
       if (this.group && this.stateProperties.indexOf(key) > -1 && this.group.isOnACache()) {
         this.group.set('dirty', true);
-      }
-
-      if (key === 'width' || key === 'height') {
-        this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));
       }
 
       return this;

@@ -313,6 +313,9 @@
           return this.minScaleLimit;
         }
       }
+      else if (value === 0) {
+        return 0.0001;
+      }
       return value;
     },
 
@@ -323,16 +326,8 @@
      * @chainable
      */
     scale: function(value) {
-      value = this._constrainScale(value);
-
-      if (value < 0) {
-        this.flipX = !this.flipX;
-        this.flipY = !this.flipY;
-        value *= -1;
-      }
-
-      this.scaleX = value;
-      this.scaleY = value;
+      this._set('scaleX', value);
+      this._set('scaleY', value);
       return this.setCoords();
     },
 
