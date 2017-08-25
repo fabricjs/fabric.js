@@ -463,14 +463,14 @@
      * Applies the 'styles' at given character 'index'
      * @private
      * @param {Number} index
-     * @param {Object|String} styles can also be 'superscript'/'subscript'
+     * @param {Object|String} styles can be 'superscript'/'subscript'
      * @returns {fabric.Text} thisArg
      * @chainable
      */
     _extendStyles: function(index, styles) {
       var pos = this.get2DCursorLocation(index),
-        line = pos.lineIndex,
-        char = pos.charIndex;
+          line = pos.lineIndex,
+          char = pos.charIndex;
       if (typeof styles === 'string') {
         var schema = this[styles];
         if (schema && schema.baseline) {
@@ -755,11 +755,12 @@
           decl = { }, slate = this._styleProperties;
       for (var i = 0, len = slate.length; i < len; i++) {
         var prop = slate[i];
-        if (style[prop] != null) {
+        if (typeof style[prop] !== 'undefined') {
           decl[prop] = style[prop];
-        } else {
+        }
+        else {
           decl[prop] = prop === 'deltaY' ? 0 : this[prop];
-      }
+        }
       }
       return decl;
     },
@@ -1185,7 +1186,7 @@
      */
     _setScript: function(line, char, schema) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-        dy = this.getValueOfPropertyAt(line, char, 'deltaY');
+          dy = this.getValueOfPropertyAt(line, char, 'deltaY');
       this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
       this.setPropertyAt(line, char, 'deltaY', dy + fontSize * schema.baseline);
       return this;
@@ -1355,7 +1356,8 @@
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
           _size = this.getHeightOfChar(i, j);
           _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
-          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) && boxWidth > 0) {
+          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) &&
+              boxWidth > 0) {
             ctx.fillStyle = lastFill;
             lastDecoration && lastFill && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
@@ -1369,7 +1371,8 @@
             lastFill = currentFill;
             size = _size;
             dy = _dy;
-          } else {
+          }
+          else {
             boxWidth += charBox.kernedWidth;
           }
         }

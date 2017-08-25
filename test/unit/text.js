@@ -387,13 +387,13 @@
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
     } });
     ok(typeof text.setSuperscript === 'function');
-    text.setSuperscript(0, 1).setSuperscript(0, 2);
-    
+
     var size = text.fontSize;
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    
+    text.setSuperscript(0, 1).setSuperscript(0, 2);
+
     equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
 
@@ -408,13 +408,13 @@
     var text = new fabric.Text('xxx', { styles: {
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
     } });
-    ok(typeof text.setSuperscript === 'function');
-    text.setSubscript(0, 1).setSubscript(0, 2);
+    ok(typeof text.setSubscript === 'function');
 
     var size = text.fontSize;
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSubscript(0, 1).setSubscript(0, 2);
 
     equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
