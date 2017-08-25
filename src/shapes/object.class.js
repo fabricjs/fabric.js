@@ -907,10 +907,6 @@
         this.group.set('dirty', true);
       }
 
-      if (key === 'width' || key === 'height') {
-        this.minScaleLimit = Math.min(0.1, 1 / Math.max(this.width, this.height));
-      }
-
       return this;
     },
 
