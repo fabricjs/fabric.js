@@ -382,48 +382,48 @@
     equal(cache, cache2, 'you get the same cache');
   });
 
-  test('text superscript - single char', function() {
+  test('text superscript', function() {
     var text = new fabric.Text('xxx', { styles: {
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
     } });
+    ok(typeof text.setSuperscript === 'function');
+
     var size = text.fontSize;
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSuperscript(0, 1).setSuperscript(0, 2);
 
-    ok(typeof text.setSuperscript === 'function');
-    text.setSuperscript(0, 1);
-    text.setSuperscript(0, 2);
-    equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize remained the same');
+    equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
 
-    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize was reduced');
+    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
     equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
 
-    equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize was reduced from the style one');
-    equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been incremented');
+    equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
+    equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been decreased');
   });
 
-  test('text subscript - single char', function() {
+  test('text subscript', function() {
     var text = new fabric.Text('xxx', { styles: {
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
     } });
+    ok(typeof text.setSubscript === 'function');
+
     var size = text.fontSize;
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSubscript(0, 1).setSubscript(0, 2);
 
-    ok(typeof text.setSuperscript === 'function');
-    text.setSubscript(0, 1);
-    text.setSubscript(0, 2);
-    equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize remained the same');
+    equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
 
-    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize was reduced');
+    equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
     equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
 
-    equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize was reduced from the style one');
-    equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been incremented');
+    equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
+    equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
 
 })();

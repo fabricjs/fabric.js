@@ -170,23 +170,23 @@
     lineHeight:           1.16,
 
     /**
-     * Superscript schema object (based on https://tr.im/subscript_superscript)
-     * @type Object
+     * Superscript schema object (minimum overlap)
+     * @type {Object}
      * @default
      */
     superscript: {
       size:      0.60, // fontSize factor
-      baseline:  -0.67  // baseline-shift factor (upwards)
+      baseline: -0.35  // baseline-shift factor (upwards)
     },
 
     /**
-     * Subscript schema object (based on https://tr.im/subscript_superscript)
-     * @type Object
+     * Subscript schema object (minimum overlap)
+     * @type {Object}
      * @default
      */
     subscript: {
-      size:      0.62, // fontSize factor
-      baseline: 0.25  // baseline-shift factor (downwards)
+      size:      0.60, // fontSize factor
+      baseline:  0.11  // baseline-shift factor (downwards)
     },
 
     /**
@@ -460,13 +460,28 @@
     },
 
     /**
+     * Applies the 'styles' at given character 'index'
      * @private
+     * @param {Number} index
+     * @param {Object|String} styles can be 'superscript'/'subscript'
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     _extendStyles: function(index, styles) {
-      var loc = this.get2DCursorLocation(index);
-      var decl = this._getStyleDeclaration(loc.lineIndex, loc.charIndex) || {};
+      var pos = this.get2DCursorLocation(index),
+          line = pos.lineIndex,
+          char = pos.charIndex;
+      if (typeof styles === 'string') {
+        var schema = this[styles];
+        if (schema && schema.baseline) {
+          this._setScript(line, char, schema);
+        }
+        return this;
+      }
+
+      var decl = this._getStyleDeclaration(line, char) || {};
       fabric.util.object.extend(decl, styles);
-      this._setStyleDeclaration(loc.lineIndex, loc.charIndex, decl);
+      return this._setStyleDeclaration(line, char, decl);
     },
 
     /**
@@ -737,24 +752,30 @@
      */
     getCompleteStyleDeclaration: function(lineIndex, charIndex) {
       var style = this._getStyleDeclaration(lineIndex, charIndex) || { },
-          styleObject = { }, prop;
-      for (var i = 0; i < this._styleProperties.length; i++) {
-        prop = this._styleProperties[i];
-        styleObject[prop] = typeof style[prop] === 'undefined' ? this[prop] : style[prop];
+          decl = { }, slate = this._styleProperties;
+      for (var i = 0, len = slate.length; i < len; i++) {
+        var prop = slate[i];
+        if (typeof style[prop] !== 'undefined') {
+          decl[prop] = style[prop];
+        }
+        else {
+          decl[prop] = prop === 'deltaY' ? 0 : this[prop];
+        }
       }
-      return styleObject;
+      return decl;
     },
 
     /**
+     * @private
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @param {Object} style
-     * @private
+     * @chainable
      */
     _setStyleDeclaration: function(lineIndex, charIndex, style) {
       var decl = this._getLineStyle(lineIndex) || {};
       decl[charIndex] = style;
-      this._setLineStyle(lineIndex, decl);
+      return this._setLineStyle(lineIndex, decl);
     },
 
     /**
@@ -776,12 +797,14 @@
     },
 
     /**
+     * @private
      * @param {Number} lineIndex
      * @param {Object} style
-     * @private
+     * @chainable
      */
     _setLineStyle: function(lineIndex, style) {
       this.styles[lineIndex] = style;
+      return this;
     },
 
     /**
@@ -929,7 +952,7 @@
         left: 0,
         height: style.fontSize,
         kernedWidth: kernedWidth,
-        deltaY: style.deltaY || 0,
+        deltaY: style.deltaY,
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
@@ -951,7 +974,6 @@
       var line = this._textLines[lineIndex], maxHeight = 0;
       for (var i = 0, len = line.length; i < len; i++) {
         maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
-        // TODO: Take 'deltaY' into account to avoid overlaps (may require 'allowOverlaps' property)
       }
 
       return this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
@@ -1132,38 +1154,41 @@
     },
 
     /**
-     * Turns the character into a 'superior figure' (aka. 'superscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @returns {Object} this
+     * Turns the character into a 'superior figure' (i.e. 'superscript')
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     setSuperscript: function(line, char) {
       return this._setScript(line, char, this.superscript);
     },
 
     /**
-     * Turns the character into an 'inferior figure' (aka. 'subscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @returns {Object} this
+     * Turns the character into an 'inferior figure' (i.e. 'subscript')
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     setSubscript: function(line, char) {
       return this._setScript(line, char, this.subscript);
     },
 
     /**
-     * Turns the character into an 'inferior figure' (aka. 'subscript')
-     * @param {Number} line the line number or starting position
-     * @param {Number} char the character number or final position
-     * @param {Object} schema either this.superscript or this.subscript
-     * @returns {Object} this
+     * Applies 'schema' at given position
      * @private
+     * @param {Number} line the line number
+     * @param {Number} char the character number
+     * @param {Number} key one of {'this.superscript', 'this.subscript'}
+     * @returns {fabric.Text} thisArg
+     * @chainable
      */
     _setScript: function(line, char, schema) {
       var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          baseline = this.getValueOfPropertyAt(line, char, 'deltaY') + fontSize * schema.baseline;
-      this.setPropertyAt(line, char, 'deltaY', baseline);
+          dy = this.getValueOfPropertyAt(line, char, 'deltaY');
       this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
+      this.setPropertyAt(line, char, 'deltaY', dy + fontSize * schema.baseline);
       return this;
     },
 
@@ -1301,11 +1326,11 @@
       if (!this[type] && !this.styleHas(type)) {
         return;
       }
-      var heightOfLine,
-          lineLeftOffset,
+      var heightOfLine, size, _size,
+          lineLeftOffset, dy, _dy,
           line, lastDecoration,
           leftOffset = this._getLeftOffset(),
-          topOffset = this._getTopOffset(),
+          topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
           maxHeight, currentFill, lastFill;
 
@@ -1322,21 +1347,30 @@
         boxWidth = 0;
         lastDecoration = this.getValueOfPropertyAt(i, 0, type);
         lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+        top = topOffset + maxHeight * (1 - this._fontSizeFraction);
+        size = this.getHeightOfChar(i, 0);
+        dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentDecoration = this.getValueOfPropertyAt(i, j, type);
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-          if ((currentDecoration !== lastDecoration || currentFill !== lastFill) && boxWidth > 0) {
+          _size = this.getHeightOfChar(i, j);
+          _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
+          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) &&
+              boxWidth > 0) {
             ctx.fillStyle = lastFill;
             lastDecoration && lastFill && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
+              top + this.offsets[type] * size + dy,
               boxWidth,
-              this.fontSize / 15);
+              this.fontSize / 15
+            );
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
             lastFill = currentFill;
+            size = _size;
+            dy = _dy;
           }
           else {
             boxWidth += charBox.kernedWidth;
@@ -1345,7 +1379,7 @@
         ctx.fillStyle = currentFill;
         currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
-          topOffset + maxHeight * (1 - this._fontSizeFraction) + this.offsets[type] * this.fontSize,
+          top + this.offsets[type] * size + dy,
           boxWidth,
           this.fontSize / 15
         );
