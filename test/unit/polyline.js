@@ -8,6 +8,7 @@
   }
 
   var REFERENCE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'polyline',
     'originX':                  'left',
     'originY':                  'top',

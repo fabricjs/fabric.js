@@ -13,6 +13,7 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
+    'version':                   fabric.version,
     'type':                      'text',
     'originX':                   'left',
     'originY':                   'top',

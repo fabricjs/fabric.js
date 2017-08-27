@@ -8,6 +8,7 @@
   });
 
   var ITEXT_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'text',
     'originX':                  'left',
     'originY':                  'top',
