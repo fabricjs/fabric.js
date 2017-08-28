@@ -8,7 +8,7 @@
   var CANVAS_SVG_VIEWBOX = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
                            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="100 100 300 300" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n</svg>';
 
-  var PATH_JSON = '{"version":"'+fabric.version+'","objects": [{"type": "path", "version":"'+fabric.version+'", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
+  var PATH_JSON = '{"version":"' + fabric.version + '","objects": [{"type": "path", "version":"' + fabric.version + '", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
                   ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
                   '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
                   ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
@@ -25,7 +25,7 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z", null]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
 
-  var PATH_WITHOUT_DEFAULTS_JSON = '{"version":"'+fabric.version+'","objects": [{"type": "path", "version":"'+ fabric.version +'", "left": 268, "top": 266, "width": 51, "height": 49, "path": [["M", 18.511, 13.99],' +
+  var PATH_WITHOUT_DEFAULTS_JSON = '{"version":"' + fabric.version + '","objects": [{"type": "path", "version":"' + fabric.version + '", "left": 268, "top": 266, "width": 51, "height": 49, "path": [["M", 18.511, 13.99],' +
                   ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
                   ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
                   '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
@@ -40,17 +40,17 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"version":"'+fabric.version+'","objects":[{"type":"path","version":"'+fabric.version+'","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"version":"'+fabric.version+'","objects":[{"type":"rect","version":"'+fabric.version+'","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
-  var RECT_JSON_WITH_PADDING = '{"version":"'+fabric.version+'","objects":[{"type":"rect","version":"'+fabric.version+'","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
+  var RECT_JSON_WITH_PADDING = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                                '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
@@ -775,10 +775,10 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"version":"'+fabric.version+'","objects":[]}');
+    equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[]}');
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    equal(JSON.stringify(canvas.toJSON()), '{"version":"'+fabric.version+'","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
+    equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
     deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
   });
