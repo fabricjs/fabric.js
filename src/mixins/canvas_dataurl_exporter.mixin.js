@@ -73,7 +73,7 @@
       // setting interactive to false avoid exporting controls
       this.interactive = false;
       if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
-        this.setDimensions({ width: scaledWidth, height: scaledHeight });
+        this.setDimensions({ width: scaledWidth, height: scaledHeight }, {backstoreOnly: true});
       }
       // call a renderAll to force sync update. This will cancel the scheduled requestRenderAll
       // from setDimensions
@@ -84,7 +84,7 @@
       this.viewportTransform = vp;
       //setDimensions with no option object is taking care of:
       //this.width, this.height, this.requestRenderAll()
-      this.setDimensions({ width: origWidth, height: origHeight });
+      this.setDimensions({ width: origWidth, height: origHeight }, {backstoreOnly: true});
       return data;
     },
 
