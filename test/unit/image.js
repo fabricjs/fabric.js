@@ -15,6 +15,7 @@
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'image',
     'originX':                  'left',
     'originY':                  'top',

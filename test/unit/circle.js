@@ -79,6 +79,7 @@
   test('toObject', function() {
     var circle = new fabric.Circle();
     var defaultProperties = {
+      'version':                  fabric.version,
       'type':                     'circle',
       'originX':                  'left',
       'originY':                  'top',

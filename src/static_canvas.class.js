@@ -1108,6 +1108,7 @@
     _toObjectMethod: function (methodName, propertiesToInclude) {
 
       var data = {
+        version: fabric.version,
         objects: this._toObjects(methodName, propertiesToInclude)
       };
 

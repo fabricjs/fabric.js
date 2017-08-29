@@ -1,6 +1,7 @@
 (function() {
 
   var REFERENCE_PATH_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'path',
     'originX':                  'left',
     'originY':                  'top',

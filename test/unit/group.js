@@ -163,6 +163,7 @@
     var clone = group.toObject();
 
     var expectedObject = {
+      'version': fabric.version,
       'type':                     'group',
       'originX':                  'left',
       'originY':                  'top',
@@ -207,6 +208,7 @@
     group.includeDefaultValues = false;
     var clone = group.toObject();
     var objects = [{
+      version: fabric.version,
       type: 'rect',
       left: 10,
       top: -30,
@@ -214,6 +216,7 @@
       height: 10,
       strokeWidth: 0
     }, {
+      version: fabric.version,
       type: 'rect',
       left: -40,
       top: -10,
@@ -222,6 +225,7 @@
       strokeWidth: 0
     }];
     var expectedObject = {
+      'version': fabric.version,
       'type':               'group',
       'left':               50,
       'top':                100,

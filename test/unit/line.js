@@ -1,6 +1,7 @@
 (function(){
 
   var LINE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'line',
     'originX':                  'left',
     'originY':                  'top',

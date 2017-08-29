@@ -762,6 +762,7 @@
 
           object = {
             type:                     this.type,
+            version:                  fabric.version,
             originX:                  this.originX,
             originY:                  this.originY,
             left:                     toFixed(this.left, NUM_FRACTION_DIGITS),
