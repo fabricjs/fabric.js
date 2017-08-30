@@ -163,6 +163,7 @@
     var clone = group.toObject();
 
     var expectedObject = {
+      'version': fabric.version,
       'type':                     'group',
       'originX':                  'left',
       'originY':                  'top',
@@ -207,6 +208,7 @@
     group.includeDefaultValues = false;
     var clone = group.toObject();
     var objects = [{
+      version: fabric.version,
       type: 'rect',
       left: 10,
       top: -30,
@@ -214,6 +216,7 @@
       height: 10,
       strokeWidth: 0
     }, {
+      version: fabric.version,
       type: 'rect',
       left: -40,
       top: -10,
@@ -222,6 +225,7 @@
       strokeWidth: 0
     }];
     var expectedObject = {
+      'version': fabric.version,
       'type':               'group',
       'left':               50,
       'top':                100,
@@ -687,6 +691,42 @@
     equal(inspectKey, 'fill', 'setOnGroup has been called');
     equal(inspectValue, 'red', 'setOnGroup has been called');
   });
+
+  test('canvas prop propagation with set', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        group = new fabric.Group([rect1, rect2]);
+
+    group.set('canvas', 'a-canvas');
+    equal(group.canvas, 'a-canvas', 'canvas has been set');
+    equal(group._objects[0].canvas, 'a-canvas', 'canvas has been set on object 0');
+    equal(group._objects[1].canvas, 'a-canvas', 'canvas has been set on object 1');
+  });
+
+  test('canvas prop propagation with add', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        group = new fabric.Group([rect1, rect2]);
+
+    canvas.add(group);
+    equal(group.canvas, canvas, 'canvas has been set');
+    equal(group._objects[0].canvas, canvas, 'canvas has been set on object 0');
+    equal(group._objects[1].canvas, canvas, 'canvas has been set on object 1');
+  });
+
+  test('canvas prop propagation with add to group', function() {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        group = new fabric.Group();
+
+    canvas.add(group);
+    equal(group.canvas, canvas, 'canvas has been set');
+    group.add(rect1);
+    equal(group._objects[0].canvas, canvas, 'canvas has been set on object 0');
+    group.addWithUpdate(rect2);
+    equal(group._objects[1].canvas, canvas, 'canvas has been set on object 0');
+  });
+
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),

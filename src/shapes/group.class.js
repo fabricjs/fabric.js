@@ -66,14 +66,12 @@
      * @return {Object} thisArg
      */
     initialize: function(objects, options, isAlreadyGrouped) {
-      options = options || { };
-
+      options = options || {};
       this._objects = [];
       // if objects enclosed in a group have been grouped already,
       // we cannot change properties of objects.
       // Thus we need to set options to group without objects,
       isAlreadyGrouped && this.callSuper('initialize', options);
-
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
@@ -181,6 +179,7 @@
     _onObjectAdded: function(object) {
       this.dirty = true;
       object.group = this;
+      object._set('canvas', this.canvas);
     },
 
     /**
@@ -199,6 +198,12 @@
       if (this.useSetOnGroup) {
         while (i--) {
           this._objects[i].setOnGroup(key, value);
+        }
+      }
+      if (key === 'canvas') {
+        i = this._objects.length;
+        while (i--) {
+          this._objects[i]._set(key, value);
         }
       }
       this.callSuper('_set', key, value);
@@ -404,6 +409,7 @@
       var objects = this._objects, canvas = this.canvas;
       this._objects = [];
       var options = this.toObject();
+      delete options.objects;
       var activeSelection = new fabric.ActiveSelection([]);
       activeSelection.set(options);
       activeSelection.type = 'activeSelection';
@@ -413,6 +419,7 @@
         object.dirty = true;
         canvas.add(object);
       });
+      activeSelection.canvas = canvas;
       activeSelection._objects = objects;
       canvas._activeObject = activeSelection;
       activeSelection.setCoords();

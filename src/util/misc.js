@@ -229,6 +229,33 @@
       return fabric.util.resolveNamespace(namespace)[type];
     },
 
+     /**
+     * Returns array of attributes for given svg that fabric parses
+     * @memberOf fabric.util
+     * @param {String} type Type of svg element (eg. 'circle')
+     * @return {Array} string names of supported attributes
+     */
+    getSvgAttributes: function(type) {
+      var attributes = [
+        'instantiated_by_use',
+        'style',
+        'id',
+        'class'
+      ];
+      switch (type) {
+        case 'linearGradient':
+          attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
+          break;
+        case 'radialGradient':
+          attributes = attributes.concat(['gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr']);
+          break;
+        case 'stop':
+          attributes = attributes.concat(['offset', 'stop-color', 'stop-opacity']);
+          break;
+      }
+      return attributes;
+    },
+
     /**
      * Returns object of given namespace
      * @memberOf fabric.util
@@ -338,10 +365,8 @@
      * Create and wait for loading of patterns
      * @static
      * @memberOf fabric.util
-     * @param {Array} objects Objects to enliven
+     * @param {Array} patterns Objects to enliven
      * @param {Function} callback Callback to invoke when all objects are created
-     * @param {String} namespace Namespace to get klass "Class" object from
-     * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
     enlivenPatterns: function(patterns, callback) {
@@ -415,7 +440,7 @@
      * @memberOf fabric.util
      * @param {Object} source Source object
      * @param {Object} destination Destination object
-     * @return {Array} properties Propertie names to include
+     * @return {Array} properties Properties names to include
      */
     populateWithProperties: function(source, destination, properties) {
       if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
@@ -468,16 +493,13 @@
     },
 
     /**
-     * Creates canvas element and initializes it via excanvas if necessary
+     * Creates canvas element
      * @static
      * @memberOf fabric.util
-     * @param {CanvasElement} [canvasEl] optional canvas element to initialize;
-     * when not given, element is created implicitly
      * @return {CanvasElement} initialized canvas element
      */
-    createCanvasElement: function(canvasEl) {
-      canvasEl || (canvasEl = fabric.document.createElement('canvas'));
-      return canvasEl;
+    createCanvasElement: function() {
+      return fabric.document.createElement('canvas');
     },
 
     /**
@@ -562,7 +584,7 @@
       target.skewY = 0;
       target.flipX = false;
       target.flipY = false;
-      target.setAngle(0);
+      target.rotate(0);
     },
 
     /**
@@ -667,7 +689,6 @@
      * @memberOf fabric.util
      * @param {Number} ar aspect ratio
      * @param {Number} maximumArea Maximum area you want to achieve
-     * @param {Number} maximumSide biggest side allowed
      * @return {Object.x} Limited dimensions by X
      * @return {Object.y} Limited dimensions by Y
      */
@@ -689,5 +710,4 @@
       return Math.max(destination.width / source.width, destination.height / source.height);
     }
   };
-
 })(typeof exports !== 'undefined' ? exports : this);

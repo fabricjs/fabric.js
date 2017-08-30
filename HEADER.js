@@ -1,6 +1,6 @@
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-beta4' };
+var fabric = fabric || { version: '2.0.0-beta6' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -8,8 +8,6 @@ if (typeof exports !== 'undefined') {
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
-  // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
-  window.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present
@@ -50,7 +48,8 @@ fabric.SHARED_ATTRIBUTES = [
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width",
-  "id"
+  "id",
+  "instantiated_by_use"
 ];
 /* _FROM_SVG_END_ */
 
@@ -121,10 +120,9 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
                           1;
 
 fabric.initFilterBackend = function() {
-  if (fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize) && fabric.enableGLFiltering) {
+  if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {
     console.log('max texture size: ' + fabric.maxTextureSize);
     return (new fabric.WebglFilterBackend({ tileSize: fabric.textureSize }));
-
   }
   else if (fabric.Canvas2dFilterBackend) {
     return (new fabric.Canvas2dFilterBackend());

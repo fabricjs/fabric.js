@@ -63,12 +63,12 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    * Invoked on mouse up
    */
   onMouseUp: function() {
-    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove, i, len;
     this.canvas.renderOnAddRemove = false;
 
     var circles = [];
 
-    for (var i = 0, len = this.points.length; i < len; i++) {
+    for (i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i],
           circle = new fabric.Circle({
             radius: point.radius,

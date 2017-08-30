@@ -327,19 +327,21 @@
      */
     __onMouseUp: function (e) {
 
-      var target;
+      var target, searchTarget = true, transform = this._currentTransform,
+          groupSelector = this._groupSelector,
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target, RIGHT_CLICK);
+          this._handleEvent(e, 'up', target, RIGHT_CLICK, isClick);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK, isClick);
         }
         return;
       }
@@ -348,10 +350,6 @@
         this._onMouseUpInDrawingMode(e);
         return;
       }
-
-      var searchTarget = true, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
         this._finalizeCurrentTransform(e);
@@ -543,7 +541,8 @@
         target = this._activeObject;
       }
 
-      if (this.selection && (!target || (!target.selectable && !target.isEditing))) {
+      if (this.selection && (!target ||
+        (!target.selectable && !target.isEditing && target !== this._activeObject))) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -553,15 +552,12 @@
       }
 
       if (target) {
-        if (target.selectable && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
-          this._setupCurrentTransform(e, target);
-        }
         if (target.selectable) {
           this.setActiveObject(target, e);
         }
-        else {
-          this.discardActiveObject();
+        if (target === this._activeObject && (target.__corner || !shouldGroup)) {
+          this._beforeTransform(e, target);
+          this._setupCurrentTransform(e, target);
         }
       }
       this._handleEvent(e, 'down', target ? target : null);

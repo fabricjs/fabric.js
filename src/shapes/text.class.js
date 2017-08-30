@@ -267,7 +267,8 @@
       'fontStyle',
       'underline',
       'overline',
-      'linethrough'
+      'linethrough',
+      'textBackgroundColor',
     ],
 
     /**
@@ -282,7 +283,7 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      options = options || { };
+      this.styles = options ? (options.styles || { }) : { };
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
@@ -306,152 +307,6 @@
           fabric.util.createCanvasElement().getContext('2d');
       }
       return fabric._measuringContext;
-    },
-
-    /**
-     * Returns true if object has no styling or no styling in a line
-     * @param {Number} lineIndex
-     * @return {Boolean}
-     */
-    isEmptyStyles: function(lineIndex) {
-      if (!this.styles) {
-        return true;
-      }
-      if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-        return true;
-      }
-      var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
-      for (var p1 in obj) {
-        for (var p2 in obj[p1]) {
-          // eslint-disable-next-line no-unused-vars
-          for (var p3 in obj[p1][p2]) {
-            return false;
-          }
-        }
-      }
-      return true;
-    },
-
-    /**
-     * Returns true if object has a style property or has it ina specified line
-     * @param {Number} lineIndex
-     * @return {Boolean}
-     */
-    styleHas: function(property, lineIndex) {
-      if (!this.styles || !property || property === '') {
-        return false;
-      }
-      if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-        return false;
-      }
-      var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
-      // eslint-disable-next-line
-      for (var p1 in obj) {
-        // eslint-disable-next-line
-        for (var p2 in obj[p1]) {
-          if (typeof obj[p1][p2][property] !== 'undefined') {
-            return true;
-          }
-        }
-      }
-      return false;
-    },
-
-    /**
-     * Check if characters in a text have a value for a property
-     * whose value matches the textbox's value for that property.  If so,
-     * the character-level property is deleted.  If the character
-     * has no other properties, then it is also deleted.  Finally,
-     * if the line containing that character has no other characters
-     * then it also is deleted.
-     *
-     * @param {string} property The property to compare between characters and text.
-     */
-    cleanStyle: function(property) {
-      if (!this.styles || !property || property === '') {
-        return false;
-      }
-      var obj = this.styles, stylesCount = 0, letterCount, foundStyle = false, style,
-          canBeSwapped = true, graphemeCount = 0;
-      // eslint-disable-next-line
-      for (var p1 in obj) {
-        letterCount = 0;
-        // eslint-disable-next-line
-        for (var p2 in obj[p1]) {
-          stylesCount++;
-          if (!foundStyle) {
-            style = obj[p1][p2][property];
-            foundStyle = true;
-          }
-          else if (obj[p1][p2][property] !== style) {
-            canBeSwapped = false;
-          }
-          if (obj[p1][p2][property] === this[property]) {
-            delete obj[p1][p2][property];
-          }
-          if (Object.keys(obj[p1][p2]).length !== 0) {
-            letterCount++;
-          }
-          else {
-            delete obj[p1][p2];
-          }
-        }
-        if (letterCount === 0) {
-          delete obj[p1];
-        }
-      }
-      // if every grapheme has the same style set then
-      // delete those styles and set it on the parent
-      for (var i = 0; i < this._textLines.length; i++) {
-        graphemeCount += this._textLines[i].length;
-      }
-      if (canBeSwapped && stylesCount === graphemeCount) {
-        this[property] = style;
-        this.removeStyle(property);
-      }
-    },
-
-    /**
-     * Remove a style property or properties from all individual character styles
-     * in a text object.  Deletes the character style object if it contains no other style
-     * props.  Deletes a line style object if it contains no other character styles.
-     *
-     * @param {String} props The property to remove from character styles.
-     */
-    removeStyle: function(property) {
-      if (!this.styles || !property || property === '') {
-        return;
-      }
-      var obj = this.styles, line, lineNum, charNum;
-      for (lineNum in obj) {
-        var line = obj[lineNum];
-        for (charNum in line) {
-          delete line[charNum][property];
-          if (Object.keys(line[charNum]).length === 0) {
-            delete line[charNum];
-          }
-        }
-        if (Object.keys(line).length === 0) {
-          delete obj[lineNum];
-        }
-      }
-    },
-
-    /**
-     * @private
-     */
-    _extendStyles: function(index, styles) {
-      var loc = this.get2DCursorLocation(index);
-
-      if (!this._getLineStyle(loc.lineIndex)) {
-        this._setLineStyle(loc.lineIndex, {});
-      }
-
-      if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
-        this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
-      }
-
-      fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
     },
 
     /**
@@ -700,82 +555,6 @@
     },
 
     /**
-     * get the reference, not a clone, of the style object for a given character
-     * @param {Number} lineIndex
-     * @param {Number} charIndex
-     * @return {Object} style object
-     */
-    _getStyleDeclaration: function(lineIndex, charIndex) {
-      var lineStyle = this.styles && this.styles[lineIndex];
-      if (!lineStyle) {
-        return null;
-      }
-      return lineStyle[charIndex];
-    },
-
-    /**
-     * return a new object that contains all the style property for a character
-     * the object returned is newly created
-     * @param {Number} lineIndex of the line where the character is
-     * @param {Number} charIndex position of the character on the line
-     * @return {Object} style object
-     */
-    getCompleteStyleDeclaration: function(lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex) || { },
-          styleObject = { }, prop;
-      for (var i = 0; i < this._styleProperties.length; i++) {
-        prop = this._styleProperties[i];
-        styleObject[prop] = typeof style[prop] === 'undefined' ? this[prop] : style[prop];
-      }
-      return styleObject;
-    },
-
-    /**
-     * @param {Number} lineIndex
-     * @param {Number} charIndex
-     * @param {Object} style
-     * @private
-     */
-    _setStyleDeclaration: function(lineIndex, charIndex, style) {
-      this.styles[lineIndex][charIndex] = style;
-    },
-
-    /**
-     *
-     * @param {Number} lineIndex
-     * @param {Number} charIndex
-     * @private
-     */
-    _deleteStyleDeclaration: function(lineIndex, charIndex) {
-      delete this.styles[lineIndex][charIndex];
-    },
-
-    /**
-     * @param {Number} lineIndex
-     * @private
-     */
-    _getLineStyle: function(lineIndex) {
-      return this.styles[lineIndex];
-    },
-
-    /**
-     * @param {Number} lineIndex
-     * @param {Object} style
-     * @private
-     */
-    _setLineStyle: function(lineIndex, style) {
-      this.styles[lineIndex] = style;
-    },
-
-    /**
-     * @param {Number} lineIndex
-     * @private
-     */
-    _deleteLineStyle: function(lineIndex) {
-      delete this.styles[lineIndex];
-    },
-
-    /**
      * measure and return the width of a single character.
      * possibly overridden to accommodate different measure logic or
      * to hook some external lib for character measurement
@@ -977,9 +756,9 @@
      * @param {String} method Method name ("fillText" or "strokeText")
      */
     _renderTextCommon: function(ctx, method) {
-
-      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
-
+      ctx.save();
+      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset(),
+          offsets = this._applyPatternGradientTransform(ctx, method === 'fillText' ? this.fill : this.stroke);
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
@@ -988,12 +767,13 @@
           method,
           ctx,
           this._textLines[i],
-          left + leftOffset,
-          top + lineHeights + maxHeight,
+          left + leftOffset - offsets.offsetX,
+          top + lineHeights + maxHeight - offsets.offsetY,
           i
         );
         lineHeights += heightOfLine;
       }
+      ctx.restore();
     },
 
     /**
@@ -1410,7 +1190,8 @@
       return callback(null);
     }
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES),
+        parsedAnchor = parsedAttributes.textAnchor || 'left';
     options = fabric.util.object.extend((options ? clone(options) : { }), parsedAttributes);
 
     options.top = options.top || 0;
@@ -1436,10 +1217,6 @@
     }
     if (!('fontSize' in options)) {
       options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
-    }
-
-    if (!options.originX) {
-      options.originX = 'left';
     }
 
     var textContent = '';
@@ -1471,18 +1248,16 @@
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (text.originX === 'center') {
+    if (parsedAnchor === 'center') {
       offX = text.getScaledWidth() / 2;
     }
-    if (text.originX === 'right') {
+    if (parsedAnchor === 'right') {
       offX = text.getScaledWidth();
     }
     text.set({
       left: text.left - offX,
       top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
     });
-    text.originX = 'left';
-    text.originY = 'top';
     callback(text);
   };
   /* _FROM_SVG_END_ */

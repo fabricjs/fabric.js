@@ -65,24 +65,30 @@
           translateX = (vp[4] - cropping.left) * multiplier,
           translateY = (vp[5] - cropping.top) * multiplier,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
-          originalInteractive = this.interactive;
+          originalInteractive = this.interactive,
+          originalSkipOffScreen = this.skipOffscreen,
+          needsResize = origWidth !== scaledWidth || origHeight !== scaledHeight;
 
       this.viewportTransform = newVp;
+      this.skipOffscreen = false;
       // setting interactive to false avoid exporting controls
-      this.interactive && (this.interactive = false);
-      if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
-        // this.setDimensions is going to renderAll also;
-        this.setDimensions({ width: scaledWidth, height: scaledHeight });
+      this.interactive = false;
+      if (needsResize) {
+        this.setDimensions({ width: scaledWidth, height: scaledHeight }, { backstoreOnly: true });
       }
-      else {
-        this.renderAll();
-      }
+      // call a renderAll to force sync update. This will cancel the scheduled requestRenderAll
+      // from setDimensions
+      this.renderAll();
       var data = this.__toDataURL(format, quality, cropping);
-      originalInteractive && (this.interactive = originalInteractive);
+      this.interactive = originalInteractive;
+      this.skipOffscreen = originalSkipOffScreen;
       this.viewportTransform = vp;
       //setDimensions with no option object is taking care of:
-      //this.width, this.height, this.renderAll()
-      this.setDimensions({ width: origWidth, height: origHeight });
+      //this.width, this.height, this.requestRenderAll()
+      if (needsResize) {
+        this.setDimensions({ width: origWidth, height: origHeight }, { backstoreOnly: true });
+      }
+      this.renderAll();
       return data;
     },
 
@@ -102,22 +108,6 @@
                 : canvasEl.toDataURL('image/' + format);
 
       return data;
-    },
-
-    /**
-     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-     * @deprecated since 1.0.13
-     * @param {String} format (png|jpeg)
-     * @param {Number} multiplier
-     * @param {Number} quality (0..1)
-     * @return {String}
-     */
-    toDataURLWithMultiplier: function (format, multiplier, quality) {
-      return this.toDataURL({
-        format: format,
-        multiplier: multiplier,
-        quality: quality
-      });
     },
   });
 

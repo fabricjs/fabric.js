@@ -123,7 +123,7 @@ function ifSpecifiedAMDInclude(amdLib) {
 
 var filesToInclude = [
   'HEADER.js',
-
+  ifSpecifiedInclude('global', 'src/globalFabric.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',
@@ -136,7 +136,7 @@ var filesToInclude = [
   'src/util/lang_object.js',
   'src/util/lang_string.js',
   'src/util/lang_class.js',
-  'src/util/dom_event.js',
+  ifSpecifiedInclude('interaction', 'src/util/dom_event.js'),
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
@@ -187,7 +187,6 @@ var filesToInclude = [
   ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
 
   ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
-  //'src/mixins/animation.mixin.js',
 
   'src/shapes/line.class.js',
   'src/shapes/circle.class.js',
@@ -198,7 +197,7 @@ var filesToInclude = [
   'src/shapes/polygon.class.js',
   'src/shapes/path.class.js',
   'src/shapes/group.class.js',
-  'src/shapes/active_selection.class.js',
+  ifSpecifiedInclude('interaction', 'src/shapes/active_selection.class.js'),
   'src/shapes/image.class.js',
 
   ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
@@ -222,8 +221,10 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/blur_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/gamma_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/composed_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/hue_rotation.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
+  ifSpecifiedInclude('text', 'src/mixins/text_style.mixin.js'),
 
   ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),

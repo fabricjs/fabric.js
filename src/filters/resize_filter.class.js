@@ -96,7 +96,7 @@
     //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
     //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
     //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
-    //   'uniform sampler2d uTexture;\n' +
+    //   'uniform sampler2D uTexture;\n' +
     //   'void main() {\n' +
     //     'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
     //     'color += texture2D(uTexture, oneStepLeftTextureCoordinate) * 0.27667;\n' +

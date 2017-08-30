@@ -8,6 +8,7 @@
   });
 
   var ITEXT_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'text',
     'originX':                  'left',
     'originY':                  'top',
@@ -243,6 +244,8 @@
     iText.selectAll();
     equal(iText.selectionStart, 0);
     equal(iText.selectionEnd, 4);
+
+    equal(iText.selectAll(), iText, 'should be chainable');
   });
 
   test('getSelectedText', function() {
@@ -506,6 +509,8 @@
     iText.selectLine(18);
     equal(iText.selectionStart, 17); // |qux|
     equal(iText.selectionEnd, 20);
+
+    equal(iText.selectLine(0), iText, 'should be chainable');
   });
 
   test('findWordBoundaryLeft', function() {
@@ -569,48 +574,21 @@
     iText.selectionStart = 0;
     iText.selectionEnd = 0;
 
-    deepEqual(iText.getSelectionStyles(), {
-      textDecoration: 'underline'
-    });
+    deepEqual(iText.getSelectionStyles(), []);
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2;
+    iText.selectionEnd = 3;
 
-    deepEqual(iText.getSelectionStyles(), {
+    deepEqual(iText.getSelectionStyles(), [{
       textDecoration: 'overline'
-    });
+    }]);
 
     iText.selectionStart = 17;
-    iText.selectionStart = 17;
+    iText.selectionEnd = 18;
 
-    deepEqual(iText.getSelectionStyles(), {
+    deepEqual(iText.getSelectionStyles(), [{
       fill: 'red'
-    });
-  });
-
-  test('getSelectionStyles with 1 arg', function() {
-
-    var iText = new fabric.IText('test foo bar-baz\nqux', {
-      styles: {
-        0: {
-          0: { textDecoration: 'underline' },
-          2: { textDecoration: 'overline' },
-          4: { textBackgroundColor: '#ffc' }
-        },
-        1: {
-          0: { fill: 'red' },
-          1: { fill: 'green' },
-          2: { fill: 'blue' }
-        }
-      }
-    });
-
-    iText.selectionStart = 17;
-    iText.selectionStart = 17;
-
-    deepEqual(iText.getSelectionStyles(2), {
-      textDecoration: 'overline'
-    });
+    }]);
   });
 
   test('getSelectionStyles with 2 args', function() {

@@ -86,7 +86,7 @@
 
   test('_setCornerCoords', function(){
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
-    ok(typeof cObj._setCornerCoords == 'function', '_setCornerCoords should exist');
+    ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
     cObj.setCoords();
 
     equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
@@ -136,7 +136,9 @@
     var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
     ok(typeof cObj._findTargetCorner == 'function', '_findTargetCorner should exist');
     cObj.setCoords();
-    cObj.active = true;
+    cObj.canvas = {
+      _activeObject: cObj
+    };
     equal(cObj._findTargetCorner(cObj.oCoords.br), 'br');
     equal(cObj._findTargetCorner(cObj.oCoords.tl), 'tl');
     equal(cObj._findTargetCorner(cObj.oCoords.tr), 'tr');

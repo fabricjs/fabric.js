@@ -22,6 +22,7 @@
   test('toObject', function() {
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
+      'version':                  fabric.version,
       'type':                     'ellipse',
       'originX':                  'left',
       'originY':                  'top',

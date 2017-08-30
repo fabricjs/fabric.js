@@ -82,7 +82,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyDown: function(e) {
-    if (!this.isEditing　|| this.inCompositionMode) {
+    if (!this.isEditing || this.inCompositionMode) {
       return;
     }
     if (e.keyCode in this.keysMap) {
@@ -228,10 +228,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //do not cut-copy if no selection
       return;
     }
-    var selectedText = this.getSelectedText();
 
-    fabric.copiedText = selectedText;
-    fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd);
+    fabric.copiedText = this.getSelectedText();
+    fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
     this._copyDone = true;
   },
 

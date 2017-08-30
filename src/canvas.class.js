@@ -25,7 +25,6 @@
    *
    * @fires before:selection:cleared
    * @fires selection:cleared
-   * @fires selection:created
    *
    * @fires path:created
    * @fires mouse:down
@@ -478,9 +477,7 @@
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
-      var hasBorders = target.hasBorders,
-          transparentCorners = target.transparentCorners,
-          ctx = this.contextCache,
+      var ctx = this.contextCache,
           originalColor = target.selectionBackgroundColor;
 
       target.hasBorders = target.transparentCorners = false;
@@ -491,10 +488,11 @@
       target.render(ctx);
       ctx.restore();
 
-      target.active && target._renderControls(ctx);
+      target === this._activeObject && target._renderControls(ctx, {
+        hasBorders: false,
+        transparentCorners: false
+      });
 
-      target.hasBorders = hasBorders;
-      target.transparentCorners = transparentCorners;
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
@@ -843,14 +841,16 @@
 
       if (lockScalingFlip && scaleX <= 0 && scaleX < target.scaleX) {
         forbidScalingX = true;
+        localMouse.x = 0;
       }
 
       if (lockScalingFlip && scaleY <= 0 && scaleY < target.scaleY) {
         forbidScalingY = true;
+        localMouse.y = 0;
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        forbidScalingX || forbidScalingY || (scaled = this._scaleObjectEqually(localMouse, target, transform, _dim));
+        scaled = this._scaleObjectEqually(localMouse, target, transform, _dim);
       }
       else if (!by) {
         forbidScalingX || lockScalingX || (target.set('scaleX', scaleX) && (scaled = scaled || changeX));
@@ -1033,7 +1033,7 @@
       target.scaleY = 1;
       target.skewX = 0;
       target.skewY = 0;
-      target.setAngle(0);
+      target.rotate(0);
     },
 
     /**
@@ -1391,7 +1391,7 @@
       var active = this._activeObject;
       if (active) {
         if (active.type === 'activeSelection' && active._objects) {
-          return active._objects;
+          return active._objects.slice(0);
         }
         else {
           return [active];
@@ -1430,42 +1430,44 @@
       if (object === currentActiveObject) {
         return this;
       }
-      if (this._setActiveObject(object)) {
+      if (this._setActiveObject(object, e)) {
         currentActiveObject && currentActiveObject.fire('deselected', { e: e });
         this.fire('object:selected', { target: object, e: e });
         object.fire('selected', { e: e });
-      };
+      }
       return this;
     },
 
     /**
      * @private
-     * @param {Object} object
+     * @param {Object} object to set as active
+     * @param {Event} [e] Event (passed along when firing "object:selected")
+     * @return {Boolean} true if the selection happened
      */
-    _setActiveObject: function(object) {
-      var active = this._activeObject;
-      if (active === object) {
+    _setActiveObject: function(object, e) {
+      if (this._activeObject === object) {
         return false;
       }
-      if (this._discardActiveObject()) {
-        this._activeObject = object;
-        object.set('active', true);
-        return true;
+      if (!this._discardActiveObject(e, object)) {
+        return false;
       }
-      return false;
+      if (object.onSelect({ e: e })) {
+        return false;
+      }
+      this._activeObject = object;
+      return true;
     },
 
     /**
      * @private
      */
-    _discardActiveObject: function() {
+    _discardActiveObject: function(e, object) {
       var obj = this._activeObject;
-      if (obj && obj.onDeselect && typeof obj.onDeselect === 'function') {
+      if (obj) {
         // onDeselect return TRUE to cancel selection;
-        if (obj.onDeselect()) {
+        if (obj.onDeselect({ e: e, object: object })) {
           return false;
         }
-        obj.set('active', false);
         this._activeObject = null;
       }
       return true;
@@ -1484,8 +1486,8 @@
       var activeObject = this._activeObject;
       if (activeObject) {
         this.fire('before:selection:cleared', { target: activeObject, e: e });
-        if (this._discardActiveObject()) {
-          this.fire('selection:cleared', { e: e });
+        if (this._discardActiveObject(e)) {
+          this.fire('selection:cleared', { e: e, target: activeObject });
           activeObject.fire('deselected', { e: e });
         }
       }

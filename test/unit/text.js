@@ -13,6 +13,7 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
+    'version':                   fabric.version,
     'type':                      'text',
     'originX':                   'left',
     'originY':                   'top',
@@ -54,7 +55,7 @@
     'skewY':                      0,
     'transformMatrix':            null,
     'charSpacing':                0,
-    'styles':                     null
+    'styles':                     {}
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" >\n\t\t\t<tspan x="-10" y="12.57" >x</tspan>\n\t\t</text>\n\t</g>\n';
@@ -252,7 +253,6 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-        originX:          'left'
       });
 
       deepEqual(textWithAttrs.toObject(), expectedObject);
@@ -382,5 +382,154 @@
     var cache2 = text2.getFontCache(text2);
     equal(cache, cache2, 'you get the same cache');
   });
+// moved
+  test('getSelectionStyles with no arguments', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
 
+    equal(typeof iText.getSelectionStyles, 'function');
+
+    deepEqual(iText.getSelectionStyles(), []);
+
+  });
+
+  test('getSelectionStyles with 2 args', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    deepEqual(iText.getSelectionStyles(0, 5), [
+      { textDecoration: 'underline' },
+      {},
+      { textDecoration: 'overline' },
+      {},
+      { textBackgroundColor: '#ffc' },
+    ]);
+
+    deepEqual(iText.getSelectionStyles(2, 2), [
+    ]);
+  });
+
+  test('setSelectionStyles', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { fill: '#112233' },
+          2: { stroke: '#223344' }
+        }
+      }
+    });
+
+    equal(typeof iText.setSelectionStyles, 'function');
+
+    iText.setSelectionStyles({
+      fill: 'red',
+      stroke: 'yellow'
+    });
+
+    deepEqual(iText.styles[0][0], {
+      fill: '#112233'
+    });
+
+    iText.setSelectionStyles({
+      fill: 'red',
+      stroke: 'yellow'
+    }, 0, 1);
+
+    deepEqual(iText.styles[0][0], {
+      fill: 'red',
+      stroke: 'yellow'
+    });
+
+    iText.setSelectionStyles({
+      fill: '#998877',
+      stroke: 'yellow'
+    }, 2, 3);
+
+    deepEqual(iText.styles[0][2], {
+      fill: '#998877',
+      stroke: 'yellow'
+    });
+  });
+
+  test('getStyleAtPosition', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    equal(typeof iText.getStyleAtPosition, 'function');
+
+    deepEqual(iText.getStyleAtPosition(2), { textDecoration: 'overline' });
+
+    deepEqual(iText.getStyleAtPosition(1), { });
+
+    deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
+  });
+
+  test('getStyleAtPosition complete', function() {
+    var iText = new fabric.Text('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    equal(typeof iText.getStyleAtPosition, 'function');
+
+    deepEqual(iText.getStyleAtPosition(2, true), {
+      stroke: null,
+      strokeWidth: 1,
+      fill: 'rgb(0,0,0)',
+      fontFamily: 'Times New Roman',
+      fontSize: 40,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      underline: false,
+      overline: false,
+      linethrough: false,
+      textBackgroundColor: ''
+    });
+  });
 })();

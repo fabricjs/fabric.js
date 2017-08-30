@@ -261,9 +261,9 @@
           alpha = this.getAlpha(),
           otherAlpha = 0.5,
           source = this.getSource(),
-          otherSource = otherColor.getSource();
+          otherSource = otherColor.getSource(), i;
 
-      for (var i = 0; i < 3; i++) {
+      for (i = 0; i < 3; i++) {
         result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
       }
 

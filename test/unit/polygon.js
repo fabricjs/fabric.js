@@ -8,6 +8,7 @@
   }
 
   var REFERENCE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'polygon',
     'originX':                  'left',
     'originY':                  'top',

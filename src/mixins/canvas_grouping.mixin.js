@@ -13,7 +13,7 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return e[this.selectionKey] && target && target.selectable && this.selection &&
+      return activeObject && e[this.selectionKey] && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
 
@@ -24,7 +24,7 @@
      */
     _handleGrouping: function (e, target) {
       var activeObject = this._activeObject;
-      if (activeObject.__corner !== 0) {
+      if (activeObject.__corner) {
         return;
       }
       if (target === activeObject) {

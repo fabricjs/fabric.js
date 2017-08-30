@@ -1,6 +1,7 @@
 (function() {
 
   var REFERENCE_RECT = {
+    'version':                  fabric.version,
     'type':                     'rect',
     'originX':                  'left',
     'originY':                  'top',
@@ -190,7 +191,7 @@
   });
 
   test('toObject without default values', function() {
-    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20 };
+    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
     var rect = new fabric.Rect(options);
     rect.includeDefaultValues = false;
     deepEqual(rect.toObject(), options);
