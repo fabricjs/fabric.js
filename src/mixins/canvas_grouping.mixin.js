@@ -50,6 +50,7 @@
       var activeSelection = this._activeObject;
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
+        this._hoveredTarget = target;
         if (activeSelection.size() === 1) {
           // activate last remaining object
           this.setActiveObject(activeSelection.item(0), e);
@@ -58,6 +59,7 @@
       }
       else {
         activeSelection.addWithUpdate(target);
+        this._hoveredTarget = activeSelection;
       }
       this.fire('selection:created', { target: activeSelection, e: e });
     },
