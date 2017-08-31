@@ -173,18 +173,22 @@
     toSVG: function(object) {
       var coords = clone(this.coords, true), i, len,
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
-          needsSwap = coords.r1 > coords.r2;
+          needsSwap = coords.r1 > coords.r2,
+          offsetX = object.width / 2, offsetY = object.height / 2;
       // colorStops must be sorted ascending
       colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
-
+      if (object.type === 'path') {
+        offsetX = 0;
+        offsetY = 0;
+      }
       for (var prop in coords) {
         if (prop === 'x1' || prop === 'x2') {
-          coords[prop] += this.offsetX - object.width / 2;
+          coords[prop] += this.offsetX - offsetX;
         }
         else if (prop === 'y1' || prop === 'y2') {
-          coords[prop] += this.offsetY - object.height / 2;
+          coords[prop] += this.offsetY - offsetY;
         }
       }
 

@@ -116,10 +116,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
+      var markup = this._createBaseSVGMarkup();
       markup.push(
         '<ellipse ', this.getSvgId(),
-          'cx="', x, '" cy="', y, '" ',
+          'cx="0" cy="0" ',
           'rx="', this.rx,
           '" ry="', this.ry,
           '" style="', this.getSvgStyles(),
