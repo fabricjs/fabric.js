@@ -180,8 +180,8 @@
         return a.offset - b.offset;
       });
       if (object.type === 'path') {
-        offsetX = 0;
-        offsetY = 0;
+        offsetX -= object.pathOffset.x;
+        offsetY -= object.pathOffset.y;
       }
       for (var prop in coords) {
         if (prop === 'x1' || prop === 'x2') {
