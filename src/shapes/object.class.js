@@ -858,7 +858,7 @@
 
     /**
      * Return the object opacity counting also the group property
-     * @return {Object} object with scaleX and scaleY properties
+     * @return {Number}
      */
     getObjectOpacity: function() {
       var opacity = this.opacity;
