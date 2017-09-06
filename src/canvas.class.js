@@ -1113,18 +1113,15 @@
       this.targets = [];
 
       if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
-        this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
       if (aObjects.length === 1 && activeObject._findTargetCorner(pointer)) {
-        this._fireOverOutEvents(activeObject, e);
         return activeObject;
       }
       if (aObjects.length === 1 &&
         activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
-          this._fireOverOutEvents(activeObject, e);
           return activeObject;
         }
         else {
@@ -1135,34 +1132,7 @@
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
       }
-      this._fireOverOutEvents(target, e);
       return target;
-    },
-
-    /**
-     * @private
-     */
-    _fireOverOutEvents: function(target, e) {
-      var overOpt, outOpt, hoveredTarget = this._hoveredTarget;
-      if (hoveredTarget !== target) {
-        overOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
-        outOpt = { e: e, target: this._hoveredTarget, nextTarget: target };
-        this._hoveredTarget = target;
-      }
-      if (target) {
-        if (hoveredTarget !== target) {
-          if (hoveredTarget) {
-            this.fire('mouse:out', outOpt);
-            hoveredTarget.fire('mouseout', outOpt);
-          }
-          this.fire('mouse:over', overOpt);
-          target.fire('mouseover', overOpt);
-        }
-      }
-      else if (hoveredTarget) {
-        this.fire('mouse:out', outOpt);
-        hoveredTarget.fire('mouseout', outOpt);
-      }
     },
 
     /**
