@@ -61,7 +61,7 @@
     /**
      * Returns styles-string for svg-export
      * @param {Object} style style properties for the span a boolean to skip shadow filter output
-     * @param {Boolean} useWhiteSpace a boolean to skip shadow filter output
+     * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
      * @return {String}
      */
     getSvgSpanStyles: function(style, useWhiteSpace) {
