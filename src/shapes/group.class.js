@@ -393,6 +393,11 @@
      * @chainable
      */
     destroy: function() {
+      // when group is destroyed objects needs to get a repaint to be eventually
+      // displayed on canvas.
+      this._objects.forEach(function(object) {
+        object.set('dirty', true);
+      });
       return this._restoreObjectsState();
     },
 
