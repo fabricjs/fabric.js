@@ -87,7 +87,7 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-      var styleProps = this.getSvgSpanStyles(styleDecl, false),
+      var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
 
       return [
@@ -212,8 +212,12 @@
       };
     },
 
+    /**
+     * Returns styles-string for svg-export
+     * @param {Boolean} skipShadow a boolean to skip shadow filter output
+     * @return {String}
+     */
     getSvgStyles: function(skipShadow) {
-
       var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
       return svgStyle + ' white-space: pre;';
     },

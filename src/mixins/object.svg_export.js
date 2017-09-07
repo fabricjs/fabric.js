@@ -60,10 +60,11 @@
 
     /**
      * Returns styles-string for svg-export
-     * @param {Boolean} skipShadow a boolean to skip shadow filter output
+     * @param {Object} style style properties for the span a boolean to skip shadow filter output
+     * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
      * @return {String}
      */
-    getSvgSpanStyles: function(style) {
+    getSvgSpanStyles: function(style, useWhiteSpace) {
       var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
           fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
           fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
@@ -82,6 +83,7 @@
         fontWeight,
         textDecoration,
         fill,
+        useWhiteSpace ? 'white-space: pre; ' : ''
       ].join('');
     },
 
