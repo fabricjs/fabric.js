@@ -202,7 +202,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
           distanceBtwNextCharAndCursor < 0 ? 0 : 1,
         newSelectionStart = index + offset;
-        console.log(offset)
     // if object is horizontally flipped, mirror cursor location from the end
     if (this.flipX) {
       newSelectionStart = jlen - newSelectionStart;
