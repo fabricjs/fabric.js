@@ -87,7 +87,7 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-      var styleProps = this.getSvgSpanStyles(styleDecl, false),
+      var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
 
       return [
