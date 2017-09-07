@@ -82,6 +82,7 @@
         fontWeight,
         textDecoration,
         fill,
+        'white-space: pre; '
       ].join('');
     },
 

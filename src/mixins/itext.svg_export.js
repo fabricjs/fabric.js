@@ -213,7 +213,6 @@
     },
 
     getSvgStyles: function(skipShadow) {
-
       var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
       return svgStyle + ' white-space: pre;';
     },
