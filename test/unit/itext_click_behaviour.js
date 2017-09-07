@@ -17,8 +17,8 @@
     var iText = new fabric.IText('test need some word\nsecond line');
     var index = 10;
     var jlen = 20;
-    var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 511 }, 500, 520, index, jlen);
-    equal(selection, index, 'index value was NOT moved to next char, since is very near');
+    var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 502 }, 500, 520, index, jlen);
+    equal(selection, index, 'index value was NOT moved to next char, since is very near to first one');
   });
   test('_getNewSelectionStartFromOffset middle of line', function() {
     var iText = new fabric.IText('test need some word\nsecond line');
