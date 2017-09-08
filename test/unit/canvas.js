@@ -465,6 +465,37 @@
     canvas.remove(group);
   });
 
+  test('findTarget with subTargetCheck on activeObject and preserveObjectStacking true', function() {
+    var rect = makeRect({ left: 0, top: 0 }),
+        rect2 = makeRect({ left: 30, top:  30}), target,
+        group = new fabric.Group([rect, rect2]);
+    canvas.preserveObjectStacking = true;
+    canvas.add(group);
+    canvas.setActiveObject(group);
+    group.subTargetCheck = true;
+    target = canvas.findTarget({
+      clientX: 9, clientY: 9
+    });
+    equal(target, group, 'Should return the group');
+    equal(canvas.targets[0], rect, 'should return the rect');
+
+    target = canvas.findTarget({
+      clientX: 9, clientY: 9
+    });
+
+    target = canvas.findTarget({
+      clientX: 9, clientY: 9
+    });
+
+    target = canvas.findTarget({
+      clientX: 9, clientY: 9
+    });
+
+    equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
+
+    canvas.remove(group);
+  });
+
   test('findTarget with perPixelTargetFind', function() {
     ok(typeof canvas.findTarget == 'function');
     var triangle = makeTriangle({ left: 0, top: 0 }), target;
