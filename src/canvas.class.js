@@ -1097,7 +1097,7 @@
           pointer = this.getPointer(e, ignoreZoom),
           activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
-          activeTarget;
+          activeTarget, activeTargetSubs;
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
@@ -1118,12 +1118,15 @@
         }
         else {
           activeTarget = activeObject;
+          activeTargetSubs = this.targets;
+          this.targets = [];
         }
       }
 
       var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
+        this.targets = activeTargetSubs;
       }
       this._fireOverOutEvents(target, e);
       return target;
