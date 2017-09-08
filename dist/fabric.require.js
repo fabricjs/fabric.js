@@ -4849,7 +4849,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this.skipTargetFind) {
                 return;
             }
-            var ignoreZoom = true, pointer = this.getPointer(e, ignoreZoom), activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject(), activeTarget;
+            var ignoreZoom = true, pointer = this.getPointer(e, ignoreZoom), activeGroup = this.getActiveGroup(), activeObject = this.getActiveObject(), activeTarget, activeTargetSubs;
             this.targets = [];
             if (activeGroup && !skipGroup && activeGroup === this._searchPossibleTargets([ activeGroup ], pointer)) {
                 this._fireOverOutEvents(activeGroup, e);
@@ -4865,11 +4865,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                     return activeObject;
                 } else {
                     activeTarget = activeObject;
+                    activeTargetSubs = this.targets;
+                    this.targets = [];
                 }
             }
             var target = this._searchPossibleTargets(this._objects, pointer);
             if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
                 target = activeTarget;
+                this.targets = activeTargetSubs;
             }
             this._fireOverOutEvents(target, e);
             return target;
@@ -9100,6 +9103,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return this;
         },
         destroy: function() {
+            this._objects.forEach(function(object) {
+                object.set("dirty", true);
+            });
             return this._restoreObjectsState();
         },
         saveCoords: function() {
