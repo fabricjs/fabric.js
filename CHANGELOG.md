@@ -1,3 +1,8 @@
+**Version 1.7.18**
+
+- Fixed doubling of subtargets for preserveObjectStacking = true [#4297](https://github.com/kangax/fabric.js/pull/4297)
+- Added a dirty set to objects in group destroy.
+
 **Version 1.7.17**
 
 - Change: swapped style white-space:nowrap with attribute wrap="off" since the style rule was creating problems in browsers like ie11 and safari. [#4119](https://github.com/kangax/fabric.js/pull/4119)

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.7.17" };
+var fabric = fabric || { version: "1.7.18" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -245,6 +245,9 @@ fabric.Collection = {
    * (if `renderOnAddRemove` is not `false`).
    * in case of Group no changes to bounding box are made.
    * Objects should be instances of (or inherit from) fabric.Object
+   * Use of this function is highly discouraged for groups.
+   * you can add a bunch of objects with the add method but then you NEED
+   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
    * @chainable
@@ -263,6 +266,9 @@ fabric.Collection = {
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
+   * Use of this function is highly discouraged for groups.
+   * you can add a bunch of objects with the insertAt method but then you NEED
+   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {Object} object Object to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
@@ -9727,7 +9733,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           pointer = this.getPointer(e, ignoreZoom),
           activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject(),
-          activeTarget;
+          activeTarget, activeTargetSubs;
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
@@ -9748,12 +9754,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
         else {
           activeTarget = activeObject;
+          activeTargetSubs = this.targets;
+          this.targets = [];
         }
       }
 
       var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
+        this.targets = activeTargetSubs;
       }
       this._fireOverOutEvents(target, e);
       return target;
@@ -18794,6 +18803,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     destroy: function() {
+      // when group is destroyed objects needs to get a repaint to be eventually
+      // displayed on canvas.
+      this._objects.forEach(function(object) {
+        object.set('dirty', true);
+      });
       return this._restoreObjectsState();
     },
 
