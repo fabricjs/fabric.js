@@ -1008,7 +1008,7 @@
      * @returns false
      */
     needsItsOwnCache: function() {
-      if (this.paintFirst === 'stroke') {
+      if (this.paintFirst === 'stroke' && typeof this.shadow === 'object') {
         return true;
       }
       return false;
