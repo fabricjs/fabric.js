@@ -407,7 +407,8 @@
       if (this.paintFirst === 'stroke') {
         this._renderTextStroke(ctx);
         this._renderTextFill(ctx);
-      } else {
+      }
+      else {
         this._renderTextFill(ctx);
         this._renderTextStroke(ctx);
       }

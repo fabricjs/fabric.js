@@ -214,6 +214,6 @@
       equal(rectObject.paintFirst, 'stroke');
       ok(rectSvg.indexOf('paint-order="stroke"') > -1);
       done();
-    })
+    });
   });
 })();

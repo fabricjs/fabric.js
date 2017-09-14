@@ -1256,7 +1256,8 @@
       if (this.paintFirst === 'stroke') {
         this._renderStroke(ctx);
         this._renderFill(ctx);
-      } else {
+      }
+      else {
         this._renderFill(ctx);
         this._renderStroke(ctx);
       }
