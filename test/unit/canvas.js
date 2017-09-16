@@ -107,6 +107,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
+      canvas.off();
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
     }
@@ -309,6 +310,61 @@
     canvas.remove(canvas.item(0));
 
     equal(isFired, true, 'removing active object should fire "selection:cleared"');
+    canvas.off('selection:cleared');
+  });
+
+  test('create active selection fires selection:created', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.on('selection:created', function() { isFired = true; });
+    canvas.setActiveObject(rect1);
+    canvas._createActiveSelection(rect2, {});
+    equal(isFired, true, 'selection:created fired');
+    canvas.off('selection:created');
+  });
+
+  test('create active selection fires selected on new object', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect2.on('selected', function() { isFired = true; });
+    canvas.setActiveObject(rect1);
+    canvas._createActiveSelection(rect2, {});
+    equal(isFired, true, 'selected fired on rect2');
+  });
+
+  test('update active selection selection:updated', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    canvas.on('selection:updated', function() { isFired = true; });
+    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
+    canvas._updateActiveSelection(rect3, {});
+    equal(isFired, true, 'selection:updated fired');
+    canvas.off('selection:updated');
+  });
+
+  test('update active selection fires deselected on an object', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect2.on('deselected', function() { isFired = true; });
+    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
+    canvas._updateActiveSelection(rect2, {});
+    equal(isFired, true, 'deselected on rect2 fired');
+  });
+
+  test('update active selection firse selected on an object', function() {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    rect3.on('selected', function() { isFired = true; });
+    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
+    canvas._updateActiveSelection(rect3, {});
+    equal(isFired, true, 'selected on rect3 fired');
   });
 
   test('setActiveObject fires deselected', function() {
@@ -320,6 +376,28 @@
     canvas.setActiveObject(rect1);
     canvas.setActiveObject(rect2);
     equal(isFired, true, 'switching active group fires deselected');
+  });
+
+  test('_createGroup respect order of objects', function() {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1);
+    canvas.add(rect2);
+    canvas.setActiveObject(rect1);
+    var selection = canvas._createGroup(rect2);
+    equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
+    equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
+  });
+
+  test('_createGroup respect order of objects (inverted)', function() {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1);
+    canvas.add(rect2);
+    canvas.setActiveObject(rect2);
+    var selection = canvas._createGroup(rect1);
+    equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
+    equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
   test('getContext', function() {
