@@ -139,18 +139,21 @@
     convertPointsToSVGPath: function(points) {
       var path = [], i, len,
           p1 = new fabric.Point(points[0].x, points[0].y),
-          p2 = new fabric.Point(points[1].x, points[1].y);
+          p2 = new fabric.Point(points[1].x, points[1].y),
+          len = points.length;
 
       path.push('M ', points[0].x, ' ', points[0].y, ' ');
-      for (i = 1, len = points.length; i < len; i++) {
-        var midPoint = p1.midPointFrom(p2);
-        // p1 is our bezier control point
-        // midpoint is our endpoint
-        // start point is p(i-1) value.
-        path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
-        p1 = new fabric.Point(points[i].x, points[i].y);
-        if ((i + 1) < points.length) {
-          p2 = new fabric.Point(points[i + 1].x, points[i + 1].y);
+      if (len > 2) {
+        for (i = 1; i < len; i++) {
+          var midPoint = p1.midPointFrom(p2);
+          // p1 is our bezier control point
+          // midpoint is our endpoint
+          // start point is p(i-1) value.
+          path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
+          p1 = new fabric.Point(points[i].x, points[i].y);
+          if ((i + 1) < points.length) {
+            p2 = new fabric.Point(points[i + 1].x, points[i + 1].y);
+          }
         }
       }
       path.push('L ', p1.x, ' ', p1.y, ' ');
