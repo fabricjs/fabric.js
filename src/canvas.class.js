@@ -879,12 +879,13 @@
       var dist = localMouse.y + localMouse.x,
           lastDist = _dim.y * transform.original.scaleY / target.scaleY +
                      _dim.x * transform.original.scaleX / target.scaleX,
-          scaled;
+          scaled, signX = localMouse.x / Math.abs(localMouse.x),
+          signY = localMouse.y / Math.abs(localMouse.y);
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
-      transform.newScaleX = transform.original.scaleX * dist / lastDist;
-      transform.newScaleY = transform.original.scaleY * dist / lastDist;
+      transform.newScaleX = signX * Math.abs(transform.original.scaleX * dist / lastDist);
+      transform.newScaleY = signY * Math.abs(transform.original.scaleY * dist / lastDist);
       scaled = transform.newScaleX !== target.scaleX || transform.newScaleY !== target.scaleY;
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);
