@@ -407,7 +407,7 @@
     var rect3 = new fabric.Rect();
     canvas._collectObjects = function() {
       return [rect1, rect2, rect3];
-    }
+    };
     rect1.on('selected', function() { fired++; });
     rect2.on('selected', function() { fired++; });
     rect3.on('selected', function() { fired++; });
@@ -423,7 +423,7 @@
     var rect3 = new fabric.Rect();
     canvas._collectObjects = function() {
       return [rect1, rect2, rect3];
-    }
+    };
     canvas.on('selection:created', function() { isFired = true; });
     canvas._groupSelectedObjects({});
     equal(isFired, true, 'selection created fired');
@@ -440,7 +440,7 @@
     var rect1 = new fabric.Rect();
     canvas._collectObjects = function() {
       return [rect1];
-    }
+    };
     canvas.on('object:selected', function() { isFired = true; });
     canvas._groupSelectedObjects({});
     equal(isFired, true, 'object:selected fired for _groupSelectedObjects');
