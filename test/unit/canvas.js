@@ -350,7 +350,6 @@
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
-    var rect3 = new fabric.Rect();
     rect2.on('deselected', function() { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
     canvas._updateActiveSelection(rect2, {});
@@ -388,7 +387,7 @@
     var selection = canvas._createGroup(rect2);
     equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
     equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  })
+  });
 
   test('_createGroup respect order of objects (inverted)', function() {
     var rect1 = new fabric.Rect();
@@ -399,7 +398,7 @@
     var selection = canvas._createGroup(rect1);
     equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
     equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  })
+  });
 
   test('getContext', function() {
     ok(typeof canvas.getContext == 'function');
