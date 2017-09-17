@@ -433,7 +433,7 @@
   ];
 
   lineCoordsCases.forEach(function (c_) {
-    QUnit.test('stroke-less line coords ' + c_.description, function() {
+    QUnit.test('stroke-less line coords ' + c_.description, function(assert) {
       var points = c_.givenLineArgs.points;
       var options = c_.givenLineArgs.options;
 
@@ -511,7 +511,7 @@
   ];
 
   getLeftToOriginXCases.forEach(function (c_) {
-    QUnit.test('Line.getLeftToOriginX() ' + c_.description, function () {
+    QUnit.test('Line.getLeftToOriginX() ' + c_.description, function (assert) {
       var line = new fabric.Line(
         c_.givenPoints,
         { originX: c_.givenOrigin }
@@ -585,7 +585,7 @@
   ];
 
   getTopToOriginYCases.forEach(function (c_) {
-    QUnit.test('Line._getTopToOriginY() ' + c_.description, function () {
+    QUnit.test('Line._getTopToOriginY() ' + c_.description, function (assert) {
       var line = new fabric.Line(
         c_.givenPoints,
         { originY: c_.givenOrigin }
