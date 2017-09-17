@@ -404,8 +404,14 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderText: function(ctx) {
-      this._renderTextFill(ctx);
-      this._renderTextStroke(ctx);
+      if (this.paintFirst === 'stroke') {
+        this._renderTextStroke(ctx);
+        this._renderTextFill(ctx);
+      }
+      else {
+        this._renderTextFill(ctx);
+        this._renderTextStroke(ctx);
+      }
     },
 
     /**

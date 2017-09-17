@@ -50,8 +50,7 @@
       ctx.lineTo(widthBy2, heightBy2);
       ctx.closePath();
 
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -90,8 +89,9 @@
         '<polygon ', this.getSvgId(),
         'points="', points,
         '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        '"/>'
+        '" transform="', this.getSvgTransform(), '"',
+        this.addPaintOrder(),
+        '/>'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');

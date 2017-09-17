@@ -430,8 +430,7 @@
      */
     _render: function(ctx) {
       this._renderPathCommands(ctx);
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -491,6 +490,7 @@
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(), addTransform,
         this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
+        this.addPaintOrder(),
         '/>\n'
       );
 

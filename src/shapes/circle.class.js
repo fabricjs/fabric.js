@@ -138,13 +138,13 @@
      */
     _render: function(ctx) {
       ctx.beginPath();
-      ctx.arc(0,
+      ctx.arc(
+        0,
         0,
         this.radius,
         this.startAngle,
         this.endAngle, false);
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**

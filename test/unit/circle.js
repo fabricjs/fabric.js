@@ -105,6 +105,7 @@
       'backgroundColor':          '',
       'clipTo':                   null,
       'fillRule':                 'nonzero',
+      'paintFirst':               'fill',
       'globalCompositeOperation': 'source-over',
       'radius':                   0,
       'startAngle':               0,

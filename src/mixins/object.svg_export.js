@@ -195,6 +195,10 @@
         markup.push(this.shadow.toSVG(this));
       }
       return markup;
+    },
+
+    addPaintOrder: function() {
+      return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
 })();

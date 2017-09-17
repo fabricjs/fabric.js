@@ -556,6 +556,13 @@
     __corner: 0,
 
     /**
+     * Determins if the fill or the stroke is drawn first (one of "fill" or "stroke")
+     * @type String
+     * @default
+     */
+    paintFirst:           'fill',
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -565,7 +572,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow clipTo visible backgroundColor ' +
-      'skewX skewY fillRule'
+      'skewX skewY fillRule paintFirst'
     ).split(' '),
 
     /**
@@ -787,6 +794,7 @@
             clipTo:                   this.clipTo && String(this.clipTo),
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
+            paintFirst:               this.paintFirst,
             globalCompositeOperation: this.globalCompositeOperation,
             transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : null,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
@@ -997,6 +1005,9 @@
      * @returns false
      */
     needsItsOwnCache: function() {
+      if (this.paintFirst === 'stroke' && typeof this.shadow === 'object') {
+        return true;
+      }
       return false;
     },
 
@@ -1232,6 +1243,21 @@
         ctx.transform.apply(ctx, transform);
       }
       return { offsetX: offsetX, offsetY: offsetY };
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderPaintInOrder: function(ctx) {
+      if (this.paintFirst === 'stroke') {
+        this._renderStroke(ctx);
+        this._renderFill(ctx);
+      }
+      else {
+        this._renderFill(ctx);
+        this._renderStroke(ctx);
+      }
     },
 
     /**

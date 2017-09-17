@@ -82,6 +82,7 @@
       'flipY':                    false,
       'opacity':                  1,
       'fillRule':                 'nonzero',
+      'paintFirst':               'fill',
       'globalCompositeOperation': 'source-over',
       'transformMatrix':          null,
       'skewX':                    0,

@@ -34,8 +34,7 @@
         return;
       }
       ctx.closePath();
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
