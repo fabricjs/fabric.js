@@ -206,16 +206,16 @@
     assert.deepEqual(rect.toObject(), options);
   });
 
-  test('paintFirst life cycle', function( assert ) {
+  QUnit.test('paintFirst life cycle', function(assert) {
     var done = assert.async();
     var svg = '<svg><rect x="10" y="10" height="50" width="55" fill="red" stroke="blue" paint-order="stroke" /></svg>';
     fabric.loadSVGFromString(svg, function(envlivedObjects) {
       var rect = envlivedObjects[0];
       var rectObject = rect.toObject();
       var rectSvg = rect.toSVG();
-      equal(rect.paintFirst, 'stroke');
-      equal(rectObject.paintFirst, 'stroke');
-      ok(rectSvg.indexOf('paint-order="stroke"') > -1);
+      assert.equal(rect.paintFirst, 'stroke');
+      assert.equal(rectObject.paintFirst, 'stroke');
+      assert.ok(rectSvg.indexOf('paint-order="stroke"') > -1);
       done();
     });
   });
