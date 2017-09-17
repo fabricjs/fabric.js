@@ -124,7 +124,7 @@
         '" ry="', this.ry,
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(),
-        this.getSvgTransformMatrix(),'"',
+        this.getSvgTransformMatrix(), '"',
         this.addPaintOrder(),
         '/>\n'
       );
