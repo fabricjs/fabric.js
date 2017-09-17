@@ -107,6 +107,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
+      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
@@ -443,9 +444,8 @@
     };
     canvas.on('object:selected', function() { isFired = true; });
     canvas._groupSelectedObjects({});
-    assert.assert.equal(isFired, true, 'object:selected fired for _groupSelectedObjects');
+    assert.equal(isFired, true, 'object:selected fired for _groupSelectedObjects');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
-    canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
   });
 
   QUnit.test('_collectObjects collects object contained in area', function(assert) {

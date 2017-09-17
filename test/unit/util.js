@@ -439,6 +439,7 @@
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
       done();
+      return;
     }
 
     fabric.util.loadImage(IMG_URL, function(obj) {
