@@ -1,8 +1,7 @@
 {
   "env": {
     "browser": true,
-    "node": true,
-    "QUnit": true
+    "node": true
   },
   "globals": {
     "fabric": true,

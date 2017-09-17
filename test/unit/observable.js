@@ -159,7 +159,7 @@ QUnit.test('trigger', function(assert) {
 
   var eventFired = false;
   var context;
-  foo.on('bar:baz', function(assert) {
+  foo.on('bar:baz', function() {
     context = this;
     eventFired = true;
   });
@@ -278,10 +278,10 @@ QUnit.test('chaining', function(assert) {
 
   var event1Fired = false, event2Fired = false;
   foo
-    .on('event1', function(assert) {
+    .on('event1', function() {
       event1Fired = true;
     })
-    .on('event2', function(assert) {
+    .on('event2', function() {
       event2Fired = true;
     });
 
