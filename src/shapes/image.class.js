@@ -453,19 +453,21 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var x = -this.width / 2, y = -this.height / 2, elementToDraw;
-
       if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
         this._lastScaleX = this.scaleX;
         this._lastScaleY = this.scaleY;
         this.applyResizeFilters();
       }
+      this._stroke(ctx);
+      this._renderPaintInOrder(ctx);
+    },
+
+    _renderFill: function(ctx) {
+      var x = -this.width / 2, y = -this.height / 2, elementToDraw;
       elementToDraw = this._element;
       elementToDraw && ctx.drawImage(elementToDraw,
         this.cropX, this.cropY, this.width, this.height,
         x, y, this.width, this.height);
-      this._stroke(ctx);
-      this._renderStroke(ctx);
     },
 
     /**

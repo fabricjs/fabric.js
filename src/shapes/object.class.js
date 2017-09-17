@@ -580,7 +580,7 @@
      * @type Array
      */
     cacheProperties: (
-      'fill stroke strokeWidth strokeDashArray width height' +
+      'fill stroke strokeWidth strokeDashArray width height paintFirst' +
       ' strokeLineCap strokeLineJoin strokeMiterLimit backgroundColor'
     ).split(' '),
 
