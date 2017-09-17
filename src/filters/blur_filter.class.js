@@ -25,7 +25,7 @@
 
     type: 'Blur',
 
-/*
+    /*
 'gl_FragColor = vec4(0.0);',
 'gl_FragColor += texture2D(texture, vTexCoord + -7 * uDelta)*0.0044299121055113265;',
 'gl_FragColor += texture2D(texture, vTexCoord + -6 * uDelta)*0.00895781211794;',

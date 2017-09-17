@@ -8,6 +8,7 @@
   }
 
   var REFERENCE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'polyline',
     'originX':                  'left',
     'originY':                  'top',
@@ -51,72 +52,73 @@
 
   QUnit.module('fabric.Polyline');
 
-  test('constructor', function() {
-    ok(fabric.Polyline);
+  QUnit.test('constructor', function(assert) {
+    assert.ok(fabric.Polyline);
 
     var polyline = new fabric.Polyline(getPoints());
 
-    ok(polyline instanceof fabric.Polyline);
-    ok(polyline instanceof fabric.Object);
+    assert.ok(polyline instanceof fabric.Polyline);
+    assert.ok(polyline instanceof fabric.Object);
 
-    equal(polyline.type, 'polyline');
-    deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
+    assert.equal(polyline.type, 'polyline');
+    assert.deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
-  test('complexity', function() {
+  QUnit.test('complexity', function(assert) {
     var polyline = new fabric.Polyline(getPoints());
-    ok(typeof polyline.complexity == 'function');
+    assert.ok(typeof polyline.complexity === 'function');
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var polyline = new fabric.Polyline(getPoints());
-    ok(typeof polyline.toObject == 'function');
+    assert.ok(typeof polyline.toObject === 'function');
     var objectWithOriginalPoints = fabric.util.object.extend(polyline.toObject(), {
       points: getPoints()
     });
 
-    deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
+    assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
-  asyncTest('fromObject', function() {
-    ok(typeof fabric.Polyline.fromObject == 'function');
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Polyline.fromObject === 'function');
     fabric.Polyline.fromObject(REFERENCE_OBJECT, function(polyline) {
-      ok(polyline instanceof fabric.Polyline);
-      deepEqual(polyline.toObject(), REFERENCE_OBJECT);
-      start();
+      assert.ok(polyline instanceof fabric.Polyline);
+      assert.deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+      done();
     });
   });
 
-  test('fromElement without points', function() {
-    ok(typeof fabric.Polyline.fromElement == 'function');
+  QUnit.test('fromElement without points', function(assert) {
+    assert.ok(typeof fabric.Polyline.fromElement === 'function');
     var elPolylineWithoutPoints = fabric.document.createElement('polyline');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
-      deepEqual(polyline.toObject(), empty_object);
+      assert.deepEqual(polyline.toObject(), empty_object);
     });
   });
 
-  test('fromElement with empty points', function() {
+  QUnit.test('fromElement with empty points', function(assert) {
     var elPolylineWithEmptyPoints = fabric.document.createElement('polyline');
     elPolylineWithEmptyPoints.setAttribute('points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
       var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
       empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
-      deepEqual(polyline.toObject(), empty_object);
+      assert.deepEqual(polyline.toObject(), empty_object);
     });
   });
 
-  test('fromElement', function() {
+  QUnit.test('fromElement', function(assert) {
     var elPolyline = fabric.document.createElement('polyline');
     elPolyline.setAttribute('points', '10,12 20,22');
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
-      ok(polyline instanceof fabric.Polyline);
-      deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+      assert.ok(polyline instanceof fabric.Polyline);
+      assert.deepEqual(polyline.toObject(), REFERENCE_OBJECT);
     });
   });
 
-  test('fromElement with custom attr', function() {
+  QUnit.test('fromElement with custom attr', function(assert) {
     var elPolylineWithAttrs = fabric.document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolylineWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
@@ -131,7 +133,7 @@
 
     fabric.Polyline.fromElement(elPolylineWithAttrs, function(polylineWithAttrs) {
       var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
-      deepEqual(polylineWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
+      assert.deepEqual(polylineWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
         'width': 20,
         'height': 20,
         'fill': 'rgb(255,255,255)',
@@ -147,13 +149,13 @@
         'top': 10,
         'transformMatrix': [2, 0, 0, 2, -10, -20]
       }));
-      deepEqual(polylineWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
+      assert.deepEqual(polylineWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
     });
   });
 
-  test('fromElement with nothing', function() {
+  QUnit.test('fromElement with nothing', function(assert) {
     fabric.Polyline.fromElement(null, function(polyline) {
-      equal(polyline, null);
+      assert.equal(polyline, null);
     });
   });
 })();

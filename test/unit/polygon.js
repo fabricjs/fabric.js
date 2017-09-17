@@ -8,6 +8,7 @@
   }
 
   var REFERENCE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'polygon',
     'originX':                  'left',
     'originY':                  'top',
@@ -51,45 +52,46 @@
 
   QUnit.module('fabric.Polygon');
 
-  test('constructor', function() {
-    ok(fabric.Polygon);
+  QUnit.test('constructor', function(assert) {
+    assert.ok(fabric.Polygon);
 
     var polygon = new fabric.Polygon(getPoints());
 
-    ok(polygon instanceof fabric.Polygon);
-    ok(polygon instanceof fabric.Object);
+    assert.ok(polygon instanceof fabric.Polygon);
+    assert.ok(polygon instanceof fabric.Object);
 
-    equal(polygon.type, 'polygon');
-    deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
+    assert.equal(polygon.type, 'polygon');
+    assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
-  test('complexity', function() {
+  QUnit.test('complexity', function(assert) {
     var polygon = new fabric.Polygon(getPoints());
-    ok(typeof polygon.complexity == 'function');
+    assert.ok(typeof polygon.complexity === 'function');
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var polygon = new fabric.Polygon(getPoints());
-    ok(typeof polygon.toObject == 'function');
+    assert.ok(typeof polygon.toObject === 'function');
 
     var objectWithOriginalPoints = fabric.util.object.extend(polygon.toObject(), {
       points: getPoints()
     });
 
-    deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
+    assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
-  asyncTest('fromObject', function() {
-    ok(typeof fabric.Polygon.fromObject == 'function');
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Polygon.fromObject === 'function');
     fabric.Polygon.fromObject(REFERENCE_OBJECT, function(polygon) {
-      ok(polygon instanceof fabric.Polygon);
-      deepEqual(polygon.toObject(), REFERENCE_OBJECT);
-      start();
+      assert.ok(polygon instanceof fabric.Polygon);
+      assert.deepEqual(polygon.toObject(), REFERENCE_OBJECT);
+      done();
     });
   });
 
-  test('fromElement without points', function() {
-    ok(typeof fabric.Polygon.fromElement == 'function');
+  QUnit.test('fromElement without points', function(assert) {
+    assert.ok(typeof fabric.Polygon.fromElement === 'function');
 
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
@@ -97,34 +99,34 @@
     var elPolygonWithoutPoints = fabric.document.createElement('polygon');
 
     fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
-      deepEqual(polygon.toObject(), empty_object);
+      assert.deepEqual(polygon.toObject(), empty_object);
     });
   });
 
-  test('fromElement with empty points', function() {
+  QUnit.test('fromElement with empty points', function(assert) {
     var elPolygonWithEmptyPoints = fabric.document.createElement('polygon');
     elPolygonWithEmptyPoints.setAttribute('points', '');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
     fabric.Polygon.fromElement(elPolygonWithEmptyPoints, function(polygon) {
-      deepEqual(polygon.toObject(), empty_object);
+      assert.deepEqual(polygon.toObject(), empty_object);
     });
   });
 
-  test('fromElement with empty points', function() {
+  QUnit.test('fromElement with empty points', function(assert) {
     var elPolygon = fabric.document.createElement('polygon');
     elPolygon.setAttribute('points', '10,12 20,22');
     fabric.Polygon.fromElement(elPolygon, function(polygon) {
-      ok(polygon instanceof fabric.Polygon);
+      assert.ok(polygon instanceof fabric.Polygon);
       var expected = fabric.util.object.extend(
         fabric.util.object.clone(REFERENCE_OBJECT), {
           points: [{ x: 10, y: 12 }, { x: 20, y: 22 }]
         });
-      deepEqual(polygon.toObject(), expected);
+      assert.deepEqual(polygon.toObject(), expected);
     });
   });
 
-  test('fromElement with empty points', function() {
+  QUnit.test('fromElement with empty points', function(assert) {
     var elPolygonWithAttrs = fabric.document.createElement('polygon');
     elPolygonWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolygonWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
@@ -143,7 +145,7 @@
         { x: 30, y: 30 },
         { x: 10, y: 10 }
       ];
-      deepEqual(polygonWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
+      assert.deepEqual(polygonWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
         'width':            20,
         'height':           20,
         'fill':             'rgb(255,255,255)',
@@ -159,12 +161,12 @@
         'left':             10,
         'transformMatrix':  [2, 0, 0, 2, -10, -20]
       }));
-      deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
+      assert.deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
     });
   });
-  test('fromElement with null', function() {
+  QUnit.test('fromElement with null', function(assert) {
     fabric.Polygon.fromElement(null, function(polygon) {
-      equal(polygon, null);
+      assert.equal(polygon, null);
     });
   });
 })();

@@ -39,17 +39,17 @@
 
       markup.push(
         '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
-          style, '>\n',
-          textAndBg.textBgRects.join(''),
-          '\t\t<text xml:space="preserve" ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
-            (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
-            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
-            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
-            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
-            'style="', this.getSvgStyles(noShadow), '" >\n',
-            textAndBg.textSpans.join(''),
-          '\t\t</text>\n',
+        style, '>\n',
+        textAndBg.textBgRects.join(''),
+        '\t\t<text xml:space="preserve" ',
+        (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
+        (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
+        (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
+        (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
+        (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
+        'style="', this.getSvgStyles(noShadow), '" >\n',
+        textAndBg.textSpans.join(''),
+        '\t\t</text>\n',
         '\t</g>\n'
       );
     },
@@ -87,7 +87,7 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-      var styleProps = this.getSvgSpanStyles(styleDecl, false),
+      var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
 
       return [
@@ -144,15 +144,15 @@
     _pushTextBgRect: function(textBgRects, color, left, top, width, height) {
       textBgRects.push(
         '\t\t<rect ',
-          this._getFillAttributes(color),
-          ' x="',
-          toFixed(left, NUM_FRACTION_DIGITS),
-          '" y="',
-          toFixed(top, NUM_FRACTION_DIGITS),
-          '" width="',
-          toFixed(width, NUM_FRACTION_DIGITS),
-          '" height="',
-          toFixed(height, NUM_FRACTION_DIGITS),
+        this._getFillAttributes(color),
+        ' x="',
+        toFixed(left, NUM_FRACTION_DIGITS),
+        '" y="',
+        toFixed(top, NUM_FRACTION_DIGITS),
+        '" width="',
+        toFixed(width, NUM_FRACTION_DIGITS),
+        '" height="',
+        toFixed(height, NUM_FRACTION_DIGITS),
         '"></rect>\n');
     },
 
@@ -212,8 +212,12 @@
       };
     },
 
+    /**
+     * Returns styles-string for svg-export
+     * @param {Boolean} skipShadow a boolean to skip shadow filter output
+     * @return {String}
+     */
     getSvgStyles: function(skipShadow) {
-
       var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
       return svgStyle + ' white-space: pre;';
     },

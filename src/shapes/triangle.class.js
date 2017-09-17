@@ -33,7 +33,7 @@
     initialize: function(options) {
       this.callSuper('initialize', options);
       this.set('width', options && options.width || 100)
-          .set('height', options && options.height || 100);
+        .set('height', options && options.height || 100);
     },
 
     /**
@@ -83,15 +83,15 @@
             '0 ' + -heightBy2,
             widthBy2 + ' ' + heightBy2
           ]
-          .join(',');
+            .join(',');
 
       markup.push(
         '<polygon ', this.getSvgId(),
-          'points="', points,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),'"',
-          this.addPaintOrder(),
-        '/>\n'
+        'points="', points,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        this.addPaintOrder(),
+        '"/>'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');

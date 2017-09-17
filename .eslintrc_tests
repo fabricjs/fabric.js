@@ -1,12 +1,12 @@
 {
   "env": {
     "browser": true,
-    "node": true,
-    "qunit": true
+    "node": true
   },
   "globals": {
     "fabric": true,
-    "G_vmlCanvasManager": true
+    "QUnit": true,
+    "assert": true
   },
   "rules": {
     "eqeqeq": 0,

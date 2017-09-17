@@ -136,12 +136,12 @@
       }
       markup.push(
         '<', this.type, ' ', this.getSvgId(),
-          'points="', points.join(''),
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(),'"',
-          this.addPaintOrder(),
-        '/>\n'
+        'points="', points.join(''),
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        ' ', this.getSvgTransformMatrix(),
+        this.addPaintOrder(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');

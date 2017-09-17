@@ -153,7 +153,7 @@
           drawRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
             styleOverride.hasRotatingPoint : this.hasRotatingPoint,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-              styleOverride.hasControls : this.hasControls,
+            styleOverride.hasControls : this.hasControls,
           rotatingPointOffset = typeof styleOverride.rotatingPointOffset !== 'undefined' ?
             styleOverride.rotatingPointOffset : this.rotatingPointOffset;
 

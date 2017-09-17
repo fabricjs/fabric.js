@@ -103,11 +103,11 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var pointerPoint = new fabric.Point(pointer.x, pointer.y),
 
         circleRadius = fabric.util.getRandomInt(
-                        Math.max(0, this.width - 20), this.width + 20) / 2,
+          Math.max(0, this.width - 20), this.width + 20) / 2,
 
         circleColor = new fabric.Color(this.color)
-                        .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
-                        .toRgba();
+          .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
+          .toRgba();
 
     pointerPoint.radius = circleRadius;
     pointerPoint.fill = circleColor;
