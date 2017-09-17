@@ -51,7 +51,7 @@
      * @param {Number} [options.contrast=0] Value to contrast the image up (-1...1)
      */
 
-     /**
+    /**
       * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
       *
       * @param {Object} options

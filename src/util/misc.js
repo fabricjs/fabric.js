@@ -229,7 +229,7 @@
       return fabric.util.resolveNamespace(namespace)[type];
     },
 
-     /**
+    /**
      * Returns array of attributes for given svg that fabric parses
      * @memberOf fabric.util
      * @param {String} type Type of svg element (eg. 'circle')

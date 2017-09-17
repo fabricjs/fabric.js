@@ -3,8 +3,8 @@
 
   function createImageElement() {
     return fabric.isLikelyNode
-            ? new (require(fabric.canvasModule).Image)()
-            : fabric.document.createElement('img');
+      ? new (require(fabric.canvasModule).Image)()
+      : fabric.document.createElement('img');
   }
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
@@ -32,77 +32,78 @@
     });
   }
 
-  test('constructor', function() {
-    ok(fabric.Pattern);
+  QUnit.test('constructor', function(assert) {
+    assert.ok(fabric.Pattern);
     var pattern = createPattern();
-    ok(pattern instanceof fabric.Pattern, 'should inherit from fabric.Pattern');
+    assert.ok(pattern instanceof fabric.Pattern, 'should inherit from fabric.Pattern');
   });
 
-  asyncTest('constructor with source string and with callback', function() {
+  QUnit.test('constructor with source string and with callback', function(assert) {
+    var done = assert.async();
     function callback(pattern) {
       if (fabric.isLikelyNode) {
-        equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
+        assert.equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
       }
       else {
-        equal(pattern.source.complete, true, 'pattern source has been loaded');
+        assert.equal(pattern.source.complete, true, 'pattern source has been loaded');
       }
-      start();
+      done();
     }
     new fabric.Pattern({
       source: IMG_SRC
     }, callback);
   });
 
-  test('properties', function() {
+  QUnit.test('properties', function(assert) {
     var pattern = createPattern();
 
-    equal(pattern.source, img);
-    equal(pattern.repeat, 'repeat');
-    equal(pattern.offsetX, 0);
-    equal(pattern.offsetY, 0);
+    assert.equal(pattern.source, img);
+    assert.equal(pattern.repeat, 'repeat');
+    assert.equal(pattern.offsetX, 0);
+    assert.equal(pattern.offsetY, 0);
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var pattern = createPattern();
 
-    ok(typeof pattern.toObject == 'function');
+    assert.ok(typeof pattern.toObject === 'function');
 
     var object = pattern.toObject();
 
     // node-canvas doesn't give <img> "src"
     if (img.src) {
-      ok(object.source.indexOf('fixtures/greyfloral.png') > -1);
+      assert.ok(object.source.indexOf('fixtures/greyfloral.png') > -1);
     }
-    equal(object.repeat, 'repeat');
-    equal(object.offsetX, 0);
-    equal(object.offsetY, 0);
+    assert.equal(object.repeat, 'repeat');
+    assert.equal(object.offsetX, 0);
+    assert.equal(object.offsetY, 0);
 
     var patternWithGetSource = new fabric.Pattern({
       source: function() {return fabric.document.createElement('canvas');}
     });
 
     var object2 = patternWithGetSource.toObject();
-    equal(object2.source, 'function () {return fabric.document.createElement(\'canvas\');}');
-    equal(object2.repeat, 'repeat');
+    assert.equal(object2.source, 'function () {return fabric.document.createElement(\'canvas\');}');
+    assert.equal(object2.repeat, 'repeat');
   });
 
-  test('toObject with custom props', function() {
+  QUnit.test('toObject with custom props', function(assert) {
     var pattern = createPattern();
     pattern.id = 'myId';
     var object = pattern.toObject(['id']);
-    equal(object.id, 'myId');
+    assert.equal(object.id, 'myId');
   });
 
-  test('toLive', function() {
+  QUnit.test('toLive', function(assert) {
     var pattern = createPattern();
     var el = fabric.document.createElement('canvas');
     var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
-    ok(typeof pattern.toLive === 'function');
+    assert.ok(typeof pattern.toLive === 'function');
     var created = pattern.toLive(canvas.contextContainer);
-    equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');
+    assert.equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');
   });
 
-  test('pattern serialization / deserialization (function)', function() {
+  QUnit.test('pattern serialization / deserialization (function)', function(assert) {
     var patternSourceCanvas, padding;
 
     var pattern = new fabric.Pattern({
@@ -119,40 +120,40 @@
     var obj = pattern.toObject();
     var patternDeserialized = new fabric.Pattern(obj);
 
-    equal(typeof patternDeserialized.source, 'function');
-    equal(patternDeserialized.repeat, 'repeat');
+    assert.equal(typeof patternDeserialized.source, 'function');
+    assert.equal(patternDeserialized.repeat, 'repeat');
   });
 
-  test('pattern serialization / deserialization (image source)', function() {
+  QUnit.test('pattern serialization / deserialization (image source)', function(assert) {
     var pattern = createPattern();
     var obj = pattern.toObject();
 
     // node-canvas doesn't give <img> "src"
     if (obj.src) {
       var patternDeserialized = new fabric.Pattern(obj);
-      equal(typeof patternDeserialized.source, 'object');
-      equal(patternDeserialized.repeat, 'repeat');
+      assert.equal(typeof patternDeserialized.source, 'object');
+      assert.equal(patternDeserialized.repeat, 'repeat');
     }
     else {
-      ok(true);
+      assert.ok(true);
     }
   });
 
-  test('toSVG', function() {
+  QUnit.test('toSVG', function(assert) {
     var pattern = createPattern();
 
-    ok(typeof pattern.toSVG == 'function');
+    assert.ok(typeof pattern.toSVG === 'function');
 
     // TODO: test toSVG
   });
 
-  test('initPattern from object', function() {
+  QUnit.test('initPattern from object', function(assert) {
     var fillObj = {
       type: 'pattern',
       source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
     };
     var obj = new fabric.Object({ fill: fillObj });
-    ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
+    assert.ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
   });
 
 })();
