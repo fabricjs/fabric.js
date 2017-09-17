@@ -71,6 +71,7 @@
      */
     _createActiveSelection: function(target, e) {
       var group = this._createGroup(target);
+      this._hoveredTarget = group;
       this.setActiveObject(group, e);
       target.fire('selected', { e: e });
       this.fire('selection:created', { target: group, e: e });

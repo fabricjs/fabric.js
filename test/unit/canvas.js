@@ -321,6 +321,7 @@
     canvas.on('selection:created', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
     canvas._createActiveSelection(rect2, {});
+    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
   });
@@ -344,6 +345,7 @@
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
     canvas._updateActiveSelection(rect3, {});
     assert.equal(isFired, true, 'selection:updated fired');
+    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
     canvas.off('selection:updated');
   });
 
