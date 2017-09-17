@@ -106,8 +106,9 @@
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(),
-          '"/>\n'
+          ' ', this.getSvgTransformMatrix(), '"',
+          this.addPaintOrder(),
+          '/>\n'
         );
       }
       else {
@@ -123,7 +124,8 @@
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(),
+          ' ', this.getSvgTransformMatrix(), '"',
+          this.addPaintOrder(),
           '"/>\n'
         );
       }
