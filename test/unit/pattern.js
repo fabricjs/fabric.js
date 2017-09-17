@@ -3,8 +3,8 @@
 
   function createImageElement() {
     return fabric.isLikelyNode
-            ? new (require(fabric.canvasModule).Image)()
-            : fabric.document.createElement('img');
+      ? new (require(fabric.canvasModule).Image)()
+      : fabric.document.createElement('img');
   }
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {

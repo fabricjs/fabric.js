@@ -127,7 +127,7 @@
       equal(Math.round(object.get('left')), 1);
       equal(Math.round(object.get('top')), 1);
 
-      //equal(changedInvocations, 2);
+      equal(changedInvocations, 2);
       equal(completeInvocations, 1);
 
       start();

@@ -58,7 +58,7 @@
      */
     mainParameter: 'brightness',
 
-   /**
+    /**
     * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
     *
     * @param {Object} options

@@ -102,11 +102,11 @@
       if (angle === 0) {
         markup.push(
           '<circle ', this.getSvgId(),
-            'cx="' + x + '" cy="' + y + '" ',
-            'r="', this.radius,
-            '" style="', this.getSvgStyles(),
-            '" transform="', this.getSvgTransform(),
-            ' ', this.getSvgTransformMatrix(),
+          'cx="' + x + '" cy="' + y + '" ',
+          'r="', this.radius,
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+          ' ', this.getSvgTransformMatrix(),
           '"/>\n'
         );
       }
@@ -139,10 +139,10 @@
     _render: function(ctx) {
       ctx.beginPath();
       ctx.arc(0,
-              0,
-              this.radius,
-              this.startAngle,
-              this.endAngle, false);
+        0,
+        this.radius,
+        this.startAngle,
+        this.endAngle, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },

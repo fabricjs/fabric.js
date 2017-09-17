@@ -382,7 +382,7 @@
     var cache2 = text2.getFontCache(text2);
     equal(cache, cache2, 'you get the same cache');
   });
-// moved
+  // moved
   test('getSelectionStyles with no arguments', function() {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {

@@ -125,7 +125,7 @@
     equal(iText.selectionStart, 28, 'should move to selection Start');
     equal(iText.selectionEnd, 28, 'should move to selection Start');
     selection = 0;
-// TODO verify and dp
+    // TODO verify and dp
     // iText.selectionStart = 0;
     // iText.selectionEnd = 0;
     // iText.insertChars('hello');

@@ -164,13 +164,13 @@
     equal(JSON.stringify(cObj.toJSON()), emptyObjectJSON);
 
     cObj.set('opacity', 0.88)
-        .set('scaleX', 1.3)
-        .set('width', 122)
-        .set('flipY', true)
-        .set('strokeDashArray', [5, 2])
-        .set('strokeLineCap', 'round')
-        .set('strokeLineJoin', 'bevil')
-        .set('strokeMiterLimit', 5);
+      .set('scaleX', 1.3)
+      .set('width', 122)
+      .set('flipY', true)
+      .set('strokeDashArray', [5, 2])
+      .set('strokeLineCap', 'round')
+      .set('strokeLineJoin', 'bevil')
+      .set('strokeMiterLimit', 5);
 
     equal(JSON.stringify(cObj.toJSON()), augmentedJSON);
   });
@@ -246,15 +246,15 @@
     deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.set('left', 10)
-        .set('top', 20)
-        .set('width', 30)
-        .set('height', 40)
-        .set('flipX', true)
-        .set('opacity', 0.13)
-        .set('strokeDashArray', [5, 2])
-        .set('strokeLineCap', 'round')
-        .set('strokeLineJoin', 'bevil')
-        .set('strokeMiterLimit', 5);
+      .set('top', 20)
+      .set('width', 30)
+      .set('height', 40)
+      .set('flipX', true)
+      .set('opacity', 0.13)
+      .set('strokeDashArray', [5, 2])
+      .set('strokeLineCap', 'round')
+      .set('strokeLineJoin', 'bevil')
+      .set('strokeMiterLimit', 5);
 
     deepEqual(augmentedObjectRepr, cObj.toObject());
 
@@ -306,16 +306,16 @@
     deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.set('left', 10)
-        .set('top', 20)
-        .set('width', 30)
-        .set('height', 40)
-        .set('flipX', true)
-        .set('opacity', 0.13)
-        .set('strokeDashArray', [5, 2])
-        .set('strokeLineCap', 'round')
-        .set('strokeLineJoin', 'bevil')
-        .set('strokeMiterLimit', 5)
-        .set('transformMatrix', [3, 0, 3, 1, 0, 0]);
+      .set('top', 20)
+      .set('width', 30)
+      .set('height', 40)
+      .set('flipX', true)
+      .set('opacity', 0.13)
+      .set('strokeDashArray', [5, 2])
+      .set('strokeLineCap', 'round')
+      .set('strokeLineJoin', 'bevil')
+      .set('strokeMiterLimit', 5)
+      .set('transformMatrix', [3, 0, 3, 1, 0, 0]);
     toObjectObj = cObj.toObject();
     deepEqual(augmentedObjectRepr, toObjectObj);
     notEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
@@ -421,7 +421,7 @@
 
   test('getHeight', function() {
     var cObj = new fabric.Object({strokeWidth: 0});
-  //  ok(typeof cObj.getHeight == 'function');
+    //  ok(typeof cObj.getHeight == 'function');
     equal(cObj.getScaledHeight(), 0);
     cObj.set('height', 123);
     equal(cObj.getScaledHeight(), 123);

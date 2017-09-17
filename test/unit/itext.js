@@ -273,7 +273,7 @@
     ok(!iText.isEditing);
   });
 
-/*  test('enterEditing, exitEditing eventlistener counts', function() {
+  /*  test('enterEditing, exitEditing eventlistener counts', function() {
     var iText = new fabric.IText('test');
     canvas.add(iText);
     equal(typeof iText.enterEditing, 'function');
