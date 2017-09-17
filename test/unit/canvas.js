@@ -321,6 +321,7 @@
     canvas.on('selection:created', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
     canvas._createActiveSelection(rect2, {});
+    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
   });
