@@ -162,9 +162,9 @@
         '" width="', this.width, '" height="', this.height,
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(),
-        this.getSvgTransformMatrix(),
+        this.getSvgTransformMatrix(), '"',
         this.addPaintOrder(),
-        '"/>\n');
+        '/>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
