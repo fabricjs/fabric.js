@@ -4,6 +4,7 @@ testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 testrunner.options.log.coverage = true;
+testrunner.options.log.testing = true;
 
 testrunner.options.coverage = true;
 testrunner.options.maxBlockDuration = 120000;
