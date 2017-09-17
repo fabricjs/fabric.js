@@ -89,9 +89,9 @@
         '<polygon ', this.getSvgId(),
         'points="', points,
         '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
+        '" transform="', this.getSvgTransform(), '"',
         this.addPaintOrder(),
-        '"/>'
+        '/>'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
