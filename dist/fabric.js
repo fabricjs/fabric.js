@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.7.18" };
+var fabric = fabric || { version: "1.7.19" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -30,7 +30,8 @@ else {
  * True when in environment that supports touch events
  * @type boolean
  */
-fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
+
+fabric.isTouchSupported = 'ontouchstart' in fabric.window;
 
 /**
  * True when in environment that's probably Node.js
@@ -8123,7 +8124,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @private
      */
     _render: function() {
-      var ctx  = this.canvas.contextTop,
+      var ctx  = this.canvas.contextTop, i, len,
           v = this.canvas.viewportTransform,
           p1 = this._points[0],
           p2 = this._points[1];
@@ -8137,12 +8138,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       //then we should be drawing a dot. A path isn't drawn between two identical dots
       //that's why we set them apart a bit
       if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
-        p1.x -= 0.5;
-        p2.x += 0.5;
+        var width = this.width / 1000;
+        p1 = new fabric.Point(p1.x, p1.y);
+        p2 = new fabric.Point(p2.x, p2.y);
+        p1.x -= width;
+        p2.x += width;
       }
       ctx.moveTo(p1.x, p1.y);
 
-      for (var i = 1, len = this._points.length; i < len; i++) {
+      for (i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi + 1 & pi + 2 as the
         // end point and p1 as our control point.
         var midPoint = p1.midPointFrom(p2);
@@ -8165,23 +8169,26 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points) {
-      var path = [],
+      var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
-          p2 = new fabric.Point(points[1].x, points[1].y);
+          p2 = new fabric.Point(points[1].x, points[1].y),
+          len = points.length;
 
-      path.push('M ', points[0].x, ' ', points[0].y, ' ');
-      for (var i = 1, len = points.length; i < len; i++) {
-        var midPoint = p1.midPointFrom(p2);
-        // p1 is our bezier control point
-        // midpoint is our endpoint
-        // start point is p(i-1) value.
-        path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
-        p1 = new fabric.Point(points[i].x, points[i].y);
+      path.push('M ', p1.x - width, ' ', p1.y, ' ');
+      for (i = 1; i < len; i++) {
+        if (!p1.eq(p2)) {
+          var midPoint = p1.midPointFrom(p2);
+          // p1 is our bezier control point
+          // midpoint is our endpoint
+          // start point is p(i-1) value.
+          path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
+        }
+        p1 = points[i];
         if ((i + 1) < points.length) {
-          p2 = new fabric.Point(points[i + 1].x, points[i + 1].y);
+          p2 = points[i + 1];
         }
       }
-      path.push('L ', p1.x, ' ', p1.y, ' ');
+      path.push('L ', p1.x + width, ' ', p1.y, ' ');
       return path;
     },
 
@@ -8198,10 +8205,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         strokeLineCap: this.strokeLineCap,
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
-        originX: 'center',
-        originY: 'center'
       });
-
+      var position = new fabric.Point(path.left + path.width / 2, path.top + path.height / 2);
+      position = path.translateToGivenOrigin(position, 'center', 'center', path.originX, path.originY);
+      path.top = position.y;
+      path.left = position.x;
       if (this.shadow) {
         this.shadow.affectStroke = true;
         path.setShadow(this.shadow);
@@ -9504,12 +9512,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var dist = localMouse.y + localMouse.x,
           lastDist = _dim.y * transform.original.scaleY / target.scaleY +
                      _dim.x * transform.original.scaleX / target.scaleX,
-          scaled;
+          scaled, signX = localMouse.x / Math.abs(localMouse.x),
+          signY = localMouse.y / Math.abs(localMouse.y);
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
-      transform.newScaleX = transform.original.scaleX * dist / lastDist;
-      transform.newScaleY = transform.original.scaleY * dist / lastDist;
+      transform.newScaleX = signX * Math.abs(transform.original.scaleX * dist / lastDist);
+      transform.newScaleY = signY * Math.abs(transform.original.scaleY * dist / lastDist);
       scaled = transform.newScaleX !== target.scaleX || transform.newScaleY !== target.scaleY;
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);

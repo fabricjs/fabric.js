@@ -1,3 +1,9 @@
+**Version 1.7.19**
+
+- Fixed drawing path displacement [#4318](https://github.com/kangax/fabric.js/pull/4318)
+- Fixed the flip of images with scale equally [#4313](https://github.com/kangax/fabric.js/pull/4313)
+- Improved touch detection [#4302](https://github.com/kangax/fabric.js/pull/4302)
+
 **Version 1.7.18**
 
 - Fixed doubling of subtargets for preserveObjectStacking = true [#4297](https://github.com/kangax/fabric.js/pull/4297)
