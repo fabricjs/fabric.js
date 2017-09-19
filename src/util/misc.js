@@ -309,7 +309,8 @@
             callback && callback.call(context, img);
             div = img = img.onload = img.onerror = null;
           }, 1);
-        } else {
+        }
+        else {
           callback && callback.call(context, img);
           img = img.onload = img.onerror = null;
         }
