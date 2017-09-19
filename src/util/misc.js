@@ -296,19 +296,11 @@
 
       /** @ignore */
       img.onload = function () {
-        // ugly fix for IE11; IE11 will only render data-url SVG if visible in DOM
-        // so we create a div (1x1px at -1,-1px) containing the img.
-        if (img.src.substr(0,5) === 'data:') {
-          var div = document.createElement('div');
-          div.style.width = div.style.height = '1px';
-          div.style.left = div.style.right = '-1px';
-          div.style.position = 'absolute';
-          div.appendChild(img);
-          document.querySelector('body').appendChild(div);
-          setTimeout(function(){
-            callback && callback.call(context, img);
-            div = img = img.onload = img.onerror = null;
-          }, 1);
+        if (img.src.substring(0,14) === 'data:image/svg') {
+          // IE10 / IE11-Fix: SVG contents from data: URI
+          // will only be available if the IMG is present
+          // in the DOM (and visible)
+          fabric.util.loadImageInDom(img, callback, context);
         }
         else {
           callback && callback.call(context, img);
@@ -332,6 +324,27 @@
       }
 
       img.src = url;
+    },
+
+    /**
+     * Attaches SVG image with data: URL to the dom
+     * @memberOf fabric.util
+     * @param {Object} img Image object with data:image/svg src
+     * @param {Function} callback Callback; invoked with loaded image
+     * @param {*} [context] Context to invoke callback in
+     */
+    loadImageInDom: function(img, callback, context) {
+      var div = document.createElement('div');
+      div.style.width = div.style.height = '1px';
+      div.style.left = div.style.top = '-100%';
+      div.style.position = 'absolute';
+      div.appendChild(img);
+      document.querySelector('body').appendChild(div);
+      setTimeout(function(){
+        callback && callback.call(context, img);
+        div.parentNode.removeChild(div);
+        div = img = img.onload = img.onerror = null;
+      }, 1);
     },
 
     /**
