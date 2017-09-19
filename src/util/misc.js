@@ -295,19 +295,12 @@
       var img = fabric.util.createImage();
 
       /** @ignore */
-      img.onload = function () {
-        if (img.src.substring(0,14) === 'data:image/svg') {
-          // IE10 / IE11-Fix: SVG contents from data: URI
-          // will only be available if the IMG is present
-          // in the DOM (and visible)
-          fabric.util.loadImageInDom(img, callback, context);
-        }
-        else {
-          callback && callback.call(context, img);
-          img = img.onload = img.onerror = null;
-        }
+      var onLoadCallback = function () {
+        callback && callback.call(context, img);
+        img = img.onload = img.onerror = null;
       };
 
+      img.onload = onLoadCallback;
       /** @ignore */
       img.onerror = function() {
         fabric.log('Error loading ' + img.src);
@@ -323,6 +316,14 @@
         img.crossOrigin = crossOrigin;
       }
 
+      // IE10 / IE11-Fix: SVG contents from data: URI
+      // will only be available if the IMG is present
+      // in the DOM (and visible)
+      if (url.substring(0,14) === 'data:image/svg') {
+        img.onload = null;
+        fabric.util.loadImageInDom(img, onLoadCallback);
+      }
+
       img.src = url;
     },
 
@@ -331,19 +332,19 @@
      * @memberOf fabric.util
      * @param {Object} img Image object with data:image/svg src
      * @param {Function} callback Callback; invoked with loaded image
-     * @param {*} [context] Context to invoke callback in
+     * @return {Object} DOM element (div containing the SVG image)
      */
-    loadImageInDom: function(img, callback, context) {
+    loadImageInDom: function(img, onLoadCallback) {
       var div = document.createElement('div');
       div.style.width = div.style.height = '1px';
       div.style.left = div.style.top = '-100%';
       div.style.position = 'absolute';
       div.appendChild(img);
       document.querySelector('body').appendChild(div);
-      setTimeout(function(){
-        callback && callback.call(context, img);
+      img.onload = setTimeout(function () {
+        onLoadCallback();
         div.parentNode.removeChild(div);
-        div = img = img.onload = img.onerror = null;
+        div = null;
       }, 1);
     },
 
