@@ -298,17 +298,17 @@
       img.onload = function () {
         // ugly fix for IE11; IE11 will only render data-url SVG if visible in DOM
         // so we create a div (1x1px at -1,-1px) containing the img.
-        if(img.src.substr(0,5) == 'data:'){
+        if (img.src.substr(0,5) === 'data:') {
           var div = document.createElement('div');
           div.style.width = div.style.height = '1px';
           div.style.left = div.style.right = '-1px';
           div.style.position = 'absolute';
-          div.appendChild(img)
-          document.querySelector("body").appendChild(div)
+          div.appendChild(img);
+          document.querySelector('body').appendChild(div);
           setTimeout(function(){
             callback && callback.call(context, img);
             div = img = img.onload = img.onerror = null;
-          }, 1)  
+          }, 1);
         } else {
           callback && callback.call(context, img);
           img = img.onload = img.onerror = null;
