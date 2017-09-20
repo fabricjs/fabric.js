@@ -341,11 +341,16 @@
       div.style.position = 'absolute';
       div.appendChild(img);
       document.querySelector('body').appendChild(div);
-      img.onload = setTimeout(function () {
+      /**
+       * Wrap in function to:
+       *   1. Call existing callback
+       *   2. Cleanup DOM
+       */
+      img.onload = function () {
         onLoadCallback();
         div.parentNode.removeChild(div);
         div = null;
-      }, 1);
+      };
     },
 
     /**
