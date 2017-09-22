@@ -154,6 +154,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.canvas.fire('text:changed', { target: this });
         this.canvas.requestRenderAll();
       }
+      return;
     }
 
     if (this.selectionStart !== this.selectionEnd) {
