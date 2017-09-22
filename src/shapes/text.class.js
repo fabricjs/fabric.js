@@ -316,9 +316,10 @@
     _splitText: function() {
       var newLines = this._splitTextIntoLines(this.text);
       this.textLines = newLines.lines;
-      this._unwrappedTextLines = newLines._unwrappedLines;
       this._textLines = newLines.graphemeLines;
+      this._unwrappedTextLines = newLines._unwrappedLines;
       this._text = newLines.graphemeText;
+      return newLines;
     },
 
     /**
