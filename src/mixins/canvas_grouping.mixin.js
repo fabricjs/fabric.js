@@ -74,7 +74,7 @@
       this._hoveredTarget = group;
       this.setActiveObject(group, e);
       target.fire('selected', { e: e });
-      this.fire('selection:created', { target: group, e: e });
+      this.fire('selection:updated', { target: group, e: e });
     },
 
     /**

@@ -17,11 +17,12 @@
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:added
+   * @fires object:removed
    * @fires object:modified
    * @fires object:rotating
    * @fires object:scaling
    * @fires object:moving
-   * @fires object:selected
+   * @fires object:selected this event is deprecated. use selection:created
    *
    * @fires before:selection:cleared
    * @fires selection:cleared
@@ -1409,7 +1410,9 @@
       }
       if (this._setActiveObject(object, e)) {
         currentActiveObject && currentActiveObject.fire('deselected', { e: e });
+        // this event is deprecated and left for compatibility reasons.
         this.fire('object:selected', { target: object, e: e });
+        this.fire('selection:created', { target: object, e: e });
         object.fire('selected', { e: e });
       }
       return this;
