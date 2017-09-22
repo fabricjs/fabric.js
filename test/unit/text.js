@@ -503,6 +503,15 @@
     assert.deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
   });
 
+  QUnit.test('_splitText', function(assert) {
+    var text = new fabric.Text('test foo bar-baz\nqux', {});
+    var test = text._splitText();
+    assert.equal(test.lines[0], 'test foo bar-baz', 'first line is correct');
+    assert.equal(test.lines[1], 'qux', 'second line is correct');
+    assert.equal(test.graphemeLines[0], 'test foo bar-baz', 'first line is correct');
+    assert.equal(test.graphemeLines[1], 'qux', 'second line is correct');
+  });
+
   QUnit.test('getStyleAtPosition complete', function(assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
