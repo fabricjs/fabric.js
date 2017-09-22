@@ -478,6 +478,9 @@
       }
       this.cursorOffsetCache = { };
       this.text = this.hiddenTextarea.value;
+      if (this._shouldClearDimensionCache()) {
+        this.initDimensions();
+      }
       var newSelection = this.fromStringToGraphemeSelection(
         this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
       this.selectionEnd = this.selectionStart = newSelection.selectionEnd;

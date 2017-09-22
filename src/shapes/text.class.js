@@ -310,6 +310,18 @@
     },
 
     /**
+     * @private
+     * Divides text into lines of text and lines of graphemes.
+     */
+    _splitText: function() {
+      var newLines = this._splitTextIntoLines(this.text);
+      this.textLines = newLines.lines;
+      this._unwrappedTextLines = newLines._unwrappedLines;
+      this._textLines = newLines.graphemeLines;
+      this._text = newLines.graphemeText;
+    },
+
+    /**
      * Initialize or update text dimensions.
      * Updates this.width and this.height with the proper values.
      * Does not return dimensions.
@@ -318,11 +330,7 @@
       if (this.__skipDimension) {
         return;
       }
-      var newLines = this._splitTextIntoLines(this.text);
-      this.textLines = newLines.lines;
-      this._unwrappedTextLines = newLines._unwrappedLines;
-      this._textLines = newLines.graphemeLines;
-      this._text = newLines.graphemeText;
+      this._splitText();
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
       if (this.textAlign === 'justify') {
