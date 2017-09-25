@@ -1423,7 +1423,10 @@
         opt.deselected = removed;
         somethingChanged && this.fire('selection:updated', opt);
       }
-      else if (objects.length > 0){
+      else if (objects.length > 0) {
+        if (objects.length === 1) {
+          this.fire('object:selected', opt);
+        }
         opt.selected = added;
         this.fire('selection:created', opt);
       }
