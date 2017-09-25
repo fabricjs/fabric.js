@@ -47,34 +47,31 @@
      * @private
      */
     _updateActiveSelection: function(target, e) {
-      var activeSelection = this._activeObject;
+      var activeSelection = this._activeObject,
+          currentActiveObjects = activeSelection._objects.slice(0);
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
-        target.fire('deselected', { e: e });
         this._hoveredTarget = target;
         if (activeSelection.size() === 1) {
           // activate last remaining object
-          this.setActiveObject(activeSelection.item(0), e);
-          return;
+          this._setActiveObject(activeSelection.item(0), e);
         }
       }
       else {
         activeSelection.addWithUpdate(target);
-        target.fire('selected', { e: e });
         this._hoveredTarget = activeSelection;
       }
-      this.fire('selection:updated', { target: activeSelection, e: e, updated: target });
+      this._fireSelectionEvents(currentActiveObjects, e);
     },
 
     /**
      * @private
      */
     _createActiveSelection: function(target, e) {
-      var group = this._createGroup(target);
+      var currentActives = this.getActiveObjects(), group = this._createGroup(target);
       this._hoveredTarget = group;
-      this.setActiveObject(group, e);
-      target.fire('selected', { e: e });
-      this.fire('selection:created', { target: group, e: e });
+      this._setActiveObject(group, e);
+      this._fireSelectionEvents(currentActives, e);
     },
 
     /**
@@ -110,11 +107,7 @@
         aGroup = new fabric.ActiveSelection(group.reverse(), {
           canvas: this
         });
-        group.forEach(function(object) {
-          object.fire('selected', { e: e });
-        });
         this.setActiveObject(aGroup, e);
-        this.fire('selection:created', { target: aGroup, e: e });
       }
     },
 
