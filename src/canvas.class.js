@@ -1425,6 +1425,7 @@
       }
       else if (objects.length > 0) {
         if (objects.length === 1) {
+          opt.target = added[0];
           this.fire('object:selected', opt);
         }
         opt.selected = added;
