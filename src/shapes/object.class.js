@@ -981,6 +981,7 @@
         this.drawCacheOnCanvas(ctx);
       }
       else {
+        this._cacheCanvas = null;
         this.dirty = false;
         this.drawObject(ctx);
         if (this.objectCaching && this.statefullCache) {
