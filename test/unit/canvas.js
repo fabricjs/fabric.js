@@ -534,6 +534,28 @@
     assert.equal(collected[2], rect1, 'rect1 is collected');
   });
 
+  QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
+    var rect1Deselected = false;
+    var rect3Selected = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    var activeSelection = new fabric.ActiveSelection([rect1, rect2]);
+    canvas.setActiveObject(activeSelection);
+    rect1.on('deselected', function( ) {
+      rect1Deselected = true;
+    });
+    rect3.on('selected', function( ) {
+      rect3Selected = true;
+    });
+    var currentObjects = canvas.getActiveObjects();
+    activeSelection.removeWithUpdate(rect1);
+    activeSelection.addWithUpdate(rect3);
+    canvas._fireSelectionEvents(currentObjects, {});
+    assert.ok(rect3Selected, 'rect 3 selected');
+    assert.ok(rect1Deselected, 'rect 1 deselected');
+  });
+
   QUnit.test('getContext', function(assert) {
     assert.ok(typeof canvas.getContext === 'function');
   });

@@ -55,7 +55,7 @@
     ],
     "max-statements": [
       2,
-      45
+      150
     ],
     "curly": [
       2,
