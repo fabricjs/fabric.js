@@ -335,12 +335,12 @@
      * @return {Object} DOM element (div containing the SVG image)
      */
     loadImageInDom: function(img, onLoadCallback) {
-      var div = document.createElement('div');
+      var div = fabric.document.createElement('div');
       div.style.width = div.style.height = '1px';
       div.style.left = div.style.top = '-100%';
       div.style.position = 'absolute';
       div.appendChild(img);
-      document.querySelector('body').appendChild(div);
+      fabric.document.querySelector('body').appendChild(div);
       /**
        * Wrap in function to:
        *   1. Call existing callback
