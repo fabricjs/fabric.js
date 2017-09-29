@@ -679,8 +679,9 @@
      */
     _updateCacheCanvas: function() {
       if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
+        var target = this.canvas._currentTransform.target;
         var action = this.canvas._currentTransform.action;
-        if (action.slice && action.slice(0, 5) === 'scale') {
+        if (action.slice && action.slice(0, 5) === 'scale' && this === target) {
           return false;
         }
       }
