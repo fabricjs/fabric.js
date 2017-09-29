@@ -127,11 +127,11 @@
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
           minX = fabric.util.array.min(xPoints),
           maxX = fabric.util.array.max(xPoints),
-          width = Math.abs(minX - maxX),
+          width = maxX - minX,
           yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
           minY = fabric.util.array.min(yPoints),
           maxY = fabric.util.array.max(yPoints),
-          height = Math.abs(minY - maxY);
+          height = maxY - minY;
 
       return {
         left: minX,
