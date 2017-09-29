@@ -253,24 +253,6 @@
     },
 
     /**
-     * Returns width of an object's bounding rectangle
-     * @deprecated since 1.0.4
-     * @return {Number} width value
-     */
-    getBoundingRectWidth: function() {
-      return this.getBoundingRect().width;
-    },
-
-    /**
-     * Returns height of an object's bounding rectangle
-     * @deprecated since 1.0.4
-     * @return {Number} height value
-     */
-    getBoundingRectHeight: function() {
-      return this.getBoundingRect().height;
-    },
-
-    /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
      * the box is intented as aligned to axis of canvas.
      * @param {Boolean} [absolute] use coordinates without viewportTransform
@@ -334,24 +316,26 @@
     /**
      * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
      * @param {Number} value New width value
+     * @param {Boolean} absolute ignore viewport
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    scaleToWidth: function(value) {
+    scaleToWidth: function(value, absolute) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().width / this.getScaledWidth();
+      var boundingRectFactor = this.getBoundingRect(absolute).width / this.getScaledWidth();
       return this.scale(value / this.width / boundingRectFactor);
     },
 
     /**
      * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
      * @param {Number} value New height value
+     * @param {Boolean} absolute ignore viewport
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    scaleToHeight: function(value) {
+    scaleToHeight: function(value, absolute) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRect().height / this.getScaledHeight();
+      var boundingRectFactor = this.getBoundingRect(absolute).height / this.getScaledHeight();
       return this.scale(value / this.height / boundingRectFactor);
     },
 
@@ -365,8 +349,8 @@
           vpt = this.getViewportTransform(),
           dim = absolute ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y,
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta),
+          sinTh = theta ? Math.sin(theta) : 0,
+          cosTh = theta ? Math.cos(theta) : 1,
           _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
           _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
