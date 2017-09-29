@@ -483,8 +483,9 @@
       var ctx = this.contextCache,
           originalColor = target.selectionBackgroundColor;
 
-      target.hasBorders = target.transparentCorners = false;
       target.selectionBackgroundColor = '';
+
+      this.clearContext(ctx);
 
       ctx.save();
       ctx.transform.apply(ctx, this.viewportTransform);
@@ -494,14 +495,14 @@
       target === this._activeObject && target._renderControls(ctx, {
         hasBorders: false,
         transparentCorners: false
+      }, {
+        hasBorders: false,
       });
 
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
         ctx, x, y, this.targetFindTolerance);
-
-      this.clearContext(ctx);
 
       return isTransparent;
     },
