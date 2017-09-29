@@ -127,15 +127,16 @@
     selection:              true,
 
     /**
-     * Indicates which keys enable multiple click selection
+     * Indicates which key or keys enable multiple click selection
+     * Pass value as a string or array of strings
      * values: 'altKey', 'shiftKey', 'ctrlKey'.
      * If `null` or empty or containing any other string that is not a modifier key
      * feature is disabled.
      * @since 1.6.2
-     * @type Array
+     * @type String|Array
      * @default
      */
-    selectionKeys:           ['shiftKey'],
+    selectionKey:           'shiftKey',
 
     /**
      * Indicates which key enable alternative selection
@@ -508,6 +509,24 @@
     },
 
     /**
+     * takes an event and determins if selection key has been pressed
+     * @private
+     * @param {Event} e Event object
+     */
+    _isSelectionKeyPressed: function(e) {
+      var selectionKeyPressed = false;
+
+      if (Object.prototype.toString.call(this.selectionKey) === '[object Array]') {
+        selectionKeyPressed = !!this.selectionKey.find(function(key) { return e[key] === true; });
+      }
+      else {
+        selectionKeyPressed = e[this.selectionKey];
+      }
+
+      return selectionKeyPressed;
+    },
+
+    /**
      * @private
      * @param {Event} e Event object
      * @param {fabric.Object} target
@@ -515,16 +534,6 @@
     _shouldClearSelection: function (e, target) {
       var activeObjects = this.getActiveObjects(),
           activeObject = this._activeObject;
-
-      var selectionKeyPressed = false;
-      if (Array.isArray(this.selectionKeys)){
-        selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
-          return e[selectionKey];
-        });
-      }
-      else if (e[this.selectionKeys.toString()]){
-        selectionKeyPressed = true;
-      }
 
       return (
         !target
@@ -534,7 +543,7 @@
           activeObjects.length > 1 &&
           activeObjects.indexOf(target) === -1 &&
           activeObject !== target &&
-          !selectionKeyPressed)
+          !this._isSelectionKeyPressed(e))
         ||
         (target && !target.evented)
         ||
