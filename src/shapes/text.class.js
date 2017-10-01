@@ -1164,7 +1164,7 @@
         }
       }
       else {
-        needsDims = this._dimensionAffectingProps.indexOf(_key) !== -1;
+        needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
       }
       if (needsDims) {
         this.initDimensions();
