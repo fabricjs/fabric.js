@@ -14,17 +14,7 @@
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
 
-      var selectionKeyPressed = false;
-      if (Array.isArray(this.selectionKeys)){
-        selectionKeyPressed = this.selectionKeys.some(function (selectionKey) {
-          return e[selectionKey];
-        });
-      }
-      else if (e[this.selectionKeys.toString()]){
-        selectionKeyPressed = true;
-      }
-
-      return activeObject && selectionKeyPressed && target && target.selectable && this.selection &&
+      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
 
