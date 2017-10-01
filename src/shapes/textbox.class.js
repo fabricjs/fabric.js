@@ -100,6 +100,7 @@
       }
       // clear cache and re-calculate height
       this.height = this.calcTextHeight();
+      this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**
