@@ -1156,7 +1156,7 @@
      * @chainable
      */
     set: function(key, value) {
-      this.callSuper('_set', key, value);
+      this.callSuper('set', key, value);
       var needsDims = false;
       if (typeof key === 'object') {
         for (var _key in key) {
