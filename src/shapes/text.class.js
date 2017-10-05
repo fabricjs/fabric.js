@@ -148,7 +148,7 @@
     linethrough:       false,
 
     /**
-     * Text alignment. Possible values: "left", "center", "right", "justify" or "justify-left".
+     * Text alignment. Possible values: "left", "center", "right", "justify" or "justify-wrapped".
      * @type String
      * @default
      */
@@ -347,7 +347,8 @@
     enlargeSpaces: function() {
       var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (this.textAlign === 'justify' || this._textLineBreaks.indexOf(i) === -1) {
+        if (this.textAlign === 'justify' || !this.hasOwnProperty('_textLineBreaks') ||
+            this._textLineBreaks.indexOf(i) === -1) {
           accumulatedSpace = 0;
           line = this._textLines[i];
           currentLineWidth = this.getLineWidth(i);
