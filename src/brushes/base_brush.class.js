@@ -36,11 +36,18 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeLineCap: 'round',
 
   /**
-   * Corner style of a brush (one of "bevil", "round", "miter")
+   * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
    * @type String
    * @default
    */
   strokeLineJoin: 'round',
+
+  /**
+   * Corner style of a brush (one of "bevel", "round", "miter")
+   * @type Number
+   * @default
+   */
+  strokeMiterLimit:         10,
 
   /**
    * Stroke Dash Array.
@@ -66,10 +73,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    */
   _setBrushStyles: function() {
     var ctx = this.canvas.contextTop;
-
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
+    ctx.miterLimit = this.strokeMiterLimit;
     ctx.lineJoin = this.strokeLineJoin;
     if (this.strokeDashArray && fabric.StaticCanvas.supports('setLineDash')) {
       ctx.setLineDash(this.strokeDashArray);
