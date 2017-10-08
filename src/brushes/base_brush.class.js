@@ -36,14 +36,14 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeLineCap: 'round',
 
   /**
-   * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
+   * Corner style of a brush (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
   strokeLineJoin: 'round',
 
   /**
-   * Corner style of a brush (one of "bevel", "round", "miter")
+   * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
    * @type Number
    * @default
    */
