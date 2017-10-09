@@ -67,6 +67,9 @@
      * @param {fabric.Point} point Point to be added to points array
      */
     _addPoint: function(point) {
+      if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
+        return;
+      }
       this._points.push(point);
     },
 
@@ -103,7 +106,6 @@
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       ctx.beginPath();
-
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
       //then we should be drawing a dot. A path isn't drawn between two identical dots
@@ -143,9 +145,13 @@
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length;
+          len = points.length, multSignX, multSignY, manyPoints = len > 2;
 
-      path.push('M ', p1.x - width, ' ', p1.y, ' ');
+      if (manyPoints) {
+        multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
+        multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
+      }
+      path.push('M ', p1.x - multSignX * width, ' ', p1.y - multSignY * width, ' ');
       for (i = 1; i < len; i++) {
         if (!p1.eq(p2)) {
           var midPoint = p1.midPointFrom(p2);
@@ -159,7 +165,11 @@
           p2 = points[i + 1];
         }
       }
-      path.push('L ', p1.x + width, ' ', p1.y, ' ');
+      if (manyPoints) {
+        multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
+        multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
+      }
+      path.push('L ', p1.x + multSignX * width, ' ', p1.y + multSignY * width);
       return path;
     },
 
@@ -174,6 +184,7 @@
         stroke: this.color,
         strokeWidth: this.width,
         strokeLineCap: this.strokeLineCap,
+        strokeMiterLimit: this.strokeMiterLimit,
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
       });
@@ -209,13 +220,12 @@
       }
 
       var path = this.createPath(pathData);
-
-      this.canvas.add(path);
-      path.setCoords();
-
       this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.add(path);
+      this.canvas.renderAll();
+      path.setCoords();
       this._resetShadow();
-      this.canvas.requestRenderAll();
+
 
       // fire event 'path' created
       this.canvas.fire('path:created', { path: path });
