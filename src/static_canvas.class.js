@@ -373,9 +373,9 @@
     },
 
     /**
-     * Sets {@link fabric.StaticCanvas#overlayColor|background color} for this canvas
-     * @param {(String|fabric.Pattern)} overlayColor Color or pattern to set background color to
-     * @param {Function} callback Callback to invoke when background color is set
+     * Sets {@link fabric.StaticCanvas#overlayColor|foreground color} for this canvas
+     * @param {(String|fabric.Pattern)} overlayColor Color or pattern to set foreground color to
+     * @param {Function} callback Callback to invoke when foreground color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/pB55h/|jsFiddle demo}
