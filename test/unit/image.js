@@ -259,7 +259,7 @@
       fabric.filterBackend = {
         textureCache: {},
         evictCachesForKey: function(key) {
-          delete this.cacheKey[key];
+          delete this.textureCache[key];
         }
       };
       var elImage = _createImageElement();
