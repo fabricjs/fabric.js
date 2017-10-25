@@ -1197,20 +1197,26 @@
       offsetY: 15
     });
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY);
-    assert.equal(context.shadowBlur, object.shadow.blur);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is set');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is set');
+    assert.equal(context.shadowBlur, object.shadow.blur, 'shadow blur is set');
+    fabric.browserShadowBlurConstant = 1.5;
+    object._setShadow(context);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is unchanged with browserConstant');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is unchanged with browserConstant');
+    assert.equal(context.shadowBlur, object.shadow.blur * 1.5, 'shadow blur is affected with browserConstant');
+    fabric.browserShadowBlurConstant = 1;
     object.scaleX = 2;
     object.scaleY = 3;
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY);
-    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX, 'shadow offsetX is affected by scaleX');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY, 'shadow offsetY is affected by scaleY');
+    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2, 'shadow blur is affected by scaleY and scaleX');
     object.group = group;
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
-    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX, 'shadow offsetX is affected by scaleX and group.scaleX');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY, 'shadow offsetX is affected by scaleX and group.scaleX');
+    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2, 'shadow blur is affected by scales');
   });
 
   QUnit.test('willDrawShadow', function(assert) {

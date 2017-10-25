@@ -1210,7 +1210,7 @@
         multY *= fabric.devicePixelRatio;
       }
       ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowBlur = this.shadow.blur * fabric.browserShadowBlurConstant * (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
       ctx.shadowOffsetX = this.shadow.offsetX * multX * scaling.scaleX;
       ctx.shadowOffsetY = this.shadow.offsetY * multY * scaling.scaleY;
     },
