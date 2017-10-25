@@ -244,10 +244,29 @@
       assert.ok(typeof image.setElement === 'function');
 
       var elImage = _createImageElement();
+      assert.notEqual(image.getElement(), elImage);
       assert.equal(image.setElement(elImage), image, 'chainable');
       assert.equal(image.getElement(), elImage);
       assert.equal(image._originalElement, elImage);
+      done();
+    });
+  });
 
+  QUnit.test('setElement resets the webgl cache', function(assert) {
+    var done = assert.async();
+    var fabricBackend = fabric.filterBackend;
+    createImageObject(function(image) {
+      fabric.filterBackend = {
+        textureCache: {},
+        evictCachesForKey: function(key) {
+          delete this.textureCache[key];
+        }
+      };
+      var elImage = _createImageElement();
+      fabric.filterBackend.textureCache[image.cacheKey] = 'something';
+      assert.equal(image.setElement(elImage), image, 'chainable');
+      assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
+      fabric.filterBackend = fabricBackend;
       done();
     });
   });

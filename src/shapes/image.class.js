@@ -163,6 +163,10 @@
      * @chainable
      */
     setElement: function(element, options) {
+      var backend = fabric.filterBackend;
+      if (backend && backend.evictCachesForKey) {
+        backend.evictCachesForKey(this.cacheKey);
+      }
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
