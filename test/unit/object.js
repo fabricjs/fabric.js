@@ -1200,6 +1200,12 @@
     assert.equal(context.shadowOffsetX, object.shadow.offsetX);
     assert.equal(context.shadowOffsetY, object.shadow.offsetY);
     assert.equal(context.shadowBlur, object.shadow.blur);
+    fabric.browserShadowBlurConstant = 1.5;
+    object._setShadow(context);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX);
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY);
+    assert.equal(context.shadowBlur, object.shadow.blur * 1.5);
+    fabric.browserShadowBlurConstant = 1;
     object.scaleX = 2;
     object.scaleY = 3;
     object._setShadow(context);
