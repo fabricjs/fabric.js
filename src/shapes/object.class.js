@@ -1107,7 +1107,8 @@
      * @return {fabric.Object} thisArg
      */
     _set: function(key, value) {
-      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
+      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
+          isChanged = this[key] !== value;
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1129,14 +1130,14 @@
 
       this[key] = value;
 
-      if (this.cacheProperties.indexOf(key) > -1) {
+      if (isChanged && this.cacheProperties.indexOf(key) > -1) {
         if (this.group) {
           this.group.set('dirty', true);
         }
         this.dirty = true;
       }
 
-      if (this.group && this.stateProperties.indexOf(key) > -1) {
+      if (isChanged && this.group && this.stateProperties.indexOf(key) > -1) {
         this.group.set('dirty', true);
       }
 

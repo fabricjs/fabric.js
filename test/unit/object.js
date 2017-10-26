@@ -1367,4 +1367,22 @@
     object.shadow.offsetX = 1;
     equal(object.willDrawShadow(), true, 'object will drawShadow');
   });
+
+  test('_set  change a property', function() {
+    var object = new fabric.Object({ fill: 'blue' });
+    object._set('fill', 'red');
+    equal(object.fill, 'red', 'property changed');
+  });
+  test('_set can rise the dirty flag', function() {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'red');
+    equal(object.dirty, true, 'dirty is rised');
+  });
+  test('_set rise dirty flag only if value changed', function() {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'blue');
+    equal(object.dirty, false, 'dirty is not rised');
+  });
 })();
