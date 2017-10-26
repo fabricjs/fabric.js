@@ -1225,4 +1225,22 @@
     object.shadow.offsetX = 1;
     assert.equal(object.willDrawShadow(), true, 'object will drawShadow');
   });
+
+  QUnit.test('_set  change a property', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object._set('fill', 'red');
+    assert.equal(object.fill, 'red', 'property changed');
+  });
+  QUnit.test('_set can rise the dirty flag', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'red');
+    assert.equal(object.dirty, true, 'dirty is rised');
+  });
+  QUnit.test('_set rise dirty flag only if value changed', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'blue');
+    assert.equal(object.dirty, false, 'dirty is not rised');
+  });
 })();
