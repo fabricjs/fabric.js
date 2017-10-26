@@ -885,7 +885,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value;
+          isChanged = this[key] !== value, groupNeedsUpdate = false;
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -907,15 +907,15 @@
 
       this[key] = value;
 
-      if (isChanged && this.cacheProperties.indexOf(key) > -1) {
-        if (this.group) {
+      if (isChanged) {
+        groupNeedsUpdate = this.group && this.group.isOnACache();
+        if (this.cacheProperties.indexOf(key) > -1) {
+          this.dirty = true;
+          groupNeedsUpdate && this.group.set('dirty', true);
+        }
+        else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
           this.group.set('dirty', true);
         }
-        this.dirty = true;
-      }
-
-      if (isChanged && this.group && this.stateProperties.indexOf(key) > -1 && this.group.isOnACache()) {
-        this.group.set('dirty', true);
       }
 
       return this;
