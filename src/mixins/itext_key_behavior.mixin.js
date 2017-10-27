@@ -145,7 +145,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         nextCharCount = nextText.length,
         removedText, insertedText,
         charDiff = nextCharCount - charCount;
-
     if (this.hiddenTextarea.value === '') {
       this.styles = { };
       this.updateFromTextArea();
@@ -157,25 +156,31 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    if (this.selectionStart !== this.selectionEnd) {
-      removedText = this._text.slice(this.selectionStart, this.selectionEnd);
-      charDiff += this.selectionEnd - this.selectionStart;
-    }
-    else if (nextCharCount < charCount) {
-      removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
-    }
     var textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
       this.hiddenTextarea.selectionEnd,
       this.hiddenTextarea.value
     );
+    var backDelete = this.selectionStart > textareaSelection.selectionStart;
+
+    if (this.selectionStart !== this.selectionEnd) {
+      removedText = this._text.slice(this.selectionStart, this.selectionEnd);
+      charDiff += this.selectionEnd - this.selectionStart;
+    }
+    else if (nextCharCount < charCount) {
+      if (backDelete) {
+        removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
+      }
+      else {
+        removedText = this._text.slice(this.selectionStart, this.selectionStart - charDiff);
+      }
+    }
     insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
-      console.log('removedText', removedText)
       if (this.selectionStart !== this.selectionEnd) {
         this.removeStyleFromTo(this.selectionStart, this.selectionEnd);
       }
-      else if (this.selectionStart > textareaSelection.selectionStart) {
+      else if (backDelete) {
         // detect differencies between forwardDelete and backDelete
         this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
       }
@@ -184,7 +189,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
-      console.log('insertedText', insertedText)
       if (fromPaste && insertedText.join('') === fabric.copiedText) {
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }
