@@ -110,6 +110,7 @@
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
+      this.setCoords();
     },
 
     /**
