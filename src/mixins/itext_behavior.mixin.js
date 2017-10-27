@@ -557,10 +557,7 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
-      if (this._shouldClearDimensionCache()) {
-        this._initDimensions();
-        this.setCoords();
-      }
+
       this.fire('editing:exited');
       isTextChanged && this.fire('modified');
       if (this.canvas) {
