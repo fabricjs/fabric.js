@@ -643,6 +643,7 @@
           lineEnd = cursorEnd.lineIndex,
           charEnd = cursorEnd.charIndex,
           i, styleObj;
+          console.log('lines', lineStart, lineEnd)
       if (lineStart !== lineEnd) {
         // step1 remove the trailing of lineStart
         if (this.styles[lineStart]) {
@@ -684,6 +685,7 @@
           }
         }
       }
+      console.debug(this.styles)
     },
 
     /**
@@ -839,9 +841,12 @@
       }
       linesLenght && this.insertNewlineStyleObject(
         cursorLoc.lineIndex, cursorLoc.charIndex + addedLines[0], linesLenght);
-      for (var i = 1; i <= linesLenght; i++) {
+      for (var i = 1; i < linesLenght; i++) {
         this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
         copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
+      }
+      if (addedLines[linesLenght] > 0) {
+        this.insertCharStyleObject(cursorLoc.lineIndex + linesLenght, 0, addedLines[linesLenght], copiedStyle);
       }
     },
 

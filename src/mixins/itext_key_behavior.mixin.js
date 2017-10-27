@@ -171,6 +171,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     );
     insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
+      console.log('removedText', removedText)
       if (this.selectionStart !== this.selectionEnd) {
         this.removeStyleFromTo(this.selectionStart, this.selectionEnd);
       }
@@ -183,6 +184,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
+      console.log('insertedText', insertedText)
       if (fromPaste && insertedText.join('') === fabric.copiedText) {
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }
