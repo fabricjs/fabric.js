@@ -482,14 +482,14 @@
      */
     isTargetTransparent: function (target, x, y) {
       var ctx = this.contextCache,
-          originalColor = target.selectionBackgroundColor;
+          originalColor = target.selectionBackgroundColor, v = this.viewportTransform;
 
       target.selectionBackgroundColor = '';
 
       this.clearContext(ctx);
 
       ctx.save();
-      ctx.transform.apply(ctx, this.viewportTransform);
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       target.render(ctx);
       ctx.restore();
 
