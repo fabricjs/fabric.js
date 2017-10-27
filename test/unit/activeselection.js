@@ -259,7 +259,7 @@
     assert.equal(canvas.item(2), groupEl3, 'actual canvas position 3');
     assert.equal(canvas.item(3), groupEl4, 'actual canvas position 4');
     assert.equal(canvas.item(9999), undefined);
-  
+
     group.item(0).moveTo(3);
 
     assert.equal(group.item(0), groupEl1, 'did not change group position 1');
