@@ -356,9 +356,50 @@
     assert.ok(!cObj.isOnScreen(), 'object is completely out of viewport');
   });
 
-  QUnit.test('calcTransformMatrix', function(assert) {
+  QUnit.test('calcTransformMatrix with no group', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     assert.ok(typeof cObj.calcTransformMatrix === 'function', 'calcTransformMatrix should exist');
+    cObj.top = 0;
+    cObj.left = 0;
+    cObj.scaleX = 2;
+    cObj.scaleY = 3;
+    assert.deepEqual(cObj.calcTransformMatrix(), cObj.calcOwnMatrix(), 'without group matrix is same');
+  });
+
+  QUnit.test('calcOwnMatrix', function(assert) {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
+    assert.ok(typeof cObj.calcOwnMatrix === 'function', 'calcTransformMatrix should exist');
+    cObj.top = 0;
+    cObj.left = 0;
+    assert.deepEqual(cObj.calcOwnMatrix(), [1, 0, 0, 1, 5, 7.5], 'only translate matrix');
+    cObj.scaleX = 2;
+    cObj.scaleY = 3;
+    assert.deepEqual(cObj.calcOwnMatrix(), [2, 0, 0, 3, 10, 22.5], 'only translate matrix and scale');
+    cObj.skewX = 45;
+    assert.deepEqual(cObj.calcOwnMatrix(), [2, 0, 1.9999999999999998, 3, 25, 22.5], 'translate matrix scale skewX');
+    cObj.skewY = 30;
+    assert.deepEqual(cObj.calcOwnMatrix(), [3.1547005383792515, 1.7320508075688772, 1.9999999999999998, 3, 30.773502691896255, 31.160254037844386], 'translate matrix scale skewX skewY');
+    cObj.angle = 38;
+    assert.deepEqual(cObj.calcOwnMatrix(), [1.4195809931249126,
+      3.3071022498267006,
+      -0.2709629187635314,
+      3.595355211471482,
+      5.065683074898075,
+      43.50067533516962], 'translate matrix scale skewX skewY angle');
+    cObj.flipX = true;
+    assert.deepEqual(cObj.calcOwnMatrix(), [-3.552294904178618,
+      -0.5773529255117364,
+      -3.4230059331904186,
+      1.1327093101688495,
+      5.065683074898075,
+      43.50067533516962], 'translate matrix scale skewX skewY angle flipX');
+    cObj.flipY = true;
+    assert.deepEqual(cObj.calcOwnMatrix(), [-1.4195809931249126,
+      -3.3071022498267006,
+      0.2709629187635314,
+      -3.595355211471482,
+      5.065683074898075,
+      43.50067533516962], 'translate matrix scale skewX skewY angle flipX flipY');
   });
 
   QUnit.test('_calcDimensionsTransformMatrix', function(assert) {
