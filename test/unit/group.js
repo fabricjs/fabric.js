@@ -483,7 +483,7 @@
     assert.equal(secondObjInGroup.group, group);
 
     group.remove(firstObjInGroup);
-    assert.ok(typeof firstObjInGroup.group == 'undefined');
+    assert.ok(typeof firstObjInGroup.group === 'undefined');
   });
 
   QUnit.test('insertAt', function(assert) {
@@ -507,10 +507,37 @@
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
+    g1.ownCaching = true;
     assert.equal(g1.dirty, false, 'Group has no dirty flag set');
     obj.set('fill', 'red');
     assert.equal(obj.dirty, true, 'Obj has dirty flag set');
     assert.equal(g1.dirty, true, 'Group has dirty flag set');
+  });
+
+  QUnit.test('dirty flag propagation from children up is stopped if group is not caching', function(assert) {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    g1.dirty = false;
+    obj.dirty = false;
+    g1.ownCaching = false;
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, true, 'Obj has dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+  });
+
+  QUnit.test('dirty flag propagation from children up does not happen if value does not change really', function(assert) {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    obj.fill = 'red';
+    g1.dirty = false;
+    obj.dirty = false;
+    g1.ownCaching = true;
+    assert.equal(obj.dirty, false, 'Obj has no dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, false, 'Obj has no dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
   });
 
   QUnit.test('dirty flag propagation from children up with', function(assert) {
