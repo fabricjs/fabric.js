@@ -480,6 +480,7 @@
       this.text = this.hiddenTextarea.value;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
+        this.setCoords();
       }
       var newSelection = this.fromStringToGraphemeSelection(
         this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
@@ -604,7 +605,10 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
-
+      if (this._shouldClearDimensionCache()) {
+        this.initDimensions();
+        this.setCoords();
+      }
       this.fire('editing:exited');
       isTextChanged && this.fire('modified');
       if (this.canvas) {

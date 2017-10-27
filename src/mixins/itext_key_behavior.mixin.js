@@ -600,10 +600,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.setSelectionEnd(this.selectionStart);
 
     this._removeExtraneousStyles();
-
+    if (this._shouldClearDimensionCache()) {
+      this.initDimensions();
+      this.setCoords();
+    }
     this.canvas && this.canvas.requestRenderAll();
-
-    this.setCoords();
     this.fire('changed');
     this.canvas && this.canvas.fire('text:changed', { target: this });
   },
