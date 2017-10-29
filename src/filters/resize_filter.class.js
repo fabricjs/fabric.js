@@ -57,119 +57,105 @@
     lanczosLobes: 3,
 
     /**
-     * Return WebGL uniform locations for this filter's shader.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {WebGLShaderProgram} program This filter's compiled shader program.
-     */
-    getUniformLocations: function(gl, program) {
-      return {
-        uStepWW: gl.getUniformLocation(program, 'uStepWW'),
-        uStepHH: gl.getUniformLocation(program, 'uStepHH'),
-      };
-    },
-
-    /**
      * Send data from this filter to its shader program's uniforms.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
     sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uStepWW, 1 / this.width);
-      gl.uniform1f(uniformLocations.uStepHH, 1 / this.height);
+      gl.uniform1f(uniformLocations.uStepW, this.horizontal ? 1 / this.width : 0);
+      gl.uniform1f(uniformLocations.uStepH, this.horizontal ? 0 : 1 / this.height);
     },
 
-    vertexSource: 'attribute vec2 aPosition;\n' +
-      'uniform float uStepWW;\n' +
-      'uniform float uStepHH;\n' +
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + this.lanczosLobes + '_' + filterWindow;
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        var shaders = this.generateShader(filterWindow);
+        options.programCache[cacheKey] =
+          this.createProgram(options.context, shaders.fragmentShader, shaders.vertexShader);
+      }
+      return options.programCache[cacheKey];
+    },
+
+    getFilterWindow: function() {
+      var scale = this.tempScale;
+      return Math.ceil(this.lanczosLobes / scale);
+    },
+
+    /**
+     * Generate vertex and shader sources from the necessary steps numbers
+     * @param {Number} filterWindow
+     */
+    generateShader: function(filterWindow) {
+      var scale = this.tempScale,
+          varNames = new Array(filterWindow * 2), taps = new Array(filterWindow),
+          offsets = new Array(filterWindow), lobeFunction = this.lanczosCreate(this.lanczosLobes),
+          vertexShader = '', fragmentShader = this.fragmentSourceTOP, varName, tap;
+      for (var i = 1; i <= filterWindow; i++) {
+        varNames[(i - 1) * 2] = 'step_' + i + '_leftCoord';
+        varNames[(i - 1) * 2 + 1] = 'step_' + i + '_rightCoord';
+        taps[i - 1] = lobeFunction(i * scale).toFixed(8);
+        offsets[i - 1] = '  vec2 offset_' + i + ' = vec2(' + i + '.0 * uStepW, ' + i + '.0 * uStepH);\n';
+      }
+      varNames.forEach(function(varName) {
+        vertexShader += 'varying vec2 ' + varName + ';\n';
+        fragmentShader += 'varying vec2 ' + varName + ';\n';
+      });
+      vertexShader += this.vertexSourceTOP;
+      offsets.forEach(function(offset) {
+        vertexShader += offset;
+      });
+
+      fragmentShader += 'void main() {\n';
+      fragmentShader += '  vec4 color = texture2D(uTexture, centerTextureCoordinate);\n';
+      fragmentShader += '  float sum = 1.0;\n';
+
+      for (var i = 0; i < varNames.length; i++) {
+        varName = varNames[i];
+        if (i % 2) {
+          vertexShader += '  ' + varName + ' = aPosition + offset_' + ((i + 1) / 2) + ';\n';
+          tap = taps[(i - 1) / 2];
+          tap &&
+            (fragmentShader += '  color += texture2D(uTexture, ' + varName + ') * ' + tap + '; sum += ' + tap + ';\n');
+        }
+        else {
+          vertexShader += '  ' + varName + ' = aPosition - offset_' + (i / 2 + 1) + ';\n';
+          tap = taps[i / 2];
+          tap &&
+            (fragmentShader += '  color += texture2D(uTexture, ' + varName + ') * ' + tap + '; sum += ' + tap + ';\n');
+        }
+      }
+      fragmentShader += '  gl_FragColor = color / sum;\n';
+      fragmentShader += '}';
+      vertexShader += this.vertexSourceBOTTOM;
+      return {
+        fragmentShader: fragmentShader,
+        vertexShader: vertexShader,
+        taps: taps,
+      };
+    },
+
+    vertexSourceTOP: '' +
       'varying vec2 centerTextureCoordinate;\n' +
-      'varying vec2 oneStepLeftTextureCoordinateH;\n' +
-      'varying vec2 twoStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 threeStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 fourStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 oneStepRightTextureCoordinateH;\n' +
-      'varying vec2 twoStepsRightTextureCoordinateH;\n' +
-      'varying vec2 threeStepsRightTextureCoordinateH;\n' +
-      'varying vec2 fourStepsRightTextureCoordinateH;\n' +
-      'varying vec2 oneStepLeftTextureCoordinateV;\n' +
-      'varying vec2 twoStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 threeStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 fourStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 oneStepRightTextureCoordinateV;\n' +
-      'varying vec2 twoStepsRightTextureCoordinateV;\n' +
-      'varying vec2 threeStepsRightTextureCoordinateV;\n' +
-      'varying vec2 fourStepsRightTextureCoordinateV;\n' +
-      'void main() {\n' +
-          'vec2 firstOffsetH = vec2(uStepWW, 0.0);\n' +
-          'vec2 secondOffsetH = vec2(2.0 * uStepWW, 0.0);\n' +
-          'vec2 thirdOffsetH = vec2(3.0 * uStepWW, 0.0);\n' +
-          'vec2 fourthOffsetH = vec2(4.0 * uStepWW, 0.0);\n' +
-          'vec2 firstOffsetV = vec2(0.0, uStepHH);\n' +
-          'vec2 secondOffsetV = vec2(0.0, 2.0 * uStepHH);\n' +
-          'vec2 thirdOffsetV = vec2(0.0, 3.0 * uStepHH);\n' +
-          'vec2 fourthOffsetV = vec2(0.0, 4.0 * uStepHH);\n' +
-          'centerTextureCoordinate = aPosition;\n' +
-          'oneStepLeftTextureCoordinateH = aPosition - firstOffsetH;\n' +
-          'twoStepsLeftTextureCoordinateH = aPosition - secondOffsetH;\n' +
-          'threeStepsLeftTextureCoordinateH = aPosition - thirdOffsetH;\n' +
-          'fourStepsLeftTextureCoordinateH = aPosition - fourthOffsetH;\n' +
-          'oneStepRightTextureCoordinateH = aPosition + firstOffsetH;\n' +
-          'twoStepsRightTextureCoordinateH = aPosition + secondOffsetH;\n' +
-          'threeStepsRightTextureCoordinateH = aPosition + thirdOffsetH;\n' +
-          'fourStepsRightTextureCoordinateH = aPosition + fourthOffsetH;\n' +
-          'oneStepLeftTextureCoordinateV = aPosition - firstOffsetV;\n' +
-          'twoStepsLeftTextureCoordinateV = aPosition - secondOffsetV;\n' +
-          'threeStepsLeftTextureCoordinateV = aPosition - thirdOffsetV;\n' +
-          'fourStepsLeftTextureCoordinateV = aPosition - fourthOffsetV;\n' +
-          'oneStepRightTextureCoordinateV = aPosition + firstOffsetV;\n' +
-          'twoStepsRightTextureCoordinateV = aPosition + secondOffsetV;\n' +
-          'threeStepsRightTextureCoordinateV = aPosition + thirdOffsetV;\n' +
-          'fourStepsRightTextureCoordinateV = aPosition + fourthOffsetV;\n' +
-          'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
+      'attribute vec2 aPosition;\n' +
+      'uniform float uStepW;\n' +
+      'uniform float uStepH;\n' +
+      'void main() {\n',
+
+    vertexSourceBOTTOM: '' +
+          '  centerTextureCoordinate = aPosition;\n' +
+          '  gl_Position = vec4(aPosition * 2.0 - 1.0, 0, 1);\n' +
       '}',
 
-    fragmentSource: 'precision highp float;\n' +
-      'varying vec2 centerTextureCoordinate;\n' +
-      'varying vec2 oneStepLeftTextureCoordinateH;\n' +
-      'varying vec2 twoStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 threeStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 fourStepsLeftTextureCoordinateH;\n' +
-      'varying vec2 oneStepRightTextureCoordinateH;\n' +
-      'varying vec2 twoStepsRightTextureCoordinateH;\n' +
-      'varying vec2 threeStepsRightTextureCoordinateH;\n' +
-      'varying vec2 fourStepsRightTextureCoordinateH;\n' +
-      'varying vec2 oneStepLeftTextureCoordinateV;\n' +
-      'varying vec2 twoStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 threeStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 fourStepsLeftTextureCoordinateV;\n' +
-      'varying vec2 oneStepRightTextureCoordinateV;\n' +
-      'varying vec2 twoStepsRightTextureCoordinateV;\n' +
-      'varying vec2 threeStepsRightTextureCoordinateV;\n' +
-      'varying vec2 fourStepsRightTextureCoordinateV;\n' +
+    fragmentSourceTOP: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
-        'color += texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
-        'color += texture2D(uTexture, oneStepLeftTextureCoordinateH) * 0.27667;\n' +
-        'color += texture2D(uTexture, oneStepRightTextureCoordinateH) * 0.27667;\n' +
-        'color += texture2D(uTexture, twoStepsLeftTextureCoordinateH) * 0.08074;\n' +
-        'color += texture2D(uTexture, twoStepsRightTextureCoordinateH) * 0.08074;\n' +
-        'color += texture2D(uTexture, threeStepsLeftTextureCoordinateH) * -0.02612;\n' +
-        'color += texture2D(uTexture, threeStepsRightTextureCoordinateH) * -0.02612;\n' +
-        'color += texture2D(uTexture, fourStepsLeftTextureCoordinateH) * -0.02143;\n' +
-        'color += texture2D(uTexture, fourStepsRightTextureCoordinateH) * -0.02143;\n' +
-        'color += texture2D(uTexture, oneStepLeftTextureCoordinateV) * 0.27667;\n' +
-        'color += texture2D(uTexture, oneStepRightTextureCoordinateV) * 0.27667;\n' +
-        'color += texture2D(uTexture, twoStepsLeftTextureCoordinateV) * 0.08074;\n' +
-        'color += texture2D(uTexture, twoStepsRightTextureCoordinateV) * 0.08074;\n' +
-        'color += texture2D(uTexture, threeStepsLeftTextureCoordinateV) * -0.02612;\n' +
-        'color += texture2D(uTexture, threeStepsRightTextureCoordinateV) * -0.02612;\n' +
-        'color += texture2D(uTexture, fourStepsLeftTextureCoordinateV) * -0.02143;\n' +
-        'color += texture2D(uTexture, fourStepsRightTextureCoordinateV) * -0.02143;\n' +
-        'gl_FragColor = color / 2.0;\n' +
-      '}',
-
+      'varying vec2 centerTextureCoordinate;\n',
 
     /**
      * Apply the resize filter to the image
@@ -189,25 +175,27 @@
           // avoid doing something that we do not need
           return;
         }
-        while (options.sourceWidth * this.scaleX < options.destinationWidth * 0.5) {
-          this.width = options.destinationWidth;
-          this.height = options.destinationHeight;
-          options.destinationWidth = Math.floor(options.destinationWidth * 0.5);
-          options.destinationHeight = Math.floor(options.destinationHeight * 0.5);
-          this._setupFrameBuffer(options);
-          this.applyToWebGL(options);
-          this._swapTextures(options);
-          // options.sourceWidth = options.destinationWidth;
-          // options.sourceHeight = options.destinationHeight;
-        }
-        this.width = options.destinationWidth;
-        this.height = options.destinationHeight;
-        options.destinationWidth = Math.floor(options.sourceWidth * this.scaleX);
-        options.destinationHeight = Math.floor(options.sourceHeight * this.scaleY);
+
+        options.passes++;
+        this.width = options.sourceWidth;
+        this.horizontal = true;
+        this.dW = Math.round(this.width * this.scaleX);
+        this.dH = options.sourceHeight;
+        this.tempScale = this.dW / this.width;
+        options.destinationWidth = this.dW;
         this._setupFrameBuffer(options);
         this.applyToWebGL(options);
         this._swapTextures(options);
         options.sourceWidth = options.destinationWidth;
+
+        this.height = options.sourceHeight;
+        this.horizontal = false;
+        this.dH = Math.round(this.height * this.scaleY);
+        this.tempScale = this.dH / this.height;
+        options.destinationHeight = this.dH;
+        this._setupFrameBuffer(options);
+        this.applyToWebGL(options);
+        this._swapTextures(options);
         options.sourceHeight = options.destinationHeight;
       }
       else if (!this.isNeutralState(options)) {
@@ -219,6 +207,20 @@
       var scaleX = options.scaleX || this.scaleX,
           scaleY = options.scaleY || this.scaleY;
       return scaleX === 1 && scaleY === 1;
+    },
+
+    lanczosCreate: function(lobes) {
+      return function(x) {
+        if (x >= lobes || x <= -lobes) {
+          return 0.0;
+        }
+        if (x < 1.19209290E-07 && x > -1.19209290E-07) {
+          return 1.0;
+        }
+        x *= Math.PI;
+        var xx = x / lobes;
+        return sin(x) * sin(xx) / x / xx;
+      };
     },
 
     /**
@@ -320,20 +322,6 @@
      */
     lanczosResize: function(options, oW, oH, dW, dH) {
 
-      function lanczosCreate(lobes) {
-        return function(x) {
-          if (x > lobes) {
-            return 0;
-          }
-          x *= Math.PI;
-          if (abs(x) < 1e-16) {
-            return 1;
-          }
-          var xx = x / lobes;
-          return sin(x) * sin(xx) / x / xx;
-        };
-      }
-
       function process(u) {
         var v, i, weight, idx, a, red, green,
             blue, alpha, fX, fY;
@@ -388,7 +376,7 @@
       var srcData = options.imageData.data,
           destImg = options.ctx.createImageData(dW, dH),
           destData = destImg.data,
-          lanczos = lanczosCreate(this.lanczosLobes),
+          lanczos = this.lanczosCreate(this.lanczosLobes),
           ratioX = this.rcpScaleX, ratioY = this.rcpScaleY,
           rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY,
           range2X = ceil(ratioX * this.lanczosLobes / 2),

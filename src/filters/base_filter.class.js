@@ -67,9 +67,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {String} vertexSource vertexShader source for compilation
    */
   createProgram: function(gl, fragmentSource, vertexSource) {
-    if (!this.vertexSource || !this.fragmentSource) {
-      return;
-    }
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
     gl.compileShader(vertexShader);
@@ -138,7 +135,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @returns {Object} A map of uniform names to uniform locations.
    */
   getUniformLocations: function (/* gl, program */) {
-    // Intentionally left blank, override me in subclasses.
+    // in case i do not need any special uniform i need to return an empty object
+    return { };
   },
 
   /**

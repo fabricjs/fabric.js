@@ -374,7 +374,6 @@ function copyGLTo2DDrawImage(gl, pipelineState) {
   ctx.translate(0, targetCanvas.height); // move it down again
   ctx.scale(1, -1); // vertical flip
   // where is my image on the big glcanvas?
-  document.body.appendChild(glCanvas)
   var sourceY = glCanvas.height - targetCanvas.height;
   ctx.drawImage(glCanvas, 0, sourceY, targetCanvas.width, targetCanvas.height, 0, 0,
     targetCanvas.width, targetCanvas.height);
