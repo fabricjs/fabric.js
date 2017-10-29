@@ -56,6 +56,19 @@
      */
     lanczosLobes: 3,
 
+
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uDelta: gl.getUniformLocation(program, 'uDelta'),
+      };
+    },
+
     /**
      * Send data from this filter to its shader program's uniforms.
      *
@@ -63,8 +76,7 @@
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
     sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uStepW, this.horizontal ? 1 / this.width : 0);
-      gl.uniform1f(uniformLocations.uStepH, this.horizontal ? 0 : 1 / this.height);
+      gl.uniform2fv(uniformLocations.uDelta, this.horizontal ? [1 / this.width, 0] : [0, 1 / this.height]);
     },
 
     /**
@@ -74,11 +86,11 @@
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
     retrieveShader: function(options) {
-      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + this.lanczosLobes + '_' + filterWindow;
+      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + filterWindow + '_' + this.lanczosLobes;
       if (!options.programCache.hasOwnProperty(cacheKey)) {
-        var shaders = this.generateShader(filterWindow);
-        options.programCache[cacheKey] =
-          this.createProgram(options.context, shaders.fragmentShader, shaders.vertexShader);
+        var fragmentShader = this.generateShader(filterWindow);
+        console.log(fragmentShader);
+        options.programCache[cacheKey] = this.createProgram(options.context, fragmentShader);
       }
       return options.programCache[cacheKey];
     },
@@ -88,74 +100,48 @@
       return Math.ceil(this.lanczosLobes / scale);
     },
 
+    getTaps: function() {
+      var lobeFunction = this.lanczosCreate(this.lanczosLobes), scale = this.tempScale,
+          filterWindow = this.getFilterWindow(), taps = new Array(filterWindow);
+      for (var i = 1; i <= filterWindow; i++) {
+        taps[i - 1] = lobeFunction(i * scale);
+      }
+      return taps;
+    },
+
     /**
      * Generate vertex and shader sources from the necessary steps numbers
      * @param {Number} filterWindow
      */
     generateShader: function(filterWindow) {
-      var scale = this.tempScale,
-          varNames = new Array(filterWindow * 2), taps = new Array(filterWindow),
-          offsets = new Array(filterWindow), lobeFunction = this.lanczosCreate(this.lanczosLobes),
-          vertexShader = '', fragmentShader = this.fragmentSourceTOP, varName, tap;
-      for (var i = 1; i <= filterWindow; i++) {
-        varNames[(i - 1) * 2] = 'step_' + i + '_leftCoord';
-        varNames[(i - 1) * 2 + 1] = 'step_' + i + '_rightCoord';
-        taps[i - 1] = lobeFunction(i * scale).toFixed(8);
-        offsets[i - 1] = '  vec2 offset_' + i + ' = vec2(' + i + '.0 * uStepW, ' + i + '.0 * uStepH);\n';
-      }
-      varNames.forEach(function(varName) {
-        vertexShader += 'varying vec2 ' + varName + ';\n';
-        fragmentShader += 'varying vec2 ' + varName + ';\n';
-      });
-      vertexShader += this.vertexSourceTOP;
-      offsets.forEach(function(offset) {
-        vertexShader += offset;
-      });
+      var offsets = new Array(filterWindow),
+          fragmentShader = this.fragmentSourceTOP, taps = this.getTaps();
 
+      for (var i = 1; i <= filterWindow; i++) {
+        offsets[i - 1] = i + '.0 * uDelta';
+      }
+
+      fragmentShader += 'uniform float uTaps[' + taps.length + '];\n';
       fragmentShader += 'void main() {\n';
-      fragmentShader += '  vec4 color = texture2D(uTexture, centerTextureCoordinate);\n';
+      fragmentShader += '  vec4 color = texture2D(uTexture, vTexCoord);\n';
       fragmentShader += '  float sum = 1.0;\n';
 
-      for (var i = 0; i < varNames.length; i++) {
-        varName = varNames[i];
-        if (i % 2) {
-          vertexShader += '  ' + varName + ' = aPosition + offset_' + ((i + 1) / 2) + ';\n';
-          tap = taps[(i - 1) / 2];
-          tap &&
-            (fragmentShader += '  color += texture2D(uTexture, ' + varName + ') * ' + tap + '; sum += ' + tap + ';\n');
+      offsets.forEach(function(offset, i) {
+        if (taps[i]) {
+          fragmentShader += '  color += texture2D(uTexture, vTexCoord + ' + offset + ') * ' + taps[i] + ';\n';
+          fragmentShader += '  color += texture2D(uTexture, vTexCoord - ' + offset + ') * ' + taps[i] + ';\n';
+          fragmentShader += '  sum += ' + taps[i] + '; sum += ' + taps[i] + ';\n';
         }
-        else {
-          vertexShader += '  ' + varName + ' = aPosition - offset_' + (i / 2 + 1) + ';\n';
-          tap = taps[i / 2];
-          tap &&
-            (fragmentShader += '  color += texture2D(uTexture, ' + varName + ') * ' + tap + '; sum += ' + tap + ';\n');
-        }
-      }
+      });
       fragmentShader += '  gl_FragColor = color / sum;\n';
       fragmentShader += '}';
-      vertexShader += this.vertexSourceBOTTOM;
-      return {
-        fragmentShader: fragmentShader,
-        vertexShader: vertexShader,
-        taps: taps,
-      };
+      return fragmentShader;
     },
-
-    vertexSourceTOP: '' +
-      'varying vec2 centerTextureCoordinate;\n' +
-      'attribute vec2 aPosition;\n' +
-      'uniform float uStepW;\n' +
-      'uniform float uStepH;\n' +
-      'void main() {\n',
-
-    vertexSourceBOTTOM: '' +
-          '  centerTextureCoordinate = aPosition;\n' +
-          '  gl_Position = vec4(aPosition * 2.0 - 1.0, 0, 1);\n' +
-      '}',
 
     fragmentSourceTOP: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
-      'varying vec2 centerTextureCoordinate;\n',
+      'uniform vec2 uDelta;\n' +
+      'varying vec2 vTexCoord;\n',
 
     /**
      * Apply the resize filter to the image
@@ -175,7 +161,6 @@
           // avoid doing something that we do not need
           return;
         }
-
         options.passes++;
         this.width = options.sourceWidth;
         this.horizontal = true;
@@ -219,7 +204,7 @@
         }
         x *= Math.PI;
         var xx = x / lobes;
-        return sin(x) * sin(xx) / x / xx;
+        return (sin(x) / x) * sin(xx) / xx;
       };
     },
 
