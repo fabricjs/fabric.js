@@ -56,59 +56,170 @@
      */
     lanczosLobes: 3,
 
-    // vertexSource: 'attribute vec2 aPosition;\n' +
-    //   'attribute vec2 aTexCoord;\n' +
-    //   'uniform float uStepW;\n' +
-    //   'uniform float uStepH;\n' +
-    //   'varying vec2 centerTextureCoordinate;\n' +
-    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
-    //   'void main() {\n' +
-    //       'vec2 firstOffset = vec2(uStepW, uStepH);\n' +
-    //       'vec2 secondOffset = vec2(2.0 * uStepW, 2.0 * uStepH);\n' +
-    //       'vec2 thirdOffset = vec2(3.0 * uStepW, 3.0 * uStepH);\n' +
-    //       'vec2 fourthOffset = vec2(4.0 * uStepW, 4.0 * uStepH);\n' +
-    //       'centerTextureCoordinate = aTexCoord;\n' +
-    //       'oneStepLeftTextureCoordinate = aTexCoord - firstOffset;\n' +
-    //       'twoStepsLeftTextureCoordinate = aTexCoord - secondOffset;\n' +
-    //       'threeStepsLeftTextureCoordinate = aTexCoord - thirdOffset;\n' +
-    //       'fourStepsLeftTextureCoordinate = aTexCoord - fourthOffset;\n' +
-    //       'oneStepRightTextureCoordinate = aTexCoord + firstOffset;\n' +
-    //       'twoStepsRightTextureCoordinate = aTexCoord + secondOffset;\n' +
-    //       'threeStepsRightTextureCoordinate = aTexCoord + thirdOffset;\n' +
-    //       'fourStepsRightTextureCoordinate = aTexCoord + fourthOffset;\n' +
-    //       'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
-    //   '}',
-    //
-    // fragmentSource: 'precision highp float;\n' +
-    //   'varying vec2 centerTextureCoordinate;\n' +
-    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
-    //   'uniform sampler2D uTexture;\n' +
-    //   'void main() {\n' +
-    //     'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
-    //     'color += texture2D(uTexture, oneStepLeftTextureCoordinate) * 0.27667;\n' +
-    //     'color += texture2D(uTexture, oneStepRightTextureCoordinate) * 0.27667;\n' +
-    //     'color += texture2D(uTexture, twoStepsLeftTextureCoordinate) * 0.08074;\n' +
-    //     'color += texture2D(uTexture, twoStepsRightTextureCoordinate) * 0.08074;\n' +
-    //     'color += texture2D(uTexture, threeStepsLeftTextureCoordinate) * -0.02612;\n' +
-    //     'color += texture2D(uTexture, threeStepsRightTextureCoordinate) * -0.02612;\n' +
-    //     'color += texture2D(uTexture, fourStepsLeftTextureCoordinate) * -0.02143;\n' +
-    //     'color += texture2D(uTexture, fourStepsRightTextureCoordinate) * -0.02143;\n' +
-    //     'gl_FragColor = color;\n' +
-    //   '}',
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uStepWW: gl.getUniformLocation(program, 'uStepWW'),
+        uStepHH: gl.getUniformLocation(program, 'uStepHH'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      gl.uniform1f(uniformLocations.uStepWW, 1 / this.width);
+      gl.uniform1f(uniformLocations.uStepHH, 1 / this.height);
+    },
+
+    vertexSource: 'attribute vec2 aPosition;\n' +
+      'uniform float uStepWW;\n' +
+      'uniform float uStepHH;\n' +
+      'varying vec2 centerTextureCoordinate;\n' +
+      'varying vec2 oneStepLeftTextureCoordinateH;\n' +
+      'varying vec2 twoStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 threeStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 fourStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 oneStepRightTextureCoordinateH;\n' +
+      'varying vec2 twoStepsRightTextureCoordinateH;\n' +
+      'varying vec2 threeStepsRightTextureCoordinateH;\n' +
+      'varying vec2 fourStepsRightTextureCoordinateH;\n' +
+      'varying vec2 oneStepLeftTextureCoordinateV;\n' +
+      'varying vec2 twoStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 threeStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 fourStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 oneStepRightTextureCoordinateV;\n' +
+      'varying vec2 twoStepsRightTextureCoordinateV;\n' +
+      'varying vec2 threeStepsRightTextureCoordinateV;\n' +
+      'varying vec2 fourStepsRightTextureCoordinateV;\n' +
+      'void main() {\n' +
+          'vec2 firstOffsetH = vec2(uStepWW, 0.0);\n' +
+          'vec2 secondOffsetH = vec2(2.0 * uStepWW, 0.0);\n' +
+          'vec2 thirdOffsetH = vec2(3.0 * uStepWW, 0.0);\n' +
+          'vec2 fourthOffsetH = vec2(4.0 * uStepWW, 0.0);\n' +
+          'vec2 firstOffsetV = vec2(0.0, uStepHH);\n' +
+          'vec2 secondOffsetV = vec2(0.0, 2.0 * uStepHH);\n' +
+          'vec2 thirdOffsetV = vec2(0.0, 3.0 * uStepHH);\n' +
+          'vec2 fourthOffsetV = vec2(0.0, 4.0 * uStepHH);\n' +
+          'centerTextureCoordinate = aPosition;\n' +
+          'oneStepLeftTextureCoordinateH = aPosition - firstOffsetH;\n' +
+          'twoStepsLeftTextureCoordinateH = aPosition - secondOffsetH;\n' +
+          'threeStepsLeftTextureCoordinateH = aPosition - thirdOffsetH;\n' +
+          'fourStepsLeftTextureCoordinateH = aPosition - fourthOffsetH;\n' +
+          'oneStepRightTextureCoordinateH = aPosition + firstOffsetH;\n' +
+          'twoStepsRightTextureCoordinateH = aPosition + secondOffsetH;\n' +
+          'threeStepsRightTextureCoordinateH = aPosition + thirdOffsetH;\n' +
+          'fourStepsRightTextureCoordinateH = aPosition + fourthOffsetH;\n' +
+          'oneStepLeftTextureCoordinateV = aPosition - firstOffsetV;\n' +
+          'twoStepsLeftTextureCoordinateV = aPosition - secondOffsetV;\n' +
+          'threeStepsLeftTextureCoordinateV = aPosition - thirdOffsetV;\n' +
+          'fourStepsLeftTextureCoordinateV = aPosition - fourthOffsetV;\n' +
+          'oneStepRightTextureCoordinateV = aPosition + firstOffsetV;\n' +
+          'twoStepsRightTextureCoordinateV = aPosition + secondOffsetV;\n' +
+          'threeStepsRightTextureCoordinateV = aPosition + thirdOffsetV;\n' +
+          'fourStepsRightTextureCoordinateV = aPosition + fourthOffsetV;\n' +
+          'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
+      '}',
+
+    fragmentSource: 'precision highp float;\n' +
+      'varying vec2 centerTextureCoordinate;\n' +
+      'varying vec2 oneStepLeftTextureCoordinateH;\n' +
+      'varying vec2 twoStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 threeStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 fourStepsLeftTextureCoordinateH;\n' +
+      'varying vec2 oneStepRightTextureCoordinateH;\n' +
+      'varying vec2 twoStepsRightTextureCoordinateH;\n' +
+      'varying vec2 threeStepsRightTextureCoordinateH;\n' +
+      'varying vec2 fourStepsRightTextureCoordinateH;\n' +
+      'varying vec2 oneStepLeftTextureCoordinateV;\n' +
+      'varying vec2 twoStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 threeStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 fourStepsLeftTextureCoordinateV;\n' +
+      'varying vec2 oneStepRightTextureCoordinateV;\n' +
+      'varying vec2 twoStepsRightTextureCoordinateV;\n' +
+      'varying vec2 threeStepsRightTextureCoordinateV;\n' +
+      'varying vec2 fourStepsRightTextureCoordinateV;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
+        'color += texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
+        'color += texture2D(uTexture, oneStepLeftTextureCoordinateH) * 0.27667;\n' +
+        'color += texture2D(uTexture, oneStepRightTextureCoordinateH) * 0.27667;\n' +
+        'color += texture2D(uTexture, twoStepsLeftTextureCoordinateH) * 0.08074;\n' +
+        'color += texture2D(uTexture, twoStepsRightTextureCoordinateH) * 0.08074;\n' +
+        'color += texture2D(uTexture, threeStepsLeftTextureCoordinateH) * -0.02612;\n' +
+        'color += texture2D(uTexture, threeStepsRightTextureCoordinateH) * -0.02612;\n' +
+        'color += texture2D(uTexture, fourStepsLeftTextureCoordinateH) * -0.02143;\n' +
+        'color += texture2D(uTexture, fourStepsRightTextureCoordinateH) * -0.02143;\n' +
+        'color += texture2D(uTexture, oneStepLeftTextureCoordinateV) * 0.27667;\n' +
+        'color += texture2D(uTexture, oneStepRightTextureCoordinateV) * 0.27667;\n' +
+        'color += texture2D(uTexture, twoStepsLeftTextureCoordinateV) * 0.08074;\n' +
+        'color += texture2D(uTexture, twoStepsRightTextureCoordinateV) * 0.08074;\n' +
+        'color += texture2D(uTexture, threeStepsLeftTextureCoordinateV) * -0.02612;\n' +
+        'color += texture2D(uTexture, threeStepsRightTextureCoordinateV) * -0.02612;\n' +
+        'color += texture2D(uTexture, fourStepsLeftTextureCoordinateV) * -0.02143;\n' +
+        'color += texture2D(uTexture, fourStepsRightTextureCoordinateV) * -0.02143;\n' +
+        'gl_FragColor = color / 2.0;\n' +
+      '}',
+
+
+    /**
+     * Apply the resize filter to the image
+     * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
+     *
+     * @param {Object} options
+     * @param {Number} options.passes The number of filters remaining to be executed
+     * @param {Boolean} options.webgl Whether to use webgl to render the filter.
+     * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
+     * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    applyTo: function(options) {
+      if (options.webgl) {
+        if (options.passes > 1 && this.isNeutralState(options)) {
+          // avoid doing something that we do not need
+          return;
+        }
+        while (options.sourceWidth * this.scaleX < options.destinationWidth * 0.5) {
+          this.width = options.destinationWidth;
+          this.height = options.destinationHeight;
+          options.destinationWidth = Math.floor(options.destinationWidth * 0.5);
+          options.destinationHeight = Math.floor(options.destinationHeight * 0.5);
+          this._setupFrameBuffer(options);
+          this.applyToWebGL(options);
+          this._swapTextures(options);
+          // options.sourceWidth = options.destinationWidth;
+          // options.sourceHeight = options.destinationHeight;
+        }
+        this.width = options.destinationWidth;
+        this.height = options.destinationHeight;
+        options.destinationWidth = Math.floor(options.sourceWidth * this.scaleX);
+        options.destinationHeight = Math.floor(options.sourceHeight * this.scaleY);
+        this._setupFrameBuffer(options);
+        this.applyToWebGL(options);
+        this._swapTextures(options);
+        options.sourceWidth = options.destinationWidth;
+        options.sourceHeight = options.destinationHeight;
+      }
+      else if (!this.isNeutralState(options)) {
+        this.applyTo2d(options);
+      }
+    },
+
+    isNeutralState: function(options) {
+      var scaleX = options.scaleX || this.scaleX,
+          scaleY = options.scaleY || this.scaleY;
+      return scaleX === 1 && scaleY === 1;
+    },
 
     /**
      * Applies filter to canvas element
@@ -121,9 +232,6 @@
       var imageData = options.imageData,
           scaleX = options.scaleX || this.scaleX,
           scaleY = options.scaleY || this.scaleY;
-      if (scaleX === 1 && scaleY === 1) {
-        return;
-      }
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
@@ -278,7 +386,7 @@
       }
 
       var srcData = options.imageData.data,
-          destImg = options.ctx.creteImageData(dW, dH),
+          destImg = options.ctx.createImageData(dW, dH),
           destData = destImg.data,
           lanczos = lanczosCreate(this.lanczosLobes),
           ratioX = this.rcpScaleX, ratioY = this.rcpScaleY,

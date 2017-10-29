@@ -97,6 +97,13 @@
     },
 
     /**
+     * Indicate when the filter is not gonna apply changes to the image
+     **/
+    isNeutralState: function() {
+      return this.blocksize === 1;
+    },
+
+    /**
      * Return WebGL uniform locations for this filter's shader.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
