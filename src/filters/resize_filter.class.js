@@ -66,6 +66,7 @@
     getUniformLocations: function(gl, program) {
       return {
         uDelta: gl.getUniformLocation(program, 'uDelta'),
+        uTaps: gl.getUniformLocation(program, 'uTaps'),
       };
     },
 
@@ -77,6 +78,7 @@
      */
     sendUniformData: function(gl, uniformLocations) {
       gl.uniform2fv(uniformLocations.uDelta, this.horizontal ? [1 / this.width, 0] : [0, 1 / this.height]);
+      gl.uniform1fv(uniformLocations.uTaps, this.taps);
     },
 
     /**
@@ -86,10 +88,9 @@
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
     retrieveShader: function(options) {
-      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + filterWindow + '_' + this.lanczosLobes;
+      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + filterWindow;
       if (!options.programCache.hasOwnProperty(cacheKey)) {
         var fragmentShader = this.generateShader(filterWindow);
-        console.log(fragmentShader);
         options.programCache[cacheKey] = this.createProgram(options.context, fragmentShader);
       }
       return options.programCache[cacheKey];
@@ -115,23 +116,21 @@
      */
     generateShader: function(filterWindow) {
       var offsets = new Array(filterWindow),
-          fragmentShader = this.fragmentSourceTOP, taps = this.getTaps();
+          fragmentShader = this.fragmentSourceTOP, filterWindow;
 
       for (var i = 1; i <= filterWindow; i++) {
         offsets[i - 1] = i + '.0 * uDelta';
       }
 
-      fragmentShader += 'uniform float uTaps[' + taps.length + '];\n';
+      fragmentShader += 'uniform float uTaps[' + filterWindow + '];\n';
       fragmentShader += 'void main() {\n';
       fragmentShader += '  vec4 color = texture2D(uTexture, vTexCoord);\n';
       fragmentShader += '  float sum = 1.0;\n';
 
       offsets.forEach(function(offset, i) {
-        if (taps[i]) {
-          fragmentShader += '  color += texture2D(uTexture, vTexCoord + ' + offset + ') * ' + taps[i] + ';\n';
-          fragmentShader += '  color += texture2D(uTexture, vTexCoord - ' + offset + ') * ' + taps[i] + ';\n';
-          fragmentShader += '  sum += ' + taps[i] + '; sum += ' + taps[i] + ';\n';
-        }
+        fragmentShader += '  color += texture2D(uTexture, vTexCoord + ' + offset + ') * uTaps[' + i + '];\n';
+        fragmentShader += '  color += texture2D(uTexture, vTexCoord - ' + offset + ') * uTaps[' + i + '];\n';
+        fragmentShader += '  sum += 2.0 * uTaps[' + i + '];\n';
       });
       fragmentShader += '  gl_FragColor = color / sum;\n';
       fragmentShader += '}';
@@ -167,6 +166,7 @@
         this.dW = Math.round(this.width * this.scaleX);
         this.dH = options.sourceHeight;
         this.tempScale = this.dW / this.width;
+        this.taps = this.getTaps();
         options.destinationWidth = this.dW;
         this._setupFrameBuffer(options);
         this.applyToWebGL(options);
@@ -177,6 +177,7 @@
         this.horizontal = false;
         this.dH = Math.round(this.height * this.scaleY);
         this.tempScale = this.dH / this.height;
+        this.taps = this.getTaps();
         options.destinationHeight = this.dH;
         this._setupFrameBuffer(options);
         this.applyToWebGL(options);

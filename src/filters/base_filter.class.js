@@ -175,7 +175,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   _swapTextures: function(options) {
     options.passes--;
-    // options.pass++;
+    options.pass++;
     var temp = options.targetTexture;
     options.targetTexture = options.sourceTexture;
     options.sourceTexture = temp;
@@ -246,7 +246,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     var gl = options.context;
     var shader = this.retrieveShader(options);
     if (options.pass === 0 && options.originalTexture) {
-      console.log('hit')
       gl.bindTexture(gl.TEXTURE_2D, options.originalTexture);
     }
     else {
