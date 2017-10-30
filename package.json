@@ -24,6 +24,8 @@
     "canvas": false,
     "fs":      false,
     "jsdom":   false,
+    "http":   false,
+    "https":   false,
     "xmldom":  false
   },
   "repository": {
