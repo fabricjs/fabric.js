@@ -27,7 +27,7 @@
     "http":   false,
     "https":   false,
     "xmldom":  false,
-    "url": false,
+    "url": false
   },
   "repository": {
     "type": "git",
