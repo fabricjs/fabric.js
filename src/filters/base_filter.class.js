@@ -66,6 +66,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     if (!this.vertexSource || !this.fragmentSource) {
       return;
     }
+    if(fabric.webGlPrecision !== 'highp'){
+      fragmentSource = fragmentSource.replace(/precision highp float/g, 'precision ' + fabric.webGlPrecision + ' float');
+    }
+
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
     gl.compileShader(vertexShader);
