@@ -20,6 +20,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   type: 'BaseFilter',
 
+  webGlPrecision: 'highp',
+
   vertexSource: 'attribute vec2 aPosition;\n' +
     'attribute vec2 aTexCoord;\n' +
     'varying vec2 vTexCoord;\n' +
@@ -66,6 +68,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     if (!this.vertexSource || !this.fragmentSource) {
       return;
     }
+    if(this.webGlPrecision !== 'highp'){
+      fragmentSource = fragmentSource.replace(/precision highp float/g, 'precision ' + this.webGlPrecision + ' float');
+    }
+
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
     gl.compileShader(vertexShader);
