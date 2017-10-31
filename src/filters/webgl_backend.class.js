@@ -37,18 +37,12 @@
     if (gl) {
       fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       isSupported = fabric.maxTextureSize >= tileSize;
-      var precision;
       var precisions = ['highp', 'mediump', 'lowp'];
       for(var i = 0; i < 3; i++){
         if(testPrecision(gl, precisions[i])){
-          precision = precisions[i];
-          fabric.Image.filters.BaseFilter.prototype.webGlPrecision = precision;
+          fabric.webGlPrecision = precisions[i];
           break;
         };
-      }
-
-      if(!precision){
-        isSupported = false;
       }
     }
     this.isSupported = isSupported;
