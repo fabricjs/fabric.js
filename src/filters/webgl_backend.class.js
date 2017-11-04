@@ -13,7 +13,7 @@
     var fragmentSource = 'precision ' + precision + ' float;\nvoid main(){}';
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentSource);
-    gl.compileShader(fragmentShader);        
+    gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       return false;
     }
@@ -38,8 +38,8 @@
       fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       isSupported = fabric.maxTextureSize >= tileSize;
       var precisions = ['highp', 'mediump', 'lowp'];
-      for(var i = 0; i < 3; i++){
-        if(testPrecision(gl, precisions[i])){
+      for (var i = 0; i < 3; i++){
+        if (testPrecision(gl, precisions[i])){
           fabric.webGlPrecision = precisions[i];
           break;
         };
