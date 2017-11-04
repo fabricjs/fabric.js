@@ -2,6 +2,24 @@
 
   'use strict';
 
+
+  /**
+   * Tests if webgl supports certain precision
+   * @param {WebGL} Canvas WebGL context to test on
+   * @param {String} Precision to test can be any of following: 'lowp', 'mediump', 'highp'
+   * @returns {Boolean} Whether the user's browser WebGL supports given precision.
+   */
+  function testPrecision(gl, precision){
+    var fragmentSource = 'precision ' + precision + ' float;\nvoid main(){}';
+    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentSource);
+    gl.compileShader(fragmentShader);        
+    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Indicate whether this filtering backend is supported by the user's browser.
    * @param {Number} tileSize check if the tileSize is supported
@@ -19,6 +37,13 @@
     if (gl) {
       fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       isSupported = fabric.maxTextureSize >= tileSize;
+      var precisions = ['highp', 'mediump', 'lowp'];
+      for(var i = 0; i < 3; i++){
+        if(testPrecision(gl, precisions[i])){
+          fabric.webGlPrecision = precisions[i];
+          break;
+        };
+      }
     }
     this.isSupported = isSupported;
     return isSupported;

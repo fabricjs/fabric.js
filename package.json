@@ -24,7 +24,10 @@
     "canvas": false,
     "fs":      false,
     "jsdom":   false,
-    "xmldom":  false
+    "http":   false,
+    "https":   false,
+    "xmldom":  false,
+    "url": false
   },
   "repository": {
     "type": "git",
