@@ -185,8 +185,10 @@
       var width = image.width, height = image.height;
       assert.ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       image.applyFilters();
-      assert.equal(image.width, Math.floor(width / 5), 'width should be a fifth');
-      assert.equal(image.height, Math.floor(height / 5), 'height should a fifth');
+      assert.equal(image.width, Math.floor(width), 'width is not changed');
+      assert.equal(image.height, Math.floor(height), 'height is not changed');
+      assert.equal(image._filterScalingX.toFixed(1), 0.2, 'a new scaling factor is made for x');
+      assert.equal(image._filterScalingY.toFixed(1), 0.2, 'a new scaling factor is made for y');
       var toObject = image.toObject();
       assert.deepEqual(toObject.filters[0], filter.toObject());
       assert.equal(toObject.width, width, 'width is stored as before filters');
@@ -196,8 +198,6 @@
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
         assert.equal(filterFromObj.scaleX, 0.2);
-        assert.equal(_imageFromObject.width, Math.floor(width / 5), 'on image reload width is halved again');
-        assert.equal(_imageFromObject.height, Math.floor(height / 5), 'on image reload width is halved again');
         done();
       });
     });

@@ -267,9 +267,6 @@
       if (this.resizeFilter) {
         object.resizeFilter = this.resizeFilter.toObject();
       }
-      object.width /= this._filterScalingX;
-      object.height /= this._filterScalingY;
-
       return object;
     },
 
