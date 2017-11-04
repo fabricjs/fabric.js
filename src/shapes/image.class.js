@@ -267,9 +267,6 @@
       if (this.resizeFilter) {
         object.resizeFilter = this.resizeFilter.toObject();
       }
-      object.width /= this._filterScalingX;
-      object.height /= this._filterScalingY;
-
       return object;
     },
 
@@ -443,11 +440,10 @@
       }
       fabric.filterBackend.applyFilters(
         filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
-      if (this.width !== this._element.width || this.height !== this._element.height) {
-        this._filterScalingX = this._element.width / this.width;
-        this._filterScalingY = this._element.height / this.height;
-        this.width = this._element.width;
-        this.height = this._element.height;
+      if (this._originalElement.width !== this._element.width ||
+        this._originalElement.height !== this._element.height) {
+        this._filterScalingX = this._element.width / this._originalElement.width;
+        this._filterScalingY = this._element.height / this._originalElement.height;
       }
       return this;
     },
@@ -467,11 +463,14 @@
     },
 
     _renderFill: function(ctx) {
-      var x = -this.width / 2, y = -this.height / 2, elementToDraw;
-      elementToDraw = this._element;
+      var w = this.width, h = this.height, sW = w * this._filterScalingX, sH = h * this._filterScalingY,
+          x = -w / 2, y = -h / 2, elementToDraw = this._element;
       elementToDraw && ctx.drawImage(elementToDraw,
-        this.cropX, this.cropY, this.width, this.height,
-        x, y, this.width, this.height);
+        this.cropX * this._filterScalingX,
+        this.cropY * this._filterScalingY,
+        sW,
+        sH,
+        x, y, w, h);
     },
 
     /**
