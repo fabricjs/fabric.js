@@ -334,7 +334,7 @@
       this._splitText();
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
-      if (this.textAlign === 'justify') {
+      if (this.textAlign.indexOf('justify') !== -1) {
         // once text is misured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
@@ -348,6 +348,9 @@
     enlargeSpaces: function() {
       var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        if (i === len - 1 || this.isEndOfWrapping(i)) {
+          continue;
+        }
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
@@ -368,6 +371,15 @@
           }
         }
       }
+    },
+
+    /**
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @return {Boolean}
+     */
+    isEndOfWrapping: function(/* lineIndex */) {
+      return false;
     },
 
     /**
@@ -855,7 +867,7 @@
           left += charBox.kernedWidth - charBox.width;
         }
         boxWidth += charBox.kernedWidth;
-        if (this.textAlign === 'justify' && !timeToRender) {
+        if (this.textAlign.indexOf('justify') !== -1 && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }
@@ -936,6 +948,12 @@
         return (this.width - lineWidth) / 2;
       }
       if (this.textAlign === 'right') {
+        return this.width - lineWidth;
+      }
+      if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
+        return (this.width - lineWidth) / 2;
+      }
+      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;

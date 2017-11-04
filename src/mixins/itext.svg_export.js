@@ -119,7 +119,7 @@
           textLeftOffset += charBox.kernedWidth - charBox.width;
         }
         boxWidth += charBox.kernedWidth;
-        if (this.textAlign === 'justify' && !timeToRender) {
+        if (this.textAlign.indexOf('justify') !== -1 && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }
