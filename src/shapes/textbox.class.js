@@ -94,7 +94,7 @@
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
-      if (this.textAlign === 'justify') {
+      if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
@@ -234,11 +234,13 @@
      * @returns {Array} Array of lines
      */
     _wrapText: function(lines, desiredWidth) {
-      var wrapped = [], i;
+      var wrapped = [], textLineBreaks = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
         wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
+        textLineBreaks[i] = wrapped.length - 1;
       }
+      this._textLineBreaks = textLineBreaks;
       this.isWrapping = false;
       return wrapped;
     },
