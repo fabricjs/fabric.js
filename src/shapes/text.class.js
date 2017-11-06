@@ -511,14 +511,15 @@
      * @param {Number} left Left position of text
      * @param {Number} top Top position of text
      * @param {Number} lineIndex Index of a line in a text
+     * @param {Boolean} isLastLine Detects if the line is last in the text
      */
-    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
       // lift the line by quarter of fontSize
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
       var lineWidth = this._getLineWidth(ctx, lineIndex);
-      if (this.textAlign !== 'justify' || this.width < lineWidth) {
+      if (this.textAlign !== 'justify' || this.width < lineWidth || isLastLine) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
@@ -594,14 +595,16 @@
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight,
             lineWidth = this._getLineWidth(ctx, i),
-            leftOffset = this._getLineLeftOffset(lineWidth);
+            leftOffset = this._getLineLeftOffset(lineWidth),
+            isLastLine = i === len - 1;
         this._renderTextLine(
           method,
           ctx,
           this._textLines[i],
           left + leftOffset,
           top + lineHeights + maxHeight,
-          i
+          i,
+          isLastLine
         );
         lineHeights += heightOfLine;
       }
