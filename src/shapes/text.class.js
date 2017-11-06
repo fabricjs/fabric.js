@@ -148,7 +148,8 @@
     linethrough:       false,
 
     /**
-     * Text alignment. Possible values: "left", "center", "right" or "justify".
+     * Text alignment. Possible values: "left", "center", "right", "justify",
+     * "justify-center" or "justify-right".
      * @type String
      * @default
      */
@@ -335,7 +336,7 @@
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
       if (this.textAlign.indexOf('justify') !== -1) {
-        // once text is misured we need to make space fatter to make justified text.
+        // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
       this.height = this.calcTextHeight();
