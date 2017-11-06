@@ -331,11 +331,11 @@
      * @return {Boolean}
      */
     isEndOfWrapping: function(lineIndex) {
-      if (!this.styleMap[lineIndex + 1]) {
+      if (!this._styleMap[lineIndex + 1]) {
         // is last line, return true;
         return true;
       }
-      if (this.styleMap[lineIndex + 1].line !== this.styleMap[lineIndex].line) {
+      if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
         // this is last line before a line break, return true;
         return true;
       }
