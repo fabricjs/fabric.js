@@ -853,8 +853,11 @@
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
           left += charBox.kernedWidth - charBox.width;
+          boxWidth += charBox.width;
         }
-        boxWidth += charBox.kernedWidth;
+        else {
+          boxWidth += charBox.kernedWidth;
+        }
         if (this.textAlign === 'justify' && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
