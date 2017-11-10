@@ -531,26 +531,6 @@
       }
     },
 
-    // /**
-    //  * This function is an helper for svg import. it decoompose the transformMatrix
-    //  * and assign properties to object.
-    //  * untransformed coordinates
-    //  * @private
-    //  * @chainable
-    //  */
-    // _assignTransformMatrixProps: function() {
-    //   if (this.transformMatrix) {
-    //     var options = fabric.util.qrDecompose(this.transformMatrix);
-    //     this.flipX = false;
-    //     this.flipY = false;
-    //     this.set('scaleX', options.scaleX);
-    //     this.set('scaleY', options.scaleY);
-    //     this.angle = options.angle;
-    //     this.skewX = options.skewX;
-    //     this.skewY = 0;
-    //   }
-    // },
-
     /**
      * @private
      * @param {Object} [options] Object with width/height properties
