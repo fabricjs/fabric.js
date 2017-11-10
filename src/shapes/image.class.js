@@ -551,7 +551,7 @@
 
     parsePreserveAspectRatioAttribute: function() {
       var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
-          width = this._element.width, height = this._element.height, scale,
+          width = this._element.width, height = this._element.height, scale, offset,
           pWidth = this.width, pHeight = this.height, parsedAttributes = { width: pWidth, height: pHeight };
       if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
         if (pAR.meetOrSlice === 'meet') {
@@ -560,17 +560,19 @@
           scale = fabric.util.findScaleToFit(this._element, parsedAttributes);
           this.scaleX *= scale;
           this.scaleY *= scale;
-          if (pAR.alignX === 'Mid') {
-            this.left += (pWidth - width * scale) / 2;
+          offset = (pWidth - width * this.scaleX) / 2;
+          if (pAR.alignX === 'Min') {
+            this.left -= offset;
           }
           if (pAR.alignX === 'Max') {
-            this.left += pWidth - width * scale;
+            this.left += offset;
           }
-          if (pAR.alignY === 'Mid') {
-            this.top += (pHeight - height * scale) / 2;
+          offset = (pHeight - height * this.scaleY) / 2;
+          if (pAR.alignY === 'Min') {
+            this.top -= offset;
           }
           if (pAR.alignY === 'Max') {
-            this.top += pHeight - height * scale;
+            this.top += offset;
           }
         }
         if (pAR.meetOrSlice === 'slice') {
