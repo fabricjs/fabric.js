@@ -531,6 +531,26 @@
       }
     },
 
+    // /**
+    //  * This function is an helper for svg import. it decoompose the transformMatrix
+    //  * and assign properties to object.
+    //  * untransformed coordinates
+    //  * @private
+    //  * @chainable
+    //  */
+    // _assignTransformMatrixProps: function() {
+    //   if (this.transformMatrix) {
+    //     var options = fabric.util.qrDecompose(this.transformMatrix);
+    //     this.flipX = false;
+    //     this.flipY = false;
+    //     this.set('scaleX', options.scaleX);
+    //     this.set('scaleY', options.scaleY);
+    //     this.angle = options.angle;
+    //     this.skewX = options.skewX;
+    //     this.skewY = 0;
+    //   }
+    // },
+
     /**
      * @private
      * @param {Object} [options] Object with width/height properties
@@ -550,17 +570,16 @@
     },
 
     parsePreserveAspectRatioAttribute: function() {
-      if (!this.preserveAspectRatio) {
-        return;
-      }
-      var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio),
+      var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
           width = this._element.width, height = this._element.height, scale,
           pWidth = this.width, pHeight = this.height, parsedAttributes = { width: pWidth, height: pHeight };
       if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
         if (pAR.meetOrSlice === 'meet') {
           this.width = width;
           this.height = height;
-          this.scaleX = this.scaleY = scale = fabric.util.findScaleToFit(this._element, parsedAttributes);
+          scale = fabric.util.findScaleToFit(this._element, parsedAttributes);
+          this.scaleX *= scale;
+          this.scaleY *= scale;
           if (pAR.alignX === 'Mid') {
             this.left += (pWidth - width * scale) / 2;
           }
@@ -575,7 +594,9 @@
           }
         }
         if (pAR.meetOrSlice === 'slice') {
-          this.scaleX = this.scaleY = scale = fabric.util.findScaleToCover(this._element, parsedAttributes);
+          scale = fabric.util.findScaleToCover(this._element, parsedAttributes);
+          this.scaleX *= scale;
+          this.scaleY *= scale;
           this.width = pWidth / scale;
           this.height = pHeight / scale;
           if (pAR.alignX === 'Mid') {
@@ -593,8 +614,8 @@
         }
       }
       else {
-        this.scaleX = pWidth / width;
-        this.scaleY = pHeight / height;
+        this.scaleX *= pWidth / width;
+        this.scaleY *= pHeight / height;
       }
     }
   });
@@ -668,7 +689,6 @@
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
-
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
