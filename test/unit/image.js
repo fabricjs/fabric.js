@@ -10,6 +10,23 @@
     return src;
   }
 
+  function makeImageElement(attributes) {
+    var element = {};
+    if (fabric.isLikelyNode) {
+      element.getAttribute = function(x) {
+        return element[x];
+      };
+      element.setAttribute = function(x, value) {
+        element[x] = value;
+      };
+    }
+    for (var prop in attributes) {
+      element.setAttribute(prop, attributes[prop]);
+    }
+    return element;
+  }
+
+
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
@@ -185,8 +202,10 @@
       var width = image.width, height = image.height;
       assert.ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       image.applyFilters();
-      assert.equal(image.width, Math.floor(width / 5), 'width should be a fifth');
-      assert.equal(image.height, Math.floor(height / 5), 'height should a fifth');
+      assert.equal(image.width, Math.floor(width), 'width is not changed');
+      assert.equal(image.height, Math.floor(height), 'height is not changed');
+      assert.equal(image._filterScalingX.toFixed(1), 0.2, 'a new scaling factor is made for x');
+      assert.equal(image._filterScalingY.toFixed(1), 0.2, 'a new scaling factor is made for y');
       var toObject = image.toObject();
       assert.deepEqual(toObject.filters[0], filter.toObject());
       assert.equal(toObject.width, width, 'width is stored as before filters');
@@ -196,8 +215,6 @@
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
         assert.equal(filterFromObj.scaleX, 0.2);
-        assert.equal(_imageFromObject.width, Math.floor(width / 5), 'on image reload width is halved again');
-        assert.equal(_imageFromObject.height, Math.floor(height / 5), 'on image reload width is halved again');
         done();
       });
     });
@@ -353,21 +370,6 @@
 
   QUnit.test('fromElement', function(assert) {
     var done = assert.async();
-    function makeImageElement(attributes) {
-      var element = _createImageElement();
-      if (fabric.isLikelyNode) {
-        element.getAttribute = function(x) {
-          return element[x];
-        };
-        element.setAttribute = function(x, value) {
-          element[x] = value;
-        };
-      }
-      for (var prop in attributes) {
-        element.setAttribute(prop, attributes[prop]);
-      }
-      return element;
-    }
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
 
@@ -388,24 +390,202 @@
     });
   });
 
-  // QUnit.test('minimumScale', function(assert) {
-  //   var done = assert.async();
-  //   createImageObject(function(image) {
-  //     assert.ok(typeof image.toObject === 'function');
-  //     var filter = new fabric.Image.filters.Resize({resizeType: 'sliceHack', scaleX: 0.2, scaleY: 0.2});
-  //     image.resizeFilters.push(filter);
-  //     var width = image.width, height = image.height;
-  //     assert.ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-  //     var toObject = image.toObject();
-  //     fabric.Image.fromObject(toObject, function(_imageFromObject) {
-  //       var filterFromObj = _imageFromObject.resizeFilters[0];
-  //       assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-  //       assert.equal(filterFromObj.scaleY, 0.2);
-  //       assert.equal(filterFromObj.scaleX, 0.2);
-  //       var canvasEl = _imageFromObject.applyFilters(null, _imageFromObject.resizeFilters, _imageFromObject._originalElement, true);
-  //       done();
-  //     });
-  //   });
-  // });
+  QUnit.test('fromElement with preserveAspectRatio', function(assert) {
+    var done = assert.async();
 
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      width: '140',
+      height: '170',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.ok(imgObject instanceof fabric.Image);
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('scaleX'), 10, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 10, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMid',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 42.5, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmax', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMax',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 85, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMinYMin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMinYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMidYmin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMidYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 35, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMaxYMin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMaxYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 70, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
 })();

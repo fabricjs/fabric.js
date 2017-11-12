@@ -102,6 +102,7 @@
     _setSVGTextLineText: function(textSpans, lineIndex, textLeftOffset, textTopOffset) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
+          isJustify = this.textAlign.indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
           charsToRender = '',
@@ -119,7 +120,7 @@
           textLeftOffset += charBox.kernedWidth - charBox.width;
         }
         boxWidth += charBox.kernedWidth;
-        if (this.textAlign.indexOf('justify') !== -1 && !timeToRender) {
+        if (isJustify && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }

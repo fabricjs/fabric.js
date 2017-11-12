@@ -658,7 +658,7 @@
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move', target);
+      this._handleEvent(e, 'move', this._currentTransform ? null : target);
     },
 
     /**
