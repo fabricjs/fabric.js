@@ -720,15 +720,6 @@
         drawingHeight = dim.y * zoomY / 2;
         this.cacheTranslationX = Math.round(this._cacheCanvas.width / 2 - drawingWidth) + drawingWidth;
         this.cacheTranslationY = Math.round(this._cacheCanvas.height / 2 - drawingHeight) + drawingHeight;
-        console.log({
-          drawingWidth: drawingWidth,
-          drawingHeight: drawingHeight,
-          tX: this.cacheTranslationX,
-          tY: this.cacheTranslationY,
-          w: this._cacheCanvas.width,
-          h: this._cacheCanvas.height,
-          dim: dim,
-        })
         this.cacheWidth = width;
         this.cacheHeight = height;
         this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
