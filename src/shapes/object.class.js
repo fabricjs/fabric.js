@@ -686,7 +686,7 @@
           return false;
         }
       }
-      var dim = this._getNonTransformedDimensions(),
+      var dim = this._getNonTransformedDimensions(), canvas = this._cacheCanvas,
           dims = this._limitCacheSize(this._getCacheCanvasDimensions(dim)),
           minCacheSize = fabric.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
@@ -703,23 +703,23 @@
               canvasWidth > minCacheSize && canvasHeight > minCacheSize;
         shouldResizeCanvas = sizeGrowing || sizeShrinking;
         if (sizeGrowing) {
-          additionalWidth = (width * 0.1) & ~1;
-          additionalHeight = (height * 0.1) & ~1;
+          additionalWidth = width * 0.1;
+          additionalHeight = height * 0.1;
         }
       }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
-          this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
-          this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
+          canvas.width = Math.max(Math.ceil(width + additionalWidth), minCacheSize);
+          canvas.height = Math.max(Math.ceil(height + additionalHeight), minCacheSize);
         }
         else {
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
-          this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
+          this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
         }
         drawingWidth = dim.x * zoomX / 2;
         drawingHeight = dim.y * zoomY / 2;
-        this.cacheTranslationX = Math.round(this._cacheCanvas.width / 2 - drawingWidth) + drawingWidth;
-        this.cacheTranslationY = Math.round(this._cacheCanvas.height / 2 - drawingHeight) + drawingHeight;
+        this.cacheTranslationX = Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
+        this.cacheTranslationY = Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
         this.cacheWidth = width;
         this.cacheHeight = height;
         this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
