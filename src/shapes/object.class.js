@@ -649,15 +649,16 @@
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
      * @private
+     * @param {Object} dim.x width of object to be cached
+     * @param {Object} dim.y height of object to be cached
      * @return {Object}.width width of canvas
      * @return {Object}.height height of canvas
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
-    _getCacheCanvasDimensions: function() {
+    _getCacheCanvasDimensions: function(dim) {
       var zoom = this.canvas && this.canvas.getZoom() || 1,
           objectScale = this.getObjectScaling(),
-          dim = this._getNonTransformedDimensions(),
           retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
@@ -685,9 +686,10 @@
           return false;
         }
       }
-      var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+      var dim = this._getNonTransformedDimensions(),
+          dims = this._limitCacheSize(this._getCacheCanvasDimensions(dim)),
           minCacheSize = fabric.minCacheSideLimit,
-          width = dims.width, height = dims.height,
+          width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
           dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
           zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
@@ -709,13 +711,24 @@
         if (shouldResizeCanvas) {
           this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
           this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
-          this.cacheTranslationX = (width + additionalWidth) / 2;
-          this.cacheTranslationY = (height + additionalHeight) / 2;
         }
         else {
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
           this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
         }
+        drawingWidth = dim.x * zoomX / 2;
+        drawingHeight = dim.y * zoomY / 2;
+        this.cacheTranslationX = Math.round(this._cacheCanvas.width / 2 - drawingWidth) + drawingWidth;
+        this.cacheTranslationY = Math.round(this._cacheCanvas.height / 2 - drawingHeight) + drawingHeight;
+        console.log({
+          drawingWidth: drawingWidth,
+          drawingHeight: drawingHeight,
+          tX: this.cacheTranslationX,
+          tY: this.cacheTranslationY,
+          w: this._cacheCanvas.width,
+          h: this._cacheCanvas.height,
+          dim: dim,
+        })
         this.cacheWidth = width;
         this.cacheHeight = height;
         this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
