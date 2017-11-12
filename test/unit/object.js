@@ -1197,14 +1197,14 @@
   test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function() {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1, x: 10, y: 10  }, 'if no scaling is applied cache is as big as object');
     object.strokeWidth = 2;
     dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'cache contains the stroke');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+    deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3, x: 12, y: 12 }, 'cache is as big as the scaled object');
   });
 
   test('_updateCacheCanvas check if cache canvas should be updated', function() {
