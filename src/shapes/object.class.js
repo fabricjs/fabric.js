@@ -990,7 +990,7 @@
         this.drawCacheOnCanvas(ctx);
       }
       else {
-        this._cacheCanvas = null;
+        this._removeCacheCanvas();
         this.dirty = false;
         this.drawObject(ctx);
         if (this.objectCaching && this.statefullCache) {
@@ -999,6 +999,15 @@
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    /**
+     * Remove cacheCanvas and its dimensions from the objects
+     */
+    _removeCacheCanvas: function() {
+      this._cacheCanvas = null;
+      this.cacheWidth = 0;
+      this.cacheHeight = 0;
     },
 
     /**
