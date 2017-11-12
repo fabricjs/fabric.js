@@ -149,7 +149,7 @@
 
     /**
      * Text alignment. Possible values: "left", "center", "right", "justify",
-     * "justify-center" or "justify-right".
+     * "justify-left", "justify-center" or "justify-right".
      * @type String
      * @default
      */
@@ -349,7 +349,7 @@
     enlargeSpaces: function() {
       var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (i === len - 1 || this.isEndOfWrapping(i)) {
+        if (this.textAlign !== 'justify' && (i === len - 1 || this.isEndOfWrapping(i))) {
           continue;
         }
         accumulatedSpace = 0;
@@ -379,8 +379,8 @@
      * text and itext do not have wrapping, return false
      * @return {Boolean}
      */
-    isEndOfWrapping: function(/* lineIndex */) {
-      return false;
+    isEndOfWrapping: function(lineIndex) {
+      return lineIndex === this._textLines.length - 1;
     },
 
     /**
