@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.19"
+    version: "1.7.20"
 };
 
 if (typeof exports !== "undefined") {
@@ -4066,6 +4066,9 @@ fabric.BaseBrush = fabric.util.createClass({
             this.canvas.contextTop.moveTo(p.x, p.y);
         },
         _addPoint: function(point) {
+            if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
+                return;
+            }
             this._points.push(point);
         },
         _reset: function() {
@@ -4101,8 +4104,12 @@ fabric.BaseBrush = fabric.util.createClass({
             ctx.restore();
         },
         convertPointsToSVGPath: function(points) {
-            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length;
-            path.push("M ", p1.x - width, " ", p1.y, " ");
+            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length, multSignX, multSignY, manyPoints = len > 2;
+            if (manyPoints) {
+                multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
+                multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
+            }
+            path.push("M ", p1.x - multSignX * width, " ", p1.y - multSignY * width, " ");
             for (i = 1; i < len; i++) {
                 if (!p1.eq(p2)) {
                     var midPoint = p1.midPointFrom(p2);
@@ -4113,7 +4120,11 @@ fabric.BaseBrush = fabric.util.createClass({
                     p2 = points[i + 1];
                 }
             }
-            path.push("L ", p1.x + width, " ", p1.y, " ");
+            if (manyPoints) {
+                multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
+                multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
+            }
+            path.push("L ", p1.x + multSignX * width, " ", p1.y + multSignY * width);
             return path;
         },
         createPath: function(pathData) {
@@ -6127,40 +6138,44 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             return dims;
         },
         _getCacheCanvasDimensions: function() {
-            var zoom = this.canvas && this.canvas.getZoom() || 1, objectScale = this.getObjectScaling(), dim = this._getNonTransformedDimensions(), retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1, zoomX = objectScale.scaleX * zoom * retina, zoomY = objectScale.scaleY * zoom * retina, width = dim.x * zoomX, height = dim.y * zoomY;
+            var zoom = this.canvas && this.canvas.getZoom() || 1, objectScale = this.getObjectScaling(), retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1, dim = this._getNonTransformedDimensions(), zoomX = objectScale.scaleX * zoom * retina, zoomY = objectScale.scaleY * zoom * retina, width = dim.x * zoomX, height = dim.y * zoomY;
             return {
                 width: width + ALIASING_LIMIT,
                 height: height + ALIASING_LIMIT,
                 zoomX: zoomX,
-                zoomY: zoomY
+                zoomY: zoomY,
+                x: dim.x,
+                y: dim.y
             };
         },
         _updateCacheCanvas: function() {
             if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
-                var action = this.canvas._currentTransform.action;
-                if (action.slice && action.slice(0, 5) === "scale") {
+                var target = this.canvas._currentTransform.target, action = this.canvas._currentTransform.action;
+                if (this === target && action.slice && action.slice(0, 5) === "scale") {
                     return false;
                 }
             }
-            var dims = this._limitCacheSize(this._getCacheCanvasDimensions()), minCacheSize = fabric.minCacheSideLimit, width = dims.width, height = dims.height, zoomX = dims.zoomX, zoomY = dims.zoomY, dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight, zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY, shouldRedraw = dimensionsChanged || zoomChanged, additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
+            var canvas = this._cacheCanvas, dims = this._limitCacheSize(this._getCacheCanvasDimensions()), minCacheSize = fabric.minCacheSideLimit, width = dims.width, height = dims.height, drawingWidth, drawingHeight, zoomX = dims.zoomX, zoomY = dims.zoomY, dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight, zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY, shouldRedraw = dimensionsChanged || zoomChanged, additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
             if (dimensionsChanged) {
                 var canvasWidth = this._cacheCanvas.width, canvasHeight = this._cacheCanvas.height, sizeGrowing = width > canvasWidth || height > canvasHeight, sizeShrinking = (width < canvasWidth * .9 || height < canvasHeight * .9) && canvasWidth > minCacheSize && canvasHeight > minCacheSize;
                 shouldResizeCanvas = sizeGrowing || sizeShrinking;
                 if (sizeGrowing) {
-                    additionalWidth = width * .1 & ~1;
-                    additionalHeight = height * .1 & ~1;
+                    additionalWidth = width * .1;
+                    additionalHeight = height * .1;
                 }
             }
             if (shouldRedraw) {
                 if (shouldResizeCanvas) {
-                    this._cacheCanvas.width = Math.max(Math.ceil(width) + additionalWidth, minCacheSize);
-                    this._cacheCanvas.height = Math.max(Math.ceil(height) + additionalHeight, minCacheSize);
-                    this.cacheTranslationX = (width + additionalWidth) / 2;
-                    this.cacheTranslationY = (height + additionalHeight) / 2;
+                    canvas.width = Math.max(Math.ceil(width + additionalWidth), minCacheSize);
+                    canvas.height = Math.max(Math.ceil(height + additionalHeight), minCacheSize);
                 } else {
                     this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
-                    this._cacheContext.clearRect(0, 0, this._cacheCanvas.width, this._cacheCanvas.height);
+                    this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
                 }
+                drawingWidth = dims.x * zoomX / 2;
+                drawingHeight = dims.y * zoomY / 2;
+                this.cacheTranslationX = Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
+                this.cacheTranslationY = Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
                 this.cacheWidth = width;
                 this.cacheHeight = height;
                 this._cacheContext.translate(this.cacheTranslationX, this.cacheTranslationY);
@@ -6260,7 +6275,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             };
         },
         _set: function(key, value) {
-            var shouldConstrainValue = key === "scaleX" || key === "scaleY";
+            var shouldConstrainValue = key === "scaleX" || key === "scaleY", isChanged = this[key] !== value;
             if (shouldConstrainValue) {
                 value = this._constrainScale(value);
             }
@@ -6276,13 +6291,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 this.group.set("dirty", value);
             }
             this[key] = value;
-            if (this.cacheProperties.indexOf(key) > -1) {
+            if (isChanged && this.cacheProperties.indexOf(key) > -1) {
                 if (this.group) {
                     this.group.set("dirty", true);
                 }
                 this.dirty = true;
             }
-            if (this.group && this.stateProperties.indexOf(key) > -1) {
+            if (isChanged && this.group && this.stateProperties.indexOf(key) > -1) {
                 this.group.set("dirty", true);
             }
             if (key === "width" || key === "height") {
@@ -6336,6 +6351,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 }
                 this.drawCacheOnCanvas(ctx);
             } else {
+                this._removeCacheCanvas();
                 this.dirty = false;
                 this.drawObject(ctx, noTransform);
                 if (noTransform && this.objectCaching && this.statefullCache) {
@@ -6346,6 +6362,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             }
             this.clipTo && ctx.restore();
             ctx.restore();
+        },
+        _removeCacheCanvas: function() {
+            this._cacheCanvas = null;
+            this.cacheWidth = 0;
+            this.cacheHeight = 0;
         },
         needsItsOwnCache: function() {
             return false;
@@ -8891,6 +8912,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
             if (isAlreadyGrouped) {
                 this._updateObjectsCoords(true);
+                this._updateObjectsACoords();
             } else {
                 this._calcBounds();
                 this._updateObjectsCoords();
@@ -8898,6 +8920,12 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
             this.setCoords();
             this.saveCoords();
+        },
+        _updateObjectsACoords: function() {
+            var ignoreZoom = true, skipAbsolute = true;
+            for (var i = this._objects.length; i--; ) {
+                this._objects[i].setCoords(ignoreZoom, skipAbsolute);
+            }
         },
         _updateObjectsCoords: function(skipCoordsChange) {
             var center = this.getCenterPoint();
@@ -10461,16 +10489,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this._clearCache();
             this.width = this._getTextWidth(ctx) || this.cursorWidth || MIN_TEXT_WIDTH;
             this.height = this._getTextHeight(ctx);
+            this.setCoords();
         },
         toString: function() {
             return "#<fabric.Text (" + this.complexity() + '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
         },
         _getCacheCanvasDimensions: function() {
-            var dim = this.callSuper("_getCacheCanvasDimensions");
+            var dims = this.callSuper("_getCacheCanvasDimensions");
             var fontSize = this.fontSize;
-            dim.width += fontSize * dim.zoomX;
-            dim.height += fontSize * dim.zoomY;
-            return dim;
+            dims.width += fontSize * dims.zoomX;
+            dims.height += fontSize * dims.zoomY;
+            return dims;
         },
         _render: function(ctx) {
             this._setTextStyles(ctx);
@@ -12623,6 +12652,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             this._clearCache();
             this.height = this._getTextHeight(ctx);
+            this.setCoords();
         },
         _generateStyleMap: function() {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
