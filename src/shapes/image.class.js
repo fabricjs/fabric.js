@@ -549,56 +549,69 @@
           : 0);
     },
 
+    /**
+     * Calculate offset for center and scale factor for the image in order to respect
+     * the preserveAspectRatio attribute
+     * @private
+     * @return {Object}
+     */
     parsePreserveAspectRatioAttribute: function() {
       var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
-          width = this._element.width, height = this._element.height, scale, offset,
-          pWidth = this.width, pHeight = this.height, parsedAttributes = { width: pWidth, height: pHeight };
+          rWidth = this._element.width, rHeight = this._element.height,
+          scaleX = 1, scaleY = 1, offsetLeft = 0, offsetTop = 0, cropX = 0, cropY = 0,
+          offset, pWidth = this.width, pHeight = this.height, parsedAttributes = { width: pWidth, height: pHeight };
       if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
         if (pAR.meetOrSlice === 'meet') {
-          this.width = width;
-          this.height = height;
-          scale = fabric.util.findScaleToFit(this._element, parsedAttributes);
-          this.scaleX *= scale;
-          this.scaleY *= scale;
-          offset = (pWidth - width * this.scaleX) / 2;
+          scaleX = scaleY = fabric.util.findScaleToFit(this._element, parsedAttributes);
+          offset = (pWidth - rWidth * scaleX) / 2;
           if (pAR.alignX === 'Min') {
-            this.left -= offset;
+            offsetLeft = -offset;
           }
           if (pAR.alignX === 'Max') {
-            this.left += offset;
+            offsetLeft = offset;
           }
-          offset = (pHeight - height * this.scaleY) / 2;
+          offset = (pHeight - rHeight * scaleY) / 2;
           if (pAR.alignY === 'Min') {
-            this.top -= offset;
+            offsetTop = -offset;
           }
           if (pAR.alignY === 'Max') {
-            this.top += offset;
+            offsetTop = offset;
           }
         }
         if (pAR.meetOrSlice === 'slice') {
-          scale = fabric.util.findScaleToCover(this._element, parsedAttributes);
-          this.scaleX *= scale;
-          this.scaleY *= scale;
-          this.width = pWidth / scale;
-          this.height = pHeight / scale;
+          scaleX = scaleY = fabric.util.findScaleToCover(this._element, parsedAttributes);
+          offset = rWidth - pWidth / scaleX;
           if (pAR.alignX === 'Mid') {
-            this.cropX = (width - this.width) / 2;
+            cropX = offset / 2;
           }
           if (pAR.alignX === 'Max') {
-            this.cropX = width - this.width;
+            cropX = offset;
           }
+          offset = rHeight - pHeight / scaleY;
           if (pAR.alignY === 'Mid') {
-            this.cropY = (height - this.height) / 2;
+            cropY = offset / 2;
           }
           if (pAR.alignY === 'Max') {
-            this.cropY = height - this.height;
+            cropY = offset;
           }
+          rWidth = pWidth / scaleX;
+          rHeight = pHeight / scaleY;
         }
       }
       else {
-        this.scaleX *= pWidth / width;
-        this.scaleY *= pHeight / height;
+        scaleX = pWidth / rWidth;
+        scaleY = pHeight / rHeight;
       }
+      return {
+        width: rWidth,
+        height: rHeight,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        offsetLeft: offsetLeft,
+        offsetTop: offsetTop,
+        cropX: cropX,
+        cropY: cropY
+      };
     }
   });
 

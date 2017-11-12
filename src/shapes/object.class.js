@@ -1329,16 +1329,26 @@
      * This function is an helper for svg import. it removes the transform matrix
      * and set to object properties that fabricjs can handle
      * @private
-     * @chainable
+     * @param {Object} preserveAspectRatioOptions
      * @return {thisArg}
      */
-    _removeTransformMatrix: function() {
+    _removeTransformMatrix: function(preserveAspectRatioOptions) {
       var center = this._findCenterFromElement();
       if (this.transformMatrix) {
         this._assignTransformMatrixProps();
         center = fabric.util.transformPoint(center, this.transformMatrix);
       }
       this.transformMatrix = null;
+      if (preserveAspectRatioOptions) {
+        this.scaleX *= preserveAspectRatioOptions.scaleX;
+        this.scaleY *= preserveAspectRatioOptions.scaleY;
+        this.cropX = preserveAspectRatioOptions.cropX;
+        this.cropY = preserveAspectRatioOptions.cropY;
+        center.x += preserveAspectRatioOptions.offsetLeft;
+        center.y += preserveAspectRatioOptions.offsetTop;
+        this.width = preserveAspectRatioOptions.width;
+        this.height = preserveAspectRatioOptions.height;
+      }
       this.setPositionByOrigin(center, 'center', 'center');
     },
 
