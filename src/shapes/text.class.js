@@ -390,8 +390,8 @@
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
-    _getCacheCanvasDimensions: function(dim) {
-      var dims = this.callSuper('_getCacheCanvasDimensions', dim);
+    _getCacheCanvasDimensions: function() {
+      var dims = this.callSuper('_getCacheCanvasDimensions');
       var fontSize = this.fontSize;
       dims.width += fontSize * dims.zoomX;
       dims.height += fontSize * dims.zoomY;

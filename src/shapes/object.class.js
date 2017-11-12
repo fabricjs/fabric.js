@@ -656,10 +656,11 @@
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
-    _getCacheCanvasDimensions: function(dim) {
+    _getCacheCanvasDimensions: function() {
       var zoom = this.canvas && this.canvas.getZoom() || 1,
           objectScale = this.getObjectScaling(),
           retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+          dim = this._getNonTransformedDimensions(),
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
           width = dim.x * zoomX,
@@ -668,7 +669,9 @@
         width: width + ALIASING_LIMIT,
         height: height + ALIASING_LIMIT,
         zoomX: zoomX,
-        zoomY: zoomY
+        zoomY: zoomY,
+        x: dim.x,
+        y: dim.y
       };
     },
 
@@ -686,8 +689,8 @@
           return false;
         }
       }
-      var dim = this._getNonTransformedDimensions(), canvas = this._cacheCanvas,
-          dims = this._limitCacheSize(this._getCacheCanvasDimensions(dim)),
+      var canvas = this._cacheCanvas,
+          dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           minCacheSize = fabric.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
@@ -716,8 +719,8 @@
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
           this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
         }
-        drawingWidth = dim.x * zoomX / 2;
-        drawingHeight = dim.y * zoomY / 2;
+        drawingWidth = dims.x * zoomX / 2;
+        drawingHeight = dims.y * zoomY / 2;
         this.cacheTranslationX = Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
         this.cacheTranslationY = Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
         this.cacheWidth = width;
