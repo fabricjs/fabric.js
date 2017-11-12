@@ -94,6 +94,7 @@
         // do not change coordinate of objects enclosed in a group,
         // because objects coordinate system have been group coodinate system already.
         this._updateObjectsCoords(true);
+        this._updateObjectsACoords();
       }
       else {
         this._calcBounds();
@@ -103,6 +104,13 @@
 
       this.setCoords();
       this.saveCoords();
+    },
+
+    _updateObjectsACoords: function() {
+      var ignoreZoom = true, skipAbsolute = true;
+      for (var i = this._objects.length; i--; ){
+        this._objects[i].setCoords(ignoreZoom, skipAbsolute);
+      }
     },
 
     /**
