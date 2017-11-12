@@ -392,6 +392,21 @@
     });
   });
 
+  QUnit.test('fromObject restores oCoords', function(assert) {
+    var done = assert.async();
+    var group = makeGroupWith2ObjectsWithOpacity();
+
+    var groupObject = group.toObject();
+
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+      console.log(newGroupFromObject._objects[0]);
+      assert.ok(newGroupFromObject._objects[0].oCoords.tl, 'acoords 0 are restored');
+      assert.ok(newGroupFromObject._objects[1].oCoords.tl, 'acoords 1 are restored');
+
+      done();
+    });
+  });
+
   QUnit.test('fromObject does not delete objects from source', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
