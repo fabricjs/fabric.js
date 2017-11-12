@@ -1,3 +1,9 @@
+**Version 1.7.20**
+- BACKPORT Group from object and subTargetCheck fix [#4454](https://github.com/kangax/fabric.js/pull/4454)
+- BACKPORT cache canvas deletion fix [#4453](https://github.com/kangax/fabric.js/pull/4453)
+- BACKPORT cache fuzzyness fix [#4452](https://github.com/kangax/fabric.js/pull/4452)
+- Fixed noScaleCache from stop refreshing cache of not transforming objects [#4358](https://github.com/kangax/fabric.js/pull/4358)
+
 **Version 1.7.19**
 
 - Fixed drawing path displacement [#4318](https://github.com/kangax/fabric.js/pull/4318)
