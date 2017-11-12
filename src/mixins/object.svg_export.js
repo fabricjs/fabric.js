@@ -65,15 +65,18 @@
      * @return {String}
      */
     getSvgSpanStyles: function(style, useWhiteSpace) {
-      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
-          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
-          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
-          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
+      var term = '; ',
+          strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
+          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + term : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + term : '',
+          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
+          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
           stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
           textDecoration = this.getSvgTextDecoration(style);
-
+      if (textDecoration) {
+        textDecoration = 'text-decoration: ' + textDecoration + term;
+      }
       return [
         stroke,
         strokeWidth,
@@ -89,8 +92,8 @@
 
     getSvgTextDecoration: function(style) {
       if ('overline' in style || 'underline' in style || 'linethrough' in style) {
-        return 'text-decoration: ' + (style.overline ? 'overline ' : '') +
-          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '') + ';';
+        return (style.overline ? 'overline ' : '') +
+          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '');
       }
       return '';
     },

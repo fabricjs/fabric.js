@@ -35,8 +35,8 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg) {
       var noShadow = true, filter = this.getSvgFilter(),
-          style = filter === '' ? '' : ' style="' + filter + '"';
-
+          style = filter === '' ? '' : ' style="' + filter + '"',
+          textDecoration = this.getSvgTextDecoration(this);
       markup.push(
         '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
         style, '>\n',
@@ -46,7 +46,7 @@
         (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
         (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
         (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
-        (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
+        (textDecoration ? 'text-decoration="' + textDecoration + '" ' : ''),
         'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >\n',
         textAndBg.textSpans.join(''),
         '\t\t</text>\n',
@@ -102,6 +102,7 @@
     _setSVGTextLineText: function(textSpans, lineIndex, textLeftOffset, textTopOffset) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
+          isJustify = this.textAlign.indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
           charsToRender = '',
@@ -117,9 +118,12 @@
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
           textLeftOffset += charBox.kernedWidth - charBox.width;
+          boxWidth += charBox.width;
         }
-        boxWidth += charBox.kernedWidth;
-        if (this.textAlign === 'justify' && !timeToRender) {
+        else {
+          boxWidth += charBox.kernedWidth;
+        }
+        if (isJustify && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }
@@ -128,7 +132,7 @@
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
+          timeToRender = this._hasStyleChangedForSvg(actualStyle, nextStyle);
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };

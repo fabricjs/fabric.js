@@ -148,7 +148,8 @@
     linethrough:       false,
 
     /**
-     * Text alignment. Possible values: "left", "center", "right" or "justify".
+     * Text alignment. Possible values: "left", "center", "right", "justify",
+     * "justify-left", "justify-center" or "justify-right".
      * @type String
      * @default
      */
@@ -334,8 +335,8 @@
       this._splitText();
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || MIN_TEXT_WIDTH;
-      if (this.textAlign === 'justify') {
-        // once text is misured we need to make space fatter to make justified text.
+      if (this.textAlign.indexOf('justify') !== -1) {
+        // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
       this.height = this.calcTextHeight();
@@ -348,6 +349,9 @@
     enlargeSpaces: function() {
       var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
+        if (this.textAlign !== 'justify' && (i === len - 1 || this.isEndOfWrapping(i))) {
+          continue;
+        }
         accumulatedSpace = 0;
         line = this._textLines[i];
         currentLineWidth = this.getLineWidth(i);
@@ -368,6 +372,15 @@
           }
         }
       }
+    },
+
+    /**
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @return {Boolean}
+     */
+    isEndOfWrapping: function(lineIndex) {
+      return lineIndex === this._textLines.length - 1;
     },
 
     /**
@@ -840,6 +853,7 @@
     _renderChars: function(method, ctx, line, left, top, lineIndex) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
+          isJustify = this.textAlign.indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
           charsToRender = '',
@@ -860,7 +874,7 @@
         else {
           boxWidth += charBox.kernedWidth;
         }
-        if (this.textAlign === 'justify' && !timeToRender) {
+        if (isJustify && !timeToRender) {
           if (this._reSpaceAndTab.test(line[i])) {
             timeToRender = true;
           }
@@ -920,14 +934,25 @@
      * @param {Object} thisStyle
      */
     _hasStyleChanged: function(prevStyle, thisStyle) {
-      return (prevStyle.fill !== thisStyle.fill ||
+      return prevStyle.fill !== thisStyle.fill ||
               prevStyle.stroke !== thisStyle.stroke ||
               prevStyle.strokeWidth !== thisStyle.strokeWidth ||
               prevStyle.fontSize !== thisStyle.fontSize ||
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle
-      );
+              prevStyle.fontStyle !== thisStyle.fontStyle;
+    },
+
+    /**
+     * @private
+     * @param {Object} prevStyle
+     * @param {Object} thisStyle
+     */
+    _hasStyleChangedForSvg: function(prevStyle, thisStyle) {
+      return this._hasStyleChanged(prevStyle, thisStyle) ||
+        prevStyle.overline !== thisStyle.overline ||
+        prevStyle.underline !== thisStyle.underline ||
+        prevStyle.linethrough !== thisStyle.linethrough;
     },
 
     /**
@@ -941,6 +966,12 @@
         return (this.width - lineWidth) / 2;
       }
       if (this.textAlign === 'right') {
+        return this.width - lineWidth;
+      }
+      if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
+        return (this.width - lineWidth) / 2;
+      }
+      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;
