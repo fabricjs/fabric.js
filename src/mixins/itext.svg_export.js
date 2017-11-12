@@ -35,8 +35,8 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg) {
       var noShadow = true, filter = this.getSvgFilter(),
-          style = filter === '' ? '' : ' style="' + filter + '"';
-
+          style = filter === '' ? '' : ' style="' + filter + '"',
+          textDecoration = this.getSvgTextDecoration(this);
       markup.push(
         '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
         style, '>\n',
@@ -46,7 +46,7 @@
         (this.fontSize ? 'font-size="' + this.fontSize + '" ' : ''),
         (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
         (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
-        (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
+        (textDecoration ? 'text-decoration="' + textDecoration + '" ' : ''),
         'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >\n',
         textAndBg.textSpans.join(''),
         '\t\t</text>\n',
@@ -132,7 +132,7 @@
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
+          timeToRender = this._hasStyleChangedForSvg(actualStyle, nextStyle);
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
