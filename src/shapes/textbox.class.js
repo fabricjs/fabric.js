@@ -62,7 +62,7 @@
      * @type Object
      * @private
      */
-    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.slice(0).push('width'),
+    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
 
     /**
      * Constructor. Some scaling related property values are forced. Visibility
