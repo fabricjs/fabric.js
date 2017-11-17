@@ -14,9 +14,6 @@
     return;
   }
 
-  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
-  cacheProperties.push('points');
-
   /**
    * Polyline class
    * @class fabric.Polyline
@@ -39,7 +36,7 @@
      */
     points: null,
 
-    cacheProperties: cacheProperties,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
     /**
      * Constructor

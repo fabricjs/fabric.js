@@ -29,12 +29,6 @@
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push('path');
-
-  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
-  cacheProperties.push('path', 'fillRule');
-
   /**
    * Path class
    * @class fabric.Path
@@ -58,9 +52,9 @@
      */
     path: null,
 
-    cacheProperties: cacheProperties,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('path', 'fillRule'),
 
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('path'),
 
     /**
      * Constructor
