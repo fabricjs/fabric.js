@@ -74,7 +74,6 @@
      */
     initialize: function(text, options) {
       this.callSuper('initialize', text, options);
-      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
     },
 
     /**
