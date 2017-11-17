@@ -58,6 +58,13 @@
     noScaleCache: false,
 
     /**
+     * Properties which when set cause object to change dimensions
+     * @type Object
+     * @private
+     */
+    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.slice(0).push('width'),
+
+    /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
      * made available.
@@ -66,11 +73,8 @@
      * @return {fabric.Textbox} thisArg
      */
     initialize: function(text, options) {
-
       this.callSuper('initialize', text, options);
       this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
-      // add width to this list of props that effect line wrapping.
-      this._dimensionAffectingProps.push('width');
     },
 
     /**
