@@ -1080,7 +1080,7 @@
   });
 
   QUnit.test('_limitCacheSize limit min to 256', function(assert) {
-    fabric.perfLimitSizeTotal = 10000;
+    fabric.perfLimitSizeTotal = 50000;
     fabric.maxCacheSideLimit = 4096;
     fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
