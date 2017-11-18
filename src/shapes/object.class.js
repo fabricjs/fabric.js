@@ -622,25 +622,30 @@
      */
     _limitCacheSize: function(dims) {
       var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
-          maximumSide = fabric.cacheSideLimit,
           width = dims.width, height = dims.height,
-          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide),
-          capValue = fabric.util.capValue, max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit,
+          max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit;
+      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
+        if (width < min) {
+          dims.width = min;
+        }
+        if (height < min) {
+          dims.height = min;
+        }
+        return dims;
+      }
+      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
+          capValue = fabric.util.capValue,
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;
-      }
-      else if (width < min) {
-        dims.width = min;
+        dims.capped = true;
       }
       if (height > y) {
         dims.zoomY /= height / y;
         dims.height = y;
-      }
-      else if (height < min) {
-        dims.height = min;
+        dims.capped = true;
       }
       return dims;
     },
@@ -666,6 +671,8 @@
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
+        // for sure this ALIASING_LIMIT is slightly crating problem
+        // in situation in wich the cache canvas gets an upper limit
         width: width + ALIASING_LIMIT,
         height: height + ALIASING_LIMIT,
         zoomX: zoomX,
@@ -705,15 +712,15 @@
             sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
               canvasWidth > minCacheSize && canvasHeight > minCacheSize;
         shouldResizeCanvas = sizeGrowing || sizeShrinking;
-        if (sizeGrowing) {
+        if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
           additionalWidth = width * 0.1;
           additionalHeight = height * 0.1;
         }
       }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
-          canvas.width = Math.max(Math.ceil(width + additionalWidth), minCacheSize);
-          canvas.height = Math.max(Math.ceil(height + additionalHeight), minCacheSize);
+          canvas.width = Math.ceil(width + additionalWidth);
+          canvas.height = Math.ceil(height + additionalHeight);
         }
         else {
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
