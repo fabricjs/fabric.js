@@ -1,5 +1,27 @@
 **Version 2.0.0**
-
+ - rc1
+    - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
+    - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
+    - Remove extra padding of cache when upper limited [#4467](https://github.com/kangax/fabric.js/pull/4467)
+    - Solved 2 perfomances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
+    - Added justify-left justify-right and justify-center [#4437](https://github.com/kangax/fabric.js/pull/4437)
+    - Fix Group fromObject and subTargetCheck [#4454](https://github.com/kangax/fabric.js/pull/4454)
+    - Fix regression on IMG from SVG [#4450](https://github.com/kangax/fabric.js/pull/4450)
+    - Remove cache dimensions together with canvas [#4453](https://github.com/kangax/fabric.js/pull/4453)
+    - Fixed some fuzzyness cases for cache [#4452](https://github.com/kangax/fabric.js/pull/4452)
+    - Fixed resize filter for webgl [#4426](https://github.com/kangax/fabric.js/pull/4426)
+    - Stop searching target during a mouse move with a transform [#4442](https://github.com/kangax/fabric.js/pull/4442)
+    - safeguard shaders for non supported precisions [#4433](https://github.com/kangax/fabric.js/pull/4433)
+    - fix insert and remove style for edge cases [#4420](https://github.com/kangax/fabric.js/pull/4420)
+    - Fix object.move when in active selection [#4394](https://github.com/kangax/fabric.js/pull/4394)
+    - Memoize calcTransformMatrix function [#4418](https://github.com/kangax/fabric.js/pull/4418)
+    - Make _set flag object as dirty just when a real change happen[#4415](https://github.com/kangax/fabric.js/pull/4415)
+    - Add browserShadowBlurConstant to adjust shadowBlur value [#4413](https://github.com/kangax/fabric.js/pull/4413)
+    - Fix set element not clearing the cacheTexture. [#4410](https://github.com/kangax/fabric.js/pull/4410)
+    - Multi selection key can be configured with an array of keys. [#4363](https://github.com/kangax/fabric.js/pull/4363)
+    - fix fast type in text loosing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
+    - fixed division by zero with lockscaling flip.
+    - added paintFirst ( paint-order with svg support ) [#4303](https://github.com/kangax/fabric.js/pull/4303)
   - beta7
     - added a build flag for not attaching fabric to window [#4199](https://github.com/kangax/fabric.js/pull/4199)
     - removed .active property from objects [#4200](https://github.com/kangax/fabric.js/pull/4200)
