@@ -71,24 +71,15 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback, options) {
     var elImage = _createImageElement();
     setSrc(elImage, IMG_SRC, function() {
-      if (width != elImage.width || height != elImage.height) {
-        if (fabric.isLikelyNode) {
-          var Canvas = require(fabric.canvasModule);
-          var canvas = new Canvas(width, height);
-          canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
-          elImage._src = canvas.toDataURL();
-          elImage.src = elImage._src;
-        }
-        else {
-          elImage.width = width;
-          elImage.height = height;
-        }
+      if (width !== elImage.width || height !== elImage.height) {
+        elImage.width = width;
+        elImage.height = height;
         callback(new fabric.Image(elImage, options));
       }
       else {
@@ -106,20 +97,10 @@
   }
 
   function setSrc(img, src, callback) {
-    if (fabric.isLikelyNode) {
-      require('fs').readFile(src, function(err, imgData) {
-        if (err) { throw err; };
-        img.src = imgData;
-        img._src = src;
-        callback && callback();
-      });
-    }
-    else {
-      img.onload = function() {
-        callback && callback();
-      };
-      img.src = src;
-    }
+    img.onload = function() {
+      callback && callback();
+    };
+    img.src = src;
   }
 
   QUnit.module('fabric.Image');

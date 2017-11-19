@@ -1,5 +1,5 @@
 (function() {
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
   QUnit.module('fabric.ObjectGeometry');
 
   QUnit.test('intersectsWithRectangle', function(assert) {

@@ -65,7 +65,7 @@
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -80,10 +80,7 @@
 
   var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
   var upperCanvasEl = canvas.upperCanvasEl;
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
@@ -1684,7 +1681,7 @@
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2135,8 +2132,7 @@
   });
 
   QUnit.test('avoid multiple bindings', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     var eventsArray = [
       c._onMouseDown,
       c._onMouseMove,
@@ -2153,8 +2149,8 @@
       c._onContextMenu
     ];
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize();
+    c.initialize();
     var eventsArray2 = [
       c._onMouseDown,
       c._onMouseMove,
@@ -2174,16 +2170,15 @@
   });
 
   QUnit.test('avoid multiple registration - mousedown', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseDown = fabric.Canvas.prototype._onMouseDown;
     var counter = 0;
     fabric.Canvas.prototype._onMouseDown = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mousedown', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2192,16 +2187,15 @@
   });
 
   QUnit.test('avoid multiple registration - mousemove', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseMove = fabric.Canvas.prototype._onMouseMove;
     var counter = 0;
     fabric.Canvas.prototype._onMouseMove = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mousemove', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2211,16 +2205,15 @@
 
   QUnit.test('avoid multiple registration - mouseup', function(assert) {
     var done = assert.async();
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseUp = fabric.Canvas.prototype._onMouseUp;
     var counter = 0;
     fabric.Canvas.prototype._onMouseUp = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
 
     // a mouse down is necessary to register mouse up.
     var _event = fabric.document.createEvent('MouseEvent');
@@ -2237,16 +2230,15 @@
   });
 
   QUnit.test('avoid multiple registration - mouseout', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseOut = fabric.Canvas.prototype._onMouseOut;
     var counter = 0;
     fabric.Canvas.prototype._onMouseOut = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseout', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2255,16 +2247,15 @@
   });
 
   QUnit.test('avoid multiple registration - mouseenter', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseEnter = fabric.Canvas.prototype._onMouseEnter;
     var counter = 0;
     fabric.Canvas.prototype._onMouseEnter = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2273,16 +2264,15 @@
   });
 
   QUnit.test('avoid multiple events on window', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalResize = fabric.Canvas.prototype._onResize;
     var counter = 0;
     fabric.Canvas.prototype._onResize = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('UIEvents');
     event.initUIEvent('resize', true, false, fabric.window, 0);
     fabric.window.dispatchEvent(event);

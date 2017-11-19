@@ -3,9 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.isLikelyNode
-      ? new (require(fabric.canvasModule).Image)()
-      : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -606,10 +604,8 @@
   QUnit.test('fabric.util.drawDashedLine', function(assert) {
     assert.ok(typeof fabric.util.drawDashedLine === 'function');
 
-    var el = fabric.document.createElement('canvas');
-    var canvas = fabric.isLikelyNode
-      ? fabric.createCanvasForNode()
-      : new fabric.Canvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+
 
     var ctx = canvas.getContext('2d');
 
@@ -885,7 +881,7 @@
 
   QUnit.test('drawArc', function(assert) {
     assert.ok(typeof fabric.util.drawArc === 'function');
-    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(null, {enableRetinaScaling: false});
+    var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
     var ctx = canvas.contextContainer;
     fabric.util.drawArc(ctx, 0, 0, [
       50,

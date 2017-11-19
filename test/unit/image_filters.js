@@ -51,9 +51,6 @@
   //   'filters':            []
   // };
 
-  // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  // }
 
   function _createImageData(context) {
     var imageData = context.createImageData(3, 1);

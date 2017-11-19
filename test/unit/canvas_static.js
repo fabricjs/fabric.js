@@ -109,7 +109,7 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback) {
@@ -126,18 +126,8 @@
   }
 
   function setSrc(img, src, callback) {
-    if (fabric.isLikelyNode) {
-      require('fs').readFile(src, function(err, imgData) {
-        if (err) { throw err; };
-        img.src = imgData;
-        img._src = src;
-        callback && callback();
-      });
-    }
-    else {
-      img.src = src;
-      callback && callback();
-    }
+    img.onload = callback;
+    img.src = src;
   }
 
   function fixImageDimension(imgObj) {
@@ -152,15 +142,9 @@
 
   // force creation of static canvas
   // TODO: fix this
-  var Canvas = fabric.Canvas;
-  fabric.Canvas = null;
-  var el = fabric.document.createElement('canvas');
-  el.width = 600;
-  el.height = 600;
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+  var canvas2 = this.canvas2 = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el),
-      canvas2 = this.canvas2 = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
-  fabric.Canvas = Canvas;
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
 

@@ -324,7 +324,7 @@
         if (element.toDataURL) {
           return element.toDataURL();
         }
-        return fabric.isLikelyNode ? element._src : element.src;
+        return element.src;
       }
       else {
         return this.src || '';
