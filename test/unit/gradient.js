@@ -175,8 +175,7 @@
   });
 
   QUnit.test('toLive linearGradient', function(assert) {
-    var el = fabric.document.createElement('canvas');
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
     var gradient = createLinearGradient();
     assert.ok(typeof gradient.toLive === 'function');
     var gradientCtx = gradient.toLive(canvas.contextContainer);
@@ -184,8 +183,7 @@
   });
 
   QUnit.test('toLive radialGradient', function(assert) {
-    var el = fabric.document.createElement('canvas');
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false });
     var gradient = createRadialGradient();
     assert.ok(typeof gradient.toLive === 'function');
     var gradientCtx = gradient.toLive(canvas.contextContainer);

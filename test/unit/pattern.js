@@ -42,7 +42,7 @@
     var done = assert.async();
     function callback(pattern) {
       if (fabric.isLikelyNode) {
-        assert.equal(pattern.source._src, IMG_SRC, 'pattern source has been loaded');
+        assert.equal(pattern.source.src, IMG_SRC, 'pattern source has been loaded');
       }
       else {
         assert.equal(pattern.source.complete, true, 'pattern source has been loaded');
@@ -96,8 +96,7 @@
 
   QUnit.test('toLive', function(assert) {
     var pattern = createPattern();
-    var el = fabric.document.createElement('canvas');
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
     assert.ok(typeof pattern.toLive === 'function');
     var created = pattern.toLive(canvas.contextContainer);
     assert.equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');

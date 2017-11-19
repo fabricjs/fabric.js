@@ -1,13 +1,5 @@
 (function() {
-
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
-
-  // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  // }
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeGroupWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),

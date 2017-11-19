@@ -1,6 +1,6 @@
 (function(){
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -19,7 +19,7 @@
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function createImageObject(callback) {
@@ -1182,9 +1182,7 @@
   });
 
   QUnit.test('_setShadow', function(assert) {
-    var el = fabric.document.createElement('canvas');
-    el.width = 600; el.height = 600;
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
     var context = canvas.contextContainer;
     var object = new fabric.Object({ scaleX: 1, scaleY: 1});
     var group = new fabric.Group();

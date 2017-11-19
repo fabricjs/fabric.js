@@ -1,9 +1,6 @@
 (function() {
 
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
+  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeAsWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),

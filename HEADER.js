@@ -17,9 +17,9 @@ else {
       { features: {
         FetchExternalResources: ['img']
       }
-    });
-
+      });
   fabric.window = fabric.document.defaultView;
+  DOMParser = require('xmldom').DOMParser;
 }
 
 /**
