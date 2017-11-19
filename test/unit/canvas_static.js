@@ -1313,11 +1313,13 @@
     assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
 
-  QUnit.test('dispose', function(assert) {
-    assert.ok(typeof canvas.dispose === 'function');
-    canvas.add(makeRect(), makeRect(), makeRect());
-    canvas.dispose();
-    assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+  QUnit.test('dispose clear references', function(assert) {
+    var canvas2 = new fabric.Canvas();
+    assert.ok(typeof canvas2.dispose === 'function');
+    canvas2.add(makeRect(), makeRect(), makeRect());
+    canvas2.dispose();
+    assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
+    assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
   });
 
   QUnit.test('clone', function(assert) {
