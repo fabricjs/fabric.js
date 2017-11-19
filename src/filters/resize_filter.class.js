@@ -218,8 +218,8 @@
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
-          scaleX = options.scaleX || this.scaleX,
-          scaleY = options.scaleY || this.scaleY;
+          scaleX = this.scaleX,
+          scaleY = this.scaleY;
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;

@@ -166,6 +166,7 @@
       var backend = fabric.filterBackend;
       if (backend && backend.evictCachesForKey) {
         backend.evictCachesForKey(this.cacheKey);
+        backend.evictCachesForKey(this.cacheKey + '_filtered');
       }
       this._element = element;
       this._originalElement = element;
@@ -358,47 +359,30 @@
       var filter = this.resizeFilter,
           retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1,
           minimumScale = this.minimumScaleTrigger,
-          scaleX = this.scaleX < minimumScale ? this.scaleX : 1,
-          scaleY = this.scaleY < minimumScale ? this.scaleY : 1;
-      if (scaleX * retinaScaling < 1) {
-        scaleX *= retinaScaling;
-      }
-      if (scaleY * retinaScaling < 1) {
-        scaleY *= retinaScaling;
-      }
-      if (!filter || (scaleX >= 1 && scaleY >= 1)) {
-        this._element = this._filteredEl;
+          scaleX = this.scaleX * retinaScaling,
+          scaleY = this.scaleY * retinaScaling,
+          elementToFilter = this._filteredEl || this._originalElement;
+      if (!filter || (scaleX > minimumScale && scaleY > minimumScale)) {
+        this._element = elementToFilter;
+        this._filterScalingX = 1;
+        this._filterScalingY = 1;
         return;
       }
       if (!fabric.filterBackend) {
         fabric.filterBackend = fabric.initFilterBackend();
       }
-      var elementToFilter = this._filteredEl || this._originalElement, imageData;
-      if (this._element === this._originalElement) {
-        // if the element is the same we need to create a new element
-        var canvasEl = fabric.util.createCanvasElement();
-        canvasEl.width = elementToFilter.width;
-        canvasEl.height = elementToFilter.height;
-        this._element = canvasEl;
-      }
-      var ctx = this._element.getContext('2d');
-      if (elementToFilter.getContext) {
-        imageData =
-          elementToFilter.getContext('2d').getImageData(0, 0, elementToFilter.width, elementToFilter.height);
-      }
-      else {
-        ctx.drawImage(elementToFilter, 0, 0);
-        imageData = ctx.getImageData(0, 0, elementToFilter.width, elementToFilter.height);
-      }
-      var options = {
-        imageData: imageData,
-        scaleX: scaleX,
-        scaleY: scaleY,
-      };
-      filter.applyTo2d(options);
-      this.width = this._element.width = options.imageData.width;
-      this.height = this._element.height = options.imageData.height;
-      ctx.putImageData(options.imageData, 0, 0);
+      var canvasEl = fabric.util.createCanvasElement(),
+          cacheKey = this._filteredEl ? this.cacheKey : (this.cacheKey + '_filtered'),
+          sourceWidth = elementToFilter.width, sourceHeight = elementToFilter.height;
+      canvasEl.width = sourceWidth;
+      canvasEl.height = sourceHeight;
+      this._element = canvasEl;
+      filter.scaleX = scaleX;
+      filter.scaleY = scaleY;
+      fabric.filterBackend.applyFilters(
+        [filter], elementToFilter, sourceWidth, sourceHeight, this._element, cacheKey);
+      this._filterScalingX = canvasEl.width / this._originalElement.width;
+      this._filterScalingY = canvasEl.height / this._originalElement.height;
     },
 
     /**
@@ -415,6 +399,7 @@
       filters = filters.filter(function(filter) { return filter; });
       if (filters.length === 0) {
         this._element = this._originalElement;
+        this._filteredEl = null;
         this._filterScalingX = 1;
         this._filterScalingY = 1;
         return this;
@@ -427,9 +412,10 @@
       if (this._element === this._originalElement) {
         // if the element is the same we need to create a new element
         var canvasEl = fabric.util.createCanvasElement();
-        canvasEl.width = imgElement.width;
-        canvasEl.height = imgElement.height;
+        canvasEl.width = sourceWidth;
+        canvasEl.height = sourceHeight;
         this._element = canvasEl;
+        this._filteredEl = canvasEl;
       }
       else {
         // clear the existing element to get new filter data
