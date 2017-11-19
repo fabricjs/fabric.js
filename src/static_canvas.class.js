@@ -1664,7 +1664,12 @@
      * @chainable
      */
     dispose: function () {
-      this.clear();
+      this._objects.length = 0;
+      this.backgroundImage = null;
+      this.overlayImage = null;
+      this._iTextInstances = null;
+      this.lowerCanvasEl = null;
+      this.cacheCanvasEl = null;
       return this;
     },
 
