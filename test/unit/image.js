@@ -12,14 +12,12 @@
 
   function makeImageElement(attributes) {
     var element = {};
-    if (fabric.isLikelyNode) {
-      element.getAttribute = function(x) {
-        return element[x];
-      };
-      element.setAttribute = function(x, value) {
-        element[x] = value;
-      };
-    }
+    element.getAttribute = function(x) {
+      return element[x];
+    };
+    element.setAttribute = function(x, value) {
+      element[x] = value;
+    };
     for (var prop in attributes) {
       element.setAttribute(prop, attributes[prop]);
     }
