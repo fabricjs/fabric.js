@@ -152,7 +152,7 @@
      */
     abortCursorAnimation: function() {
       var shouldClear = this._currentTickState || this._currentTickCompleteState,
-        canvas = this.canvas;
+          canvas = this.canvas;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
