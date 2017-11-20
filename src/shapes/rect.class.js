@@ -10,12 +10,6 @@
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push('rx', 'ry');
-
-  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
-  cacheProperties.push('rx', 'ry');
-
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -30,7 +24,7 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('rx', 'ry'),
 
     /**
      * Type of an object
@@ -53,7 +47,7 @@
      */
     ry:   0,
 
-    cacheProperties: cacheProperties,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
 
     /**
      * Constructor

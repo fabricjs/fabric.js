@@ -11,12 +11,6 @@
     return;
   }
 
-  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
-  cacheProperties.push(
-    'rx',
-    'ry'
-  );
-
   /**
    * Ellipse class
    * @class fabric.Ellipse
@@ -47,7 +41,7 @@
      */
     ry:   0,
 
-    cacheProperties: cacheProperties,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
 
     /**
      * Constructor
