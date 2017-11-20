@@ -13,12 +13,6 @@
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push(
-    'cropX',
-    'cropY'
-  );
-
   /**
    * Image class
    * @class fabric.Image
@@ -95,7 +89,7 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
      * When `true`, object is cached on an additional canvas.
