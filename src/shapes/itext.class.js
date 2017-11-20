@@ -336,15 +336,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-    },
-
-    /**
      * Prepare and clean the contextTop
      */
     clearContextTop: function() {
@@ -366,7 +357,7 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active || !this.isEditing) {
+      if (!this.active || !this.isEditing || !this.canvas) {
         return;
       }
       var chars = this.text.split(''),
@@ -380,7 +371,7 @@
         this._clearTextArea(ctx);
       }
       else {
-        ctx = this.ctx;
+        ctx = this.canvas.contextContainer;
         ctx.save();
       }
       if (this.selectionStart === this.selectionEnd) {
