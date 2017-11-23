@@ -453,7 +453,8 @@
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
-        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY;
+        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY +
+        sep + this.width + sep + this.height;
     },
 
     /**
