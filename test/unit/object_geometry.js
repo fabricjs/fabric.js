@@ -331,7 +331,7 @@
     assert.ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
   });
 
-  Qunit.test('transformMatrixKey depends from properties', function(assert) {
+  QUnit.test('transformMatrixKey depends from properties', function(assert) {
     var cObj = new fabric.Object(
       { left: -10, top: -10, width: 30, height: 40, strokeWidth: 0});
     var key1 = cObj.transformMatrixKey();
