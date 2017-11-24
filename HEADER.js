@@ -11,14 +11,14 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
 }
 else {
   // assume we're running under node.js when document/window are not present
-  fabric.document = require('jsdom-fabricjs')
+  fabric.document = require('jsdom')
     .jsdom(
       decodeURIComponent('%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'),
       { features: {
         FetchExternalResources: ['img']
       }
       });
-  fabric.jsdomImplForWrapper = require('jsdom-fabricjs/lib/jsdom/living/generated/utils').implForWrapper;
+  fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
   fabric.window = fabric.document.defaultView;
   DOMParser = require('xmldom').DOMParser;
 }
