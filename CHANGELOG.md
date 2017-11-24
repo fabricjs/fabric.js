@@ -1,4 +1,10 @@
 **Version 2.0.0**
+ - rc2
+    - Fixed a transform matrix memoize missing width/height [#4491](https://github.com/kangax/fabric.js/pull/4491)
+    - Fix pattern drawing a point [#4492](https://github.com/kangax/fabric.js/pull/4492)
+    - Fixed Text.removeChars [#4495](https://github.com/kangax/fabric.js/pull/4495)
+    - Added back 2 node-canvas methods [#4497](https://github.com/kangax/fabric.js/pull/4497)
+    - Fix a typo not restoring hoverCursor correctly.
  - rc1
     - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
     - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
