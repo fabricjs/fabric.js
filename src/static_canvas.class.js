@@ -1759,4 +1759,12 @@
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
+  if (fabric.isLikelyNode) {
+    fabric.StaticCanvas.prototype.createPNGStream = function() {
+      return this.lowerCanvasEl._canvas.createPNGStream();
+    };
+    fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+      return this.lowerCanvasEl._canvas.createJPEGStream(opts);
+    };
+  }
 })();
