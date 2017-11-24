@@ -18,6 +18,7 @@ else {
         FetchExternalResources: ['img']
       }
       });
+  fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
   fabric.window = fabric.document.defaultView;
   DOMParser = require('xmldom').DOMParser;
 }
