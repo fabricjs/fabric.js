@@ -591,55 +591,25 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Removes characters selected by selection
-   * @param {Event} e Event object
+   * Removes characters from start/end
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {Number} start
+   * @param {Number} end default to start + 1
    */
-  removeChars: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      this._removeCharsNearCursor(e);
+  removeChars: function(start, end) {
+    if (typeof end === 'undefined') {
+      end = start + 1;
     }
-    else {
-      this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-    }
-
+    this.removeStyleFromTo(start, end);
+    this._text.splice(start, end - start);
+    this.text = this._text.join('');
     this.set('dirty', true);
-    this.setSelectionEnd(this.selectionStart);
-
     this._removeExtraneousStyles();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();
       this.setCoords();
     }
-    this.canvas && this.canvas.requestRenderAll();
-    this.fire('changed');
-    this.canvas && this.canvas.fire('text:changed', { target: this });
   },
 
-  /**
-   * @private
-   * @param {Event} e Event object
-   */
-  _removeCharsNearCursor: function(e) {
-    if (this.selectionStart === 0) {
-      return;
-    }
-    if (e.metaKey) {
-      // remove all till the start of current line
-      var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
-
-      this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-      this.setSelectionStart(leftLineBoundary);
-    }
-    else if (e.altKey) {
-      // remove all till the start of current word
-      var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
-
-      this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-      this.setSelectionStart(leftWordBoundary);
-    }
-    else {
-      this._removeSingleCharAndStyle(this.selectionStart);
-      this.setSelectionStart(this.selectionStart - 1);
-    }
-  }
 });
