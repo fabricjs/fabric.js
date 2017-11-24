@@ -23,7 +23,7 @@
   "browser" : {
     "canvas": false,
     "fs":      false,
-    "jsdom":   false,
+    "jsdom-fabricjs":   false,
     "http":   false,
     "https":   false,
     "xmldom":  false,
@@ -51,7 +51,7 @@
   },
   "optionalDependencies": {
     "canvas": "1.6.x",
-    "jsdom": "9.x.x",
+    "jsdom-fabricjs": "9.x.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
