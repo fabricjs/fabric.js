@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "2.0.0-rc.1"
+    version: "2.0.0-rc.2"
 };
 
 if (typeof exports !== "undefined") {
@@ -15,6 +15,7 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
             FetchExternalResources: [ "img" ]
         }
     });
+    fabric.jsdomImplForWrapper = require("jsdom/lib/jsdom/living/generated/utils").implForWrapper;
     fabric.window = fabric.document.defaultView;
     DOMParser = require("xmldom").DOMParser;
 }
@@ -4127,6 +4128,16 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         }
     });
     fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
+    if (fabric.isLikelyNode) {
+        fabric.StaticCanvas.prototype.createPNGStream = function() {
+            var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+            return impl && impl.createPNGStream();
+        };
+        fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+            var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+            return impl && impl.createJPEGStream(opts);
+        };
+    }
 })();
 
 fabric.BaseBrush = fabric.util.createClass({
@@ -4233,7 +4244,7 @@ fabric.BaseBrush = fabric.util.createClass({
             ctx.restore();
         },
         convertPointsToSVGPath: function(points) {
-            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length, multSignX, multSignY, manyPoints = len > 2;
+            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
             if (manyPoints) {
                 multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
                 multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
@@ -7163,7 +7174,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             if (!skipGroup && this.group) {
                 prefix = this.group.transformMatrixKey(skipGroup) + sep;
             }
-            return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY + sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY;
+            return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY + sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY + sep + this.width + sep + this.height;
         },
         calcTransformMatrix: function(skipGroup) {
             if (skipGroup) {
@@ -9223,8 +9234,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
         fabric.warn("fabric.Image is already defined.");
         return;
     }
-    var stateProperties = fabric.Object.prototype.stateProperties.concat();
-    stateProperties.push("cropX", "cropY");
     fabric.Image = fabric.util.createClass(fabric.Object, {
         type: "image",
         crossOrigin: "",
@@ -9234,7 +9243,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         _filterScalingX: 1,
         _filterScalingY: 1,
         minimumScaleTrigger: .5,
-        stateProperties: stateProperties,
+        stateProperties: fabric.Object.prototype.stateProperties.concat("cropX", "cropY"),
         objectCaching: false,
         cacheKey: "",
         cropX: 0,
@@ -12654,7 +12663,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this._savedProps) {
                 return;
             }
-            this.hoverCursor = this._savedProps.overCursor;
+            this.hoverCursor = this._savedProps.hoverCursor;
             this.hasControls = this._savedProps.hasControls;
             this.borderColor = this._savedProps.borderColor;
             this.lockMovementX = this._savedProps.lockMovementX;
@@ -13367,40 +13376,18 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
         return changed;
     },
-    removeChars: function(e) {
-        if (this.selectionStart === this.selectionEnd) {
-            this._removeCharsNearCursor(e);
-        } else {
-            this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+    removeChars: function(start, end) {
+        if (typeof end === "undefined") {
+            end = start + 1;
         }
+        this.removeStyleFromTo(start, end);
+        this._text.splice(start, end - start);
+        this.text = this._text.join("");
         this.set("dirty", true);
-        this.setSelectionEnd(this.selectionStart);
         this._removeExtraneousStyles();
         if (this._shouldClearDimensionCache()) {
             this.initDimensions();
             this.setCoords();
-        }
-        this.canvas && this.canvas.requestRenderAll();
-        this.fire("changed");
-        this.canvas && this.canvas.fire("text:changed", {
-            target: this
-        });
-    },
-    _removeCharsNearCursor: function(e) {
-        if (this.selectionStart === 0) {
-            return;
-        }
-        if (e.metaKey) {
-            var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
-            this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-            this.setSelectionStart(leftLineBoundary);
-        } else if (e.altKey) {
-            var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
-            this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-            this.setSelectionStart(leftWordBoundary);
-        } else {
-            this._removeSingleCharAndStyle(this.selectionStart);
-            this.setSelectionStart(this.selectionStart - 1);
         }
     }
 });

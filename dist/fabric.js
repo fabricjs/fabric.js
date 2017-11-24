@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-rc.1' };
+var fabric = fabric || { version: '2.0.0-rc.2' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -19,6 +19,7 @@ else {
         FetchExternalResources: ['img']
       }
       });
+  fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
   fabric.window = fabric.document.defaultView;
   DOMParser = require('xmldom').DOMParser;
 }
@@ -8040,6 +8041,16 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
+  if (fabric.isLikelyNode) {
+    fabric.StaticCanvas.prototype.createPNGStream = function() {
+      var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+      return impl && impl.createPNGStream();
+    };
+    fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+      var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+      return impl && impl.createJPEGStream(opts);
+    };
+  }
 })();
 
 
@@ -8306,7 +8317,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX, multSignY, manyPoints = len > 2;
+          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
@@ -14344,7 +14355,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
-        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY;
+        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY +
+        sep + this.width + sep + this.height;
     },
 
     /**
@@ -18659,12 +18671,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push(
-    'cropX',
-    'cropY'
-  );
-
   /**
    * Image class
    * @class fabric.Image
@@ -18741,7 +18747,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
      * When `true`, object is cached on an additional canvas.
@@ -26188,7 +26194,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
       }
 
-      this.hoverCursor = this._savedProps.overCursor;
+      this.hoverCursor = this._savedProps.hoverCursor;
       this.hasControls = this._savedProps.hasControls;
       this.borderColor = this._savedProps.borderColor;
       this.lockMovementX = this._savedProps.lockMovementX;
@@ -27332,57 +27338,27 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Removes characters selected by selection
-   * @param {Event} e Event object
+   * Removes characters from start/end
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {Number} start
+   * @param {Number} end default to start + 1
    */
-  removeChars: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      this._removeCharsNearCursor(e);
+  removeChars: function(start, end) {
+    if (typeof end === 'undefined') {
+      end = start + 1;
     }
-    else {
-      this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-    }
-
+    this.removeStyleFromTo(start, end);
+    this._text.splice(start, end - start);
+    this.text = this._text.join('');
     this.set('dirty', true);
-    this.setSelectionEnd(this.selectionStart);
-
     this._removeExtraneousStyles();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();
       this.setCoords();
     }
-    this.canvas && this.canvas.requestRenderAll();
-    this.fire('changed');
-    this.canvas && this.canvas.fire('text:changed', { target: this });
   },
 
-  /**
-   * @private
-   * @param {Event} e Event object
-   */
-  _removeCharsNearCursor: function(e) {
-    if (this.selectionStart === 0) {
-      return;
-    }
-    if (e.metaKey) {
-      // remove all till the start of current line
-      var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
-
-      this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-      this.setSelectionStart(leftLineBoundary);
-    }
-    else if (e.altKey) {
-      // remove all till the start of current word
-      var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
-
-      this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-      this.setSelectionStart(leftWordBoundary);
-    }
-    else {
-      this._removeSingleCharAndStyle(this.selectionStart);
-      this.setSelectionStart(this.selectionStart - 1);
-    }
-  }
 });
 
 
