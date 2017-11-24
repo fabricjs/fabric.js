@@ -271,4 +271,13 @@
     assert.equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
     assert.equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
   });
+
+  QUnit.test('removeChars', function(assert) {
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    assert.ok(typeof iText.removeChars === 'function');
+    iText.removeChars(1,3);
+    assert.equal(iText.text, 'tt', 'text has been remoed');
+    assert.deepEqual(iText._text, ['t','t'], 'text has been remoed');
+    assert.equal(iText.styles[0][1], undefined, 'style has been removed');
+  });
 })();
