@@ -26,6 +26,7 @@ testrunner.run({
       './test/unit/object.js',
       './test/unit/text.js',
       './test/unit/util.js',
+      './test/unit/brushes.js',
       './test/unit/image.js',
       './test/unit/image_filters.js',
       './test/unit/group.js',
@@ -45,7 +46,7 @@ testrunner.run({
       './test/unit/point.js',
       './test/unit/intersection.js',
       './test/unit/stateful.js'
-    ]
+    ],
 }, function(err, report) {
   if (err) {
     console.log(err);
