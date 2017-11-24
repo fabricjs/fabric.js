@@ -23,7 +23,7 @@
   "browser" : {
     "canvas": false,
     "fs":      false,
-    "jsdom-fabricjs":   false,
+    "jsdom":   false,
     "http":   false,
     "https":   false,
     "xmldom":  false,
