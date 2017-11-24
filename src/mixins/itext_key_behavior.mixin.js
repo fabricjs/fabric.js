@@ -591,10 +591,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Removes characters selected by selection
-   * @param {Event} e Event object
+   * Removes characters selected by selection or from start/end
+   * @param {Number} start
+   * @param {Number} end
    */
-  removeChars: function(e) {
+  removeChars: function(start, end) {
     if (this.selectionStart === this.selectionEnd) {
       this._removeCharsNearCursor(e);
     }
@@ -613,6 +614,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.canvas && this.canvas.requestRenderAll();
     this.fire('changed');
     this.canvas && this.canvas.fire('text:changed', { target: this });
+  },
+
+  /**
+   * @private
+
+   */
+  _removeCharsFromTo: function(start, end) {
+
   },
 
   /**
