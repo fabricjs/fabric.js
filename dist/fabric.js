@@ -8040,6 +8040,14 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
+  if (fabric.isLikelyNode) {
+    fabric.StaticCanvas.prototype.createPNGStream = function() {
+      return this.lowerCanvasEl._canvas.createPNGStream();
+    };
+    fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+      return this.lowerCanvasEl._canvas.createJPEGStream(opts);
+    };
+  }
 })();
 
 
@@ -8306,7 +8314,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX, multSignY, manyPoints = len > 2;
+          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
@@ -14344,7 +14352,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
-        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY;
+        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY +
+        sep + this.width + sep + this.height;
     },
 
     /**
@@ -18659,12 +18668,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push(
-    'cropX',
-    'cropY'
-  );
-
   /**
    * Image class
    * @class fabric.Image
@@ -18741,7 +18744,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
      * When `true`, object is cached on an additional canvas.
@@ -26188,7 +26191,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
       }
 
-      this.hoverCursor = this._savedProps.overCursor;
+      this.hoverCursor = this._savedProps.hoverCursor;
       this.hasControls = this._savedProps.hasControls;
       this.borderColor = this._savedProps.borderColor;
       this.lockMovementX = this._savedProps.lockMovementX;

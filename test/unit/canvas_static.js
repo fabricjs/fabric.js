@@ -1572,6 +1572,22 @@
     });
   });
 
+  QUnit.test('createPNGStream', function(assert) {
+    if (!fabric.isLikelyNode) {
+      assert.ok(true, 'not supposed to run outside node');
+    } else {
+      assert.ok(typeof canvas.createPNGStream === 'function', 'there is a createPNGStream method');
+    }
+  });
+
+  QUnit.test('createJPEGStream', function(assert) {
+    if (!fabric.isLikelyNode) {
+      assert.ok(true, 'not supposed to run outside node');
+    } else {
+      assert.ok(typeof canvas.createJPEGStream === 'function', 'there is a createJPEGStream method');
+    }
+  });
+
   // QUnit.test('backgroundImage', function(assert) {
   //   var done = assert.async();
   //   assert.deepEqual('', canvas.backgroundImage);

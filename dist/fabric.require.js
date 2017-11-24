@@ -4127,6 +4127,14 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         }
     });
     fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
+    if (fabric.isLikelyNode) {
+        fabric.StaticCanvas.prototype.createPNGStream = function() {
+            return this.lowerCanvasEl._canvas.createPNGStream();
+        };
+        fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+            return this.lowerCanvasEl._canvas.createJPEGStream(opts);
+        };
+    }
 })();
 
 fabric.BaseBrush = fabric.util.createClass({
@@ -4233,7 +4241,7 @@ fabric.BaseBrush = fabric.util.createClass({
             ctx.restore();
         },
         convertPointsToSVGPath: function(points) {
-            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length, multSignX, multSignY, manyPoints = len > 2;
+            var path = [], i, width = this.width / 1e3, p1 = new fabric.Point(points[0].x, points[0].y), p2 = new fabric.Point(points[1].x, points[1].y), len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
             if (manyPoints) {
                 multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
                 multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
@@ -7163,7 +7171,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             if (!skipGroup && this.group) {
                 prefix = this.group.transformMatrixKey(skipGroup) + sep;
             }
-            return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY + sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY;
+            return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY + sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.flipX + sep + this.flipY + sep + this.width + sep + this.height;
         },
         calcTransformMatrix: function(skipGroup) {
             if (skipGroup) {
@@ -9223,8 +9231,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
         fabric.warn("fabric.Image is already defined.");
         return;
     }
-    var stateProperties = fabric.Object.prototype.stateProperties.concat();
-    stateProperties.push("cropX", "cropY");
     fabric.Image = fabric.util.createClass(fabric.Object, {
         type: "image",
         crossOrigin: "",
@@ -9234,7 +9240,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         _filterScalingX: 1,
         _filterScalingY: 1,
         minimumScaleTrigger: .5,
-        stateProperties: stateProperties,
+        stateProperties: fabric.Object.prototype.stateProperties.concat("cropX", "cropY"),
         objectCaching: false,
         cacheKey: "",
         cropX: 0,
@@ -12654,7 +12660,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (!this._savedProps) {
                 return;
             }
-            this.hoverCursor = this._savedProps.overCursor;
+            this.hoverCursor = this._savedProps.hoverCursor;
             this.hasControls = this._savedProps.hasControls;
             this.borderColor = this._savedProps.borderColor;
             this.lockMovementX = this._savedProps.lockMovementX;
