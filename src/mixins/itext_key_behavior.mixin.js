@@ -591,7 +591,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Removes characters selected by selection or from start/end
+   * Removes characters from start/end
    * start/end ar per grapheme position in _text array.
    *
    * @param {Number} start
