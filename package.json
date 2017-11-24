@@ -51,7 +51,7 @@
   },
   "optionalDependencies": {
     "canvas": "1.6.x",
-    "jsdom-fabricjs": "9.x.x",
+    "jsdom": "9.x.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
