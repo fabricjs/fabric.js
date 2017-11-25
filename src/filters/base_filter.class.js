@@ -67,6 +67,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {String} vertexSource vertexShader source for compilation
    */
   createProgram: function(gl, fragmentSource, vertexSource) {
+    fragmentSource = fragmentSource || this.fragmentSource;
+    vertexSource = vertexSource || this.vertexSource;
     if (fabric.webGlPrecision !== 'highp'){
       fragmentSource = fragmentSource.replace(
         /precision highp float/g,
@@ -74,23 +76,23 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       );
     }
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
+    gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Vertex shader compile error for "${this.type}": ' +
+        'Vertex shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(vertexShader)
       );
     }
 
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentSource || this.fragmentSource);
+    gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Fragment shader compile error for "${this.type}": ' +
+        'Fragment shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(fragmentShader)
       );
     }

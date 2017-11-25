@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "2.0.0-rc.2"
+    version: "2.0.0-rc.3"
 };
 
 if (typeof exports !== "undefined") {
@@ -9937,20 +9937,22 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
         }
     },
     createProgram: function(gl, fragmentSource, vertexSource) {
+        fragmentSource = fragmentSource || this.fragmentSource;
+        vertexSource = vertexSource || this.vertexSource;
         if (fabric.webGlPrecision !== "highp") {
             fragmentSource = fragmentSource.replace(/precision highp float/g, "precision " + fabric.webGlPrecision + " float");
         }
         var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
+        gl.shaderSource(vertexShader, vertexSource);
         gl.compileShader(vertexShader);
         if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-            throw new Error('Vertex shader compile error for "${this.type}": ' + gl.getShaderInfoLog(vertexShader));
+            throw new Error("Vertex shader compile error for " + this.type + ": " + gl.getShaderInfoLog(vertexShader));
         }
         var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentSource || this.fragmentSource);
+        gl.shaderSource(fragmentShader, fragmentSource);
         gl.compileShader(fragmentShader);
         if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-            throw new Error('Fragment shader compile error for "${this.type}": ' + gl.getShaderInfoLog(fragmentShader));
+            throw new Error("Fragment shader compile error for " + this.type + ": " + gl.getShaderInfoLog(fragmentShader));
         }
         var program = gl.createProgram();
         gl.attachShader(program, vertexShader);
@@ -10290,8 +10292,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         retrieveShader: function(options) {
             var cacheKey = this.type + "_" + this.mode;
-            var shaderSource = this.fragmentSource[this.mode];
             if (!options.programCache.hasOwnProperty(cacheKey)) {
+                var shaderSource = this.fragmentSource[this.mode];
                 options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
             }
             return options.programCache[cacheKey];

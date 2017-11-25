@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-rc.2' };
+var fabric = fabric || { version: '2.0.0-rc.3' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -19421,7 +19421,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   'use strict';
 
-
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
@@ -19984,6 +19983,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {String} vertexSource vertexShader source for compilation
    */
   createProgram: function(gl, fragmentSource, vertexSource) {
+    fragmentSource = fragmentSource || this.fragmentSource;
+    vertexSource = vertexSource || this.vertexSource;
     if (fabric.webGlPrecision !== 'highp'){
       fragmentSource = fragmentSource.replace(
         /precision highp float/g,
@@ -19991,23 +19992,23 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       );
     }
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
+    gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Vertex shader compile error for "${this.type}": ' +
+        'Vertex shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(vertexShader)
       );
     }
 
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentSource || this.fragmentSource);
+    gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Fragment shader compile error for "${this.type}": ' +
+        'Fragment shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(fragmentShader)
       );
     }
@@ -21005,8 +21006,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     retrieveShader: function(options) {
       var cacheKey = this.type + '_' + this.mode;
-      var shaderSource = this.fragmentSource[this.mode];
       if (!options.programCache.hasOwnProperty(cacheKey)) {
+        var shaderSource = this.fragmentSource[this.mode];
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }
       return options.programCache[cacheKey];
