@@ -41,6 +41,13 @@
     dynamicMinWidth: 2,
 
     /**
+     * Allow cutted words to fit in the textbox width
+     * pretty much like css white-space normal or pre-wrap
+     * @type {Boolean}
+     */
+    allowCuttedWords: false,
+
+    /**
      * Cached array of text wrapping.
      * @type Array
      */
@@ -288,12 +295,13 @@
           infixWidth       = 0,
           largestWordWidth = 0,
           lineJustStarted = true,
+          cutIndex = 0,
+          cuttedWord = [],
           additionalSpace = this._getWidthOfCharSpacing();
       for (var i = 0; i < words.length; i++) {
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
         wordWidth = this._measureWord(word, lineIndex, offset);
-        offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
@@ -303,6 +311,31 @@
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
+
+        // if still too long
+        if (this.allowCuttedWords && lineWidth >= desiredWidth) {
+          while (lineWidth >= desiredWidth && cutIndex > 0) {
+            cuttedWord = word.slice(0, cutIndex);
+            wordWidth = this._measureWord(cuttedWord, lineIndex, offset);
+            lineWidth = wordWidth;
+            // success, but next part can also be wider
+            if (lineWidth < desiredWidth) {
+              graphemeLines.push(cuttedWord);
+              offset += cuttedWord.length;
+              line = [];
+              word = word.slice(cutIndex);
+              cutIndex = word.length - 1;
+              lineWidth = wordWidth = this._measureWord(word, lineIndex, offset);
+              lineJustStarted = true;
+            }
+            // not enough
+            else {
+              cutIndex--;
+            }
+          }
+        }
+
+        offset += word.length;
 
         if (!lineJustStarted) {
           line.push(infix);
