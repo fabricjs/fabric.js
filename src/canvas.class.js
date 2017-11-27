@@ -179,6 +179,13 @@
     selectionLineWidth:     1,
 
     /**
+     * Selection only shapes that intersect to 100%
+     * @type Boolean
+     * @default
+     */
+    selectionFullyContained: false,
+
+    /**
      * Default cursor value used when hovering over an object on canvas
      * @type String
      * @default

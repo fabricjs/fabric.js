@@ -133,10 +133,10 @@
           continue;
         }
 
-        if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
+        if ((!this.selectionFullyContained && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2)) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
-            currentObject.containsPoint(selectionX1Y1) ||
-            currentObject.containsPoint(selectionX2Y2)
+            (!this.selectionFullyContained && currentObject.containsPoint(selectionX1Y1)) ||
+            (!this.selectionFullyContained && currentObject.containsPoint(selectionX2Y2))
         ) {
           group.push(currentObject);
 
