@@ -179,7 +179,7 @@
     selectionLineWidth:     1,
 
     /**
-     * Selection only shapes that intersect to 100%
+     * Select only shapes that are fully contained in the dragged selection rectangle.
      * @type Boolean
      * @default
      */
