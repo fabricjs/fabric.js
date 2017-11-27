@@ -1473,8 +1473,9 @@
      */
     setActiveObject: function (object, e) {
       var currentActives = this.getActiveObjects();
-      this._setActiveObject(object, e);
-      this._fireSelectionEvents(currentActives, e);
+      if (this._setActiveObject(object, e)) {
+        this._fireSelectionEvents(currentActives, e);
+      }
       return this;
     },
 
@@ -1527,8 +1528,9 @@
       if (currentActives.length) {
         this.fire('before:selection:cleared', { target: currentActives[0], e: e });
       }
-      this._discardActiveObject(e);
-      this._fireSelectionEvents(currentActives, e);
+      if (this._discardActiveObject(e)) {
+        this._fireSelectionEvents(currentActives, e);
+      }
       return this;
     },
 
