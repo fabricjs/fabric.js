@@ -354,7 +354,7 @@
 
       i && graphemeLines.push(line);
 
-      if (largestWordWidth > this.dynamicMinWidth) {
+      if (!this.allowCuttedWords && largestWordWidth > this.dynamicMinWidth) {
         this.dynamicMinWidth = largestWordWidth - additionalSpace;
       }
 
