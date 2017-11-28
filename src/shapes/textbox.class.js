@@ -301,6 +301,7 @@
       for (var i = 0; i < words.length; i++) {
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
+        cutIndex = word.length - 1;
         wordWidth = this._measureWord(word, lineIndex, offset);
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
