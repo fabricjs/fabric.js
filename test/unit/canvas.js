@@ -572,24 +572,6 @@
     canvas.selectionFullyContained = false;
   });
 
-  QUnit.test('_collectObjects does not collect object if objects are not fully contained inside', function(assert) {
-    canvas.selectionFullyContained = true;
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 0,
-      ey: 0
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 0, 'a rect not fully including objects do not collect any of them');
-    canvas.selectionFullyContained = false;
-  });
-
   QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
     var rect1Deselected = false;
     var rect3Selected = false;
