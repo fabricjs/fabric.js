@@ -531,6 +531,47 @@
     assert.equal(collected[2], rect1, 'rect1 is collected');
   });
 
+  QUnit.test('_collectObjects collects object fully contained in area', function(assert) {
+    canvas.selectionFullyContained = true;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+    canvas.add(rect1, rect2, rect3, rect4);
+    canvas._groupSelector = {
+      top: 30,
+      left: 30,
+      ex: -1,
+      ey: -1
+    };
+    var collected = canvas._collectObjects();
+    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
+    assert.equal(collected[3], rect1, 'contains rect1 as last object');
+    assert.equal(collected[2], rect2, 'contains rect2');
+    assert.equal(collected[1], rect3, 'contains rect3');
+    assert.equal(collected[0], rect4, 'contains rect4 as first object');
+    canvas.selectionFullyContained = false;
+  });
+
+  QUnit.test('_collectObjects does not collect objects not fully contained', function(assert) {
+    canvas.selectionFullyContained = true;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+    canvas.add(rect1, rect2, rect3, rect4);
+    canvas._groupSelector = {
+      top: 20,
+      left: 20,
+      ex: 5,
+      ey: 5
+    };
+    var collected = canvas._collectObjects();
+    assert.equal(collected.length, 1, 'a rect intersecting objects does not collect those');
+    assert.equal(collected[0], rect4, 'contains rect1 as only one fully contained');
+    canvas.selectionFullyContained = false;
+  });
+
   QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
     var rect1Deselected = false;
     var rect3Selected = false;

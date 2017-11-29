@@ -179,6 +179,13 @@
     selectionLineWidth:     1,
 
     /**
+     * Select only shapes that are fully contained in the dragged selection rectangle.
+     * @type Boolean
+     * @default
+     */
+    selectionFullyContained: false,
+
+    /**
      * Default cursor value used when hovering over an object on canvas
      * @type String
      * @default
