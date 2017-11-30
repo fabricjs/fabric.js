@@ -850,10 +850,17 @@
           charsToRender = '',
           charBox,
           boxWidth = 0,
-          timeToRender;
+          timeToRender,
+          shortCut = !isJustify && this.isEmptyStyles(lineIndex);
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
+      if (shortCut) {
+        // render all the line in one pass without checking
+        this._renderChar(method, ctx, lineIndex, 0, line, left, top, lineHeight);
+        ctx.restore();
+        return;
+      }
       for (var i = 0, len = line.length - 1; i <= len; i++) {
         timeToRender = i === len || this.charSpacing;
         charsToRender += line[i];
