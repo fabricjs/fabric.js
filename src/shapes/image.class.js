@@ -134,9 +134,9 @@
     initialize: function(element, options) {
       options || (options = { });
       this.filters = [];
+      this.cacheKey = 'texture' + fabric.Object.__uid++;
       this.callSuper('initialize', options);
       this._initElement(element, options);
-      this.cacheKey = 'texture' + fabric.Object.__uid++;
     },
 
     /**
@@ -172,6 +172,21 @@
         this.applyFilters();
       }
       return this;
+    },
+
+    /**
+     * Delete cacheKey if we have a webGlBackend
+     * delete reference to image elements
+     */
+    dispose: function() {
+      var backend = fabric.filterBackend;
+      if (backend && backend.evictCachesForKey) {
+        backend.evictCachesForKey(this.cacheKey);
+        backend.evictCachesForKey(this.cacheKey + '_filtered');
+      }
+      this._originalElement = undefined;
+      this._element = undefined;
+      this._filteredEl = undefined;
     },
 
     /**
