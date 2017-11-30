@@ -13,7 +13,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   color: 'rgb(0, 0, 0)',
 
   /**
-   * Width of a brush
+   * Width of a brush, has to be a Number, no string literals
    * @type Number
    * @default
    */
