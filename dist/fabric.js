@@ -8175,7 +8175,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
+          len = points.length, multSignX, multSignY, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
@@ -8216,14 +8216,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         strokeLineCap: this.strokeLineCap,
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
-        originX: 'center',
-        originY: 'center'
       });
-      var position = new fabric.Point(path.left, path.top);
-      path.originX = fabric.Object.prototype.originX;
-      path.originY = fabric.Object.prototype.originY;
-      position = path.translateToGivenOrigin(
-        position, 'center', 'center', path.originX, path.originY);
+      var position = new fabric.Point(path.left + path.width / 2, path.top + path.height / 2);
+      position = path.translateToGivenOrigin(position, 'center', 'center', path.originX, path.originY);
       path.top = position.y;
       path.left = position.x;
       if (this.shadow) {
@@ -11490,7 +11485,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.interactive && (this.interactive = false);
       if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
         // this.setDimensions is going to renderAll also;
-        this.setDimensions({ width: scaledWidth, height: scaledHeight }, { backstoreOnly: true });
+        this.setDimensions({ width: scaledWidth, height: scaledHeight });
       }
       else {
         this.renderAll();
@@ -11500,7 +11495,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.viewportTransform = vp;
       //setDimensions with no option object is taking care of:
       //this.width, this.height, this.renderAll()
-      this.setDimensions({ width: origWidth, height: origHeight }, { backstoreOnly: true });
+      this.setDimensions({ width: origWidth, height: origHeight });
       return data;
     },
 
@@ -12627,30 +12622,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _limitCacheSize: function(dims) {
       var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
+          maximumSide = fabric.cacheSideLimit,
           width = dims.width, height = dims.height,
-          max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit;
-      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
-        if (width < min) {
-          dims.width = min;
-        }
-        if (height < min) {
-          dims.height = min;
-        }
-        return dims;
-      }
-      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          capValue = fabric.util.capValue,
+          ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal, maximumSide),
+          capValue = fabric.util.capValue, max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit,
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;
-        dims.capped = true;
+      }
+      else if (width < min) {
+        dims.width = min;
       }
       if (height > y) {
         dims.zoomY /= height / y;
         dims.height = y;
-        dims.capped = true;
+      }
+      else if (height < min) {
+        dims.height = min;
       }
       return dims;
     },
@@ -12715,15 +12705,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
               canvasWidth > minCacheSize && canvasHeight > minCacheSize;
         shouldResizeCanvas = sizeGrowing || sizeShrinking;
-        if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
+        if (sizeGrowing) {
           additionalWidth = width * 0.1;
           additionalHeight = height * 0.1;
         }
       }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
-          canvas.width = Math.ceil(width + additionalWidth);
-          canvas.height = Math.ceil(height + additionalHeight);
+          canvas.width = Math.max(Math.ceil(width + additionalWidth), minCacheSize);
+          canvas.height = Math.max(Math.ceil(height + additionalHeight), minCacheSize);
         }
         else {
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
@@ -15556,6 +15546,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'x1',
+    'x2',
+    'y1',
+    'y2'
+  );
+
   /**
    * Line class
    * @class fabric.Line
@@ -15599,7 +15597,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     y2: 0,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('x1', 'x2', 'y1', 'y2'),
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -15914,6 +15912,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'radius'
+  );
+
   /**
    * Circle class
    * @class fabric.Circle
@@ -15950,7 +15953,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     endAngle: pi * 2,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('radius'),
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -16267,6 +16270,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'rx',
+    'ry'
+  );
+
   /**
    * Ellipse class
    * @class fabric.Ellipse
@@ -16297,7 +16306,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     ry:   0,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -16469,6 +16478,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push('rx', 'ry');
+
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -16483,7 +16498,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('rx', 'ry'),
+    stateProperties: stateProperties,
 
     /**
      * Type of an object
@@ -16506,7 +16521,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     ry:   0,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -16694,6 +16709,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('points');
+
   /**
    * Polyline class
    * @class fabric.Polyline
@@ -16730,7 +16748,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     minY: 0,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
+    cacheProperties: cacheProperties,
 
     /**
      * Constructor
@@ -17069,6 +17087,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push('path');
+
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push('path', 'fillRule');
+
   /**
    * Path class
    * @class fabric.Path
@@ -17106,9 +17130,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     minY: 0,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('path', 'fillRule'),
+    cacheProperties: cacheProperties,
 
-    stateProperties: fabric.Object.prototype.stateProperties.concat('path'),
+    stateProperties: stateProperties,
 
     /**
      * Constructor
@@ -19021,6 +19045,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'alignX',
+    'alignY',
+    'meetOrSlice'
+  );
+
   /**
    * Image class
    * @class fabric.Image
@@ -19111,10 +19142,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(
-      'alignX',
-      'alignY',
-      'meetOrSlice'),
+    stateProperties: stateProperties,
 
     /**
      * When `true`, object is cached on an additional canvas.
@@ -21894,6 +21922,34 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'text',
+    'textDecoration',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'textBackgroundColor',
+    'charSpacing'
+  );
+
+  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
+  cacheProperties.push(
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'text',
+    'textDecoration',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'textBackgroundColor',
+    'charSpacing',
+    'styles'
+  );
   /**
    * Text class
    * @class fabric.Text
@@ -22155,34 +22211,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(
-      'fontFamily',
-      'fontWeight',
-      'fontSize',
-      'text',
-      'textDecoration',
-      'textAlign',
-      'fontStyle',
-      'lineHeight',
-      'textBackgroundColor',
-      'charSpacing'),
+    stateProperties:      stateProperties,
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(
-      'fontFamily',
-      'fontWeight',
-      'fontSize',
-      'text',
-      'textDecoration',
-      'textAlign',
-      'fontStyle',
-      'lineHeight',
-      'textBackgroundColor',
-      'charSpacing',
-      'styles'),
+    cacheProperties:      cacheProperties,
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -26288,13 +26323,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     noScaleCache: false,
 
     /**
-     * Properties which when set cause object to change dimensions
-     * @type Object
-     * @private
-     */
-    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
-
-    /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
      * made available.
@@ -26307,6 +26335,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.callSuper('initialize', text, options);
       this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
       this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
+      // add width to this list of props that effect line wrapping.
+      this._dimensionAffectingProps.push('width');
     },
 
     /**
