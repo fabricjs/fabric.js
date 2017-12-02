@@ -47,9 +47,9 @@
         (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
         (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
         (textDecoration ? 'text-decoration="' + textDecoration + '" ' : ''),
-        'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >\n',
+        'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >',
         textAndBg.textSpans.join(''),
-        '\t\t</text>\n',
+        '</text>\n',
         '\t</g>\n'
       );
     },
@@ -91,11 +91,11 @@
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
 
       return [
-        '\t\t\t<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
+        '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ',
         fillStyles, '>',
         fabric.util.string.escapeXml(_char),
-        '</tspan>\n'
+        '</tspan>'
       ].join('');
     },
 
