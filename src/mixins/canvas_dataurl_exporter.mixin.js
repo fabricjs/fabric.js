@@ -72,7 +72,7 @@
       this.interactive && (this.interactive = false);
       if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
         // this.setDimensions is going to renderAll also;
-        this.setDimensions({ width: scaledWidth, height: scaledHeight });
+        this.setDimensions({ width: scaledWidth, height: scaledHeight }, { backstoreOnly: true });
       }
       else {
         this.renderAll();
@@ -82,7 +82,7 @@
       this.viewportTransform = vp;
       //setDimensions with no option object is taking care of:
       //this.width, this.height, this.renderAll()
-      this.setDimensions({ width: origWidth, height: origHeight });
+      this.setDimensions({ width: origWidth, height: origHeight }, { backstoreOnly: true });
       return data;
     },
 
