@@ -417,7 +417,6 @@
     var groupObject = group.toObject();
 
     fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
-      console.log(newGroupFromObject._objects[0]);
       ok(newGroupFromObject._objects[0].oCoords.tl, 'acoords 0 are restored');
       ok(newGroupFromObject._objects[1].oCoords.tl, 'acoords 1 are restored');
 

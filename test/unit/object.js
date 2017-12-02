@@ -1228,7 +1228,7 @@
   });
 
   test('_limitCacheSize limit min to 256', function() {
-    fabric.perfLimitSizeTotal = 10000;
+    fabric.perfLimitSizeTotal = 40000;
     fabric.maxCacheSideLimit = 4096;
     fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
@@ -1237,8 +1237,8 @@
     var zoomY = dims.zoomY;
     var limitedDims = object._limitCacheSize(dims);
     equal(dims, limitedDims, 'object is mutated');
-    equal(dims.width, 256, 'width gets minimum to the cacheSideLimit');
-    equal(dims.height, 256, 'height gets minimum to the cacheSideLimit');
+    equal(limitedDims.width, 256, 'width gets minimum to the cacheSideLimit');
+    equal(limitedDims.height, 256, 'height gets minimum to the cacheSideLimit');
     equal(zoomX, dims.zoomX, 'zoom factor X does not need a change');
     equal(zoomY, dims.zoomY, 'zoom factor Y does not need a change');
   });
