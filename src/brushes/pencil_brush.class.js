@@ -146,7 +146,7 @@
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX, multSignY, manyPoints = len > 2;
+          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
@@ -187,9 +187,14 @@
         strokeLineCap: this.strokeLineCap,
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
+        originX: 'center',
+        originY: 'center'
       });
-      var position = new fabric.Point(path.left + path.width / 2, path.top + path.height / 2);
-      position = path.translateToGivenOrigin(position, 'center', 'center', path.originX, path.originY);
+      var position = new fabric.Point(path.left, path.top);
+      path.originX = fabric.Object.prototype.originX;
+      path.originY = fabric.Object.prototype.originY;
+      position = path.translateToGivenOrigin(
+        position, 'center', 'center', path.originX, path.originY);
       path.top = position.y;
       path.left = position.x;
       if (this.shadow) {
