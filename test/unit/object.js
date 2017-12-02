@@ -1228,7 +1228,7 @@
   });
 
   test('_limitCacheSize limit min to 256', function() {
-    fabric.perfLimitSizeTotal = 40000;
+    fabric.perfLimitSizeTotal = 60000;
     fabric.maxCacheSideLimit = 4096;
     fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
