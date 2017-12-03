@@ -605,6 +605,9 @@
           this._setCssDimension(prop, cssValue);
         }
       }
+      if (this._isCurrentlyDrawing) {
+        this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
+      }
       this._initRetinaScaling();
       this._setImageSmoothing();
       this.calcOffset();
