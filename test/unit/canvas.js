@@ -2159,6 +2159,22 @@
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
   });
 
+  QUnit.test('setDimensions and active brush', function(assert) {
+    var prepareFor = false;
+    var rendered = false;
+    var canva = new fabric.Canvas(null, { width: 500, height: 500 });
+    var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
+    canva.isDrawingMode = true;
+    canva.freeDrawingBrush = brush;
+    canva._isCurrentlyDrawing = true;
+    brush._render = function() { rendered = true; };
+    brush._setBrushStyles = function() { prepareFor = true; };
+    canva.setDimensions({ width: 200, height: 200 });
+    canva.renderAll();
+    assert.equal(rendered, true, 'the brush called the _render method');
+    assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
+  });
+
   QUnit.test('mouse:up isClick = false', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
