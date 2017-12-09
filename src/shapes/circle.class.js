@@ -50,16 +50,6 @@
     cacheProperties: fabric.Object.prototype.cacheProperties.concat('radius'),
 
     /**
-     * Constructor
-     * @param {Object} [options] Options object
-     * @return {fabric.Circle} thisArg
-     */
-    initialize: function(options) {
-      this.callSuper('initialize', options);
-      this.set('radius', options && options.radius || 0);
-    },
-
-    /**
      * @private
      * @param {String} key
      * @param {*} value
