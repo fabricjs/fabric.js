@@ -27,14 +27,14 @@
 
     /**
      * Width is set to 100 to compensate the old initialize code that was setting it to 100
-     * @type String
+     * @type Number
      * @default
      */
     width: 100,
 
     /**
      * Height is set to 100 to compensate the old initialize code that was setting it to 100
-     * @type String
+     * @type Number
      * @default
      */
     height: 100,
