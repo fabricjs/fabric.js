@@ -1117,7 +1117,7 @@
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
         forMeasuring ? CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + style.fontFamily + '"') : style.fontFamily)
+        style.fontFamily
       ].join(' ');
     },
 
