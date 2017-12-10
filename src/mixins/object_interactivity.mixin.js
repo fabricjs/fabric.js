@@ -175,7 +175,6 @@
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
         ctx.lineTo(0, rotateHeight - rotatingPointOffset);
-        ctx.closePath();
         ctx.stroke();
       }
 
