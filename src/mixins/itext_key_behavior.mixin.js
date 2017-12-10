@@ -605,11 +605,42 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
-    this._removeExtraneousStyles();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();
       this.setCoords();
     }
+    this._removeExtraneousStyles();
+  },
+
+  /**
+   * insert characters at start position, before start position.
+   * start  equal 1 it means the text get inserted between actual grapheme 0 and 1
+   * if style array is provided, it must be as the same length of text in graphemes
+   * if end is provided and is bigger than start, old text is replaced.
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {String} text text to insert
+   * @param {Array} style array of style objects
+   * @param {Number} start
+   * @param {Number} end default to start + 1
+   */
+  insertChars: function(text, style, start, end) {
+    if (typeof end === 'undefined') {
+      end = start;
+    }
+    if (end > start) {
+      this.removeStyleFromTo(start, end);
+    }
+    var graphemes = fabric.util.string.graphemeSplit(text);
+    this.insertNewStyleBlock(graphemes, start, style);
+    this._text = [].concat(this._text.slice(0, start), graphemes, this._text.slice(end));
+    this.text = this._text.join('');
+    this.set('dirty', true);
+    if (this._shouldClearDimensionCache()) {
+      this.initDimensions();
+      this.setCoords();
+    }
+    this._removeExtraneousStyles();
   },
 
 });
