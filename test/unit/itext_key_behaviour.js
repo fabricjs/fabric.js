@@ -280,4 +280,61 @@
     assert.deepEqual(iText._text, ['t','t'], 'text has been remoed');
     assert.equal(iText.styles[0][1], undefined, 'style has been removed');
   });
+
+  QUnit.test('insertChars', function(assert) {
+    var iText = new fabric.IText('test');
+    assert.ok(typeof iText.insertChars === 'function');
+    iText.insertChars('ab', null, 1);
+    assert.equal(iText.text, 'tabest', 'text has been added');
+    assert.deepEqual(iText._text.join(''), 'tabest', '_text has been updated');
+  });
+
+  QUnit.test('insertChars can remove chars', function(assert) {
+    var iText = new fabric.IText('test');
+    iText.insertChars('ab', null, 1, 2);
+    assert.equal(iText.text, 'tabst', 'text has added');
+    assert.deepEqual(iText._text.join(''), 'tabst', '_text has been updated');
+    var iText = new fabric.IText('test');
+    iText.insertChars('ab', null, 1, 4);
+    assert.equal(iText.text, 'tab', 'text has added');
+    assert.deepEqual(iText._text.join(''), 'tab', '_text has been updated');
+  });
+
+  QUnit.test('insertChars pick up the style of the character behind and replicates it', function(assert) {
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.insertChars('ab', null, 1);
+    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+    assert.equal(iText.styles[0][3].fill, 'blue', 'style 0 3 was the old blue moved 2 char later');
+  });
+
+  QUnit.test('insertChars removes style from the removed text', function(assert) {
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.insertChars('ab', null, 1, 2);
+    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+    assert.equal(iText.styles[0][3], undefined, 'style 0 3 has been removed');
+  });
+
+  QUnit.test('insertChars handles new lines correctly', function(assert) {
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.insertChars('ab\n\n', null, 1);
+    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+    assert.equal(iText.styles[2][0].fill, 'blue', 'blue has been moved down');
+  });
+
+  QUnit.test('insertChars can accept some style for the new text', function(assert) {
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.insertChars('ab\n\na', [{ fill: 'col1'},{ fill: 'col2'},{ fill: 'col3'},{ fill: 'col4'},{ fill: 'col5'}], 1);
+    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+    assert.equal(iText.styles[0][1].fill, 'col1', 'style 0 1 has been inserted col1');
+    assert.equal(iText.styles[0][2].fill, 'col2', 'style 0 2 has been inserted col2');
+    assert.equal(iText.styles[1][0].fill, 'col4', 'style 1 0 has been inserted col4');
+    assert.equal(iText.styles[2][0].fill, 'col5', 'style 2 0 has been inserted col5');
+    assert.equal(iText.styles[2][1].fill, 'blue', 'style 2 1 has been inserted blue');
+  });
 })();
