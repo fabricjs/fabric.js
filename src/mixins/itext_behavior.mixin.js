@@ -841,7 +841,12 @@
       linesLenght && this.insertNewlineStyleObject(
         cursorLoc.lineIndex, cursorLoc.charIndex + addedLines[0], linesLenght);
       for (var i = 1; i < linesLenght; i++) {
-        this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
+        if (addedLines[i] > 0) {
+          this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
+        }
+        else if (copiedStyle) {
+          this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
+        }
         copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
       }
       // we use i outside the loop to get it like linesLength
