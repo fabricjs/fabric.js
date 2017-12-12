@@ -288,6 +288,11 @@
     fabric.util.getScript = getScript;
   })();
 
+  function getNodeCanvas(element) {
+    var impl = fabric.jsdomImplForWrapper(element);
+    return impl._canvas || impl._image;
+  };
+
   fabric.util.getById = getById;
   fabric.util.toArray = toArray;
   fabric.util.makeElement = makeElement;
@@ -296,5 +301,6 @@
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getElementStyle = getElementStyle;
+  fabric.util.getNodeCanvas = getNodeCanvas;
 
 })();
