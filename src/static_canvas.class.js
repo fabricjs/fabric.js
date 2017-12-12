@@ -1762,11 +1762,11 @@
 
   if (fabric.isLikelyNode) {
     fabric.StaticCanvas.prototype.createPNGStream = function() {
-      var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+      var impl = fabric.util.getNodeCanvas(this.lowerCanvasEl);
       return impl && impl.createPNGStream();
     };
     fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
-      var impl = fabric.jsdomImplForWrapper(this.lowerCanvasEl);
+      var impl = fabric.util.getNodeCanvas(this.lowerCanvasEl);
       return impl && impl.createJPEGStream(opts);
     };
   }
