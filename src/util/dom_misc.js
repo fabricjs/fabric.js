@@ -125,8 +125,7 @@
         top += element.scrollTop || 0;
       }
 
-      if (element.nodeType === 1 &&
-          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+      if (element.nodeType === 1 && element.style.position === 'fixed') {
         break;
       }
     }
