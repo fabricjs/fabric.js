@@ -18,6 +18,8 @@
    * @mixes fabric.Collection
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
    * @see {@link fabric.Group#initialize} for constructor definition
+   * @fires object:added
+   * @fires object:removed
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
@@ -158,7 +160,7 @@
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
       if (object) {
-        this._objects.push(object);
+        this.add(object);
         object.group = this;
         object._set('canvas', this.canvas);
       }
@@ -194,12 +196,16 @@
       this.dirty = true;
       object.group = this;
       object._set('canvas', this.canvas);
+      this.fire('object:added', { target: object });
+      object.fire('added');
     },
 
     /**
      * @private
      */
     _onObjectRemoved: function(object) {
+      this.fire('object:removed', { target: object });
+      object.fire('removed');
       this.dirty = true;
       delete object.group;
     },
@@ -550,6 +556,7 @@
     },
     /* _TO_SVG_END_ */
   });
+
 
   /**
    * Returns {@link fabric.Group} instance from an object representation
