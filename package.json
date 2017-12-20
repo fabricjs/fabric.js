@@ -24,6 +24,8 @@
     "canvas": false,
     "fs":      false,
     "jsdom":   false,
+    "jsdom/lib/jsdom/living/generated/utils": false,
+    "jsdom/lib/jsdom/utils": false,
     "http":   false,
     "https":   false,
     "xmldom":  false,
