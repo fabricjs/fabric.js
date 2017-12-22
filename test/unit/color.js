@@ -88,8 +88,8 @@
     var oColor = new fabric.Color('ffffffff');
     assert.ok(typeof oColor.toHexa === 'function');
     assert.equal(oColor.toHexa(), 'FFFFFFFF');
-    oColor.setSource([255,255,255,0.8]);
-    assert.equal(oColor.toHexa(), 'FFFFFFCC');
+    oColor.setSource([255,255,255,0.1]);
+    assert.equal(oColor.toHexa(), 'FFFFFF19');
   });
 
   QUnit.test('getAlpha', function(assert) {
