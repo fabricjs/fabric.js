@@ -1,4 +1,15 @@
 **Version 2.0.0**
+ - rc3 and rc4
+    - more fixes to transformMatrix memoization
+    - Canvas.selectionFullyContained allows you to select objects just when full grabbed by the selections. [#4508](https://github.com/kangax/fabric.js/pull/4508)
+    - Remove some ouput of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
+    - Reinserted a performance shortcut for when there is no style at all [#4519](https://github.com/kangax/fabric.js/pull/4519)
+    - Manage canvas resize during a freedrawing brush without wiping the brush [#4527](https://github.com/kangax/fabric.js/pull/4527)
+    - Removed an extra closePath that was creating wrong visual on IntelIntegrated cards [#4549](https://github.com/kangax/fabric.js/pull/4549)
+    - Added a method to insert and remove text from command line [#4541](https://github.com/kangax/fabric.js/pull/4541)
+    - Some fixes around text styles management
+    - nodejs support changes: removed specific node code in order to use standard fabricjs code in nodejs.
+    - added fabric.util.getNodeCanvas that passed a JSDOM element allows you to get the node-canvas instance behind it and do what you need.
  - rc2
     - Fixed a transform matrix memoize missing width/height [#4491](https://github.com/kangax/fabric.js/pull/4491)
     - Fix pattern drawing a point [#4492](https://github.com/kangax/fabric.js/pull/4492)
