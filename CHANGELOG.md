@@ -1,3 +1,9 @@
+**Version 1.7.21**
+- BACKPORT cache fuzzyness fix part 2
+- BACKPORT freedrawing fix part 2
+- BACKPORT toDataURL backstoreOnly resize
+- BACKPORT Removal of unnecessary context creation on text init
+
 **Version 1.7.20**
 - BACKPORT Group from object and subTargetCheck fix [#4454](https://github.com/kangax/fabric.js/pull/4454)
 - BACKPORT cache canvas deletion fix [#4453](https://github.com/kangax/fabric.js/pull/4453)
