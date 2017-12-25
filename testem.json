@@ -4,8 +4,14 @@
     "dist/fabric.js",
     "test/unit/*.js"
   ],
+  "routes": {
+    "/fixtures": "test/fixtures"
+  },
   "test_page": "tests.mustache?hidepassed",
   "launch_in_dev": [
+    "Chrome", "Node"
+  ],
+  "launch_in_ci": [
     "Chrome", "Node"
   ],
   "launchers": {

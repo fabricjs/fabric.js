@@ -1,4 +1,4 @@
- {
+{
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
@@ -20,15 +20,15 @@
     "HTML5",
     "object model"
   ],
-  "browser" : {
+  "browser": {
     "canvas": false,
-    "fs":      false,
-    "jsdom":   false,
+    "fs": false,
+    "jsdom": false,
     "jsdom/lib/jsdom/living/generated/utils": false,
     "jsdom/lib/jsdom/utils": false,
-    "http":   false,
-    "https":   false,
-    "xmldom":  false,
+    "http": false,
+    "https": false,
+    "xmldom": false,
     "url": false
   },
   "repository": {
@@ -49,7 +49,9 @@
     "lint_tests": "eslint test/unit --config .eslintrc_tests",
     "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js && cp package.json ../fabricjs.com/lib/package.json && cp -r src HEADER.js lib ../fabricjs.com/build/files/",
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
-    "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
+    "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
+    "testem": "testem .",
+    "testem:ci": "testem ci"
   },
   "optionalDependencies": {
     "canvas": "1.6.x",
@@ -57,12 +59,13 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "uglify-js": "3.1.x",
     "eslint": "4.7.x",
+    "istanbul": "0.4.x",
+    "onchange": "^3.x.x",
     "qunit": "1.x.x",
     "qunitjs": "^1.23.1",
-    "istanbul": "0.4.x",
-    "onchange": "^3.x.x"
+    "testem": "^1.18.4",
+    "uglify-js": "3.1.x"
   },
   "engines": {
     "node": ">=4.0.0"
