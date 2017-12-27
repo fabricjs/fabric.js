@@ -89,7 +89,7 @@
     assert.ok(typeof oColor.toHexa === 'function');
     assert.equal(oColor.toHexa(), 'FFFFFFFF');
     oColor.setSource([255,255,255,0.1]);
-    assert.equal(oColor.toHexa(), 'FFFFFF19');
+    assert.equal(oColor.toHexa(), 'FFFFFF1A');
   });
 
   QUnit.test('getAlpha', function(assert) {
