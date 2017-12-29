@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "1.7.21"
+    version: "1.7.22"
 };
 
 if (typeof exports !== "undefined") {
@@ -10992,6 +10992,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             this.cursorOffsetCache = {};
             this.renderCursorOrSelection();
         },
+        _render: function(ctx) {
+            this.callSuper("_render", ctx);
+            this.ctx = ctx;
+        },
         clearContextTop: function() {
             if (!this.active || !this.isEditing) {
                 return;
@@ -11007,7 +11011,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
         },
         renderCursorOrSelection: function() {
-            if (!this.active || !this.isEditing || !this.canvas) {
+            if (!this.active || !this.isEditing) {
                 return;
             }
             var chars = this.text.split(""), boundaries, ctx;
@@ -11019,7 +11023,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
                 this._clearTextArea(ctx);
             } else {
-                ctx = this.canvas.contextContainer;
+                ctx = this.ctx;
                 ctx.save();
             }
             if (this.selectionStart === this.selectionEnd) {
@@ -11566,14 +11570,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }, delay);
         },
         abortCursorAnimation: function() {
-            var shouldClear = this._currentTickState || this._currentTickCompleteState, canvas = this.canvas;
+            var shouldClear = this._currentTickState || this._currentTickCompleteState;
             this._currentTickState && this._currentTickState.abort();
             this._currentTickCompleteState && this._currentTickCompleteState.abort();
             clearTimeout(this._cursorTimeout1);
             clearTimeout(this._cursorTimeout2);
             this._currentCursorOpacity = 0;
-            if (shouldClear && canvas) {
-                canvas.clearContext(canvas.contextTop || canvas.contextContainer);
+            if (shouldClear) {
+                this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
             }
         },
         selectAll: function() {
@@ -12624,6 +12628,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
         initialize: function(text, options) {
             this.callSuper("initialize", text, options);
             this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+            this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext("2d");
         },
         _initDimensions: function(ctx) {
             if (this.__skipDimension) {

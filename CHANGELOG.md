@@ -1,3 +1,6 @@
+**Version 1.7.22**
+- Reverted removal of this.ctx
+
 **Version 1.7.21**
 - BACKPORT cache fuzzyness fix part 2
 - BACKPORT freedrawing fix part 2

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.7.21" };
+var fabric = fabric || { version: "1.7.22" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -23435,6 +23435,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     },
 
     /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+      this.ctx = ctx;
+    },
+
+    /**
      * Prepare and clean the contextTop
      */
     clearContextTop: function() {
@@ -23456,7 +23465,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active || !this.isEditing || !this.canvas) {
+      if (!this.active || !this.isEditing) {
         return;
       }
       var chars = this.text.split(''),
@@ -23470,7 +23479,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         this._clearTextArea(ctx);
       }
       else {
-        ctx = this.canvas.contextContainer;
+        ctx = this.ctx;
         ctx.save();
       }
       if (this.selectionStart === this.selectionEnd) {
@@ -24444,8 +24453,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Aborts cursor animation and clears all timeouts
      */
     abortCursorAnimation: function() {
-      var shouldClear = this._currentTickState || this._currentTickCompleteState,
-          canvas = this.canvas;
+      var shouldClear = this._currentTickState || this._currentTickCompleteState;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
@@ -24455,8 +24463,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this._currentCursorOpacity = 0;
       // to clear just itext area we need to transform the context
       // it may not be worth it
-      if (shouldClear && canvas) {
-        canvas.clearContext(canvas.contextTop || canvas.contextContainer);
+      if (shouldClear) {
+        this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
       }
 
     },
@@ -26295,8 +26303,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @return {fabric.Textbox} thisArg
      */
     initialize: function(text, options) {
+
       this.callSuper('initialize', text, options);
       this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
     },
 
     /**
