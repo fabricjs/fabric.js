@@ -1,4 +1,4 @@
-var testrunner = require('qunit');
+var testrunner = require('node-qunit');
 
 testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;

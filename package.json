@@ -61,6 +61,7 @@
   "devDependencies": {
     "eslint": "4.7.x",
     "istanbul": "0.4.x",
+    "node-qunit": "^1.0.0",
     "onchange": "^3.x.x",
     "qunit": "1.x.x",
     "qunitjs": "^1.23.1",
