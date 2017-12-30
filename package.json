@@ -65,7 +65,6 @@
     "istanbul": "0.4.x",
     "node-qunit": "^1.0.0",
     "onchange": "^3.x.x",
-    "qunitjs": "^1.23.1",
     "qunit": "^2.4.1",
     "testem": "^1.18.4",
     "uglify-js": "3.1.x"
