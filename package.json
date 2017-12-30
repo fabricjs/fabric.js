@@ -50,8 +50,7 @@
     "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js && cp package.json ../fabricjs.com/lib/package.json && cp -r src HEADER.js lib ../fabricjs.com/build/files/",
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
     "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
-
-    "test:node": "qunit test/node_test_setup.js test/lib test/unit",
+    "test:node": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/unit",
     "testem": "testem .",
     "testem:ci": "testem ci"
   },
