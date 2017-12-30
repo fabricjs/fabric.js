@@ -851,7 +851,7 @@
           charBox,
           boxWidth = 0,
           timeToRender,
-          shortCut = !isJustify && this.isEmptyStyles(lineIndex);
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
