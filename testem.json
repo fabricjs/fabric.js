@@ -1,4 +1,5 @@
 {
+  "framework": "qunit",
   "serve_files": [
     "test/fixtures/test_script.js",
     "dist/fabric.js",
@@ -7,16 +8,23 @@
   "routes": {
     "/fixtures": "test/fixtures"
   },
-  "test_page": "tests.mustache?hidepassed",
+  "test_page": "tests.mustache?hidepassed&hideskipped&timeout=60000",
+  "browser_args": {
+    "Chrome": [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ],
+    "Firefox": [ "--headless" ]
+  },
   "launch_in_dev": [
-    "Chrome", "Node"
+    "Chrome",
+    "Node"
   ],
   "launch_in_ci": [
-    "Chrome", "Node"
+    "Chrome",
+    "Node"
   ],
   "launchers": {
     "Node": {
-      "command": "node test.js"
+      "command": "npm run test:node",
+      "protocol": "tap"
     }
   },
   "timeout": 540,
