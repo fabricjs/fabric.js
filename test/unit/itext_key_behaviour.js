@@ -125,6 +125,8 @@
     assert.equal(iText.selectionStart, 28, 'should move to selection Start');
     assert.equal(iText.selectionEnd, 28, 'should move to selection Start');
     selection = 0;
+    // needed or test hangs
+    iText.abortCursorAnimation();
     // TODO verify and dp
     // iText.selectionStart = 0;
     // iText.selectionEnd = 0;
@@ -236,6 +238,8 @@
     assert.equal(iText.selectionStart, 30, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');
     selection = 0;
+    // needed or test hangs
+    iText.abortCursorAnimation();
   });
   // QUnit.test('copy and paste', function(assert) {
   //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
