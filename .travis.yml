@@ -8,14 +8,12 @@ env:
 
 matrix:
   include:
-    - env: LAUNCHER=Chrome
     - env: LAUNCHER=Firefox
+    - env: LAUNCHER=Chrome
     - node_js: "9"
     - node_js: "8"
     - node_js: "6"
     - node_js: "4"
-  allow_failures:
-    - env: LAUNCHER=Firefox
 
 script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 

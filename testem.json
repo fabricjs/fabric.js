@@ -15,11 +15,13 @@
   },
   "launch_in_dev": [
     "Chrome",
-    "Node"
+    "Node",
+    "Firefox"
   ],
   "launch_in_ci": [
     "Chrome",
-    "Node"
+    "Node",
+    "Firefox"
   ],
   "launchers": {
     "Node": {
