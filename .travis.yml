@@ -1,11 +1,26 @@
 language: node_js
 node_js:
-  - "9"
-  - "8"
   - "6"
-  - "4"
-script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
+
+env:
+  global:
+    - LAUNCHER=Node
+
+matrix:
+  include:
+    - env: LAUNCHER=Chrome
+    - env: LAUNCHER=Firefox
+    - node_js: "9"
+    - node_js: "8"
+    - node_js: "6"
+    - node_js: "4"
+  allow_failures:
+    - env: LAUNCHER=Firefox
+
+script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libc6 libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
+  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get update -qq; fi
+  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev; fi
+
 dist: trusty
