@@ -487,9 +487,11 @@
   });
 
   QUnit.test('toDataURL cropping', function(assert) {
+    var done = assert.async();
     assert.ok(typeof canvas.toDataURL === 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
       window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+      done();
     }
     else {
       var croppingWidth = 75,
@@ -499,6 +501,7 @@
       fabric.Image.fromURL(dataURL, function (img) {
         assert.equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
         assert.equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
+        done();
       });
     }
   });

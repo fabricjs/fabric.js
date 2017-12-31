@@ -273,6 +273,7 @@
 
     iText.exitEditing();
     assert.ok(!iText.isEditing);
+    iText.abortCursorAnimation();
   });
 
   /*  QUnit.test('enterEditing, exitEditing eventlistener counts', function(assert) {
@@ -330,6 +331,7 @@
     assert.equal(enter, 2);
     assert.equal(exit, 2);
     assert.equal(modify, 1);
+    iText.abortCursorAnimation();
   });
 
   // TODO: read those and make tests for new functions
@@ -786,6 +788,7 @@
     var iText = new fabric.IText('test foo bar-baz\nqux');
     iText.enterEditing();
     assert.equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
+    iText.abortCursorAnimation();
   });
 
   // QUnit.test('measuring width of words', function (assert) {
