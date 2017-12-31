@@ -10,13 +10,6 @@ env:
   global:
     - LAUNCHER=Node
 
-# matrix:
-#   include:
-#     - node_js: "9"
-#     - node_js: "8"
-#     - node_js: "6"
-#     - node_js: "4"
-
 jobs:
   include:
     - stage: lint_build
@@ -27,21 +20,23 @@ jobs:
       env: LAUNCHER=Chrome
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
-      script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
     - stage: test
       env: LAUNCHER=Firefox
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
-      script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+    - stage: test
+      node_js: "9"
+    - stage: test
+      node_js: "8"
+    - stage: test
+      node_js: "6"
+    - stage: test
+      node_js: "4"
 
-# script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
-# install:
-#   - if [ "$LAUNCHER" != "Node" ]; then npm install --no-optional; fi
-#   - if [ "$LAUNCHER" == "Node" ]; then npm install; fi
-#
-# before_install:
-#   - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get update -qq; fi
-#   - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev; fi
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
 
 dist: trusty
