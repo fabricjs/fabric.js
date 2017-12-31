@@ -15,7 +15,12 @@ matrix:
     - node_js: "6"
     - node_js: "4"
 
-script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+script: 'npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+
+jobs:
+  include:
+    - stage: Linting
+      script: 'npm run lint && npm run lint_tests'
 
 before_install:
   - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get update -qq; fi
