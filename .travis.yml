@@ -6,6 +6,10 @@ stages:
   - lint_build
   - test
 
+cache:
+  directories:
+    - node_modules
+
 env:
   global:
     - LAUNCHER=Node
@@ -14,16 +18,16 @@ jobs:
   include:
     - stage: lint_build
       before_install: skip
-      install: npm install uglify-js@3.1.x eslint@4.7.x
+      # install: npm install uglify-js@3.1.x eslint@4.7.x
       script: 'npm run lint && npm run lint_tests && npm run build'
     - stage: test
       env: LAUNCHER=Chrome
       before_install: skip
-      install: npm install testem@1.18.4 qunit@2.4.1
+      # install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
       env: LAUNCHER=Firefox
       before_install: skip
-      install: npm install testem@1.18.4 qunit@2.4.1
+      # install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
       node_js: "9"
     - stage: test
