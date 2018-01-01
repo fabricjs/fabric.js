@@ -6,6 +6,10 @@ stages:
   - Linting and Building
   - test
 
+cache:
+  directories:
+    - node_modules
+
 env:
   global:
     - LAUNCHER=Node
@@ -20,6 +24,8 @@ jobs:
     - stage: Linting and Building
       before_install: skip
       env: STEP=BUILD
+      cache:
+        directories: skip
       install: npm install uglify-js@3.1.x
       script: 'npm run build'
     - stage: test
@@ -31,24 +37,12 @@ jobs:
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
-      cache:
-        directories:
-          - node_modules
       node_js: "9"
     - stage: test
-      cache:
-        directories:
-          - node_modules
       node_js: "8"
     - stage: test
-      cache:
-        directories:
-          - node_modules
       node_js: "6"
     - stage: test
-      cache:
-        directories:
-          - node_modules
       node_js: "4"
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
