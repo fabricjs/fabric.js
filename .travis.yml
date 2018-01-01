@@ -2,6 +2,14 @@ language: node_js
 node_js:
   - "6"
 
+addons:
+  apt:
+    packages:
+    - libgif-dev
+    - libpango1.0-dev
+    - libjpeg-dev
+    - libcairo2-dev
+
 stages:
   - lint_build
   - test
@@ -40,8 +48,8 @@ jobs:
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
+# before_install:
+#   - sudo apt-get update -qq
+#   - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
 
 dist: trusty
