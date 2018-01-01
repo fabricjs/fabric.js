@@ -2,23 +2,51 @@ language: node_js
 node_js:
   - "6"
 
+stages:
+  - Linting and Building
+  - test
+
+cache:
+  directories:
+    - node_modules
+
 env:
   global:
     - LAUNCHER=Node
 
-matrix:
+jobs:
   include:
-    - env: LAUNCHER=Firefox
-    - env: LAUNCHER=Chrome
-    - node_js: "9"
-    - node_js: "8"
-    - node_js: "6"
-    - node_js: "4"
+    - stage: Linting and Building
+      before_install: skip
+      env: STEP=LINT
+      install: npm install eslint@4.7.x
+      script: 'npm run lint && npm run lint_tests'
+    - stage: Linting and Building
+      before_install: skip
+      env: STEP=BUILD
+      install: npm install uglify-js@3.1.x
+      script: 'npm run build'
+    - stage: test
+      env: LAUNCHER=Chrome
+      before_install: skip
+      install: npm install testem@1.18.4 qunit@2.4.1
+    - stage: test
+      env: LAUNCHER=Firefox
+      before_install: skip
+      install: npm install testem@1.18.4 qunit@2.4.1
+    - stage: test
+      node_js: "9"
+    - stage: test
+      node_js: "8"
+    - stage: test
+      node_js: "6"
+    - stage: test
+      node_js: "4"
 
-script: 'npm run lint && npm run lint_tests && npm run build && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
 before_install:
-  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get update -qq; fi
-  - if [ "$LAUNCHER" == "Node" ]; then sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev; fi
+  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg-dev libpango1.0-dev
+  # libcairo2-dev is preinstalled
 
 dist: trusty
