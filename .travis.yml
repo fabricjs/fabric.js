@@ -2,14 +2,6 @@ language: node_js
 node_js:
   - "6"
 
-addons:
-  apt:
-    packages:
-    - libgif-dev
-    - libpango1.0-dev
-    - libjpeg-dev
-    - libcairo2-dev
-
 stages:
   - lint_build
   - test
@@ -26,15 +18,20 @@ jobs:
   include:
     - stage: lint_build
       before_install: skip
-      env: CACHE_NAME=LINT
-      install: npm install uglify-js@3.1.x eslint@4.7.x
-      script: 'npm run lint && npm run lint_tests && npm run build'
+      env: STEP=LINT
+      install: npm install eslint@4.7.x
+      script: 'npm run lint && npm run lint_tests'
+    - stage: lint_build
+      before_install: skip
+      env: STEP=BUILD
+      install: npm install uglify-js@3.1.x
+      script: 'npm run build'
     - stage: test
-      env: LAUNCHER=Chrome CACHE_NAME=BROWSER
+      env: LAUNCHER=Chrome
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
-      env: LAUNCHER=Firefox CACHE_NAME=BROWSER
+      env: LAUNCHER=Firefox
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
@@ -48,8 +45,8 @@ jobs:
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
-# before_install:
-#   - sudo apt-get update -qq
-#   - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
+before_install:
+  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg-dev libpango1.0-dev
+  # libcairo2-dev is preinstalled
 
 dist: trusty
