@@ -24,8 +24,6 @@ jobs:
     - stage: Linting and Building
       before_install: skip
       env: STEP=BUILD
-      cache:
-        directories: skip
       install: npm install uglify-js@3.1.x
       script: 'npm run build'
     - stage: test
