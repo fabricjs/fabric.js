@@ -18,14 +18,15 @@ jobs:
   include:
     - stage: lint_build
       before_install: skip
+      env: CACHE_NAME=LINT
       install: npm install uglify-js@3.1.x eslint@4.7.x
       script: 'npm run lint && npm run lint_tests && npm run build'
     - stage: test
-      env: LAUNCHER=Chrome
+      env: LAUNCHER=Chrome CACHE_NAME=BROWSER
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
-      env: LAUNCHER=Firefox
+      env: LAUNCHER=Firefox CACHE_NAME=BROWSER
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
