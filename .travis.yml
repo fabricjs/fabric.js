@@ -1,4 +1,10 @@
 language: node_js
+
+sudo: required
+
+services:
+  - docker
+
 node_js:
   - "6"
 
