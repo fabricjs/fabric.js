@@ -1,7 +1,18 @@
 language: node_js
+
+services:
+  - docker
+
 node_js:
   - "6"
 
+addons:
+  apt:
+    packages:
+    - libgif-dev
+    - libpng-dev
+    - libpango1.0-dev
+# libcairo2-dev is preinstalled
 stages:
   - Linting and Building
   - test
@@ -17,23 +28,31 @@ env:
 jobs:
   include:
     - stage: Linting and Building
-      before_install: skip
       env: STEP=LINT
       install: npm install eslint@4.7.x
       script: 'npm run lint && npm run lint_tests'
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: Linting and Building
-      before_install: skip
       env: STEP=BUILD
       install: npm install uglify-js@3.1.x
       script: 'npm run build'
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: test
       env: LAUNCHER=Chrome
-      before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: test
       env: LAUNCHER=Firefox
-      before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: test
       node_js: "9"
     - stage: test
@@ -44,9 +63,5 @@ jobs:
       node_js: "4"
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
-
-before_install:
-  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg-dev libpango1.0-dev
-  # libcairo2-dev is preinstalled
 
 dist: trusty
