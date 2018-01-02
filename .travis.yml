@@ -6,6 +6,13 @@ services:
 node_js:
   - "6"
 
+addons:
+  apt:
+    packages:
+    - libgif-dev
+    - libpng-dev
+    - libpango1.0-dev
+
 stages:
   - Linting and Building
   - test
@@ -25,19 +32,22 @@ jobs:
       env: STEP=LINT
       install: npm install eslint@4.7.x
       script: 'npm run lint && npm run lint_tests'
+      addons:
+        apt:
+          packages:
     - stage: Linting and Building
       before_install: skip
       env: STEP=BUILD
       install: npm install uglify-js@3.1.x
       script: 'npm run build'
     - stage: test
+      env: LAUNCHER=Chrome
       before_install: skip
       install: npm install testem@1.18.4 qunit@2.4.1
-      matrix:
-        include:
-          env:
-            - LAUNCHER=Chrome
-            - LAUNCHER=Firefox
+    - stage: test
+      env: LAUNCHER=Firefox
+      before_install: skip
+      install: npm install testem@1.18.4 qunit@2.4.1
     - stage: test
       node_js: "9"
       addons:
