@@ -44,9 +44,15 @@ jobs:
     - stage: test
       env: LAUNCHER=Chrome
       install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: test
       env: LAUNCHER=Firefox
       install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: test
       node_js: "9"
     - stage: test
