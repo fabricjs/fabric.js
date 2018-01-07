@@ -52,6 +52,28 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   },
 
   /**
+   * Render the full state of the brush
+   * @private
+   */
+  _render: function() {
+    var ctx  = this.canvas.contextTop, i, len,
+        points = this.points, point,
+        v = this.canvas.viewportTransform;
+
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    for (i = 0, len = points.length; i < len; i++) {
+      point = points[i];
+      ctx.fillStyle = point.fill;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  },
+
+  /**
    * Invoked on mouse move
    * @param {Object} pointer
    */
