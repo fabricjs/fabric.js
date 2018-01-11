@@ -66,7 +66,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.render();
+    this.render(this.sprayChunkPoints);
   },
 
   /**
@@ -75,7 +75,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    */
   onMouseMove: function(pointer) {
     this.addSprayChunk(pointer);
-    this.render();
+    this.render(this.sprayChunkPoints);
   },
 
   /**
@@ -101,8 +101,6 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           originY: 'center',
           fill: this.color
         });
-
-        this.shadow && rect.setShadow(this.shadow);
         rects.push(rect);
       }
     }
@@ -112,8 +110,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     var group = new fabric.Group(rects, { originX: 'center', originY: 'center' });
-    group.canvas = this.canvas;
-
+    this.shadow && group.setShadow(this.shadow);
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 
@@ -147,22 +144,35 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   },
 
   /**
-   * Renders brush
+   * Render new chunk of spray brush
    */
-  render: function() {
-    var ctx = this.canvas.contextTop;
+  render: function(sprayChunk) {
+    var ctx = this.canvas.contextTop, i, len;
     ctx.fillStyle = this.color;
 
-    var v = this.canvas.viewportTransform, i, len;
-    ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    this._saveAndTransform(ctx);
 
-    for (i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
-      var point = this.sprayChunkPoints[i];
+    for (i = 0, len = sprayChunk.length; i < len; i++) {
+      var point = sprayChunk[i];
       if (typeof point.opacity !== 'undefined') {
         ctx.globalAlpha = point.opacity;
       }
       ctx.fillRect(point.x, point.y, point.width, point.width);
+    }
+    ctx.restore();
+  },
+
+  /**
+   * Render all spray chunks
+   */
+  _render: function() {
+    var ctx = this.canvas.contextTop, i, ilen;
+    ctx.fillStyle = this.color;
+
+    this._saveAndTransform(ctx);
+
+    for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
+      this.render(this.sprayChunks[i]);
     }
     ctx.restore();
   },
