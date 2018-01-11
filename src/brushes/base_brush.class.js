@@ -83,6 +83,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     }
   },
 
+  /**
+   * Sets the transformation on given context
+   * @param {RenderingContext2d} ctx context to render on
+   * @private
+   */
   _saveAndTransform: function(ctx) {
     var v = this.canvas.viewportTransform;
     ctx.save();
