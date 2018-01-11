@@ -83,6 +83,12 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     }
   },
 
+  _saveAndTransform: function(ctx) {
+    var v = this.canvas.viewportTransform;
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+  },
+
   /**
    * Sets brush shadow styles
    * @private
