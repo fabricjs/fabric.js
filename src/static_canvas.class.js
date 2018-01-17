@@ -670,7 +670,8 @@
      * @return {Number}
      */
     getZoom: function () {
-      return this.viewportTransform[0];
+      var options = fabric.util.qrDecompose(this.viewportTransform);
+      return options.scaleX;
     },
 
     /**
@@ -868,8 +869,8 @@
           iVpt = invertTransform(this.viewportTransform);
       points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
       points.br = transformPoint({ x: width, y: height }, iVpt);
-      points.tr = new fabric.Point(points.br.x, points.tl.y);
-      points.bl = new fabric.Point(points.tl.x, points.br.y);
+      points.bl = transformPoint({ x: 0, y: height }, iVpt);
+      points.tr = transformPoint({ x: width, y: 0 }, iVpt);
       this.vptCoords = points;
       return points;
     },

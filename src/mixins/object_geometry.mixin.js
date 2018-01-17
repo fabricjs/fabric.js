@@ -355,45 +355,38 @@
      * @chainable
      */
     calcCoords: function(absolute) {
-      var theta = degreesToRadians(this.angle),
+      var objectMatrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
-          dim = absolute ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
-          currentWidth = dim.x, currentHeight = dim.y,
-          sinTh = theta ? Math.sin(theta) : 0,
-          cosTh = theta ? Math.cos(theta) : 1,
-          _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
-          _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
-          offsetX = Math.cos(_angle + theta) * _hypotenuse,
-          offsetY = Math.sin(_angle + theta) * _hypotenuse,
-          center = this.getCenterPoint(),
-          // offset added for rotate and scale actions
-          coords = absolute ? center : fabric.util.transformPoint(center, vpt),
-          tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
-          tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
-          bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
-          br  = new fabric.Point(coords.x + offsetX, coords.y + offsetY);
+          canvas = this.canvas,
+          finalMatrix = absolute ? objectMatrix : fabric.util.multiplyTransformMatrices(vpt, objectMatrix),
+          dim = this._getNonTransformedDimensions(),
+          tl  = fabric.util.transformPoint({ x: -dim.x/2, y: -dim.y/2}, finalMatrix),
+          tr  = fabric.util.transformPoint({ x: dim.x/2, y: -dim.y/2}, finalMatrix),
+          bl  = fabric.util.transformPoint({ x: -dim.x/2, y: dim.y/2}, finalMatrix),
+          br  = fabric.util.transformPoint({ x: dim.x/2, y: dim.y/2}, finalMatrix);
       if (!absolute) {
         var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
             mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
             mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
-            mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
-            mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
+            mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2);
+            //mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
       }
 
       // debugging
 
-      /* setTimeout(function() {
+      absolute || setTimeout(function() {
+         canvas.contextTop.clearRect(0,0,500,500)
          canvas.contextTop.fillStyle = 'green';
-         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+         mb && canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
          canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
          canvas.contextTop.fillRect(br.x, br.y, 3, 3);
          canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
          canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
-       }, 50); */
+         mb && canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+         mb && canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+         mb && canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+         false && canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+       }, 50);
 
       var coords = {
         // corners
@@ -406,7 +399,7 @@
         coords.mr = mr;
         coords.mb = mb;
         // rotating point
-        coords.mtr = mtr;
+        //coords.mtr = mtr;
       }
       return coords;
     },
@@ -577,9 +570,10 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          p = fabric.util.transformPoint(dim, vpt, true);
+          options = fabric.util.qrDecompose(vpt),
+          zoom = options.scaleX;
 
-      return p.scalarAdd(2 * this.padding);
+      return new fabric.Point(dim.x * zoom + this.padding, dim.y * zoom + this.padding);
     },
   });
 })();
