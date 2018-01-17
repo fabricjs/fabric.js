@@ -10,7 +10,8 @@
   }
 
   var degreesToRadians = fabric.util.degreesToRadians,
-      multiplyMatrices = fabric.util.multiplyTransformMatrices;
+      multiplyMatrices = fabric.util.multiplyTransformMatrices,
+      transformPoint = fabric.util.transformPoint;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -358,35 +359,37 @@
       var objectMatrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
           canvas = this.canvas,
-          finalMatrix = absolute ? objectMatrix : fabric.util.multiplyTransformMatrices(vpt, objectMatrix),
+          finalMatrix = absolute ? objectMatrix : fabric.util.multiplyMatrices(vpt, objectMatrix),
           dim = this._getNonTransformedDimensions(),
-          tl  = fabric.util.transformPoint({ x: -dim.x/2, y: -dim.y/2}, finalMatrix),
-          tr  = fabric.util.transformPoint({ x: dim.x/2, y: -dim.y/2}, finalMatrix),
-          bl  = fabric.util.transformPoint({ x: -dim.x/2, y: dim.y/2}, finalMatrix),
-          br  = fabric.util.transformPoint({ x: dim.x/2, y: dim.y/2}, finalMatrix);
+          w = dim.x / 2, h = dim.y / 2,
+          tl = transformPoint({ x: -w, y: -h }, finalMatrix),
+          tr = transformPoint({ x: w, y: -h }, finalMatrix),
+          bl = transformPoint({ x: -w, y: w }, finalMatrix),
+          br = transformPoint({ x: w, y: w }, finalMatrix);
       if (!absolute) {
         var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
             mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
             mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
-            mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2);
-            //mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
+            mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
+            mtr = transformPoint({ x: 0, y: -h - this.rotatingPointOffset }, finalMatrix);
       }
 
       // debugging
-
-      absolute || setTimeout(function() {
-         canvas.contextTop.clearRect(0,0,500,500)
-         canvas.contextTop.fillStyle = 'green';
-         mb && canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-         canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-         canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-         canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-         canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-         mb && canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-         mb && canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-         mb && canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-         false && canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
-       }, 50);
+      if (!absolute) {
+        setTimeout(function() {
+          canvas.contextTop.clearRect(0, 0, 500, 500);
+          canvas.contextTop.fillStyle = 'green';
+          canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+          canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
+          canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+          canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
+          canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+          canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+          canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+          canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+          canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+        }, 50);
+      }
 
       var coords = {
         // corners
@@ -399,7 +402,7 @@
         coords.mr = mr;
         coords.mb = mb;
         // rotating point
-        //coords.mtr = mtr;
+        coords.mtr = mtr;
       }
       return coords;
     },
