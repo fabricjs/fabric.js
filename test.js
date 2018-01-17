@@ -47,6 +47,7 @@ testrunner.run({
       './test/unit/intersection.js',
       './test/unit/stateful.js'
     ],
+    tests: ['./test/unit/pattern.js'],
 }, function(err, report) {
   if (err) {
     console.log(err);
