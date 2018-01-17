@@ -56,11 +56,11 @@
 
   QUnit.test('properties', function(assert) {
     var pattern = createPattern();
-
     assert.equal(pattern.source, img);
     assert.equal(pattern.repeat, 'repeat');
     assert.equal(pattern.offsetX, 0);
     assert.equal(pattern.offsetY, 0);
+    assert.equal(pattern.crossOrigin, '');
   });
 
   QUnit.test('toObject', function(assert) {
@@ -70,13 +70,14 @@
 
     var object = pattern.toObject();
 
-    // node-canvas doesn't give <img> "src"
     if (img.src) {
       assert.ok(object.source.indexOf('fixtures/greyfloral.png') > -1);
     }
+    console.log(object.source)
     assert.equal(object.repeat, 'repeat');
     assert.equal(object.offsetX, 0);
     assert.equal(object.offsetY, 0);
+    assert.equal(object.patternTransform, null);
 
     var patternWithGetSource = new fabric.Pattern({
       source: function () {return fabric.document.createElement('canvas');}
@@ -89,9 +90,11 @@
 
   QUnit.test('toObject with custom props', function(assert) {
     var pattern = createPattern();
+    pattern.patternTransform = [1, 0, 0, 2, 0, 0];
     pattern.id = 'myId';
     var object = pattern.toObject(['id']);
     assert.equal(object.id, 'myId');
+    assert.deepEqual(object.patternTransform, pattern.patternTransform);
   });
 
   QUnit.test('toLive', function(assert) {

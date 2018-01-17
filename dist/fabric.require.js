@@ -2723,7 +2723,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         },
         toHexa: function() {
             var source = this.getSource(), a;
-            a = source[3] * 255;
+            a = Math.round(source[3] * 255);
             a = a.toString(16);
             a = a.length === 1 ? "0" + a : a;
             return this.toHex() + a.toUpperCase();
@@ -3230,6 +3230,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         repeat: "repeat",
         offsetX: 0,
         offsetY: 0,
+        crossOrigin: "",
         initialize: function(options, callback) {
             options || (options = {});
             this.id = fabric.Object.__uid++;
@@ -3247,7 +3248,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 fabric.util.loadImage(options.source, function(img) {
                     _this.source = img;
                     callback && callback(_this);
-                });
+                }, null, this.crossOrigin);
             }
         },
         toObject: function(propertiesToInclude) {
@@ -3263,6 +3264,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 type: "pattern",
                 source: source,
                 repeat: this.repeat,
+                crossOrigin: this.crossOrigin,
                 offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
                 offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS)
             };
@@ -4176,6 +4178,11 @@ fabric.BaseBrush = fabric.util.createClass({
             ctx.setLineDash(this.strokeDashArray);
         }
     },
+    _saveAndTransform: function(ctx) {
+        var v = this.canvas.viewportTransform;
+        ctx.save();
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    },
     _setShadow: function() {
         if (!this.shadow) {
             return;
@@ -4234,9 +4241,8 @@ fabric.BaseBrush = fabric.util.createClass({
             this._addPoint(pointerPoint);
         },
         _render: function() {
-            var ctx = this.canvas.contextTop, i, len, v = this.canvas.viewportTransform, p1 = this._points[0], p2 = this._points[1];
-            ctx.save();
-            ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+            var ctx = this.canvas.contextTop, i, len, p1 = this._points[0], p2 = this._points[1];
+            this._saveAndTransform(ctx);
             ctx.beginPath();
             if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
                 var width = this.width / 1e3;
@@ -4328,9 +4334,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.points = [];
     },
     drawDot: function(pointer) {
-        var point = this.addPoint(pointer), ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        var point = this.addPoint(pointer), ctx = this.canvas.contextTop;
+        this._saveAndTransform(ctx);
         ctx.fillStyle = point.fill;
         ctx.beginPath();
         ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
@@ -4343,6 +4348,19 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.canvas.clearContext(this.canvas.contextTop);
         this._setShadow();
         this.drawDot(pointer);
+    },
+    _render: function() {
+        var ctx = this.canvas.contextTop, i, len, points = this.points, point;
+        this._saveAndTransform(ctx);
+        for (i = 0, len = points.length; i < len; i++) {
+            point = points[i];
+            ctx.fillStyle = point.fill;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
     },
     onMouseMove: function(pointer) {
         this.drawDot(pointer);
@@ -4402,11 +4420,11 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.canvas.clearContext(this.canvas.contextTop);
         this._setShadow();
         this.addSprayChunk(pointer);
-        this.render();
+        this.render(this.sprayChunkPoints);
     },
     onMouseMove: function(pointer) {
         this.addSprayChunk(pointer);
-        this.render();
+        this.render(this.sprayChunkPoints);
     },
     onMouseUp: function() {
         var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
@@ -4424,7 +4442,6 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
                     originY: "center",
                     fill: this.color
                 });
-                this.shadow && rect.setShadow(this.shadow);
                 rects.push(rect);
             }
         }
@@ -4435,7 +4452,7 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
             originX: "center",
             originY: "center"
         });
-        group.canvas = this.canvas;
+        this.shadow && group.setShadow(this.shadow);
         this.canvas.add(group);
         this.canvas.fire("path:created", {
             path: group
@@ -4459,18 +4476,25 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
         }
         return uniqueRectsArray;
     },
-    render: function() {
-        var ctx = this.canvas.contextTop;
+    render: function(sprayChunk) {
+        var ctx = this.canvas.contextTop, i, len;
         ctx.fillStyle = this.color;
-        var v = this.canvas.viewportTransform, i, len;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        for (i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
-            var point = this.sprayChunkPoints[i];
+        this._saveAndTransform(ctx);
+        for (i = 0, len = sprayChunk.length; i < len; i++) {
+            var point = sprayChunk[i];
             if (typeof point.opacity !== "undefined") {
                 ctx.globalAlpha = point.opacity;
             }
             ctx.fillRect(point.x, point.y, point.width, point.width);
+        }
+        ctx.restore();
+    },
+    _render: function() {
+        var ctx = this.canvas.contextTop, i, ilen;
+        ctx.fillStyle = this.color;
+        this._saveAndTransform(ctx);
+        for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
+            this.render(this.sprayChunks[i]);
         }
         ctx.restore();
     },
@@ -5626,7 +5650,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _onMouseDownInDrawingMode: function(e) {
             this._isCurrentlyDrawing = true;
-            this.discardActiveObject(e).requestRenderAll();
+            if (this.getActiveObject()) {
+                this.discardActiveObject(e).requestRenderAll();
+            }
             if (this.clipTo) {
                 fabric.util.clipContext(this, this.contextTop);
             }
@@ -11646,7 +11672,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             ctx.restore();
         },
         _renderChars: function(method, ctx, line, left, top, lineIndex) {
-            var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf("justify") !== -1, actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender, shortCut = !isJustify && this.isEmptyStyles(lineIndex);
+            var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf("justify") !== -1, actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender, shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
             ctx.save();
             top -= lineHeight * this._fontSizeFraction / this.lineHeight;
             if (shortCut) {
