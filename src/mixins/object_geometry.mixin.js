@@ -358,7 +358,7 @@
     calcCoords: function(absolute) {
       var objectMatrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
-          finalMatrix = absolute ? objectMatrix : fabric.util.multiplyMatrices(vpt, objectMatrix),
+          finalMatrix = absolute ? objectMatrix : multiplyMatrices(vpt, objectMatrix),
           dim = this._getNonTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2,
           tl = transformPoint({ x: -w, y: -h }, finalMatrix),
