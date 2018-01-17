@@ -358,7 +358,6 @@
     calcCoords: function(absolute) {
       var objectMatrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
-          canvas = this.canvas,
           finalMatrix = absolute ? objectMatrix : fabric.util.multiplyMatrices(vpt, objectMatrix),
           dim = this._getNonTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2,
@@ -376,6 +375,7 @@
 
       // debugging
       // if (!absolute) {
+      //   var canvas = this.canvas,
       //   setTimeout(function() {
       //     canvas.contextTop.clearRect(0, 0, 500, 500);
       //     canvas.contextTop.fillStyle = 'green';
