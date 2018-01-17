@@ -95,7 +95,7 @@
         repeat: this.repeat,
         offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
-        patternTransform:  this.patternTransform
+        patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
