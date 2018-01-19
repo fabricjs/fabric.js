@@ -227,10 +227,11 @@
     assert.equal(gradient.colorStops[0].opacity, 0);
   });
 
-  QUnit.test('fromElement linearGradient with floats percentage', function(assert) {
+  QUnit.test('fromElement linearGradient with floats percentage - objectBoundingBox', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var element = fabric.document.createElement('linearGradient');
+    element.setAttribute('gradientUnits', 'objectBoundingBox');
     element.setAttribute('x1', '10%');
     element.setAttribute('y1', '0.2%');
     element.setAttribute('x2', '200');
@@ -255,16 +256,41 @@
 
     assert.equal(gradient.coords.x1, 20);
     assert.equal(gradient.coords.y1, 0.4);
-    assert.equal(gradient.coords.x2, 200);
+    assert.equal(gradient.coords.x2, 40000);
     assert.equal(gradient.coords.y2, 40);
+  });
 
-    assert.equal(gradient.colorStops[0].offset, 1);
-    assert.equal(gradient.colorStops[1].offset, 0);
+  QUnit.test('fromElement linearGradient with floats percentage - userSpaceOnUse', function(assert) {
+    assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    assert.equal(gradient.colorStops[0].color, 'rgb(0,0,0)');
-    assert.equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
+    var element = fabric.document.createElement('linearGradient');
+    element.setAttribute('gradientUnits', 'userSpaceOnUse');
+    element.setAttribute('x1', '10%');
+    element.setAttribute('y1', '0.2%');
+    element.setAttribute('x2', '200');
+    element.setAttribute('y2', '20%');
+    var stop1 = fabric.document.createElement('stop');
+    var stop2 = fabric.document.createElement('stop');
 
-    assert.equal(gradient.colorStops[0].opacity, 0);
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', 'white');
+
+    stop2.setAttribute('offset', '100%');
+    stop2.setAttribute('stop-color', 'black');
+    stop2.setAttribute('stop-opacity', '0');
+
+    element.appendChild(stop1);
+    element.appendChild(stop2);
+
+    var object = new fabric.Object({ width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+
+    assert.ok(gradient instanceof fabric.Gradient);
+
+    assert.equal(gradient.coords.x1, 0.1);
+    assert.equal(gradient.coords.y1, 0.002);
+    assert.equal(gradient.coords.x2, 200);
+    assert.equal(gradient.coords.y2, 0.2);
   });
 
   QUnit.test('fromElement linearGradient with Infinity', function(assert) {
