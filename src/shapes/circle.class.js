@@ -3,8 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      pi = Math.PI,
-      extend = fabric.util.object.extend;
+      pi = Math.PI;
 
   if (fabric.Circle) {
     fabric.warn('fabric.Circle is already defined.');
@@ -174,13 +173,11 @@
    * @static
    * @memberOf fabric.Circle
    * @param {SVGElement} element Element to parse
-   * @param {Object} [options] Options object
    * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {Object} [options] Options object
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  fabric.Circle.fromElement = function(element, callback, options) {
-    options || (options = { });
-
+  fabric.Circle.fromElement = function(element, callback) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
 
     if (!isValidRadius(parsedAttributes)) {
@@ -189,7 +186,7 @@
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.radius;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
-    callback(new fabric.Circle(extend(parsedAttributes, options)));
+    callback(new fabric.Circle(parsedAttributes));
   };
 
   /**
