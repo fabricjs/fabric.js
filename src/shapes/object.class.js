@@ -1429,7 +1429,11 @@
       el.width = boundingRect.width;
       el.height = boundingRect.height;
       fabric.util.wrapElement(el, 'div');
-      var canvas = new fabric.StaticCanvas(el, { enableRetinaScaling: options.enableRetinaScaling });
+      var canvas = new fabric.StaticCanvas(el, {
+        enableRetinaScaling: options.enableRetinaScaling,
+        renderOnAddRemove: false,
+        skipOffscreen: false,
+      });
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {
         options.format = 'jpeg';
@@ -1449,10 +1453,12 @@
       var originalCanvas = this.canvas;
       canvas.add(this);
       var data = canvas.toDataURL(options);
-
       this.set(origParams).setCoords();
       this.canvas = originalCanvas;
-
+      // canvas.dispose will call image.dispose that will nullify the elements
+      // since this canvas is a simple element for the process, we remove references
+      // to objects in this way in order to avoid object trashing.
+      canvas._objects = [];
       canvas.dispose();
       canvas = null;
 
