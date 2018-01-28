@@ -81,28 +81,33 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes "mousedown" event handler
    */
+  _mouseDownHandler: function(options) {
+    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+    var pointer = this.canvas.getPointer(options.e);
+    this.__mousedownX = pointer.x;
+    this.__mousedownY = pointer.y;
+    this.__isMousedown = true;
+
+    if (this.selected) {
+      this.setCursorByClick(options.e);
+    }
+
+    if (this.isEditing) {
+      this.__selectionStartOnMouseDown = this.selectionStart;
+      if (this.selectionStart === this.selectionEnd) {
+        this.abortCursorAnimation();
+      }
+      this.renderCursorOrSelection();
+    }
+  },
+
+  /**
+   * Initializes "mousedown" event handler
+   */
   initMousedownHandler: function() {
-    this.on('mousedown', function(options) {
-      if (!this.editable || (options.e.button && options.e.button !== 1)) {
-        return;
-      }
-      var pointer = this.canvas.getPointer(options.e);
-      this.__mousedownX = pointer.x;
-      this.__mousedownY = pointer.y;
-      this.__isMousedown = true;
-
-      if (this.selected) {
-        this.setCursorByClick(options.e);
-      }
-
-      if (this.isEditing) {
-        this.__selectionStartOnMouseDown = this.selectionStart;
-        if (this.selectionStart === this.selectionEnd) {
-          this.abortCursorAnimation();
-        }
-        this.renderCursorOrSelection();
-      }
-    });
+    this.on('mousedown', this._mouseDownHandler);
   },
 
   /**
