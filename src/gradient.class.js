@@ -422,7 +422,7 @@
         options[prop] = 0;
       }
       propValue = parseFloat(options[prop], 10);
-      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
+      if (typeof options[prop] === 'string' && /^(\d+\.\d+)%|(\d+)%$/.test(options[prop])) {
         multFactor = 0.01;
       }
       else {
