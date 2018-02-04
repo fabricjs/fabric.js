@@ -545,7 +545,7 @@
     });
   });
 
-  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function() {
+  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       // makes weird numbers
       fontSize: 22.1234,
