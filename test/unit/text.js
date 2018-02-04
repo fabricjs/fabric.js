@@ -544,4 +544,106 @@
       textBackgroundColor: ''
     });
   });
+
+  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz', {
+      // makes weird numbers
+      styles: {
+        0: {
+          0: {
+            fill: 'red',
+          },
+          1: {
+            fill: 'blue',
+          },
+          2: {
+            fill: 'green',
+          },
+          3: {
+            fill: 'yellow',
+          },
+          4: {
+            fill: 'pink',
+          },
+        }
+      }
+    });
+    fabric.Object.NUM_FRACTION_DIGITS = 1;
+    var SVG_1 = iText.toSVG();
+    // var SVG_1_EXPECTED = '\t<g transform="translate(124.5 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124" y="12.6" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.9" y="12.6" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.1" y="12.6" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.6" y="12.6" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.4" y="12.6" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.4" y="12.6" >foo bar-baz</tspan></text>\n\t</g>\n';
+    //assert.equal(SVG_1, SVG_1_EXPECTED, 'numbers have max 1 decimal');
+    fabric.Object.NUM_FRACTION_DIGITS = 3;
+    var SVG_2 = iText.toSVG();
+    // var SVG_2_EXPECTED = '\t<g transform="translate(124.484 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-123.984" y="12.566" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.871" y="12.566" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.117" y="12.566" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.551" y="12.566" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.438" y="12.566" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.438" y="12.566" >foo bar-baz</tspan></text>\n\t</g>\n';
+    //assert.equal(SVG_2, SVG_2_EXPECTED, 'numbers have max 3 decimal');
+    assert.ok(SVG_2.length > SVG_1.length, 'SVG 2 has more decimal');
+    // put back to 2 or break all tests
+    fabric.Object.NUM_FRACTION_DIGITS = 2;
+  });
+
+  QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      fill: 'red',
+      strokeWidth: 30,
+      fontFamily: 'Verdana',
+      fontSize: 25,
+    };
+    var styleString = iText.getSvgSpanStyles(styleObject);
+    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      fill: 'red',
+      strokeWidth: 30,
+      fontFamily: 'Verdana',
+      fontSize: 25,
+    };
+    var styleString = iText.getSvgSpanStyles(styleObject, true);
+    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgTextDecoration with overline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+      linethrough: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline line-through ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+      linethrough: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline line-through ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
 })();

@@ -1,7 +1,5 @@
 /* _TO_SVG_START_ */
 (function() {
-  var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -68,7 +66,7 @@
       var term = '; ',
           strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
           fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + term : '',
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + term : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
           fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
           fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
@@ -167,6 +165,7 @@
 
     _setSVGBg: function(textBgRects) {
       if (this.backgroundColor) {
+        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
