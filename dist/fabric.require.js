@@ -2723,7 +2723,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         },
         toHexa: function() {
             var source = this.getSource(), a;
-            a = source[3] * 255;
+            a = Math.round(source[3] * 255);
             a = a.toString(16);
             a = a.length === 1 ? "0" + a : a;
             return this.toHex() + a.toUpperCase();
@@ -3195,7 +3195,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 options[prop] = 0;
             }
             propValue = parseFloat(options[prop], 10);
-            if (typeof options[prop] === "string" && /^\d+%$/.test(options[prop])) {
+            if (typeof options[prop] === "string" && /^(\d+\.\d+)%|(\d+)%$/.test(options[prop])) {
                 multFactor = .01;
             } else {
                 multFactor = 1;
@@ -3230,6 +3230,8 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         repeat: "repeat",
         offsetX: 0,
         offsetY: 0,
+        crossOrigin: "",
+        patternTransform: null,
         initialize: function(options, callback) {
             options || (options = {});
             this.id = fabric.Object.__uid++;
@@ -3247,7 +3249,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 fabric.util.loadImage(options.source, function(img) {
                     _this.source = img;
                     callback && callback(_this);
-                });
+                }, null, this.crossOrigin);
             }
         },
         toObject: function(propertiesToInclude) {
@@ -3263,8 +3265,10 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
                 type: "pattern",
                 source: source,
                 repeat: this.repeat,
+                crossOrigin: this.crossOrigin,
                 offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
-                offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS)
+                offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
+                patternTransform: this.patternTransform ? this.patternTransform.concat() : null
             };
             fabric.util.populateWithProperties(this, object, propertiesToInclude);
             return object;
@@ -4176,6 +4180,11 @@ fabric.BaseBrush = fabric.util.createClass({
             ctx.setLineDash(this.strokeDashArray);
         }
     },
+    _saveAndTransform: function(ctx) {
+        var v = this.canvas.viewportTransform;
+        ctx.save();
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    },
     _setShadow: function() {
         if (!this.shadow) {
             return;
@@ -4234,9 +4243,8 @@ fabric.BaseBrush = fabric.util.createClass({
             this._addPoint(pointerPoint);
         },
         _render: function() {
-            var ctx = this.canvas.contextTop, i, len, v = this.canvas.viewportTransform, p1 = this._points[0], p2 = this._points[1];
-            ctx.save();
-            ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+            var ctx = this.canvas.contextTop, i, len, p1 = this._points[0], p2 = this._points[1];
+            this._saveAndTransform(ctx);
             ctx.beginPath();
             if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
                 var width = this.width / 1e3;
@@ -4328,9 +4336,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.points = [];
     },
     drawDot: function(pointer) {
-        var point = this.addPoint(pointer), ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        var point = this.addPoint(pointer), ctx = this.canvas.contextTop;
+        this._saveAndTransform(ctx);
         ctx.fillStyle = point.fill;
         ctx.beginPath();
         ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
@@ -4343,6 +4350,19 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.canvas.clearContext(this.canvas.contextTop);
         this._setShadow();
         this.drawDot(pointer);
+    },
+    _render: function() {
+        var ctx = this.canvas.contextTop, i, len, points = this.points, point;
+        this._saveAndTransform(ctx);
+        for (i = 0, len = points.length; i < len; i++) {
+            point = points[i];
+            ctx.fillStyle = point.fill;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
     },
     onMouseMove: function(pointer) {
         this.drawDot(pointer);
@@ -4402,11 +4422,11 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
         this.canvas.clearContext(this.canvas.contextTop);
         this._setShadow();
         this.addSprayChunk(pointer);
-        this.render();
+        this.render(this.sprayChunkPoints);
     },
     onMouseMove: function(pointer) {
         this.addSprayChunk(pointer);
-        this.render();
+        this.render(this.sprayChunkPoints);
     },
     onMouseUp: function() {
         var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
@@ -4424,7 +4444,6 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
                     originY: "center",
                     fill: this.color
                 });
-                this.shadow && rect.setShadow(this.shadow);
                 rects.push(rect);
             }
         }
@@ -4435,7 +4454,7 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
             originX: "center",
             originY: "center"
         });
-        group.canvas = this.canvas;
+        this.shadow && group.setShadow(this.shadow);
         this.canvas.add(group);
         this.canvas.fire("path:created", {
             path: group
@@ -4459,18 +4478,25 @@ fabric.SprayBrush = fabric.util.createClass(fabric.BaseBrush, {
         }
         return uniqueRectsArray;
     },
-    render: function() {
-        var ctx = this.canvas.contextTop;
+    render: function(sprayChunk) {
+        var ctx = this.canvas.contextTop, i, len;
         ctx.fillStyle = this.color;
-        var v = this.canvas.viewportTransform, i, len;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        for (i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
-            var point = this.sprayChunkPoints[i];
+        this._saveAndTransform(ctx);
+        for (i = 0, len = sprayChunk.length; i < len; i++) {
+            var point = sprayChunk[i];
             if (typeof point.opacity !== "undefined") {
                 ctx.globalAlpha = point.opacity;
             }
             ctx.fillRect(point.x, point.y, point.width, point.width);
+        }
+        ctx.restore();
+    },
+    _render: function() {
+        var ctx = this.canvas.contextTop, i, ilen;
+        ctx.fillStyle = this.color;
+        this._saveAndTransform(ctx);
+        for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
+            this.render(this.sprayChunks[i]);
         }
         ctx.restore();
     },
@@ -5626,7 +5652,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _onMouseDownInDrawingMode: function(e) {
             this._isCurrentlyDrawing = true;
-            this.discardActiveObject(e).requestRenderAll();
+            if (this.getActiveObject()) {
+                this.discardActiveObject(e).requestRenderAll();
+            }
             if (this.clipTo) {
                 fabric.util.clipContext(this, this.contextTop);
             }
@@ -5991,7 +6019,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
     fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         toDataURL: function(options) {
             options || (options = {});
-            var format = options.format || "png", quality = options.quality || 1, multiplier = options.multiplier || 1, cropping = {
+            var format = options.format || "png", quality = options.quality || 1, multiplier = options.multiplier || options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling(), cropping = {
                 left: options.left || 0,
                 top: options.top || 0,
                 width: options.width || 0,
@@ -6741,7 +6769,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             el.height = boundingRect.height;
             fabric.util.wrapElement(el, "div");
             var canvas = new fabric.StaticCanvas(el, {
-                enableRetinaScaling: options.enableRetinaScaling
+                enableRetinaScaling: options.enableRetinaScaling,
+                renderOnAddRemove: false,
+                skipOffscreen: false
             });
             if (options.format === "jpg") {
                 options.format = "jpeg";
@@ -6759,6 +6789,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             var data = canvas.toDataURL(options);
             this.set(origParams).setCoords();
             this.canvas = originalCanvas;
+            canvas._objects = [];
             canvas.dispose();
             canvas = null;
             return data;
@@ -7322,7 +7353,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
 });
 
 (function() {
-    var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
     function getSvgColorString(prop, value) {
         if (!value) {
             return prop + ": none; ";
@@ -7343,7 +7373,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return [ stroke, "stroke-width: ", strokeWidth, "; ", "stroke-dasharray: ", strokeDashArray, "; ", "stroke-linecap: ", strokeLineCap, "; ", "stroke-linejoin: ", strokeLineJoin, "; ", "stroke-miterlimit: ", strokeMiterLimit, "; ", fill, "fill-rule: ", fillRule, "; ", "opacity: ", opacity, ";", filter, visibility ].join("");
         },
         getSvgSpanStyles: function(style, useWhiteSpace) {
-            var term = "; ", strokeWidth = style.strokeWidth ? "stroke-width: " + style.strokeWidth + term : "", fontFamily = style.fontFamily ? "font-family: " + style.fontFamily.replace(/"/g, "'") + term : "", fontSize = style.fontSize ? "font-size: " + style.fontSize + term : "", fontStyle = style.fontStyle ? "font-style: " + style.fontStyle + term : "", fontWeight = style.fontWeight ? "font-weight: " + style.fontWeight + term : "", fill = style.fill ? getSvgColorString("fill", style.fill) : "", stroke = style.stroke ? getSvgColorString("stroke", style.stroke) : "", textDecoration = this.getSvgTextDecoration(style);
+            var term = "; ", strokeWidth = style.strokeWidth ? "stroke-width: " + style.strokeWidth + term : "", fontFamily = style.fontFamily ? "font-family: " + style.fontFamily.replace(/"/g, "'") + term : "", fontSize = style.fontSize ? "font-size: " + style.fontSize + "px" + term : "", fontStyle = style.fontStyle ? "font-style: " + style.fontStyle + term : "", fontWeight = style.fontWeight ? "font-weight: " + style.fontWeight + term : "", fill = style.fill ? getSvgColorString("fill", style.fill) : "", stroke = style.stroke ? getSvgColorString("stroke", style.stroke) : "", textDecoration = this.getSvgTextDecoration(style);
             if (textDecoration) {
                 textDecoration = "text-decoration: " + textDecoration + term;
             }
@@ -7370,6 +7400,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
         },
         _setSVGBg: function(textBgRects) {
             if (this.backgroundColor) {
+                var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
                 textBgRects.push("\t\t<rect ", this._getFillAttributes(this.backgroundColor), ' x="', toFixed(-this.width / 2, NUM_FRACTION_DIGITS), '" y="', toFixed(-this.height / 2, NUM_FRACTION_DIGITS), '" width="', toFixed(this.width, NUM_FRACTION_DIGITS), '" height="', toFixed(this.height, NUM_FRACTION_DIGITS), '"></rect>\n');
             }
         },
@@ -7923,7 +7954,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), pi = Math.PI, extend = fabric.util.object.extend;
+    var fabric = global.fabric || (global.fabric = {}), pi = Math.PI;
     if (fabric.Circle) {
         fabric.warn("fabric.Circle is already defined.");
         return;
@@ -7971,15 +8002,14 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
     });
     fabric.Circle.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("cx cy r".split(" "));
-    fabric.Circle.fromElement = function(element, callback, options) {
-        options || (options = {});
+    fabric.Circle.fromElement = function(element, callback) {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
         if (!isValidRadius(parsedAttributes)) {
             throw new Error("value of `r` attribute is required and can not be negative");
         }
         parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.radius;
         parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.radius;
-        callback(new fabric.Circle(extend(parsedAttributes, options)));
+        callback(new fabric.Circle(parsedAttributes));
     };
     function isValidRadius(attributes) {
         return "radius" in attributes && attributes.radius >= 0;
@@ -8030,7 +8060,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), piBy2 = Math.PI * 2, extend = fabric.util.object.extend;
+    var fabric = global.fabric || (global.fabric = {}), piBy2 = Math.PI * 2;
     if (fabric.Ellipse) {
         fabric.warn("fabric.Ellipse is already defined.");
         return;
@@ -8084,12 +8114,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
     });
     fabric.Ellipse.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("cx cy rx ry".split(" "));
-    fabric.Ellipse.fromElement = function(element, callback, options) {
-        options || (options = {});
+    fabric.Ellipse.fromElement = function(element, callback) {
         var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
         parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
         parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-        callback(new fabric.Ellipse(extend(parsedAttributes, options)));
+        callback(new fabric.Ellipse(parsedAttributes));
     };
     fabric.Ellipse.fromObject = function(object, callback) {
         return fabric.Object._fromObject("Ellipse", object, callback);
@@ -8177,7 +8206,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, min = fabric.util.array.min, max = fabric.util.array.max, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    var fabric = global.fabric || (global.fabric = {}), extend = fabric.util.object.extend, min = fabric.util.array.min, max = fabric.util.array.max, toFixed = fabric.util.toFixed;
     if (fabric.Polyline) {
         fabric.warn("fabric.Polyline is already defined");
         return;
@@ -8219,7 +8248,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             });
         },
         toSVG: function(reviver) {
-            var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y, markup = this._createBaseSVGMarkup();
+            var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y, markup = this._createBaseSVGMarkup(), NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
             for (var i = 0, len = this.points.length; i < len; i++) {
                 points.push(toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ",", toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), " ");
             }
@@ -11646,7 +11675,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             ctx.restore();
         },
         _renderChars: function(method, ctx, line, left, top, lineIndex) {
-            var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf("justify") !== -1, actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender, shortCut = !isJustify && this.isEmptyStyles(lineIndex);
+            var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf("justify") !== -1, actualStyle, nextStyle, charsToRender = "", charBox, boxWidth = 0, timeToRender, shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
             ctx.save();
             top -= lineHeight * this._fontSizeFraction / this.lineHeight;
             if (shortCut) {
@@ -12509,6 +12538,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 return;
             }
             if (this.canvas) {
+                this.canvas.calcOffset();
                 this.exitEditingOnOthers(this.canvas);
             }
             this.isEditing = true;
@@ -12972,26 +13002,27 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this.selectLine(this.getSelectionStartFromPointer(options.e));
         });
     },
+    _mouseDownHandler: function(options) {
+        if (!this.canvas || !this.editable || options.e.button && options.e.button !== 1) {
+            return;
+        }
+        var pointer = this.canvas.getPointer(options.e);
+        this.__mousedownX = pointer.x;
+        this.__mousedownY = pointer.y;
+        this.__isMousedown = true;
+        if (this.selected) {
+            this.setCursorByClick(options.e);
+        }
+        if (this.isEditing) {
+            this.__selectionStartOnMouseDown = this.selectionStart;
+            if (this.selectionStart === this.selectionEnd) {
+                this.abortCursorAnimation();
+            }
+            this.renderCursorOrSelection();
+        }
+    },
     initMousedownHandler: function() {
-        this.on("mousedown", function(options) {
-            if (!this.editable || options.e.button && options.e.button !== 1) {
-                return;
-            }
-            var pointer = this.canvas.getPointer(options.e);
-            this.__mousedownX = pointer.x;
-            this.__mousedownY = pointer.y;
-            this.__isMousedown = true;
-            if (this.selected) {
-                this.setCursorByClick(options.e);
-            }
-            if (this.isEditing) {
-                this.__selectionStartOnMouseDown = this.selectionStart;
-                if (this.selectionStart === this.selectionEnd) {
-                    this.abortCursorAnimation();
-                }
-                this.renderCursorOrSelection();
-            }
-        });
+        this.on("mousedown", this._mouseDownHandler);
     },
     _isObjectMoved: function(e) {
         var pointer = this.canvas.getPointer(e);
@@ -13441,7 +13472,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
 });
 
 (function() {
-    var toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    var toFixed = fabric.util.toFixed;
     fabric.util.object.extend(fabric.Text.prototype, {
         toSVG: function(reviver) {
             var markup = this._createBaseSVGMarkup(), offsets = this._getSVGLeftTopOffsets(), textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
@@ -13476,7 +13507,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             };
         },
         _createTextCharSpan: function(_char, styleDecl, left, top) {
-            var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()), fillStyles = styleProps ? 'style="' + styleProps + '"' : "";
+            var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()), fillStyles = styleProps ? 'style="' + styleProps + '"' : "", NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
             return [ '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="', toFixed(top, NUM_FRACTION_DIGITS), '" ', fillStyles, ">", fabric.util.string.escapeXml(_char), "</tspan>" ].join("");
         },
         _setSVGTextLineText: function(textSpans, lineIndex, textLeftOffset, textTopOffset) {
@@ -13513,6 +13544,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
         },
         _pushTextBgRect: function(textBgRects, color, left, top, width, height) {
+            var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
             textBgRects.push("\t\t<rect ", this._getFillAttributes(color), ' x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="', toFixed(top, NUM_FRACTION_DIGITS), '" width="', toFixed(width, NUM_FRACTION_DIGITS), '" height="', toFixed(height, NUM_FRACTION_DIGITS), '"></rect>\n');
         },
         _setSVGTextLineBg: function(textBgRects, i, leftOffset, textTopOffset) {
