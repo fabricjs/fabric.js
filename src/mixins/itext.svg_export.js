@@ -1,7 +1,6 @@
 /* _TO_SVG_START_ */
 (function() {
-  var toFixed = fabric.util.toFixed,
-      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+  var toFixed = fabric.util.toFixed;
 
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
 
@@ -88,7 +87,8 @@
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
       var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
-          fillStyles = styleProps ? 'style="' + styleProps + '"' : '';
+          fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       return [
         '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
@@ -146,6 +146,7 @@
     },
 
     _pushTextBgRect: function(textBgRects, color, left, top, width, height) {
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
       textBgRects.push(
         '\t\t<rect ',
         this._getFillAttributes(color),

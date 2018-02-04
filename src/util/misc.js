@@ -336,9 +336,9 @@
      */
     loadImageInDom: function(img, onLoadCallback) {
       var div = fabric.document.createElement('div');
-      div.style.width = div.style.height = '1px';
-      div.style.left = div.style.top = '-100%';
-      div.style.position = 'absolute';
+      div.style.width = div.style.height = '300px';
+      // div.style.left = div.style.top = '-100%';
+      // div.style.position = 'absolute';
       div.appendChild(img);
       fabric.document.querySelector('body').appendChild(div);
       /**
@@ -347,7 +347,9 @@
        *   2. Cleanup DOM
        */
       img.onload = function () {
+        img.width = 300;
         onLoadCallback();
+        div.removeChild(img);
         div.parentNode.removeChild(div);
         div = null;
       };

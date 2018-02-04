@@ -460,12 +460,18 @@
     _renderFill: function(ctx) {
       var w = this.width, h = this.height, sW = w * this._filterScalingX, sH = h * this._filterScalingY,
           x = -w / 2, y = -h / 2, elementToDraw = this._element;
-      elementToDraw && ctx.drawImage(elementToDraw,
-        this.cropX * this._filterScalingX,
-        this.cropY * this._filterScalingY,
-        sW,
-        sH,
-        x, y, w, h);
+      if (this.drawImage3Args) {
+        elementToDraw && ctx.drawImage(elementToDraw,
+          x, y, w, h);
+      }
+      else {
+        elementToDraw && ctx.drawImage(elementToDraw,
+          this.cropX * this._filterScalingX,
+          this.cropY * this._filterScalingY,
+          sW,
+          sH,
+          x, y, w, h);
+      }
     },
 
     /**

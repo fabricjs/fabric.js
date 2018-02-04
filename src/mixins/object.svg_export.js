@@ -1,7 +1,5 @@
 /* _TO_SVG_START_ */
 (function() {
-  var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -167,6 +165,7 @@
 
     _setSVGBg: function(textBgRects) {
       if (this.backgroundColor) {
+        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
