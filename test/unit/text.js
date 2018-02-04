@@ -544,4 +544,40 @@
       textBackgroundColor: ''
     });
   });
+
+  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux', {
+      // makes weird numbers
+      fontSize: 22.1234,
+      styles: {
+        0: {
+          0: {
+            fill: 'red',
+          },
+          1: {
+            fill: 'blue',
+          },
+          2: {
+            fill: 'green',
+          },
+          3: {
+            fill: 'yellow',
+          },
+          4: {
+            fill: 'pink',
+          },
+        }
+      }
+    });
+    fabric.Object.NUM_FRACTION_DIGITS = 1;
+    var SVG_1 = iText.toSVG();
+    var SVG_1_EXPECTED = '\t<g transform="translate(69.5 27.5)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="22.1234" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-69" y="-7.5" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-62.8" y="-7.5" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-52.9" y="-7.5" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-44.3" y="-7.5" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-38.1" y="-7.5" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-32.6" y="-7.5" >foo bar-baz</tspan><tspan x="-69" y="21.4" >qux</tspan></text>\n\t</g>\n';
+    assert.equal(SVG_1, SVG_1_EXPECTED, 'numbers have max 1 decimal');
+    fabric.Object.NUM_FRACTION_DIGITS = 3;
+    var SVG_2 = iText.toSVG();
+    var SVG_2_EXPECTED = '\t<g transform="translate(69.47 27.499)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="22.1234" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-68.97" y="-7.55" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-62.775" y="-7.55" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-52.93" y="-7.55" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-44.302" y="-7.55" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-38.108" y="-7.55" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-32.577" y="-7.55" >foo bar-baz</tspan><tspan x="-68.97" y="21.45" >qux</tspan></text>\n\t</g>\n';
+    assert.equal(SVG_2, SVG_2_EXPECTED, 'numbers have max 3 decimal');
+    // put back to 2 or break all tests
+    fabric.Object.NUM_FRACTION_DIGITS = 2;
+  });
 })();
