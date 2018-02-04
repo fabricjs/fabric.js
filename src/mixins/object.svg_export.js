@@ -66,7 +66,7 @@
       var term = '; ',
           strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
           fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + term : '',
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + term : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
           fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
           fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
