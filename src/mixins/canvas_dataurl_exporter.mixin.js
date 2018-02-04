@@ -14,7 +14,7 @@
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
-     * @param {Boolean} [options.enableRetina] Enable retina scaling for clone image. Introduce in 2.0.0
+     * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
      * @example <caption>Generate jpeg dataURL with lower quality</caption>
@@ -41,7 +41,7 @@
 
       var format = options.format || 'png',
           quality = options.quality || 1,
-          multiplier = options.multiplier || options.enableRetina ? 1 : 1 / this.getRetinaScaling(),
+          multiplier = options.multiplier || options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling(),
           cropping = {
             left: options.left || 0,
             top: options.top || 0,
