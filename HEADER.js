@@ -1,6 +1,6 @@
- /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-rc.4' };
+var fabric = fabric || { version: '2.0.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
