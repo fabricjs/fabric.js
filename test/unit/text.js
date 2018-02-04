@@ -580,4 +580,70 @@
     // put back to 2 or break all tests
     fabric.Object.NUM_FRACTION_DIGITS = 2;
   });
+
+  QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      fill: 'red',
+      strokeWidth: 30,
+      fontFamily: 'Verdana',
+      fontSize: 25,
+    };
+    var styleString = iText.getSvgSpanStyles(styleObject);
+    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      fill: 'red',
+      strokeWidth: 30,
+      fontFamily: 'Verdana',
+      fontSize: 25,
+    };
+    var styleString = iText.getSvgSpanStyles(styleObject, true);
+    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgTextDecoration with overline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline ';
+    assert.equal(styleString, expected, 'style is as expected');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+      linethrough: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline line-through ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+    var iText = new fabric.IText('test foo bar-baz');
+    var styleObject = {
+      overline: true,
+      underline: true,
+      linethrough: true,
+    };
+    var styleString = iText.getSvgTextDecoration(styleObject);
+    var expected = 'overline underline line-through ';
+    assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
 })();
