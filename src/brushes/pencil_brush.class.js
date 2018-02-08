@@ -69,7 +69,7 @@
         return false;
       }
       this._points.push(point);
-      return true
+      return true;
     },
 
     /**
@@ -78,7 +78,7 @@
      */
     _reset: function() {
       this._points.length = 0;
-      this._curPointIdx = 0
+      this._curPointIdx = 0;
       this._setBrushStyles();
       this._setShadow();
     },
@@ -97,9 +97,9 @@
      * @private
      */
     _render: function() {
-      var ctx  = this.canvas.contextTop, i, len,
+      var ctx  = this.canvas.contextTop,
           p1 = this._points[this._curPointIdx],
-          p2 = this._points[this._curPointIdx + 1]
+          p2 = this._points[this._curPointIdx + 1];
 
       this._saveAndTransform(ctx);
       ctx.beginPath();
@@ -121,7 +121,7 @@
       ctx.lineTo(p2.x, p2.y);
       ctx.stroke();
       ctx.restore();
-      this._curPointIdx ++
+      this._curPointIdx++;
     },
 
     /**
