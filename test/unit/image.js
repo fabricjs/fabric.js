@@ -336,30 +336,29 @@
       done();
     });
   });
-  
+
   QUnit.test('fromObject does not mutate data', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
 
-    // should not throw error when no callback is given
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC
     });
     var brightness = {
-      type: Brightness,
-      brightness: 0.1,
+      type: 'Brightness',
+      brightness: 0.1
     };
     var contrast = {
-      type: Contrast,
-      contrast: 0.1,
+      type: 'Contrast',
+      contrast: 0.1
     };
-    obj.filters = [brightness]
+    obj.filters = [brightness];
     obj.resizeFilter = contrast;
     var copyOfFilters = obj.filters;
     var copyOfBrighteness = brightness;
     var copyOfContrast = contrast;
     var copyOfObject = obj;
-    fabric.Image.fromObject(obj, function(instance){
+    fabric.Image.fromObject(obj, function(){
       assert.ok(copyOfFilters === obj.filters, 'filters array did not mutate');
       assert.ok(copyOfBrighteness === copyOfFilters[0], 'filter is same object');
       assert.deepEqual(copyOfBrighteness, obj.filters[0], 'did not mutate filter');
