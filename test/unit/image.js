@@ -337,6 +337,39 @@
     });
   });
 
+  QUnit.test('fromObject does not mutate data', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Image.fromObject === 'function');
+
+    var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+      src: IMG_SRC
+    });
+    var brightness = {
+      type: 'Brightness',
+      brightness: 0.1
+    };
+    var contrast = {
+      type: 'Contrast',
+      contrast: 0.1
+    };
+    obj.filters = [brightness];
+    obj.resizeFilter = contrast;
+    var copyOfFilters = obj.filters;
+    var copyOfBrighteness = brightness;
+    var copyOfContrast = contrast;
+    var copyOfObject = obj;
+    fabric.Image.fromObject(obj, function(){
+      assert.ok(copyOfFilters === obj.filters, 'filters array did not mutate');
+      assert.ok(copyOfBrighteness === copyOfFilters[0], 'filter is same object');
+      assert.deepEqual(copyOfBrighteness, obj.filters[0], 'did not mutate filter');
+      assert.deepEqual(copyOfFilters, obj.filters, 'did not mutate array');
+      assert.deepEqual(copyOfContrast, obj.resizeFilter, 'did not mutate object');
+      assert.deepEqual(copyOfObject, obj, 'did not change any value');
+      assert.ok(copyOfContrast === obj.resizeFilter, 'resizefilter is same object');
+      done();
+    });
+  });
+
   QUnit.test('fromURL', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
