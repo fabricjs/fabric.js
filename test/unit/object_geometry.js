@@ -348,6 +348,19 @@
     assert.notEqual(key4, key3, 'keys are different');
   });
 
+  QUnit.test('transformMatrixKey depends from originX/originY', function(assert) {
+    var cObj = new fabric.Object(
+      { left: -10, top: -10, width: 30, height: 40, strokeWidth: 0, originX: 'left', originY: 'top' });
+    var key1 = cObj.transformMatrixKey();
+    cObj.originX = 'center';
+    var key2 = cObj.transformMatrixKey();
+    cObj.originY = 'center';
+    var key3 = cObj.transformMatrixKey();
+    assert.notEqual(key1, key2, 'keys are different origins 1');
+    assert.notEqual(key1, key3, 'keys are different origins 2');
+    assert.notEqual(key2, key3, 'keys are different origins 3');
+  });
+
   QUnit.test('isOnScreen with object that include canvas', function(assert) {
     var cObj = new fabric.Object(
       { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
