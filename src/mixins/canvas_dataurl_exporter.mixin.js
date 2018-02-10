@@ -41,7 +41,7 @@
 
       var format = options.format || 'png',
           quality = options.quality || 1,
-          multiplier = options.multiplier || (options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling()),
+          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling()),
           cropping = {
             left: options.left || 0,
             top: options.top || 0,
