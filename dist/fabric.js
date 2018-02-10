@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors minifier=uglifyjs` */
- /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-rc.4' };
+var fabric = fabric || { version: '2.0.1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -11629,7 +11629,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var format = options.format || 'png',
           quality = options.quality || 1,
-          multiplier = options.multiplier || options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling(),
+          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling()),
           cropping = {
             left: options.left || 0,
             top: options.top || 0,
@@ -14246,7 +14246,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
      * the box is intented as aligned to axis of canvas.
      * @param {Boolean} [absolute] use coordinates without viewportTransform
-     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords / .aCoords
      * @return {Object} Object with left, top, width, height properties
      */
     getBoundingRect: function(absolute, calculate) {
@@ -14433,7 +14433,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
-        sep + this.skewX + sep + this.skewY + sep + this.angle +
+        sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.originX + sep + this.originY +
         sep + this.width + sep + this.height + sep + this.strokeWidth + this.flipX + this.flipY;
     },
 
@@ -19351,7 +19351,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an image instance is created
    */
-  fabric.Image.fromObject = function(object, callback) {
+  fabric.Image.fromObject = function(_object, callback) {
+    var object = fabric.util.object.clone(_object);
     fabric.util.loadImage(object.src, function(img, error) {
       if (error) {
         callback && callback(null, error);
@@ -22121,13 +22122,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     alpha: 1,
 
     vertexSource: 'attribute vec2 aPosition;\n' +
-      'attribute vec2 aTexCoord;\n' +
       'varying vec2 vTexCoord;\n' +
       'varying vec2 vTexCoord2;\n' +
       'uniform mat3 uTransformMatrix;\n' +
       'void main() {\n' +
-        'vTexCoord = aTexCoord;\n' +
-        'vTexCoord2 = (uTransformMatrix * vec3(aTexCoord, 1.0)).xy;\n' +
+        'vTexCoord = aPosition;\n' +
+        'vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;\n' +
         'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
       '}',
 

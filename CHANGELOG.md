@@ -1,3 +1,8 @@
+**Version 2.0.1**
+  - fixed filter for blend image in WEBGL [#4706](https://github.com/kangax/fabric.js/pull/4706)
+  - fixed interactions between canvas toDataURL and multiplier + retina [#4705](https://github.com/kangax/fabric.js/pull/4705)
+  - fixed bug with originX and originY not invalidating the transform [#4703](https://github.com/kangax/fabric.js/pull/4703)
+  - fixed unwanted mutation on object enliving in fabric.Image [#4699](https://github.com/kangax/fabric.js/pull/4699)
 **Version 2.0.0**
   - final
     - fix dataurl and svg export on retina and rounding [#4674](https://github.com/kangax/fabric.js/pull/4674)
