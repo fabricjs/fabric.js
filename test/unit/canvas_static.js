@@ -470,7 +470,7 @@
     }
   });
 
-  QUnit.test('toDataURL with enableRetinaScaling: true', function(assert) {
+  QUnit.test('toDataURL with enableRetinaScaling: true and no multiplier', function(assert) {
     var done = assert.async();
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
@@ -479,6 +479,81 @@
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
       assert.equal(img.height, c.height * fabric.devicePixelRatio, 'output height is bigger');
+      fabric.devicePixelRatio = 1;
+      done();
+    };
+    img.src = dataUrl;
+  });
+
+  QUnit.test('toDataURL with enableRetinaScaling: true and multiplier = 1', function(assert) {
+    var done = assert.async();
+    fabric.devicePixelRatio = 2;
+    var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
+    var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 1 });
+    var img = fabric.document.createElement('img');
+    img.onload = function() {
+      assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
+      assert.equal(img.height, c.height * fabric.devicePixelRatio, 'output height is bigger');
+      fabric.devicePixelRatio = 1;
+      done();
+    };
+    img.src = dataUrl;
+  });
+
+  QUnit.test('toDataURL with enableRetinaScaling: true and multiplier = 3', function(assert) {
+    var done = assert.async();
+    fabric.devicePixelRatio = 2;
+    var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
+    var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 3 });
+    var img = fabric.document.createElement('img');
+    img.onload = function() {
+      assert.equal(img.width, c.width * fabric.devicePixelRatio * 3, 'output width is bigger by 6');
+      assert.equal(img.height, c.height * fabric.devicePixelRatio * 3, 'output height is bigger by 6');
+      fabric.devicePixelRatio = 1;
+      done();
+    };
+    img.src = dataUrl;
+  });
+
+  QUnit.test('toDataURL with enableRetinaScaling: false and no multiplier', function(assert) {
+    var done = assert.async();
+    fabric.devicePixelRatio = 2;
+    var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
+    var dataUrl = c.toDataURL({ enableRetinaScaling: false });
+    var img = fabric.document.createElement('img');
+    img.onload = function() {
+      assert.equal(img.width, c.width, 'output width is not bigger');
+      assert.equal(img.height, c.height, 'output height is not bigger');
+      fabric.devicePixelRatio = 1;
+      done();
+    };
+    img.src = dataUrl;
+  });
+
+  QUnit.test('toDataURL with enableRetinaScaling: false and multiplier = 1', function(assert) {
+    var done = assert.async();
+    fabric.devicePixelRatio = 2;
+    var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
+    var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 1 });
+    var img = fabric.document.createElement('img');
+    img.onload = function() {
+      assert.equal(img.width, c.width, 'output width is not bigger');
+      assert.equal(img.height, c.height, 'output height is not bigger');
+      fabric.devicePixelRatio = 1;
+      done();
+    };
+    img.src = dataUrl;
+  });
+
+  QUnit.test('toDataURL with enableRetinaScaling: false and multiplier = 3', function(assert) {
+    var done = assert.async();
+    fabric.devicePixelRatio = 2;
+    var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
+    var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 3 });
+    var img = fabric.document.createElement('img');
+    img.onload = function() {
+      assert.equal(img.width, c.width * 3, 'output width is bigger by 3');
+      assert.equal(img.height, c.height * 3, 'output height is bigger by 3');
       fabric.devicePixelRatio = 1;
       done();
     };
