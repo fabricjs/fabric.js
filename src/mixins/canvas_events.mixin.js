@@ -826,6 +826,7 @@
       }
 
       var hoverCursor = target.hoverCursor || this.hoverCursor,
+          defaultCursor = target.defaultCursor || this.defaultCursor,
           activeSelection = this._activeObject && this._activeObject.type === 'activeSelection' ?
             this._activeObject : null,
           // only show proper corner when group selection is not active
@@ -833,7 +834,7 @@
                     && target._findTargetCorner(this.getPointer(e, true));
 
       if (!corner) {
-        this.setCursor(hoverCursor);
+        this.setCursor(target.selectable ? hoverCursor : defaultCursor);
       }
       else {
         this.setCursor(this.getCornerCursor(corner, target, e));
