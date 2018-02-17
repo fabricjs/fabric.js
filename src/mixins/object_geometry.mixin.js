@@ -432,7 +432,7 @@
      */
     _calcRotateMatrix: function() {
       if (this.angle) {
-        var cos = fabric.util.cos(this.angle, true), sin = fabric.util.sin(this.angle, true);
+        var theta = degreesToRadians(this.angle), cos = fabric.util.cos(theta), sin = fabric.util.sin(theta);
         return [cos, sin, -sin, cos, 0, 0];
       }
       return fabric.iMatrix.concat();

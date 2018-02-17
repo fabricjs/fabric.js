@@ -75,12 +75,12 @@
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          newTheta = 45 - this.angle,
+          newTheta = degreesToRadians(45 - this.angle),
           /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
           /* 0.707106 stands for sqrt(2)/2 */
           cornerHypotenuse = this.cornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta, true),
-          sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta, true),
+          cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
+          sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta),
           x, y;
 
       for (var point in coords) {

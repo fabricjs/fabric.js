@@ -15,9 +15,9 @@
       return arcToSegmentsCache[argsString];
     }
 
-    var PI = Math.PI,
-        sinTh = fabric.util.sin(rotateX, true),
-        cosTh = fabric.util.cos(rotateX, true),
+    var PI = Math.PI, th = rotateX * PI / 180,
+        sinTh = fabric.util.sin(th),
+        cosTh = fabric.util.cos(th),
         fromX = 0, fromY = 0;
 
     rx = Math.abs(rx);
