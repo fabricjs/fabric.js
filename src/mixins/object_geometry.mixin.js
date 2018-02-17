@@ -10,7 +10,8 @@
   }
 
   var degreesToRadians = fabric.util.degreesToRadians,
-      multiplyMatrices = fabric.util.multiplyTransformMatrices;
+      multiplyMatrices = fabric.util.multiplyTransformMatrices,
+      transformPoint = fabric.util.transformPoint;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -355,45 +356,39 @@
      * @chainable
      */
     calcCoords: function(absolute) {
-      var theta = degreesToRadians(this.angle),
+      var objectMatrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
-          dim = absolute ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
-          currentWidth = dim.x, currentHeight = dim.y,
-          sinTh = fabric.util.sin(theta),
-          cosTh = fabric.util.cos(theta),
-          _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
-          _hypotenuse = (currentWidth / fabric.util.cos(_angle)) / 2,
-          offsetX = fabric.util.cos(_angle + theta) * _hypotenuse,
-          offsetY = fabric.util.sin(_angle + theta) * _hypotenuse,
-          center = this.getCenterPoint(),
-          // offset added for rotate and scale actions
-          coords = absolute ? center : fabric.util.transformPoint(center, vpt),
-          tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
-          tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
-          bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
-          br  = new fabric.Point(coords.x + offsetX, coords.y + offsetY);
+          finalMatrix = absolute ? objectMatrix : multiplyMatrices(vpt, objectMatrix),
+          dim = this._getNonTransformedDimensions(),
+          w = dim.x / 2, h = dim.y / 2,
+          tl = transformPoint({ x: -w, y: -h }, finalMatrix),
+          tr = transformPoint({ x: w, y: -h }, finalMatrix),
+          bl = transformPoint({ x: -w, y: w }, finalMatrix),
+          br = transformPoint({ x: w, y: w }, finalMatrix);
       if (!absolute) {
         var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
             mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
             mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
             mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
-            mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
+            mtr = transformPoint({ x: 0, y: -h - this.rotatingPointOffset }, finalMatrix);
       }
 
-      // debugging
-
-      /* setTimeout(function() {
-         canvas.contextTop.fillStyle = 'green';
-         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-         canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-         canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-         canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-         canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
-       }, 50); */
+      // if (!absolute) {
+      //   var canvas = this.canvas,
+      //   setTimeout(function() {
+      //     canvas.contextTop.clearRect(0, 0, 500, 500);
+      //     canvas.contextTop.fillStyle = 'green';
+      //     canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+      //     canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
+      //     canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+      //     canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
+      //     canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+      //     canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+      //     canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+      //     canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+      //     canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+      //   }, 50);
+      // }
 
       var coords = {
         // corners
