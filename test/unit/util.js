@@ -955,8 +955,8 @@
   QUnit.test('fabric.util.cos', function(assert) {
     assert.ok(typeof fabric.util.cos === 'function');
     assert.equal(fabric.util.cos(0), 1, 'cos 0 correct');
-    assert.equal(fabric.util.cos(90), 0, 'cos 90 correct');
-    assert.equal(fabric.util.cos(180), -1, 'cos 180 correct');
-    assert.equal(fabric.util.cos(270), 0,' cos 270 correct');
+    assert.equal(fabric.util.cos(Math.PI / 2), 0, 'cos 90 correct');
+    assert.equal(fabric.util.cos(Math.PI), -1, 'cos 180 correct');
+    assert.equal(fabric.util.cos(3 * Math.PI / 2), 0,' cos 270 correct');
   });
 })();
