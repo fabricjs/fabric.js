@@ -96,10 +96,10 @@
         );
       }
       else {
-        var startX = Math.cos(this.startAngle) * this.radius,
-            startY = Math.sin(this.startAngle) * this.radius,
-            endX = Math.cos(this.endAngle) * this.radius,
-            endY = Math.sin(this.endAngle) * this.radius,
+        var startX = fabric.util.cos(this.startAngle) * this.radius,
+            startY = fabric.util.sin(this.startAngle) * this.radius,
+            endX = fabric.util.cos(this.endAngle) * this.radius,
+            endY = fabric.util.sin(this.endAngle) * this.radius,
             largeFlag = angle > pi ? '1' : '0';
 
         markup.push(

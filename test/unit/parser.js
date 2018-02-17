@@ -286,7 +286,7 @@
     var ANGLE = ANGLE_DEG * Math.PI / 180;
     element.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    assert.deepEqual(parsedValue, [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]);
+    assert.deepEqual(parsedValue, [fabric.util.cos(ANGLE), fabric.util.sin(ANGLE), -fabric.util.sin(ANGLE), fabric.util.cos(ANGLE), 0, 0]);
 
     element.setAttribute('transform', 'scale(3.5)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));

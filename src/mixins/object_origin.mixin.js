@@ -180,10 +180,9 @@
      * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
-      var angle = degreesToRadians(this.angle),
-          hypotFull = this.getScaledWidth(),
-          xFull = Math.cos(angle) * hypotFull,
-          yFull = Math.sin(angle) * hypotFull,
+      var hypotFull = this.getScaledWidth(),
+          xFull = fabric.util.cos(this.angle, true) * hypotFull,
+          yFull = fabric.util.sin(this.angle, true) * hypotFull,
           offsetFrom, offsetTo;
 
       //TODO: this function does not consider mixed situation like top, center.

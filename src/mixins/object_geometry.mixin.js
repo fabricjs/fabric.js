@@ -359,12 +359,12 @@
           vpt = this.getViewportTransform(),
           dim = absolute ? this._getTransformedDimensions() : this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y,
-          sinTh = theta ? Math.sin(theta) : 0,
-          cosTh = theta ? Math.cos(theta) : 1,
+          sinTh = fabric.util.sin(theta),
+          cosTh = fabric.util.cos(theta),
           _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
-          _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
-          offsetX = Math.cos(_angle + theta) * _hypotenuse,
-          offsetY = Math.sin(_angle + theta) * _hypotenuse,
+          _hypotenuse = (currentWidth / fabric.util.cos(_angle)) / 2,
+          offsetX = fabric.util.cos(_angle + theta) * _hypotenuse,
+          offsetY = fabric.util.sin(_angle + theta) * _hypotenuse,
           center = this.getCenterPoint(),
           // offset added for rotate and scale actions
           coords = absolute ? center : fabric.util.transformPoint(center, vpt),
@@ -437,11 +437,7 @@
      */
     _calcRotateMatrix: function() {
       if (this.angle) {
-        var theta = degreesToRadians(this.angle), cos = Math.cos(theta), sin = Math.sin(theta);
-        // trying to keep rounding error small, ugly but it works.
-        if (cos === 6.123233995736766e-17 || cos === -1.8369701987210297e-16) {
-          cos = 0;
-        }
+        var cos = fabric.util.cos(this.angle, true), sin = fabric.util.sin(this.angle, true);
         return [cos, sin, -sin, cos, 0, 0];
       }
       return fabric.iMatrix.concat();
