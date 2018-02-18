@@ -280,6 +280,14 @@
       return object;
     },
 
+    /**
+     * Returns true if an image has crop applied, inspecting values of cropX,cropY,width,hight.
+     * @return {Boolean}
+     */
+    hasCrop: function() {
+      return this.cropX || this.cropY || this.width < this._element.width || this.height < this._element.height;
+    },
+
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
@@ -287,17 +295,27 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2, clipPath = '';
+      if (this.hasCrop()) {
+        var clipPathId = fabric.Object.__uid++;
+        markup.push(
+          '<clipPath id="imageCrop_' + clipPathId + '">',
+          '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />',
+          '</clipPath>'
+        );
+        clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
+      }
       markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
       var imageMarkup = ['\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(true),
-        '" x="', x, '" y="', y,
+        '" x="', x - this.cropX, '" y="', y - this.cropY,
         '" style="', this.getSvgStyles(),
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
         // so that object's center aligns with container's left/top
-        '" width="', this.width,
-        '" height="', this.height,
-        '"></image>\n'];
+        '" width="', this._element.width || this._element.naturalWidth,
+        '" height="', this._element.height || this._element.height,
+        '"', clipPath,
+        '></image>\n'];
       if (this.paintFirst === 'fill') {
         Array.prototype.push.apply(markup, imageMarkup);
       }
