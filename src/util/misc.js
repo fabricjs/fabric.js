@@ -130,8 +130,8 @@
      * @return {Object} The new rotated point
      */
     rotateVector: function(vector, radians) {
-      var sin = Math.sin(radians),
-          cos = Math.cos(radians),
+      var sin = fabric.util.sin(radians),
+          cos = fabric.util.cos(radians),
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
       return {

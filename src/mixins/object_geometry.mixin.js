@@ -370,24 +370,23 @@
       if (!absolute) {
         var padding = this.padding, angle = degreesToRadians(this.angle),
             cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
-            cosP = cos * padding, sinP = sin * padding;
+            cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
+            cosPMinusSinP = cosP - sinP;
         if (padding) {
-          tl.x -= cosP - sinP;
-          tl.y -= sinP + cosP;
-          tr.x += cosP + sinP;
-          tr.y -= cosP - sinP;
-          bl.x -= cosP + sinP;
-          bl.y += cosP - sinP;
-          br.x += cosP - sinP;
-          br.y += sinP + cosP;
+          tl.x -= cosPMinusSinP;
+          tl.y -= cosPSinP;
+          tr.x += cosPSinP;
+          tr.y -= cosPMinusSinP;
+          bl.x -= cosPSinP;
+          bl.y += cosPMinusSinP;
+          br.x += cosPMinusSinP;
+          br.y += cosPSinP;
         }
         var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
             mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
             mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
             mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
-            mtr = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2);
-        mtr.y -= cos * this.rotatingPointOffset;
-        mtr.x += sin * this.rotatingPointOffset;
+            mtr = new fabric.Point(mt.x + sin * this.rotatingPointOffset, mt.y - cos * this.rotatingPointOffset);
       }
 
       // if (!absolute) {
