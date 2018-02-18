@@ -1,3 +1,7 @@
+**Version 2.0.2**
+  - fixed image toSVG support for crop [#4738](https://github.com/kangax/fabric.js/pull/4738)
+  - changed math for better rounded results [#4734](https://github.com/kangax/fabric.js/pull/4734)
+
 **Version 2.0.1**
   - fixed filter for blend image in WEBGL [#4706](https://github.com/kangax/fabric.js/pull/4706)
   - fixed interactions between canvas toDataURL and multiplier + retina [#4705](https://github.com/kangax/fabric.js/pull/4705)
