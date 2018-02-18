@@ -15,7 +15,7 @@
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Brightness({
-   *   brightness: 200
+   *   brightness: 0.05
    * });
    * object.filters.push(filter);
    * object.applyFilters();
