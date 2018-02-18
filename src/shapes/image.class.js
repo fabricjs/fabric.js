@@ -299,9 +299,9 @@
       if (this.hasCrop()) {
         var clipPathId = fabric.Object.__uid++;
         markup.push(
-          '<clipPath id="imageCrop_' + clipPathId + '">',
-          '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />',
-          '</clipPath>'
+          '<clipPath id="imageCrop_' + clipPathId + '">\n',
+          '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />\n',
+          '</clipPath>\n'
         );
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
