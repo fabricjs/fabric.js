@@ -356,27 +356,44 @@
      * @chainable
      */
     calcCoords: function(absolute) {
-      var objectMatrix = this.calcTransformMatrix(),
+      var rotateMatrix = this._calcRotateMatrix(),
+          translateMatrix = this._calcTranslateMatrix(),
+          startMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           vpt = this.getViewportTransform(),
-          finalMatrix = absolute ? objectMatrix : multiplyMatrices(vpt, objectMatrix),
-          dim = this._getNonTransformedDimensions(),
+          finalMatrix = absolute ? startMatrix : multiplyMatrices(vpt, startMatrix),
+          dim = this._getTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2,
           tl = transformPoint({ x: -w, y: -h }, finalMatrix),
           tr = transformPoint({ x: w, y: -h }, finalMatrix),
-          bl = transformPoint({ x: -w, y: w }, finalMatrix),
-          br = transformPoint({ x: w, y: w }, finalMatrix);
+          bl = transformPoint({ x: -w, y: h }, finalMatrix),
+          br = transformPoint({ x: w, y: h }, finalMatrix);
       if (!absolute) {
+        var padding = this.padding, angle = degreesToRadians(this.angle),
+            cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
+            cosP = cos * padding, sinP = sin * padding;
+        if (padding) {
+          tl.x -= cosP - sinP;
+          tl.y -= sinP + cosP;
+          tr.x += cosP + sinP;
+          tr.y -= cosP - sinP;
+          bl.x -= cosP + sinP;
+          bl.y += cosP - sinP;
+          br.x += cosP - sinP;
+          br.y += sinP + cosP;
+        }
         var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
             mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
             mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
             mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
-            mtr = transformPoint({ x: 0, y: -h - this.rotatingPointOffset }, finalMatrix);
+            mtr = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2);
+        mtr.y -= cos * this.rotatingPointOffset;
+        mtr.x += sin * this.rotatingPointOffset;
       }
 
       // if (!absolute) {
-      //   var canvas = this.canvas,
+      //   var canvas = this.canvas;
       //   setTimeout(function() {
-      //     canvas.contextTop.clearRect(0, 0, 500, 500);
+      //     canvas.contextTop.clearRect(0, 0, 700, 700);
       //     canvas.contextTop.fillStyle = 'green';
       //     canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
       //     canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
@@ -438,6 +455,15 @@
       return fabric.iMatrix.concat();
     },
 
+    /**
+     * calculate the translation matrix for an object transform
+     * @return {Array} rotation matrix for the object
+     */
+    _calcTranslateMatrix: function() {
+      var center = this.getCenterPoint();
+      return [1, 0, 0, 1, center.x, center.y];
+    },
+
     transformMatrixKey: function(skipGroup) {
       var sep = '_', prefix = '';
       if (!skipGroup && this.group) {
@@ -476,8 +502,7 @@
       if (cache.key === key) {
         return cache.value;
       }
-      var center = this.getCenterPoint(),
-          matrix = [1, 0, 0, 1, center.x, center.y],
+      var matrix = this._calcTranslateMatrix(),
           rotateMatrix,
           dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true);
       if (this.angle) {
