@@ -678,10 +678,15 @@
       viewportTransform: [2, 0, 0, 2, 35, 25]
     };
     var coords = cObj.getCoords(true);
-    assert.deepEqual(coords[0], new fabric.Point(40, 29.999999999999996), 'return top left absolute with angle');
-    assert.deepEqual(coords[1], new fabric.Point(51.2763114494309, 34.10424171990802), 'return top right absolute with angle');
-    assert.deepEqual(coords[2], new fabric.Point(45.46196901289453, 50.079016273268465), 'return bottom right absolute with angle');
-    assert.deepEqual(coords[3], new fabric.Point(34.185657563463636, 45.97477455336044), 'return bottom left absolute with angle');
+    assert.deepEqual(coords[0].x, 40, 'return top left absolute with angle');
+    assert.deepEqual(coords[1].x, 51.2763114494309, 'return top right absolute with angle');
+    assert.deepEqual(coords[2].x, 45.46196901289453, 'return bottom right absolute with angle');
+    assert.deepEqual(coords[3].x, 34.185657563463636, 'return bottom left absolute with angle');
+    assert.deepEqual(coords[0].y, 29.999999999999996, 'return top left absolute with angle');
+    assert.deepEqual(coords[1].y, 34.10424171990802, 'return top right absolute with angle');
+    assert.deepEqual(coords[2].y, 50.079016273268465, 'return bottom right absolute with angle');
+    assert.deepEqual(coords[3].y, 45.97477455336044, 'return bottom left absolute with angle');
+
   });
 
   QUnit.test('getCoords with angle', function(assert) {
