@@ -208,6 +208,39 @@
     });
   });
 
+  QUnit.test('toSVG wit crop', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.cropX = 1;
+      image.cropY = 1;
+      image.width -= 2;
+      image.height -= 2;
+      fabric.Object.__uid = 1;
+      var expectedSVG = '<clipPath id="imageCrop_1">\n\t<rect x="-137" y="-54" width="274" height="108" />\n</clipPath>\n<g transform="translate(137 54)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110" clip-path="url(#imageCrop_1)" ></image>\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
+  QUnit.test('hasCrop', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      assert.ok(typeof image.hasCrop === 'function');
+      assert.equal(image.hasCrop(), false, 'standard image has no crop');
+      image.cropX = 1;
+      assert.equal(image.hasCrop(), true, 'cropX !== 0 gives crop true');
+      image.cropX = 0;
+      image.cropY = 1;
+      assert.equal(image.hasCrop(), true, 'cropY !== 0 gives crop true');
+      image.width -= 1;
+      assert.equal(image.hasCrop(), true, 'width < element.width gives crop true');
+      image.width += 1;
+      image.height -= 1;
+      assert.equal(image.hasCrop(), true, 'height < element.height gives crop true');
+      done();
+    });
+  });
+
   QUnit.test('toSVG', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
