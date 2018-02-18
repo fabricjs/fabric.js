@@ -15,7 +15,8 @@ addons:
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building
-  - test
+  - Test
+  - Old tests
 
 cache:
   directories:
@@ -41,26 +42,29 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Test
       env: LAUNCHER=Chrome
       install: npm install testem@1.18.4 qunit@2.4.1
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Test
       env: LAUNCHER=Firefox
       install: npm install testem@1.18.4 qunit@2.4.1
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Test
       node_js: "9"
-    - stage: test
+    - stage: Test
       node_js: "8"
-    - stage: test
+    - stage: Test
       node_js: "6"
-    - stage: test
+    - stage: Test
       node_js: "4"
+    - stage: Old tests
+      node_js: "9"
+      script: 'npm run build:fast && npm run test'
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
