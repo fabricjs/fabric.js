@@ -241,7 +241,7 @@
     });
   });
 
-  QUnit.test('toSVG with crop', function(assert) {
+  QUnit.test('toSVG', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toSVG === 'function');
