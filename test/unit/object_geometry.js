@@ -686,7 +686,6 @@
     assert.deepEqual(coords[1].y, 34.10424171990802, 'return top right absolute with angle');
     assert.deepEqual(coords[2].y, 50.079016273268465, 'return bottom right absolute with angle');
     assert.deepEqual(coords[3].y, 45.97477455336044, 'return bottom left absolute with angle');
-
   });
 
   QUnit.test('getCoords with angle', function(assert) {
