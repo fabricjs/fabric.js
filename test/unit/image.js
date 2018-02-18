@@ -215,7 +215,8 @@
       image.cropY = 1;
       image.width -= 2;
       image.height -= 2;
-      var expectedSVG = '<clipPath id="imageCrop_30">\n\t<rect x="-137" y="-54" width="274" height="108" />\n</clipPath>\n<g transform="translate(137 54)">\n\t<image xlink:href="/Users/abogazzi/fabric/fabric.js/test/unit/../fixtures/test_image.gif" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110" clip-path="url(#imageCrop_30)" ></image>\n</g>\n';
+      fabric.Object.__uid = 0
+      var expectedSVG = '<clipPath id="imageCrop_1">\n\t<rect x="-137" y="-54" width="274" height="108" />\n</clipPath>\n<g transform="translate(137 54)">\n\t<image xlink:href="/Users/abogazzi/fabric/fabric.js/test/unit/../fixtures/test_image.gif" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110" clip-path="url(#imageCrop_1)" ></image>\n</g>\n';
       assert.equal(image.toSVG(), expectedSVG);
       done();
     });
