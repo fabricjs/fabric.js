@@ -18,6 +18,42 @@
     },
 
     /**
+     * Invoked inside on mouse down and mouse move
+     * @param {Object} pointer
+     */
+    drawDot: function (pointer) {
+      var point = new fabric.Point(pointer.x, pointer.y);
+      if (!this._addPoint(point)) {
+        return;
+      }
+      var ctx  = this.canvas.contextTop,
+          p1 = this._points[this._curPointIdx],
+          p2 = this._points[this._curPointIdx + 1];
+
+      this._saveAndTransform(ctx);
+      ctx.beginPath();
+      //if we only have 2 points in the path and they are the same
+      //it means that the user only clicked the canvas without moving the mouse
+      //then we should be drawing a dot. A path isn't drawn between two identical dots
+      //that's why we set them apart a bit
+      if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
+        var width = this.width / 1000;
+        p1 = new fabric.Point(p1.x, p1.y);
+        p2 = new fabric.Point(p2.x, p2.y);
+        p1.x -= width;
+        p2.x += width;
+      }
+      ctx.moveTo(p1.x, p1.y);
+      var midPoint = p1.midPointFrom(p2);
+      ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      ctx.restore();
+      this._curPointIdx++;
+    },
+
+    /**
      * Inovoked on mouse down
      * @param {Object} pointer
      */
@@ -25,8 +61,7 @@
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
-      this._captureDrawingPath(pointer);
-      this._render();
+      this.drawDot(pointer);
     },
 
     /**
@@ -34,11 +69,7 @@
      * @param {Object} pointer
      */
     onMouseMove: function(pointer) {
-      this._captureDrawingPath(pointer);
-      // redraw curve
-      // clear top canvas
-      this.canvas.clearContext(this.canvas.contextTop);
-      this._render();
+      this.drawDot(pointer);
     },
 
     /**
@@ -68,9 +99,10 @@
      */
     _addPoint: function(point) {
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
-        return;
+        return false;
       }
       this._points.push(point);
+      return true;
     },
 
     /**
@@ -79,18 +111,9 @@
      */
     _reset: function() {
       this._points.length = 0;
-
+      this._curPointIdx = 0;
       this._setBrushStyles();
       this._setShadow();
-    },
-
-    /**
-     * @private
-     * @param {Object} pointer Actual mouse position related to the canvas.
-     */
-    _captureDrawingPath: function(pointer) {
-      var pointerPoint = new fabric.Point(pointer.x, pointer.y);
-      this._addPoint(pointerPoint);
     },
 
     /**
