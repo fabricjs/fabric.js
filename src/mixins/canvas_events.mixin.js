@@ -95,7 +95,7 @@
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
-      this._onDragOver = this._simpleEventHandler.bind(this, 'dragover');
+      this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
       this._onDrop = this._simpleEventHandler.bind(this, 'drop');
@@ -211,6 +211,16 @@
      */
     _onLongPress: function(e, self) {
       this.__onLongPress && this.__onLongPress(e, self);
+    },
+
+    /**
+     * prevent default to allow drop event to be fired
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragOver: function(e) {
+      e.preventDefault();
+      this._simpleEventHandler('dragover', e);
     },
 
     /**
@@ -396,8 +406,8 @@
      * @param {String} eventType event to fire (up, down or move)
      */
     _simpleEventHandler: function(eventType, e) {
-      var target = this.findTarget(e);
-          targets = this.targets || [],
+      var target = this.findTarget(e),
+          targets = this.targets,
           options = {
             e: e,
             target: target,
@@ -405,8 +415,11 @@
           };
       this.fire(eventType, options);
       target && target.fire(eventType, options);
+      if (!targets) {
+        return;
+      }
       for (var i = 0; i < targets.length; i++) {
-        targets[i].fire('mouse' + eventType, options);
+        targets[i].fire(eventType, options);
       }
     },
 
