@@ -43,7 +43,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 
 ### Goals
 
-- Unit tested (4600+ assertion, 940+ tests at the moment, 75%+ coverage)
+- Unit tested (4800+ assertion, 1050+ tests at the moment, 76%+ coverage)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
@@ -130,13 +130,9 @@ To install Fabric.js using npm, you must first manually [install Cairo](http://c
 
         //# sourceMappingURL=fabric.min.js.map
 
-6. Lint source code (prerequisite: `npm -g install jshint`)
+6. Ensure code guidelines are met (prerequisite: `npm -g install eslint`)
 
-        $ npm run lint_tests
-
-7. Ensure code guidelines are met (prerequisite: `npm -g install jscs`)
-
-        $ npm run lint
+        $ npm run lint && npm run lint_tests
 
 <h3 id="fabric-building">Testing</h3>
 
@@ -239,7 +235,7 @@ For example:
 
 ### Staying in touch
 
-Follow [@fabric.js](http://twitter.com/fabricjs), [@kangax](http://twitter.com/kangax) or or [@AndreaBogazzi](http://twitter.com/AndreaBogazzi) on twitter.
+Follow [@fabric.js](http://twitter.com/fabricjs), [@kangax](http://twitter.com/kangax) or [@AndreaBogazzi](http://twitter.com/AndreaBogazzi) on twitter.
 
 Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
 
@@ -253,12 +249,12 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### Credits
 
-- [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) for help with bugs, new features, documentation, github issues
+- [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) for help with bugs, new features, documentation, GitHub issues
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
-- [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, github issues
-- [Shutterstock](http://www.shutterstock.com) for the time and resources invested in using and improving fabric.js
+- [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, GitHub issues
+- [Shutterstock](http://www.shutterstock.com/jobs) for the time and resources invested in using and improving fabric.js
 - [And all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
 
 ### MIT License

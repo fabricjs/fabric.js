@@ -1,6 +1,6 @@
 (function(){
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -19,7 +19,7 @@
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function createImageObject(callback) {
@@ -1049,14 +1049,14 @@
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1, x: 10, y: 10 }, 'if no scaling is applied cache is as big as object');
     object.strokeWidth = 2;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'cache contains the stroke');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3, x: 12, y: 12 }, 'cache is as big as the scaled object');
   });
 
   QUnit.test('_updateCacheCanvas check if cache canvas should be updated', function(assert) {
@@ -1080,7 +1080,7 @@
   });
 
   QUnit.test('_limitCacheSize limit min to 256', function(assert) {
-    fabric.perfLimitSizeTotal = 10000;
+    fabric.perfLimitSizeTotal = 50000;
     fabric.maxCacheSideLimit = 4096;
     fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
@@ -1182,9 +1182,7 @@
   });
 
   QUnit.test('_setShadow', function(assert) {
-    var el = fabric.document.createElement('canvas');
-    el.width = 600; el.height = 600;
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
     var context = canvas.contextContainer;
     var object = new fabric.Object({ scaleX: 1, scaleY: 1});
     var group = new fabric.Group();

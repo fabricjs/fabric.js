@@ -99,12 +99,10 @@
      */
     _render: function() {
       var ctx  = this.canvas.contextTop, i, len,
-          v = this.canvas.viewportTransform,
           p1 = this._points[0],
           p2 = this._points[1];
 
-      ctx.save();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this._saveAndTransform(ctx);
       ctx.beginPath();
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
@@ -145,7 +143,7 @@
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX, multSignY, manyPoints = len > 2;
+          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;

@@ -23,7 +23,7 @@ var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var sourceMap = 'sourcemap' in buildArgsAsObject;
-
+var buildFast = 'fast' in buildArgsAsObject;
 // set amdLib var to encourage later support of other AMD systems
 var amdLib = requirejs;
 
@@ -235,8 +235,6 @@ var filesToInclude = [
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
 
-  ifSpecifiedInclude('node', 'src/node.js'),
-
   ifSpecifiedAMDInclude(amdLib)
 ];
 
@@ -256,6 +254,9 @@ else {
       if (err) {
         console.log(err);
         throw err;
+      }
+      if (buildFast) {
+        process.exit(0);
       }
 
       // add js wrapping in AMD closure for requirejs if necessary

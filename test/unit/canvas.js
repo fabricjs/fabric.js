@@ -65,7 +65,7 @@
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -80,10 +80,7 @@
 
   var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
   var upperCanvasEl = canvas.upperCanvasEl;
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
@@ -532,6 +529,47 @@
     assert.equal(collected[0], rect3, 'rect3 is collected');
     assert.equal(collected[1], rect2, 'rect2 is collected');
     assert.equal(collected[2], rect1, 'rect1 is collected');
+  });
+
+  QUnit.test('_collectObjects collects object fully contained in area', function(assert) {
+    canvas.selectionFullyContained = true;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+    canvas.add(rect1, rect2, rect3, rect4);
+    canvas._groupSelector = {
+      top: 30,
+      left: 30,
+      ex: -1,
+      ey: -1
+    };
+    var collected = canvas._collectObjects();
+    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
+    assert.equal(collected[3], rect1, 'contains rect1 as last object');
+    assert.equal(collected[2], rect2, 'contains rect2');
+    assert.equal(collected[1], rect3, 'contains rect3');
+    assert.equal(collected[0], rect4, 'contains rect4 as first object');
+    canvas.selectionFullyContained = false;
+  });
+
+  QUnit.test('_collectObjects does not collect objects not fully contained', function(assert) {
+    canvas.selectionFullyContained = true;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+    canvas.add(rect1, rect2, rect3, rect4);
+    canvas._groupSelector = {
+      top: 20,
+      left: 20,
+      ex: 5,
+      ey: 5
+    };
+    var collected = canvas._collectObjects();
+    assert.equal(collected.length, 1, 'a rect intersecting objects does not collect those');
+    assert.equal(collected[0], rect4, 'contains rect1 as only one fully contained');
+    canvas.selectionFullyContained = false;
   });
 
   QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
@@ -1684,7 +1722,7 @@
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
+    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2121,6 +2159,22 @@
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
   });
 
+  QUnit.test('setDimensions and active brush', function(assert) {
+    var prepareFor = false;
+    var rendered = false;
+    var canva = new fabric.Canvas(null, { width: 500, height: 500 });
+    var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
+    canva.isDrawingMode = true;
+    canva.freeDrawingBrush = brush;
+    canva._isCurrentlyDrawing = true;
+    brush._render = function() { rendered = true; };
+    brush._setBrushStyles = function() { prepareFor = true; };
+    canva.setDimensions({ width: 200, height: 200 });
+    canva.renderAll();
+    assert.equal(rendered, true, 'the brush called the _render method');
+    assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
+  });
+
   QUnit.test('mouse:up isClick = false', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
@@ -2135,8 +2189,7 @@
   });
 
   QUnit.test('avoid multiple bindings', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     var eventsArray = [
       c._onMouseDown,
       c._onMouseMove,
@@ -2153,8 +2206,8 @@
       c._onContextMenu
     ];
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize();
+    c.initialize();
     var eventsArray2 = [
       c._onMouseDown,
       c._onMouseMove,
@@ -2174,16 +2227,15 @@
   });
 
   QUnit.test('avoid multiple registration - mousedown', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseDown = fabric.Canvas.prototype._onMouseDown;
     var counter = 0;
     fabric.Canvas.prototype._onMouseDown = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mousedown', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2192,16 +2244,15 @@
   });
 
   QUnit.test('avoid multiple registration - mousemove', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseMove = fabric.Canvas.prototype._onMouseMove;
     var counter = 0;
     fabric.Canvas.prototype._onMouseMove = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mousemove', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2211,16 +2262,15 @@
 
   QUnit.test('avoid multiple registration - mouseup', function(assert) {
     var done = assert.async();
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseUp = fabric.Canvas.prototype._onMouseUp;
     var counter = 0;
     fabric.Canvas.prototype._onMouseUp = function() {
       counter++;
     };
-    var c = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
 
     // a mouse down is necessary to register mouse up.
     var _event = fabric.document.createEvent('MouseEvent');
@@ -2237,16 +2287,15 @@
   });
 
   QUnit.test('avoid multiple registration - mouseout', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseOut = fabric.Canvas.prototype._onMouseOut;
     var counter = 0;
     fabric.Canvas.prototype._onMouseOut = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseout', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2255,16 +2304,15 @@
   });
 
   QUnit.test('avoid multiple registration - mouseenter', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalMouseEnter = fabric.Canvas.prototype._onMouseEnter;
     var counter = 0;
     fabric.Canvas.prototype._onMouseEnter = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     c.upperCanvasEl.dispatchEvent(event);
@@ -2273,16 +2321,15 @@
   });
 
   QUnit.test('avoid multiple events on window', function(assert) {
-    var el2 = fabric.document.createElement('canvas');
     var originalResize = fabric.Canvas.prototype._onResize;
     var counter = 0;
     fabric.Canvas.prototype._onResize = function() {
       counter++;
     };
-    var c = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el2);
+    var c = new fabric.Canvas();
     // initialize canvas more than once
-    c.initialize(el2);
-    c.initialize(el2);
+    c.initialize(c.lowerCanvasEl);
+    c.initialize(c.lowerCanvasEl);
     var event = fabric.document.createEvent('UIEvents');
     event.initUIEvent('resize', true, false, fabric.window, 0);
     fabric.window.dispatchEvent(event);

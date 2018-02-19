@@ -93,8 +93,22 @@
         delete options.centerPoint;
         this.callSuper('initialize', options);
       }
+      else {
+        this._updateObjectsACoords();
+      }
 
       this.setCoords();
+    },
+
+    /**
+     * @private
+     * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
+     */
+    _updateObjectsACoords: function() {
+      var ignoreZoom = true, skipAbsolute = true;
+      for (var i = this._objects.length; i--; ){
+        this._objects[i].setCoords(ignoreZoom, skipAbsolute);
+      }
     },
 
     /**

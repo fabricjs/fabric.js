@@ -12,15 +12,15 @@
    * @class fabric.Image.filters.RemoveColor
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.RemoveWhite#initialize} for constructor definition
+   * @see {@link fabric.Image.filters.RemoveColor#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.RemoveColor({
-   *   threshold: 40,
-   *   distance: 140
+   *   threshold: 0.2,
    * });
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
+   * canvas.renderAll();
    */
   filters.RemoveColor = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.RemoveColor.prototype */ {
 
@@ -31,6 +31,11 @@
      */
     type: 'RemoveColor',
 
+    /**
+     * Color to remove, in any format understood by fabric.Color.
+     * @param {String} type
+     * @default
+     */
     color: '#FFFFFF',
 
     /**

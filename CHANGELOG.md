@@ -1,5 +1,63 @@
-**Version 2.0.0**
+**Version 2.0.2**
+  - fixed image toSVG support for crop [#4738](https://github.com/kangax/fabric.js/pull/4738)
+  - changed math for better rounded results [#4734](https://github.com/kangax/fabric.js/pull/4734)
 
+**Version 2.0.1**
+  - fixed filter for blend image in WEBGL [#4706](https://github.com/kangax/fabric.js/pull/4706)
+  - fixed interactions between canvas toDataURL and multiplier + retina [#4705](https://github.com/kangax/fabric.js/pull/4705)
+  - fixed bug with originX and originY not invalidating the transform [#4703](https://github.com/kangax/fabric.js/pull/4703)
+  - fixed unwanted mutation on object enliving in fabric.Image [#4699](https://github.com/kangax/fabric.js/pull/4699)
+**Version 2.0.0**
+  - final
+    - fix dataurl and svg export on retina and rounding [#4674](https://github.com/kangax/fabric.js/pull/4674)
+    - avoid error if iText is removed on mousedown [#4650](https://github.com/kangax/fabric.js/pull/4650)
+    - fix calcOffset when text enter editing [#4649](https://github.com/kangax/fabric.js/pull/4649)
+    - Gradient fix parsing floats [#4637](https://github.com/kangax/fabric.js/pull/4637)
+    - Add CrossOrigin managment to fabric.Pattern [#4618](https://github.com/kangax/fabric.js/pull/4618)
+    - Add patternTransform toObject saving [#4626](https://github.com/kangax/fabric.js/pull/4626)
+    - normalize brushes render [#4613](https://github.com/kangax/fabric.js/pull/4613)
+    - avoid charspacing shortcut [#4594](https://github.com/kangax/fabric.js/pull/4594)
+    - Fix color toHexa() [#4579](https://github.com/kangax/fabric.js/pull/4579)
+ - rc3 and rc4
+    - more fixes to transformMatrix memoization
+    - Canvas.selectionFullyContained allows you to select objects just when full grabbed by the selections. [#4508](https://github.com/kangax/fabric.js/pull/4508)
+    - Remove some ouput of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
+    - Reinserted a performance shortcut for when there is no style at all [#4519](https://github.com/kangax/fabric.js/pull/4519)
+    - Manage canvas resize during a freedrawing brush without wiping the brush [#4527](https://github.com/kangax/fabric.js/pull/4527)
+    - Removed an extra closePath that was creating wrong visual on IntelIntegrated cards [#4549](https://github.com/kangax/fabric.js/pull/4549)
+    - Added a method to insert and remove text from command line [#4541](https://github.com/kangax/fabric.js/pull/4541)
+    - Some fixes around text styles management
+    - nodejs support changes: removed specific node code in order to use standard fabricjs code in nodejs.
+    - added fabric.util.getNodeCanvas that passed a JSDOM element allows you to get the node-canvas instance behind it and do what you need.
+ - rc2
+    - Fixed a transform matrix memoize missing width/height [#4491](https://github.com/kangax/fabric.js/pull/4491)
+    - Fix pattern drawing a point [#4492](https://github.com/kangax/fabric.js/pull/4492)
+    - Fixed Text.removeChars [#4495](https://github.com/kangax/fabric.js/pull/4495)
+    - Added back 2 node-canvas methods [#4497](https://github.com/kangax/fabric.js/pull/4497)
+    - Fix a typo not restoring hoverCursor correctly.
+ - rc1
+    - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
+    - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
+    - Remove extra padding of cache when upper limited [#4467](https://github.com/kangax/fabric.js/pull/4467)
+    - Solved 2 perfomances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
+    - Added justify-left justify-right and justify-center [#4437](https://github.com/kangax/fabric.js/pull/4437)
+    - Fix Group fromObject and subTargetCheck [#4454](https://github.com/kangax/fabric.js/pull/4454)
+    - Fix regression on IMG from SVG [#4450](https://github.com/kangax/fabric.js/pull/4450)
+    - Remove cache dimensions together with canvas [#4453](https://github.com/kangax/fabric.js/pull/4453)
+    - Fixed some fuzzyness cases for cache [#4452](https://github.com/kangax/fabric.js/pull/4452)
+    - Fixed resize filter for webgl [#4426](https://github.com/kangax/fabric.js/pull/4426)
+    - Stop searching target during a mouse move with a transform [#4442](https://github.com/kangax/fabric.js/pull/4442)
+    - safeguard shaders for non supported precisions [#4433](https://github.com/kangax/fabric.js/pull/4433)
+    - fix insert and remove style for edge cases [#4420](https://github.com/kangax/fabric.js/pull/4420)
+    - Fix object.move when in active selection [#4394](https://github.com/kangax/fabric.js/pull/4394)
+    - Memoize calcTransformMatrix function [#4418](https://github.com/kangax/fabric.js/pull/4418)
+    - Make _set flag object as dirty just when a real change happen[#4415](https://github.com/kangax/fabric.js/pull/4415)
+    - Add browserShadowBlurConstant to adjust shadowBlur value [#4413](https://github.com/kangax/fabric.js/pull/4413)
+    - Fix set element not clearing the cacheTexture. [#4410](https://github.com/kangax/fabric.js/pull/4410)
+    - Multi selection key can be configured with an array of keys. [#4363](https://github.com/kangax/fabric.js/pull/4363)
+    - fix fast type in text loosing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
+    - fixed division by zero with lockscaling flip.
+    - added paintFirst ( paint-order with svg support ) [#4303](https://github.com/kangax/fabric.js/pull/4303)
   - beta7
     - added a build flag for not attaching fabric to window [#4199](https://github.com/kangax/fabric.js/pull/4199)
     - removed .active property from objects [#4200](https://github.com/kangax/fabric.js/pull/4200)

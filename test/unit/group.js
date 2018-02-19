@@ -1,13 +1,5 @@
 (function() {
-
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
-
-  // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  // }
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeGroupWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
@@ -387,6 +379,20 @@
       delete objectFromNewGroup.objects;
 
       assert.deepEqual(objectFromOldGroup, objectFromNewGroup);
+
+      done();
+    });
+  });
+
+  QUnit.test('fromObject restores oCoords', function(assert) {
+    var done = assert.async();
+    var group = makeGroupWith2ObjectsWithOpacity();
+
+    var groupObject = group.toObject();
+
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+      assert.ok(newGroupFromObject._objects[0].oCoords.tl, 'acoords 0 are restored');
+      assert.ok(newGroupFromObject._objects[1].oCoords.tl, 'acoords 1 are restored');
 
       done();
     });

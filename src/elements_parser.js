@@ -47,12 +47,13 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
+    var _options;
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
-    obj._removeTransformMatrix();
     if (obj instanceof fabric.Image) {
-      obj.parsePreserveAspectRatioAttribute(el);
+      _options = obj.parsePreserveAspectRatioAttribute(el);
     }
+    obj._removeTransformMatrix(_options);
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();

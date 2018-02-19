@@ -221,14 +221,12 @@
       }));
 
       var ANGLE_DEG = 90;
-      var ANGLE = ANGLE_DEG * Math.PI / 180;
-
       elPath.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
       fabric.Path.fromElement(elPath, function(path) {
 
         assert.deepEqual(
           path.get('transformMatrix'),
-          [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]
+          [0, 1, -1, 0, 0, 0]
         );
         done();
       });

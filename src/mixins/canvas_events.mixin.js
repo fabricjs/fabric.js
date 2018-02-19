@@ -487,7 +487,9 @@
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject(e).requestRenderAll();
+      if (this.getActiveObject()) {
+        this.discardActiveObject(e).requestRenderAll();
+      }
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
@@ -532,19 +534,19 @@
      */
     __onMouseDown: function (e) {
 
-      var target = this.findTarget(e);
+      var target = this.findTarget(e) || null;
 
       // if right click just fire events
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'down', target ? target : null, RIGHT_CLICK);
+          this._handleEvent(e, 'down', target, RIGHT_CLICK);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'down', target ? target : null, MIDDLE_CLICK);
+          this._handleEvent(e, 'down', target, MIDDLE_CLICK);
         }
         return;
       }
@@ -591,7 +593,7 @@
           this._setupCurrentTransform(e, target);
         }
       }
-      this._handleEvent(e, 'down', target ? target : null);
+      this._handleEvent(e, 'down', target);
       // we must renderAll so that we update the visuals
       shouldRender && this.requestRenderAll();
     },
@@ -682,14 +684,14 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-        target = this.findTarget(e);
+        target = this.findTarget(e) || null;
         this._setCursorFromEvent(e, target);
         this._fireOverOutEvents(target, e);
       }
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move', target);
+      this._handleEvent(e, 'move', this._currentTransform ? null : target);
     },
 
     /**
