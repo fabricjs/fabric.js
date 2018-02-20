@@ -76,6 +76,7 @@
       canvas.add(newGroup);
       canvas._activeObject = newGroup;
       newGroup.setCoords();
+      canvas.trigger('selection:updated', { target: newGroup });
       return newGroup;
     },
 
