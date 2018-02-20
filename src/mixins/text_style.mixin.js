@@ -75,7 +75,7 @@
             style = obj[p1][p2][property];
             foundStyle = true;
           }
-          else if (obj[p1][p2][property] !== style) {
+          else if (obj[p1][p2][property] !== style || !obj[p1][p2].hasOwnProperty(property)) {
             canBeSwapped = false;
           }
           if (obj[p1][p2][property] === this[property]) {

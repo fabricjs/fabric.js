@@ -336,6 +336,26 @@
     assert.equal(text.styles[1][0].stroke, 'blue', 'nothing to clean, style untouched');
   });
 
+  QUnit.test('text cleanStyle with different sub styles styles', function(assert) {
+    var text = new fabric.Text('xxxxxx\nx y');
+    text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }}};
+    text.stroke = 'red';
+    text.cleanStyle('stroke');
+    assert.equal(text.stroke, 'red', 'the stroke stays red');
+    assert.equal(text.styles[1][0].fill, 'red', 'the style has not been changed since it\'s a different property');
+    assert.equal(text.styles[1][0].stroke, undefined, 'the style has been cleaned since stroke was equal to text property');
+    assert.equal(text.styles[1][1], undefined, 'the style remains undefined');
+  });
+
+  QUnit.test('text cleanStyle with undefined and set styles', function(assert) {
+    var text = new fabric.Text('xxxxxx\nx y');
+    text.styles = { 1: { 1: { stroke: 'red' }, 3: { stroke: 'red' }}};
+    text.stroke = 'red';
+    text.cleanStyle('stroke');
+    assert.equal(text.stroke, 'red', 'the stroke stays red');
+    assert.equal(text.styles[1], undefined, 'the style has been cleaned since stroke was equal to text property');
+  });
+
   QUnit.test('text cleanStyle with empty styles', function(assert) {
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
@@ -352,6 +372,20 @@
     text.cleanStyle('fill');
     assert.equal(text.fill, 'blue', 'the fill has been changed to blue');
     assert.equal(text.styles[0], undefined, 'all the style has been removed');
+  });
+
+  QUnit.test('text cleanStyle with no relevant style', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { other: 'value1' }, 1:  { other: 'value2' }, 2:  { other: 'value3' }}};
+    text.fill = 'black';
+    text.cleanStyle('fill');
+    assert.equal(text.fill, 'black', 'the fill remains black');
+    assert.equal(text.styles[0][0].other, 'value1', 'style remains the same');
+    assert.equal(text.styles[0][0].full, undefined, 'style remains undefined');
+    assert.equal(text.styles[0][1].other, 'value2', 'style remains the same');
+    assert.equal(text.styles[0][1].full, undefined, 'style remains undefined');
+    assert.equal(text.styles[0][2].other, 'value3', 'style remains the same');
+    assert.equal(text.styles[0][2].full, undefined, 'style remains undefined');
   });
 
   QUnit.test('text removeStyle with some style', function(assert) {
