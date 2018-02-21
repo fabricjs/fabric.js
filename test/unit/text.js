@@ -338,13 +338,14 @@
 
   QUnit.test('text cleanStyle with different sub styles styles', function(assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }}};
+    text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }, 2: { stroke: 'blue' }}};
     text.stroke = 'red';
     text.cleanStyle('stroke');
     assert.equal(text.stroke, 'red', 'the stroke stays red');
     assert.equal(text.styles[1][0].fill, 'red', 'the style has not been changed since it\'s a different property');
     assert.equal(text.styles[1][0].stroke, undefined, 'the style has been cleaned since stroke was equal to text property');
     assert.equal(text.styles[1][1], undefined, 'the style remains undefined');
+    assert.equal(text.styles[1][2].stroke, 'blue', 'the style remains unchanged');
   });
 
   QUnit.test('text cleanStyle with undefined and set styles', function(assert) {
