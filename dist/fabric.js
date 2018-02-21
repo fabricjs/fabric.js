@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.2' };
+var fabric = fabric || { version: '2.0.3' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -8269,6 +8269,16 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     },
 
     /**
+     * Invoked inside on mouse down and mouse move
+     * @param {Object} pointer
+     */
+    _drawSegment: function (ctx, p1, p2) {
+      var midPoint = p1.midPointFrom(p2);
+      ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      return midPoint;
+    },
+
+    /**
      * Inovoked on mouse down
      * @param {Object} pointer
      */
@@ -8285,17 +8295,25 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @param {Object} pointer
      */
     onMouseMove: function(pointer) {
-      this._captureDrawingPath(pointer);
-      // redraw curve
-      // clear top canvas
-      this.canvas.clearContext(this.canvas.contextTop);
-      this._render();
+      if (this._captureDrawingPath(pointer) && this._points.length > 1) {
+        var points = this._points, length = points.length, ctx = this.canvas.contextTop;
+        // draw the curve update
+        this._saveAndTransform(ctx);
+        if (this.oldEnd) {
+          ctx.beginPath();
+          ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+        }
+        this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
+        ctx.stroke();
+        ctx.restore();
+      }
     },
 
     /**
      * Invoked on mouse up
      */
     onMouseUp: function() {
+      this.oldEnd = undefined;
       this._finalizeAndAddPath();
     },
 
@@ -8309,7 +8327,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
       this._reset();
       this._addPoint(p);
-
       this.canvas.contextTop.moveTo(p.x, p.y);
     },
 
@@ -8319,9 +8336,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _addPoint: function(point) {
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
-        return;
+        return false;
       }
       this._points.push(point);
+      return true;
     },
 
     /**
@@ -8330,7 +8348,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _reset: function() {
       this._points.length = 0;
-
       this._setBrushStyles();
       this._setShadow();
     },
@@ -8341,7 +8358,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _captureDrawingPath: function(pointer) {
       var pointerPoint = new fabric.Point(pointer.x, pointer.y);
-      this._addPoint(pointerPoint);
+      return this._addPoint(pointerPoint);
     },
 
     /**
@@ -8371,9 +8388,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       for (i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi + 1 & pi + 2 as the
         // end point and p1 as our control point.
-        var midPoint = p1.midPointFrom(p2);
-        ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-
+        this._drawSegment(ctx, p1, p2);
         p1 = this._points[i];
         p2 = this._points[i + 1];
       }
@@ -10106,7 +10121,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       while (i--) {
         if (this._checkTarget(pointer, objects[i])) {
           target = objects[i];
-          if (target.type === 'group' && target.subTargetCheck) {
+          if (target.subTargetCheck && target instanceof fabric.Group) {
             normalizedPointer = this._normalizePointer(target, pointer);
             subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
             subTarget && this.targets.push(subTarget);
@@ -11136,7 +11151,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.stateful && target.saveState();
 
       // determine if it's a drag or rotate case
-      if (target._findTargetCorner(this.getPointer(e))) {
+      if (target._findTargetCorner(this.getPointer(e, true))) {
         this.onBeforeScaleRotate(target);
       }
 
@@ -25043,7 +25058,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             style = obj[p1][p2][property];
             foundStyle = true;
           }
-          else if (obj[p1][p2][property] !== style) {
+          else if (obj[p1][p2][property] !== style || !obj[p1][p2].hasOwnProperty(property)) {
             canBeSwapped = false;
           }
           if (obj[p1][p2][property] === this[property]) {
