@@ -21,10 +21,10 @@
      * Invoked inside on mouse down and mouse move
      * @param {Object} pointer
      */
-    _drawSegment: function (ctx, p1, p2, withBegin) {
+    _drawSegment: function (ctx, p1, p2) {
       var midPoint = p1.midPointFrom(p2);
-      withBegin && ctx.begiPath();
       ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      return midPoint;
     },
 
     /**
@@ -44,11 +44,15 @@
      * @param {Object} pointer
      */
     onMouseMove: function(pointer) {
-      if (this._captureDrawingPath(pointer) && this._points.length > 2) {
-        var length = this._points.length, ctx = this.canvas.contextTop;
+      if (this._captureDrawingPath(pointer) && this._points.length > 1) {
+        var points = this._points, length = points.length, ctx = this.canvas.contextTop;
         // draw the curve update
         this._saveAndTransform(ctx);
-        this._drawSegment(ctx, this._points[length - 3], this._points[length - 2], true);
+        if (this.oldEnd) {
+          ctx.beginPath();
+          ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+        }
+        this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
         ctx.stroke();
         ctx.restore();
       }
@@ -58,6 +62,7 @@
      * Invoked on mouse up
      */
     onMouseUp: function() {
+      this.oldEnd = undefined;
       this._finalizeAndAddPath();
     },
 
