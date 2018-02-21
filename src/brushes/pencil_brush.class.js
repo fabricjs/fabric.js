@@ -21,8 +21,9 @@
      * Invoked inside on mouse down and mouse move
      * @param {Object} pointer
      */
-    _drawSegment: function (ctx, p1, p2) {
+    _drawSegment: function (ctx, p1, p2, withBegin) {
       var midPoint = p1.midPointFrom(p2);
+      withBegin && ctx.begiPath();
       ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
     },
 
@@ -47,7 +48,7 @@
         var length = this._points.length, ctx = this.canvas.contextTop;
         // draw the curve update
         this._saveAndTransform(ctx);
-        this._drawSegment(ctx, this._points[length - 3], this._points[length - 2]);
+        this._drawSegment(ctx, this._points[length - 3], this._points[length - 2], true);
         ctx.stroke();
         ctx.restore();
       }
