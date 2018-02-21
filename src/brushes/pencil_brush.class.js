@@ -18,6 +18,16 @@
     },
 
     /**
+     * Invoked inside on mouse down and mouse move
+     * @param {Object} pointer
+     */
+    _drawSegment: function (ctx, p1, p2) {
+      var midPoint = p1.midPointFrom(p2);
+      ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      return midPoint;
+    },
+
+    /**
      * Inovoked on mouse down
      * @param {Object} pointer
      */
@@ -34,17 +44,25 @@
      * @param {Object} pointer
      */
     onMouseMove: function(pointer) {
-      this._captureDrawingPath(pointer);
-      // redraw curve
-      // clear top canvas
-      this.canvas.clearContext(this.canvas.contextTop);
-      this._render();
+      if (this._captureDrawingPath(pointer) && this._points.length > 1) {
+        var points = this._points, length = points.length, ctx = this.canvas.contextTop;
+        // draw the curve update
+        this._saveAndTransform(ctx);
+        if (this.oldEnd) {
+          ctx.beginPath();
+          ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+        }
+        this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
+        ctx.stroke();
+        ctx.restore();
+      }
     },
 
     /**
      * Invoked on mouse up
      */
     onMouseUp: function() {
+      this.oldEnd = undefined;
       this._finalizeAndAddPath();
     },
 
@@ -58,7 +76,6 @@
 
       this._reset();
       this._addPoint(p);
-
       this.canvas.contextTop.moveTo(p.x, p.y);
     },
 
@@ -68,9 +85,10 @@
      */
     _addPoint: function(point) {
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
-        return;
+        return false;
       }
       this._points.push(point);
+      return true;
     },
 
     /**
@@ -79,7 +97,6 @@
      */
     _reset: function() {
       this._points.length = 0;
-
       this._setBrushStyles();
       this._setShadow();
     },
@@ -90,7 +107,7 @@
      */
     _captureDrawingPath: function(pointer) {
       var pointerPoint = new fabric.Point(pointer.x, pointer.y);
-      this._addPoint(pointerPoint);
+      return this._addPoint(pointerPoint);
     },
 
     /**
@@ -120,9 +137,7 @@
       for (i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi + 1 & pi + 2 as the
         // end point and p1 as our control point.
-        var midPoint = p1.midPointFrom(p2);
-        ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-
+        this._drawSegment(ctx, p1, p2);
         p1 = this._points[i];
         p2 = this._points[i + 1];
       }
