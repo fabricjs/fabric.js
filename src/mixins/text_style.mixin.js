@@ -63,7 +63,7 @@
       if (!this.styles || !property || property === '') {
         return false;
       }
-      var obj = this.styles, stylesCount = 0, letterCount, style,
+      var obj = this.styles, stylesCount = 0, letterCount, stylePropertyValue,
           allStyleObjectPropertiesMatch = true, graphemeCount = 0, styleObject;
       // eslint-disable-next-line
       for (var p1 in obj) {
@@ -76,15 +76,15 @@
           stylesCount++;
 
           if (stylePropertyHasBeenSet) {
-            if (!style) {
-              style = styleObject[property];
+            if (!stylePropertyValue) {
+              stylePropertyValue = styleObject[property];
             }
-            else if (styleObject[property] !== style) {
+            else if (styleObject[property] !== stylePropertyValue) {
               allStyleObjectPropertiesMatch = false;
             }
 
             if (styleObject[property] === this[property]) {
-              delete obj[p1][p2][property];
+              delete styleObject[property];
             }
           }
           else {
@@ -109,7 +109,7 @@
         graphemeCount += this._textLines[i].length;
       }
       if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-        this[property] = style;
+        this[property] = stylePropertyValue;
         this.removeStyle(property);
       }
     },
