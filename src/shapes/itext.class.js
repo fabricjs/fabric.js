@@ -480,7 +480,8 @@
     },
 
     /**
-     * Returns the cursor position for the getCurrent.. functions
+     * Returns the cursor position for on unwrapped lines for text typing.
+     * it basically return the character before the cursor
      * @private
      */
     _getCurrentCharIndex: function() {
