@@ -130,20 +130,24 @@
     },
 
     /**
+     * extend current style at position index with styles
+     * @param {Number} index The position to start to.
+     * @param {Object} styles the style object.
      * @private
      */
     _extendStyles: function(index, styles) {
-      var loc = this.get2DCursorLocation(index);
+      var loc = this.get2DCursorLocation(index, true), lineIndex = loc.lineIndex,
+          charIndex = loc.charIndex;
 
-      if (!this._getLineStyle(loc.lineIndex)) {
-        this._setLineStyle(loc.lineIndex, {});
+      if (!this._getLineStyle(lineIndex)) {
+        this._setLineStyle(lineIndex, {});
       }
 
-      if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
-        this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
+      if (!this._getStyleDeclaration(lineIndex, charIndex)) {
+        this._setStyleDeclaration(lineIndex, charIndex, {});
       }
 
-      fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
+      fabric.util.object.extend(this._getStyleDeclaration(lineIndex, charIndex), styles);
     },
 
     /**
@@ -202,15 +206,15 @@
      * @private
      */
     getStyleAtPosition: function(position, complete) {
-      var loc = this.get2DCursorLocation(position),
-          style = complete ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex) :
-            this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+      var loc = this.get2DCursorLocation(position, true), lineIndex = loc.lineIndex,
+          charIndex = loc.lineIndex, style = complete ? this.getCompleteStyleDeclaration(lineIndex, charIndex) :
+            this._getStyleDeclaration(lineIndex, charIndex);
       return style || {};
     },
 
     /**
      * Sets style of a current selection, if no selection exist, do not set anything.
-     * @param {Object} [styles] Styles object
+     * @param {Object} styles Styles object
      * @param {Number} [startIndex] Start index to get styles at
      * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
      * @return {fabric.IText} thisArg
