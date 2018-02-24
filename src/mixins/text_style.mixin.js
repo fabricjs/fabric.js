@@ -2,7 +2,7 @@
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
     /**
      * Returns true if object has no styling or no styling in a line
-     * @param {Number} lineIndex
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
      * @return {Boolean}
      */
     isEmptyStyles: function(lineIndex) {

@@ -156,6 +156,22 @@
     },
 
     /**
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
+     * @return {Boolean}
+     */
+    isEmptyStyles: function(lineIndex) {
+      if (this._styleMap && !this.isWrapping) {
+        var map = this._styleMap[lineIndex];
+        if (!map) {
+          return true;
+        }
+        lineIndex = map.line;
+      }
+      return fabric.Text.prototype.isEmptyStyles.call(this, lineIndex);
+    },
+
+    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @private
