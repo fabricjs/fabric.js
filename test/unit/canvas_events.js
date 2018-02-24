@@ -244,12 +244,61 @@
     });
   });
 
-  ['mousedown', 'mousemove', 'mouseout', 'mouseenter', 'wheel', 'dblclick'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+    QUnit.test('_simpleEventHandler fires on object and canvas' + eventType, function(assert) {
+      var eventName = eventType.toLowerCase();
+      var counter = 0;
+      var target;
+      var c = new fabric.Canvas();
+      var rect = new fabric.Rect({ width: 10, height: 10 });
+      c.add(rect);
+      rect.on(eventName, function() {
+        counter++;
+      });
+      c.on(eventName, function(opt) {
+        target = opt.target;
+      });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      event.clientX = 5;
+      event.clientY = 5;
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' fabric event fired on rect');
+      assert.equal(target, rect, eventName + ' on canvas has rect as a target');
+    });
+  });
+
+  ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {
     QUnit.test('Fabric event fired - ' + eventType, function(assert) {
       var eventname = eventType.slice(0, 5) + ':' + eventType.slice(5);
       if (eventType === 'wheel' || eventType === 'dblclick') {
         eventname = 'mouse:' + eventType;
       }
+      var target;
+      if (eventType === 'mouseenter') {
+        eventname = 'mouse:over';
+      }
+      var counter = 0;
+      var c = new fabric.Canvas();
+      var rect = new fabric.Rect({ top: -4, left: -4, width: 12, height: 12 });
+      c.add(rect);
+      c.on(eventname, function(opt) {
+        counter++;
+        target = opt.target;
+      });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventType, true, true);
+      event.clientX = 5;
+      event.clientY = 5;
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventname + ' fabric event fired');
+      assert.equal(target, rect, eventname + ' on canvas has rect as a target');
+    });
+  });
+
+  ['mouseout', 'mouseenter'].forEach(function(eventType) {
+    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
+      var eventname = eventType.slice(0, 5) + ':' + eventType.slice(5);
       if (eventType === 'mouseenter') {
         eventname = 'mouse:over';
       }
@@ -258,7 +307,7 @@
       c.on(eventname, function() {
         counter++;
       });
-      var event = fabric.document.createEvent('MouseEvent');
+      var event = fabric.document.createEvent('HTMLEvents');
       event.initEvent(eventType, true, true);
       c.upperCanvasEl.dispatchEvent(event);
       assert.equal(counter, 1, eventname + ' fabric event fired');
