@@ -65,18 +65,6 @@
     _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
 
     /**
-     * Constructor. Some scaling related property values are forced. Visibility
-     * of controls is also fixed; only the rotation and width controls are
-     * made available.
-     * @param {String} text Text string
-     * @param {Object} [options] Options object
-     * @return {fabric.Textbox} thisArg
-     */
-    initialize: function(text, options) {
-      this.callSuper('initialize', text, options);
-    },
-
-    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -161,14 +149,30 @@
      * @return {Boolean}
      */
     isEmptyStyles: function(lineIndex) {
-      if (this._styleMap && !this.isWrapping) {
-        var map = this._styleMap[lineIndex];
-        if (!map) {
-          return true;
-        }
+      var offset = 0, nextLineIndex = lineIndex + 1, nextOffset, obj, shouldLimit = false;
+      var map = this._styleMap[lineIndex];
+      var mapNextLine = this._styleMap[lineIndex + 1];
+      if (map) {
         lineIndex = map.line;
+        offset = map.offset;
       }
-      return fabric.Text.prototype.isEmptyStyles.call(this, lineIndex);
+      if (mapNextLine) {
+        nextLineIndex = mapNextLine.line;
+        shouldLimit = nextLineIndex === lineIndex;
+        nextOffset = mapNextLine.offset;
+      }
+      obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
+      for (var p1 in obj) {
+        for (var p2 in obj[p1]) {
+          if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+            // eslint-disable-next-line no-unused-vars
+            for (var p3 in obj[p1][p2]) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
     },
 
     /**
@@ -216,6 +220,7 @@
     },
 
     /**
+    * probably broken need a fix
      * @param {Number} lineIndex
      * @private
      */
@@ -225,6 +230,7 @@
     },
 
     /**
+     * probably broken need a fix
      * @param {Number} lineIndex
      * @param {Object} style
      * @private
@@ -235,6 +241,7 @@
     },
 
     /**
+     * probably broken need a fix
      * @param {Number} lineIndex
      * @private
      */
