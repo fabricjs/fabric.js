@@ -734,6 +734,29 @@
     },
 
     /**
+     * @private
+     */
+    _fireEnterLeaveEvents: function(target, e) {
+      var enterOpt, leaveOpt, draggedoverTarget = this._draggedoverTarget;
+      if (draggedoverTarget !== target) {
+        enterOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
+        leaveOpt = { e: e, target: this._draggedoverTarget, nextTarget: target };
+        this._hoveredTarget = target;
+      }
+      if (target) {
+        if (draggedoverTarget !== target) {
+          if (draggedoverTarget) {
+            draggedoverTarget.fire('dragleave', leaveOpt);
+          }
+          target.fire('dragenter', enterOpt);
+        }
+      }
+      else if (draggedoverTarget) {
+        draggedoverTarget.fire('dragleave', leaveOpt);
+      }
+    },
+
+    /**
      * Method that defines actions when an Event Mouse Wheel
      * @param {Event} e Event object fired on mouseup
      */
