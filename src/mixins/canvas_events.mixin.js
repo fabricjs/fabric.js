@@ -220,7 +220,8 @@
      */
     _onDragOver: function(e) {
       e.preventDefault();
-      this._simpleEventHandler('dragover', e);
+      var target = this._simpleEventHandler('dragover', e);
+      this._fireEnterLeaveEvents(target, e);
     },
 
     /**
@@ -404,6 +405,7 @@
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
+     * @return {Fabric.Object} target return the the target found, for internal reasons.
      */
     _simpleEventHandler: function(eventType, e) {
       var target = this.findTarget(e),
@@ -416,11 +418,12 @@
       this.fire(eventType, options);
       target && target.fire(eventType, options);
       if (!targets) {
-        return;
+        return target;
       }
       for (var i = 0; i < targets.length; i++) {
         targets[i].fire(eventType, options);
       }
+      return target;
     },
 
     /**
@@ -708,51 +711,64 @@
     },
 
     /**
+     * Manage the mouseout, mouseover events for the fabric object on the canvas
+     * @param {Fabric.Object} target the target where the target from the mousemove event
+     * @param {Event} e Event object fired on mousemove
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var overOpt, outOpt, hoveredTarget = this._hoveredTarget;
-      if (hoveredTarget !== target) {
-        overOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
-        outOpt = { e: e, target: this._hoveredTarget, nextTarget: target };
-        this._hoveredTarget = target;
-      }
-      if (target) {
-        if (hoveredTarget !== target) {
-          if (hoveredTarget) {
-            this.fire('mouse:out', outOpt);
-            hoveredTarget.fire('mouseout', outOpt);
-          }
-          this.fire('mouse:over', overOpt);
-          target.fire('mouseover', overOpt);
-        }
-      }
-      else if (hoveredTarget) {
-        this.fire('mouse:out', outOpt);
-        hoveredTarget.fire('mouseout', outOpt);
-      }
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_hoveredTarget',
+        canvasEvtOut: 'mouse:out',
+        evtOut: 'mouseout',
+        canvasEvtIn: 'mouse:over',
+        evtIn: 'mouseover',
+      });
     },
 
     /**
+     * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the onDrag event
+     * @param {Event} e Event object fired on ondrag
      * @private
      */
     _fireEnterLeaveEvents: function(target, e) {
-      var enterOpt, leaveOpt, draggedoverTarget = this._draggedoverTarget;
-      if (draggedoverTarget !== target) {
-        enterOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
-        leaveOpt = { e: e, target: this._draggedoverTarget, nextTarget: target };
-        this._hoveredTarget = target;
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_draggedoverTarget',
+        evtOut: 'dragleave',
+        evtIn: 'dragenter',
+      });
+    },
+
+    /**
+     * Manage the syntetic in/out events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the supported events
+     * @param {Event} e Event object fired
+     * @param {Object} config configuration for the function to work
+     * @param {String} config.targetName property on the canvas where the old target is stored
+     * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
+     * @param {String} config.evtOut name of the event to fire for out
+     * @param {String} [config.canvasEvtIn] name of the event to fire at canvas level for in
+     * @param {String} config.evtIn name of the event to fire for in
+     * @private
+     */
+    fireSynteticInOutEvents: function(target, e, config) {
+      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+          targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
+      if (targetChanged) {
+        inOpt = { e: e, target: target, previousTarget: oldTarget };
+        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        this[config.targetName] = target;
       }
-      if (target) {
-        if (draggedoverTarget !== target) {
-          if (draggedoverTarget) {
-            draggedoverTarget.fire('dragleave', leaveOpt);
-          }
-          target.fire('dragenter', enterOpt);
-        }
+      inFires = target && targetChanged;
+      outFires = oldTarget && targetChanged;
+      if (outFires) {
+        canvasEvtOut && this.fire(canvasEvtOut, outOpt);
+        oldTarget.fire(config.evtOut, outOpt);
       }
-      else if (draggedoverTarget) {
-        draggedoverTarget.fire('dragleave', leaveOpt);
+      if (inFires) {
+        canvasEvtIn && this.fire(canvasEvtIn, inOpt);
+        target.fire(config.evtIn, inOpt);
       }
     },
 
