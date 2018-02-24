@@ -324,6 +324,7 @@
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
+    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
     cObj.setCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
