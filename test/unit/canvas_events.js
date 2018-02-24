@@ -210,38 +210,84 @@
     assert.deepEqual(eventsArray, eventsArray2, 'after first initialize, functions do not change.');
   });
 
-  QUnit.test('avoid multiple registration - mousedown', function(assert) {
-    var originalMouseDown = fabric.Canvas.prototype._onMouseDown;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseDown = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('MouseEvent');
-    event.initEvent('mousedown', true, true);
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(counter, 1, 'listener executed once');
-    fabric.Canvas.prototype._onMouseDown = originalMouseDown;
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
+      var funcName = '_on' + eventType;
+      var eventName = eventType.toLowerCase();
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c[funcName] = function() {
+        counter++;
+      };
+      // initialize canvas more than once
+      c.initialize(c.lowerCanvasEl);
+      c.initialize(c.lowerCanvasEl);
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' listener executed once');
+    });
   });
 
-  QUnit.test('avoid multiple registration - mousemove', function(assert) {
-    var originalMouseMove = fabric.Canvas.prototype._onMouseMove;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseMove = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('MouseEvent');
-    event.initEvent('mousemove', true, true);
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(counter, 1, 'listener executed once');
-    fabric.Canvas.prototype._onMouseMove = originalMouseMove;
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
+      var eventName = eventType.toLowerCase();
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c.on(eventName, function() {
+        counter++;
+      });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' fabric event fired');
+    });
+  });
+
+  ['mousedown', 'mousemove', 'mouseout', 'mouseenter', 'wheel', 'dblclick'].forEach(function(eventType) {
+    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
+      var eventname = eventType.slice(0, 5) + ':' + eventType.slice(5);
+      if (eventType === 'wheel' || eventType === 'dblclick') {
+        eventname = 'mouse:' + eventType;
+      }
+      if (eventType === 'mouseenter') {
+        eventname = 'mouse:over';
+      }
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c.on(eventname, function() {
+        counter++;
+      });
+      var event = fabric.document.createEvent('MouseEvent');
+      event.initEvent(eventType, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventname + ' fabric event fired');
+    });
+  });
+
+  ['MouseDown', 'MouseMove', 'MouseOut', 'MouseEnter', 'MouseWheel', 'DoubleClick'].forEach(function(eventType) {
+    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
+      var funcName = '_on' + eventType;
+      var eventName = eventType.toLowerCase();
+      if (eventType === 'DoubleClick') {
+        eventName = 'dblclick';
+      }
+      if (eventType === 'MouseWheel') {
+        eventName = 'wheel';
+      }
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c[funcName] = function() {
+        counter++;
+      };
+      // initialize canvas more than once
+      c.initialize(c.lowerCanvasEl);
+      c.initialize(c.lowerCanvasEl);
+      var event = fabric.document.createEvent('MouseEvent');
+      event.initEvent(eventName, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' listener executed once');
+    });
   });
 
   QUnit.test('avoid multiple registration - mouseup', function(assert) {
@@ -268,40 +314,6 @@
       fabric.Canvas.prototype._onMouseUp = originalMouseUp;
       done();
     }, 200);
-  });
-
-  QUnit.test('avoid multiple registration - mouseout', function(assert) {
-    var originalMouseOut = fabric.Canvas.prototype._onMouseOut;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseOut = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('MouseEvent');
-    event.initEvent('mouseout', true, true);
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(counter, 1, 'listener executed once');
-    fabric.Canvas.prototype._onMouseOut = originalMouseOut;
-  });
-
-  QUnit.test('avoid multiple registration - mouseenter', function(assert) {
-    var originalMouseEnter = fabric.Canvas.prototype._onMouseEnter;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseEnter = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('MouseEvent');
-    event.initEvent('mouseenter', true, true);
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(counter, 1, 'listener executed once');
-    fabric.Canvas.prototype._onMouseEnter = originalMouseEnter;
   });
 
   QUnit.test('avoid multiple events on window', function(assert) {
