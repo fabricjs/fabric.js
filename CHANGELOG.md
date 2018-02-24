@@ -1,3 +1,9 @@
+**Version 2.0.3**
+  - Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
+  - Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
+  - Fix the cleanStyle was not checking for the right property to exist [#4751](https://github.com/kangax/fabric.js/pull/4751)
+  - Fix onBeforeScaleRotate with canvas zoom [#4748](https://github.com/kangax/fabric.js/pull/4748)
+
 **Version 2.0.2**
   - fixed image toSVG support for crop [#4738](https://github.com/kangax/fabric.js/pull/4738)
   - changed math for better rounded results [#4734](https://github.com/kangax/fabric.js/pull/4734)

@@ -2094,5 +2094,4 @@
 
     assert.ok(typeof InheritedCanvasClass === 'function');
   });
-
 })();
