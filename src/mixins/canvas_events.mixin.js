@@ -56,7 +56,10 @@
       addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-
+      addListener(this.upperCanvasEl, 'dragover', this._onDragOver);
+      addListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      addListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      addListener(this.upperCanvasEl, 'drop', this._onDrop);
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, { passive: false });
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, { passive: false });
@@ -74,7 +77,7 @@
      * @private
      */
     _bindEvents: function() {
-      if (this.eventsBinded) {
+      if (this.eventsBound) {
         // for any reason we pass here twice we do not want to bind events twice.
         return;
       }
@@ -92,7 +95,11 @@
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
-      this.eventsBinded = true;
+      this._onDragOver = this._onDragOver.bind(this);
+      this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
+      this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
+      this._onDrop = this._simpleEventHandler.bind(this, 'drop');
+      this.eventsBound = true;
     },
 
     /**
@@ -110,6 +117,10 @@
       removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'dragover', this._onDragOver);
+      removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      removeListener(this.upperCanvasEl, 'drop', this._onDrop);
 
       if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
         eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
@@ -200,6 +211,17 @@
      */
     _onLongPress: function(e, self) {
       this.__onLongPress && this.__onLongPress(e, self);
+    },
+
+    /**
+     * prevent default to allow drop event to be fired
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragOver: function(e) {
+      e.preventDefault();
+      var target = this._simpleEventHandler('dragover', e);
+      this._fireEnterLeaveEvents(target, e);
     },
 
     /**
@@ -376,6 +398,32 @@
       this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
       target && (target.__corner = 0);
       shouldRender && this.requestRenderAll();
+    },
+
+    /**
+     * @private
+     * Handle event firing for target and subtargets
+     * @param {Event} e event from mouse
+     * @param {String} eventType event to fire (up, down or move)
+     * @return {Fabric.Object} target return the the target found, for internal reasons.
+     */
+    _simpleEventHandler: function(eventType, e) {
+      var target = this.findTarget(e),
+          targets = this.targets,
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+          };
+      this.fire(eventType, options);
+      target && target.fire(eventType, options);
+      if (!targets) {
+        return target;
+      }
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].fire(eventType, options);
+      }
+      return target;
     },
 
     /**
@@ -663,28 +711,64 @@
     },
 
     /**
+     * Manage the mouseout, mouseover events for the fabric object on the canvas
+     * @param {Fabric.Object} target the target where the target from the mousemove event
+     * @param {Event} e Event object fired on mousemove
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var overOpt, outOpt, hoveredTarget = this._hoveredTarget;
-      if (hoveredTarget !== target) {
-        overOpt = { e: e, target: target, previousTarget: this._hoveredTarget };
-        outOpt = { e: e, target: this._hoveredTarget, nextTarget: target };
-        this._hoveredTarget = target;
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_hoveredTarget',
+        canvasEvtOut: 'mouse:out',
+        evtOut: 'mouseout',
+        canvasEvtIn: 'mouse:over',
+        evtIn: 'mouseover',
+      });
+    },
+
+    /**
+     * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the onDrag event
+     * @param {Event} e Event object fired on ondrag
+     * @private
+     */
+    _fireEnterLeaveEvents: function(target, e) {
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_draggedoverTarget',
+        evtOut: 'dragleave',
+        evtIn: 'dragenter',
+      });
+    },
+
+    /**
+     * Manage the syntetic in/out events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the supported events
+     * @param {Event} e Event object fired
+     * @param {Object} config configuration for the function to work
+     * @param {String} config.targetName property on the canvas where the old target is stored
+     * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
+     * @param {String} config.evtOut name of the event to fire for out
+     * @param {String} [config.canvasEvtIn] name of the event to fire at canvas level for in
+     * @param {String} config.evtIn name of the event to fire for in
+     * @private
+     */
+    fireSynteticInOutEvents: function(target, e, config) {
+      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+          targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
+      if (targetChanged) {
+        inOpt = { e: e, target: target, previousTarget: oldTarget };
+        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        this[config.targetName] = target;
       }
-      if (target) {
-        if (hoveredTarget !== target) {
-          if (hoveredTarget) {
-            this.fire('mouse:out', outOpt);
-            hoveredTarget.fire('mouseout', outOpt);
-          }
-          this.fire('mouse:over', overOpt);
-          target.fire('mouseover', overOpt);
-        }
+      inFires = target && targetChanged;
+      outFires = oldTarget && targetChanged;
+      if (outFires) {
+        canvasEvtOut && this.fire(canvasEvtOut, outOpt);
+        oldTarget.fire(config.evtOut, outOpt);
       }
-      else if (hoveredTarget) {
-        this.fire('mouse:out', outOpt);
-        hoveredTarget.fire('mouseout', outOpt);
+      if (inFires) {
+        canvasEvtIn && this.fire(canvasEvtIn, inOpt);
+        target.fire(config.evtIn, inOpt);
       }
     },
 

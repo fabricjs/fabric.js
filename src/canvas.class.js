@@ -16,8 +16,6 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
-   * @fires object:added
-   * @fires object:removed
    * @fires object:modified
    * @fires object:rotating
    * @fires object:scaling
@@ -36,6 +34,11 @@
    * @fires mouse:over
    * @fires mouse:out
    * @fires mouse:dblclick
+   *
+   * @fires dragover
+   * @fires dragenter
+   * @fires dragleave
+   * @fires drop
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {

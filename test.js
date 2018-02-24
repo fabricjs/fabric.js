@@ -47,6 +47,7 @@ testrunner.run({
     './test/unit/intersection.js',
     './test/unit/stateful.js',
     './test/unit/textbox.js',
+    './test/unit/canvas_events.js',
   ],
   // tests: ['./test/unit/pattern.js'],
 }, function(err, report) {
