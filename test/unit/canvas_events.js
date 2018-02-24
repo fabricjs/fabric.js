@@ -20,6 +20,57 @@
     }
   });
 
+  QUnit.test('_beforeTransform', function (assert) {
+    assert.ok(typeof canvas._beforeTransform === 'function');
+
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+
+    var rect = new fabric.Rect({ left: 50, top: 50, width: 50, height: 50 });
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+
+    var t, counter = 0;
+    var _onBeforeScaleRotate = canvas.onBeforeScaleRotate;
+    canvas.onBeforeScaleRotate = function (target) {
+      t = target;
+      counter++;
+    };
+
+    var corners = ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr'];
+    for (var i = 0; i < corners.length; i++) {
+      var co = rect.oCoords[corners[i]].corner;
+      var e = {
+        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
+        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
+        which: 1
+      };
+      canvas._beforeTransform(e, rect);
+    }
+    assert.equal(counter, corners.length, '_beforeTransform should trigger onBeforeScaleRotate for all corners');
+    assert.equal(t, rect, 'onBeforeScaleRotate should receive correct target');
+
+    canvas.zoomToPoint({ x: 25, y: 25 }, 2);
+
+    t = null;
+    counter = 0;
+    for (var i = 0; i < corners.length; i++) {
+      var c = corners[i];
+      var co = rect.oCoords[c].corner;
+      var e = {
+        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
+        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
+        which: 1
+      };
+      canvas._beforeTransform(e, rect);
+    }
+    assert.equal(counter, corners.length, '_beforeTransform should trigger onBeforeScaleRotate when canvas is zoomed');
+    assert.equal(t, rect, 'onBeforeScaleRotate should receive correct target when canvas is zoomed');
+
+    canvas.zoomToPoint({ x: 0, y: 0 }, 1);
+    canvas.onBeforeScaleRotate = _onBeforeScaleRotate;
+  });
+
   QUnit.test('mouse:down with different buttons', function(assert) {
     var clickCount = 0;
     function mouseHandler() {
