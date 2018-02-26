@@ -1,3 +1,7 @@
+**Version 2.1.0**
+  - Added: Added: Drag and drop event binding [#4421](https://github.com/kangax/fabric.js/pull/4421)
+  - Fixed: isEmptyStyle implementation for TextBox [#4762](https://github.com/kangax/fabric.js/pull/4762)
+  
 **Version 2.0.3**
   - Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
   - Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
