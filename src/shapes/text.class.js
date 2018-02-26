@@ -999,8 +999,7 @@
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.deltaY !== thisStyle.deltaY
-      );
+              prevStyle.deltaY !== thisStyle.deltaY;
     },
 
     /**
