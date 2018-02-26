@@ -1003,6 +1003,18 @@
     },
 
     /**
+      * @private
+      * @param {Object} prevStyle
+      * @param {Object} thisStyle
+      */
+    _hasStyleChangedForSvg: function(prevStyle, thisStyle) {
+      return this._hasStyleChanged(prevStyle, thisStyle) ||
+        prevStyle.overline !== thisStyle.overline ||
+        prevStyle.underline !== thisStyle.underline ||
+        prevStyle.linethrough !== thisStyle.linethrough;
+    },
+
+    /**
      * @private
      * @param {Number} lineIndex index text line
      * @return {Number} Line left offset
