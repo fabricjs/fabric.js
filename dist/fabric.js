@@ -13957,8 +13957,6 @@ fabric.util.object.extend(fabric.IText.prototype, {
     });
 })();
 
-window.fabric = fabric;
-
 if (typeof define === "function" && define.amd) {
     define([], function() {
         return fabric;
