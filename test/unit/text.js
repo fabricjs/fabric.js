@@ -681,7 +681,7 @@
     var expected = 'overline underline line-through ';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
-  
+
   QUnit.test('text superscript', function(assert) {
     var text = new fabric.Text('xxx', { styles: {
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
