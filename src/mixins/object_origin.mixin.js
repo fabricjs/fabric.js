@@ -182,8 +182,8 @@
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
           hypotFull = this.getScaledWidth(),
-          xFull = Math.cos(angle) * hypotFull,
-          yFull = Math.sin(angle) * hypotFull,
+          xFull = fabric.util.cos(angle) * hypotFull,
+          yFull = fabric.util.sin(angle) * hypotFull,
           offsetFrom, offsetTo;
 
       //TODO: this function does not consider mixed situation like top, center.

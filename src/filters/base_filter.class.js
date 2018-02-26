@@ -20,11 +20,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   type: 'BaseFilter',
 
+  /**
+   * Array of attributes to send with buffers. do not modify
+   * @private
+   */
+
   vertexSource: 'attribute vec2 aPosition;\n' +
-    'attribute vec2 aTexCoord;\n' +
     'varying vec2 vTexCoord;\n' +
     'void main() {\n' +
-      'vTexCoord = aTexCoord;\n' +
+      'vTexCoord = aPosition;\n' +
       'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
     '}',
 
@@ -63,27 +67,32 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {String} vertexSource vertexShader source for compilation
    */
   createProgram: function(gl, fragmentSource, vertexSource) {
-    if (!this.vertexSource || !this.fragmentSource) {
-      return;
+    fragmentSource = fragmentSource || this.fragmentSource;
+    vertexSource = vertexSource || this.vertexSource;
+    if (fabric.webGlPrecision !== 'highp'){
+      fragmentSource = fragmentSource.replace(
+        /precision highp float/g,
+        'precision ' + fabric.webGlPrecision + ' float'
+      );
     }
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vertexSource || this.vertexSource);
+    gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Vertex shader compile error for "${this.type}": ' +
+        'Vertex shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(vertexShader)
       );
     }
 
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentSource || this.fragmentSource);
+    gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Fragment shader compile error for "${this.type}": ' +
+        'Fragment shader compile error for ' + this.type + ': ' +
         gl.getShaderInfoLog(fragmentShader)
       );
     }
@@ -121,7 +130,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   getAttributeLocations: function(gl, program) {
     return {
       aPosition: gl.getAttribLocation(program, 'aPosition'),
-      aTexCoord: gl.getAttribLocation(program, 'aTexCoord'),
     };
   },
 
@@ -135,7 +143,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @returns {Object} A map of uniform names to uniform locations.
    */
   getUniformLocations: function (/* gl, program */) {
-    // Intentionally left blank, override me in subclasses.
+    // in case i do not need any special uniform i need to return an empty object
+    return { };
   },
 
   /**
@@ -144,20 +153,24 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {Object} attributeLocations A map of shader attribute names to their locations.
    */
-  sendAttributeData: function(gl, attributeLocations, squareVertices) {
-    ['aPosition', 'aTexCoord'].forEach(function(attribute) {
-      var attributeLocation = attributeLocations[attribute];
-      var buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.enableVertexAttribArray(attributeLocation);
-      gl.vertexAttribPointer(attributeLocation, 2, gl.FLOAT, false, 0, 0);
-      gl.bufferData(gl.ARRAY_BUFFER, squareVertices, gl.STATIC_DRAW);
-    });
+  sendAttributeData: function(gl, attributeLocations, aPositionData) {
+    var attributeLocation = attributeLocations.aPostion;
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.enableVertexAttribArray(attributeLocation);
+    gl.vertexAttribPointer(attributeLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.bufferData(gl.ARRAY_BUFFER, aPositionData, gl.STATIC_DRAW);
   },
 
   _setupFrameBuffer: function(options) {
-    var gl = options.context;
+    var gl = options.context, width, height;
     if (options.passes > 1) {
+      width = options.destinationWidth;
+      height = options.destinationHeight;
+      if (options.sourceWidth !== width || options.sourceHeight !== height) {
+        gl.deleteTexture(options.targetTexture);
+        options.targetTexture = options.filterBackend.createTexture(gl, width, height);
+      }
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D,
         options.targetTexture, 0);
     }
@@ -207,7 +220,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.applyToWebGL(options);
       this._swapTextures(options);
     }
-    else {
+    else if (!this.isNeutralState()) {
       this.applyTo2d(options);
     }
   },
@@ -247,13 +260,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       gl.bindTexture(gl.TEXTURE_2D, options.sourceTexture);
     }
     gl.useProgram(shader.program);
-    this.sendAttributeData(gl, shader.attributeLocations, options.squareVertices);
+    this.sendAttributeData(gl, shader.attributeLocations, options.aPosition);
 
     gl.uniform1f(shader.uniformLocations.uStepW, 1 / options.sourceWidth);
     gl.uniform1f(shader.uniformLocations.uStepH, 1 / options.sourceHeight);
 
     this.sendUniformData(gl, shader.uniformLocations);
-    gl.viewport(0, 0, options.sourceWidth, options.sourceHeight);
+    gl.viewport(0, 0, options.destinationWidth, options.destinationHeight);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   },
 

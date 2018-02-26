@@ -224,48 +224,6 @@
     },
 
     /**
-     * Gets style of a current selection/cursor (at the start position)
-     * @param {Number} [startIndex] Start index to get styles at
-     * @param {Number} [endIndex] End index to get styles at
-     * @return {Object} styles Style object at a specified (or current) index
-     */
-    getSelectionStyles: function(startIndex, endIndex) {
-
-      if (arguments.length === 2) {
-        var styles = [];
-        for (var i = startIndex; i < endIndex; i++) {
-          styles.push(this.getSelectionStyles(i));
-        }
-        return styles;
-      }
-
-      var loc = this.get2DCursorLocation(startIndex),
-          style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
-
-      return style || {};
-    },
-
-    /**
-     * Sets style of a current selection, if no selection exist, do not set anything.
-     * @param {Object} [styles] Styles object
-     * @return {fabric.IText} thisArg
-     * @chainable
-     */
-    setSelectionStyles: function(styles) {
-      if (this.selectionStart === this.selectionEnd) {
-        return this;
-      }
-      else {
-        for (var i = this.selectionStart; i < this.selectionEnd; i++) {
-          this._extendStyles(i, styles);
-        }
-      }
-      /* not included in _extendStyles to avoid clearing cache more than once */
-      this._forceClearCache = true;
-      return this;
-    },
-
-    /**
      * Initialize text dimensions. Render all text on given context
      * or on a offscreen canvas to get the text width with measureText.
      * Updates this.width and this.height with the proper values.
@@ -297,20 +255,19 @@
      */
     _render: function(ctx) {
       this.callSuper('_render', ctx);
-      this.ctx = ctx;
     },
 
     /**
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.active || !this.isEditing) {
+      if (!this.isEditing) {
         return;
       }
       if (this.canvas && this.canvas.contextTop) {
-        var ctx = this.canvas.contextTop;
+        var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
         ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         this.transform(ctx);
         this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
         this._clearTextArea(ctx);
@@ -322,7 +279,7 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active || !this.isEditing) {
+      if (!this.isEditing || !this.canvas) {
         return;
       }
       var boundaries = this._getCursorBoundaries(), ctx;
@@ -331,7 +288,7 @@
         this.clearContextTop(true);
       }
       else {
-        ctx = this.ctx;
+        ctx = this.canvas.contextContainer;
         ctx.save();
       }
       if (this.selectionStart === this.selectionEnd) {
@@ -347,31 +304,6 @@
       // we add 4 pixel, to be sure to do not leave any pixel out
       var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
-    },
-    /**
-     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
-     */
-    get2DCursorLocation: function(selectionStart, skipWrapping) {
-      if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
-      }
-      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-      var len = lines.length;
-      for (var i = 0; i < len; i++) {
-        if (selectionStart <= lines[i].length) {
-          return {
-            lineIndex: i,
-            charIndex: selectionStart
-          };
-        }
-        selectionStart -= lines[i].length + 1;
-      }
-      return {
-        lineIndex: i - 1,
-        charIndex: lines[i - 1].length < selectionStart ? lines[i - 1].length : selectionStart
-      };
     },
 
     /**
@@ -473,6 +405,7 @@
 
       var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
           selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+          isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
@@ -489,7 +422,7 @@
           boxStart = this.__charBounds[startLine][startChar].left;
         }
         if (i >= startLine && i < endLine) {
-          boxEnd = this.getLineWidth(i) || 5; // WTF is this 5?
+          boxEnd = isJustify && !this.isEndOfWrapping(i) ? this.width : this.getLineWidth(i) || 5; // WTF is this 5?
         }
         else if (i === endLine) {
           if (endChar === 0) {

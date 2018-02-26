@@ -1,7 +1,5 @@
 /* _TO_SVG_START_ */
 (function() {
-  var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -61,18 +59,23 @@
     /**
      * Returns styles-string for svg-export
      * @param {Object} style the object from which to retrieve style properties
+     * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
      * @return {String}
      */
-    getSvgSpanStyles: function(style) {
-      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + '; ' : '',
-          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + '; ' : '',
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + '; ' : '',
-          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + '; ' : '',
-          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + '; ' : '',
+    getSvgSpanStyles: function(style, useWhiteSpace) {
+      var term = '; ',
+          strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
+          fontFamily = style.fontFamily ? 'font-family: ' + style.fontFamily.replace(/"/g, '\'') + term : '',
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
+          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
+          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
           stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
           textDecoration = this.getSvgTextDecoration(style),
           deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
+      if (textDecoration) {
+        textDecoration = 'text-decoration: ' + textDecoration + term;
+      }
 
       return [
         stroke,
@@ -84,6 +87,7 @@
         textDecoration,
         fill,
         deltaY,
+        useWhiteSpace ? 'white-space: pre; ' : ''
       ].join('');
     },
 
@@ -94,8 +98,8 @@
      */
     getSvgTextDecoration: function(style) {
       if ('overline' in style || 'underline' in style || 'linethrough' in style) {
-        return 'text-decoration: ' + (style.overline ? 'overline ' : '') +
-          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '') + ';';
+        return (style.overline ? 'overline ' : '') +
+          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '');
       }
       return '';
     },
@@ -169,17 +173,18 @@
 
     _setSVGBg: function(textBgRects) {
       if (this.backgroundColor) {
+        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
-            this._getFillAttributes(this.backgroundColor),
-            ' x="',
-            toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
-            '" y="',
-            toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
-            '" width="',
-            toFixed(this.width, NUM_FRACTION_DIGITS),
-            '" height="',
-            toFixed(this.height, NUM_FRACTION_DIGITS),
+          this._getFillAttributes(this.backgroundColor),
+          ' x="',
+          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+          '" y="',
+          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+          '" width="',
+          toFixed(this.width, NUM_FRACTION_DIGITS),
+          '" height="',
+          toFixed(this.height, NUM_FRACTION_DIGITS),
           '"></rect>\n');
       }
     },
@@ -200,6 +205,10 @@
         markup.push(this.shadow.toSVG(this));
       }
       return markup;
+    },
+
+    addPaintOrder: function() {
+      return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
 })();

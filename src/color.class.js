@@ -191,7 +191,7 @@
     toHexa: function() {
       var source = this.getSource(), a;
 
-      a = source[3] * 255;
+      a = Math.round(source[3] * 255);
       a = a.toString(16);
       a = (a.length === 1) ? ('0' + a) : a;
 
@@ -279,7 +279,7 @@
    * @field
    * @memberOf fabric.Color
    */
-   // eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/;
 
   /**

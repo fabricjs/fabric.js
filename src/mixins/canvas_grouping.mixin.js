@@ -13,7 +13,8 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && e[this.selectionKey] && target && target.selectable && this.selection &&
+
+      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
 
@@ -47,28 +48,31 @@
      * @private
      */
     _updateActiveSelection: function(target, e) {
-      var activeSelection = this._activeObject;
+      var activeSelection = this._activeObject,
+          currentActiveObjects = activeSelection._objects.slice(0);
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
+        this._hoveredTarget = target;
         if (activeSelection.size() === 1) {
           // activate last remaining object
-          this.setActiveObject(activeSelection.item(0), e);
-          return;
+          this._setActiveObject(activeSelection.item(0), e);
         }
       }
       else {
         activeSelection.addWithUpdate(target);
+        this._hoveredTarget = activeSelection;
       }
-      this.fire('selection:created', { target: activeSelection, e: e });
+      this._fireSelectionEvents(currentActiveObjects, e);
     },
 
     /**
      * @private
      */
     _createActiveSelection: function(target, e) {
-      var group = this._createGroup(target);
-      this.setActiveObject(group, e);
-      this.fire('selection:created', { target: group, e: e });
+      var currentActives = this.getActiveObjects(), group = this._createGroup(target);
+      this._hoveredTarget = group;
+      this._setActiveObject(group, e);
+      this._fireSelectionEvents(currentActives, e);
     },
 
     /**
@@ -93,19 +97,18 @@
      */
     _groupSelectedObjects: function (e) {
 
-      var group = this._collectObjects();
+      var group = this._collectObjects(),
+          aGroup;
 
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.ActiveSelection(group.reverse(), {
+        aGroup = new fabric.ActiveSelection(group.reverse(), {
           canvas: this
         });
-        this.setActiveObject(group, e);
-        this.fire('selection:created', { target: group, e: e });
-        this.requestRenderAll();
+        this.setActiveObject(aGroup, e);
       }
     },
 
@@ -121,8 +124,9 @@
           y2 = y1 + this._groupSelector.top,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
           selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
+          allowIntersect = !this.selectionFullyContained,
           isClick = x1 === x2 && y1 === y2;
-
+      // we iterate reverse order to collect top first in case of click.
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
@@ -130,10 +134,10 @@
           continue;
         }
 
-        if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
+        if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2)) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
-            currentObject.containsPoint(selectionX1Y1) ||
-            currentObject.containsPoint(selectionX2Y2)
+            (allowIntersect && currentObject.containsPoint(selectionX1Y1)) ||
+            (allowIntersect && currentObject.containsPoint(selectionX2Y2))
         ) {
           group.push(currentObject);
 

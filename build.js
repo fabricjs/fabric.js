@@ -23,7 +23,7 @@ var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var sourceMap = 'sourcemap' in buildArgsAsObject;
-
+var buildFast = 'fast' in buildArgsAsObject;
 // set amdLib var to encourage later support of other AMD systems
 var amdLib = requirejs;
 
@@ -123,7 +123,7 @@ function ifSpecifiedAMDInclude(amdLib) {
 
 var filesToInclude = [
   'HEADER.js',
-
+  ifSpecifiedInclude('global', 'src/globalFabric.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',
@@ -224,6 +224,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/hue_rotation.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
+  ifSpecifiedInclude('text', 'src/mixins/text_style.mixin.js'),
 
   ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),
@@ -233,8 +234,6 @@ var filesToInclude = [
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
-
-  ifSpecifiedInclude('node', 'src/node.js'),
 
   ifSpecifiedAMDInclude(amdLib)
 ];
@@ -255,6 +254,9 @@ else {
       if (err) {
         console.log(err);
         throw err;
+      }
+      if (buildFast) {
+        process.exit(0);
       }
 
       // add js wrapping in AMD closure for requirejs if necessary

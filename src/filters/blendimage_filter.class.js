@@ -47,13 +47,12 @@
     alpha: 1,
 
     vertexSource: 'attribute vec2 aPosition;\n' +
-      'attribute vec2 aTexCoord;\n' +
       'varying vec2 vTexCoord;\n' +
       'varying vec2 vTexCoord2;\n' +
       'uniform mat3 uTransformMatrix;\n' +
       'void main() {\n' +
-        'vTexCoord = aTexCoord;\n' +
-        'vTexCoord2 = (uTransformMatrix * vec3(aTexCoord, 1.0)).xy;\n' +
+        'vTexCoord = aPosition;\n' +
+        'vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;\n' +
         'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
       '}',
 

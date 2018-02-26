@@ -56,7 +56,10 @@
       addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-
+      addListener(this.upperCanvasEl, 'dragover', this._onDragOver);
+      addListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      addListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      addListener(this.upperCanvasEl, 'drop', this._onDrop);
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, { passive: false });
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, { passive: false });
@@ -74,7 +77,7 @@
      * @private
      */
     _bindEvents: function() {
-      if (this.eventsBinded) {
+      if (this.eventsBound) {
         // for any reason we pass here twice we do not want to bind events twice.
         return;
       }
@@ -92,7 +95,11 @@
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
-      this.eventsBinded = true;
+      this._onDragOver = this._onDragOver.bind(this);
+      this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
+      this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
+      this._onDrop = this._simpleEventHandler.bind(this, 'drop');
+      this.eventsBound = true;
     },
 
     /**
@@ -110,6 +117,10 @@
       removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'dragover', this._onDragOver);
+      removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      removeListener(this.upperCanvasEl, 'drop', this._onDrop);
 
       if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
         eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
@@ -203,6 +214,17 @@
     },
 
     /**
+     * prevent default to allow drop event to be fired
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragOver: function(e) {
+      e.preventDefault();
+      var target = this._simpleEventHandler('dragover', e);
+      this._fireEnterLeaveEvents(target, e);
+    },
+
+    /**
      * @private
      * @param {Event} e Event object fired on mousedown
      */
@@ -219,8 +241,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onDoubleClick: function (e) {
-      var target;
-      this._handleEvent(e, 'dblclick', target);
+      this._handleEvent(e, 'dblclick');
     },
 
     /**
@@ -313,7 +334,7 @@
         (pointer &&
           this._previousPointer &&
           this.selection && (
-          pointer.x !== this._previousPointer.x ||
+            pointer.x !== this._previousPointer.x ||
           pointer.y !== this._previousPointer.y))
       );
     },
@@ -327,19 +348,21 @@
      */
     __onMouseUp: function (e) {
 
-      var target;
+      var target, searchTarget = true, transform = this._currentTransform,
+          groupSelector = this._groupSelector,
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target, RIGHT_CLICK);
+          this._handleEvent(e, 'up', target, RIGHT_CLICK, isClick);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target, MIDDLE_CLICK);
+          this._handleEvent(e, 'up', target, MIDDLE_CLICK, isClick);
         }
         return;
       }
@@ -348,10 +371,6 @@
         this._onMouseUpInDrawingMode(e);
         return;
       }
-
-      var searchTarget = true, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
 
       if (transform) {
         this._finalizeCurrentTransform(e);
@@ -379,6 +398,32 @@
       this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
       target && (target.__corner = 0);
       shouldRender && this.requestRenderAll();
+    },
+
+    /**
+     * @private
+     * Handle event firing for target and subtargets
+     * @param {Event} e event from mouse
+     * @param {String} eventType event to fire (up, down or move)
+     * @return {Fabric.Object} target return the the target found, for internal reasons.
+     */
+    _simpleEventHandler: function(eventType, e) {
+      var target = this.findTarget(e),
+          targets = this.targets,
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+          };
+      this.fire(eventType, options);
+      target && target.fire(eventType, options);
+      if (!targets) {
+        return target;
+      }
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].fire(eventType, options);
+      }
+      return target;
     },
 
     /**
@@ -458,7 +503,9 @@
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject(e).requestRenderAll();
+      if (this.getActiveObject()) {
+        this.discardActiveObject(e).requestRenderAll();
+      }
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
@@ -503,19 +550,19 @@
      */
     __onMouseDown: function (e) {
 
-      var target = this.findTarget(e);
+      var target = this.findTarget(e) || null;
 
       // if right click just fire events
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'down', target ? target : null, RIGHT_CLICK);
+          this._handleEvent(e, 'down', target, RIGHT_CLICK);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'down', target ? target : null, MIDDLE_CLICK);
+          this._handleEvent(e, 'down', target, MIDDLE_CLICK);
         }
         return;
       }
@@ -554,15 +601,15 @@
       }
 
       if (target) {
-        if ((target.selectable || target === this._activeObject) && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
-          this._setupCurrentTransform(e, target);
-        }
         if (target.selectable) {
           this.setActiveObject(target, e);
         }
+        if (target === this._activeObject && (target.__corner || !shouldGroup)) {
+          this._beforeTransform(e, target);
+          this._setupCurrentTransform(e, target);
+        }
       }
-      this._handleEvent(e, 'down', target ? target : null);
+      this._handleEvent(e, 'down', target);
       // we must renderAll so that we update the visuals
       shouldRender && this.requestRenderAll();
     },
@@ -574,7 +621,7 @@
       this.stateful && target.saveState();
 
       // determine if it's a drag or rotate case
-      if (target._findTargetCorner(this.getPointer(e))) {
+      if (target._findTargetCorner(this.getPointer(e, true))) {
         this.onBeforeScaleRotate(target);
       }
 
@@ -653,13 +700,76 @@
         this.renderTop();
       }
       else if (!this._currentTransform) {
-        target = this.findTarget(e);
+        target = this.findTarget(e) || null;
         this._setCursorFromEvent(e, target);
+        this._fireOverOutEvents(target, e);
       }
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move', target ? target : null);
+      this._handleEvent(e, 'move', this._currentTransform ? null : target);
+    },
+
+    /**
+     * Manage the mouseout, mouseover events for the fabric object on the canvas
+     * @param {Fabric.Object} target the target where the target from the mousemove event
+     * @param {Event} e Event object fired on mousemove
+     * @private
+     */
+    _fireOverOutEvents: function(target, e) {
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_hoveredTarget',
+        canvasEvtOut: 'mouse:out',
+        evtOut: 'mouseout',
+        canvasEvtIn: 'mouse:over',
+        evtIn: 'mouseover',
+      });
+    },
+
+    /**
+     * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the onDrag event
+     * @param {Event} e Event object fired on ondrag
+     * @private
+     */
+    _fireEnterLeaveEvents: function(target, e) {
+      this.fireSynteticInOutEvents(target, e, {
+        targetName: '_draggedoverTarget',
+        evtOut: 'dragleave',
+        evtIn: 'dragenter',
+      });
+    },
+
+    /**
+     * Manage the syntetic in/out events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the supported events
+     * @param {Event} e Event object fired
+     * @param {Object} config configuration for the function to work
+     * @param {String} config.targetName property on the canvas where the old target is stored
+     * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
+     * @param {String} config.evtOut name of the event to fire for out
+     * @param {String} [config.canvasEvtIn] name of the event to fire at canvas level for in
+     * @param {String} config.evtIn name of the event to fire for in
+     * @private
+     */
+    fireSynteticInOutEvents: function(target, e, config) {
+      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+          targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
+      if (targetChanged) {
+        inOpt = { e: e, target: target, previousTarget: oldTarget };
+        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        this[config.targetName] = target;
+      }
+      inFires = target && targetChanged;
+      outFires = oldTarget && targetChanged;
+      if (outFires) {
+        canvasEvtOut && this.fire(canvasEvtOut, outOpt);
+        oldTarget.fire(config.evtOut, outOpt);
+      }
+      if (inFires) {
+        canvasEvtIn && this.fire(canvasEvtIn, inOpt);
+        target.fire(config.evtIn, inOpt);
+      }
     },
 
     /**
