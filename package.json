@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -40,8 +40,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "node build.js modules=ALL exclude=gestures,accessors",
-    "build:fast": "node build.js modules=ALL fast exclude=gestures,accessors",
+    "build": "node build.js modules=ALL requirejs exclude=gestures,accessors",
+    "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
     "build_export": "npm run build && npm run export_dist_to_site",
