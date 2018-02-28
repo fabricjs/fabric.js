@@ -1106,15 +1106,9 @@
      */
     getValueOfPropertyAt: function(lineIndex, charIndex, property) {
       var charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-
       if (charStyle && typeof charStyle[property] !== 'undefined') {
         return charStyle[property];
       }
-      if (property === 'deltaY') {
-        // if did not find deltaY in style, return 0
-        return 0;
-      }
-
       return this[property];
     },
 
