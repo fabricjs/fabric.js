@@ -551,8 +551,8 @@
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
-          0: { textDecoration: 'underline' },
-          2: { textDecoration: 'overline' },
+          0: { underline: true },
+          2: { overline: true },
           4: { textBackgroundColor: '#ffc' }
         },
         1: {
@@ -563,9 +563,22 @@
       }
     });
 
-    assert.equal(typeof iText.getStyleAtPosition, 'function');
+    var expectedStyle0 = {
+      stroke: null,
+      strokeWidth: 1,
+      fill: 'rgb(0,0,0)',
+      fontFamily: 'Times New Roman',
+      fontSize: 40,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      underline: true,
+      overline: false,
+      linethrough: false,
+      textBackgroundColor: '',
+      deltaY: 0,
+    };
 
-    assert.deepEqual(iText.getStyleAtPosition(2, true), {
+    var expectedStyle2 = {
       stroke: null,
       strokeWidth: 1,
       fill: 'rgb(0,0,0)',
@@ -574,10 +587,17 @@
       fontWeight: 'normal',
       fontStyle: 'normal',
       underline: false,
-      overline: false,
+      overline: true,
       linethrough: false,
-      textBackgroundColor: ''
-    });
+      textBackgroundColor: '',
+      deltaY: 0,
+    };
+
+    assert.equal(typeof iText.getStyleAtPosition, 'function');
+
+    assert.deepEqual(iText.getStyleAtPosition(0, true), expectedStyle0, 'styles do match at 0');
+
+    assert.deepEqual(iText.getStyleAtPosition(2, true), expectedStyle2, 'styles do match at 2');
   });
 
   QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {

@@ -265,6 +265,13 @@
     _measuringContext: null,
 
     /**
+     * Baseline shift, stlyes only, keep at 0 for the main text object
+     * @type {Number}
+     * @default
+     */
+    deltaY: 0,
+
+    /**
      * Array of properties that define a style unit (of 'styles').
      * @type {Array}
      * @default
@@ -1003,10 +1010,10 @@
     },
 
     /**
-      * @private
-      * @param {Object} prevStyle
-      * @param {Object} thisStyle
-      */
+     * @private
+     * @param {Object} prevStyle
+     * @param {Object} thisStyle
+     */
     _hasStyleChangedForSvg: function(prevStyle, thisStyle) {
       return this._hasStyleChanged(prevStyle, thisStyle) ||
         prevStyle.overline !== thisStyle.overline ||
