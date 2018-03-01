@@ -176,12 +176,12 @@
         }
       }
       // no points on screen, check intersection with absolute coordinates
-      if (this.intersectsWithRect(pointTL, pointBR, true)) {
+      if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
       // worst case scenario the object is so big that contains the screen
       var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
-      if (this.containsPoint(centerPoint, null, true)) {
+      if (this.containsPoint(centerPoint, null, true, calculate)) {
         return true;
       }
       return false;
