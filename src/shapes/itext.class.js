@@ -377,7 +377,8 @@
           charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier,
-          topOffset = boundaries.topOffset;
+          topOffset = boundaries.topOffset,
+          dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
 
       topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
         - charHeight * (1 - this._fontSizeFraction);
@@ -390,7 +391,7 @@
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
-        topOffset + boundaries.top,
+        topOffset + boundaries.top + dy,
         cursorWidth,
         charHeight);
     },

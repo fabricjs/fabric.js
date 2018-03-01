@@ -551,8 +551,8 @@
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
-          0: { textDecoration: 'underline' },
-          2: { textDecoration: 'overline' },
+          0: { underline: true },
+          2: { overline: true },
           4: { textBackgroundColor: '#ffc' }
         },
         1: {
@@ -563,9 +563,22 @@
       }
     });
 
-    assert.equal(typeof iText.getStyleAtPosition, 'function');
+    var expectedStyle0 = {
+      stroke: null,
+      strokeWidth: 1,
+      fill: 'rgb(0,0,0)',
+      fontFamily: 'Times New Roman',
+      fontSize: 40,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      underline: true,
+      overline: false,
+      linethrough: false,
+      textBackgroundColor: '',
+      deltaY: 0,
+    };
 
-    assert.deepEqual(iText.getStyleAtPosition(2, true), {
+    var expectedStyle2 = {
       stroke: null,
       strokeWidth: 1,
       fill: 'rgb(0,0,0)',
@@ -574,10 +587,17 @@
       fontWeight: 'normal',
       fontStyle: 'normal',
       underline: false,
-      overline: false,
+      overline: true,
       linethrough: false,
-      textBackgroundColor: ''
-    });
+      textBackgroundColor: '',
+      deltaY: 0,
+    };
+
+    assert.equal(typeof iText.getStyleAtPosition, 'function');
+
+    assert.deepEqual(iText.getStyleAtPosition(0, true), expectedStyle0, 'styles do match at 0');
+
+    assert.deepEqual(iText.getStyleAtPosition(2, true), expectedStyle2, 'styles do match at 2');
   });
 
   QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
@@ -680,5 +700,49 @@
     var styleString = iText.getSvgTextDecoration(styleObject);
     var expected = 'overline underline line-through ';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
+  });
+
+  QUnit.test('text superscript', function(assert) {
+    var text = new fabric.Text('xxx', { styles: {
+      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
+    } });
+    assert.ok(typeof text.setSuperscript === 'function');
+
+    var size = text.fontSize;
+    var schema = text.superscript;
+    var styleFontSize = text.styles[0][2].fontSize;
+    var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSuperscript(0, 1).setSuperscript(0, 2);
+
+    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
+    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    assert.equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
+
+    assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been decreased');
+  });
+
+  QUnit.test('text subscript', function(assert) {
+    var text = new fabric.Text('xxx', { styles: {
+      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
+    } });
+    assert.ok(typeof text.setSubscript === 'function');
+
+    var size = text.fontSize;
+    var schema = text.subscript;
+    var styleFontSize = text.styles[0][2].fontSize;
+    var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSubscript(0, 1).setSubscript(0, 2);
+
+    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
+    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    assert.equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
+
+    assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
 })();

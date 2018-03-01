@@ -58,7 +58,7 @@
 
     /**
      * Returns styles-string for svg-export
-     * @param {Object} style style properties for the span a boolean to skip shadow filter output
+     * @param {Object} style the object from which to retrieve style properties
      * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
      * @return {String}
      */
@@ -71,10 +71,12 @@
           fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
           fill = style.fill ? getSvgColorString('fill', style.fill) : '',
           stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
-          textDecoration = this.getSvgTextDecoration(style);
+          textDecoration = this.getSvgTextDecoration(style),
+          deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
       if (textDecoration) {
         textDecoration = 'text-decoration: ' + textDecoration + term;
       }
+
       return [
         stroke,
         strokeWidth,
@@ -84,10 +86,16 @@
         fontWeight,
         textDecoration,
         fill,
+        deltaY,
         useWhiteSpace ? 'white-space: pre; ' : ''
       ].join('');
     },
 
+    /**
+     * Returns text-decoration property for svg-export
+     * @param {Object} style the object from which to retrieve style properties
+     * @return {String}
+     */
     getSvgTextDecoration: function(style) {
       if ('overline' in style || 'underline' in style || 'linethrough' in style) {
         return (style.overline ? 'overline ' : '') +
