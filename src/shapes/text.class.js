@@ -968,8 +968,8 @@
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    setSuperscript: function(line, char) {
-      return this._setScript(line, char, this.superscript);
+    setSuperscript: function(start, end) {
+      return this._setScript(start, end, this.superscript);
     },
 
     /**
