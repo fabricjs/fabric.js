@@ -963,8 +963,8 @@
 
     /**
      * Turns the character into a 'superior figure' (i.e. 'superscript')
-     * @param {Number} line the line number
-     * @param {Number} char the character number
+     * @param {Number} start selection start
+     * @param {Number} end selection end
      * @returns {fabric.Text} thisArg
      * @chainable
      */
@@ -974,29 +974,30 @@
 
     /**
      * Turns the character into an 'inferior figure' (i.e. 'subscript')
-     * @param {Number} line the line number
-     * @param {Number} char the character number
+     * @param {Number} start selection start
+     * @param {Number} end selection end
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    setSubscript: function(line, char) {
-      return this._setScript(line, char, this.subscript);
+    setSubscript: function(start, end) {
+      return this._setScript(start, end, this.subscript);
     },
 
     /**
      * Applies 'schema' at given position
      * @private
-     * @param {Number} line the line number
-     * @param {Number} char the character number
-     * @param {Number} key one of {'this.superscript', 'this.subscript'}
+     * @param {Number} start selection start
+     * @param {Number} end selection end
+     * @param {Number} schema
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    _setScript: function(line, char, schema) {
-      var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          dy = this.getValueOfPropertyAt(line, char, 'deltaY');
-      this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
-      this.setPropertyAt(line, char, 'deltaY', dy + fontSize * schema.baseline);
+    _setScript: function(start, end, schema) {
+      var loc = this.get2DCursorLocation(start, true),
+          fontSize = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'fontSize'),
+          dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'),
+          style = { fontSize: fontSize * schema.size, deltaY: dy + fontSize * schema.baseline };
+      this.setSelectionStyles(style, start, end);
       return this;
     },
 
@@ -1117,21 +1118,6 @@
         return charStyle[property];
       }
       return this[property];
-    },
-
-    /**
-     * Assigns 'value' to the property 'key' at given character position
-     * @param {Number} line the line number
-     * @param {Number} char the character number
-     * @param {String} key the property name
-     * @param {Any} value the value
-     * @returns {Object} this
-     */
-    setPropertyAt: function(line, char, key, value) {
-      var decl = this._getStyleDeclaration(line, char) || {};
-      decl[key] = value;
-      this._setStyleDeclaration(line, char, decl);
-      return this;
     },
 
     /**

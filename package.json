@@ -44,7 +44,7 @@
     "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
-    "build_export": "npm run build && npm run export_dist_to_site",
+    "build_export": "npm run build:fast && npm run export_dist_to_site",
     "test": "node test.js",
     "lint": "eslint --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests",
