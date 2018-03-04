@@ -15,21 +15,17 @@ fabric.ElementsParser.prototype.parse = function() {
 };
 
 fabric.ElementsParser.prototype.createObjects = function() {
-  for (var i = 0, len = this.elements.length; i < len; i++) {
-    this.elements[i].setAttribute('svgUid', this.svgUid);
-    (function(_obj, i) {
-      setTimeout(function() {
-        _obj.createObject(_obj.elements[i], i);
-      }, 0);
-    })(this, i);
-  }
+  this.elements.forEach(function(element, i) {
+    element.setAttribute('svgUid', this.svgUid);
+    this.createObject(element, i);
+  });
 };
 
 fabric.ElementsParser.prototype.createObject = function(el, index) {
   var klass = fabric[fabric.util.string.capitalize(el.tagName.replace('svg:', ''))];
   if (klass && klass.fromElement) {
     try {
-      this._createObject(klass, el, index);
+      klass.fromElement(el, this.createCallback(index, el), this.options);
     }
     catch (err) {
       fabric.log(err);
@@ -40,16 +36,13 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
   }
 };
 
-fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
-  klass.fromElement(el, this.createCallback(index, el), this.options);
-};
-
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
     var _options;
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
+    _this.resolveClipPath(obj);
     if (obj instanceof fabric.Image) {
       _options = obj.parsePreserveAspectRatioAttribute(el);
     }
@@ -60,16 +53,29 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
   };
 };
 
-fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
-
-  var instanceFillValue = obj.get(property);
-  if (!(/^url\(/).test(instanceFillValue)) {
-    return;
+fabric.ElementsParser.prototype.extractPropertyDefinition = function(obj, property, storage) {
+  var value = obj.get(property);
+  if (!(/^url\(/).test(value)) {
+    return false;
   }
-  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-  if (fabric.gradientDefs[this.svgUid][gradientId]) {
-    obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+  var id = value.slice(5, value.length - 1);
+  return fabric[storage][this.svgUid][id];
+};
+
+fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
+  var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
+  if (gradientDef) {
+    obj.set(property, fabric.Gradient.fromElement(gradientDef, obj));
+  }
+};
+
+fabric.ElementsParser.prototype.resolveClipPath = function(obj) {
+  var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths');
+  if (clipPath) {
+    obj.clipPath = clipPath.map(function(element) {
+      var klass = fabric[fabric.util.string.capitalize(element.tagName.replace('svg:', ''))];
+      return klass.fromElement(element, this.options);
+    });
   }
 };
 
