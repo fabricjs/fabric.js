@@ -6,10 +6,6 @@
     return new fabric.Text(text || 'x');
   }
 
-  function removeTranslate(str) {
-    return str.replace(/translate\(.*?\)/, '');
-  }
-
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
@@ -58,9 +54,6 @@
     'charSpacing':                0,
     'styles':                     {}
   };
-
-  var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-10" y="12.57" >x</tspan></text>\n\t</g>\n';
-  var TEXT_SVG_JUSTIFIED = '\t<g transform="translate(50.5 26.72)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="-13.65" >xxxxxx</tspan><tspan x="-60" y="38.78" style="white-space: pre; ">x </tspan><tspan x=\"40\" y=\"38.78\" >y</tspan></text>\n\t</g>\n';
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Text);
@@ -290,28 +283,6 @@
 
     text.set('fontFamily', '"Arial Black", Arial');
     assert.equal(text.get('fontFamily'), '"Arial Black", Arial');
-  });
-
-  QUnit.test('toSVG', function(assert) {
-    var text = new fabric.Text('x');
-
-    // temp workaround for text objects not obtaining width under node
-    text.width = CHAR_WIDTH;
-
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
-
-    text.set('fontFamily', '"Arial Black", Arial');
-    // temp workaround for text objects not obtaining width under node
-    text.width = CHAR_WIDTH;
-
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"')));
-  });
-  QUnit.test('toSVG justified', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y', {
-      textAlign: 'justify',
-    });
-
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
 
   QUnit.test('text styleHas', function(assert) {
@@ -690,6 +661,7 @@
     var expected = 'overline underline line-through ';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
+
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
@@ -712,7 +684,7 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(0, 1).setSuperscript(0, 2);
+    text.setSuperscript(1, 2).setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -734,7 +706,7 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(0, 1).setSubscript(0, 2);
+    text.setSubscript(1,2).setSubscript(2,3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
