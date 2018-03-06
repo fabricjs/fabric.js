@@ -807,15 +807,15 @@
 
     var iText = new fabric.IText('Double-click to edit', { fill: '#ffffff', fontSize: 50 });
 
-    var canvas = new fabric.Canvas('itext-test-canvas', { width: 2800, height: 1600, renderOnAddRemove: true });
-    canvas.setDimensions({'max-height': '100%', 'max-width': '100%'}, { cssOnly: true });
-    canvas.renderAll();
+    var canvas2 = new fabric.Canvas('itext-test-canvas', { width: 2800, height: 1600, renderOnAddRemove: true });
+    canvas2.setDimensions({'max-height': '100%', 'max-width': '100%'}, { cssOnly: true });
+    canvas2.renderAll();
 
     iText.set({
-      top: canvas.height - iText.height,
-      left: canvas.width - iText.width
+      top: canvas2.height - iText.height,
+      left: canvas2.width - iText.width
     });
-    canvas.add(iText);
+    canvas2.add(iText);
 
     var widthBeforeEdit = fabric.document.documentElement.scrollWidth,
         heightBeforeEdit = fabric.document.documentElement.scrollHeight;
@@ -829,6 +829,9 @@
 
     assert.equal(widthAfterEdit, widthBeforeEdit, 'Adding hiddenTextarea modified DOM width');
     assert.equal(heightAfterEdit, heightBeforeEdit, 'Adding hiddenTextarea modified DOM height');
+
+    canvas2.dispose();
+    el.parentNode.removeChild(el);
   });
 
   // QUnit.test('measuring width of words', function (assert) {
