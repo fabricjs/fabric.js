@@ -19,7 +19,8 @@
     assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
   QUnit.test('toSVG with deltaY', function(assert) {
-    var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-16" y="12.57" >x</tspan><tspan x="4" y="12.57"  dy="-14" style="font-size: 24px; baseline-shift: 14; ">x</tspan></text>\n\t</g>\n';
+    fabric.Object.NUM_FRACTION_DIGITS = 0;
+    var TEXT_SVG = '\t<g transform="translate(10.5 26.7)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-16" y="13" >x</tspan><tspan x="4" y="13"  dy="-14" style="font-size: 24px; baseline-shift: 14; ">x</tspan></text>\n\t</g>\n';
     var text = new fabric.Text('xx', {
       styles: {
         0: {
@@ -31,5 +32,6 @@
       }
     });
     assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
+    fabric.Object.NUM_FRACTION_DIGITS = 2;
   });
 })();
