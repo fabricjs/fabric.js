@@ -1,7 +1,14 @@
+**Version 2.2.0**
+  - Fixed: super/sub script svg export [#4780](https://github.com/kangax/fabric.js/pull/4780)
+  - Added: Text superScript and subScript support [#4765](https://github.com/kangax/fabric.js/pull/4765)
+  - Fixed: negative kerning support (Pacifico font) [#4772](https://github.com/kangax/fabric.js/pull/4772)
+  - Fixed: removing text on mousedown should be safe now [#4774](https://github.com/kangax/fabric.js/pull/4774)
+  - Improved: pass to inner functions the parameter calculate coords in isOnscreen [#4763](https://github.com/kangax/fabric.js/pull/4763)
+
 **Version 2.1.0**
   - Added: Added: Drag and drop event binding [#4421](https://github.com/kangax/fabric.js/pull/4421)
   - Fixed: isEmptyStyle implementation for TextBox [#4762](https://github.com/kangax/fabric.js/pull/4762)
-  
+
 **Version 2.0.3**
   - Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
   - Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
