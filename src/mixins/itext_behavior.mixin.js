@@ -525,8 +525,10 @@
             y: boundaries.top + boundaries.topOffset + charHeight
           },
           upperCanvas = this.canvas.upperCanvasEl,
-          maxWidth = upperCanvas.clientWidth - charHeight,
-          maxHeight = upperCanvas.clientHeight - charHeight;
+          upperCanvasWidth = upperCanvas.clientWidth || upperCanvas.width,
+          upperCanvasHeight = upperCanvas.clientHeight || upperCanvas.height,
+          maxWidth = upperCanvasWidth - charHeight,
+          maxHeight = upperCanvasHeight - charHeight;
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
