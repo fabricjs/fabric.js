@@ -326,6 +326,9 @@
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
+        else {
+          lineWidth += additionalSpace;
+        }
 
         if (!lineJustStarted) {
           line.push(infix);
