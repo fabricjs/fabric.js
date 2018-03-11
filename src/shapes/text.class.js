@@ -767,8 +767,11 @@
         return this.__lineHeights[lineIndex];
       }
 
-      var line = this._textLines[lineIndex], maxHeight = 0;
-      for (var i = 0, len = line.length; i < len; i++) {
+      var line = this._textLines[lineIndex],
+          // char 0 is measured before the line cycle because it nneds to char
+          // emptylines
+          maxHeight = this.getHeightOfChar(lineIndex, 0);
+      for (var i = 1, len = line.length; i < len; i++) {
         maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
       }
 

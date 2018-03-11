@@ -717,4 +717,13 @@
     assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
     assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
+
+  QUnit.test('getHeightOfLine measures height of aline', function(assert) {
+    var text = new fabric.Text('xxx\n');
+    var height1 = text.getHeightOfLine(0);
+    var height2 = text.getHeightOfLine(1);
+    assert.equal(Math.round(height1), 52, 'height of line with text is ok');
+    assert.equal(Math.round(height2), 52, 'height of empty line is ok');
+    assert.equal(height1, height2, 'should have same height');
+  });
 })();
