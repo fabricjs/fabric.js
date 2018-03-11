@@ -89,6 +89,9 @@ function appendFileContents(fileNames, callback) {
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
       var strData = String(data);
+      if (fileName === 'src/HEADER.js' && amdLib === false) {
+        strData = strData.replace(/\/\* _AMD_START_ \*\/[\s\S]*?\/\* _AMD_END_ \*\//g, '');
+      }
       if (noStrict) {
         strData = strData.replace(/"use strict";?\n?/, '');
       }
@@ -235,7 +238,6 @@ var filesToInclude = [
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
 
-  ifSpecifiedAMDInclude(amdLib)
 ];
 
 if (buildMinified) {

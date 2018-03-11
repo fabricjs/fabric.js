@@ -1,9 +1,13 @@
 var fabric = fabric || {
-    version: "2.2.0"
+    version: "2.2.1"
 };
 
 if (typeof exports !== "undefined") {
     exports.fabric = fabric;
+} else if (typeof define === "function" && define.amd) {
+    define([], function() {
+        return fabric;
+    });
 }
 
 if (typeof document !== "undefined" && typeof window !== "undefined") {
@@ -13992,9 +13996,3 @@ fabric.util.object.extend(fabric.IText.prototype, {
         }
     });
 })();
-
-if (typeof define === "function" && define.amd) {
-    define([], function() {
-        return fabric;
-    });
-}
