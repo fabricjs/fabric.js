@@ -116,14 +116,6 @@ function ifSpecifiedInclude(moduleName, fileName) {
   return ((isInIncludedList || includeAllModules) && !isInExcludedList) ? fileName : '';
 }
 
-function ifSpecifiedAMDInclude(amdLib) {
-  var supportedLibraries = ['requirejs'];
-  if (supportedLibraries.indexOf(amdLib) > -1) {
-    return 'src/amd/' + amdLib + '.js';
-  }
-  return '';
-}
-
 var filesToInclude = [
   'HEADER.js',
   ifSpecifiedInclude('global', 'src/globalFabric.js'),
@@ -286,24 +278,6 @@ else {
 
         exec('gzip -c fabric.min.js > fabric.min.js.gz', function (error, output) {
           console.log('Gzipped to ' + distributionPath + 'fabric.min.js.gz');
-        });
-      });
-
-      // Always build requirejs AMD module in fabric.require.js
-      // add necessary requirejs footer code to filesToInclude if we haven't before
-      if (amdLib === false) {
-        amdLib = "requirejs";
-        filesToInclude[filesToInclude.length] = ifSpecifiedAMDInclude(amdLib);
-      }
-
-      appendFileContents(filesToInclude, function() {
-        fs.writeFile('fabric.require.js', distFileContents, function (err) {
-          if (err) {
-            console.log(err);
-            throw err;
-          }
-          exec('uglifyjs fabric.require.js ' + amdUglifyFlags + ' -b --output fabric.require.js');
-          console.log('Built distribution to ' + distributionPath + 'fabric.require.js (requirejs-compatible)');
         });
       });
 
