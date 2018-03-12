@@ -113,5 +113,19 @@
     assert.equal(textbox.isEmptyStyles(5), true, 'style is empty at line 5');
     assert.equal(textbox.isEmptyStyles(6), false, 'style is empty at line 6');
   });
-
+  QUnit.test('wrapping with charspacing', function(assert) {
+    var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
+      width: 190,
+    });
+    assert.equal(textbox.textLines[0], 'xa xb xc xd', 'first line match expectations');
+    textbox.charSpacing = 100;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa xb xc', 'first line match expectations spacing 100');
+    textbox.charSpacing = 300;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa xb', 'first line match expectations spacing 300');
+    textbox.charSpacing = 800;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
+  });
 })();
