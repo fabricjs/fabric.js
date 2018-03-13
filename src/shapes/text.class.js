@@ -1203,12 +1203,13 @@
      */
     _getFontDeclaration: function(styleObject, forMeasuring) {
       var style = styleObject || this;
+      var fontFamily = fabric.isLikelyNode || (style.fontFamily == undefined || style.fontFamily.includes("'") || style.fontFamily.includes('"')) ? style.fontFamily : "'"+style.fontFamily+"'";
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
         forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-        '"' + style.fontFamily + '"'
+        fontFamily
       ].join(' ');
     },
 
