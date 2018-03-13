@@ -11992,7 +11992,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _getFontDeclaration: function(styleObject, forMeasuring) {
             var style = styleObject || this;
-            var fontFamily = fabric.isLikelyNode || (style.fontFamily == undefined || style.fontFamily.includes("'") || style.fontFamily.includes('"')) ? style.fontFamily : "'" + style.fontFamily + "'";
+            var fontFamily = style.fontFamily === undefined || style.fontFamily.includes("'") || style.fontFamily.includes('"') ? style.fontFamily : '"' + style.fontFamily + '"';
             return [ fabric.isLikelyNode ? style.fontWeight : style.fontStyle, fabric.isLikelyNode ? style.fontStyle : style.fontWeight, forMeasuring ? this.CACHE_FONT_SIZE + "px" : style.fontSize + "px", fontFamily ].join(" ");
         },
         render: function(ctx) {
