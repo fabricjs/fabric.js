@@ -78,12 +78,12 @@
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
     assert.ok(typeof fontDecl == 'string', 'it returns a string');
-    if (fabric.isLikelyNode) {
+    // if (fabric.isLikelyNode) {
       assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
-    }
-    else {
-      assert.equal(fontDecl, 'normal normal 40px Times New Roman');
-    }
+    // }
+    // else {
+    //   assert.equal(fontDecl, 'normal normal 40px Times New Roman');
+    // }
 
   });
 
