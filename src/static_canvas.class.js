@@ -171,6 +171,13 @@
     },
 
     /**
+     * Callback; invoked right before object is being moved
+     */
+    onBeforeMove: function () {
+      /* NOOP */
+    },
+
+    /**
      * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
      * @type Boolean
      * @default

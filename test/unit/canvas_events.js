@@ -69,6 +69,26 @@
 
     canvas.zoomToPoint({ x: 0, y: 0 }, 1);
     canvas.onBeforeScaleRotate = _onBeforeScaleRotate;
+
+    var _onBeforeMove = canvas.onBeforeMove;
+    t = null;
+    counter = 0;
+
+    canvas.onBeforeMove = function (target) {
+      t = target;
+      counter++;
+    };
+
+    var e = {
+      clientX: canvasOffset.left + rect.left + rect.width / 2,
+      clientY: canvasOffset.top + rect.top + rect.height / 2,
+      which: 1
+    };
+    canvas._beforeTransform(e, rect);
+    assert.equal(counter, 1, '_beforeTransform should trigger onBeforeMove when object is about to be moved');
+    assert.equal(t, rect, 'onBeforeMove should receive correct target');
+
+    canvas.onBeforeMove = _onBeforeMove;
   });
 
   QUnit.test('mouse:down with different buttons', function(assert) {
