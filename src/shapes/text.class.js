@@ -1204,8 +1204,8 @@
     _getFontDeclaration: function(styleObject, forMeasuring) {
       var style = styleObject || this;
       var fontFamily = style.fontFamily === undefined ||
-      style.fontFamily.includes('\'') ||
-      style.fontFamily.includes('"')
+      style.fontFamily.indexOf('\'') > -1 ||
+      style.fontFamily.indexOf('"') > -1
         ? style.fontFamily : '"' + style.fontFamily + '"';
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
