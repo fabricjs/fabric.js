@@ -791,6 +791,49 @@
     iText.abortCursorAnimation();
   });
 
+  QUnit.test('hiddenTextarea does not move DOM', function(assert) {
+    if (fabric.isLikelyNode) {
+      assert.ok(true);
+      return;
+    }
+
+    var el = fabric.document.createElement('div');
+    el.id = 'itext-test-wrapper';
+    el.style.width = '100px';
+    el.style.height = '65px';
+    el.innerHTML = '<canvas id="itext-test-canvas" style="width: 100%; height: 100%;"></canvas>';
+
+    fabric.document.body.appendChild(el);
+
+    var iText = new fabric.IText('Double-click to edit', { fill: '#ffffff', fontSize: 50 });
+
+    var canvas2 = new fabric.Canvas('itext-test-canvas', { width: 2800, height: 1600, renderOnAddRemove: true });
+    canvas2.setDimensions({'max-height': '100%', 'max-width': '100%'}, { cssOnly: true });
+    canvas2.renderAll();
+
+    iText.set({
+      top: canvas2.height - iText.height,
+      left: canvas2.width - iText.width
+    });
+    canvas2.add(iText);
+
+    var widthBeforeEdit = fabric.document.documentElement.scrollWidth,
+        heightBeforeEdit = fabric.document.documentElement.scrollHeight;
+
+    iText.enterEditing();
+
+    var widthAfterEdit = fabric.document.documentElement.scrollWidth,
+        heightAfterEdit = fabric.document.documentElement.scrollHeight;
+
+    iText.exitEditing();
+
+    assert.equal(widthAfterEdit, widthBeforeEdit, 'Adding hiddenTextarea modified DOM width');
+    assert.equal(heightAfterEdit, heightBeforeEdit, 'Adding hiddenTextarea modified DOM height');
+
+    canvas2.dispose();
+    el.parentNode.removeChild(el);
+  });
+
   // QUnit.test('measuring width of words', function (assert) {
   //   var ctx = canvas.getContext('2d');
   //   var text = 'test foo bar';
