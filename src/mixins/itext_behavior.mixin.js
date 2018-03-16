@@ -525,13 +525,17 @@
             y: boundaries.top + boundaries.topOffset + charHeight
           },
           upperCanvas = this.canvas.upperCanvasEl,
-          upperCanvasWidth = upperCanvas.clientWidth || upperCanvas.width,
-          upperCanvasHeight = upperCanvas.clientHeight || upperCanvas.height,
+          upperCanvasWidth = upperCanvas.width,
+          upperCanvasHeight = upperCanvas.height,
           maxWidth = upperCanvasWidth - charHeight,
-          maxHeight = upperCanvasHeight - charHeight;
+          maxHeight = upperCanvasHeight - charHeight,
+          scaleX = upperCanvas.clientWidth / upperCanvasWidth,
+          scaleY = upperCanvas.clientHeight / upperCanvasHeight;
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+      p.x *= scaleX;
+      p.y *= scaleY;
       if (p.x < 0) {
         p.x = 0;
       }

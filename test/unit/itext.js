@@ -792,46 +792,35 @@
   });
 
   QUnit.test('hiddenTextarea does not move DOM', function(assert) {
-    if (fabric.isLikelyNode) {
-      assert.ok(true);
-      return;
-    }
-
-    var el = fabric.document.createElement('div');
-    el.id = 'itext-test-wrapper';
-    el.style.width = '100px';
-    el.style.height = '65px';
-    el.innerHTML = '<canvas id="itext-test-canvas" style="width: 100%; height: 100%;"></canvas>';
-
-    fabric.document.body.appendChild(el);
-
-    var iText = new fabric.IText('Double-click to edit', { fill: '#ffffff', fontSize: 50 });
-
-    var canvas2 = new fabric.Canvas('itext-test-canvas', { width: 2800, height: 1600, renderOnAddRemove: true });
-    canvas2.setDimensions({'max-height': '100%', 'max-width': '100%'}, { cssOnly: true });
-    canvas2.renderAll();
-
+    var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
+    var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false });
+    canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
     iText.set({
-      top: canvas2.height - iText.height,
-      left: canvas2.width - iText.width
+      top: 400,
+      left: 400,
     });
     canvas2.add(iText);
-
-    var widthBeforeEdit = fabric.document.documentElement.scrollWidth,
-        heightBeforeEdit = fabric.document.documentElement.scrollHeight;
-
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientWidth', {
+      get: function() { return this._clientWidth; },
+      set: function(value) { return this._clientWidth = value; },
+    });
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientHeight', {
+      get: function() { return this._clientHeight; },
+      set: function(value) { return this._clientHeight = value; },
+    });
+    canvas2.upperCanvasEl._clientWidth = 100;
+    canvas2.upperCanvasEl._clientHeight = 100;
     iText.enterEditing();
-
-    var widthAfterEdit = fabric.document.documentElement.scrollWidth,
-        heightAfterEdit = fabric.document.documentElement.scrollHeight;
-
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 57, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 50, 'left is scaled with CSS');
     iText.exitEditing();
-
-    assert.equal(widthAfterEdit, widthBeforeEdit, 'Adding hiddenTextarea modified DOM width');
-    assert.equal(heightAfterEdit, heightBeforeEdit, 'Adding hiddenTextarea modified DOM height');
-
+    canvas2.upperCanvasEl._clientWidth = 200;
+    canvas2.upperCanvasEl._clientHeight = 200;
+    iText.enterEditing();
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 114, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
+    iText.exitEditing();
     canvas2.dispose();
-    el.parentNode.removeChild(el);
   });
 
   // QUnit.test('measuring width of words', function (assert) {
