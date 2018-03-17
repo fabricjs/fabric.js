@@ -1,3 +1,14 @@
+**Version 2.2.2**
+  - Fixed: Applying filters to an image will invalidate its cache [#4828](https://github.com/kangax/fabric.js/pull/4828)
+  - Fixed: Attempt at fix font families that requires quoting [#4831](https://github.com/kangax/fabric.js/pull/4831)
+  - Improvement: check upperCanvas client size for textarea position [#4827](https://github.com/kangax/fabric.js/pull/4827)
+  - Fixed: Attempt to fix multiple touchends [#4804](https://github.com/kangax/fabric.js/pull/4804)
+  - Fixed: Wrapping of textbox with charspacing [#4803](https://github.com/kangax/fabric.js/pull/4803)
+  - Fixed: bad calculation of empty line in text (regression from 2.2.0) [#4802](https://github.com/kangax/fabric.js/pull/4802)
+
+**Version 2.2.1**
+  - Reworked how amd and commonJS are together in the same file.
+
 **Version 2.2.0**
   - Fixed: super/sub script svg export [#4780](https://github.com/kangax/fabric.js/pull/4780)
   - Added: Text superScript and subScript support [#4765](https://github.com/kangax/fabric.js/pull/4765)
