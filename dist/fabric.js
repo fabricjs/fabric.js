@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "2.2.1"
+    version: "2.2.2"
 };
 
 if (typeof exports !== "undefined") {
@@ -5453,7 +5453,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         bl: 5,
         ml: 6,
         tl: 7
-    }, addListener = fabric.util.addListener, removeListener = fabric.util.removeListener, RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1;
+    }, addListener = fabric.util.addListener, removeListener = fabric.util.removeListener, RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1, addEventOptions = {
+        passive: false
+    };
     function checkClick(e, value) {
         return "which" in e ? e.which === value : e.button === value - 1;
     }
@@ -5474,12 +5476,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             addListener(this.upperCanvasEl, "dragenter", this._onDragEnter);
             addListener(this.upperCanvasEl, "dragleave", this._onDragLeave);
             addListener(this.upperCanvasEl, "drop", this._onDrop);
-            addListener(this.upperCanvasEl, "touchstart", this._onMouseDown, {
-                passive: false
-            });
-            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove, {
-                passive: false
-            });
+            addListener(this.upperCanvasEl, "touchstart", this._onMouseDown, addEventOptions);
+            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove, addEventOptions);
             if (typeof eventjs !== "undefined" && "add" in eventjs) {
                 eventjs.add(this.upperCanvasEl, "gesture", this._onGesture);
                 eventjs.add(this.upperCanvasEl, "drag", this._onDrag);
@@ -5597,14 +5595,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _onMouseDown: function(e) {
             this.__onMouseDown(e);
-            addListener(fabric.document, "touchend", this._onMouseUp, {
-                passive: false
-            });
-            addListener(fabric.document, "touchmove", this._onMouseMove, {
-                passive: false
-            });
+            addListener(fabric.document, "touchend", this._onMouseUp, addEventOptions);
+            addListener(fabric.document, "touchmove", this._onMouseMove, addEventOptions);
             removeListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
-            removeListener(this.upperCanvasEl, "touchmove", this._onMouseMove);
+            removeListener(this.upperCanvasEl, "touchmove", this._onMouseMove, addEventOptions);
             if (e.type === "touchstart") {
                 removeListener(this.upperCanvasEl, "mousedown", this._onMouseDown);
             } else {
@@ -5615,13 +5609,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         _onMouseUp: function(e) {
             this.__onMouseUp(e);
             removeListener(fabric.document, "mouseup", this._onMouseUp);
-            removeListener(fabric.document, "touchend", this._onMouseUp);
+            removeListener(fabric.document, "touchend", this._onMouseUp, addEventOptions);
             removeListener(fabric.document, "mousemove", this._onMouseMove);
-            removeListener(fabric.document, "touchmove", this._onMouseMove);
+            removeListener(fabric.document, "touchmove", this._onMouseMove, addEventOptions);
             addListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
-            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove, {
-                passive: false
-            });
+            addListener(this.upperCanvasEl, "touchmove", this._onMouseMove, addEventOptions);
             if (e.type === "touchend") {
                 var _this = this;
                 setTimeout(function() {
@@ -9559,6 +9551,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
         },
         applyResizeFilters: function() {
             var filter = this.resizeFilter, retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1, minimumScale = this.minimumScaleTrigger, scaleX = this.scaleX * retinaScaling, scaleY = this.scaleY * retinaScaling, elementToFilter = this._filteredEl || this._originalElement;
+            if (this.group) {
+                this.set("dirty", true);
+            }
             if (!filter || scaleX > minimumScale && scaleY > minimumScale) {
                 this._element = elementToFilter;
                 this._filterScalingX = 1;
@@ -9583,6 +9578,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
             filters = filters.filter(function(filter) {
                 return filter;
             });
+            if (this.group) {
+                this.set("dirty", true);
+            }
             if (filters.length === 0) {
                 this._element = this._originalElement;
                 this._filteredEl = null;
@@ -11746,10 +11744,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             };
         },
         _getGraphemeBox: function(grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
-            var style = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, info = this._measureChar(grapheme, style, prevGrapheme, prevStyle), kernedWidth = info.kernedWidth, width = info.width;
+            var style = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : {}, info = this._measureChar(grapheme, style, prevGrapheme, prevStyle), kernedWidth = info.kernedWidth, width = info.width, charSpacing;
             if (this.charSpacing !== 0) {
-                width += this._getWidthOfCharSpacing();
-                kernedWidth += this._getWidthOfCharSpacing();
+                charSpacing = this._getWidthOfCharSpacing();
+                width += charSpacing;
+                kernedWidth += charSpacing;
             }
             var box = {
                 width: width,
@@ -11768,8 +11767,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             if (this.__lineHeights[lineIndex]) {
                 return this.__lineHeights[lineIndex];
             }
-            var line = this._textLines[lineIndex], maxHeight = 0;
-            for (var i = 0, len = line.length; i < len; i++) {
+            var line = this._textLines[lineIndex], maxHeight = this.getHeightOfChar(lineIndex, 0);
+            for (var i = 1, len = line.length; i < len; i++) {
                 maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
             }
             return this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
@@ -11999,7 +11998,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _getFontDeclaration: function(styleObject, forMeasuring) {
             var style = styleObject || this;
-            return [ fabric.isLikelyNode ? style.fontWeight : style.fontStyle, fabric.isLikelyNode ? style.fontStyle : style.fontWeight, forMeasuring ? this.CACHE_FONT_SIZE + "px" : style.fontSize + "px", fabric.isLikelyNode ? '"' + style.fontFamily + '"' : style.fontFamily ].join(" ");
+            var fontFamily = style.fontFamily === undefined || style.fontFamily.indexOf("'") > -1 || style.fontFamily.indexOf('"') > -1 ? style.fontFamily : '"' + style.fontFamily + '"';
+            return [ fabric.isLikelyNode ? style.fontWeight : style.fontStyle, fabric.isLikelyNode ? style.fontStyle : style.fontWeight, forMeasuring ? this.CACHE_FONT_SIZE + "px" : style.fontSize + "px", fontFamily ].join(" ");
         },
         render: function(ctx) {
             if (!this.visible) {
@@ -12855,9 +12855,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             var desiredPostion = this.inCompositionMode ? this.compositionStart : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPostion), cursorLocation = this.get2DCursorLocation(desiredPostion), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, "fontSize") * this.lineHeight, leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
                 y: boundaries.top + boundaries.topOffset + charHeight
-            }, upperCanvas = this.canvas.upperCanvasEl, maxWidth = upperCanvas.width - charHeight, maxHeight = upperCanvas.height - charHeight;
+            }, upperCanvas = this.canvas.upperCanvasEl, upperCanvasWidth = upperCanvas.width, upperCanvasHeight = upperCanvas.height, maxWidth = upperCanvasWidth - charHeight, maxHeight = upperCanvasHeight - charHeight, scaleX = upperCanvas.clientWidth / upperCanvasWidth, scaleY = upperCanvas.clientHeight / upperCanvasHeight;
             p = fabric.util.transformPoint(p, m);
             p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+            p.x *= scaleX;
+            p.y *= scaleY;
             if (p.x < 0) {
                 p.x = 0;
             }
@@ -13923,6 +13925,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
                     line = [];
                     lineWidth = wordWidth;
                     lineJustStarted = true;
+                } else {
+                    lineWidth += additionalSpace;
                 }
                 if (!lineJustStarted) {
                     line.push(infix);
