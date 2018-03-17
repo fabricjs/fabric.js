@@ -389,7 +389,9 @@
           retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : fabric.devicePixelRatio,
           minimumScale = this.minimumScaleTrigger / retinaScaling,
           _this = this, scaleX, scaleY;
-
+      if (this.group) {
+        this.set('dirty', true);
+      }
       if (filters.length === 0) {
         this._element = imgElement;
         callback && callback(this);
