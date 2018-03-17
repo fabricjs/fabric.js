@@ -78,13 +78,13 @@
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
     assert.ok(typeof fontDecl == 'string', 'it returns a string');
-    if (fabric.isLikelyNode) {
-      assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
-    }
-    else {
-      assert.equal(fontDecl, 'normal normal 40px Times New Roman');
-    }
-
+    assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
+    text.fontFamily = '"Times New Roman"';
+    fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
+    text.fontFamily = '\'Times New Roman\'';
+    fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
   });
 
   QUnit.test('toObject', function(assert) {
