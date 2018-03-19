@@ -616,7 +616,7 @@
       fontSize: 25,
     };
     var styleString = iText.getSvgSpanStyles(styleObject);
-    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); ';
+    var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); ';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function(assert) {
@@ -628,7 +628,7 @@
       fontSize: 25,
     };
     var styleString = iText.getSvgSpanStyles(styleObject, true);
-    var expected = 'stroke-width: 30; font-family: Verdana; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
+    var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline true produces correct output', function(assert){

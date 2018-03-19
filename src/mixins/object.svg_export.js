@@ -64,8 +64,8 @@
      */
     getSvgSpanStyles: function(style, useWhiteSpace) {
       var fontFamily = style.fontFamily ?
-        'font-family: ' + ((style.fontFamily.indexOf('\'') === -1 && style.fontFamily.indexOf('"') === -1) ?
-          '\'' + style.fontFamily  + '\'' : style.fontFamily) : '';
+        'font-family: ' + (((style.fontFamily.indexOf('\'') === -1 && style.fontFamily.indexOf('"') === -1) ?
+          '\'' + style.fontFamily  + '\'' : style.fontFamily)) + term : '';
       var term = '; ',
           strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
           fontFamily = fontFamily,
