@@ -63,11 +63,11 @@
      * @return {String}
      */
     getSvgSpanStyles: function(style, useWhiteSpace) {
+      var term = '; ';
       var fontFamily = style.fontFamily ?
         'font-family: ' + (((style.fontFamily.indexOf('\'') === -1 && style.fontFamily.indexOf('"') === -1) ?
           '\'' + style.fontFamily  + '\'' : style.fontFamily)) + term : '';
-      var term = '; ',
-          strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
+      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
           fontFamily = fontFamily,
           fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
           fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
