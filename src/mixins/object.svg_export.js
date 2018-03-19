@@ -9,8 +9,8 @@
     }
     else {
       var color = new fabric.Color(value),
-        str = prop + ': ' + color.toRgb() + '; ',
-        opacity = color.getAlpha();
+          str = prop + ': ' + color.toRgb() + '; ',
+          opacity = color.getAlpha();
       if (opacity !== 1) {
         //change the color in rgb + opacity
         str += prop + '-opacity: ' + opacity.toString() + '; ';
@@ -30,16 +30,16 @@
     getSvgStyles: function(skipShadow) {
 
       var fillRule = this.fillRule,
-        strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
-        strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
-        strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
-        strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
-        strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
-        opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
-        visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = skipShadow ? '' : this.getSvgFilter(),
-        fill = getSvgColorString('fill', this.fill),
-        stroke = getSvgColorString('stroke', this.stroke);
+          strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
+          strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
+          strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
+          strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
+          strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
+          opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+          visibility = this.visible ? '' : ' visibility: hidden;',
+          filter = skipShadow ? '' : this.getSvgFilter(),
+          fill = getSvgColorString('fill', this.fill),
+          stroke = getSvgColorString('stroke', this.stroke);
 
       return [
         stroke,
@@ -129,37 +129,37 @@
      */
     getSvgTransform: function() {
       var angle = this.angle,
-        skewX = (this.skewX % 360),
-        skewY = (this.skewY % 360),
-        center = this.getCenterPoint(),
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
+          center = this.getCenterPoint(),
 
-        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
-        translatePart = 'translate(' +
-          toFixed(center.x, NUM_FRACTION_DIGITS) +
-          ' ' +
-          toFixed(center.y, NUM_FRACTION_DIGITS) +
-          ')',
+          translatePart = 'translate(' +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
+                            ' ' +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
+                          ')',
 
-        anglePart = angle !== 0
-          ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
-          : '',
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
 
-        scalePart = (this.scaleX === 1 && this.scaleY === 1)
-          ? '' :
-          (' scale(' +
-            toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-            ' ' +
-            toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+          scalePart = (this.scaleX === 1 && this.scaleY === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
             ')'),
 
-        skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
+          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
 
-        skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
+          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
 
-        flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
 
-        flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
 
       return [
         translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
