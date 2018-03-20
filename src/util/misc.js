@@ -519,7 +519,7 @@
      * @memberOf fabric.util
      * @param {Object} source Source object
      * @param {Object} destination Destination object
-     * @return {Array} properties Properties names to include
+     * @param {Array} properties Properties names to include
      */
     populateWithProperties: function(source, destination, properties) {
       if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
