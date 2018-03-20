@@ -128,4 +128,29 @@
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
+  QUnit.test('wrapping with custom space', function(assert) {
+    var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
+      width: 2000,
+    });
+    var line1 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 0);
+    var expected1 =  [
+      ['x', 'a', ' ', 'x', 'b'],
+      ['x', 'c', ' ', 'x', 'd'],
+      ['x', 'e', ' ', 'y', 'a'],
+      ['y', 'b', ' ', 'i', 'd']];
+    assert.deepEqual(line1, expected1, 'wrapping without reserved');
+    assert.deepEqual(textbox.dynamicMinWidth, 40, 'wrapping without reserved');
+    var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 50);
+    var expected2 =  [
+      ['x', 'a'],
+      ['x', 'b'],
+      ['x', 'c'],
+      ['x', 'd'],
+      ['x', 'e'],
+      ['y', 'a'],
+      ['y', 'b'],
+      ['i', 'd']];
+    assert.deepEqual(line2, expected2, 'wrapping without reserved');
+    assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
+  });
 })();

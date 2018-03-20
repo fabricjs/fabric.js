@@ -295,10 +295,11 @@
      * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
      * @param {Number} desiredWidth width you want to wrap the line to
+     * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(_line, lineIndex, desiredWidth) {
+    _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
       var lineWidth        = 0,
           graphemeLines    = [],
           line             = [],
@@ -311,7 +312,10 @@
           infixWidth       = 0,
           largestWordWidth = 0,
           lineJustStarted = true,
-          additionalSpace = this._getWidthOfCharSpacing();
+          additionalSpace = this._getWidthOfCharSpacing(),
+          reservedSpace = reservedSpace || 0;
+
+      desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
@@ -346,8 +350,8 @@
 
       i && graphemeLines.push(line);
 
-      if (largestWordWidth > this.dynamicMinWidth) {
-        this.dynamicMinWidth = largestWordWidth - additionalSpace;
+      if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+        this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
       }
 
       return graphemeLines;
