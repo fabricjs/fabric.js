@@ -1662,6 +1662,11 @@
      * @chainable
      */
     dispose: function () {
+      // cancel eventually ongoing renders
+      if (this.isRendering) {
+        fabric.util.cancelAnimFrame(this.isRendering);
+        this.isRendering = 0;
+      }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
@@ -1670,7 +1675,7 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.lowerCanvasEl = null;
-      this.cacheCanvasEl = null;
+      this.contextContainer = null;
       return this;
     },
 
