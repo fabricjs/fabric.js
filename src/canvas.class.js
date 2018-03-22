@@ -1555,7 +1555,10 @@
       this.removeListeners();
       wrapper.removeChild(this.upperCanvasEl);
       wrapper.removeChild(this.lowerCanvasEl);
-      delete this.upperCanvasEl;
+      this.upperCanvasEl = null;
+      this.cacheCanvasEl = null;
+      this.contextCache = null;
+      this.contextTop = null;
       if (wrapper.parentNode) {
         wrapper.parentNode.replaceChild(this.lowerCanvasEl, this.wrapperEl);
       }

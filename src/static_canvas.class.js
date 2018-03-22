@@ -1670,7 +1670,7 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.lowerCanvasEl = null;
-      this.cacheCanvasEl = null;
+      this.contextContainer = null;
       return this;
     },
 
