@@ -377,12 +377,20 @@
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
       }
-      if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this.freeDrawingBrush && this.freeDrawingBrush._render();
-      }
+      this.renderTopLayer(this.contextTop);
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
       return this;
+    },
+
+    renderTopLayer: function(ctx) {
+      if (this.isDrawingMode && this._isCurrentlyDrawing) {
+        this.freeDrawingBrush && this.freeDrawingBrush._render();
+      }
+      // we render the top context - last object
+      if (this.selection && this._groupSelector) {
+        this._drawSelection(ctx);
+      }
     },
 
     /**
@@ -394,12 +402,7 @@
     renderTop: function () {
       var ctx = this.contextTop;
       this.clearContext(ctx);
-
-      // we render the top context - last object
-      if (this.selection && this._groupSelector) {
-        this._drawSelection(ctx);
-      }
-
+      this.renderTopLayer(ctx);
       this.fire('after:render');
       this.contextTopDirty = true;
       return this;
