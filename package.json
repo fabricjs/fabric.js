@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "2.1.0",
+  "version": "2.2.2",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -44,7 +44,7 @@
     "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=json",
-    "build_export": "npm run build && npm run export_dist_to_site",
+    "build_export": "npm run build:fast && npm run export_dist_to_site",
     "test": "node test.js",
     "lint": "eslint --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests",
@@ -61,13 +61,13 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "eslint": "4.7.x",
+    "eslint": "4.18.x",
     "istanbul": "0.4.x",
     "node-qunit": "^1.0.0",
     "onchange": "^3.x.x",
     "qunit": "^2.4.1",
     "testem": "^1.18.4",
-    "uglify-js": "3.1.x"
+    "uglify-js": "3.3.x"
   },
   "engines": {
     "node": ">=4.0.0"

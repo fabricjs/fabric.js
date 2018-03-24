@@ -48,6 +48,7 @@ testrunner.run({
     './test/unit/stateful.js',
     './test/unit/textbox.js',
     './test/unit/canvas_events.js',
+    './test/unit/text_to_svg.js',
   ],
   // tests: ['./test/unit/pattern.js'],
 }, function(err, report) {

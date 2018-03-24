@@ -389,6 +389,9 @@
           scaleX = this.scaleX * retinaScaling,
           scaleY = this.scaleY * retinaScaling,
           elementToFilter = this._filteredEl || this._originalElement;
+      if (this.group) {
+        this.set('dirty', true);
+      }
       if (!filter || (scaleX > minimumScale && scaleY > minimumScale)) {
         this._element = elementToFilter;
         this._filterScalingX = 1;
@@ -424,6 +427,9 @@
 
       filters = filters || this.filters || [];
       filters = filters.filter(function(filter) { return filter; });
+      if (this.group) {
+        this.set('dirty', true);
+      }
       if (filters.length === 0) {
         this._element = this._originalElement;
         this._filteredEl = null;

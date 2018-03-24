@@ -736,11 +736,12 @@
           prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
           kernedWidth = info.kernedWidth,
-          width = info.width;
+          width = info.width, charSpacing;
 
       if (this.charSpacing !== 0) {
-        width += this._getWidthOfCharSpacing();
-        kernedWidth += this._getWidthOfCharSpacing();
+        charSpacing = this._getWidthOfCharSpacing();
+        width += charSpacing;
+        kernedWidth += charSpacing;
       }
 
       var box = {
@@ -767,8 +768,11 @@
         return this.__lineHeights[lineIndex];
       }
 
-      var line = this._textLines[lineIndex], maxHeight = 0;
-      for (var i = 0, len = line.length; i < len; i++) {
+      var line = this._textLines[lineIndex],
+          // char 0 is measured before the line cycle because it nneds to char
+          // emptylines
+          maxHeight = this.getHeightOfChar(lineIndex, 0);
+      for (var i = 1, len = line.length; i < len; i++) {
         maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
       }
 
@@ -963,40 +967,41 @@
 
     /**
      * Turns the character into a 'superior figure' (i.e. 'superscript')
-     * @param {Number} line the line number
-     * @param {Number} char the character number
+     * @param {Number} start selection start
+     * @param {Number} end selection end
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    setSuperscript: function(line, char) {
-      return this._setScript(line, char, this.superscript);
+    setSuperscript: function(start, end) {
+      return this._setScript(start, end, this.superscript);
     },
 
     /**
      * Turns the character into an 'inferior figure' (i.e. 'subscript')
-     * @param {Number} line the line number
-     * @param {Number} char the character number
+     * @param {Number} start selection start
+     * @param {Number} end selection end
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    setSubscript: function(line, char) {
-      return this._setScript(line, char, this.subscript);
+    setSubscript: function(start, end) {
+      return this._setScript(start, end, this.subscript);
     },
 
     /**
      * Applies 'schema' at given position
      * @private
-     * @param {Number} line the line number
-     * @param {Number} char the character number
-     * @param {Number} key one of {'this.superscript', 'this.subscript'}
+     * @param {Number} start selection start
+     * @param {Number} end selection end
+     * @param {Number} schema
      * @returns {fabric.Text} thisArg
      * @chainable
      */
-    _setScript: function(line, char, schema) {
-      var fontSize = this.getValueOfPropertyAt(line, char, 'fontSize'),
-          dy = this.getValueOfPropertyAt(line, char, 'deltaY');
-      this.setPropertyAt(line, char, 'fontSize', fontSize * schema.size);
-      this.setPropertyAt(line, char, 'deltaY', dy + fontSize * schema.baseline);
+    _setScript: function(start, end, schema) {
+      var loc = this.get2DCursorLocation(start, true),
+          fontSize = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'fontSize'),
+          dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'),
+          style = { fontSize: fontSize * schema.size, deltaY: dy + fontSize * schema.baseline };
+      this.setSelectionStyles(style, start, end);
       return this;
     },
 
@@ -1120,21 +1125,6 @@
     },
 
     /**
-     * Assigns 'value' to the property 'key' at given character position
-     * @param {Number} line the line number
-     * @param {Number} char the character number
-     * @param {String} key the property name
-     * @param {Any} value the value
-     * @returns {Object} this
-     */
-    setPropertyAt: function(line, char, key, value) {
-      var decl = this._getStyleDeclaration(line, char) || {};
-      decl[key] = value;
-      this._setStyleDeclaration(line, char, decl);
-      return this;
-    },
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -1213,12 +1203,16 @@
      */
     _getFontDeclaration: function(styleObject, forMeasuring) {
       var style = styleObject || this;
+      var fontFamily = style.fontFamily === undefined ||
+      style.fontFamily.indexOf('\'') > -1 ||
+      style.fontFamily.indexOf('"') > -1
+        ? style.fontFamily : '"' + style.fontFamily + '"';
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
         forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-        (fabric.isLikelyNode ? ('"' + style.fontFamily + '"') : style.fontFamily)
+        fontFamily
       ].join(' ');
     },
 

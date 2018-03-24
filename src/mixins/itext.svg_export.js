@@ -88,11 +88,14 @@
     _createTextCharSpan: function(_char, styleDecl, left, top) {
       var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
+          dy = styleDecl.deltaY, dySpan = '',
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-
+      if (dy) {
+        dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
+      }
       return [
         '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
-        toFixed(top, NUM_FRACTION_DIGITS), '" ',
+        toFixed(top, NUM_FRACTION_DIGITS), '" ', dySpan,
         fillStyles, '>',
         fabric.util.string.escapeXml(_char),
         '</tspan>'

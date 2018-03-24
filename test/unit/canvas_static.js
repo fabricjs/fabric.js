@@ -1428,6 +1428,7 @@
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
+    assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
 
   QUnit.test('clone', function(assert) {

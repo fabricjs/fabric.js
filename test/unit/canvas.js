@@ -1751,6 +1751,9 @@
     }
     assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
+    assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
+    assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
+    assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
   });
 
   // QUnit.test('dispose', function(assert) {
