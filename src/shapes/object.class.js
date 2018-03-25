@@ -593,11 +593,10 @@
     ).split(' '),
 
     /**
-     * Array of fabricObjects that, without stroke define a clipping area with their opacity
-     * To avoid mutation problem, please create a new array when you need to use it.
-     * @type Array
+     * a fabricObject that, without stroke define a clipping area with their opacity
+     * @type fabric.Object
      */
-    clipPaths: null,
+    clipPath: null,
 
     /**
      * Constructor
@@ -613,11 +612,11 @@
      * Create a the canvas used to keep the cached copy of the object
      * @private
      */
-    _createCacheCanvas: function() {
+    _createCacheCanvas: function(parentObject) {
       this._cacheProperties = {};
       this._cacheCanvas = fabric.document.createElement('canvas');
       this._cacheContext = this._cacheCanvas.getContext('2d');
-      this._updateCacheCanvas();
+      this._updateCacheCanvas(parentObject);
     },
 
     /**
@@ -669,22 +668,31 @@
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
      * @private
-     * @param {Object} dim.x width of object to be cached
-     * @param {Object} dim.y height of object to be cached
+     * @return {Object}.x width of object to be cached
+     * @return {Object}.y height of object to be cached
      * @return {Object}.width width of canvas
      * @return {Object}.height height of canvas
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
-    _getCacheCanvasDimensions: function() {
-      var zoom = this.canvas && this.canvas.getZoom() || 1,
+    _getCacheCanvasDimensions: function(parentObject) {
+      var targetCanvas = this.canvas || (parentObject && parentObject.canvas),
+          zoom = targetCanvas && targetCanvas.getZoom() || 1,
           objectScale = this.getObjectScaling(),
-          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+          parentScale,
+          retina = targetCanvas && targetCanvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           dim = this._getNonTransformedDimensions(),
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
-          width = dim.x * zoomX,
-          height = dim.y * zoomY;
+          width, height;
+      if (parentObject) {
+        parentScale = parentObject.getObjectScaling();
+        zoomX *= parentScale.scaleX;
+        zoomY *= parentScale.scaleY;
+
+      }
+      width = dim.x * zoomX;
+      height = dim.y * zoomY;
       return {
         // for sure this ALIASING_LIMIT is slightly crating problem
         // in situation in wich the cache canvas gets an upper limit
@@ -703,16 +711,17 @@
      * @private
      * @return {Boolean} true if the canvas has been resized
      */
-    _updateCacheCanvas: function() {
-      if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
-        var target = this.canvas._currentTransform.target,
-            action = this.canvas._currentTransform.action;
+    _updateCacheCanvas: function(parentObject) {
+      var targetCanvas = this.canvas || (parentObject && parentObject.canvas);
+      if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+        var target = targetCanvas._currentTransform.target,
+            action = targetCanvas._currentTransform.action;
         if (this === target && action.slice && action.slice(0, 5) === 'scale') {
           return false;
         }
       }
       var canvas = this._cacheCanvas,
-          dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+          dims = this._limitCacheSize(this._getCacheCanvasDimensions(parentObject)),
           minCacheSize = fabric.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
@@ -1001,14 +1010,7 @@
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.shouldCache()) {
-        if (!this._cacheCanvas) {
-          this._createCacheCanvas();
-        }
-        if (this.isCacheDirty()) {
-          this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-          this.drawObject(this._cacheContext);
-          this.dirty = false;
-        }
+        this.renderCache();
         this.drawCacheOnCanvas(ctx);
       }
       else {
@@ -1021,6 +1023,17 @@
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    renderCache: function(parentObject) {
+      if (!this._cacheCanvas) {
+        this._createCacheCanvas(parentObject);
+      }
+      if (this.isCacheDirty(false, parentObject)) {
+        this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
+        this.drawObject(this._cacheContext);
+        this.dirty = false;
+      }
     },
 
     /**
@@ -1044,7 +1057,7 @@
       if (this.paintFirst === 'stroke' && typeof this.shadow === 'object') {
         return true;
       }
-      if (this.clipPaths && this.clipPaths.length > 0) {
+      if (this.clipPath) {
         return true;
       }
       return false;
@@ -1077,15 +1090,14 @@
      * Execute the drawing operation for an object clipPath
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawClipPaths: function(ctx) {
-      var paths = this.clipPaths, path;
-      for (var i = 0; i < paths.length; i++) {
-        path = paths[i];
-        ctx.save();
-        path.transform(ctx);
-        path.drawObject(ctx);
-        ctx.restore();
-      }
+    drawClipPathOnCache: function(ctx) {
+      var path = this.clipPath;
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-in';
+      //path.transform(ctx);
+      ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+      ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
+      ctx.restore();
     },
 
     /**
@@ -1093,15 +1105,15 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
-      var paths = this.clipPaths, needClip = paths && paths.length > 0;
-      needClip && this.drawClipPaths(ctx);
+      var path = this.clipPath;
       this._renderBackground(ctx);
       this._setStrokeStyles(ctx, this);
       this._setFillStyles(ctx, this);
-      if (needClip) {
-        ctx.globalCompositeOperation = 'source-in';
-      }
       this._render(ctx);
+      if (path) {
+        path.renderCache(this);
+        this.drawClipPathOnCache(ctx);
+      }
     },
 
     /**
@@ -1118,11 +1130,11 @@
      * @param {Boolean} skipCanvas skip canvas checks because this object is painted
      * on parent canvas.
      */
-    isCacheDirty: function(skipCanvas) {
+    isCacheDirty: function(skipCanvas, parentObject) {
       if (this.isNotVisible()) {
         return false;
       }
-      if (this._cacheCanvas && !skipCanvas && this._updateCacheCanvas()) {
+      if (this._cacheCanvas && !skipCanvas && this._updateCacheCanvas(parentObject)) {
         // in this case the context is already cleared.
         return true;
       }

@@ -44,8 +44,9 @@
         'stroke-width':       'strokeWidth',
         'text-decoration':    'textDecoration',
         'text-anchor':        'textAnchor',
-        opacity:            'opacity',
-        'clip-path':          'clipPath'
+        opacity:              'opacity',
+        'clip-path':          'clipPath',
+        'clip-rule':          'clipRule',
       },
 
       colorAttributes = {
