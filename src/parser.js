@@ -15,7 +15,7 @@
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
 
       svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line',
-        'image', 'text', 'linearGradient', 'radialGradient', 'stop'],
+        'image', 'text'],
       svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'],
       svgInvalidAncestors = ['pattern', 'defs', 'symbol', 'metadata', 'clipPath', 'mask', 'desc'],
       svgValidParents = ['symbol', 'g', 'a', 'svg'],
@@ -670,7 +670,9 @@
     descendants.filter(function(el) {
       return el.nodeName.replace('svg:', '') === 'clipPath';
     }).forEach(function(el) {
-      clipPaths[el.id] = el.getElementsByTagName('*');
+      clipPaths[el.id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function(el) {
+        return fabric.svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
+      });
     });
     fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);

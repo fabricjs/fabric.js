@@ -15,9 +15,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   };
 
   proto.createObjects = function() {
+    var _this = this;
     this.elements.forEach(function(element, i) {
-      element.setAttribute('svgUid', this.svgUid);
-      this.createObject(element, i);
+      element.setAttribute('svgUid', _this.svgUid);
+      _this.createObject(element, i);
     });
   };
 
@@ -43,14 +44,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   proto.createCallback = function(index, el) {
     var _this = this;
     return function(obj) {
-      var _options;
+      var _options, transform = obj.transformMatrix;
       _this.resolveGradient(obj, 'fill');
       _this.resolveGradient(obj, 'stroke');
-      _this.resolveClipPath(obj);
       if (obj instanceof fabric.Image) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
+      _this.resolveClipPath(obj, transform);
       _this.reviver && _this.reviver(el, obj);
       _this.instances[index] = obj;
       _this.checkIfDone();
@@ -73,13 +74,35 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
   };
 
-  proto.resolveClipPath = function(obj) {
-    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths');
+  proto.createClipPathCallback = function(obj, transform, originalTransform) {
+    return function(_newObj) {
+      var newTransform = fabric.util.multiplyTransformMatrices(
+        transform,
+        originalTransform
+      );
+      if (_newObj.transformMatrix) {
+        newTransform = fabric.util.multiplyTransformMatrices(
+          newTransform,
+          _newObj.transformMatrix
+        );
+      }
+      _newObj.transformMatrix = newTransform;
+      _newObj._removeTransformMatrix();
+      obj.clipPaths.push(_newObj);
+    };
+  };
+
+  proto.resolveClipPath = function(obj, transform) {
+    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
+        element, klass, objTransformInv;
     if (clipPath) {
-      obj.clipPath = clipPath.map(function(element) {
-        var klass = this.findTag(element);
-        return klass.fromElement(element, this.options);
-      });
+      obj.clipPaths = [];
+      objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
+      for (var i = 0; i < clipPath.length; i++) {
+        element = clipPath[i];
+        klass = this.findTag(element);
+        klass.fromElement(element, this.createClipPathCallback(obj, objTransformInv, transform), this.options);
+      }
     }
   };
 

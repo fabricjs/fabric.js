@@ -593,6 +593,13 @@
     ).split(' '),
 
     /**
+     * Array of fabricObjects that, without stroke define a clipping area with their opacity
+     * To avoid mutation problem, please create a new array when you need to use it.
+     * @type Array
+     */
+    clipPaths: null,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -1037,6 +1044,9 @@
       if (this.paintFirst === 'stroke' && typeof this.shadow === 'object') {
         return true;
       }
+      if (this.clipPaths && this.clipPaths.length > 0) {
+        return true;
+      }
       return false;
     },
 
@@ -1064,13 +1074,33 @@
     },
 
     /**
+     * Execute the drawing operation for an object clipPath
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawClipPaths: function(ctx) {
+      var paths = this.clipPaths, path;
+      for (var i = 0; i < paths.length; i++) {
+        path = paths[i];
+        ctx.save();
+        path.transform(ctx);
+        path.drawObject(ctx);
+        ctx.restore();
+      }
+    },
+
+    /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
+      var paths = this.clipPaths, needClip = paths && paths.length > 0;
+      needClip && this.drawClipPaths(ctx);
       this._renderBackground(ctx);
       this._setStrokeStyles(ctx, this);
       this._setFillStyles(ctx, this);
+      if (needClip) {
+        ctx.globalCompositeOperation = 'source-in';
+      }
       this._render(ctx);
     },
 
