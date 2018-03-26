@@ -84,7 +84,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
   proto.resolveClipPath = function(obj, transform) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-        element, klass, objTransformInv, container, gTransform;
+        element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
       container = [];
       objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
@@ -98,13 +98,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         );
       }
       clipPath = new fabric.Group(container);
-      // gTransform = fabric.util.multiplyTransformMatrices(
-      //   objTransformInv,
-      //   clipPath.calcTransformMatrix()
-      // );
-      console.log(gTransform, clipPath.calcTransformMatrix())
-      // clipPath.transformMatrix = gTransform;
-      // clipPath._removeTransformMatrix();
+      gTransform = fabric.util.multiplyTransformMatrices(
+        objTransformInv,
+        clipPath.calcTransformMatrix()
+      );
+      var options = fabric.util.qrDecompose(gTransform);
+      clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
+      console.log(clipPath)
       obj.clipPath = clipPath;
     }
   };

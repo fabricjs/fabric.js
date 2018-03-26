@@ -1093,9 +1093,10 @@
     drawClipPathOnCache: function(ctx) {
       var path = this.clipPath;
       ctx.save();
-      ctx.globalCompositeOperation = 'destination-in';
-      //path.transform(ctx);
-      ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+      // ctx.globalCompositeOperation = 'destination-in';
+      // ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      path.transform(ctx);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
       ctx.restore();
     },

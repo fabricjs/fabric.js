@@ -4384,7 +4384,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
   proto.resolveClipPath = function(obj, transform) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-        element, klass, objTransformInv, container, gTransform;
+        element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
       container = [];
       objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
@@ -4398,13 +4398,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         );
       }
       clipPath = new fabric.Group(container);
-      // gTransform = fabric.util.multiplyTransformMatrices(
-      //   objTransformInv,
-      //   clipPath.calcTransformMatrix()
-      // );
-      console.log(gTransform, clipPath.calcTransformMatrix())
-      // clipPath.transformMatrix = gTransform;
-      // clipPath._removeTransformMatrix();
+      gTransform = fabric.util.multiplyTransformMatrices(
+        objTransformInv,
+        clipPath.calcTransformMatrix()
+      );
+      var options = fabric.util.qrDecompose(gTransform);
+      clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
+      console.log(clipPath)
       obj.clipPath = clipPath;
     }
   };
@@ -13236,9 +13236,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     drawClipPathOnCache: function(ctx) {
       var path = this.clipPath;
       ctx.save();
-      ctx.globalCompositeOperation = 'destination-in';
-      //path.transform(ctx);
-      ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+      // ctx.globalCompositeOperation = 'destination-in';
+      // ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      path.transform(ctx);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
       ctx.restore();
     },
@@ -19111,7 +19112,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Boolean
      * @default
      */
-    objectCaching: false,
+    objectCaching: true,
 
     /**
      * key used to retrieve the texture representing this image

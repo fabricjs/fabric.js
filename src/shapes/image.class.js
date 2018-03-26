@@ -98,7 +98,7 @@
      * @type Boolean
      * @default
      */
-    objectCaching: false,
+    objectCaching: true,
 
     /**
      * key used to retrieve the texture representing this image
