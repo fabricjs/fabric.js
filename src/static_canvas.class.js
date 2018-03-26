@@ -1406,33 +1406,32 @@
      * @private
      */
     _setSVGBgOverlayColor: function(markup, property) {
-      var filler = this[property];
+      var filler = this[property], vpt = this.viewportTransform, finalWidth = this.width / vpt[0],
+          finalHeight = this.height / vpt[3];
       if (!filler) {
         return;
       }
       if (filler.toLive) {
         var repeat = filler.repeat;
         markup.push(
-          '<rect transform="translate(', this.width / 2, ',', this.height / 2, ')"',
-          ' x="', filler.offsetX - this.width / 2, '" y="', filler.offsetY - this.height / 2, '" ',
+          '<rect transform="translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
+          ' x="', filler.offsetX - finalWidth / 2, '" y="', filler.offsetY - finalHeight / 2, '" ',
           'width="',
           (repeat === 'repeat-y' || repeat === 'no-repeat'
             ? filler.source.width
-            : this.width),
+            : finalWidth ),
           '" height="',
           (repeat === 'repeat-x' || repeat === 'no-repeat'
             ? filler.source.height
-            : this.height),
+            : finalHeight),
           '" fill="url(#SVGID_' + filler.id + ')"',
           '></rect>\n'
         );
       }
       else {
         markup.push(
-          '<rect x="0" y="0" ',
-          'width="', this.width,
-          '" height="', this.height,
-          '" fill="', this[property], '"',
+          '<rect x="0" y="0" width="100%" height="100%" ',
+          'fill="', this[property], '"',
           '></rect>\n'
         );
       }
