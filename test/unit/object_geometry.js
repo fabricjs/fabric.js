@@ -802,4 +802,38 @@
     assert.deepEqual(coords[3].y, 85, 'return bottom left with skewY skewX angle Y');
   });
 
+  QUnit.test('isPartiallyOnScreen', function(assert) {
+    var cObj = new fabric.Object(
+      { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), true, 'object is partially on screen because it include the canvas');
+    cObj.left = 100;
+    cObj.top = 100;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), false, 'object is not partially on screen because it include the canvas');
+    cObj.left = -1000;
+    cObj.top = -1000;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), false, 'object is not partially on screen because it is outside the canvas');
+  });
+
+  QUnit.test('isOffScreen', function(assert) {
+    var cObj = new fabric.Object(
+      { left: -1000, top: -1000, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    assert.equal(cObj.isOffScreen(cObj.aCoords), true, 'object is off screen because it is not include on the canvas');
+    cObj.left = -10;
+    cObj.top = -10;
+    cObj.setCoords();
+    assert.equal(cObj.isOffScreen(cObj.aCoords), false, 'object is partially on screen because it include the canvas');
+    cObj.left = 1000;
+    cObj.top = 1000;
+    cObj.setCoords();
+    assert.equal(cObj.isOffScreen(cObj.aCoords), false, 'object is on screen because it include the canvas');
+  });
+
 })();
