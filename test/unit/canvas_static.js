@@ -1699,6 +1699,58 @@
     }
   });
 
+
+
+  QUnit.test('toSVG with background', function(assert) {
+    var canvas2 = new fabric.StaticCanvas();
+    canvas2.backgroundColor = 'red';
+    var svg = canvas2.toSVG();
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n<rect x="0" y="0" width="100%" height="100%" fill="red"></rect>\n</svg>';
+    assert.equal(svg, expectedSVG, 'svg is as expected');
+  });
+
+  QUnit.test('toSVG with background and zoom and svgViewportTransformation', function(assert) {
+    var canvas2 = new fabric.StaticCanvas();
+    canvas2.backgroundColor = 'blue';
+    canvas2.svgViewportTransformation = true;
+    canvas2.viewportTransform = [3, 0, 0, 3, 60, 30];
+    var svg = canvas2.toSVG();
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="-20 -10 100 50" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n<rect x="0" y="0" width="100%" height="100%" fill="blue"></rect>\n</svg>';
+    assert.equal(svg, expectedSVG, 'svg is as expected');
+  });
+
+  QUnit.test('toSVG with background gradient', function(assert) {
+    var canvas2 = new fabric.StaticCanvas();
+    canvas2.backgroundColor = new fabric.Gradient({
+      type: 'linear',
+      colorStops: [
+        { offset: 0, color: 'black' },
+        { offset: 1, color: 'white' },
+      ],
+      coords: {
+        x1: 0,
+        x2: 300,
+        y1: 0,
+        y2: 0,
+      },
+    });
+    var svg = canvas2.toSVG();
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id="SVGID_13" gradientUnits="userSpaceOnUse" x1="-150" y1="-75" x2="150" y2="-75">\n<stop offset="0%" style="stop-color:black;"/>\n<stop offset="100%" style="stop-color:white;"/>\n</linearGradient>\n</defs>\n<rect transform="translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_13)"></rect>\n</svg>';
+    assert.equal(svg, expectedSVG, 'svg is as expected');
+  });
+
+  QUnit.test('toSVG with background pattern', function(assert) {
+    var canvas2 = new fabric.StaticCanvas();
+    canvas2.backgroundColor = new fabric.Pattern({
+      source: 'a.jpeg',
+      repeat: 'repeat',
+    });
+    var svg = canvas2.toSVG();
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_14" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href=""></image>\n</pattern>\n</defs>\n<rect transform="translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_14)"></rect>\n</svg>';
+    assert.equal(svg, expectedSVG, 'svg is as expected');
+  });
+
+
   // QUnit.test('backgroundImage', function(assert) {
   //   var done = assert.async();
   //   assert.deepEqual('', canvas.backgroundImage);
