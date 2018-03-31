@@ -1699,8 +1699,6 @@
     }
   });
 
-
-
   QUnit.test('toSVG with background', function(assert) {
     var canvas2 = new fabric.StaticCanvas();
     canvas2.backgroundColor = 'red';
