@@ -1752,7 +1752,6 @@
     assert.equal(svg, expectedSVG, 'svg is as expected');
   });
 
-
   // QUnit.test('backgroundImage', function(assert) {
   //   var done = assert.async();
   //   assert.deepEqual('', canvas.backgroundImage);
