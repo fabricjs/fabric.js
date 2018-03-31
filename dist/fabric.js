@@ -3992,15 +3992,15 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             }
         },
         _setSVGBgOverlayColor: function(markup, property) {
-            var filler = this[property], vpt = this.viewportTransform, finalWidth = this.width / vpt[0], finalHeight = this.height / vpt[3];
+            var filler = this[property];
             if (!filler) {
                 return;
             }
             if (filler.toLive) {
                 var repeat = filler.repeat;
-                markup.push('<rect transform="translate(', finalWidth / 2, ",", finalHeight / 2, ')"', ' x="', filler.offsetX - finalWidth / 2, '" y="', filler.offsetY - finalHeight / 2, '" ', 'width="', repeat === "repeat-y" || repeat === "no-repeat" ? filler.source.width : finalWidth, '" height="', repeat === "repeat-x" || repeat === "no-repeat" ? filler.source.height : finalHeight, '" fill="url(#SVGID_' + filler.id + ')"', "></rect>\n");
+                markup.push('<rect transform="translate(', this.width / 2, ",", this.height / 2, ')"', ' x="', filler.offsetX - this.width / 2, '" y="', filler.offsetY - this.height / 2, '" ', 'width="', repeat === "repeat-y" || repeat === "no-repeat" ? filler.source.width : this.width, '" height="', repeat === "repeat-x" || repeat === "no-repeat" ? filler.source.height : this.height, '" fill="url(#SVGID_' + filler.id + ')"', "></rect>\n");
             } else {
-                markup.push('<rect x="0" y="0" width="100%" height="100%" ', 'fill="', this[property], '"', "></rect>\n");
+                markup.push('<rect x="0" y="0" ', 'width="', this.width, '" height="', this.height, '" fill="', this[property], '"', "></rect>\n");
             }
         },
         sendToBack: function(object) {
@@ -4135,10 +4135,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             return this.renderOnAddRemove && this.requestRenderAll();
         },
         dispose: function() {
-            if (this.isRendering) {
-                fabric.util.cancelAnimFrame(this.isRendering);
-                this.isRendering = 0;
-            }
             this.forEachObject(function(object) {
                 object.dispose && object.dispose();
             });
@@ -4147,7 +4143,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
             this.overlayImage = null;
             this._iTextInstances = null;
             this.lowerCanvasEl = null;
-            this.contextContainer = null;
+            this.cacheCanvasEl = null;
             return this;
         },
         toString: function() {
@@ -4693,23 +4689,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 this.clearContext(this.contextTop);
                 this.contextTopDirty = false;
             }
-            this.renderTopLayer(this.contextTop);
+            if (this.isDrawingMode && this._isCurrentlyDrawing) {
+                this.freeDrawingBrush && this.freeDrawingBrush._render();
+            }
             var canvasToDrawOn = this.contextContainer;
             this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
             return this;
         },
-        renderTopLayer: function(ctx) {
-            if (this.isDrawingMode && this._isCurrentlyDrawing) {
-                this.freeDrawingBrush && this.freeDrawingBrush._render();
-            }
-            if (this.selection && this._groupSelector) {
-                this._drawSelection(ctx);
-            }
-        },
         renderTop: function() {
             var ctx = this.contextTop;
             this.clearContext(ctx);
-            this.renderTopLayer(ctx);
+            if (this.selection && this._groupSelector) {
+                this._drawSelection(ctx);
+            }
             this.fire("after:render");
             this.contextTopDirty = true;
             return this;
@@ -5393,10 +5385,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this.removeListeners();
             wrapper.removeChild(this.upperCanvasEl);
             wrapper.removeChild(this.lowerCanvasEl);
-            this.upperCanvasEl = null;
-            this.cacheCanvasEl = null;
-            this.contextCache = null;
-            this.contextTop = null;
+            delete this.upperCanvasEl;
             if (wrapper.parentNode) {
                 wrapper.parentNode.replaceChild(this.lowerCanvasEl, this.wrapperEl);
             }
@@ -7509,9 +7498,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return [ stroke, "stroke-width: ", strokeWidth, "; ", "stroke-dasharray: ", strokeDashArray, "; ", "stroke-linecap: ", strokeLineCap, "; ", "stroke-linejoin: ", strokeLineJoin, "; ", "stroke-miterlimit: ", strokeMiterLimit, "; ", fill, "fill-rule: ", fillRule, "; ", "opacity: ", opacity, ";", filter, visibility ].join("");
         },
         getSvgSpanStyles: function(style, useWhiteSpace) {
-            var term = "; ";
-            var fontFamily = style.fontFamily ? "font-family: " + (style.fontFamily.indexOf("'") === -1 && style.fontFamily.indexOf('"') === -1 ? "'" + style.fontFamily + "'" : style.fontFamily) + term : "";
-            var strokeWidth = style.strokeWidth ? "stroke-width: " + style.strokeWidth + term : "", fontFamily = fontFamily, fontSize = style.fontSize ? "font-size: " + style.fontSize + "px" + term : "", fontStyle = style.fontStyle ? "font-style: " + style.fontStyle + term : "", fontWeight = style.fontWeight ? "font-weight: " + style.fontWeight + term : "", fill = style.fill ? getSvgColorString("fill", style.fill) : "", stroke = style.stroke ? getSvgColorString("stroke", style.stroke) : "", textDecoration = this.getSvgTextDecoration(style), deltaY = style.deltaY ? "baseline-shift: " + -style.deltaY + "; " : "";
+            var term = "; ", strokeWidth = style.strokeWidth ? "stroke-width: " + style.strokeWidth + term : "", fontFamily = style.fontFamily ? "font-family: " + style.fontFamily.replace(/"/g, "'") + term : "", fontSize = style.fontSize ? "font-size: " + style.fontSize + "px" + term : "", fontStyle = style.fontStyle ? "font-style: " + style.fontStyle + term : "", fontWeight = style.fontWeight ? "font-weight: " + style.fontWeight + term : "", fill = style.fill ? getSvgColorString("fill", style.fill) : "", stroke = style.stroke ? getSvgColorString("stroke", style.stroke) : "", textDecoration = this.getSvgTextDecoration(style), deltaY = style.deltaY ? "baseline-shift: " + -style.deltaY + "; " : "";
             if (textDecoration) {
                 textDecoration = "text-decoration: " + textDecoration + term;
             }
@@ -13926,9 +13913,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
             }
             return width;
         },
-        _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
-            var lineWidth = 0, graphemeLines = [], line = [], words = _line.split(this._reSpaceAndTab), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing(), reservedSpace = reservedSpace || 0;
-            desiredWidth -= reservedSpace;
+        _wrapLine: function(_line, lineIndex, desiredWidth) {
+            var lineWidth = 0, graphemeLines = [], line = [], words = _line.split(this._reSpaceAndTab), word = "", offset = 0, infix = " ", wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing();
             for (var i = 0; i < words.length; i++) {
                 word = fabric.util.string.graphemeSplit(words[i]);
                 wordWidth = this._measureWord(word, lineIndex, offset);
@@ -13954,8 +13940,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
                 }
             }
             i && graphemeLines.push(line);
-            if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-                this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+            if (largestWordWidth > this.dynamicMinWidth) {
+                this.dynamicMinWidth = largestWordWidth - additionalSpace;
             }
             return graphemeLines;
         },
