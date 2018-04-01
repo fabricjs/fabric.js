@@ -15,34 +15,33 @@
   }
 
   function _isEqual(origValue, currentValue, firstPass) {
-    if (!fabric.isLikelyNode && origValue instanceof Element) {
-      // avoid checking deep html elements
-      return origValue === currentValue;
+    if (origValue === currentValue) {
+      // if the objects are identical, return
+      return true;
     }
-    else if (origValue instanceof Array) {
+    else if (Array.isArray(origValue)) {
       if (origValue.length !== currentValue.length) {
         return false;
       }
       for (var i = 0, len = origValue.length; i < len; i++) {
-        if (origValue[i] !== currentValue[i]) {
+        if (!_isEqual(origValue[i], currentValue[i])) {
           return false;
         }
       }
       return true;
     }
     else if (origValue && typeof origValue === 'object') {
-      if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
+      var keys = Object.keys(origValue), key;
+      if (!firstPass && keys.length !== Object.keys(currentValue).length) {
         return false;
       }
-      for (var key in origValue) {
+      for (var i = 0, len = keys.length; i < len; i++) {
+        key = keys[i];
         if (!_isEqual(origValue[key], currentValue[key])) {
           return false;
         }
       }
       return true;
-    }
-    else {
-      return origValue === currentValue;
     }
   }
 
@@ -56,8 +55,11 @@
      */
     hasStateChanged: function(propertySet) {
       propertySet = propertySet || originalSet;
-      propertySet = '_' + propertySet;
-      return !_isEqual(this[propertySet], this, true);
+      var dashedPropertySet = '_' + propertySet;
+      if (Object.keys(this[dashedPropertySet]).length < this[propertySet].length) {
+        return true;
+      }
+      return !_isEqual(this[dashedPropertySet], this, true);
     },
 
     /**

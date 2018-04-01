@@ -37,6 +37,21 @@
     offsetY: 0,
 
     /**
+     * crossOrigin value (one of "", "anonymous", "use-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+     * @type String
+     * @default
+     */
+    crossOrigin: '',
+
+    /**
+     * transform matrix to change the pattern, imported from svgs.
+     * @type Array
+     * @default
+     */
+    patternTransform: null,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      * @param {Function} [callback] function to invoke after callback init.
@@ -63,7 +78,7 @@
         fabric.util.loadImage(options.source, function(img) {
           _this.source = img;
           callback && callback(_this);
-        });
+        }, null, this.crossOrigin);
       }
     },
 
@@ -93,8 +108,10 @@
         type: 'pattern',
         source: source,
         repeat: this.repeat,
+        crossOrigin: this.crossOrigin,
         offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
+        patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 

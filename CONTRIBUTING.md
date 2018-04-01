@@ -11,7 +11,7 @@
 To get your questions answered, please ask/search on [Fabric's google group], [StackOverflow] or on Fabric's IRC channel (irc://irc.freenode.net/#fabric.js).
 Please do not open an issue if you're not sure it's a bug or if it's not a feature/suggestion.
 
-For news about Fabric you can follow [@fabric.js], [@kangax], or [@kienzle_s] on Twitter.
+For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
 Demos and examples can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
 
 ## Issue tracker
@@ -61,10 +61,12 @@ Here are a few notes you should take into account:
 [Fabric's google group]: https://groups.google.com/forum/#!forum/fabricjs
 [stackoverflow]: http://stackoverflow.com/questions/tagged/fabricjs
 [@fabric.js]: https://twitter.com/fabricjs
+[@AndreaBogazzi]: https://twitter.com/AndreaBogazzi
 [@kangax]: https://twitter.com/kangax
 [@kienzle_s]: https://twitter.com/kienzle_s
 [jsfiddle]: http://jsfiddle.net/user/fabricjs/fiddles
 [codepen.io]: http://codepen.io/tag/fabricjs
 [fabricjs.com]: http://fabricjs.com/demos
+[fabricjs.com/docs]: http://fabricjs.com/docs
 [JSDoc 3]: http://usejsdoc.org/
 [issue]: https://github.com/kangax/fabric.js/issues

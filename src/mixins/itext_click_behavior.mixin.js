@@ -15,31 +15,25 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.on('mousedown', this.onMouseDown.bind(this));
   },
 
+  /**
+   * Default event handler to simulate triple click
+   * @private
+   */
   onMouseDown: function(options) {
-
+    if (!this.canvas) {
+      return;
+    }
     this.__newClickTime = +new Date();
     var newPointer = this.canvas.getPointer(options.e);
-
     if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
     }
-    else if (this.isDoubleClick(newPointer)) {
-      this.fire('dblclick', options);
-      this._stopEvent(options.e);
-    }
-
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
     this.__lastIsEditing = this.isEditing;
     this.__lastSelected = this.selected;
-  },
-
-  isDoubleClick: function(newPointer) {
-    return this.__newClickTime - this.__lastClickTime < 500 &&
-        this.__lastPointer.x === newPointer.x &&
-        this.__lastPointer.y === newPointer.y && this.__lastIsEditing;
   },
 
   isTripleClick: function(newPointer) {
@@ -70,7 +64,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes double and triple click event handlers
    */
   initClicks: function() {
-    this.on('dblclick', function(options) {
+    this.on('mousedblclick', function(options) {
       this.selectWord(this.getSelectionStartFromPointer(options.e));
     });
     this.on('tripleclick', function(options) {
@@ -79,34 +73,43 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Initializes "mousedown" event handler
+   * Default event handler for the basic functionalities needed on _mouseDown
+   * can be overridden to do something different.
+   * Scope of this implementation is: find the click position, set selectionStart
+   * find selectionEnd, initialize the drawing of either cursor or selection area
    */
-  initMousedownHandler: function() {
-    this.on('mousedown', function(options) {
-      if (!this.editable) {
-        return;
-      }
-      var pointer = this.canvas.getPointer(options.e);
+  _mouseDownHandler: function(options) {
+    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+    var pointer = this.canvas.getPointer(options.e);
 
-      this.__mousedownX = pointer.x;
-      this.__mousedownY = pointer.y;
-      this.__isMousedown = true;
+    this.__mousedownX = pointer.x;
+    this.__mousedownY = pointer.y;
+    this.__isMousedown = true;
 
-      if (this.selected) {
-        this.setCursorByClick(options.e);
-      }
+    if (this.selected) {
+      this.setCursorByClick(options.e);
+    }
 
-      if (this.isEditing) {
-        this.__selectionStartOnMouseDown = this.selectionStart;
-        if (this.selectionStart === this.selectionEnd) {
-          this.abortCursorAnimation();
-        }
-        this.renderCursorOrSelection();
+    if (this.isEditing) {
+      this.__selectionStartOnMouseDown = this.selectionStart;
+      if (this.selectionStart === this.selectionEnd) {
+        this.abortCursorAnimation();
       }
-    });
+      this.renderCursorOrSelection();
+    }
   },
 
   /**
+   * Initializes "mousedown" event handler
+   */
+  initMousedownHandler: function() {
+    this.on('mousedown', this._mouseDownHandler);
+  },
+
+  /**
+   * detect if object moved
    * @private
    */
   _isObjectMoved: function(e) {
@@ -120,23 +123,29 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes "mouseup" event handler
    */
   initMouseupHandler: function() {
-    this.on('mouseup', function(options) {
-      this.__isMousedown = false;
-      if (!this.editable || this._isObjectMoved(options.e)) {
-        return;
-      }
+    this.on('mouseup', this.mouseUpHandler);
+  },
 
-      if (this.__lastSelected && !this.__corner) {
-        this.enterEditing(options.e);
-        if (this.selectionStart === this.selectionEnd) {
-          this.initDelayedCursor(true);
-        }
-        else {
-          this.renderCursorOrSelection();
-        }
+  /**
+   * standard hander for mouse up, overridable
+   * @private
+   */
+  mouseUpHandler: function(options) {
+    this.__isMousedown = false;
+    if (!this.editable || this._isObjectMoved(options.e) || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+
+    if (this.__lastSelected && !this.__corner) {
+      this.enterEditing(options.e);
+      if (this.selectionStart === this.selectionEnd) {
+        this.initDelayedCursor(true);
       }
-      this.selected = true;
-    });
+      else {
+        this.renderCursorOrSelection();
+      }
+    }
+    this.selected = true;
   },
 
   /**
@@ -170,64 +179,56 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         width = 0,
         height = 0,
         charIndex = 0,
-        newSelectionStart,
+        lineIndex = 0,
+        lineLeftOffset,
         line;
 
     for (var i = 0, len = this._textLines.length; i < len; i++) {
-      line = this._textLines[i];
-      height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
-
-      var widthOfLine = this._getLineWidth(this.ctx, i),
-          lineLeftOffset = this._getLineLeftOffset(widthOfLine);
-
-      width = lineLeftOffset * this.scaleX;
-
-      for (var j = 0, jlen = line.length; j < jlen; j++) {
-
-        prevWidth = width;
-
-        width += this._getWidthOfChar(this.ctx, line[j], i, this.flipX ? jlen - j : j) *
-                 this.scaleX;
-
-        if (height <= mouseOffset.y || width <= mouseOffset.x) {
-          charIndex++;
-          continue;
+      if (height <= mouseOffset.y) {
+        height += this.getHeightOfLine(i) * this.scaleY;
+        lineIndex = i;
+        if (i > 0) {
+          charIndex += this._textLines[i - 1].length + 1;
         }
-
-        return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
-
-      if (mouseOffset.y < height) {
-        //this happens just on end of lines.
-        return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex + i - 1, jlen);
+      else {
+        break;
       }
     }
-
-    // clicked somewhere after all chars, so set at the end
-    if (typeof newSelectionStart === 'undefined') {
-      return this.text.length;
+    lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    width = lineLeftOffset * this.scaleX;
+    line = this._textLines[lineIndex];
+    for (var j = 0, jlen = line.length; j < jlen; j++) {
+      prevWidth = width;
+      // i removed something about flipX here, check.
+      width += this.__charBounds[lineIndex][j].kernedWidth * this.scaleX;
+      if (width <= mouseOffset.x) {
+        charIndex++;
+      }
+      else {
+        break;
+      }
     }
+    return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex, jlen);
   },
 
   /**
    * @private
    */
   _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
-
+    // we need Math.abs because when width is after the last char, the offset is given as 1, while is 0
     var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
         distanceBtwNextCharAndCursor = width - mouseOffset.x,
-        offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1,
+        offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
+          distanceBtwNextCharAndCursor < 0 ? 0 : 1,
         newSelectionStart = index + offset;
-
     // if object is horizontally flipped, mirror cursor location from the end
     if (this.flipX) {
       newSelectionStart = jlen - newSelectionStart;
     }
 
-    if (newSelectionStart > this.text.length) {
-      newSelectionStart = this.text.length;
+    if (newSelectionStart > this._text.length) {
+      newSelectionStart = this._text.length;
     }
 
     return newSelectionStart;

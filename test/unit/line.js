@@ -1,6 +1,7 @@
 (function(){
 
   var LINE_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'line',
     'originX':                  'left',
     'originY':                  'top',
@@ -30,6 +31,7 @@
     'clipTo':                   null,
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
+    'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
     'skewY':                    0,
@@ -38,48 +40,51 @@
 
   QUnit.module('fabric.Line');
 
-  test('constructor', function() {
-    ok(fabric.Line);
+  QUnit.test('constructor', function(assert) {
+    assert.ok(fabric.Line);
     var line = new fabric.Line([10, 11, 20, 21]);
 
-    ok(line instanceof fabric.Line);
-    ok(line instanceof fabric.Object);
+    assert.ok(line instanceof fabric.Line);
+    assert.ok(line instanceof fabric.Object);
 
-    equal(line.type, 'line');
+    assert.equal(line.type, 'line');
 
-    equal(line.get('x1'), 10);
-    equal(line.get('y1'), 11);
-    equal(line.get('x2'), 20);
-    equal(line.get('y2'), 21);
+    assert.equal(line.get('x1'), 10);
+    assert.equal(line.get('y1'), 11);
+    assert.equal(line.get('x2'), 20);
+    assert.equal(line.get('y2'), 21);
 
     var lineWithoutPoints = new fabric.Line();
 
-    equal(lineWithoutPoints.get('x1'), 0);
-    equal(lineWithoutPoints.get('y1'), 0);
-    equal(lineWithoutPoints.get('x2'), 0);
-    equal(lineWithoutPoints.get('y2'), 0);
+    assert.equal(lineWithoutPoints.get('x1'), 0);
+    assert.equal(lineWithoutPoints.get('y1'), 0);
+    assert.equal(lineWithoutPoints.get('x2'), 0);
+    assert.equal(lineWithoutPoints.get('y2'), 0);
   });
 
-  test('complexity', function() {
+  QUnit.test('complexity', function(assert) {
     var line = new fabric.Line();
-    ok(typeof line.complexity == 'function');
+    assert.ok(typeof line.complexity === 'function');
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var line = new fabric.Line([11, 12, 13, 14]);
-    ok(typeof line.toObject == 'function');
-    deepEqual(LINE_OBJECT, line.toObject());
+    assert.ok(typeof line.toObject === 'function');
+    assert.deepEqual(LINE_OBJECT, line.toObject());
   });
 
-  test('fromObject', function() {
-    ok(typeof fabric.Line.fromObject == 'function');
-    var line = fabric.Line.fromObject(LINE_OBJECT);
-    ok(line instanceof fabric.Line);
-    deepEqual(LINE_OBJECT, line.toObject());
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Line.fromObject === 'function');
+    fabric.Line.fromObject(LINE_OBJECT, function(line) {
+      assert.ok(line instanceof fabric.Line);
+      assert.deepEqual(LINE_OBJECT, line.toObject());
+      done();
+    });
   });
 
-  test('fromElement', function() {
-    ok(typeof fabric.Line.fromElement == 'function');
+  QUnit.test('fromElement', function(assert) {
+    assert.ok(typeof fabric.Line.fromElement === 'function');
 
     var lineEl           = fabric.document.createElement('line'),
         x1               = 11,
@@ -104,64 +109,65 @@
     lineEl.setAttribute('stroke-linejoin', strokeLineJoin);
     lineEl.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
-    var oLine = fabric.Line.fromElement(lineEl);
-    ok(oLine instanceof fabric.Line);
+    fabric.Line.fromElement(lineEl, function(oLine) {
+      assert.ok(oLine instanceof fabric.Line);
 
-    equal(oLine.get('x1'), x1);
-    equal(oLine.get('y1'), y1);
-    equal(oLine.get('x2'), x2);
-    equal(oLine.get('y2'), y2);
-    equal(oLine.get('stroke'), stroke);
-    equal(oLine.get('strokeWidth'), strokeWidth);
-    deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
-    equal(oLine.get('strokeLineCap'), strokeLineCap);
-    equal(oLine.get('strokeLineJoin'), strokeLineJoin);
-    equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
+      assert.equal(oLine.get('x1'), x1);
+      assert.equal(oLine.get('y1'), y1);
+      assert.equal(oLine.get('x2'), x2);
+      assert.equal(oLine.get('y2'), y2);
+      assert.equal(oLine.get('stroke'), stroke);
+      assert.equal(oLine.get('strokeWidth'), strokeWidth);
+      assert.deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
+      assert.equal(oLine.get('strokeLineCap'), strokeLineCap);
+      assert.equal(oLine.get('strokeLineJoin'), strokeLineJoin);
+      assert.equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-    var lineElWithMissingAttributes = fabric.document.createElement('line');
-    lineElWithMissingAttributes.setAttribute('x1', 10);
-    lineElWithMissingAttributes.setAttribute('y1', 20);
+      var lineElWithMissingAttributes = fabric.document.createElement('line');
+      lineElWithMissingAttributes.setAttribute('x1', 10);
+      lineElWithMissingAttributes.setAttribute('y1', 20);
 
-    oLine = fabric.Line.fromElement(lineElWithMissingAttributes);
-
-    equal(oLine.get('x2'), 0, 'missing attributes count as 0 values');
-    equal(oLine.get('y2'), 0, 'missing attributes count as 0 values');
+      fabric.Line.fromElement(lineElWithMissingAttributes, function(oLine2) {
+        assert.equal(oLine2.get('x2'), 0, 'missing attributes count as 0 values');
+        assert.equal(oLine2.get('y2'), 0, 'missing attributes count as 0 values');
+      });
+    });
   });
 
-  test('straight lines may have 0 width or heigth', function() {
+  QUnit.test('straight lines may have 0 width or heigth', function(assert) {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 
-    equal(line1.get('height'), 0);
-    equal(line2.get('width'), 0);
+    assert.equal(line1.get('height'), 0);
+    assert.equal(line2.get('width'), 0);
   });
 
-  test('changing x/y coords should update width/height', function() {
+  QUnit.test('changing x/y coords should update width/height', function(assert) {
     var line = new fabric.Line([50, 50, 100, 100]);
 
-    equal(50, line.width);
+    assert.equal(50, line.width);
 
     line.set({ x1: 75, y1: 75, x2: 175, y2: 175 });
 
-    equal(100, line.width);
-    equal(100, line.height);
+    assert.equal(100, line.width);
+    assert.equal(100, line.height);
   });
 
-  test('stroke-width in a style', function() {
+  QUnit.test('stroke-width in a style', function(assert) {
     var lineEl = fabric.document.createElement('line');
     lineEl.setAttribute('style', 'stroke-width:4');
-
-    var oLine = fabric.Line.fromElement(lineEl);
-    ok(4, oLine.strokeWidth);
+    fabric.Line.fromElement(lineEl, function(oLine) {
+      assert.ok(4, oLine.strokeWidth);
+    });
   });
 
   // this isn't implemented yet, so disabling for now
 
-  // test('x1,y1 less than x2,y2 should work', function() {
+  // QUnit.test('x1,y1 less than x2,y2 should work', function(assert) {
   //   var line = new fabric.Line([ 400, 200, 300, 400]);
 
-  //   equal(100, line.width);
-  //   equal(200, line.height);
+  //   assert.equal(100, line.width);
+  //   assert.equal(200, line.height);
   // });
 
   var lineCoordsCases = [
@@ -428,7 +434,7 @@
   ];
 
   lineCoordsCases.forEach(function (c_) {
-    test('stroke-less line coords ' + c_.description, function() {
+    QUnit.test('stroke-less line coords ' + c_.description, function(assert) {
       var points = c_.givenLineArgs.points;
       var options = c_.givenLineArgs.options;
 
@@ -437,8 +443,8 @@
         options
       );
 
-      equal(givenLine.left, c_.expectedCoords.left);
-      equal(givenLine.top, c_.expectedCoords.top);
+      assert.equal(givenLine.left, c_.expectedCoords.left);
+      assert.equal(givenLine.top, c_.expectedCoords.top);
     });
   });
 
@@ -506,13 +512,13 @@
   ];
 
   getLeftToOriginXCases.forEach(function (c_) {
-    test('Line.getLeftToOriginX() ' + c_.description, function () {
+    QUnit.test('Line.getLeftToOriginX() ' + c_.description, function (assert) {
       var line = new fabric.Line(
         c_.givenPoints,
         { originX: c_.givenOrigin }
       );
 
-      equal(line._getLeftToOriginX(), c_.expectedLeft);
+      assert.equal(line._getLeftToOriginX(), c_.expectedLeft);
     });
   });
 
@@ -580,13 +586,13 @@
   ];
 
   getTopToOriginYCases.forEach(function (c_) {
-    test('Line._getTopToOriginY() ' + c_.description, function () {
+    QUnit.test('Line._getTopToOriginY() ' + c_.description, function (assert) {
       var line = new fabric.Line(
         c_.givenPoints,
         { originY: c_.givenOrigin }
       );
 
-      equal(line._getTopToOriginY(), c_.expectedTop);
+      assert.equal(line._getTopToOriginY(), c_.expectedTop);
     });
   });
 

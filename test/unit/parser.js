@@ -22,14 +22,14 @@
 
   QUnit.module('fabric.Parser');
 
-  test('parseAttributes', function() {
-    ok(fabric.parseAttributes);
+  QUnit.test('parseAttributes', function(assert) {
+    assert.ok(fabric.parseAttributes);
 
     var element = makeElement();
     var attributeNames = 'cx cy x y r opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
     var parsedAttributes = fabric.parseAttributes(element, attributeNames);
 
-    deepEqual(parsedAttributes, {
+    assert.deepEqual(parsedAttributes, {
       left:         102,
       top:          104,
       radius:       105,
@@ -39,35 +39,35 @@
     });
   });
 
-  test('parseAttributesNoneValues', function() {
+  QUnit.test('parseAttributesNoneValues', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('fill', 'none');
     element.setAttribute('stroke', 'none');
 
-    deepEqual(fabric.parseAttributes(element, 'fill stroke'.split(' ')), { fill: '', stroke: '' });
+    assert.deepEqual(fabric.parseAttributes(element, 'fill stroke'.split(' ')), { fill: '', stroke: '' });
   });
 
-  test('parseAttributesFillRule', function() {
+  QUnit.test('parseAttributesFillRule', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'evenodd');
 
-    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
+    assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
   });
 
-  test('parseAttributesFillRuleWithoutTransformation', function() {
+  QUnit.test('parseAttributesFillRuleWithoutTransformation', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'inherit');
 
-    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'inherit' });
+    assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'inherit' });
   });
 
-  test('parseAttributesTransform', function() {
+  QUnit.test('parseAttributesTransform', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('transform', 'translate(5, 10)');
-    deepEqual(fabric.parseAttributes(element, ['transform']), { transformMatrix: [1, 0, 0, 1, 5, 10] });
+    assert.deepEqual(fabric.parseAttributes(element, ['transform']), { transformMatrix: [1, 0, 0, 1, 5, 10] });
   });
 
-  test('parseAttributesWithParent', function() {
+  QUnit.test('parseAttributesWithParent', function(assert) {
     var element = fabric.document.createElement('path');
     var parent = fabric.document.createElement('g');
     var grandParent = fabric.document.createElement('g');
@@ -79,11 +79,11 @@
     parent.setAttribute('y', '200');
     grandParent.setAttribute('fill', 'red');
 
-    deepEqual(fabric.parseAttributes(element, 'x y fill'.split(' ')),
+    assert.deepEqual(fabric.parseAttributes(element, 'x y fill'.split(' ')),
       { fill: 'red', left: 100, top: 200 });
   });
 
-  test('parseAttributesWithGrandParentSvg', function() {
+  QUnit.test('parseAttributesWithGrandParentSvg', function(assert) {
     var element = fabric.document.createElement('path'),
         parent = fabric.document.createElement('g'),
         grandParent = fabric.document.createElement('svg');
@@ -96,12 +96,13 @@
     grandParent.setAttribute('width', '600');
     grandParent.setAttribute('height', '600');
 
-    deepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
+    assert.deepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
       { left: 100, top: 200, width: 600, height: 600 });
   });
 
-  asyncTest('parseElements', function() {
-    ok(fabric.parseElements);
+  QUnit.test('parseElements', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.parseElements === 'function');
 
     function getOptions(options) {
       return fabric.util.object.extend(fabric.util.object.clone({
@@ -115,77 +116,64 @@
       fabric.util.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
       fabric.util.makeElement('inexistent', getOptions())
     ];
+    fabric.parseElements(elements, function(parsedElements) {
+      assert.ok(parsedElements[0] instanceof fabric.Rect);
+      assert.ok(parsedElements[1] instanceof fabric.Circle);
+      assert.ok(parsedElements[2] instanceof fabric.Path);
+      setTimeout(done, 1000);
+    });
 
-    var parsedElements, error;
-    try {
-      fabric.parseElements(elements, function(instances) {
-        parsedElements = instances;
-      });
-    }
-    catch (err) {
-      error = err;
-    }
-    ok(error === undefined, 'No error is raised');
-
-    setTimeout(function() {
-      if (parsedElements) {
-        ok(parsedElements[0] instanceof fabric.Rect);
-        ok(parsedElements[1] instanceof fabric.Circle);
-        ok(parsedElements[2] instanceof fabric.Path);
-      }
-      start();
-    }, 1000);
   });
 
-  test('parseStyleAttribute', function() {
-    ok(fabric.parseStyleAttribute);
+  QUnit.test('parseStyleAttribute', function(assert) {
+    assert.ok(fabric.parseStyleAttribute);
 
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
     var styleObj = fabric.parseStyleAttribute(element);
     // TODO: looks like this still fails with % values
     var expectedObject = {
-      'left':   10,
-      'top':    356.8,
-      'width':  137.93333333333334,
-      'height': 20
+      left:   '10px',
+      top:    '22.3em',
+      width:  '103.45pt',
+      height: '20%'
     };
-    deepEqual(styleObj, expectedObject);
+    assert.deepEqual(styleObj, expectedObject);
   });
 
-  test('parseStyleAttribute with one pair', function() {
+  QUnit.test('parseStyleAttribute with one pair', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px');
 
     var expectedObject = {
-      'left': 10
+      left: '10px'
     };
-    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+    assert.deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
-  test('parseStyleAttribute with trailing spaces', function() {
+  QUnit.test('parseStyleAttribute with trailing spaces', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px;  top:5px;  ');
 
     var expectedObject = {
-      'left': 10,
-      'top': 5
+      left: '10px',
+      top: '5px'
     };
-    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+    assert.deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
-  test('parseStyleAttribute with value normalization', function() {
+  QUnit.test('parseStyleAttribute with value normalization', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
 
     var expectedObject = {
-      'fill': '',
-      'strokeDashArray': [2, 0.4]
+      fill: 'none',
+      'stroke-dasharray': '2 0.4'
     };
-    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+    assert.deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
-  test('parseStyleAttribute with short font declaration', function() {
+  QUnit.test('parseStyleAttribute with short font declaration', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
     var styleObj = fabric.parseStyleAttribute(element);
@@ -199,7 +187,7 @@
       'fontFamily': 'Arial,Helvetica,sans-serif'
     };
 
-    deepEqual(styleObj, expectedObject);
+    assert.deepEqual(styleObj, expectedObject);
 
     //testing different unit
     element.setAttribute('style', 'font: italic 1.5em Arial,Helvetica,sans-serif');
@@ -214,10 +202,10 @@
       'fontFamily': 'Arial,Helvetica,sans-serif'
     };
 
-    deepEqual(styleObj, expectedObject);
+    assert.deepEqual(styleObj, expectedObject);
   });
 
-  test('parseAttributes (style to have higher priority than attribute)', function() {
+  QUnit.test('parseAttributes (style to have higher priority than attribute)', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:red');
     element.setAttribute('fill', 'green');
@@ -225,10 +213,10 @@
     var expectedObject = {
       'fill': 'red'
     };
-    deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
+    assert.deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
   });
 
-  test('parseAttributes stroke-opacity and fill-opacity', function() {
+  QUnit.test('parseAttributes stroke-opacity and fill-opacity', function(assert) {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:rgb(100,200,50);fill-opacity:0.2;');
     element.setAttribute('stroke', 'green');
@@ -241,86 +229,96 @@
       'fillOpacity': 0.2,
       'strokeOpacity': 0.5
     };
-    deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
+    assert.deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
   });
 
-  test('parsePointsAttribute', function() {
-    ok(fabric.parsePointsAttribute);
+  QUnit.test('parse 0 attribute', function(assert) {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('opacity', 0);
+
+    var expectedObject = {
+      opacity: 0,
+    };
+    assert.deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
+  });
+
+  QUnit.test('parsePointsAttribute', function(assert) {
+    assert.ok(fabric.parsePointsAttribute);
 
     var element = fabric.document.createElement('polygon');
     element.setAttribute('points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
 
     var actualPoints = fabric.parsePointsAttribute(element.getAttribute('points'));
 
-    equal(actualPoints[0].x, 10);
-    equal(actualPoints[0].y, 12);
+    assert.equal(actualPoints[0].x, 10);
+    assert.equal(actualPoints[0].y, 12);
 
-    equal(actualPoints[1].x, 20);
-    equal(actualPoints[1].y, 22);
+    assert.equal(actualPoints[1].x, 20);
+    assert.equal(actualPoints[1].y, 22);
 
-    equal(actualPoints[2].x, -0.52);
-    equal(actualPoints[2].y, 0.001);
+    assert.equal(actualPoints[2].x, -0.52);
+    assert.equal(actualPoints[2].y, 0.001);
 
-    equal(actualPoints[3].x, 2.3e2);
-    equal(actualPoints[3].y, 2.3e-2);
+    assert.equal(actualPoints[3].x, 2.3e2);
+    assert.equal(actualPoints[3].y, 2.3e-2);
 
-    equal(actualPoints[4].x, 10);
-    equal(actualPoints[4].y, -1);
+    assert.equal(actualPoints[4].x, 10);
+    assert.equal(actualPoints[4].y, -1);
   });
 
-  test('parseTransformAttribute', function() {
+  QUnit.test('parseTransformAttribute', function(assert) {
     var parsedValue;
 
-    ok(fabric.parseTransformAttribute);
+    assert.ok(fabric.parseTransformAttribute);
     var element = fabric.document.createElement('path');
 
     //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
 
     element.setAttribute('transform', 'translate(5,10)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,0,1,5,10]);
+    assert.deepEqual(parsedValue, [1,0,0,1,5,10]);
 
     element.setAttribute('transform', 'translate(-10,-20)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,0,1,-10,-20]);
+    assert.deepEqual(parsedValue, [1,0,0,1,-10,-20]);
 
     var ANGLE_DEG = 90;
     var ANGLE = ANGLE_DEG * Math.PI / 180;
     element.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]);
+    assert.deepEqual(parsedValue, [fabric.util.cos(ANGLE), fabric.util.sin(ANGLE), -fabric.util.sin(ANGLE), fabric.util.cos(ANGLE), 0, 0]);
 
     element.setAttribute('transform', 'scale(3.5)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [3.5,0,0,3.5,0,0]);
+    assert.deepEqual(parsedValue, [3.5,0,0,3.5,0,0]);
 
     element.setAttribute('transform', 'scale(2 13)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [2,0,0,13,0,0]);
+    assert.deepEqual(parsedValue, [2,0,0,13,0,0]);
 
     element.setAttribute('transform', 'skewX(2)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,0.03492076949174773,1,0,0]);
+    assert.deepEqual(parsedValue, [1,0,0.03492076949174773,1,0,0]);
 
     element.setAttribute('transform', 'skewY(234.111)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
+    assert.deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
 
     element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,2,3,4,5,6]);
+    assert.deepEqual(parsedValue, [1,2,3,4,5,6]);
 
     element.setAttribute('transform', 'translate(21,31) translate(11,22)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,0,1,32,53]);
+    assert.deepEqual(parsedValue, [1,0,0,1,32,53]);
 
     element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [2,0,0.3967362169237356,13,10,195]);
+    assert.deepEqual(parsedValue, [2,0,0.3967362169237356,13,10,195]);
 
   });
 
-  test('parseNestedTransformAttribute', function() {
+  QUnit.test('parseNestedTransformAttribute', function(assert) {
     var element = fabric.document.createElement('path');
     var parent = fabric.document.createElement('g');
     parent.appendChild(element);
@@ -329,44 +327,92 @@
     element.setAttribute('transform', 'translate(10 10)');
 
     var parsedAttributes = fabric.parseAttributes(element, ['transform']);
-    deepEqual(parsedAttributes.transformMatrix, [1, 0, 0, 1, 60, 10]);
+    assert.deepEqual(parsedAttributes.transformMatrix, [1, 0, 0, 1, 60, 10]);
   });
 
-  asyncTest('parseSVGFromString id polyfill', function() {
+  QUnit.test('parseSVGFromString id polyfill', function(assert) {
+    var done = assert.async();
     var string = '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
                  '<defs><rect id="myrect" width="300" height="100" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/></defs>' +
                  '<use xlink:href="#myrect" x="50" y="50" ></use>' +
                  '</svg>',
         rect;
 
-    ok(fabric.loadSVGFromString);
+    assert.ok(fabric.loadSVGFromString);
 
     fabric.loadSVGFromString(string, function(objects) {
       rect = objects[0];
-      ok(rect instanceof fabric.Rect);
-      start();
+      assert.ok(rect instanceof fabric.Rect);
+      done();
     });
   });
 
-  asyncTest('parseSVGFromString with svg:namespace', function() {
+  QUnit.test('parseSVGFromString nested opacity', function(assert) {
+    var done = assert.async();
+    var string = '<?xml version="1.0" encoding="UTF-8"?>' +
+    '<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="300" height="400" ' +
+      'viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" ' +
+      'xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">' +
+      '<defs>' +
+      '<style>' +
+      '.cls-3{opacity:0.5;}' +
+      '.cls-4{opacity:0.5;}' +
+      '</style>' +
+      '</defs>' +
+        '<g fill="red" stroke="#000000" fill-opacity="0.5">' +
+          '<circle cx="50" cy="50" r="50" fill-opacity="1" fill="rgba(255,0,0,0.3)" />' +
+          '<circle cx="150" cy="50" r="50" fill="rgba(0,255,0,0.5)" />' +
+          '<circle cx="50" cy="150" r="50" />' +
+          '<circle cx="150" cy="150" r="50" fill-opacity="0.5" fill="rgb(0,0,255)" />' +
+          '<circle cx="250" cy="50" r="50" fill-opacity="0.5" fill="rgba(0,0,255,0.5)" />' +
+          '<circle cx="250" cy="150" r="50" fill-opacity="1" fill="rgb(0,0,255)" />' +
+        '</g>' +
+        '<g class="cls-3" transform="translate(0,200)">' +
+          '<circle cx="50" cy="50" r="50" class="cls-4" fill="red" />' +
+          '<circle cx="150" cy="50" r="50" fill="red" />' +
+        '</g>' +
+    '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].fill, 'rgba(255,0,0,0.3)', 'first circle has opacity 0.3 from rgba');
+      assert.equal(objects[0].fillOpacity, 1,'first circle has fill-opacity 1');
+      assert.equal(objects[1].fill, 'rgba(0,255,0,0.25)', 'first circle has opacity 0.5 from rgba and 0.5 from gtoup fill opacity');
+      assert.equal(objects[1].fillOpacity, 0.5,'first circle has fill-opacity 0.5');
+      assert.equal(objects[2].fill, 'rgba(255,0,0,0.5)', 'first circle has opacity 0.5 from group fill opacity');
+      assert.equal(objects[2].fillOpacity, 0.5,'first circle has fill-opacity 0.5');
+      assert.equal(objects[3].fill, 'rgba(0,0,255,0.5)', 'first circle has opacity 0.5 from fill opacity');
+      assert.equal(objects[3].fillOpacity, 0.5,'first circle has fill-opacity 1');
+      assert.equal(objects[4].fill, 'rgba(0,0,255,0.25)', 'first circle has opacity 0.5 from rgba and 0.5 from fill opacity');
+      assert.equal(objects[4].fillOpacity, 0.5,'first circle has fill-opacity 0.5');
+      assert.equal(objects[5].fill, 'rgba(0,0,255,1)', 'first circle has opacity 1 from rgba');
+      assert.equal(objects[5].fillOpacity, 1,'first circle has fill-opacity 1');
+      assert.equal(objects[6].opacity, 0.25, 'opacity is 0.25 for cls-3 * cls-4');
+      assert.equal(objects[7].opacity, 0.5,'opacity is 0.5 from cls-3');
+      done();
+    });
+  });
+
+  QUnit.test('parseSVGFromString with svg:namespace', function(assert) {
+    var done = assert.async();
     var string = '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
                  '<svg:defs><svg:rect id="myrect" width="300" height="100" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/></svg:defs>' +
                  '<svg:use xlink:href="#myrect" x="50" y="50" ></svg:use>' +
                  '</svg>',
         rect;
 
-    ok(fabric.loadSVGFromString);
+    assert.ok(fabric.loadSVGFromString);
 
     fabric.loadSVGFromString(string, function(objects) {
       rect = objects[0];
-      ok(rect instanceof fabric.Rect);
-      start();
+      assert.ok(rect instanceof fabric.Rect);
+      done();
     });
   });
 
-  // asyncTest('parseSVGDocument', function() {
-  //   ok(fabric.parseSVGDocument);
-
+  // QUnit.test('parseSVGDocument', function(assert) {
+  //   var done = assert.async();
+  //   assert.ok(fabric.parseSVGDocument);
+  //
   //   var data;
   //   fabric.util.request('../fixtures/path.svg', {
   //     method: 'get',
@@ -384,25 +430,25 @@
   //       });
   //     }
   //   });
-
+  //
   //   setTimeout(function() {
-  //     equal(typeof data, 'object');
-
+  //     assert.equal(typeof data, 'object');
+  //
   //     if (data) {
-  //       equal(data.length, 1);
-
+  //       assert.equal(data.length, 1);
+  //
   //       var path = data[0];
-
-  //       ok(path instanceof fabric.Path);
-  //       equal(JSON.stringify(path), EXPECTED_PATH_JSON);
+  //
+  //       assert.ok(path instanceof fabric.Path);
+  //       assert.equal(JSON.stringify(path), EXPECTED_PATH_JSON);
   //     }
-  //     start();
+  //     done();
   //   }, 1500);
   // });
 
   // https://github.com/kangax/fabric.js/issues/25
-  // asyncTest('parsing one element should not "leak" its "fill" value onto parsing of following element', function() {
-
+  // QUnit.test('parsing one element should not "leak" its "fill" value onto parsing of following element', function(assert) {
+  //   var done = assert.async();
   //   var objects;
   //   fabric.util.request('../fixtures/svg_with_rect.svg', {
   //     method: 'get',
@@ -414,17 +460,17 @@
   //       });
   //     }
   //   });
-
+  //
   //   setTimeout(function() {
   //     if (objects) {
-  //       equal(objects[1].fill, 'green');
+  //       assert.equal(objects[1].fill, 'green');
   //     }
-
-  //     start();
+  //
+  //     done();
   //   }, 1500);
   // });
 
-  test('opacity attribute', function() {
+  QUnit.test('opacity attribute', function(assert) {
     var tagNames = ['rect', 'path', 'circle', 'ellipse', 'polygon'];
 
     for (var i = tagNames.length; i--; ) {
@@ -432,83 +478,84 @@
       var opacityValue = Math.random().toFixed(2);
 
       el.setAttribute('opacity', opacityValue);
-      var obj = fabric.Rect.fromElement(el);
-
-      equal(obj.opacity, parseFloat(opacityValue),
-        'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+      // eslint-disable-next-line
+      fabric.Rect.fromElement(el, function(obj) {
+        assert.equal(obj.opacity, parseFloat(opacityValue),
+          'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+      });
     }
   });
 
-  test('fill-opacity attribute with fill attribute', function() {
+  QUnit.test('fill-opacity attribute with fill attribute', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
     el.setAttribute('fill', '#FF0000');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.fill, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
-  test('fill-opacity attribute without fill attribute', function() {
+  QUnit.test('fill-opacity attribute without fill attribute', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.fill, 'rgba(0,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
-  test('fill-opacity attribute with fill none', function() {
+  QUnit.test('fill-opacity attribute with fill none', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
     el.setAttribute('fill', 'none');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.fill, '', 'fill should stay empty');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.fill, '', 'fill should stay empty');
+    });
   });
 
-  test('stroke-opacity attribute with stroke attribute', function() {
+  QUnit.test('stroke-opacity attribute with stroke attribute', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
     el.setAttribute('stroke', '#FF0000');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
-      'opacity should be parsed correctly from "opacity" attribute of rect element');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.stroke, 'rgba(255,0,0,' + parseFloat(opacityValue) + ')',
+        'opacity should be parsed correctly from "opacity" attribute of rect element');
+    });
   });
 
-  test('stroke-opacity attribute without stroke attribute', function() {
+  QUnit.test('stroke-opacity attribute without stroke attribute', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, null, 'Default stroke is null');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.stroke, null, 'Default stroke is null');
+    });
   });
 
-  test('stroke-opacity attribute with stroke none', function() {
+  QUnit.test('stroke-opacity attribute with stroke none', function(assert) {
     var el = fabric.document.createElement('rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
     el.setAttribute('stroke', 'none');
-    var obj = fabric.Rect.fromElement(el);
-
-    equal(obj.stroke, '', 'stroke should stay empty');
+    fabric.Rect.fromElement(el, function(obj) {
+      assert.equal(obj.stroke, '', 'stroke should stay empty');
+    });
   });
 
-  test('getCssRule', function() {
+  QUnit.test('getCssRule', function(assert) {
 
-    ok(fabric.getCSSRules);
+    assert.ok(fabric.getCSSRules);
 
     var doc = fabric.document,
         svgUid = 'uniqueId',
@@ -523,21 +570,21 @@
       'g polygon.cls': {
         'fill': '#FF0000',
         'stroke': '#000000',
-        'strokeWidth': 0.25
+        'stroke-width': '0.25px'
       },
       'rect': {
         'fill': '#FF0000',
         'stroke': '#000000',
-        'strokeWidth': 0.25
+        'stroke-width': '0.25px'
       },
       'polygon.cls': {
-        'fill': '',
+        'fill': 'none',
         'stroke': '#0000FF'
       }
     };
 
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules[svgUid], expectedObject);
+    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
 
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
@@ -550,18 +597,18 @@
     elPolygon.setAttribute('svgUid', svgUid);
 
     var style = fabric.parseAttributes(elPolygon, []);
-    deepEqual(style, expectedStyle);
+    assert.deepEqual(style, expectedStyle);
 
     styleElement.textContent = '\t\n';
     expectedStyle = { };
     svgUid =  'uniqueId2';
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules[svgUid], expectedStyle);
+    assert.deepEqual(fabric.cssRules[svgUid], expectedStyle);
   });
 
-  test('getCssRule with same selectors', function() {
+  QUnit.test('getCssRule with same selectors', function(assert) {
 
-    ok(fabric.getCSSRules);
+    assert.ok(fabric.getCSSRules);
 
     var doc = fabric.document,
         svgUid = 'uniqueId',
@@ -575,18 +622,18 @@
       '.cls1': {
         'fill': '#FF0000',
         'stroke': '#00FF00',
-        'strokeWidth': 3
+        'stroke-width': '3'
       },
       '.cls2': {
         'fill': '#FF0000'
       },
       '.cls3': {
-        'strokeWidth': 3
+        'stroke-width': '3'
       }
     };
 
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules[svgUid], expectedObject);
+    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
   });
 
 })();

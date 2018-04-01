@@ -2,26 +2,27 @@
 
   QUnit.module('fabric.Ellipse');
 
-  test('constructor', function() {
-    ok(fabric.Ellipse);
+  QUnit.test('constructor', function(assert) {
+    assert.ok(fabric.Ellipse);
 
     var ellipse = new fabric.Ellipse();
 
-    ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
-    ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
+    assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
+    assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    equal(ellipse.type, 'ellipse');
+    assert.equal(ellipse.type, 'ellipse');
   });
 
-  test('complexity', function() {
+  QUnit.test('complexity', function(assert) {
     var ellipse = new fabric.Ellipse();
-    ok(typeof ellipse.complexity == 'function');
-    equal(ellipse.complexity(), 1);
+    assert.ok(typeof ellipse.complexity === 'function');
+    assert.equal(ellipse.complexity(), 1);
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
+      'version':                  fabric.version,
       'type':                     'ellipse',
       'originX':                  'left',
       'originY':                  'top',
@@ -50,12 +51,13 @@
       'visible':                  true,
       'backgroundColor':          '',
       'fillRule':                 'nonzero',
+      'paintFirst':               'fill',
       'globalCompositeOperation': 'source-over',
       'clipTo':                   null,
       'transformMatrix':          null
     };
-    ok(typeof ellipse.toObject == 'function');
-    deepEqual(ellipse.toObject(), defaultProperties);
+    assert.ok(typeof ellipse.toObject === 'function');
+    assert.deepEqual(ellipse.toObject(), defaultProperties);
 
     ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
 
@@ -68,16 +70,16 @@
       height: 50
     });
 
-    deepEqual(ellipse.toObject(), augmentedProperties);
+    assert.deepEqual(ellipse.toObject(), augmentedProperties);
 
     ellipse.set('rx', 30);
-    deepEqual(ellipse.width, ellipse.rx * 2);
+    assert.deepEqual(ellipse.width, ellipse.rx * 2);
 
     ellipse.set('scaleX', 2);
-    deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
+    assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
-  test('render', function() {
+  QUnit.test('render', function(assert) {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0).set('ry', 0);
 
@@ -88,11 +90,11 @@
     };
     ellipse.render({});
 
-    equal(wasRenderCalled, false, 'should not render when rx/ry are 0');
+    assert.equal(wasRenderCalled, false, 'should not render when rx/ry are 0');
   });
 
-  test('fromElement', function() {
-    ok(typeof fabric.Ellipse.fromElement == 'function');
+  QUnit.test('fromElement', function(assert) {
+    assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var elEllipse        = fabric.document.createElement('ellipse'),
         rx               = 5,
@@ -119,24 +121,25 @@
     elEllipse.setAttribute('stroke-linejoin', strokeLineJoin);
     elEllipse.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
-    var oEllipse = fabric.Ellipse.fromElement(elEllipse);
-    ok(oEllipse instanceof fabric.Ellipse);
-
-    equal(oEllipse.get('rx'), rx);
-    equal(oEllipse.get('ry'), ry);
-    equal(oEllipse.get('left'), left - rx);
-    equal(oEllipse.get('top'), top - ry);
-    equal(oEllipse.get('fill'), fill);
-    equal(oEllipse.get('opacity'), opacity);
-    equal(oEllipse.get('strokeWidth'), strokeWidth);
-    deepEqual(oEllipse.get('strokeDashArray'), strokeDashArray);
-    equal(oEllipse.get('strokeLineCap'), strokeLineCap);
-    equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
-    equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+    fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
+      assert.ok(oEllipse instanceof fabric.Ellipse);
+      assert.equal(oEllipse.get('rx'), rx);
+      assert.equal(oEllipse.get('ry'), ry);
+      assert.equal(oEllipse.get('left'), left - rx);
+      assert.equal(oEllipse.get('top'), top - ry);
+      assert.equal(oEllipse.get('fill'), fill);
+      assert.equal(oEllipse.get('opacity'), opacity);
+      assert.equal(oEllipse.get('strokeWidth'), strokeWidth);
+      assert.deepEqual(oEllipse.get('strokeDashArray'), strokeDashArray);
+      assert.equal(oEllipse.get('strokeLineCap'), strokeLineCap);
+      assert.equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
+      assert.equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+    });
   });
 
-  test('fromObject', function() {
-    ok(typeof fabric.Ellipse == 'function');
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Ellipse === 'function');
 
     var left    = 112,
         top     = 234,
@@ -144,20 +147,24 @@
         ry      = 14.78,
         fill    = 'ff5555';
 
-    var ellipse = fabric.Ellipse.fromObject({
+    fabric.Ellipse.fromObject({
       left: left, top: top, rx: rx, ry: ry, fill: fill
+    }, function(ellipse) {
+      assert.ok(ellipse instanceof fabric.Ellipse);
+
+      assert.equal(ellipse.get('left'), left);
+      assert.equal(ellipse.get('top'), top);
+      assert.equal(ellipse.get('rx'), rx);
+      assert.equal(ellipse.get('ry'), ry);
+      assert.equal(ellipse.get('fill'), fill);
+
+      var expected = ellipse.toObject();
+      fabric.Ellipse.fromObject(expected, function(actual) {
+        assert.deepEqual(actual.toObject(), expected);
+        done();
+      });
     });
-    ok(ellipse instanceof fabric.Ellipse);
 
-    equal(ellipse.get('left'), left);
-    equal(ellipse.get('top'), top);
-    equal(ellipse.get('rx'), rx);
-    equal(ellipse.get('ry'), ry);
-    equal(ellipse.get('fill'), fill);
 
-    var expected = ellipse.toObject();
-    var actual = fabric.Ellipse.fromObject(expected).toObject();
-
-    deepEqual(actual, expected);
   });
 })();

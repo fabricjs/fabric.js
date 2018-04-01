@@ -2,12 +2,13 @@
   var canvas = this.canvas = new fabric.Canvas();
 
   QUnit.module('fabric.IText', {
-    teardown: function() {
+    afterEach: function() {
       canvas.clear();
     }
   });
 
   var ITEXT_OBJECT = {
+    'version':                  fabric.version,
     'type':                     'text',
     'originX':                  'left',
     'originY':                  'top',
@@ -35,13 +36,16 @@
     'fontSize':                 40,
     'fontWeight':               'normal',
     'fontFamily':               'Times New Roman',
-    'fontStyle':                '',
+    'fontStyle':                'normal',
     'lineHeight':               1.3,
-    'textDecoration':           '',
+    'underline':                false,
+    'overline':                 false,
+    'linethrough':              false,
     'textAlign':                'left',
     'backgroundColor':          '',
     'textBackgroundColor':      '',
     'fillRule':                 'nonzero',
+    'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
     'skewY':                    0,
@@ -50,76 +54,77 @@
     styles:                     { }
   };
 
-  test('constructor', function() {
+  QUnit.test('constructor', function(assert) {
     var iText = new fabric.IText('test');
 
-    ok(iText instanceof fabric.IText);
-    ok(iText instanceof fabric.Text);
+    assert.ok(iText instanceof fabric.IText);
+    assert.ok(iText instanceof fabric.Text);
   });
 
-  test('initial properties', function() {
+  QUnit.test('initial properties', function(assert) {
     var iText = new fabric.IText('test');
-    ok(iText instanceof fabric.IText);
+    assert.ok(iText instanceof fabric.IText);
 
-    equal(iText.text, 'test');
-    equal(iText.type, 'i-text');
-    deepEqual(iText.styles, { });
+    assert.equal(iText.text, 'test');
+    assert.equal(iText.type, 'i-text');
+    assert.deepEqual(iText.styles, { });
   });
 
-  test('instances', function() {
+  QUnit.test('instances', function(assert) {
     var iText = new fabric.IText('test');
 
     // Not on a sketchpad; storing it in instances array already would leak it forever.
     var instances = canvas._iTextInstances && canvas._iTextInstances;
     var lastInstance = instances && instances[instances.length - 1];
-    equal(lastInstance, undefined);
+    assert.equal(lastInstance, undefined);
 
     canvas.add(iText);
     instances = canvas._iTextInstances && canvas._iTextInstances;
     lastInstance = instances && instances[instances.length - 1];
-    equal(lastInstance, iText);
+    assert.equal(lastInstance, iText);
 
     canvas.remove(iText);
     instances = canvas._iTextInstances && canvas._iTextInstances;
     lastInstance = instances && instances[instances.length - 1];
-    equal(lastInstance, undefined);
+    assert.equal(lastInstance, undefined);
 
     // Should survive being added again after removal.
     canvas.add(iText);
     lastInstance = canvas._iTextInstances && canvas._iTextInstances[canvas._iTextInstances.length - 1];
-    equal(lastInstance, iText);
+    assert.equal(lastInstance, iText);
   });
 
-  test('fromObject', function() {
-    ok(typeof fabric.IText.fromObject == 'function');
-
-    var iText = fabric.IText.fromObject(ITEXT_OBJECT);
-
-    ok(iText instanceof fabric.IText);
-    deepEqual(ITEXT_OBJECT, iText.toObject());
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.IText.fromObject === 'function');
+    fabric.IText.fromObject(ITEXT_OBJECT, function(iText) {
+      assert.ok(iText instanceof fabric.IText);
+      assert.deepEqual(ITEXT_OBJECT, iText.toObject());
+      done();
+    });
   });
 
-  test('lineHeight with single line', function() {
+  QUnit.test('lineHeight with single line', function(assert) {
     var text = new fabric.IText('text with one line');
     text.lineHeight = 2;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height;
     text.lineHeight = 0.5;
-    text._initDimensions();
+    text.initDimensions();
     var heightNew = text.height;
-    equal(height, heightNew, 'text height does not change with one single line');
+    assert.equal(height, heightNew, 'text height does not change with one single line');
   });
 
-  test('lineHeight with multi line', function() {
+  QUnit.test('lineHeight with multi line', function(assert) {
     var text = new fabric.IText('text with\ntwo lines');
     text.lineHeight = 0.1;
-    text._initDimensions();
+    text.initDimensions();
     var height = text.height,
         minimumHeight = text.fontSize * text._fontSizeMult;
-    equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
+    assert.equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
   });
 
-  test('toObject', function() {
+  QUnit.test('toObject', function(assert) {
     var styles = {
       0: {
         0: { fill: 'red' },
@@ -129,66 +134,65 @@
     var iText = new fabric.IText('test', {
       styles: styles
     });
-    equal(typeof iText.toObject, 'function');
-
+    assert.equal(typeof iText.toObject, 'function');
     var obj = iText.toObject();
-    deepEqual(obj.styles, styles);
-    notEqual(obj.styles[0], styles[0]);
-    notEqual(obj.styles[0][1], styles[0][1]);
-    deepEqual(obj.styles[0], styles[0]);
-    deepEqual(obj.styles[0][1], styles[0][1]);
+    assert.deepEqual(obj.styles, styles);
+    assert.notEqual(obj.styles[0], styles[0]);
+    assert.notEqual(obj.styles[0][1], styles[0][1]);
+    assert.deepEqual(obj.styles[0], styles[0]);
+    assert.deepEqual(obj.styles[0][1], styles[0][1]);
   });
 
-  test('setSelectionStart', function() {
+  QUnit.test('setSelectionStart', function(assert) {
     var iText = new fabric.IText('test');
 
-    equal(typeof iText.setSelectionStart, 'function');
+    assert.equal(typeof iText.setSelectionStart, 'function');
 
-    equal(iText.selectionStart, 0);
+    assert.equal(iText.selectionStart, 0);
 
     iText.setSelectionStart(3);
-    equal(iText.selectionStart, 3);
-    equal(iText.selectionEnd, 0);
+    assert.equal(iText.selectionStart, 3);
+    assert.equal(iText.selectionEnd, 0);
   });
 
-  test('empty itext', function() {
+  QUnit.test('empty itext', function(assert) {
     var iText = new fabric.IText('');
-    equal(iText.width, iText.cursorWidth);
+    assert.equal(iText.width, iText.cursorWidth);
   });
 
-  test('setSelectionEnd', function() {
+  QUnit.test('setSelectionEnd', function(assert) {
     var iText = new fabric.IText('test');
 
-    equal(typeof iText.setSelectionEnd, 'function');
+    assert.equal(typeof iText.setSelectionEnd, 'function');
 
-    equal(iText.selectionEnd, 0);
+    assert.equal(iText.selectionEnd, 0);
 
     iText.setSelectionEnd(3);
-    equal(iText.selectionEnd, 3);
-    equal(iText.selectionStart, 0);
+    assert.equal(iText.selectionEnd, 3);
+    assert.equal(iText.selectionStart, 0);
   });
 
-  test('get2DCursorLocation', function() {
+  QUnit.test('get2DCursorLocation', function(assert) {
     var iText = new fabric.IText('test\nfoo\nbarbaz');
     var loc = iText.get2DCursorLocation();
 
-    equal(loc.lineIndex, 0);
-    equal(loc.charIndex, 0);
+    assert.equal(loc.lineIndex, 0);
+    assert.equal(loc.charIndex, 0);
 
     // 'tes|t'
     iText.selectionStart = iText.selectionEnd = 3;
     loc = iText.get2DCursorLocation();
 
-    equal(loc.lineIndex, 0);
-    equal(loc.charIndex, 3);
+    assert.equal(loc.lineIndex, 0);
+    assert.equal(loc.charIndex, 3);
 
     // test
     // fo|o
     iText.selectionStart = iText.selectionEnd = 7;
     loc = iText.get2DCursorLocation();
 
-    equal(loc.lineIndex, 1);
-    equal(loc.charIndex, 2);
+    assert.equal(loc.lineIndex, 1);
+    assert.equal(loc.charIndex, 2);
 
     // test
     // foo
@@ -196,13 +200,13 @@
     iText.selectionStart = iText.selectionEnd = 14;
     loc = iText.get2DCursorLocation();
 
-    equal(loc.lineIndex, 2);
-    equal(loc.charIndex, 5);
+    assert.equal(loc.lineIndex, 2);
+    assert.equal(loc.charIndex, 5);
   });
 
-  test('isEmptyStyles', function() {
+  QUnit.test('isEmptyStyles', function(assert) {
     var iText = new fabric.IText('test');
-    ok(iText.isEmptyStyles());
+    assert.ok(iText.isEmptyStyles());
 
     iText = new fabric.IText('test', {
       styles: {
@@ -214,7 +218,7 @@
         }
       }
     });
-    ok(iText.isEmptyStyles());
+    assert.ok(iText.isEmptyStyles());
 
     iText = new fabric.IText('test', {
       styles: {
@@ -226,62 +230,65 @@
         }
       }
     });
-    ok(!iText.isEmptyStyles());
+    assert.ok(!iText.isEmptyStyles());
   });
 
-  test('selectAll', function() {
+  QUnit.test('selectAll', function(assert) {
     var iText = new fabric.IText('test');
 
     iText.selectAll();
-    equal(iText.selectionStart, 0);
-    equal(iText.selectionEnd, 4);
+    assert.equal(iText.selectionStart, 0);
+    assert.equal(iText.selectionEnd, 4);
 
     iText.selectionStart = 1;
     iText.selectionEnd = 2;
 
     iText.selectAll();
-    equal(iText.selectionStart, 0);
-    equal(iText.selectionEnd, 4);
+    assert.equal(iText.selectionStart, 0);
+    assert.equal(iText.selectionEnd, 4);
+
+    assert.equal(iText.selectAll(), iText, 'should be chainable');
   });
 
-  test('getSelectedText', function() {
+  QUnit.test('getSelectedText', function(assert) {
     var iText = new fabric.IText('test\nfoobarbaz');
     iText.selectionStart = 1;
     iText.selectionEnd = 10;
-    equal(iText.getSelectedText(), 'est\nfooba');
+    assert.equal(iText.getSelectedText(), 'est\nfooba');
 
     iText.selectionStart = iText.selectionEnd = 3;
-    equal(iText.getSelectedText(), '');
+    assert.equal(iText.getSelectedText(), '');
   });
 
-  test('enterEditing, exitEditing', function() {
+  QUnit.test('enterEditing, exitEditing', function(assert) {
     var iText = new fabric.IText('test');
 
-    equal(typeof iText.enterEditing, 'function');
-    equal(typeof iText.exitEditing, 'function');
+    assert.equal(typeof iText.enterEditing, 'function');
+    assert.equal(typeof iText.exitEditing, 'function');
 
-    ok(!iText.isEditing);
+    assert.ok(!iText.isEditing);
 
     iText.enterEditing();
-    ok(iText.isEditing);
+    assert.ok(iText.isEditing);
 
     iText.exitEditing();
-    ok(!iText.isEditing);
+    assert.ok(!iText.isEditing);
+    iText.abortCursorAnimation();
   });
 
-/*  test('enterEditing, exitEditing eventlistener counts', function() {
+  /*  QUnit.test('enterEditing, exitEditing eventlistener counts', function(assert) {
     var iText = new fabric.IText('test');
     canvas.add(iText);
-    equal(typeof iText.enterEditing, 'function');
-    equal(typeof iText.exitEditing, 'function');
+    assert.equal(typeof iText.enterEditing, 'function');
+    assert.equal(typeof iText.exitEditing, 'function');
     iText.enterEditing();
     var length = iText.canvas.__eventListeners["mouse:move"].length;
-    equal(iText.canvas.__eventListeners["mouse:move"], length);
+    assert.equal(iText.canvas.__eventListeners["mouse:move"], length);
     iText.exitEditing();
-    equal(iText.canvas__eventListeners["mouse:move"].length, length - 1);
+    assert.equal(iText.canvas__eventListeners["mouse:move"].length, length - 1);
   });*/
 
-  test('event firing', function() {
+  QUnit.test('event firing', function(assert) {
     var iText = new fabric.IText('test'),
         enter = 0, exit = 0, modify = 0;
 
@@ -301,145 +308,150 @@
     iText.on('editing:exited', countExit);
     iText.on('modified', countModify);
 
-    equal(typeof iText.enterEditing, 'function');
-    equal(typeof iText.exitEditing, 'function');
+    assert.equal(typeof iText.enterEditing, 'function');
+    assert.equal(typeof iText.exitEditing, 'function');
 
     iText.enterEditing();
-    equal(enter, 1);
-    equal(exit, 0);
-    equal(modify, 0);
+    assert.equal(enter, 1);
+    assert.equal(exit, 0);
+    assert.equal(modify, 0);
 
     iText.exitEditing();
-    equal(enter, 1);
-    equal(exit, 1);
-    equal(modify, 0);
+    assert.equal(enter, 1);
+    assert.equal(exit, 1);
+    assert.equal(modify, 0);
 
     iText.enterEditing();
-    equal(enter, 2);
-    equal(exit, 1);
-    equal(modify, 0);
+    assert.equal(enter, 2);
+    assert.equal(exit, 1);
+    assert.equal(modify, 0);
 
     iText.text = 'Test+';
     iText.exitEditing();
-    equal(enter, 2);
-    equal(exit, 2);
-    equal(modify, 1);
+    assert.equal(enter, 2);
+    assert.equal(exit, 2);
+    assert.equal(modify, 1);
+    iText.abortCursorAnimation();
   });
 
-  test('insertChar and changed', function() {
-    var iText = new fabric.IText('test'), changed = 0;
+  // TODO: read those and make tests for new functions
+  // QUnit.test('insertChar and changed', function(assert) {
+  //   var iText = new fabric.IText('test'), changed = 0;
+  //
+  //   function textChanged () {
+  //     changed++;
+  //   }
+  //   assert.equal(typeof iText.insertChar, 'function');
+  //   iText.on('changed', textChanged);
+  //   assert.equal(changed, 0);
+  //   iText.insertChar('foo_');
+  //   assert.equal(iText.text, 'foo_test');
+  //   assert.equal(changed, 1, 'event will fire once');
+  // });
+  //
+  // QUnit.test('insertChar with style', function(assert) {
+  //   var iText = new fabric.IText('test'),
+  //       style = {fontSize: 4};
+  //
+  //   assert.equal(typeof iText.insertChar, 'function');
+  //   iText.insertChar('f', false, style);
+  //   assert.equal(iText.text, 'ftest');
+  //   assert.deepEqual(iText.styles[0][0], style);
+  // });
+  //
+  // QUnit.test('insertChar with selectionStart with style', function(assert) {
+  //   var iText = new fabric.IText('test'),
+  //       style = {fontSize: 4};
+  //   assert.equal(typeof iText.insertChar, 'function');
+  //   iText.selectionStart = 2;
+  //   iText.selectionEnd = 2;
+  //   iText.insertChar('f', false, style);
+  //   assert.equal(iText.text, 'tefst');
+  //   assert.deepEqual(iText.styles[0][2], style);
+  // });
+  //
+  //
+  // QUnit.test('insertChars', function(assert) {
+  //   var iText = new fabric.IText('test');
+  //
+  //   assert.equal(typeof iText.insertChars, 'function');
+  //
+  //   iText.insertChars('foo_');
+  //   assert.equal(iText.text, 'foo_test');
+  //
+  //   iText.text = 'test';
+  //   iText.selectionStart = iText.selectionEnd = 2;
+  //   iText.insertChars('_foo_');
+  //   assert.equal(iText.text, 'te_foo_st');
+  //
+  //   iText.text = 'test';
+  //   iText.selectionStart = 1;
+  //   iText.selectionEnd = 3;
+  //   iText.insertChars('_foo_');
+  //   assert.equal(iText.text, 't_foo_t');
+  // });
+  //
+  // QUnit.test('insertChars changed', function(assert) {
+  //   var iText = new fabric.IText('test'), changed = 0;
+  //   function textChanged () {
+  //     changed++;
+  //   }
+  //   assert.equal(typeof iText.insertChars, 'function');
+  //   iText.on('changed', textChanged);
+  //   assert.equal(changed, 0);
+  //   iText.insertChars('foo_');
+  //   assert.equal(changed, 1, 'insertChars fires the event once if there is no style');
+  //   assert.equal(iText.text, 'foo_test');
+  // });
+  //
+  // QUnit.test('insertChars changed with copied style', function(assert) {
+  //   var iText = new fabric.IText('test'), changed = 0,
+  //       style = {0: {fontSize: 20}, 1: {fontSize: 22}};
+  //   function textChanged () {
+  //     changed++;
+  //   }
+  //   fabric.copiedTextStyle = style;
+  //   assert.equal(typeof iText.insertChars, 'function');
+  //   iText.on('changed', textChanged);
+  //   assert.equal(changed, 0);
+  //   iText.insertChars('foo_', true);
+  //   assert.equal(changed, 1, 'insertChars fires once even if style is used');
+  //   assert.equal(iText.text, 'foo_test');
+  //   assert.deepEqual(iText.styles[0][0], style[0], 'style should be copied');
+  // });
+  //
+  //
+  // QUnit.test('insertNewline', function(assert) {
+  //   var iText = new fabric.IText('test');
+  //
+  //   assert.equal(typeof iText.insertNewline, 'function');
+  //
+  //   iText.selectionStart = iText.selectionEnd = 2;
+  //   iText.insertNewline();
+  //
+  //   assert.equal(iText.text, 'te\nst');
+  //
+  //   iText.text = 'test';
+  //   iText.selectionStart = 1;
+  //   iText.selectionEnd = 3;
+  //   iText.insertNewline();
+  //
+  //   assert.equal(iText.text, 't\nt');
+  // });
 
-    function textChanged () {
-      changed++;
-    }
-    equal(typeof iText.insertChar, 'function');
-    iText.on('changed', textChanged);
-    equal(changed, 0);
-    iText.insertChar('foo_');
-    equal(iText.text, 'foo_test');
-    equal(changed, 1, 'event will fire once');
-  });
+  QUnit.test('insertNewlineStyleObject', function(assert) {
+    var iText = new fabric.IText('test\n2');
 
-  test('insertChar with style', function() {
-    var iText = new fabric.IText('test'),
-        style = {fontSize: 4};
-
-    equal(typeof iText.insertChar, 'function');
-    iText.insertChar('f', false, style);
-    equal(iText.text, 'ftest');
-    deepEqual(iText.styles[0][0], style);
-  });
-
-  test('insertChar with selectionStart with style', function() {
-    var iText = new fabric.IText('test'),
-        style = {fontSize: 4};
-    equal(typeof iText.insertChar, 'function');
-    iText.selectionStart = 2;
-    iText.selectionEnd = 2;
-    iText.insertChar('f', false, style);
-    equal(iText.text, 'tefst');
-    deepEqual(iText.styles[0][2], style);
-  });
-
-
-  test('insertChars', function() {
-    var iText = new fabric.IText('test');
-
-    equal(typeof iText.insertChars, 'function');
-
-    iText.insertChars('foo_');
-    equal(iText.text, 'foo_test');
-
-    iText.text = 'test';
-    iText.selectionStart = iText.selectionEnd = 2;
-    iText.insertChars('_foo_');
-    equal(iText.text, 'te_foo_st');
-
-    iText.text = 'test';
-    iText.selectionStart = 1;
-    iText.selectionEnd = 3;
-    iText.insertChars('_foo_');
-    equal(iText.text, 't_foo_t');
-  });
-
-  test('insertChars changed', function() {
-    var iText = new fabric.IText('test'), changed = 0;
-    function textChanged () {
-      changed++;
-    }
-    equal(typeof iText.insertChars, 'function');
-    iText.on('changed', textChanged);
-    equal(changed, 0);
-    iText.insertChars('foo_');
-    equal(changed, 1, 'insertChars fires the event once if there is no style');
-    equal(iText.text, 'foo_test');
-  });
-
-  test('insertChars changed with copied style', function() {
-    var iText = new fabric.IText('test'), changed = 0,
-        style = {0: {fontSize: 20}, 1: {fontSize: 22}};
-    function textChanged () {
-      changed++;
-    }
-    fabric.copiedTextStyle = style;
-    equal(typeof iText.insertChars, 'function');
-    iText.on('changed', textChanged);
-    equal(changed, 0);
-    iText.insertChars('foo_', true);
-    equal(changed, 1, 'insertChars fires once even if style is used');
-    equal(iText.text, 'foo_test');
-    deepEqual(iText.styles[0][0], style[0], 'style should be copied');
-  });
-
-
-  test('insertNewline', function() {
-    var iText = new fabric.IText('test');
-
-    equal(typeof iText.insertNewline, 'function');
-
-    iText.selectionStart = iText.selectionEnd = 2;
-    iText.insertNewline();
-
-    equal(iText.text, 'te\nst');
-
-    iText.text = 'test';
-    iText.selectionStart = 1;
-    iText.selectionEnd = 3;
-    iText.insertNewline();
-
-    equal(iText.text, 't\nt');
-  });
-
-  test('insertNewlineStyleObject', function() {
-    var iText = new fabric.IText('test\n');
-
-    equal(typeof iText.insertNewlineStyleObject, 'function');
+    assert.equal(typeof iText.insertNewlineStyleObject, 'function');
 
     iText.insertNewlineStyleObject(0, 4, true);
-    deepEqual(iText.styles, { '1': { '0': { } } });
+    assert.deepEqual(iText.styles, { }, 'does not insert empty styles');
+    iText.styles = { 1: { 0: { fill: 'blue' } } };
+    iText.insertNewlineStyleObject(0, 4, true);
+    assert.deepEqual(iText.styles, { 2: { 0: { fill: 'blue' } } }, 'correctly shift styles');
   });
 
-  test('shiftLineStyles', function() {
+  QUnit.test('shiftLineStyles', function(assert) {
     var iText = new fabric.IText('test\ntest\ntest', {
       styles: {
         '1': {
@@ -451,10 +463,10 @@
       }
     });
 
-    equal(typeof iText.shiftLineStyles, 'function');
+    assert.equal(typeof iText.shiftLineStyles, 'function');
 
     iText.shiftLineStyles(0, +1);
-    deepEqual(iText.styles, {
+    assert.deepEqual(iText.styles, {
       '2': {
         '0': { 'fill': 'red' },
         '1': { 'fill': 'red' },
@@ -464,7 +476,7 @@
     });
 
     iText.shiftLineStyles(0, -1);
-    deepEqual(iText.styles, {
+    assert.deepEqual(iText.styles, {
       '1': {
         '0': { 'fill': 'red' },
         '1': { 'fill': 'red' },
@@ -475,88 +487,77 @@
 
   });
 
-  test('selectWord', function() {
+  QUnit.test('selectWord', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.selectWord, 'function');
+    assert.equal(typeof iText.selectWord, 'function');
 
     iText.selectWord(1);
-    equal(iText.selectionStart, 0); // |test|
-    equal(iText.selectionEnd, 4);
+    assert.equal(iText.selectionStart, 0); // |test|
+    assert.equal(iText.selectionEnd, 4);
 
     iText.selectWord(7);
-    equal(iText.selectionStart, 5); // |foo|
-    equal(iText.selectionEnd, 8);
+    assert.equal(iText.selectionStart, 5); // |foo|
+    assert.equal(iText.selectionEnd, 8);
   });
 
-  test('selectLine', function() {
+  QUnit.test('selectLine', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.selectLine, 'function');
+    assert.equal(typeof iText.selectLine, 'function');
 
     iText.selectLine(6);
-    equal(iText.selectionStart, 0); // |test foo bar-baz|
-    equal(iText.selectionEnd, 16);
+    assert.equal(iText.selectionStart, 0); // |test foo bar-baz|
+    assert.equal(iText.selectionEnd, 16);
 
     iText.selectLine(18);
-    equal(iText.selectionStart, 17); // |qux|
-    equal(iText.selectionEnd, 20);
+    assert.equal(iText.selectionStart, 17); // |qux|
+    assert.equal(iText.selectionEnd, 20);
+
+    assert.equal(iText.selectLine(0), iText, 'should be chainable');
   });
 
-  test('findWordBoundaryLeft', function() {
+  QUnit.test('findWordBoundaryLeft', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.findWordBoundaryLeft, 'function');
+    assert.equal(typeof iText.findWordBoundaryLeft, 'function');
 
-    equal(iText.findWordBoundaryLeft(3), 0); // 'tes|t'
-    equal(iText.findWordBoundaryLeft(20), 17); // 'qux|'
-    equal(iText.findWordBoundaryLeft(6), 5); // 'f|oo'
-    equal(iText.findWordBoundaryLeft(11), 9); // 'ba|r-baz'
+    assert.equal(iText.findWordBoundaryLeft(3), 0); // 'tes|t'
+    assert.equal(iText.findWordBoundaryLeft(20), 17); // 'qux|'
+    assert.equal(iText.findWordBoundaryLeft(6), 5); // 'f|oo'
+    assert.equal(iText.findWordBoundaryLeft(11), 9); // 'ba|r-baz'
   });
 
-  test('findWordBoundaryRight', function() {
+  QUnit.test('findWordBoundaryRight', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.findWordBoundaryRight, 'function');
+    assert.equal(typeof iText.findWordBoundaryRight, 'function');
 
-    equal(iText.findWordBoundaryRight(3), 4); // 'tes|t'
-    equal(iText.findWordBoundaryRight(17), 20); // '|qux'
-    equal(iText.findWordBoundaryRight(6), 8); // 'f|oo'
-    equal(iText.findWordBoundaryRight(11), 16); // 'ba|r-baz'
+    assert.equal(iText.findWordBoundaryRight(3), 4); // 'tes|t'
+    assert.equal(iText.findWordBoundaryRight(17), 20); // '|qux'
+    assert.equal(iText.findWordBoundaryRight(6), 8); // 'f|oo'
+    assert.equal(iText.findWordBoundaryRight(11), 16); // 'ba|r-baz'
   });
 
-  test('findLineBoundaryLeft', function() {
+  QUnit.test('findLineBoundaryLeft', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.findLineBoundaryLeft, 'function');
+    assert.equal(typeof iText.findLineBoundaryLeft, 'function');
 
-    equal(iText.findLineBoundaryLeft(3), 0); // 'tes|t'
-    equal(iText.findLineBoundaryLeft(20), 17); // 'qux|'
+    assert.equal(iText.findLineBoundaryLeft(3), 0); // 'tes|t'
+    assert.equal(iText.findLineBoundaryLeft(20), 17); // 'qux|'
   });
 
-  test('findLineBoundaryRight', function() {
+  QUnit.test('findLineBoundaryRight', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
-    equal(typeof iText.findLineBoundaryRight, 'function');
+    assert.equal(typeof iText.findLineBoundaryRight, 'function');
 
-    equal(iText.findLineBoundaryRight(3), 16); // 'tes|t'
-    equal(iText.findLineBoundaryRight(17), 20); // '|qux'
+    assert.equal(iText.findLineBoundaryRight(3), 16); // 'tes|t'
+    assert.equal(iText.findLineBoundaryRight(17), 20); // '|qux'
   });
 
-  test('getNumNewLinesInSelectedText', function() {
-    var iText = new fabric.IText('test foo bar-baz\nqux');
-
-    equal(typeof iText.getNumNewLinesInSelectedText, 'function');
-
-    equal(iText.getNumNewLinesInSelectedText(), 0);
-
-    iText.selectionStart = 0;
-    iText.selectionEnd = 20;
-
-    equal(iText.getNumNewLinesInSelectedText(), 1);
-  });
-
-  test('getSelectionStyles with no arguments', function() {
+  QUnit.test('getSelectionStyles with no arguments', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -572,32 +573,29 @@
       }
     });
 
-    equal(typeof iText.getSelectionStyles, 'function');
+    assert.equal(typeof iText.getSelectionStyles, 'function');
 
     iText.selectionStart = 0;
     iText.selectionEnd = 0;
 
-    deepEqual(iText.getSelectionStyles(), {
-      textDecoration: 'underline'
-    });
+    assert.deepEqual(iText.getSelectionStyles(), []);
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2;
+    iText.selectionEnd = 3;
 
-    deepEqual(iText.getSelectionStyles(), {
+    assert.deepEqual(iText.getSelectionStyles(), [{
       textDecoration: 'overline'
-    });
+    }]);
 
     iText.selectionStart = 17;
-    iText.selectionStart = 17;
+    iText.selectionEnd = 18;
 
-    deepEqual(iText.getSelectionStyles(), {
+    assert.deepEqual(iText.getSelectionStyles(), [{
       fill: 'red'
-    });
+    }]);
   });
 
-  test('getSelectionStyles with 1 arg', function() {
-
+  QUnit.test('getSelectionStyles with 2 args', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -613,37 +611,13 @@
       }
     });
 
-    iText.selectionStart = 17;
-    iText.selectionStart = 17;
-
-    deepEqual(iText.getSelectionStyles(2), {
-      textDecoration: 'overline'
-    });
-  });
-
-  test('getSelectionStyles with 2 args', function() {
-    var iText = new fabric.IText('test foo bar-baz\nqux', {
-      styles: {
-        0: {
-          0: { textDecoration: 'underline' },
-          2: { textDecoration: 'overline' },
-          4: { textBackgroundColor: '#ffc' }
-        },
-        1: {
-          0: { fill: 'red' },
-          1: { fill: 'green' },
-          2: { fill: 'blue' }
-        }
-      }
-    });
-
-    deepEqual(iText.getSelectionStyles(0, 2), [
+    assert.deepEqual(iText.getSelectionStyles(0, 2), [
       { textDecoration: 'underline' },
       { }
     ]);
   });
 
-  test('setSelectionStyles', function() {
+  QUnit.test('setSelectionStyles', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -653,33 +627,44 @@
       }
     });
 
-    equal(typeof iText.setSelectionStyles, 'function');
+    assert.equal(typeof iText.setSelectionStyles, 'function');
 
     iText.setSelectionStyles({
       fill: 'red',
       stroke: 'yellow'
     });
 
-    deepEqual(iText.styles[0][0], {
+    assert.deepEqual(iText.styles[0][0], {
+      fill: '#112233'
+    });
+
+    iText.selectionEnd = 0;
+    iText.selectionEnd = 1;
+    iText.setSelectionStyles({
+      fill: 'red',
+      stroke: 'yellow'
+    });
+
+    assert.deepEqual(iText.styles[0][0], {
       fill: 'red',
       stroke: 'yellow'
     });
 
     iText.selectionStart = 2;
-    iText.selectionEnd = 2;
+    iText.selectionEnd = 3;
 
     iText.setSelectionStyles({
       fill: '#998877',
       stroke: 'yellow'
     });
 
-    deepEqual(iText.styles[0][2], {
+    assert.deepEqual(iText.styles[0][2], {
       fill: '#998877',
       stroke: 'yellow'
     });
   });
 
-  test('getCurrentCharFontSize', function() {
+  QUnit.test('getCurrentCharFontSize', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -689,63 +674,68 @@
       }
     });
 
-    equal(typeof iText.getCurrentCharFontSize, 'function');
-
-    equal(iText.getCurrentCharFontSize(0, 0), 20);
-    equal(iText.getCurrentCharFontSize(0, 1), 20);
-    equal(iText.getCurrentCharFontSize(0, 2), 60);
-    equal(iText.getCurrentCharFontSize(1, 0), 40);
+    assert.equal(typeof iText.getCurrentCharFontSize, 'function');
+    iText.selectionStart = 0;
+    assert.equal(iText.getCurrentCharFontSize(), 20);
+    iText.selectionStart = 1;
+    assert.equal(iText.getCurrentCharFontSize(), 20);
+    iText.selectionStart = 2;
+    assert.equal(iText.getCurrentCharFontSize(), 60);
+    iText.selectionStart = 3;
+    assert.equal(iText.getCurrentCharFontSize(), 40);
   });
 
-  test('object removal from canvas', function() {
+  QUnit.test('object removal from canvas', function(assert) {
     canvas.clear();
     canvas._iTextInstances = null;
     var text1 = new fabric.IText('Text Will be here');
     var text2 = new fabric.IText('Text Will be here');
-    ok(!canvas._iTextInstances, 'canvas has no iText instances');
-    ok(!canvas._hasITextHandlers, 'canvas has no handlers');
+    assert.ok(!canvas._iTextInstances, 'canvas has no iText instances');
+    assert.ok(!canvas._hasITextHandlers, 'canvas has no handlers');
 
     canvas.add(text1);
-    deepEqual(canvas._iTextInstances, [text1], 'canvas has 1 text instance');
-    ok(canvas._hasITextHandlers, 'canvas has handlers');
-    equal(canvas._iTextInstances.length, 1, 'just one itext object should be on canvas');
+    assert.deepEqual(canvas._iTextInstances, [text1], 'canvas has 1 text instance');
+    assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
+    assert.equal(canvas._iTextInstances.length, 1, 'just one itext object should be on canvas');
 
     canvas.add(text2);
-    deepEqual(canvas._iTextInstances, [text1, text2], 'canvas has 2 text instance');
-    ok(canvas._hasITextHandlers, 'canvas has handlers');
-    equal(canvas._iTextInstances.length, 2, 'just two itext object should be on canvas');
+    assert.deepEqual(canvas._iTextInstances, [text1, text2], 'canvas has 2 text instance');
+    assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
+    assert.equal(canvas._iTextInstances.length, 2, 'just two itext object should be on canvas');
 
     canvas.remove(text1);
-    deepEqual(canvas._iTextInstances, [text2], 'canvas has 1 text instance');
-    ok(canvas._hasITextHandlers, 'canvas has handlers');
-    equal(canvas._iTextInstances.length, 1, 'just two itext object should be on canvas');
+    assert.deepEqual(canvas._iTextInstances, [text2], 'canvas has 1 text instance');
+    assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
+    assert.equal(canvas._iTextInstances.length, 1, 'just two itext object should be on canvas');
 
     canvas.remove(text2);
-    deepEqual(canvas._iTextInstances, [], 'canvas has 0 text instance');
-    ok(!canvas._hasITextHandlers, 'canvas has no handlers');
+    assert.deepEqual(canvas._iTextInstances, [], 'canvas has 0 text instance');
+    assert.ok(!canvas._hasITextHandlers, 'canvas has no handlers');
   });
 
-  test('getCurrentCharColor', function() {
+  QUnit.test('getCurrentCharColor', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { fill: 'red' },
           1: { fill: 'green' }
         }
-      }
+      },
+      fill: '#333',
     });
 
-    equal(typeof iText.getCurrentCharColor, 'function');
-
-    equal(iText.getCurrentCharColor(0, 0), 'red');
-    equal(iText.getCurrentCharColor(0, 1), 'red');
-    equal(iText.getCurrentCharColor(0, 2), 'green');
-
-    // or cursor color
-    equal(iText.getCurrentCharColor(1, 0), '#333');
+    assert.equal(typeof iText.getCurrentCharColor, 'function');
+    iText.selectionStart = 0;
+    assert.equal(iText.getCurrentCharColor(), 'red');
+    iText.selectionStart = 1;
+    assert.equal(iText.getCurrentCharColor(), 'red');
+    iText.selectionStart = 2;
+    assert.equal(iText.getCurrentCharColor(), 'green');
+    iText.selectionStart = 3;
+    assert.equal(iText.getCurrentCharColor(), '#333');
   });
 
-  // test('toSVG', function() {
+  // QUnit.test('toSVG', function(assert) {
   //   var iText = new fabric.IText('test', {
   //     styles: {
   //       0: {
@@ -754,16 +744,16 @@
   //       }
   //     }
   //   });
-  //   equal(typeof iText.toSVG, 'function');
+  //   assert.equal(typeof iText.toSVG, 'function');
   //   if (fabric.isLikelyNode) {
-  //     equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
+  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
   //   }
   //   else {
-  //     equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
+  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
   //   }
   // });
 
-  test('toSVGWithFonts', function() {
+  QUnit.test('toSVGWithFonts', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -779,7 +769,7 @@
       Plaster: 'path-to-plaster-font-file',
     };
     canvas.add(iText);
-    equal(typeof iText.toSVG, 'function');
+    assert.equal(typeof iText.toSVG, 'function');
     var parser;
     if (fabric.isLikelyNode) {
       var XmlDomParser = require('xmldom').DOMParser;
@@ -791,27 +781,66 @@
     var svgString = canvas.toSVG(),
         doc = parser.parseFromString(svgString, 'image/svg+xml'),
         style = doc.getElementsByTagName('style')[0].firstChild.data;
-    equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
+    assert.equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
   });
 
-  test('measuring width of words', function () {
-    var ctx = canvas.getContext('2d');
-    var text = 'test foo bar';
-    var iText = new fabric.IText(text, {
-      styles: {
-        0: {
-          9: { fontWeight: 'bold' },
-          10: { fontWeight: 'bold' },
-          11: { fontWeight: 'bold' },
-        }
-      }
+  QUnit.test('space wrap attribute', function(assert) {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+    iText.enterEditing();
+    assert.equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
+    iText.abortCursorAnimation();
+  });
+
+  QUnit.test('hiddenTextarea does not move DOM', function(assert) {
+    var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
+    var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false });
+    canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
+    iText.set({
+      top: 400,
+      left: 400,
     });
-
-    var textSplitted = text.split(' ');
-    var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
-    var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
-
-    notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
+    canvas2.add(iText);
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientWidth', {
+      get: function() { return this._clientWidth; },
+      set: function(value) { return this._clientWidth = value; },
+    });
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientHeight', {
+      get: function() { return this._clientHeight; },
+      set: function(value) { return this._clientHeight = value; },
+    });
+    canvas2.upperCanvasEl._clientWidth = 100;
+    canvas2.upperCanvasEl._clientHeight = 100;
+    iText.enterEditing();
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 57, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 50, 'left is scaled with CSS');
+    iText.exitEditing();
+    canvas2.upperCanvasEl._clientWidth = 200;
+    canvas2.upperCanvasEl._clientHeight = 200;
+    iText.enterEditing();
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 114, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
+    iText.exitEditing();
+    canvas2.dispose();
   });
+
+  // QUnit.test('measuring width of words', function (assert) {
+  //   var ctx = canvas.getContext('2d');
+  //   var text = 'test foo bar';
+  //   var iText = new fabric.IText(text, {
+  //     styles: {
+  //       0: {
+  //         9: { fontWeight: 'bold' },
+  //         10: { fontWeight: 'bold' },
+  //         11: { fontWeight: 'bold' },
+  //       }
+  //     }
+  //   });
+  //
+  //   var textSplitted = text.split(' ');
+  //   var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
+  //   var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
+  //
+  //   assert.notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
+  // });
 
 })();

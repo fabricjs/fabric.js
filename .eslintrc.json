@@ -8,10 +8,11 @@
     "eventjs": true,
     "exports": true,
     "fabric": true,
-    "G_vmlCanvasManager": true,
     "require": true,
     "Buffer": true,
-    "process": true
+    "process": true,
+    "QUnit": true,
+    "assert": true
   },
   "rules": {
     "semi": 2,
@@ -54,7 +55,7 @@
     ],
     "max-statements": [
       2,
-      45
+      150
     ],
     "curly": [
       2,

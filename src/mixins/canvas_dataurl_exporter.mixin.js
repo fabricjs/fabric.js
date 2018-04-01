@@ -9,11 +9,12 @@
      * @param {Object} [options] Options object
      * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
      * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
-     * @param {Number} [options.multiplier=1] Multiplier to scale by
+     * @param {Number} [options.multiplier=1] Multiplier to scale by, to have consistent
      * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+     * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
      * @example <caption>Generate jpeg dataURL with lower quality</caption>
@@ -40,7 +41,7 @@
 
       var format = options.format || 'png',
           quality = options.quality || 1,
-          multiplier = options.multiplier || 1,
+          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? 1 : 1 / this.getRetinaScaling()),
           cropping = {
             left: options.left || 0,
             top: options.top || 0,
@@ -55,34 +56,40 @@
      */
     __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
-      var origWidth = this.getWidth(),
-          origHeight = this.getHeight(),
-          scaledWidth = (cropping.width || this.getWidth()) * multiplier,
-          scaledHeight = (cropping.height || this.getHeight()) * multiplier,
+      var origWidth = this.width,
+          origHeight = this.height,
+          scaledWidth = (cropping.width || this.width) * multiplier,
+          scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
           translateX = (vp[4] - cropping.left) * multiplier,
           translateY = (vp[5] - cropping.top) * multiplier,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
-          originalInteractive = this.interactive;
+          originalInteractive = this.interactive,
+          originalSkipOffScreen = this.skipOffscreen,
+          needsResize = origWidth !== scaledWidth || origHeight !== scaledHeight;
 
       this.viewportTransform = newVp;
+      this.skipOffscreen = false;
       // setting interactive to false avoid exporting controls
-      this.interactive && (this.interactive = false);
-      if (origWidth !== scaledWidth || origHeight !== scaledHeight) {
-        // this.setDimensions is going to renderAll also;
-        this.setDimensions({ width: scaledWidth, height: scaledHeight });
+      this.interactive = false;
+      if (needsResize) {
+        this.setDimensions({ width: scaledWidth, height: scaledHeight }, { backstoreOnly: true });
       }
-      else {
-        this.renderAll();
-      }
+      // call a renderAll to force sync update. This will cancel the scheduled requestRenderAll
+      // from setDimensions
+      this.renderAll();
       var data = this.__toDataURL(format, quality, cropping);
-      originalInteractive && (this.interactive = originalInteractive);
+      this.interactive = originalInteractive;
+      this.skipOffscreen = originalSkipOffScreen;
       this.viewportTransform = vp;
       //setDimensions with no option object is taking care of:
-      //this.width, this.height, this.renderAll()
-      this.setDimensions({ width: origWidth, height: origHeight });
+      //this.width, this.height, this.requestRenderAll()
+      if (needsResize) {
+        this.setDimensions({ width: origWidth, height: origHeight }, { backstoreOnly: true });
+      }
+      this.renderAll();
       return data;
     },
 
@@ -98,26 +105,10 @@
       }
 
       var data = supportQuality
-                ? canvasEl.toDataURL('image/' + format, quality)
-                : canvasEl.toDataURL('image/' + format);
+        ? canvasEl.toDataURL('image/' + format, quality)
+        : canvasEl.toDataURL('image/' + format);
 
       return data;
-    },
-
-    /**
-     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-     * @deprecated since 1.0.13
-     * @param {String} format (png|jpeg)
-     * @param {Number} multiplier
-     * @param {Number} quality (0..1)
-     * @return {String}
-     */
-    toDataURLWithMultiplier: function (format, multiplier, quality) {
-      return this.toDataURL({
-        format: format,
-        multiplier: multiplier,
-        quality: quality
-      });
     },
   });
 

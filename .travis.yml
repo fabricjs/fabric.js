@@ -1,18 +1,67 @@
 language: node_js
+
+services:
+  - docker
+
 node_js:
-  - "7"
   - "6"
-  - "5"
-  - "4"
-env:
-  - CXX=g++-4.9
+
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
-      - g++-4.9
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
-script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
+    - libgif-dev
+    - libpng-dev
+    - libpango1.0-dev
+# libcairo2-dev is preinstalled
+stages:
+  - Linting and Building
+  - test
+
+cache:
+  directories:
+    - node_modules
+
+env:
+  global:
+    - LAUNCHER=Node
+
+jobs:
+  include:
+    - stage: Linting and Building
+      env: STEP=LINT
+      install: npm install eslint@4.7.x
+      script: 'npm run lint && npm run lint_tests'
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: Linting and Building
+      env: STEP=BUILD
+      install: npm install uglify-js@3.1.x
+      script: 'npm run build'
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: test
+      env: LAUNCHER=Chrome
+      install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: test
+      env: LAUNCHER=Firefox
+      install: npm install testem@1.18.4 qunit@2.4.1
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: test
+      node_js: "9"
+    - stage: test
+      node_js: "8"
+    - stage: test
+      node_js: "6"
+    - stage: test
+      node_js: "4"
+
+script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+
+dist: trusty

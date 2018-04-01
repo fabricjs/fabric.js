@@ -1,9 +1,10 @@
-fabric.ElementsParser = function(elements, callback, options, reviver) {
+fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions) {
   this.elements = elements;
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
+  this.parsingOptions = parsingOptions;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -40,24 +41,19 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
 };
 
 fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
-  if (klass.async) {
-    klass.fromElement(el, this.createCallback(index, el), this.options);
-  }
-  else {
-    var obj = klass.fromElement(el, this.options);
-    this.resolveGradient(obj, 'fill');
-    this.resolveGradient(obj, 'stroke');
-    this.reviver && this.reviver(el, obj);
-    this.instances[index] = obj;
-    this.checkIfDone();
-  }
+  klass.fromElement(el, this.createCallback(index, el), this.options);
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
+    var _options;
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
+    if (obj instanceof fabric.Image) {
+      _options = obj.parsePreserveAspectRatioAttribute(el);
+    }
+    obj._removeTransformMatrix(_options);
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();
@@ -83,6 +79,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       // eslint-disable-next-line no-eq-null, eqeqeq
       return el != null;
     });
-    this.callback(this.instances);
+    this.callback(this.instances, this.elements);
   }
 };
