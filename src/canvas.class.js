@@ -668,9 +668,11 @@
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
+        // unsure they are usefull anymore.
         left: target.left,
         top: target.top,
         theta: degreesToRadians(target.angle),
+        // end of unsure
         width: target.width * target.scaleX,
         mouseXSign: 1,
         mouseYSign: 1,
@@ -840,9 +842,9 @@
     _scaleObject: function (x, y, by) {
       var t = this._currentTransform,
           target = t.target,
-          lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY'),
-          lockScalingFlip = target.get('lockScalingFlip');
+          lockScalingX = target.lockScalingX,
+          lockScalingY = target.lockScalingY,
+          lockScalingFlip = target.lockScalingFlip;
 
       if (lockScalingX && lockScalingY) {
         return false;
@@ -1012,20 +1014,22 @@
      */
     _rotateObject: function (x, y) {
 
-      var t = this._currentTransform;
+      var t = this._currentTransform,
+          target = t.target, constraintPosition,
+          constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
 
-      if (t.target.get('lockRotation')) {
+      if (target.lockRotation) {
         return false;
       }
 
-      var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
-          curAngle = atan2(y - t.top, x - t.left),
+      var lastAngle = atan2(t.ey - constraintPosition.y, t.ex - constraintPosition.x),
+          curAngle = atan2(y - constraintPosition.y, x - constraintPosition.x),
           angle = radiansToDegrees(curAngle - lastAngle + t.theta),
           hasRotated = true;
 
-      if (t.target.snapAngle > 0) {
-        var snapAngle  = t.target.snapAngle,
-            snapThreshold  = t.target.snapThreshold || snapAngle,
+      if (target.snapAngle > 0) {
+        var snapAngle  = target.snapAngle,
+            snapThreshold  = target.snapThreshold || snapAngle,
             rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
             leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
 
@@ -1043,11 +1047,14 @@
       }
       angle %= 360;
 
-      if (t.target.angle === angle) {
+      if (target.angle === angle) {
         hasRotated = false;
       }
       else {
-        t.target.angle = angle;
+        // rotation only happen here
+        target.angle = angle;
+        // Make sure the constraints apply
+        target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
       }
 
       return hasRotated;
