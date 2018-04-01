@@ -743,7 +743,6 @@
           elList = _getMultipleNodes(doc, tagArray),
           el, j = 0, id, xlink,
           gradientDefs = { }, idsToXlinkMap = { };
-
       j = elList.length;
 
       while (j--) {
