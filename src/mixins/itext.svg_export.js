@@ -98,7 +98,6 @@
           (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ' : ''),
           (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ' : ''),
           (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ' : ''),
-          (styleDecl.charSpacing ? 'letter-spacing="' + styleDecl.charSpacing / 1000 + 'em" ' : ''),
           (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ' : ''),
         'style="', fillStyles, '">',
         fabric.util.string.escapeXml(_char),
