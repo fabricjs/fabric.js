@@ -1,6 +1,7 @@
 /* _TO_SVG_START_ */
 (function() {
-  var toFixed = fabric.util.toFixed;
+  var toFixed = fabric.util.toFixed,
+      multipleSpacesRegex = /  +/g;
 
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
 
@@ -86,7 +87,8 @@
      * @private
      */
     _createTextCharSpan: function(_char, styleDecl, left, top) {
-      var styleProps = this.getSvgSpanStyles(styleDecl, _char !== _char.trim()),
+      var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex),
+          styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
           dy = styleDecl.deltaY, dySpan = '',
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
