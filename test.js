@@ -50,7 +50,7 @@ testrunner.run({
     './test/unit/canvas_events.js',
     './test/unit/text_to_svg.js',
   ],
-  // tests: ['./test/unit/canvas.js',],
+  // tests: ['./test/unit/pattern.js'],
 }, function(err, report) {
   if (err) {
     console.log(err);
