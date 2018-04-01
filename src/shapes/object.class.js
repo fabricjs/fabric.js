@@ -506,7 +506,7 @@
     lockScalingFlip:          false,
 
     /**
-     * When `true`, object is not exported in SVG or OBJECT/JSON
+     * When `true`, object is not exported in OBJECT/JSON
      * since 1.6.3
      * @type Boolean
      * @default
