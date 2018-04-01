@@ -660,6 +660,7 @@
         scaleY: target.scaleY,
         skewX: target.skewX,
         skewY: target.skewY,
+        // used by transation
         offsetX: pointer.x - target.left,
         offsetY: pointer.y - target.top,
         originX: origin.x,
@@ -669,8 +670,8 @@
         lastX: pointer.x,
         lastY: pointer.y,
         // unsure they are usefull anymore.
-        left: target.left,
-        top: target.top,
+        // left: target.left,
+        // top: target.top,
         theta: degreesToRadians(target.angle),
         // end of unsure
         width: target.width * target.scaleX,
