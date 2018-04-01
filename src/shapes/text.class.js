@@ -934,7 +934,6 @@
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ' : ''),
-            (this.charSpacing ? 'letter-spacing="' + this.charSpacing / 1000 + 'em" ' : ''),
             'style="', this.getSvgStyles(noShadow), '" >\n',
             textAndBg.textSpans.join(''),
           '\t\t</text>\n',
