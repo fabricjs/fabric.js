@@ -220,6 +220,7 @@
     elTextWithAttrs.setAttribute('font-style', 'italic');
     elTextWithAttrs.setAttribute('font-weight', 'bold');
     elTextWithAttrs.setAttribute('font-size', '123');
+    elTextWithAttrs.setAttribute('letter-spacing', '1em');
     elTextWithAttrs.setAttribute('text-decoration', 'underline');
     elTextWithAttrs.setAttribute('text-anchor', 'middle');
 
@@ -246,6 +247,7 @@
         fontFamily:       'Monaco',
         paintFirst:       'fill',
         fontStyle:        'italic',
+        charSpacing:      1000,
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
