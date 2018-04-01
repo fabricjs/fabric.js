@@ -134,6 +134,22 @@
     });
   });
 
+  QUnit.test('setSrc', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.widh = 100;
+      image.height = 100;
+      assert.ok(typeof image.setSrc === 'function');
+      assert.equal(image.width, 100);
+      assert.equal(image.width, 100);
+      image.setSrc(IMG_SRC, function() {
+        assert.equal(image.width, IMG_WIDTH);
+        assert.equal(image.width, IMG_HEIGHT);
+        done();
+      })
+    });
+  });
+
   QUnit.test('toObject with no element', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
