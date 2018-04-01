@@ -68,7 +68,7 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
     return;
   }
   var gradientId = this.regexUrl.exec(instanceFillValue)[1];
-  this.regexUrl.lastIndex = 0
+  this.regexUrl.lastIndex = 0;
   if (fabric.gradientDefs[this.svgUid][gradientId]) {
     obj.set(property,
       fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));

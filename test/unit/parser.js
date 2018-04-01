@@ -362,12 +362,12 @@
     '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style="fill: url(\'#SVGID_11_\');"/>' +
     '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style="fill: url(#SVGID_11_);"/>' +
     '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style=\'fill: url("#SVGID_11_");\'/>' +
-
     '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
       assert.equal(objects[0].fill.type, 'linear', 'first path has gradient');
       assert.equal(objects[1].fill.type, 'linear', 'second path has gradient');
+      assert.equal(objects[2].fill.type, 'linear', 'second path has gradient');
       done();
     });
   });
