@@ -1,3 +1,16 @@
+**Version 2.2.3**
+ - improvement: Allow to parse quoted url string. url('#myid') [#4881](https://github.com/kangax/fabric.js/pull/4881)
+ - improvement: text fromSVG import char-spacing attribute [#3718](https://github.com/kangax/fabric.js/pull/3718)
+ - fix: text toSVG export with multiple spaces in safari [#4880](https://github.com/kangax/fabric.js/pull/4880)
+ - fix: setSrc reset width and height on images [#4877](https://github.com/kangax/fabric.js/pull/4877)
+ - improvements: Removed forced origin swap when rotating [#4878](https://github.com/kangax/fabric.js/pull/4878)
+ - fix: Make the background of canvas cover all SVG in toSVG export [#4852](https://github.com/kangax/fabric.js/pull/4852)
+ - fix: Added startAngle to cacheProperties for fabric.Circle [#4875](https://github.com/kangax/fabric.js/pull/4875)
+ - fix: Rerender all the content of upperCanvas if canvas gets resized [#4850](https://github.com/kangax/fabric.js/pull/4850)
+ - fix: Remove references to context when disposing [#4846](https://github.com/kangax/fabric.js/pull/4846)
+ - improvements: Added single quoting to font names in toSVG [#4840](https://github.com/kangax/fabric.js/pull/4840)
+ - improvements: Added reserved space to wrapLine functionality [#4841](https://github.com/kangax/fabric.js/pull/4841)
+
 **Version 2.2.2**
   - Fixed: Applying filters to an image will invalidate its cache [#4828](https://github.com/kangax/fabric.js/pull/4828)
   - Fixed: Attempt at fix font families that requires quoting [#4831](https://github.com/kangax/fabric.js/pull/4831)
