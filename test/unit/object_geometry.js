@@ -803,37 +803,41 @@
   });
 
   QUnit.test('isPartiallyOnScreen', function(assert) {
-    var cObj = new fabric.Object(
-      { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
+    cObj.left = -60;
+    cObj.top = -60;
     cObj.setCoords();
-    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), true, 'object is partially on screen because it include the canvas');
-    cObj.left = 100;
-    cObj.top = 100;
+    assert.equal(cObj.isPartiallyOnScreen(true), true,'object is partially onScreen');
+    cObj.left = -110;
+    cObj.top = -110;
     cObj.setCoords();
-    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), false, 'object is not partially on screen because it include the canvas');
-    cObj.left = -1000;
-    cObj.top = -1000;
+    assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
+    cObj.left = 50;
+    cObj.top = 50;
     cObj.setCoords();
-    assert.equal(cObj.isPartiallyOnScreen(cObj.aCoords), false, 'object is not partially on screen because it is outside the canvas');
+    assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
+    canvas.setZoom(2);
+    assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
   });
 
   QUnit.test('isOffScreen', function(assert) {
     var cObj = new fabric.Object(
-      { left: -1000, top: -1000, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
+      { left: -1000, top: -1000, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     cObj.setCoords();
-    assert.equal(cObj.isOffScreen(cObj.aCoords), true, 'object is off screen because it is not include on the canvas');
+    assert.equal(cObj.isOffScreen(), true, 'object is completely off screen');
     cObj.left = -10;
     cObj.top = -10;
     cObj.setCoords();
-    assert.equal(cObj.isOffScreen(cObj.aCoords), false, 'object is partially on screen because it include the canvas');
-    cObj.left = 1000;
-    cObj.top = 1000;
+    assert.equal(cObj.isOffScreen(), false, 'object is partially on screen');
+    cObj.left = 50;
+    cObj.top = 50;
     cObj.setCoords();
-    assert.equal(cObj.isOffScreen(cObj.aCoords), false, 'object is on screen because it include the canvas');
+    assert.equal(cObj.isOffScreen(), false, 'object is completely on screen');
+    canvas.setZoom(0);
+    assert.equal(cObj.isOffScreen(), true, 'zooming out object is completely offScreen');
   });
-
 })();
