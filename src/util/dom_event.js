@@ -212,10 +212,10 @@
 
   function _getPointer(event, pageProp, clientProp) {
     var touchProp = event.type === 'touchend' ? 'changedTouches' : 'touches';
-    var pointer;
+    var pointer, eventTouchProp = event[touchProp];
 
-    if (event[touchProp] && event[touchProp][0]) {
-      pointer = event[touchProp][0][pageProp] - (event[touchProp][0][pageProp] - event[touchProp][0][clientProp]);
+    if (eventTouchProp && eventTouchProp[0]) {
+      pointer = eventTouchProp[0][clientProp];
     }
 
     if (typeof pointer === 'undefined') {
