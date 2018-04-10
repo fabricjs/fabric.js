@@ -1134,7 +1134,6 @@
           aleft,
           atop
         );
-        fabric.Object.prototype._setLineDash.call(this, ctx, []);
       }
     },
 
