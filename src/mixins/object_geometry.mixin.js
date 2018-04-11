@@ -204,18 +204,6 @@
     },
 
     /**
-     * Checks if object is completely outside the canvas with current viewportTransform
-     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
-     * @return {Boolean} true if object is not contained within canvas
-     */
-    isOffScreen: function(calculate) {
-      if (!this.isOnScreen(calculate) && !this.isPartiallyOnScreen(calculate)) {
-        return true;
-      }
-      return false;
-    },
-
-    /**
      * Method that returns an object with the object edges in it, given the coordinates of the corners
      * @private
      * @param {Object} oCoords Coordinates of the object corners
