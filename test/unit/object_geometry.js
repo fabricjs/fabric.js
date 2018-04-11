@@ -822,22 +822,4 @@
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
   });
 
-  QUnit.test('isOffScreen', function(assert) {
-    var cObj = new fabric.Object(
-      { left: -1000, top: -1000, width: 100, height: 100, strokeWidth: 0});
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    cObj.canvas = canvas;
-    cObj.setCoords();
-    assert.equal(cObj.isOffScreen(), true, 'object is completely off screen');
-    cObj.left = -10;
-    cObj.top = -10;
-    cObj.setCoords();
-    assert.equal(cObj.isOffScreen(), false, 'object is partially on screen');
-    cObj.left = 50;
-    cObj.top = 50;
-    cObj.setCoords();
-    assert.equal(cObj.isOffScreen(), false, 'object is completely on screen');
-    canvas.setZoom(0);
-    assert.equal(cObj.isOffScreen(), true, 'zooming out object is completely offScreen');
-  });
 })();
