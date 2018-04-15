@@ -59,11 +59,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   };
 
   proto.extractPropertyDefinition = function(obj, property, storage) {
-    var value = obj.get(property);
+    var value = obj[property];
     if (!(/^url\(/).test(value)) {
-      return false;
+      return;
     }
-    var id = value.slice(5, value.length - 1);
+    var id = this.regexUrl.exec(value)[1];
+    this.regexUrl.lastIndex = 0;
     return fabric[storage][this.svgUid][id];
   };
 
