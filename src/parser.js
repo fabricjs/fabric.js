@@ -35,6 +35,7 @@
         'font-size':          'fontSize',
         'font-style':         'fontStyle',
         'font-weight':        'fontWeight',
+        'letter-spacing':     'charSpacing',
         'paint-order':        'paintFirst',
         'stroke-dasharray':   'strokeDashArray',
         'stroke-linecap':     'strokeLineCap',
@@ -112,6 +113,10 @@
     }
     else if (attr === 'textAnchor' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
+    }
+    else if (attr === 'charSpacing') {
+      // parseUnit returns px and we convert it to em
+      parsed = parseUnit(value, fontSize) / fontSize * 1000;
     }
     else if (attr === 'paintFirst') {
       var fillIndex = value.indexOf('fill');
@@ -752,7 +757,6 @@
           elList = _getMultipleNodes(doc, tagArray),
           el, j = 0, id, xlink,
           gradientDefs = { }, idsToXlinkMap = { };
-
       j = elList.length;
 
       while (j--) {

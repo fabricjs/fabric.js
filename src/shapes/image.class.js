@@ -369,6 +369,7 @@
     setSrc: function(src, callback, options) {
       fabric.util.loadImage(src, function(img) {
         this.setElement(img, options);
+        this._setWidthHeight();
         callback(this);
       }, this, options && options.crossOrigin);
       return this;
@@ -555,13 +556,13 @@
      * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      this.width = 'width' in options
+      this.width = options && ('width' in options)
         ? options.width
         : (this.getElement()
           ? this.getElement().width || 0
           : 0);
 
-      this.height = 'height' in options
+      this.height = options && ('height' in options)
         ? options.height
         : (this.getElement()
           ? this.getElement().height || 0

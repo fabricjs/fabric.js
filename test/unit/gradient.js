@@ -72,10 +72,10 @@
     });
   }
 
-  var SVG_LINEAR = '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" x1="-50" y1="-40" x2="50" y2="150">\n<stop offset="0%" style="stop-color:red;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: undefined"/>\n</linearGradient>\n';
-  var SVG_RADIAL = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="0%" style="stop-color:red;stop-opacity: undefined"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
-  var SVG_INTERNALRADIUS = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="20%" style="stop-color:red;stop-opacity: undefined"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
-  var SVG_SWAPPED = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="-50" cy="-40" r="50" fx="50" fy="150">\n<stop offset="20%" style="stop-color:green;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:red;stop-opacity: undefined"/>\n</radialGradient>\n';
+  var SVG_LINEAR = '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" x1="-50" y1="-40" x2="50" y2="150">\n<stop offset="0%" style="stop-color:red;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
+  var SVG_RADIAL = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
+  var SVG_INTERNALRADIUS = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="20%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
+  var SVG_SWAPPED = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="-50" cy="-40" r="50" fx="50" fy="150">\n<stop offset="20%" style="stop-color:green;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:red;"/>\n</radialGradient>\n';
 
 
   QUnit.test('constructor linearGradient', function(assert) {
