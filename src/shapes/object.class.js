@@ -679,17 +679,11 @@
       var targetCanvas = this.canvas || (parentObject && parentObject.canvas),
           zoom = targetCanvas && targetCanvas.getZoom() || 1,
           objectScale = this.getObjectScaling(),
-          parentScale,
           retina = targetCanvas && targetCanvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           dim = this._getNonTransformedDimensions(),
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
           width, height;
-      // if (parentObject) {
-      //   parentScale = parentObject.getObjectScaling();
-      //   zoomX *= parentScale.scaleX;
-      //   zoomY *= parentScale.scaleY;
-      // }
       width = dim.x * zoomX;
       height = dim.y * zoomY;
       return {
@@ -1097,10 +1091,6 @@
       path.transform(ctx);
       ctx.scale(1 / path.zoomX, 1 / path.zoomY);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(-path.cacheTranslationX, -path.cacheTranslationY, path._cacheCanvas.width, path._cacheCanvas.height)
       ctx.restore();
     },
 
