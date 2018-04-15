@@ -4344,14 +4344,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   proto.createCallback = function(index, el) {
     var _this = this;
     return function(obj) {
-      var _options, transform = obj.transformMatrix;
+      var _options;
       _this.resolveGradient(obj, 'fill');
       _this.resolveGradient(obj, 'stroke');
       if (obj instanceof fabric.Image) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, transform);
+      _this.resolveClipPath(obj);
       _this.reviver && _this.reviver(el, obj);
       _this.instances[index] = obj;
       _this.checkIfDone();
@@ -4382,7 +4382,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     };
   };
 
-  proto.resolveClipPath = function(obj, transform) {
+  proto.resolveClipPath = function(obj) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
         element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
@@ -4404,7 +4404,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       );
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
-      console.log(clipPath)
       obj.clipPath = clipPath;
     }
   };
@@ -12828,12 +12827,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
           width, height;
-      if (parentObject) {
-        parentScale = parentObject.getObjectScaling();
-        zoomX *= parentScale.scaleX;
-        zoomY *= parentScale.scaleY;
-
-      }
+      // if (parentObject) {
+      //   parentScale = parentObject.getObjectScaling();
+      //   zoomX *= parentScale.scaleX;
+      //   zoomY *= parentScale.scaleY;
+      // }
       width = dim.x * zoomX;
       height = dim.y * zoomY;
       return {
@@ -13236,11 +13234,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     drawClipPathOnCache: function(ctx) {
       var path = this.clipPath;
       ctx.save();
-      // ctx.globalCompositeOperation = 'destination-in';
-      // ctx.scale(1 / path.zoomX, 1 / path.zoomY);
-      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      ctx.globalCompositeOperation = 'destination-in';
+      //ctx.scale(1 / 2, 1 / 2);
       path.transform(ctx);
+      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-path.cacheTranslationX, -path.cacheTranslationY, path._cacheCanvas.width, path._cacheCanvas.height)
       ctx.restore();
     },
 
@@ -13255,6 +13257,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this._setFillStyles(ctx, this);
       this._render(ctx);
       if (path) {
+        // needed to setup a couple of variables
+        path.shouldCache();
+        path._transformDone = true;
         path.renderCache(this);
         this.drawClipPathOnCache(ctx);
       }

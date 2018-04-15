@@ -685,12 +685,11 @@
           zoomX = objectScale.scaleX * zoom * retina,
           zoomY = objectScale.scaleY * zoom * retina,
           width, height;
-      if (parentObject) {
-        parentScale = parentObject.getObjectScaling();
-        zoomX *= parentScale.scaleX;
-        zoomY *= parentScale.scaleY;
-
-      }
+      // if (parentObject) {
+      //   parentScale = parentObject.getObjectScaling();
+      //   zoomX *= parentScale.scaleX;
+      //   zoomY *= parentScale.scaleY;
+      // }
       width = dim.x * zoomX;
       height = dim.y * zoomY;
       return {
@@ -1093,11 +1092,15 @@
     drawClipPathOnCache: function(ctx) {
       var path = this.clipPath;
       ctx.save();
-      // ctx.globalCompositeOperation = 'destination-in';
-      // ctx.scale(1 / path.zoomX, 1 / path.zoomY);
-      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      ctx.globalCompositeOperation = 'destination-in';
+      //ctx.scale(1 / 2, 1 / 2);
       path.transform(ctx);
+      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-path.cacheTranslationX, -path.cacheTranslationY, path._cacheCanvas.width, path._cacheCanvas.height)
       ctx.restore();
     },
 
@@ -1112,6 +1115,9 @@
       this._setFillStyles(ctx, this);
       this._render(ctx);
       if (path) {
+        // needed to setup a couple of variables
+        path.shouldCache();
+        path._transformDone = true;
         path.renderCache(this);
         this.drawClipPathOnCache(ctx);
       }

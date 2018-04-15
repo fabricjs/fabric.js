@@ -44,14 +44,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   proto.createCallback = function(index, el) {
     var _this = this;
     return function(obj) {
-      var _options, transform = obj.transformMatrix;
+      var _options;
       _this.resolveGradient(obj, 'fill');
       _this.resolveGradient(obj, 'stroke');
       if (obj instanceof fabric.Image) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, transform);
+      _this.resolveClipPath(obj);
       _this.reviver && _this.reviver(el, obj);
       _this.instances[index] = obj;
       _this.checkIfDone();
@@ -82,7 +82,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     };
   };
 
-  proto.resolveClipPath = function(obj, transform) {
+  proto.resolveClipPath = function(obj) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
         element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
@@ -104,7 +104,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       );
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
-      console.log(clipPath)
       obj.clipPath = clipPath;
     }
   };
