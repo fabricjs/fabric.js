@@ -76,7 +76,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
   };
 
-<<<<<<< HEAD
   proto.createClipPathCallback = function(obj, container) {
     return function(_newObj) {
       _newObj._removeTransformMatrix();
@@ -84,19 +83,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       container.push(_newObj);
     };
   };
-=======
-  var instanceFillValue = obj[property];
-  if (!(/^url\(/).test(instanceFillValue)) {
-    return;
-  }
-  var gradientId = this.regexUrl.exec(instanceFillValue)[1];
-  this.regexUrl.lastIndex = 0;
-  if (fabric.gradientDefs[this.svgUid][gradientId]) {
-    obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
-  }
-};
->>>>>>> master
 
   proto.resolveClipPath = function(obj) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
