@@ -105,6 +105,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         clipPath.calcTransformMatrix()
       );
       var options = fabric.util.qrDecompose(gTransform);
+      clipPath.flipX = false;
+      clipPath.flipY = false;
+      clipPath.set('scaleX', options.scaleX);
+      clipPath.set('scaleY', options.scaleY);
+      clipPath.angle = options.angle;
+      clipPath.skewX = options.skewX;
+      clipPath.skewY = 0;
       clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
       obj.clipPath = clipPath;
     }

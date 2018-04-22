@@ -18,7 +18,7 @@
         'image', 'text'],
       svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'],
       svgInvalidAncestors = ['pattern', 'defs', 'symbol', 'metadata', 'clipPath', 'mask', 'desc'],
-      svgValidParents = ['symbol', 'g', 'a', 'svg'],
+      svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs'],
 
       attributesMap = {
         cx:                   'left',
@@ -598,7 +598,7 @@
                   scaleY + ' ' +
                   (minX * scaleX) + ' ' +
                   (minY * scaleY) + ') ';
-
+    parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
       // element.firstChild != null
@@ -611,7 +611,6 @@
       el = element;
       matrix = el.getAttribute('transform') + matrix;
     }
-
     el.setAttribute('transform', matrix);
     return parsedDim;
   }

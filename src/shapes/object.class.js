@@ -1018,13 +1018,13 @@
       ctx.restore();
     },
 
-    renderCache: function(parentObject) {
+    renderCache: function(parentObject, forClipping) {
       if (!this._cacheCanvas) {
         this._createCacheCanvas(parentObject);
       }
       if (this.isCacheDirty(false, parentObject)) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-        this.drawObject(this._cacheContext);
+        this.drawObject(this._cacheContext, forClipping);
         this.dirty = false;
       }
     },
@@ -1086,6 +1086,8 @@
     drawClipPathOnCache: function(ctx) {
       var path = this.clipPath;
       ctx.save();
+      // DEBUG: uncomment this line, comment the following
+      // ctx.globalAlpha = 0.4
       ctx.globalCompositeOperation = 'destination-in';
       //ctx.scale(1 / 2, 1 / 2);
       path.transform(ctx);
@@ -1098,17 +1100,22 @@
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawObject: function(ctx) {
+    drawObject: function(ctx, forClipping) {
       var path = this.clipPath;
-      this._renderBackground(ctx);
-      this._setStrokeStyles(ctx, this);
-      this._setFillStyles(ctx, this);
+      if (forClipping) {
+        this._setClippingProperties(ctx);
+      }
+      else {
+        this._renderBackground(ctx);
+        this._setStrokeStyles(ctx, this);
+        this._setFillStyles(ctx, this);
+      }
       this._render(ctx);
       if (path) {
         // needed to setup a couple of variables
         path.shouldCache();
         path._transformDone = true;
-        path.renderCache(this);
+        path.renderCache(this, true);
         this.drawClipPathOnCache(ctx);
       }
     },
@@ -1202,6 +1209,11 @@
           ? decl.fill.toLive(ctx, this)
           : decl.fill;
       }
+    },
+
+    _setClippingProperties: function(ctx) {
+      ctx.lineWidth = 0;
+      ctx.fillStyle = 'black';
     },
 
     /**

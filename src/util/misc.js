@@ -582,6 +582,20 @@
     },
 
     /**
+     * Creates a canvas element that is a copy of another and is also painted
+     * @static
+     * @memberOf fabric.util
+     * @return {CanvasElement} initialized canvas element
+     */
+    copyCanvasElement: function(canvas) {
+      var newCanvas = fabric.document.createElement('canvas');
+      newCanvas.width = canvas.width;
+      newCanvas.height = canvas.height;
+      newCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      return newCanvas;
+    },
+
+    /**
      * Creates image element (works on client and node)
      * @static
      * @memberOf fabric.util
