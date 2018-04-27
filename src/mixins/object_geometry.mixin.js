@@ -277,6 +277,7 @@
 
     /**
      * Returns width of an object bounding box counting transformations
+     * before 2.0 it was named getWidth();
      * @return {Number} width value
      */
     getScaledWidth: function() {
@@ -285,6 +286,7 @@
 
     /**
      * Returns height of an object bounding box counting transformations
+     * before 2.0 it was named getHeight();
      * @return {Number} height value
      */
     getScaledHeight: function() {
