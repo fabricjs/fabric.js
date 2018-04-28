@@ -143,9 +143,11 @@
         'uniform vec4 uColor;\n' +
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'gl_FragColor = color;\n' +
           'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
           'gl_FragColor.rgb += uColor.rgb;\n' +
+          'gl_FragColor.a = color.a;\n' +
         '}'
     },
 
