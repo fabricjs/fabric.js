@@ -179,7 +179,7 @@
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
-      return this.__containsCenterOfCanvas(pointTL, pointBR, calculate);
+      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
@@ -213,7 +213,7 @@
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
-      return this.__containsCenterOfCanvas(pointTL, pointBR, calculate);
+      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
