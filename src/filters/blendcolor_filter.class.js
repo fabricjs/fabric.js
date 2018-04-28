@@ -59,24 +59,31 @@
       darken: 'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n',
       exclusion: 'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n',
       overlay: 'if (uColor.r < 0.5) {\n' +
-              'gl_FragColor.r *= 2.0 * uColor.r;\n' +
-            '} else {\n' +
-              'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
-            '}\n' +
-            'if (uColor.g < 0.5) {\n' +
-              'gl_FragColor.g *= 2.0 * uColor.g;\n' +
-            '} else {\n' +
-              'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
-            '}\n' +
-            'if (uColor.b < 0.5) {\n' +
-              'gl_FragColor.b *= 2.0 * uColor.b;\n' +
-            '} else {\n' +
-              'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
-            '}\n',
+          'gl_FragColor.r *= 2.0 * uColor.r;\n' +
+        '} else {\n' +
+          'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
+        '}\n' +
+        'if (uColor.g < 0.5) {\n' +
+          'gl_FragColor.g *= 2.0 * uColor.g;\n' +
+        '} else {\n' +
+          'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
+        '}\n' +
+        'if (uColor.b < 0.5) {\n' +
+          'gl_FragColor.b *= 2.0 * uColor.b;\n' +
+        '} else {\n' +
+          'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
+        '}\n',
       tint: 'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
-            'gl_FragColor.rgb += uColor.rgb;\n',
+        'gl_FragColor.rgb += uColor.rgb;\n',
     },
 
+    /**
+     * build the fragment source for the filters, joining the common part with
+     * the specific one.
+     * @param {String} mode the mode of the filter, a key of this.fragmentSource
+     * @return {String} the source to be compiled
+     * @private
+     */
     buildSource: function(mode) {
       return 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
@@ -88,8 +95,8 @@
           'if (color.a > 0.0) {\n' +
             this.fragmentSource[mode] +
           '}\n' +
-        '}'
-    }
+        '}';
+    },
 
     /**
      * Retrieves the cached shader.
@@ -100,7 +107,7 @@
     retrieveShader: function(options) {
       var cacheKey = this.type + '_' + this.mode, shaderSource;
       if (!options.programCache.hasOwnProperty(cacheKey)) {
-        this.buildSource(this.mode);
+        shaderSource = this.buildSource(this.mode);
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }
       return options.programCache[cacheKey];
