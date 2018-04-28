@@ -191,7 +191,7 @@
      * @param {Boolean} calculate use coordinates of current position instead of .oCoords
      * @return {Boolean} true if the objects containe the point
      */
-    _containsCenterOfCanvas(pointTL, pointBR, calculate) {
+    _containsCenterOfCanvas: function(pointTL, pointBR, calculate) {
       // worst case scenario the object is so big that contains the screen
       var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
       if (this.containsPoint(centerPoint, null, true, calculate)) {
