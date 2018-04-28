@@ -199,7 +199,7 @@
       }
       return false;
     },
-    
+
     /**
      * Checks if object is partially contained within the canvas with current viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
