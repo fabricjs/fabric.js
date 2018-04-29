@@ -148,13 +148,7 @@
       var canvas = fabric.util.createCanvasElement();
       canvas.width = width;
       canvas.height = height;
-      var glOptions = {
-            alpha: true,
-            premultipliedAlpha: false,
-            depth: false,
-            stencil: false,
-            antialias: false
-          },
+      var glOptions = { premultipliedAlpha: false },
           gl = canvas.getContext('webgl', glOptions);
       if (!gl) {
         gl = canvas.getContext('experimental-webgl', glOptions);
