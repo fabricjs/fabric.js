@@ -5,6 +5,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
+  this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -62,11 +63,12 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
 
 fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
 
-  var instanceFillValue = obj.get(property);
+  var instanceFillValue = obj[property];
   if (!(/^url\(/).test(instanceFillValue)) {
     return;
   }
-  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+  var gradientId = this.regexUrl.exec(instanceFillValue)[1];
+  this.regexUrl.lastIndex = 0;
   if (fabric.gradientDefs[this.svgUid][gradientId]) {
     obj.set(property,
       fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));

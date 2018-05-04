@@ -154,7 +154,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {Object} attributeLocations A map of shader attribute names to their locations.
    */
   sendAttributeData: function(gl, attributeLocations, aPositionData) {
-    var attributeLocation = attributeLocations.aPostion;
+    var attributeLocation = attributeLocations.aPosition;
     var buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.enableVertexAttribArray(attributeLocation);

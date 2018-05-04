@@ -109,8 +109,8 @@
           height = options.imageData.height;
 
       if (!resources.blurLayer1) {
-        resources.blurLayer1 = document.createElement('canvas');
-        resources.blurLayer2 = document.createElement('canvas');
+        resources.blurLayer1 = fabric.util.createCanvasElement();
+        resources.blurLayer2 = fabric.util.createCanvasElement();
       }
       canvas1 = resources.blurLayer1;
       canvas2 = resources.blurLayer2;
