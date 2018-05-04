@@ -20,7 +20,7 @@
       return true;
     }
     else if (Array.isArray(origValue)) {
-      if (origValue.length !== currentValue.length) {
+      if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
         return false;
       }
       for (var i = 0, len = origValue.length; i < len; i++) {
