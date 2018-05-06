@@ -52,7 +52,7 @@
     cObj.strokeDashArray[2] = 2;
     assert.ok(cObj.hasStateChanged(), 'more properties added');
   });
-  
+
   QUnit.test('saveState with array to null', function(assert) {
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
@@ -97,7 +97,7 @@
     gradient.colorStops[0].color = 'blue';
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on third level of nesting');
   });
-  
+
   QUnit.test('saveState with fabric class gradient to other types', function(assert) {
     var cObj = new fabric.Object();
     var gradient = new fabric.Gradient({
