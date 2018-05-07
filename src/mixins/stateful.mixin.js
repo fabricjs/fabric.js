@@ -35,7 +35,7 @@
       if (!currentValue ||
           typeof currentValue !== 'object' ||
           (!firstPass && keys.length !== Object.keys(currentValue).length)
-        ) {
+      ) {
         return false;
       }
       for (var i = 0, len = keys.length; i < len; i++) {
