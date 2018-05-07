@@ -54,7 +54,7 @@ jobs:
         apt:
           packages: # avoid installing packages
     - stage: test
-      node_js: "10"
+      node_js: "9"
     - stage: test
       node_js: "8"
     - stage: test
