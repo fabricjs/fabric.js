@@ -120,6 +120,7 @@
     cObj.saveState();
     cObj.set('fill', gradient);
     assert.ok(cObj.hasStateChanged(), 'back to gradient');
+    cObj.saveState();
     cObj.set('fill', null);
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to null without throwing');
   });
