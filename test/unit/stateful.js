@@ -1,7 +1,6 @@
 (function(){
 
   QUnit.module('fabric.stateful');
-
   QUnit.test('hasStateChanged', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.hasStateChanged === 'function');
@@ -118,8 +117,9 @@
     cObj.setupState();
     cObj.set('fill', 'red');
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to string without throwing');
-    cObj.set('fill', gradient);
     cObj.saveState();
+    cObj.set('fill', gradient);
+    assert.ok(cObj.hasStateChanged(), 'back to gradient');
     cObj.set('fill', null);
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to null without throwing');
   });
@@ -139,5 +139,4 @@
     cObj.a = 2;
     assert.ok(cObj.hasStateChanged('myProperties'), 'custom state has changed');
   });
-
 })();
