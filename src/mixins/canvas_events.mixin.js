@@ -110,14 +110,14 @@
       removeListener(fabric.window, 'resize', this._onResize);
 
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
       removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
       removeListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       removeListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       removeListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
       removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
-      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
       removeListener(this.upperCanvasEl, 'dragover', this._onDragOver);
       removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
       removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
@@ -254,8 +254,8 @@
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (e.type === 'touchstart') {
         // Unbind mousedown to prevent double triggers from touch devices
@@ -263,7 +263,7 @@
       }
       else {
         addListener(fabric.document, 'mouseup', this._onMouseUp);
-        addListener(fabric.document, 'mousemove', this._onMouseMove);
+        addListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
       }
     },
 
@@ -277,8 +277,8 @@
       removeListener(fabric.document, 'mouseup', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
-      removeListener(fabric.document, 'mousemove', this._onMouseMove);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
