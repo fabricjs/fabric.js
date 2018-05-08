@@ -1,3 +1,14 @@
+**Version 2.2.4**
+ - Fix getPointer on touch devices [#4866](https://github.com/kangax/fabric.js/pull/4866)
+ - Fix issues with selectionDashArray bleeding into free drawing [#4894](https://github.com/kangax/fabric.js/pull/4894)
+ - Fix blur filter for nodejs [#4905](https://github.com/kangax/fabric.js/pull/4905)
+ - Fix Register mousemove as non passive to help touch devices [#4933](https://github.com/kangax/fabric.js/pull/4933)
+ - Fix modified shadow tosvg for safari compatibility [#4934](https://github.com/kangax/fabric.js/pull/4934)
+ - Fix shader to avoid premultiplied alpha pixel getting dirty in blend filter [#4936](https://github.com/kangax/fabric.js/pull/4936)
+ - Add isPartiallyOnScreen method [#4856](https://github.com/kangax/fabric.js/pull/4856)
+ - Fix isEqual failing on array/null or objects/null/string compare [#4949](https://github.com/kangax/fabric.js/pull/4949)
+ - Fix pencilBrush with alpha and with rerendering canvas [#4938](https://github.com/kangax/fabric.js/pull/4938)
+
 **Version 2.2.3**
  - improvement: Allow to parse quoted url string. url('#myid') [#4881](https://github.com/kangax/fabric.js/pull/4881)
  - improvement: text fromSVG import char-spacing attribute [#3718](https://github.com/kangax/fabric.js/pull/3718)
