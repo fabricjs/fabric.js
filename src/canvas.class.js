@@ -377,7 +377,9 @@
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
       }
-      this.renderTopLayer(this.contextTop);
+      if (this.hasLostContext) {
+        this.renderTopLayer(this.contextTop);
+      }
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
       return this;
