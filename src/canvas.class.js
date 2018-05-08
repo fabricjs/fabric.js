@@ -387,11 +387,7 @@
 
     renderTopLayer: function(ctx) {
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        ctx.save();
-        var v = this.viewportTransform;
-        if (v) { ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]); }
         this.freeDrawingBrush && this.freeDrawingBrush._render();
-        ctx.restore();
       }
       // we render the top context - last object
       if (this.selection && this._groupSelector) {
