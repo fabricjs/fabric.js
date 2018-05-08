@@ -25,7 +25,7 @@ Remove the template from below and provide thoughtful commentary *and code sampl
 
 <!-- BUG TEMPLATE -->
 ## Version
-2.2.3
+2.2.4
 
 ## Test Case
 http://jsfiddle.net/fabricjs/Da7SP/
