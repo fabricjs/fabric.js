@@ -171,6 +171,15 @@
     },
 
     /**
+     * Callback; invoked right before object is being moved
+     * Since there is no way to know if the object is going to be selected or moved,
+     * this event is not a guarantee that object will be moved but indicator for likely to move
+     */
+    onBeforeMove: function () {
+      /* NOOP */
+    },
+
+    /**
      * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
      * @type Boolean
      * @default
