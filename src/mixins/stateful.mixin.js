@@ -20,7 +20,7 @@
       return true;
     }
     else if (Array.isArray(origValue)) {
-      if (origValue.length !== currentValue.length) {
+      if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
         return false;
       }
       for (var i = 0, len = origValue.length; i < len; i++) {
@@ -32,7 +32,10 @@
     }
     else if (origValue && typeof origValue === 'object') {
       var keys = Object.keys(origValue), key;
-      if (!firstPass && keys.length !== Object.keys(currentValue).length) {
+      if (!currentValue ||
+          typeof currentValue !== 'object' ||
+          (!firstPass && keys.length !== Object.keys(currentValue).length)
+      ) {
         return false;
       }
       for (var i = 0, len = keys.length; i < len; i++) {

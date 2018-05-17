@@ -377,7 +377,9 @@
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
       }
-      this.renderTopLayer(this.contextTop);
+      if (this.hasLostContext) {
+        this.renderTopLayer(this.contextTop);
+      }
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
       return this;
@@ -1362,7 +1364,7 @@
         height: height + 'px',
         left: 0,
         top: 0,
-        'touch-action': 'none'
+        'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none'
       });
       element.width = width;
       element.height = height;

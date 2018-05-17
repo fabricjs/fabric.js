@@ -52,7 +52,7 @@
       // mouse events
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
       addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
       addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
@@ -255,7 +255,7 @@
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
       if (e.type === 'touchstart') {
         // Unbind mousedown to prevent double triggers from touch devices
@@ -278,9 +278,9 @@
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
       removeListener(fabric.document, 'mousemove', this._onMouseMove);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (e.type === 'touchend') {
