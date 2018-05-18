@@ -45,7 +45,7 @@
         clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
         which: 1
       };
-      canvas._beforeTransform(e, rect);
+      canvas._setupCurrentTransform(e, rect);
     }
     assert.equal(counter, corners.length, '_beforeTransform should trigger onBeforeScaleRotate for all corners');
     assert.equal(t, rect, 'onBeforeScaleRotate should receive correct target');

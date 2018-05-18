@@ -17,11 +17,17 @@
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:modified
+   * @fires object:rotated
+   * @fires object:scaled
+   * @fires object:moved
+   * @fires object:skewed
    * @fires object:rotating
    * @fires object:scaling
    * @fires object:moving
+   * @fires object:skewing
    * @fires object:selected this event is deprecated. use selection:created
    *
+   * @fires before:transform
    * @fires before:selection:cleared
    * @fires selection:cleared
    * @fires selection:updated
@@ -695,6 +701,7 @@
       };
 
       this._resetCurrentTransform();
+      this._beforeTransform(e);
     },
 
     /**

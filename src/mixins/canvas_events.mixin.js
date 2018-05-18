@@ -582,7 +582,6 @@
           this.setActiveObject(target, e);
         }
         if (target === this._activeObject && (target.__corner || !shouldGroup)) {
-          this._beforeTransform(e, target);
           this._setupCurrentTransform(e, target);
         }
       }
@@ -594,14 +593,17 @@
     /**
      * @private
      */
-    _beforeTransform: function(e, target) {
-      this.stateful && target.saveState();
-
+    _beforeTransform: function(e) {
+      var t = this._currentTransform;
+      this.stateful && t.target.saveState();
+      this.fire('before:transform', {
+        e: e,
+        transform: t,
+      });
       // determine if it's a drag or rotate case
-      if (target._findTargetCorner(this.getPointer(e, true))) {
-        this.onBeforeScaleRotate(target);
+      if (t.corner) {
+        this.onBeforeScaleRotate(t.target);
       }
-
     },
 
     /**
