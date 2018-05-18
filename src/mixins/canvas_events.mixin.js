@@ -744,33 +744,38 @@
     _performTransformAction: function(e, transform, pointer) {
       var x = pointer.x,
           y = pointer.y,
-          target = transform.target,
           action = transform.action,
-          actionPerformed = false;
+          actionPerformed = false,
+          options = {
+            target: transform.target,
+            e: e,
+            transform: transform,
+            pointer: pointer
+          };
 
       if (action === 'rotate') {
-        (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', target, e);
+        (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', options);
       }
       else if (action === 'scale') {
-        (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', target, e);
+        (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', options);
       }
       else if (action === 'scaleX') {
-        (actionPerformed = this._scaleObject(x, y, 'x')) && this._fire('scaling', target, e);
+        (actionPerformed = this._scaleObject(x, y, 'x')) && this._fire('scaling', options);
       }
       else if (action === 'scaleY') {
-        (actionPerformed = this._scaleObject(x, y, 'y')) && this._fire('scaling', target, e);
+        (actionPerformed = this._scaleObject(x, y, 'y')) && this._fire('scaling', options);
       }
       else if (action === 'skewX') {
-        (actionPerformed = this._skewObject(x, y, 'x')) && this._fire('skewing', target, e);
+        (actionPerformed = this._skewObject(x, y, 'x')) && this._fire('skewing', options);
       }
       else if (action === 'skewY') {
-        (actionPerformed = this._skewObject(x, y, 'y')) && this._fire('skewing', target, e);
+        (actionPerformed = this._skewObject(x, y, 'y')) && this._fire('skewing', options);
       }
       else {
         actionPerformed = this._translateObject(x, y);
         if (actionPerformed) {
-          this._fire('moving', target, e);
-          this.setCursor(target.moveCursor || this.moveCursor);
+          this._fire('moving', options);
+          this.setCursor(options.target.moveCursor || this.moveCursor);
         }
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
@@ -779,9 +784,9 @@
     /**
      * @private
      */
-    _fire: function(eventName, target, e) {
-      this.fire('object:' + eventName, { target: target, e: e });
-      target.fire(eventName, { e: e });
+    _fire: function(eventName, options) {
+      this.fire('object:' + eventName, options);
+      options.target.fire(eventName, options);
     },
 
     /**
