@@ -503,6 +503,17 @@
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
+      if (target.shouldCache() && target._cacheCanvas) {
+        var normalizedPointer = this._normalizePointer(target, {x: x, y: y}),
+            targetRelativeX = target.cacheTranslationX + (normalizedPointer.x * target.zoomX),
+            targetRelativeY = target.cacheTranslationY + (normalizedPointer.y * target.zoomY);
+
+        var isTransparent = fabric.util.isTransparent(
+          target._cacheContext, targetRelativeX, targetRelativeY, this.targetFindTolerance);
+
+        return isTransparent;
+      }
+
       var ctx = this.contextCache,
           originalColor = target.selectionBackgroundColor, v = this.viewportTransform;
 
