@@ -614,6 +614,7 @@
 
       if (this.selection && (!target ||
         (!target.selectable && !target.isEditing && target !== this._activeObject))) {
+          console.log('pointer->', pointer)
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -653,6 +654,7 @@
      */
     _cacheTransformEventData: function(e) {
       this._pointer = this.getPointer(e, true);
+      console.log('pointer just done', this._pointer)
       this._absolutePointer = this.restorePointerVpt(this._pointer);
       this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
     },
