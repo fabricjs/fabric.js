@@ -242,7 +242,9 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onDoubleClick: function (e) {
+      this._cacheTransformEventData(e);
       this._handleEvent(e, 'dblclick');
+      this._resetTransformEventData(e);
     },
 
     /**
@@ -348,22 +350,24 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-
-      var target, searchTarget = true, transform = this._currentTransform,
+      var target, transform = this._currentTransform,
           groupSelector = this._groupSelector,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+      this._cacheTransformEventData(e);
+      target = this._target;
+      this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'up', target, RIGHT_CLICK, isClick);
+          this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'up', target, MIDDLE_CLICK, isClick);
+          this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
         }
         return;
       }
@@ -375,28 +379,21 @@
 
       if (transform) {
         this._finalizeCurrentTransform(e);
-        searchTarget = !transform.actionPerformed;
       }
 
-      target = searchTarget ? this.findTarget(e, true) : transform.target;
-
-      var shouldRender = this._shouldRender(target, this.getPointer(e));
+      var shouldRender = this._shouldRender(target, this._pointer);
 
       if (target || !isClick) {
         this._maybeGroupObjects(e);
       }
-      else {
-        // those are done by default on mouse up
-        // by _maybeGroupObjects, we are skipping it in case of no target find
-        this._groupSelector = null;
-        this._currentTransform = null;
-      }
-
       if (target) {
         target.isMoving = false;
       }
       this._setCursorFromEvent(e, target);
-      this._handleEvent(e, 'up', target ? target : null, LEFT_CLICK, isClick);
+      this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+      this._resetTransformEventData();
+      this._groupSelector = null;
+      this._currentTransform = null;
       target && (target.__corner = 0);
       shouldRender && this.requestRenderAll();
     },
@@ -436,15 +433,18 @@
      * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
      * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
      */
-    _handleEvent: function(e, eventType, targetObj, button, isClick) {
-      var target = typeof targetObj === 'undefined' ? this.findTarget(e) : targetObj,
+    _handleEvent: function(e, eventType, button, isClick) {
+      var target = this._target,
           targets = this.targets || [],
           options = {
             e: e,
             target: target,
             subTargets: targets,
             button: button || LEFT_CLICK,
-            isClick: isClick || false
+            isClick: isClick || false,
+            pointer: this._pointer,
+            absolutePointer: this._absolutePointer,
+            transform: this._currentTransform
           };
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
@@ -461,8 +461,6 @@
 
       var transform = this._currentTransform,
           target = transform.target,
-          action = transform.action,
-          eventName, by,
           options = {
             e: e,
             target: target,
@@ -488,6 +486,7 @@
     _addEventOptions: function(options, transform) {
       // we can probably add more details at low cost
       // scale change, rotation changes, translation changes
+      var eventName, by;
       switch (transform.action) {
         case 'scaleX':
           eventName = 'scaled';
@@ -514,11 +513,11 @@
           break;
         case 'drag':
           eventName = 'moved';
-        break;
+          break;
       }
       options.eventName = eventName;
       options.eventSpec = by;
-    }
+    },
 
     /**
      * @private
@@ -572,20 +571,20 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-
-      var target = this.findTarget(e) || null;
-
+      this.cacheTransformEventData(e);
+      this._handleEvent(e, 'down:before');
+      var target = this._target;
       // if right click just fire events
       if (checkClick(e, RIGHT_CLICK)) {
         if (this.fireRightClick) {
-          this._handleEvent(e, 'down', target, RIGHT_CLICK);
+          this._handleEvent(e, 'down', RIGHT_CLICK);
         }
         return;
       }
 
       if (checkClick(e, MIDDLE_CLICK)) {
         if (this.fireMiddleClick) {
-          this._handleEvent(e, 'down', target, MIDDLE_CLICK);
+          this._handleEvent(e, 'down', MIDDLE_CLICK);
         }
         return;
       }
@@ -600,8 +599,8 @@
         return;
       }
 
+      var pointer = this._absolutePointer;
       // save pointer for check in __onMouseUp event
-      var pointer = this.getPointer(e, true);
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
@@ -631,9 +630,31 @@
           this._setupCurrentTransform(e, target);
         }
       }
-      this._handleEvent(e, 'down', target);
+      this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
       shouldRender && this.requestRenderAll();
+      this._resetTransformEventData();
+    },
+
+    /**
+     * reset cache form common information needed during event processing
+     * @private
+     */
+    _resetTransformEventData: function() {
+      this._target = null;
+      this._pointer = null;
+      this._absolutePointer = null;
+    },
+
+    /**
+     * Cache common information needed during event processing
+     * @private
+     * @param {Event} e Event object fired on event
+     */
+    _cacheTransformEventData: function(e) {
+      this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
+      this._pointer = this.getPointer(e);
+      this._absolutePointer = fabric.util.transformPoint(this._pointer, this.viewportTransform);
     },
 
     /**
@@ -662,7 +683,8 @@
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
-
+      this._handleEvent(e, 'move:before');
+      this._cacheTransformEventData(e);
       var target, pointer;
 
       if (this.isDrawingMode) {
@@ -677,7 +699,7 @@
 
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = this.getPointer(e, true);
+        pointer = this._pointer;
 
         groupSelector.left = pointer.x - groupSelector.ex;
         groupSelector.top = pointer.y - groupSelector.ey;
@@ -692,7 +714,8 @@
       else {
         this._transformObject(e);
       }
-      this._handleEvent(e, 'move', this._currentTransform ? null : target);
+      this._handleEvent(e, 'move');
+      this._resetTransformEventData();
     },
 
     /**
@@ -762,7 +785,9 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
+      this._cacheTransformEventData(e);
       this._handleEvent(e, 'wheel');
+      this._resetTransformEventData();
     },
 
     /**

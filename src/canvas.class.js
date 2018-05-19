@@ -1266,6 +1266,14 @@
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e, ignoreZoom, upperCanvasEl) {
+      // return cached values if we are in the event processing chain
+      if (this._pointer && !ignoreZoom) {
+        return this._pointer;
+      }
+      if (this._absolutePointer && ignoreZoom) {
+        return this._absolutePointer;
+      }
+
       if (!upperCanvasEl) {
         upperCanvasEl = this.upperCanvasEl;
       }
