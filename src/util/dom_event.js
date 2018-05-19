@@ -195,7 +195,6 @@
                   (typeof event.srcElement !== unknown ? event.srcElement : null),
 
         scroll = fabric.util.getScrollLeftTop(element);
-
     return {
       x: pointerX(event) + scroll.left,
       y: pointerY(event) + scroll.top
