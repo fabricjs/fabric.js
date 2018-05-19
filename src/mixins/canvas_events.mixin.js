@@ -252,7 +252,9 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
+      this._cacheTransformEventData(e);
       this.__onMouseDown(e);
+      this._resetTransformEventData();
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
@@ -274,8 +276,9 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
+      this._cacheTransformEventData(e);
       this.__onMouseUp(e);
-
+      this._resetTransformEventData();
       removeListener(fabric.document, 'mouseup', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
@@ -353,7 +356,6 @@
       var target, transform = this._currentTransform,
           groupSelector = this._groupSelector,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
-      this._cacheTransformEventData(e);
       target = this._target;
       this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
@@ -362,7 +364,6 @@
         if (this.fireRightClick) {
           this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
         }
-        this._resetTransformEventData();
         return;
       }
 
@@ -376,13 +377,11 @@
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
-        this._resetTransformEventData();
         return;
       }
 
       if (transform) {
         this._finalizeCurrentTransform(e);
-        this._resetTransformEventData();
       }
 
       var shouldRender = this._shouldRender(target, this._absolutePointer);
@@ -395,7 +394,6 @@
       }
       this._setCursorFromEvent(e, target);
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
-      this._resetTransformEventData();
       this._groupSelector = null;
       this._currentTransform = null;
       target && (target.__corner = 0);
@@ -575,7 +573,6 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-      this._cacheTransformEventData(e);
       this._handleEvent(e, 'down:before');
       var target = this._target;
       // if right click just fire events
@@ -583,7 +580,6 @@
         if (this.fireRightClick) {
           this._handleEvent(e, 'down', RIGHT_CLICK);
         }
-        this._resetTransformEventData();
         return;
       }
 
@@ -591,19 +587,16 @@
         if (this.fireMiddleClick) {
           this._handleEvent(e, 'down', MIDDLE_CLICK);
         }
-        this._resetTransformEventData();
         return;
       }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
-        this._resetTransformEventData();
         return;
       }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) {
-        this._resetTransformEventData();
         return;
       }
 
@@ -641,7 +634,6 @@
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
       shouldRender && this.requestRenderAll();
-      this._resetTransformEventData();
     },
 
     /**
@@ -660,6 +652,8 @@
      * @param {Event} e Event object fired on event
      */
     _cacheTransformEventData: function(e) {
+      // reset in order to avoid stale caching
+      this._resetTransformEventData();
       this._pointer = this.getPointer(e, true);
       this._absolutePointer = this.restorePointerVpt(this._pointer);
       this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
