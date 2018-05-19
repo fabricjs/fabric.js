@@ -381,7 +381,7 @@
         this._finalizeCurrentTransform(e);
       }
 
-      var shouldRender = this._shouldRender(target, this._pointer);
+      var shouldRender = this._shouldRender(target, this._absolutePointer);
 
       if (target || !isClick) {
         this._maybeGroupObjects(e);
