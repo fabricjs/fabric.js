@@ -1,5 +1,5 @@
 var fabric = fabric || {
-    version: "2.2.4"
+    version: "2.3.0"
 };
 
 if (typeof exports !== "undefined") {
@@ -4785,6 +4785,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return fabric.util.transformPoint(vptPointer, invertedM);
         },
         isTargetTransparent: function(target, x, y) {
+            if (target.shouldCache() && target._cacheCanvas) {
+                var normalizedPointer = this._normalizePointer(target, {
+                    x: x,
+                    y: y
+                }), targetRelativeX = target.cacheTranslationX + normalizedPointer.x * target.zoomX, targetRelativeY = target.cacheTranslationY + normalizedPointer.y * target.zoomY;
+                var isTransparent = fabric.util.isTransparent(target._cacheContext, targetRelativeX, targetRelativeY, this.targetFindTolerance);
+                return isTransparent;
+            }
             var ctx = this.contextCache, originalColor = target.selectionBackgroundColor, v = this.viewportTransform;
             target.selectionBackgroundColor = "";
             this.clearContext(ctx);
@@ -4905,6 +4913,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 originY: origin.y
             };
             this._resetCurrentTransform();
+            this._beforeTransform(e);
         },
         _translateObject: function(x, y) {
             var transform = this._currentTransform, target = transform.target, newLeft = x - transform.offsetX, newTop = y - transform.offsetY, moveX = !target.get("lockMovementX") && target.left !== newLeft, moveY = !target.get("lockMovementY") && target.top !== newTop;
@@ -5204,11 +5213,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         restorePointerVpt: function(pointer) {
             return fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.viewportTransform));
         },
-        getPointer: function(e, ignoreZoom, upperCanvasEl) {
-            if (!upperCanvasEl) {
-                upperCanvasEl = this.upperCanvasEl;
+        getPointer: function(e, ignoreZoom) {
+            if (this._absolutePointer && !ignoreZoom) {
+                return this._absolutePointer;
             }
-            var pointer = getPointer(e), bounds = upperCanvasEl.getBoundingClientRect(), boundsWidth = bounds.width || 0, boundsHeight = bounds.height || 0, cssScale;
+            if (this._pointer && ignoreZoom) {
+                return this._pointer;
+            }
+            var pointer = getPointer(e), upperCanvasEl = this.upperCanvasEl, bounds = upperCanvasEl.getBoundingClientRect(), boundsWidth = bounds.width || 0, boundsHeight = bounds.height || 0, cssScale;
             if (!boundsWidth || !boundsHeight) {
                 if ("top" in bounds && "bottom" in bounds) {
                     boundsHeight = Math.abs(bounds.top - bounds.bottom);
@@ -5619,10 +5631,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return false;
         },
         _onDoubleClick: function(e) {
+            this._cacheTransformEventData(e);
             this._handleEvent(e, "dblclick");
+            this._resetTransformEventData(e);
         },
         _onMouseDown: function(e) {
             this.__onMouseDown(e);
+            this._resetTransformEventData();
             addListener(fabric.document, "touchend", this._onMouseUp, addEventOptions);
             addListener(fabric.document, "touchmove", this._onMouseMove, addEventOptions);
             removeListener(this.upperCanvasEl, "mousemove", this._onMouseMove);
@@ -5636,6 +5651,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
         },
         _onMouseUp: function(e) {
             this.__onMouseUp(e);
+            this._resetTransformEventData();
             removeListener(fabric.document, "mouseup", this._onMouseUp);
             removeListener(fabric.document, "touchend", this._onMouseUp, addEventOptions);
             removeListener(fabric.document, "mousemove", this._onMouseMove);
@@ -5664,17 +5680,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             return !!(target && (target.isMoving || target !== activeObject) || !target && !!activeObject || !target && !activeObject && !this._groupSelector || pointer && this._previousPointer && this.selection && (pointer.x !== this._previousPointer.x || pointer.y !== this._previousPointer.y));
         },
         __onMouseUp: function(e) {
-            var target, searchTarget = true, transform = this._currentTransform, groupSelector = this._groupSelector, isClick = !groupSelector || groupSelector.left === 0 && groupSelector.top === 0;
+            var target, transform = this._currentTransform, groupSelector = this._groupSelector, isClick = !groupSelector || groupSelector.left === 0 && groupSelector.top === 0;
+            this._cacheTransformEventData(e);
+            target = this._target;
+            this._handleEvent(e, "up:before");
             if (checkClick(e, RIGHT_CLICK)) {
                 if (this.fireRightClick) {
-                    this._handleEvent(e, "up", target, RIGHT_CLICK, isClick);
+                    this._handleEvent(e, "up", RIGHT_CLICK, isClick);
                 }
                 return;
             }
             if (checkClick(e, MIDDLE_CLICK)) {
                 if (this.fireMiddleClick) {
-                    this._handleEvent(e, "up", target, MIDDLE_CLICK, isClick);
+                    this._handleEvent(e, "up", MIDDLE_CLICK, isClick);
                 }
+                this._resetTransformEventData();
                 return;
             }
             if (this.isDrawingMode && this._isCurrentlyDrawing) {
@@ -5683,21 +5703,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             if (transform) {
                 this._finalizeCurrentTransform(e);
-                searchTarget = !transform.actionPerformed;
             }
-            target = searchTarget ? this.findTarget(e, true) : transform.target;
-            var shouldRender = this._shouldRender(target, this.getPointer(e));
+            var shouldRender = this._shouldRender(target, this._absolutePointer);
             if (target || !isClick) {
                 this._maybeGroupObjects(e);
-            } else {
-                this._groupSelector = null;
-                this._currentTransform = null;
             }
             if (target) {
                 target.isMoving = false;
             }
             this._setCursorFromEvent(e, target);
-            this._handleEvent(e, "up", target ? target : null, LEFT_CLICK, isClick);
+            this._handleEvent(e, "up", LEFT_CLICK, isClick);
+            this._groupSelector = null;
+            this._currentTransform = null;
             target && (target.__corner = 0);
             shouldRender && this.requestRenderAll();
         },
@@ -5717,13 +5734,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             return target;
         },
-        _handleEvent: function(e, eventType, targetObj, button, isClick) {
-            var target = typeof targetObj === "undefined" ? this.findTarget(e) : targetObj, targets = this.targets || [], options = {
+        _handleEvent: function(e, eventType, button, isClick) {
+            var target = this._target, targets = this.targets || [], options = {
                 e: e,
                 target: target,
                 subTargets: targets,
                 button: button || LEFT_CLICK,
-                isClick: isClick || false
+                isClick: isClick || false,
+                pointer: this._pointer,
+                absolutePointer: this._absolutePointer,
+                transform: this._currentTransform
             };
             this.fire("mouse:" + eventType, options);
             target && target.fire("mouse" + eventType, options);
@@ -5732,20 +5752,61 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         _finalizeCurrentTransform: function(e) {
-            var transform = this._currentTransform, target = transform.target;
+            var transform = this._currentTransform, target = transform.target, eventName, options = {
+                e: e,
+                target: target,
+                transform: transform
+            };
             if (target._scaling) {
                 target._scaling = false;
             }
             target.setCoords();
             if (transform.actionPerformed || this.stateful && target.hasStateChanged()) {
-                this.fire("object:modified", {
-                    target: target,
-                    e: e
-                });
-                target.fire("modified", {
-                    e: e
-                });
+                if (transform.actionPerformed) {
+                    eventName = this._addEventOptions(options, transform);
+                    this._fire(eventName, options);
+                }
+                this._fire("modified", options);
             }
+        },
+        _addEventOptions: function(options, transform) {
+            var eventName, by;
+            switch (transform.action) {
+              case "scaleX":
+                eventName = "scaled";
+                by = "x";
+                break;
+
+              case "scaleY":
+                eventName = "scaled";
+                by = "y";
+                break;
+
+              case "skewX":
+                eventName = "skewed";
+                by = "x";
+                break;
+
+              case "skewY":
+                eventName = "skewed";
+                by = "y";
+                break;
+
+              case "scale":
+                eventName = "scaled";
+                by = "equally";
+                break;
+
+              case "rotate":
+                eventName = "rotated";
+                break;
+
+              case "drag":
+                eventName = "moved";
+                break;
+            }
+            options.by = by;
+            return eventName;
         },
         _onMouseDownInDrawingMode: function(e) {
             this._isCurrentlyDrawing = true;
@@ -5776,16 +5837,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             this._handleEvent(e, "up");
         },
         __onMouseDown: function(e) {
-            var target = this.findTarget(e) || null;
+            this._cacheTransformEventData(e);
+            this._handleEvent(e, "down:before");
+            var target = this._target;
             if (checkClick(e, RIGHT_CLICK)) {
                 if (this.fireRightClick) {
-                    this._handleEvent(e, "down", target, RIGHT_CLICK);
+                    this._handleEvent(e, "down", RIGHT_CLICK);
                 }
                 return;
             }
             if (checkClick(e, MIDDLE_CLICK)) {
                 if (this.fireMiddleClick) {
-                    this._handleEvent(e, "down", target, MIDDLE_CLICK);
+                    this._handleEvent(e, "down", MIDDLE_CLICK);
                 }
                 return;
             }
@@ -5796,7 +5859,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             if (this._currentTransform) {
                 return;
             }
-            var pointer = this.getPointer(e, true);
+            var pointer = this._pointer;
             this._previousPointer = pointer;
             var shouldRender = this._shouldRender(target, pointer), shouldGroup = this._shouldGroup(e, target);
             if (this._shouldClearSelection(e, target)) {
@@ -5818,20 +5881,37 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                     this.setActiveObject(target, e);
                 }
                 if (target === this._activeObject && (target.__corner || !shouldGroup)) {
-                    this._beforeTransform(e, target);
                     this._setupCurrentTransform(e, target);
                 }
             }
-            this._handleEvent(e, "down", target);
+            this._handleEvent(e, "down");
             shouldRender && this.requestRenderAll();
         },
-        _beforeTransform: function(e, target) {
-            this.stateful && target.saveState();
-            if (target._findTargetCorner(this.getPointer(e, true))) {
-                this.onBeforeScaleRotate(target);
+        _resetTransformEventData: function() {
+            this._target = null;
+            this._pointer = null;
+            this._absolutePointer = null;
+        },
+        _cacheTransformEventData: function(e) {
+            this._resetTransformEventData();
+            this._pointer = this.getPointer(e, true);
+            this._absolutePointer = this.restorePointerVpt(this._pointer);
+            this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
+        },
+        _beforeTransform: function(e) {
+            var t = this._currentTransform;
+            this.stateful && t.target.saveState();
+            this.fire("before:transform", {
+                e: e,
+                transform: t
+            });
+            if (t.corner) {
+                this.onBeforeScaleRotate(t.target);
             }
         },
         __onMouseMove: function(e) {
+            this._handleEvent(e, "move:before");
+            this._cacheTransformEventData(e);
             var target, pointer;
             if (this.isDrawingMode) {
                 this._onMouseMoveInDrawingMode(e);
@@ -5842,7 +5922,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             var groupSelector = this._groupSelector;
             if (groupSelector) {
-                pointer = this.getPointer(e, true);
+                pointer = this._pointer;
                 groupSelector.left = pointer.x - groupSelector.ex;
                 groupSelector.top = pointer.y - groupSelector.ey;
                 this.renderTop();
@@ -5853,7 +5933,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             } else {
                 this._transformObject(e);
             }
-            this._handleEvent(e, "move", this._currentTransform ? null : target);
+            this._handleEvent(e, "move");
+            this._resetTransformEventData();
         },
         _fireOverOutEvents: function(target, e) {
             this.fireSynteticInOutEvents(target, e, {
@@ -5898,7 +5979,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         __onMouseWheel: function(e) {
+            this._cacheTransformEventData(e);
             this._handleEvent(e, "wheel");
+            this._resetTransformEventData();
         },
         _transformObject: function(e) {
             var pointer = this.getPointer(e), transform = this._currentTransform;
@@ -5911,36 +5994,36 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             transform.actionPerformed && this.requestRenderAll();
         },
         _performTransformAction: function(e, transform, pointer) {
-            var x = pointer.x, y = pointer.y, target = transform.target, action = transform.action, actionPerformed = false;
+            var x = pointer.x, y = pointer.y, action = transform.action, actionPerformed = false, options = {
+                target: transform.target,
+                e: e,
+                transform: transform,
+                pointer: pointer
+            };
             if (action === "rotate") {
-                (actionPerformed = this._rotateObject(x, y)) && this._fire("rotating", target, e);
+                (actionPerformed = this._rotateObject(x, y)) && this._fire("rotating", options);
             } else if (action === "scale") {
-                (actionPerformed = this._onScale(e, transform, x, y)) && this._fire("scaling", target, e);
+                (actionPerformed = this._onScale(e, transform, x, y)) && this._fire("scaling", options);
             } else if (action === "scaleX") {
-                (actionPerformed = this._scaleObject(x, y, "x")) && this._fire("scaling", target, e);
+                (actionPerformed = this._scaleObject(x, y, "x")) && this._fire("scaling", options);
             } else if (action === "scaleY") {
-                (actionPerformed = this._scaleObject(x, y, "y")) && this._fire("scaling", target, e);
+                (actionPerformed = this._scaleObject(x, y, "y")) && this._fire("scaling", options);
             } else if (action === "skewX") {
-                (actionPerformed = this._skewObject(x, y, "x")) && this._fire("skewing", target, e);
+                (actionPerformed = this._skewObject(x, y, "x")) && this._fire("skewing", options);
             } else if (action === "skewY") {
-                (actionPerformed = this._skewObject(x, y, "y")) && this._fire("skewing", target, e);
+                (actionPerformed = this._skewObject(x, y, "y")) && this._fire("skewing", options);
             } else {
                 actionPerformed = this._translateObject(x, y);
                 if (actionPerformed) {
-                    this._fire("moving", target, e);
-                    this.setCursor(target.moveCursor || this.moveCursor);
+                    this._fire("moving", options);
+                    this.setCursor(options.target.moveCursor || this.moveCursor);
                 }
             }
             transform.actionPerformed = transform.actionPerformed || actionPerformed;
         },
-        _fire: function(eventName, target, e) {
-            this.fire("object:" + eventName, {
-                target: target,
-                e: e
-            });
-            target.fire(eventName, {
-                e: e
-            });
+        _fire: function(eventName, options) {
+            this.fire("object:" + eventName, options);
+            options.target.fire(eventName, options);
         },
         _beforeScaleTransform: function(e, transform) {
             if (transform.action === "scale" || transform.action === "scaleX" || transform.action === "scaleY") {
