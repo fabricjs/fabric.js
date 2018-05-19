@@ -1265,20 +1265,17 @@
      * @param {Boolean} ignoreZoom
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e, ignoreZoom, upperCanvasEl) {
+    getPointer: function (e, ignoreZoom) {
       // return cached values if we are in the event processing chain
-      if (this._pointer && !ignoreZoom) {
-        return this._pointer;
-      }
-      if (this._absolutePointer && ignoreZoom) {
+      if (this._absolutePointer && !ignoreZoom) {
         return this._absolutePointer;
       }
-
-      if (!upperCanvasEl) {
-        upperCanvasEl = this.upperCanvasEl;
+      if (this._pointer && ignoreZoom) {
+        return this._pointer;
       }
+
       var pointer = getPointer(e),
-          bounds = upperCanvasEl.getBoundingClientRect(),
+          bounds = this.upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
           cssScale;
