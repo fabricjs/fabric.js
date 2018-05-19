@@ -652,8 +652,8 @@
      * @param {Event} e Event object fired on event
      */
     _cacheTransformEventData: function(e) {
-      this._pointer = this.getPointer(e);
-      this._absolutePointer = fabric.util.transformPoint(this._pointer, this.viewportTransform);
+      this._pointer = this.getPointer(e, true);
+      this._absolutePointer = this.restorePointerVpt(this._pointer);
       this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
     },
 
