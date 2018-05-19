@@ -460,7 +460,14 @@
     _finalizeCurrentTransform: function(e) {
 
       var transform = this._currentTransform,
-          target = transform.target;
+          target = transform.target,
+          action = transform.action,
+          eventName, by,
+          options = {
+            e: e,
+            target: target,
+            transform: transform,
+          };
 
       if (target._scaling) {
         target._scaling = false;
@@ -469,10 +476,49 @@
       target.setCoords();
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
-        this.fire('object:modified', { target: target, e: e });
-        target.fire('modified', { e: e });
+        if (transform.actionPerformed) {
+          this._addEventOptions(options, transform);
+          this._fire(options.eventName, options);
+        }
+        this._fire('modified', options);
       }
     },
+
+
+    _addEventOptions: function(options, transform) {
+      // we can probably add more details at low cost
+      // scale change, rotation changes, translation changes
+      switch (transform.action) {
+        case 'scaleX':
+          eventName = 'scaled';
+          by = 'x';
+          break;
+        case 'scaleY':
+          eventName = 'scaled';
+          by = 'y';
+          break;
+        case 'skewX':
+          eventName = 'skewed';
+          by = 'x';
+          break;
+        case 'skewY':
+          eventName = 'skewed';
+          by = 'y';
+          break;
+        case 'scale':
+          eventName = 'scaled';
+          by = 'equally';
+          break;
+        case 'rotate':
+          eventName = 'rotated';
+          break;
+        case 'drag':
+          eventName = 'moved';
+        break;
+      }
+      options.eventName = eventName;
+      options.eventSpec = by;
+    }
 
     /**
      * @private
