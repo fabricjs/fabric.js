@@ -28,6 +28,12 @@
    * @fires selected
    * @fires deselected
    * @fires modified
+   * @fires modified
+   * @fires moved
+   * @fires scaled
+   * @fires rotated
+   * @fires skewed
+   *
    * @fires rotating
    * @fires scaling
    * @fires moving
