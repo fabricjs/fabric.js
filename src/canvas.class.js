@@ -37,6 +37,9 @@
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
+   * @fires mouse:down:before
+   * @fires mouse:move:before
+   * @fires mouse:up:before
    * @fires mouse:over
    * @fires mouse:out
    * @fires mouse:dblclick
