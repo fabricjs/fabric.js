@@ -1,3 +1,7 @@
+**Version 2.3.0**
+ - Add and improve more events for transformations and mouse interaction [#4979](https://github.com/kangax/fabric.js/pull/4979)
+ - Improvement: whenever possible use cache for target transparency sampling [#4955](https://github.com/kangax/fabric.js/pull/4955)
+
 **Version 2.2.4**
  - Fix getPointer on touch devices [#4866](https://github.com/kangax/fabric.js/pull/4866)
  - Fix issues with selectionDashArray bleeding into free drawing [#4894](https://github.com/kangax/fabric.js/pull/4894)
