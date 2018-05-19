@@ -1296,7 +1296,7 @@
       }
 
       this.calcOffset();
-
+      console.log('inside the calc', e.clientX, pointer.x, this._offset.left)
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
       if (!ignoreZoom) {

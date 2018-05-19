@@ -81,24 +81,24 @@
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
     canvas.isDrawingMode = false;
-    canvas.__onMouseDown({ which: 1 });
+    canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse down fired');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 3 });
+    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'rightclick did not fire a mouse:down event');
     canvas.fireRightClick = true;
-    canvas.__onMouseDown({ which: 3 });
+    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'rightclick did fire a mouse:down event');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 2 });
+    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'middleClick did not fire a mouse:down event');
     canvas.fireMiddleClick = true;
-    canvas.__onMouseDown({ which: 2 });
+    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'middleClick did fire a mouse:down event');
   });
 
   QUnit.test('mouse:down and group selector', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 60, height: 60 });
     var expectedGroupSelector = { ex: 30, ey: 30, top: 0, left: 0 };
     canvas.__onMouseDown(e);
@@ -125,7 +125,7 @@
   });
 
   QUnit.test('mouse:up isClick = true', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
       isClick = opt.isClick;

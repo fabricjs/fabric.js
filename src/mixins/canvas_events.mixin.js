@@ -362,6 +362,7 @@
         if (this.fireRightClick) {
           this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
         }
+        this._resetTransformEventData();
         return;
       }
 
@@ -369,16 +370,19 @@
         if (this.fireMiddleClick) {
           this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
         }
+        this._resetTransformEventData();
         return;
       }
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
+        this._resetTransformEventData();
         return;
       }
 
       if (transform) {
         this._finalizeCurrentTransform(e);
+        this._resetTransformEventData();
       }
 
       var shouldRender = this._shouldRender(target, this._absolutePointer);
@@ -571,7 +575,9 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
+      console.log('inside the function', e.clientX)
       this._cacheTransformEventData(e);
+      console.log('after the cache', e.clientX)
       this._handleEvent(e, 'down:before');
       var target = this._target;
       // if right click just fire events
@@ -579,6 +585,7 @@
         if (this.fireRightClick) {
           this._handleEvent(e, 'down', RIGHT_CLICK);
         }
+        this._resetTransformEventData();
         return;
       }
 
@@ -586,16 +593,19 @@
         if (this.fireMiddleClick) {
           this._handleEvent(e, 'down', MIDDLE_CLICK);
         }
+        this._resetTransformEventData();
         return;
       }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
+        this._resetTransformEventData();
         return;
       }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) {
+        this._resetTransformEventData();
         return;
       }
 
@@ -654,7 +664,6 @@
      */
     _cacheTransformEventData: function(e) {
       this._pointer = this.getPointer(e, true);
-      console.log('pointer just done', this._pointer)
       this._absolutePointer = this.restorePointerVpt(this._pointer);
       this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
     },
