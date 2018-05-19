@@ -571,7 +571,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-      this.cacheTransformEventData(e);
+      this._cacheTransformEventData(e);
       this._handleEvent(e, 'down:before');
       var target = this._target;
       // if right click just fire events
@@ -599,7 +599,7 @@
         return;
       }
 
-      var pointer = this._absolutePointer;
+      var pointer = this._pointer;
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target, pointer),

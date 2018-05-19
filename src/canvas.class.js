@@ -1278,7 +1278,8 @@
       }
 
       var pointer = getPointer(e),
-          bounds = this.upperCanvasEl.getBoundingClientRect(),
+          upperCanvasEl = this.upperCanvasEl,
+          bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
           cssScale;
