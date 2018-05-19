@@ -71,6 +71,25 @@
     canvas.onBeforeScaleRotate = _onBeforeScaleRotate;
   });
 
+  QUnit.test('cache and reset event properties', function(assert) {
+    var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
+    var rect = new fabric.Rect({ width: 60, height: 60 });
+    canvas._currentTransform = null;
+    canvas.add(rect);
+    assert.equal(canvas._pointer, null);
+    assert.equal(canvas._absolutePointer, null);
+    assert.equal(canvas._target, null);
+    canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
+    canvas._cacheTransformEventData(e);
+    assert.deepEqual(canvas._pointer, { x: 30, y: 30 }, 'pointer has been cached');
+    assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
+    assert.ok(canvas._target === rect);
+    canvas._resetTransformEventData();
+    assert.equal(canvas._pointer, null);
+    assert.equal(canvas._absolutePointer, null);
+    assert.equal(canvas._target, null);
+  });
+
   QUnit.test('mouse:down with different buttons', function(assert) {
     var clickCount = 0;
     function mouseHandler() {
@@ -95,6 +114,32 @@
     canvas.fireMiddleClick = true;
     canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'middleClick did fire a mouse:down event');
+  });
+
+  QUnit.test('mouse:down:before with different buttons', function(assert) {
+    var clickCount = 0;
+    function mouseHandler() {
+      clickCount++;
+    }
+    canvas.on('mouse:down:before', mouseHandler);
+    canvas.fireMiddleClick = false;
+    canvas.fireRightClick = false;
+    canvas._currentTransform = false;
+    canvas.isDrawingMode = false;
+    canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
+    assert.equal(clickCount, 1, 'mouse:down:before fired');
+    clickCount = 0;
+    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    assert.equal(clickCount, 1, 'rightclick fired a mouse:down:before event');
+    canvas.fireRightClick = true;
+    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    assert.equal(clickCount, 2, 'rightclick did fire a mouse:down:before event');
+    clickCount = 0;
+    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    assert.equal(clickCount, 1, 'middleClick did not fire a mouse:down:before event');
+    canvas.fireMiddleClick = true;
+    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    assert.equal(clickCount, 2, 'middleClick did fire a mouse:down:before event');
   });
 
   QUnit.test('mouse:down and group selector', function(assert) {
@@ -162,6 +207,32 @@
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
     assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('fires object:modified and object:moved', function(assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
+    canvas.add(rect);
+    var count = 0;
+    var count2 = 0;
+    var opt;
+    canvas.on('object:modified', function(_opt) {
+      count++;
+      opt = _opt;
+    });
+    canvas.on('object:moved', function(_opt) {
+      count2++;
+      opt = _opt;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(count, 1, 'object:modified fired');
+    assert.equal(opt.e, e2, 'options match model - event');
+    assert.equal(opt.target, rect, 'options match model - target');
+    assert.equal(opt.transform.action, 'drag', 'options match model - target');
+    assert.equal(count2, 1, 'object:moved fired');
   });
 
   QUnit.test('avoid multiple bindings', function(assert) {
@@ -612,5 +683,21 @@
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
     assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
   });
-
+  QUnit.test('_addEventOptions return the correct event name', function(assert) {
+    var opt = {};
+    assert.equal(canvas._addEventOptions(opt, { action: 'scaleX' }), 'scaled', 'scaleX => scaled');
+    assert.equal(opt.by, 'x', 'by => x');
+    assert.equal(canvas._addEventOptions(opt, { action: 'scaleY' }), 'scaled', 'scaleY => scaled');
+    assert.equal(opt.by, 'y', 'by => y');
+    assert.equal(canvas._addEventOptions(opt, { action: 'scale' }), 'scaled', 'scale => scaled');
+    assert.equal(opt.by, 'equally', 'by => equally');
+    assert.equal(canvas._addEventOptions(opt, { action: 'skewX' }), 'skewed', 'skewX => skewed');
+    assert.equal(opt.by, 'x', 'by => x');
+    assert.equal(canvas._addEventOptions(opt, { action: 'skewY' }), 'skewed', 'skewY => skewed');
+    assert.equal(opt.by, 'y', 'by => y');
+    assert.equal(canvas._addEventOptions(opt, { action: 'rotate' }), 'rotated', 'rotate => rotated');
+    assert.equal(opt.by, undefined, 'by => undefined');
+    assert.equal(canvas._addEventOptions(opt, { action: 'drag' }), 'moved', 'drag => moved');
+    assert.equal(opt.by, undefined, 'by => undefined');
+  });
 })();

@@ -252,7 +252,6 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
-      this._cacheTransformEventData(e);
       this.__onMouseDown(e);
       this._resetTransformEventData();
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
@@ -276,7 +275,6 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
-      this._cacheTransformEventData(e);
       this.__onMouseUp(e);
       this._resetTransformEventData();
       removeListener(fabric.document, 'mouseup', this._onMouseUp);
@@ -356,6 +354,7 @@
       var target, transform = this._currentTransform,
           groupSelector = this._groupSelector,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+      this._cacheTransformEventData(e);
       target = this._target;
       this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
@@ -463,6 +462,7 @@
 
       var transform = this._currentTransform,
           target = transform.target,
+          eventName,
           options = {
             e: e,
             target: target,
@@ -477,14 +477,19 @@
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         if (transform.actionPerformed) {
-          this._addEventOptions(options, transform);
-          this._fire(options.eventName, options);
+          eventName = this._addEventOptions(options, transform);
+          this._fire(eventName, options);
         }
         this._fire('modified', options);
       }
     },
 
-
+    /**
+     * Mutate option object in order to add by property and give back the event name.
+     * @private
+     * @param {Object} options to mutate
+     * @param {Object} transform to inspect action from
+     */
     _addEventOptions: function(options, transform) {
       // we can probably add more details at low cost
       // scale change, rotation changes, translation changes
@@ -517,8 +522,8 @@
           eventName = 'moved';
           break;
       }
-      options.eventName = eventName;
-      options.eventSpec = by;
+      options.by = by;
+      return eventName;
     },
 
     /**
@@ -573,6 +578,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
+      this._cacheTransformEventData(e);
       this._handleEvent(e, 'down:before');
       var target = this._target;
       // if right click just fire events
