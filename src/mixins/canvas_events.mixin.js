@@ -575,9 +575,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-      console.log('inside the function', e.clientX)
       this._cacheTransformEventData(e);
-      console.log('after the cache', e.clientX)
       this._handleEvent(e, 'down:before');
       var target = this._target;
       // if right click just fire events
@@ -624,7 +622,6 @@
 
       if (this.selection && (!target ||
         (!target.selectable && !target.isEditing && target !== this._activeObject))) {
-          console.log('pointer->', pointer)
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
