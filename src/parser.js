@@ -542,7 +542,7 @@
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
-        parsedDim = { }, translateMatrix = '', widthDiff, heightDiff;
+        parsedDim = { }, translateMatrix = '', widthDiff = 0, heightDiff = 0;
 
     parsedDim.width = 0;
     parsedDim.height = 0;

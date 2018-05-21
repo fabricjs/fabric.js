@@ -1387,6 +1387,8 @@
     }
 
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+    var originalStrokeWidth = options.strokeWidth;
+    options.strokeWidth = 0;
 
     var text = new fabric.Text(textContent, options),
         textHeightScaleFactor = text.getScaledHeight() / text.height,
@@ -1407,7 +1409,8 @@
     }
     text.set({
       left: text.left - offX,
-      top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
+      top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight,
+      strokeWidth: typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
     });
     callback(text);
   };
