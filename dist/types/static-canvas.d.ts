@@ -73,7 +73,7 @@ export class StaticCanvas {
   getVpCenter(): Point;
 
   toDatalessJSON<T extends keyof this>(propertiesToInclude: (keyof T)[]): any; //todo
-  toObject<T extends keyof this>(propertiesToInclude: (keyof T)[]): any; //todo
+  toObject<T extends keyof this>(propertiesToInclude?: (keyof T)[]): any; //todo
   toDatalessObject<T extends keyof this>(propertiesToInclude: (keyof T)[]): any; //todo
 
   svgViewportTransformation: boolean;

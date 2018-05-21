@@ -267,6 +267,8 @@ export interface CanvasOptions extends StaticCanvasOptions {
    * @default
    */
   fireMiddleClick?: Boolean;
+
+  freeDrawingBrush?: any; // todo BaseBrush
 }
 
 export interface Canvas extends fabric.StaticCanvas, CanvasOptions {}
@@ -350,7 +352,7 @@ export class Canvas {
    * @param {Boolean} ignoreZoom
    * @return {Object} object with "x" and "y" number values
    */
-  getPointer(e: Event, ignoreZoom: boolean, upperCanvasEl: fabric.Object): Point;
+  getPointer(e: Event, ignoreZoom?: boolean, upperCanvasEl?: fabric.Object): Point;
 
   /**
    * Returns context of canvas where object selection is drawn
@@ -383,7 +385,7 @@ export class Canvas {
    * @return {Canvas} thisArg
    * @chainable
    */
-  setActiveObject(object: fabric.Object, e: Event): this;
+  setActiveObject(object: fabric.Object, e?: Event): this;
 
   /**
    * Discards currently active object and fire events. If the function is called by fabric
