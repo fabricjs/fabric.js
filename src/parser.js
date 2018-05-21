@@ -542,7 +542,7 @@
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
-        parsedDim = { }, translateMatrix = '';
+        parsedDim = { }, translateMatrix = '', widthDiff, heightDiff;
 
     parsedDim.width = 0;
     parsedDim.height = 0;
@@ -578,7 +578,28 @@
     preserveAspectRatio = fabric.util.parsePreserveAspectRatioAttribute(preserveAspectRatio);
     if (preserveAspectRatio.alignX !== 'none') {
       //translate all container for the effect of Mid, Min, Max
-      scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+      if (preserveAspectRatio.meetOrSlice === 'meet') {
+        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+        // calculate additional translation to move the viewbox
+      }
+      if (preserveAspectRatio.meetOrSlice === 'slice') {
+        scaleY = scaleX = (scaleX > scaleY ? scaleX : scaleY);
+        // calculate additional translation to move the viewbox
+      }
+      widthDiff = parsedDim.width - viewBoxWidth * scaleX;
+      heightDiff = parsedDim.height - viewBoxHeight * scaleX;
+      if (preserveAspectRatio.alignX === 'Mid') {
+        widthDiff /= 2;
+      }
+      if (preserveAspectRatio.alignY === 'Mid') {
+        heightDiff /= 2;
+      }
+      if (preserveAspectRatio.alignX === 'Min') {
+        widthDiff = 0;
+      }
+      if (preserveAspectRatio.alignY === 'Min') {
+        heightDiff = 0;
+      }
     }
 
     if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0 && x === 0 && y === 0) {
@@ -593,8 +614,8 @@
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
-                  (minX * scaleX) + ' ' +
-                  (minY * scaleY) + ') ';
+                  (minX * scaleX + widthDiff) + ' ' +
+                  (minY * scaleY + heightDiff) + ') ';
 
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
