@@ -248,18 +248,16 @@
      */
     toDatalessObject: function(propertiesToInclude) {
       var objsToObject, sourcePath = this.sourcePath;
-      if (sourcePath) {
-        objsToObject = sourcePath;
-      }
-      else {
-        objsToObject = this.getObjects().map(function(obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = obj.group.includeDefaultValues;
-          var _obj = obj.toDatalessObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
-      }
+      objsToObject = this.getObjects().map(function(obj) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        var _obj = obj.toDatalessObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        if (sourcePath) {
+          delete _obj.path;
+        }
+        return _obj;
+      });
       return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
         objects: objsToObject
       });
@@ -558,12 +556,26 @@
    * @param {Object} object Object to create a group from
    * @param {Function} [callback] Callback to invoke when an group instance is created
    */
-  fabric.Group.fromObject = function(object, callback) {
-    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
-      callback && callback(new fabric.Group(enlivenedObjects, options, true));
-    });
-  };
+fabric.Group.fromObject = function(object, callback) {
+    var options = fabric.util.object.clone(object, true);
 
+    if (typeof object.sourcePath === "string") {
+      var sourcePath = object.sourcePath;
+      fabric.loadSVGFromURL(sourcePath, function(elements) {
+        elements.forEach(function (obj, i) {
+          obj._setObject(object.objects[i]);
+        });
+        var group = fabric.util.groupSVGElements(elements);
+        group.setOptions(options);
+        callback && callback(group);
+      });
+    } 
+    else {
+      fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
+        delete options.objects;
+        callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      });
+    }
+  };
+  
 })(typeof exports !== 'undefined' ? exports : this);
