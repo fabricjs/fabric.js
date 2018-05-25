@@ -556,10 +556,10 @@
    * @param {Object} object Object to create a group from
    * @param {Function} [callback] Callback to invoke when an group instance is created
    */
-fabric.Group.fromObject = function(object, callback) {
+  fabric.Group.fromObject = function(object, callback) {
     var options = fabric.util.object.clone(object, true);
 
-    if (typeof object.sourcePath === "string") {
+    if (typeof object.sourcePath === 'string') {
       var sourcePath = object.sourcePath;
       fabric.loadSVGFromURL(sourcePath, function(elements) {
         elements.forEach(function (obj, i) {
@@ -569,7 +569,7 @@ fabric.Group.fromObject = function(object, callback) {
         group.setOptions(options);
         callback && callback(group);
       });
-    } 
+    }
     else {
       fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
         delete options.objects;
@@ -577,5 +577,5 @@ fabric.Group.fromObject = function(object, callback) {
       });
     }
   };
-  
+
 })(typeof exports !== 'undefined' ? exports : this);
