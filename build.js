@@ -253,11 +253,6 @@ else {
         process.exit(0);
       }
 
-      // add js wrapping in AMD closure for requirejs if necessary
-      if (amdLib !== false) {
-        exec('uglifyjs fabric.js ' + amdUglifyFlags + ' -b --output fabric.js');
-      }
-
       if (amdLib !== false) {
         console.log('Built distribution to ' + distributionPath + 'fabric.js (' + amdLib + '-compatible)');
       } else {
