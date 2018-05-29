@@ -25,11 +25,13 @@ env:
   global:
     - LAUNCHER=Node
 
-matrix:
-  allow_failures:
-  - node_js: 10
+jobs:
+
 
 jobs:
+  allow_failures:
+    - node_js: "10"
+    - env: LAUNCHER=Node
   include:
     - stage: Linting and Building
       env: STEP=LINT
