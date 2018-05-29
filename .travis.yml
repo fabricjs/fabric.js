@@ -29,6 +29,7 @@ jobs:
 
 
 jobs:
+  fast_finish: true
   allow_failures:
     - node_js: "10"
     - env: LAUNCHER=Node
