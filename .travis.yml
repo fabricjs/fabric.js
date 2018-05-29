@@ -4,7 +4,7 @@ services:
   - docker
 
 node_js:
-  - "6"
+  - "10"
 
 addons:
   apt:
@@ -26,6 +26,13 @@ env:
     - LAUNCHER=Node
 
 jobs:
+
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - node_js: "10"
+    - env: LAUNCHER=Node
   include:
     - stage: Linting and Building
       env: STEP=LINT
@@ -36,7 +43,7 @@ jobs:
           packages: # avoid installing packages
     - stage: Linting and Building
       env: STEP=BUILD
-      install: npm install uglify-js@3.1.x
+      install: npm install uglify-js@3.3.x
       script: 'npm run build'
       addons:
         apt:
@@ -53,6 +60,8 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
+    - stage: test
+      node_js: "10"
     - stage: test
       node_js: "9"
     - stage: test
