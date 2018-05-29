@@ -4,7 +4,7 @@ services:
   - docker
 
 node_js:
-  - "6"
+  - "10"
 
 addons:
   apt:
@@ -54,7 +54,7 @@ jobs:
         apt:
           packages: # avoid installing packages
     - stage: test
-      node_js: "9"
+      node_js: "10"
     - stage: test
       node_js: "8"
     - stage: test
