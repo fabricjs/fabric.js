@@ -340,7 +340,7 @@
      * @type Number
      * @default
      */
-    strokeMiterLimit:         10,
+    strokeMiterLimit:         4,
 
     /**
      * Shadow object representing shadow of this shape

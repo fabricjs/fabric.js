@@ -67,7 +67,7 @@
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
       'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         10,
+      'strokeMiterLimit':         4,
       'scaleX':                   1,
       'scaleY':                   1,
       'shadow':                   null,
