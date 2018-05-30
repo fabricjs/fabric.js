@@ -27,4 +27,13 @@
     var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
     assert.equal(selection, index, 'index value was NOT moved to next char, since is already at end of text');
   });
+  QUnit.test('_mouseDownHandlerBefore set up selected property', function(assert) {
+    var iText = new fabric.IText('test need some word\nsecond line');
+    assert.equal(iText.selected, undefined, 'iText has no selected property');
+    iText.canvas = {
+      _activeObject: iText,
+    };
+    iText._mouseDownHandlerBefore({ e: {} });
+    assert.equal(iText.selected, true, 'iText has selected property');
+  });
 })();
