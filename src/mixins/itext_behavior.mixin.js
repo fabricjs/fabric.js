@@ -58,13 +58,13 @@
      * @private
      */
     _initCanvasHandlers: function(canvas) {
-      canvas._mouseUpITextHandler = (function() {
+      canvas._mouseUpITextHandler = function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
             obj.__isMousedown = false;
           });
         }
-      }).bind(this);
+      };
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 
