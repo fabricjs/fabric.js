@@ -722,6 +722,13 @@
     assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
   });
 
+  QUnit.test('clearFabricFontCache wrong case', function(assert) {
+    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.util.clearFabricFontCache('ARIAL');
+    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+  });
+
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {
     assert.ok(typeof fabric.util.parsePreserveAspectRatioAttribute === 'function');
     var parsed;
