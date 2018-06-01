@@ -764,7 +764,8 @@
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
      * @memberOf fabric.util
      * @param {Number} ar aspect ratio
      * @param {Number} maximumArea Maximum area you want to achieve
