@@ -762,7 +762,7 @@
      * @param {String} [fontFamily] font family to clear
      */
     clearFabricFontCache: function(fontFamily) {
-      fontFamily = ('' || fontFamily).toLowerCase();
+      fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
         fabric.charWidthsCache = { };
       }
