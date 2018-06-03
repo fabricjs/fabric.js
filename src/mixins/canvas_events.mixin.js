@@ -46,7 +46,7 @@
       // this is a workaround to having double listeners.
       this.removeListeners();
       this._bindEvents();
-      this.addOrRemove(addListener, 'add')
+      this.addOrRemove(addListener, 'add');
     },
 
     addOrRemove: function(functor, eventjsFunctor) {
