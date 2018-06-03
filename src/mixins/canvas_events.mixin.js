@@ -46,32 +46,43 @@
       // this is a workaround to having double listeners.
       this.removeListeners();
       this._bindEvents();
+      this.addOrRemove(addListener, 'add');
+    },
 
-      addListener(fabric.window, 'resize', this._onResize);
-
-      // mouse events
-      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-      addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
-      addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
-      addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
-      addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      addListener(this.upperCanvasEl, 'dragover', this._onDragOver);
-      addListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
-      addListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
-      addListener(this.upperCanvasEl, 'drop', this._onDrop);
-      // touch events
-      addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
-      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
-
-      if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
-        eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
-        eventjs.add(this.upperCanvasEl, 'drag', this._onDrag);
-        eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
-        eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+    addOrRemove: function(functor, eventjsFunctor) {
+      functor(fabric.window, 'resize', this._onResize);
+      functor(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      functor(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
+      functor(this.upperCanvasEl, 'mouseout', this._onMouseOut);
+      functor(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
+      functor(this.upperCanvasEl, 'wheel', this._onMouseWheel);
+      functor(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
+      functor(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
+      functor(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
+      functor(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
+      functor(this.upperCanvasEl, 'dragover', this._onDragOver);
+      functor(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      functor(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      functor(this.upperCanvasEl, 'drop', this._onDrop);
+      if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'gesture', this._onGesture);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'drag', this._onDrag);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'shake', this._onShake);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'longpress', this._onLongPress);
       }
+    },
+
+    /**
+     * Removes all event listeners
+     */
+    removeListeners: function() {
+      this.addOrRemove(removeListener, 'remove');
+      // if you dispose on a mouseDown, before mouse up, you need to clean document to...
+      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
     },
 
     /**
@@ -101,35 +112,6 @@
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
       this._onDrop = this._simpleEventHandler.bind(this, 'drop');
       this.eventsBound = true;
-    },
-
-    /**
-     * Removes all event listeners
-     */
-    removeListeners: function() {
-      removeListener(fabric.window, 'resize', this._onResize);
-
-      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-      removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
-      removeListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
-      removeListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
-      removeListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
-      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
-      removeListener(this.upperCanvasEl, 'dragover', this._onDragOver);
-      removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
-      removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
-      removeListener(this.upperCanvasEl, 'drop', this._onDrop);
-
-      if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
-        eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-        eventjs.remove(this.upperCanvasEl, 'drag', this._onDrag);
-        eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
-        eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
-      }
     },
 
     /**
