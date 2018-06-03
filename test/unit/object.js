@@ -1019,6 +1019,15 @@
     assert.equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
   });
 
+  QUnit.test('_createCacheCanvas sets object as dirty', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
+    assert.equal(object.dirty, true, 'object is dirty after creation');
+    object.dirty = false;
+    assert.equal(object.dirty, false, 'object is not dirty after specifying it');
+    object._createCacheCanvas();
+    assert.equal(object.dirty, true, 'object is dirty again if cache gets created');
+  });
+
   QUnit.test('isCacheDirty statefullCache disabled', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
