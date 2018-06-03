@@ -122,6 +122,11 @@
       removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
       removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
       removeListener(this.upperCanvasEl, 'drop', this._onDrop);
+      // if you dispose on a mouseDown, before mouse up, you need to clean document to...
+      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
         eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
