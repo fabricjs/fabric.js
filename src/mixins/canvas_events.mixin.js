@@ -57,7 +57,7 @@
       functor(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
       functor(this.upperCanvasEl, 'wheel', this._onMouseWheel);
       functor(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      functor(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
+      functor(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
       functor(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
       functor(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
       functor(this.upperCanvasEl, 'dragover', this._onDragOver);
