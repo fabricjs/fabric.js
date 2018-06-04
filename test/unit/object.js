@@ -1032,7 +1032,6 @@
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
-    object._createCacheCanvas();
     object.dirty = false;
     object.statefullCache = false;
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
@@ -1043,7 +1042,6 @@
   QUnit.test('isCacheDirty statefullCache enabled', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     object.cacheProperties = ['propA', 'propB'];
-    object._createCacheCanvas();
     object.dirty = false;
     object.statefullCache = true;
     object.propA = 'A';
