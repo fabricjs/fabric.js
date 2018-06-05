@@ -1,4 +1,8 @@
+import { Object } from '../shapes/object';
+
 export class Collection {
+
+  _objects: Object[];
 
   /**
    * Adds objects to collection, Canvas or Group, then renders canvas
@@ -48,7 +52,7 @@ export class Collection {
    * @return {Self} thisArg
    * @chainable
    */
-  forEachObject(callback: (object: Object, index: number, allObjects: Object[]) => void, context: Object): this;
+  forEachObject(callback: (object: Object, index: number, allObjects: Object[]) => void, context?: Object): this;
 
   /**
    * Returns an array of children objects of this instance

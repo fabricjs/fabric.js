@@ -89,6 +89,9 @@ export { Text, TextOptions };
 import { Triangle, TriangleOptions } from "./shapes/triangle";
 export { Triangle, TriangleOptions };
 
+import { Ellipse, EllipseOptions } from "./shapes/ellipse";
+export { Ellipse, EllipseOptions };
+
 //#endregion
 
 //#region Canvas

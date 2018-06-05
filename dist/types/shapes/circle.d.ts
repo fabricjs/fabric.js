@@ -1,4 +1,6 @@
 import { ObjectOptions } from "./object";
+import { ObjectGeometry } from "../mixin/object_geometry";
+import { Object } from '../shapes/object';
 
 export interface Circle extends Object, CircleOptions {}
 export class Circle {
