@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.3.1' };
+var fabric = fabric || { version: '2.3.2' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1317,11 +1317,19 @@ fabric.CommonMethods = {
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Clear char widths cache for the given font family or all the cache if no
+     * fontFamily is specified.
+     * Use it if you know you are loading fonts in a lazy way and you are not waiting
+     * for custom fonts to load properly when adding text objects to the canvas.
+     * If a text object is added when its own font is not loaded yet, you will get wrong
+     * measurement and so wrong bounding boxes.
+     * After the font cache is cleared, either change the textObject text content or call
+     * initDimensions() to trigger a recalculation
      * @memberOf fabric.util
      * @param {String} [fontFamily] font family to clear
      */
     clearFabricFontCache: function(fontFamily) {
+      fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
         fabric.charWidthsCache = { };
       }
@@ -1331,7 +1339,8 @@ fabric.CommonMethods = {
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
      * @memberOf fabric.util
      * @param {Number} ar aspect ratio
      * @param {Number} maximumArea Maximum area you want to achieve
@@ -5197,7 +5206,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @memberOf fabric.Color
    */
   // eslint-disable-next-line max-len
-  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/;
+  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/i;
 
   /**
    * Regex matching color in HSL or HSLA formats (ex: hsl(200, 80%, 10%), hsla(300, 50%, 80%, 0.5), hsla( 300 , 50% , 80% , 0.5 ))
@@ -5205,7 +5214,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @field
    * @memberOf fabric.Color
    */
-  fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
+  fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}\%)\s*,\s*(\d{1,3}\%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/i;
 
   /**
    * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
@@ -10723,32 +10732,43 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // this is a workaround to having double listeners.
       this.removeListeners();
       this._bindEvents();
+      this.addOrRemove(addListener, 'add');
+    },
 
-      addListener(fabric.window, 'resize', this._onResize);
-
-      // mouse events
-      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-      addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
-      addListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
-      addListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
-      addListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      addListener(this.upperCanvasEl, 'dragover', this._onDragOver);
-      addListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
-      addListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
-      addListener(this.upperCanvasEl, 'drop', this._onDrop);
-      // touch events
-      addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
-      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
-
-      if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
-        eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
-        eventjs.add(this.upperCanvasEl, 'drag', this._onDrag);
-        eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
-        eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+    addOrRemove: function(functor, eventjsFunctor) {
+      functor(fabric.window, 'resize', this._onResize);
+      functor(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      functor(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
+      functor(this.upperCanvasEl, 'mouseout', this._onMouseOut);
+      functor(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
+      functor(this.upperCanvasEl, 'wheel', this._onMouseWheel);
+      functor(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
+      functor(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
+      functor(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
+      functor(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
+      functor(this.upperCanvasEl, 'dragover', this._onDragOver);
+      functor(this.upperCanvasEl, 'dragenter', this._onDragEnter);
+      functor(this.upperCanvasEl, 'dragleave', this._onDragLeave);
+      functor(this.upperCanvasEl, 'drop', this._onDrop);
+      if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'gesture', this._onGesture);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'drag', this._onDrag);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'shake', this._onShake);
+        eventjs[eventjsFunctor](this.upperCanvasEl, 'longpress', this._onLongPress);
       }
+    },
+
+    /**
+     * Removes all event listeners
+     */
+    removeListeners: function() {
+      this.addOrRemove(removeListener, 'remove');
+      // if you dispose on a mouseDown, before mouse up, you need to clean document to...
+      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
     },
 
     /**
@@ -10778,35 +10798,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
       this._onDrop = this._simpleEventHandler.bind(this, 'drop');
       this.eventsBound = true;
-    },
-
-    /**
-     * Removes all event listeners
-     */
-    removeListeners: function() {
-      removeListener(fabric.window, 'resize', this._onResize);
-
-      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
-      removeListener(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
-      removeListener(this.upperCanvasEl, 'wheel', this._onMouseWheel);
-      removeListener(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      removeListener(this.upperCanvasEl, 'doubleclick', this._onDoubleClick);
-      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'dragover', this._onDragOver);
-      removeListener(this.upperCanvasEl, 'dragenter', this._onDragEnter);
-      removeListener(this.upperCanvasEl, 'dragleave', this._onDragLeave);
-      removeListener(this.upperCanvasEl, 'drop', this._onDrop);
-
-      if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
-        eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-        eventjs.remove(this.upperCanvasEl, 'drag', this._onDrag);
-        eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
-        eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
-      }
     },
 
     /**
@@ -10934,8 +10925,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (e.type === 'touchstart') {
         // Unbind mousedown to prevent double triggers from touch devices
@@ -10943,7 +10934,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         addListener(fabric.document, 'mouseup', this._onMouseUp);
-        addListener(fabric.document, 'mousemove', this._onMouseMove);
+        addListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
       }
     },
 
@@ -10957,8 +10948,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       removeListener(fabric.document, 'mouseup', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
-      removeListener(fabric.document, 'mousemove', this._onMouseMove);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
@@ -11844,7 +11835,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.setCursor(this.defaultCursor);
       // clear selection and current transformation
       this._groupSelector = null;
-      this._currentTransform = null;
     }
   });
 
@@ -12812,6 +12802,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this._cacheCanvas = fabric.document.createElement('canvas');
       this._cacheContext = this._cacheCanvas.getContext('2d');
       this._updateCacheCanvas();
+      // if canvas gets created, is empty, so dirty.
+      this.dirty = true;
     },
 
     /**
@@ -13197,6 +13189,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.shouldCache()) {
         if (!this._cacheCanvas) {
           this._createCacheCanvas();
+
         }
         if (this.isCacheDirty()) {
           this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
@@ -14245,13 +14238,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     _getLeftTopCoords: function() {
       return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
     },
-
-    /**
-    * Callback; invoked right before object is about to go from active to inactive
-    */
-    onDeselect: function() {
-      /* NOOP */
-    }
   });
 
 })();
@@ -25016,7 +25002,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill;
+          maxHeight, currentFill, lastFill,
+          charSpacing = this._getWidthOfCharSpacing();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -25064,7 +25051,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
           top + this.offsets[type] * size + dy,
-          boxWidth,
+          boxWidth - charSpacing,
           this.fontSize / 15
         );
         topOffset += heightOfLine;
@@ -25976,18 +25963,19 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return this.cursorOffsetCache;
       }
       var lineLeftOffset,
-          lineIndex = 0,
-          charIndex = 0,
+          lineIndex,
+          charIndex,
           topOffset = 0,
           leftOffset = 0,
           boundaries,
           cursorPosition = this.get2DCursorLocation(position);
-      for (var i = 0; i < cursorPosition.lineIndex; i++) {
+      charIndex = cursorPosition.charIndex;
+      lineIndex = cursorPosition.lineIndex;
+      for (var i = 0; i < lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
-
-      lineLeftOffset = this._getLineLeftOffset(cursorPosition.lineIndex);
-      var bound = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex];
+      lineLeftOffset = this._getLineLeftOffset(lineIndex);
+      var bound = this.__charBounds[lineIndex][charIndex];
       bound && (leftOffset = bound.left);
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
@@ -26064,7 +26052,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             boxEnd = this.__charBounds[endLine][endChar].left;
           }
           else {
-            boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
+            var charSpacing = this._getWidthOfCharSpacing();
+            boxEnd = this.__charBounds[endLine][endChar - 1].left
+              + this.__charBounds[endLine][endChar - 1].width - charSpacing;
           }
         }
         realLineHeight = lineHeight;
@@ -26164,10 +26154,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
-    onDeselect: function(options) {
+    onDeselect: function() {
       this.isEditing && this.exitEditing();
       this.selected = false;
-      fabric.Object.prototype.onDeselect.call(this, options);
     },
 
     /**
@@ -26208,13 +26197,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     _initCanvasHandlers: function(canvas) {
-      canvas._mouseUpITextHandler = (function() {
+      canvas._mouseUpITextHandler = function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
             obj.__isMousedown = false;
           });
         }
-      }).bind(this);
+      };
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 
@@ -27080,7 +27069,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.__lastPointer = { };
 
-    this.on('mousedown', this.onMouseDown.bind(this));
+    this.on('mousedown', this.onMouseDown);
   },
 
   /**
@@ -27092,7 +27081,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     this.__newClickTime = +new Date();
-    var newPointer = this.canvas.getPointer(options.e);
+    var newPointer = options.pointer;
     if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
@@ -27150,10 +27139,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
       return;
     }
-    var pointer = this.canvas.getPointer(options.e);
 
-    this.__mousedownX = pointer.x;
-    this.__mousedownY = pointer.y;
     this.__isMousedown = true;
 
     if (this.selected) {
@@ -27170,21 +27156,25 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * Default event handler for the basic functionalities needed on mousedown:before
+   * can be overridden to do something different.
+   * Scope of this implementation is: verify the object is already selected when mousing down
+   */
+  _mouseDownHandlerBefore: function(options) {
+    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+    if (this === this.canvas._activeObject) {
+      this.selected = true;
+    }
+  },
+
+  /**
    * Initializes "mousedown" event handler
    */
   initMousedownHandler: function() {
     this.on('mousedown', this._mouseDownHandler);
-  },
-
-  /**
-   * detect if object moved
-   * @private
-   */
-  _isObjectMoved: function(e) {
-    var pointer = this.canvas.getPointer(e);
-
-    return this.__mousedownX !== pointer.x ||
-           this.__mousedownY !== pointer.y;
+    this.on('mousedown:before', this._mouseDownHandlerBefore);
   },
 
   /**
@@ -27200,7 +27190,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   mouseUpHandler: function(options) {
     this.__isMousedown = false;
-    if (!this.editable || this._isObjectMoved(options.e) || (options.e.button && options.e.button !== 1)) {
+    if (!this.editable ||
+      (options.transform && options.transform.actionPerformed) ||
+      (options.e.button && options.e.button !== 1)) {
       return;
     }
 
