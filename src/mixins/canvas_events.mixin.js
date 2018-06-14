@@ -484,11 +484,14 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUpInDrawingMode: function(e) {
-      this._isCurrentlyDrawing = false;
+      var holdDrawing = e.touches && e.touches.length > 0 && e.touches[0].identifier !== e.changedTouces[0].identifier;
+      if (!holdDrawing) {
+        this._isCurrentlyDrawing = false;
+        this.freeDrawingBrush.onMouseUp();
+      }
       if (this.clipTo) {
         this.contextTop.restore();
       }
-      this.freeDrawingBrush.onMouseUp();
       this._handleEvent(e, 'up');
     },
 
@@ -520,7 +523,7 @@
       }
 
       if (this.isDrawingMode) {
-        this._onMouseDownInDrawingMode(e);
+        !this._isCurrentlyDrawing && this._onMouseDownInDrawingMode(e);
         return;
       }
 
