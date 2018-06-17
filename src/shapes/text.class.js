@@ -161,15 +161,6 @@
      */
     textBackgroundColor:  '',
 
-
-    /**
-     * Zerowidth characters, characters that may return undefined when measured,
-     * will forcely return 0.
-     * @type Array
-     * @default
-     */
-    zwc:  ['\u200b', '\u200c', '\u200d'],
-
     /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
