@@ -161,6 +161,15 @@
      */
     textBackgroundColor:  '',
 
+
+    /**
+     * Zerowidth characters, characters that may return undefined when measured,
+     * will forcely return 0.
+     * @type Array
+     * @default
+     */
+    zwc:  ['\u200b', '\u200c', '\u200d'],
+
     /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
@@ -629,36 +638,38 @@
      * @param {Object} [prevCharStyle] style of previous char
      */
     _measureChar: function(_char, charStyle, previousChar, prevCharStyle) {
+      // if we are measuring a single ZWC, whatever is previous, return
+
       // first i try to return from cache
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
           fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE, kernedWidth;
 
-      if (previousChar && fontCache[previousChar]) {
+      if (previousChar && fontCache[previousChar] !== undefined) {
         previousWidth = fontCache[previousChar];
       }
-      if (fontCache[_char]) {
+      if (fontCache[_char] !== undefined) {
         kernedWidth = width = fontCache[_char];
       }
-      if (stylesAreEqual && fontCache[couple]) {
+      if (stylesAreEqual && fontCache[couple] !== undefined) {
         coupleWidth = fontCache[couple];
         kernedWidth = coupleWidth - previousWidth;
       }
-      if (!width || !previousWidth || !coupleWidth) {
+      if (width === undefined || previousWidth === undefined || coupleWidth === undefined) {
         var ctx = this.getMeasuringContext();
         // send a TRUE to specify measuring font size CACHE_FONT_SIZE
         this._setTextStyles(ctx, charStyle, true);
       }
-      if (!width) {
+      if (width === undefined) {
         kernedWidth = width = ctx.measureText(_char).width;
         fontCache[_char] = width;
       }
-      if (!previousWidth && stylesAreEqual && previousChar) {
+      if (previousWidth === undefined && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
         fontCache[previousChar] = previousWidth;
       }
-      if (stylesAreEqual && !coupleWidth) {
+      if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth;
