@@ -629,8 +629,6 @@
      * @param {Object} [prevCharStyle] style of previous char
      */
     _measureChar: function(_char, charStyle, previousChar, prevCharStyle) {
-      // if we are measuring a single ZWC, whatever is previous, return
-
       // first i try to return from cache
       var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char,
