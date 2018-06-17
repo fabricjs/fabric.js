@@ -77,7 +77,7 @@
     var text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
-    assert.ok(typeof fontDecl == 'string', 'it returns a string');
+    assert.ok(typeof fontDecl === 'string', 'it returns a string');
     assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
     text.fontFamily = '"Times New Roman"';
     fontDecl = text._getFontDeclaration();
@@ -85,6 +85,18 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+  });
+
+  fabric.Text.genericFonts.forEach(function(fontName) {
+    QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
+      var text = createTextObject();
+      text.fontFamily = fontName;
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName, 'it does not quote ' + fontName);
+      text.fontFamily = fontName.toUpperCase();
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
+    });
   });
 
   QUnit.test('toObject', function(assert) {
