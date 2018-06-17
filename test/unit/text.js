@@ -77,7 +77,7 @@
     var text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
-    assert.ok(typeof fontDecl == 'string', 'it returns a string');
+    assert.ok(typeof fontDecl === 'string', 'it returns a string');
     assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
     text.fontFamily = '"Times New Roman"';
     fontDecl = text._getFontDeclaration();
@@ -85,6 +85,18 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+  });
+
+  fabric.Text.genericFonts.forEach(function(fontName) {
+    QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
+      var text = createTextObject();
+      text.fontFamily = fontName;
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName, 'it does not quote ' + fontName);
+      text.fontFamily = fontName.toUpperCase();
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
+    });
   });
 
   QUnit.test('toObject', function(assert) {
@@ -727,5 +739,16 @@
     assert.equal(Math.round(height1), 52, 'height of line with text is ok');
     assert.equal(Math.round(height2), 52, 'height of empty line is ok');
     assert.equal(height1, height2, 'should have same height');
+  });
+
+  QUnit.test('_measureChar handles 0 width chars', function(assert) {
+    fabric.charWidthsCache = {};
+    var zwc =  '\u200b';
+    var text = new fabric.Text('');
+    var style = text.getCompleteStyleDeclaration(0, 0);
+    var box = text._measureChar('a', style, zwc, style);
+    var box2 = text._measureChar('a', style, zwc, style);
+    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 })();
