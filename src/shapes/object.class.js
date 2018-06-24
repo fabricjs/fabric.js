@@ -1224,6 +1224,7 @@
     },
 
     _setClippingProperties: function(ctx) {
+      ctx.globalAlpha = 1;
       ctx.lineWidth = 0;
       ctx.fillStyle = 'black';
     },

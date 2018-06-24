@@ -49,8 +49,9 @@ testrunner.run({
     './test/unit/textbox.js',
     './test/unit/canvas_events.js',
     './test/unit/text_to_svg.js',
+    './test/unit/object_clipPath.js',
   ],
-  // tests: ['./test/unit/text.js',],
+  // tests: ['./test/unit/object_clipPath.js',],
 }, function(err, report) {
   if (err) {
     console.log(err);
