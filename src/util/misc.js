@@ -764,11 +764,19 @@
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Clear char widths cache for the given font family or all the cache if no
+     * fontFamily is specified.
+     * Use it if you know you are loading fonts in a lazy way and you are not waiting
+     * for custom fonts to load properly when adding text objects to the canvas.
+     * If a text object is added when its own font is not loaded yet, you will get wrong
+     * measurement and so wrong bounding boxes.
+     * After the font cache is cleared, either change the textObject text content or call
+     * initDimensions() to trigger a recalculation
      * @memberOf fabric.util
      * @param {String} [fontFamily] font family to clear
      */
     clearFabricFontCache: function(fontFamily) {
+      fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
         fabric.charWidthsCache = { };
       }
@@ -778,7 +786,8 @@
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
      * @memberOf fabric.util
      * @param {Number} ar aspect ratio
      * @param {Number} maximumArea Maximum area you want to achieve

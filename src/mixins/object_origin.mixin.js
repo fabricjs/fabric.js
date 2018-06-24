@@ -250,13 +250,6 @@
     _getLeftTopCoords: function() {
       return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
     },
-
-    /**
-    * Callback; invoked right before object is about to go from active to inactive
-    */
-    onDeselect: function() {
-      /* NOOP */
-    }
   });
 
 })();

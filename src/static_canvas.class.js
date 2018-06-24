@@ -165,6 +165,8 @@
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
+     * @deprecated since 2.3.0
+     * Use before:transform event
      */
     onBeforeScaleRotate: function () {
       /* NOOP */
@@ -599,6 +601,7 @@
         if (!options.cssOnly) {
           this._setBackstoreDimension(prop, dimensions[prop]);
           cssValue += 'px';
+          this.hasLostContext = true;
         }
 
         if (!options.backstoreOnly) {

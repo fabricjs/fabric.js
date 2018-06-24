@@ -15,10 +15,9 @@
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
-    onDeselect: function(options) {
+    onDeselect: function() {
       this.isEditing && this.exitEditing();
       this.selected = false;
-      fabric.Object.prototype.onDeselect.call(this, options);
     },
 
     /**
@@ -59,13 +58,13 @@
      * @private
      */
     _initCanvasHandlers: function(canvas) {
-      canvas._mouseUpITextHandler = (function() {
+      canvas._mouseUpITextHandler = function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
             obj.__isMousedown = false;
           });
         }
-      }).bind(this);
+      };
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 

@@ -45,16 +45,24 @@
      */
     onMouseMove: function(pointer) {
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
-        var points = this._points, length = points.length, ctx = this.canvas.contextTop;
-        // draw the curve update
-        this._saveAndTransform(ctx);
-        if (this.oldEnd) {
-          ctx.beginPath();
-          ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+        if (this.needsFullRender) {
+          // redraw curve
+          // clear top canvas
+          this.canvas.clearContext(this.canvas.contextTop);
+          this._render();
         }
-        this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
-        ctx.stroke();
-        ctx.restore();
+        else {
+          var points = this._points, length = points.length, ctx = this.canvas.contextTop;
+          // draw the curve update
+          this._saveAndTransform(ctx);
+          if (this.oldEnd) {
+            ctx.beginPath();
+            ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+          }
+          this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
+          ctx.stroke();
+          ctx.restore();
+        }
       }
     },
 
@@ -98,6 +106,8 @@
     _reset: function() {
       this._points.length = 0;
       this._setBrushStyles();
+      var color = new fabric.Color(this.color);
+      this.needsFullRender = (color.getAlpha() < 1);
       this._setShadow();
     },
 
