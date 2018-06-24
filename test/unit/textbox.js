@@ -51,7 +51,7 @@
     transformMatrix: null,
     charSpacing: 0,
     styles: { },
-    minWidth: 20,
+    minWidth: 20
   };
 
   QUnit.test('constructor', function(assert) {

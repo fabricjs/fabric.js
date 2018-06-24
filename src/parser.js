@@ -617,15 +617,9 @@
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
-<<<<<<< HEAD
-                  (minX * scaleX) + ' ' +
-                  (minY * scaleY) + ') ';
-    parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
-=======
                   (minX * scaleX + widthDiff) + ' ' +
                   (minY * scaleY + heightDiff) + ') ';
-
->>>>>>> master
+    parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
       // element.firstChild != null

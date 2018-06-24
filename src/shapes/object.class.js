@@ -602,7 +602,7 @@
      * a fabricObject that, without stroke define a clipping area with their opacity
      * @type fabric.Object
      */
-    clipPath: null,
+    clipPath: undefined,
 
     /**
      * Constructor
@@ -833,8 +833,12 @@
             globalCompositeOperation: this.globalCompositeOperation,
             transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : null,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
-            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
+            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
           };
+
+      if (this.clipPath) {
+        object.clipPath = this.clipPath.toObject();
+      }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
       if (!this.includeDefaultValues) {
@@ -1835,8 +1839,11 @@
       if (typeof patterns[1] !== 'undefined') {
         object.stroke = patterns[1];
       }
-      var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
-      callback && callback(instance);
+      fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+        object.clipPath = enlivedProps[0];
+        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
+        callback && callback(instance);
+      });
     });
   };
 
