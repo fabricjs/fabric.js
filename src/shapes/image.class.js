@@ -92,15 +92,6 @@
     stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
-     * When `true`, object is cached on an additional canvas.
-     * default to false for images
-     * since 1.7.0
-     * @type Boolean
-     * @default
-     */
-    objectCaching: false,
-
-    /**
      * key used to retrieve the texture representing this image
      * since 2.0.0
      * @type String

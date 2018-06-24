@@ -326,8 +326,16 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
+      var path = this.clipPath;
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].render(ctx);
+      }
+      if (path) {
+        // needed to setup a couple of variables
+        path.shouldCache();
+        path._transformDone = true;
+        path.renderCache(this, true);
+        this.drawClipPathOnCache(ctx);
       }
     },
 
