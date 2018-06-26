@@ -1,7 +1,4 @@
-(function(){
-  // set global variable
-  this.foo = 'bar';
-  this.window = undefined;
-  this.document = undefined;
-
-})();
+var pixelmatch = require('pixelmatch');
+var fs = require('fs');
+global.pixelmatch = pixelmatch;
+global.fs = fs;
