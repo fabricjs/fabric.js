@@ -29,10 +29,7 @@ env:
 jobs:
   fast_finish: true
   allow_failures:
-    - stage: Unit Tests
-      node_js: "10"
-      env: LAUNCHER=Node
-    - stage: Visual Tests
+    - env: LAUNCHER=Node CANFAIL=TRUE
   include:
     - stage: Linting and Building
       env: STEP=LINT
@@ -61,6 +58,7 @@ jobs:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
+      env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "10"
     - stage: Unit Tests
       node_js: "9"
@@ -72,6 +70,7 @@ jobs:
       node_js: "4"
     - stage: Visual Tests
       node_js: "8"
+      env: LAUNCHER=Node CANFAIL=TRUE
       script: npm run test:visual
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
