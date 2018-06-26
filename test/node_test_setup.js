@@ -5,3 +5,4 @@ global.fs = require('fs');
 
 QUnit.config.testTimeout = 10000;
 QUnit.config.noglobals = true;
+QUnit.config.hidePassed = true;
