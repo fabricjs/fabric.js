@@ -15,7 +15,8 @@ addons:
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building
-  - test
+  - Unit Tests
+  - Visual Tests
 
 cache:
   directories:
@@ -26,13 +27,9 @@ env:
     - LAUNCHER=Node
 
 jobs:
-
-
-jobs:
   fast_finish: true
   allow_failures:
-    - node_js: "10"
-    - env: LAUNCHER=Node
+    - env: LAUNCHER=Node CANFAIL=TRUE
   include:
     - stage: Linting and Building
       env: STEP=LINT
@@ -48,28 +45,33 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Unit Tests
       env: LAUNCHER=Chrome
       install: npm install testem@1.18.4 qunit@2.4.1
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Unit Tests
       env: LAUNCHER=Firefox
       install: npm install testem@1.18.4 qunit@2.4.1
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Unit Tests
+      env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "10"
-    - stage: test
+    - stage: Unit Tests
       node_js: "9"
-    - stage: test
+    - stage: Unit Tests
       node_js: "8"
-    - stage: test
+    - stage: Unit Tests
       node_js: "6"
-    - stage: test
+    - stage: Unit Tests
       node_js: "4"
+    - stage: Visual Tests
+      node_js: "8"
+      env: LAUNCHER=Node CANFAIL=TRUE
+      script: npm run test:visual
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
