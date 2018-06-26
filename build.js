@@ -173,6 +173,7 @@ var filesToInclude = [
   ifSpecifiedInclude('gestures', 'src/mixins/canvas_gestures.mixin.js'),
 
   'src/shapes/object.class.js',
+  'src/mixins/object_behavior.mixin.js',
   'src/mixins/object_origin.mixin.js',
   'src/mixins/object_geometry.mixin.js',
   'src/mixins/object_stacking.mixin.js',
