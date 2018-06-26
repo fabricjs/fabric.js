@@ -24,7 +24,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test:node",
+      "command": "npm run test",
       "protocol": "tap"
     }
   },
