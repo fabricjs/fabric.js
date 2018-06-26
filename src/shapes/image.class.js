@@ -387,13 +387,22 @@
       else {
         elementToDraw = this._element;
       }
-      elementToDraw && ctx.drawImage(elementToDraw,
+      try {
+        elementToDraw && ctx.drawImage(elementToDraw,
                     x + imageMargins.marginX,
                     y + imageMargins.marginY,
                     imageMargins.width,
                     imageMargins.height
-                   );
-           
+        );
+      } catch (e) {
+        if (!!fabric.stileLog) {
+            fabric.stileLog.info("Failed to draw image (logging fields for further investigation)", {
+                imageMargins: imageMargins,
+                elementToDraw: elementToDraw,
+                ctx: ctx,
+            });
+        }
+      }
       this._renderStroke(ctx);
     },
 
