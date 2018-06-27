@@ -901,7 +901,7 @@
       excludeFromExport: true
     });
     canvas.toSVG(null, reviver);
-    assert.equal(reviverCount, len - 1 , 'reviver should not include objects with excludeFromExport and backgroundImage');
+    assert.equal(reviverCount, len - 1 , 'reviver should not include objects with excludeFromExport and backgroundImage & overlayImage');
 
     canvas.setBackgroundImage(null);
     canvas.setOverlayImage(null);
