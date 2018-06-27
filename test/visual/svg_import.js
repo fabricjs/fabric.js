@@ -4,7 +4,7 @@
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
   var pixelmatchOptions = {
     includeAA: true,
-    threshold: 0.05,
+    threshold: 0.1
   };
 
   function getAbsolutePath(path) {
@@ -75,23 +75,27 @@
   });
 
   [
-    'svg_stroke_1',
-    'svg_stroke_2',
-    'svg_stroke_3',
-    'svg_stroke_4',
-    'svg_stroke_5',
-    'svg_stroke_6',
-    'svg_stroke_7',
-    'svg_stroke_8',
-  ].forEach(function(filename) {
+    ['svg_stroke_1', 0],
+    ['svg_stroke_2', 0],
+    ['svg_stroke_3', 0],
+    ['svg_stroke_4', 8],
+    ['svg_stroke_5', 4],
+    ['svg_stroke_6', 83],
+    ['svg_stroke_7', 0],
+    ['svg_stroke_8', 0],
+  ].forEach(function(filenameArray) {
+    var filename = filenameArray[0];
+    var expectedPixels = filenameArray[1];
     QUnit.test('Import test for file ' + filename, function(assert) {
       var done = assert.async();
       loadAndPrepareCanvasFor(filename, function(imageDataCanvas, imageDataGolden, width, height, output) {
         var totalPixels = width * height;
         var percentage = 0.01;
         var differentPixels = pixelmatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
-        assert.ok(differentPixels < totalPixels * percentage, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + differentPixels / totalPixels * 100 + '%');
+        var percDiff = differentPixels / totalPixels * 100;
+        assert.ok(differentPixels < totalPixels * percentage, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%');
         done();
+        console.log('Different pixels for ', filename, ': ', differentPixels, '/', totalPixels, ' expected:', expectedPixels, ' diff: ', percDiff.toFixed(3), '%');
       });
     });
   });
