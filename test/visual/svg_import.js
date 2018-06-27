@@ -83,6 +83,26 @@
     ['svg_stroke_6', 83],
     ['svg_stroke_7', 0],
     ['svg_stroke_8', 0],
+    ['svg_linear_1', 0],
+    ['svg_linear_2', 0],
+    ['svg_linear_3', 0],
+    ['svg_linear_4', 14],
+    ['svg_linear_5', 8],
+    ['svg_linear_6', 83],
+    ['svg_linear_7', 0],
+    ['svg_linear_8', 0],
+    ['svg_radial_1', 100],
+    ['svg_radial_2', 0],
+    ['svg_radial_3', 0],
+    ['svg_radial_4', 143],
+    ['svg_radial_5', 143],
+    ['svg_radial_6', 8],
+    ['svg_radial_8', 0],
+    ['svg_radial_9', 8],
+    ['svg_radial_10', 12],
+    ['svg_radial_11', 0],
+    ['svg_radial_12', 8],
+    ['svg_radial_13', 4],
   ].forEach(function(filenameArray) {
     var filename = filenameArray[0];
     var expectedPixels = filenameArray[1];
@@ -95,7 +115,7 @@
         var percDiff = differentPixels / totalPixels * 100;
         assert.ok(differentPixels < totalPixels * percentage, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%');
         done();
-        console.log('Different pixels for ', filename, ': ', differentPixels, '/', totalPixels, ' expected:', expectedPixels, ' diff: ', percDiff.toFixed(3), '%');
+        console.log('Different pixels for', filename, ':', differentPixels, '/', totalPixels, 'expected:', expectedPixels, ' diff:', percDiff.toFixed(3), '%');
       });
     });
   });
