@@ -70,7 +70,6 @@ jobs:
       node_js: "4"
     - stage: Visual Tests
       node_js: "8"
-      env: LAUNCHER=Node CANFAIL=TRUE
       script: npm run test:visual
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
