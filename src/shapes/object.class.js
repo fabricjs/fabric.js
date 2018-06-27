@@ -454,28 +454,28 @@
      * @type Number
      * @default
      */
-    minWidth:                null,
+    minWidth:                Number.NEGATIVE_INFINITY,
 
     /**
      * When not null, will not allow the width of the object to be larger than the value
      * @type Number
      * @default
      */
-    maxWidth:                null,
+    maxWidth:                Number.POSITIVE_INFINITY,
 
     /**
      * When not null, will not allow the height of the object to be smaller than the value
      * @type Number
      * @default
      */
-    minHeight:                null,
+    minHeight:                Number.NEGATIVE_INFINITY,
 
     /**
      * When not null, will not allow the height of the object to be larger than the value
      * @type Number
      * @default
      */
-    maxHeight:                null,
+    maxHeight:                Number.POSITIVE_INFINITY,
 
     /**
      * When `true`, object horizontal movement is locked
@@ -872,38 +872,6 @@
     toDatalessObject: function(propertiesToInclude) {
       // will be overwritten by subclasses
       return this.toObject(propertiesToInclude);
-    },
-
-    /**
-     * Returns the minimum width of the object
-     * @return {Number}
-     */
-    getMinWidth: function() {
-      return this.minWidth ? this.minWidth : Number.NEGATIVE_INFINITY;
-    },
-
-    /**
-     * Returns the maximum width of the object
-     * @return {Number}
-     */
-    getMaxWidth: function() {
-      return this.maxWidth ? this.maxWidth : Number.POSITIVE_INFINITY;
-    },
-
-    /**
-     * Returns the minimum height of the object
-     * @return {Number}
-     */
-    getMinHeight: function() {
-      return this.minHeight ? this.minHeight : Number.NEGATIVE_INFINITY;
-    },
-
-    /**
-     * Returns the maximum height of the object
-     * @return {Number}
-     */
-    getMaxHeight: function() {
-      return this.maxHeight ? this.maxHeight : Number.POSITIVE_INFINITY;
     },
 
     /**
