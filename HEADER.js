@@ -1,10 +1,14 @@
- /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.0.0-beta7' };
+var fabric = fabric || { version: '2.3.3' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
-
+/* _AMD_START_ */
+else if (typeof define === 'function' && define.amd) {
+  define([], function() { return fabric; });
+}
+/* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
@@ -17,9 +21,11 @@ else {
       { features: {
         FetchExternalResources: ['img']
       }
-    });
-
+      });
+  fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
+  fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
   fabric.window = fabric.document.defaultView;
+  DOMParser = require('xmldom').DOMParser;
 }
 
 /**
@@ -118,6 +124,21 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
                           fabric.window.webkitDevicePixelRatio ||
                           fabric.window.mozDevicePixelRatio ||
                           1;
+/**
+ * Browser-specific constant to adjust CanvasRenderingContext2D.shadowBlur value,
+ * which is unitless and not rendered equally across browsers.
+ *
+ * Values that work quite well (as of October 2017) are:
+ * - Chrome: 1.5
+ * - Edge: 1.75
+ * - Firefox: 0.9
+ * - Safari: 0.95
+ *
+ * @since 2.0.0
+ * @type Number
+ * @default 1
+ */
+fabric.browserShadowBlurConstant = 1;
 
 fabric.initFilterBackend = function() {
   if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {

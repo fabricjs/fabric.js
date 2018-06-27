@@ -10,6 +10,21 @@
     return src;
   }
 
+  function makeImageElement(attributes) {
+    var element = {};
+    element.getAttribute = function(x) {
+      return element[x];
+    };
+    element.setAttribute = function(x, value) {
+      element[x] = value;
+    };
+    for (var prop in attributes) {
+      element.setAttribute(prop, attributes[prop]);
+    }
+    return element;
+  }
+
+
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
@@ -29,7 +44,7 @@
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -54,24 +69,15 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback, options) {
     var elImage = _createImageElement();
     setSrc(elImage, IMG_SRC, function() {
-      if (width != elImage.width || height != elImage.height) {
-        if (fabric.isLikelyNode) {
-          var Canvas = require(fabric.canvasModule);
-          var canvas = new Canvas(width, height);
-          canvas.getContext('2d').drawImage(elImage, 0, 0, width, height);
-          elImage._src = canvas.toDataURL();
-          elImage.src = elImage._src;
-        }
-        else {
-          elImage.width = width;
-          elImage.height = height;
-        }
+      if (width !== elImage.width || height !== elImage.height) {
+        elImage.width = width;
+        elImage.height = height;
         callback(new fabric.Image(elImage, options));
       }
       else {
@@ -89,20 +95,10 @@
   }
 
   function setSrc(img, src, callback) {
-    if (fabric.isLikelyNode) {
-      require('fs').readFile(src, function(err, imgData) {
-        if (err) { throw err; };
-        img.src = imgData;
-        img._src = src;
-        callback && callback();
-      });
-    }
-    else {
-      img.onload = function() {
-        callback && callback();
-      };
-      img.src = src;
-    }
+    img.onload = function() {
+      callback && callback();
+    };
+    img.src = src;
   }
 
   QUnit.module('fabric.Image');
@@ -135,6 +131,22 @@
       }
       assert.deepEqual(toObject, REFERENCE_IMG_OBJECT);
       done();
+    });
+  });
+
+  QUnit.test('setSrc', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.width = 100;
+      image.height = 100;
+      assert.ok(typeof image.setSrc === 'function');
+      assert.equal(image.width, 100);
+      assert.equal(image.height, 100);
+      image.setSrc(IMG_SRC, function() {
+        assert.equal(image.width, IMG_WIDTH);
+        assert.equal(image.height, IMG_HEIGHT);
+        done();
+      });
     });
   });
 
@@ -185,8 +197,10 @@
       var width = image.width, height = image.height;
       assert.ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       image.applyFilters();
-      assert.equal(image.width, Math.floor(width / 5), 'width should be a fifth');
-      assert.equal(image.height, Math.floor(height / 5), 'height should a fifth');
+      assert.equal(image.width, Math.floor(width), 'width is not changed');
+      assert.equal(image.height, Math.floor(height), 'height is not changed');
+      assert.equal(image._filterScalingX.toFixed(1), 0.2, 'a new scaling factor is made for x');
+      assert.equal(image._filterScalingY.toFixed(1), 0.2, 'a new scaling factor is made for y');
       var toObject = image.toObject();
       assert.deepEqual(toObject.filters[0], filter.toObject());
       assert.equal(toObject.width, width, 'width is stored as before filters');
@@ -196,8 +210,6 @@
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
         assert.equal(filterFromObj.scaleX, 0.2);
-        assert.equal(_imageFromObject.width, Math.floor(width / 5), 'on image reload width is halved again');
-        assert.equal(_imageFromObject.height, Math.floor(height / 5), 'on image reload width is halved again');
         done();
       });
     });
@@ -212,11 +224,44 @@
     });
   });
 
+  QUnit.test('toSVG wit crop', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.cropX = 1;
+      image.cropY = 1;
+      image.width -= 2;
+      image.height -= 2;
+      fabric.Object.__uid = 1;
+      var expectedSVG = '<clipPath id="imageCrop_1">\n\t<rect x="-137" y="-54" width="274" height="108" />\n</clipPath>\n<g transform="translate(137 54)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110" clip-path="url(#imageCrop_1)" ></image>\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
+  QUnit.test('hasCrop', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      assert.ok(typeof image.hasCrop === 'function');
+      assert.equal(image.hasCrop(), false, 'standard image has no crop');
+      image.cropX = 1;
+      assert.equal(image.hasCrop(), true, 'cropX !== 0 gives crop true');
+      image.cropX = 0;
+      image.cropY = 1;
+      assert.equal(image.hasCrop(), true, 'cropY !== 0 gives crop true');
+      image.width -= 1;
+      assert.equal(image.hasCrop(), true, 'width < element.width gives crop true');
+      image.width += 1;
+      image.height -= 1;
+      assert.equal(image.hasCrop(), true, 'height < element.height gives crop true');
+      done();
+    });
+  });
+
   QUnit.test('toSVG', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toSVG === 'function');
-      var expectedSVG = '<g transform="translate(138 55)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110"></image>\n</g>\n';
+      var expectedSVG = '<g transform="translate(138 55)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110"></image>\n</g>\n';
       assert.equal(image.toSVG(), expectedSVG);
       done();
     });
@@ -244,10 +289,29 @@
       assert.ok(typeof image.setElement === 'function');
 
       var elImage = _createImageElement();
+      assert.notEqual(image.getElement(), elImage);
       assert.equal(image.setElement(elImage), image, 'chainable');
       assert.equal(image.getElement(), elImage);
       assert.equal(image._originalElement, elImage);
+      done();
+    });
+  });
 
+  QUnit.test('setElement resets the webgl cache', function(assert) {
+    var done = assert.async();
+    var fabricBackend = fabric.filterBackend;
+    createImageObject(function(image) {
+      fabric.filterBackend = {
+        textureCache: {},
+        evictCachesForKey: function(key) {
+          delete this.textureCache[key];
+        }
+      };
+      var elImage = _createImageElement();
+      fabric.filterBackend.textureCache[image.cacheKey] = 'something';
+      assert.equal(image.setElement(elImage), image, 'chainable');
+      assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
+      fabric.filterBackend = fabricBackend;
       done();
     });
   });
@@ -322,6 +386,39 @@
     });
   });
 
+  QUnit.test('fromObject does not mutate data', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Image.fromObject === 'function');
+
+    var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+      src: IMG_SRC
+    });
+    var brightness = {
+      type: 'Brightness',
+      brightness: 0.1
+    };
+    var contrast = {
+      type: 'Contrast',
+      contrast: 0.1
+    };
+    obj.filters = [brightness];
+    obj.resizeFilter = contrast;
+    var copyOfFilters = obj.filters;
+    var copyOfBrighteness = brightness;
+    var copyOfContrast = contrast;
+    var copyOfObject = obj;
+    fabric.Image.fromObject(obj, function(){
+      assert.ok(copyOfFilters === obj.filters, 'filters array did not mutate');
+      assert.ok(copyOfBrighteness === copyOfFilters[0], 'filter is same object');
+      assert.deepEqual(copyOfBrighteness, obj.filters[0], 'did not mutate filter');
+      assert.deepEqual(copyOfFilters, obj.filters, 'did not mutate array');
+      assert.deepEqual(copyOfContrast, obj.resizeFilter, 'did not mutate object');
+      assert.deepEqual(copyOfObject, obj, 'did not change any value');
+      assert.ok(copyOfContrast === obj.resizeFilter, 'resizefilter is same object');
+      done();
+    });
+  });
+
   QUnit.test('fromURL', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
@@ -334,21 +431,6 @@
 
   QUnit.test('fromElement', function(assert) {
     var done = assert.async();
-    function makeImageElement(attributes) {
-      var element = _createImageElement();
-      if (fabric.isLikelyNode) {
-        element.getAttribute = function(x) {
-          return element[x];
-        };
-        element.setAttribute = function(x, value) {
-          element[x] = value;
-        };
-      }
-      for (var prop in attributes) {
-        element.setAttribute(prop, attributes[prop]);
-      }
-      return element;
-    }
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
 
@@ -369,24 +451,240 @@
     });
   });
 
-  // QUnit.test('minimumScale', function(assert) {
-  //   var done = assert.async();
-  //   createImageObject(function(image) {
-  //     assert.ok(typeof image.toObject === 'function');
-  //     var filter = new fabric.Image.filters.Resize({resizeType: 'sliceHack', scaleX: 0.2, scaleY: 0.2});
-  //     image.resizeFilters.push(filter);
-  //     var width = image.width, height = image.height;
-  //     assert.ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-  //     var toObject = image.toObject();
-  //     fabric.Image.fromObject(toObject, function(_imageFromObject) {
-  //       var filterFromObj = _imageFromObject.resizeFilters[0];
-  //       assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-  //       assert.equal(filterFromObj.scaleY, 0.2);
-  //       assert.equal(filterFromObj.scaleX, 0.2);
-  //       var canvasEl = _imageFromObject.applyFilters(null, _imageFromObject.resizeFilters, _imageFromObject._originalElement, true);
-  //       done();
-  //     });
-  //   });
-  // });
+  QUnit.test('fromElement with preserveAspectRatio', function(assert) {
+    var done = assert.async();
 
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      width: '140',
+      height: '170',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.ok(imgObject instanceof fabric.Image);
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('scaleX'), 10, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 10, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMid',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 42.5, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmax', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMax',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 85, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '70',
+      height: '170',
+      preserveAspectRatio: 'meet xMidYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMinYMin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMinYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 0, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMidYmin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMidYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 35, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMaxYMin', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      x: '0',
+      y: '0',
+      width: '140',
+      height: '85',
+      preserveAspectRatio: 'meet xMaxYMin',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
+      assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
+      assert.deepEqual(imgObject.get('left'), 70, 'left');
+      assert.deepEqual(imgObject.get('top'), 0, 'top is moved to stay in center');
+      assert.deepEqual(imgObject.get('scaleX'), 5, 'scaleX compensate the width');
+      assert.deepEqual(imgObject.get('scaleY'), 5, 'scaleY compensate the height');
+      assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('consecutive dataURLs give same result.', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var data1 = image.toDataURL();
+      var data2 = image.toDataURL();
+      var data3 = image.toDataURL();
+      assert.equal(data1, data2, 'dataurl does not change 1');
+      assert.equal(data1, data3, 'dataurl does not change 2');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters do not set the image dirty if not in group', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.dirty = false;
+      assert.equal(image.dirty, false, 'false apply filter dirty is false');
+      image.applyFilters();
+      assert.equal(image.dirty, false, 'After apply filter dirty is true');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters set the image dirty and also the group', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var group = new fabric.Group([image]);
+      image.dirty = false;
+      group.dirty = false;
+      assert.equal(image.dirty, false, 'false apply filter dirty is false');
+      assert.equal(group.dirty, false, 'false apply filter dirty is false');
+      image.applyFilters();
+      assert.equal(image.dirty, true, 'After apply filter dirty is true');
+      assert.equal(group.dirty, true, 'After apply filter dirty is true');
+      done();
+    });
+  });
 })();

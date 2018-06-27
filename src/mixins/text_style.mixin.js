@@ -2,7 +2,7 @@
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
     /**
      * Returns true if object has no styling or no styling in a line
-     * @param {Number} lineIndex
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
      * @return {Boolean}
      */
     isEmptyStyles: function(lineIndex) {
@@ -63,31 +63,42 @@
       if (!this.styles || !property || property === '') {
         return false;
       }
-      var obj = this.styles, stylesCount = 0, letterCount, foundStyle = false, style,
-          canBeSwapped = true, graphemeCount = 0;
+      var obj = this.styles, stylesCount = 0, letterCount, stylePropertyValue,
+          allStyleObjectPropertiesMatch = true, graphemeCount = 0, styleObject;
       // eslint-disable-next-line
       for (var p1 in obj) {
         letterCount = 0;
         // eslint-disable-next-line
         for (var p2 in obj[p1]) {
+          var styleObject = obj[p1][p2],
+              stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
+
           stylesCount++;
-          if (!foundStyle) {
-            style = obj[p1][p2][property];
-            foundStyle = true;
+
+          if (stylePropertyHasBeenSet) {
+            if (!stylePropertyValue) {
+              stylePropertyValue = styleObject[property];
+            }
+            else if (styleObject[property] !== stylePropertyValue) {
+              allStyleObjectPropertiesMatch = false;
+            }
+
+            if (styleObject[property] === this[property]) {
+              delete styleObject[property];
+            }
           }
-          else if (obj[p1][p2][property] !== style) {
-            canBeSwapped = false;
+          else {
+            allStyleObjectPropertiesMatch = false;
           }
-          if (obj[p1][p2][property] === this[property]) {
-            delete obj[p1][p2][property];
-          }
-          if (Object.keys(obj[p1][p2]).length !== 0) {
+
+          if (Object.keys(styleObject).length !== 0) {
             letterCount++;
           }
           else {
             delete obj[p1][p2];
           }
         }
+
         if (letterCount === 0) {
           delete obj[p1];
         }
@@ -97,8 +108,8 @@
       for (var i = 0; i < this._textLines.length; i++) {
         graphemeCount += this._textLines[i].length;
       }
-      if (canBeSwapped && stylesCount === graphemeCount) {
-        this[property] = style;
+      if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
+        this[property] = stylePropertyValue;
         this.removeStyle(property);
       }
     },

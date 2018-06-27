@@ -195,7 +195,6 @@
                   (typeof event.srcElement !== unknown ? event.srcElement : null),
 
         scroll = fabric.util.getScrollLeftTop(element);
-
     return {
       x: pointerX(event) + scroll.left,
       y: pointerY(event) + scroll.top
@@ -212,11 +211,17 @@
 
   function _getPointer(event, pageProp, clientProp) {
     var touchProp = event.type === 'touchend' ? 'changedTouches' : 'touches';
+    var pointer, eventTouchProp = event[touchProp];
 
-    return (event[touchProp] && event[touchProp][0]
-      ? (event[touchProp][0][pageProp] - (event[touchProp][0][pageProp] - event[touchProp][0][clientProp]))
-        || event[clientProp]
-      : event[clientProp]);
+    if (eventTouchProp && eventTouchProp[0]) {
+      pointer = eventTouchProp[0][clientProp];
+    }
+
+    if (typeof pointer === 'undefined') {
+      pointer = event[clientProp];
+    }
+
+    return pointer;
   }
 
   if (fabric.isTouchSupported) {

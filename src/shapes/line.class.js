@@ -13,14 +13,6 @@
     return;
   }
 
-  var cacheProperties = fabric.Object.prototype.cacheProperties.concat();
-  cacheProperties.push(
-    'x1',
-    'x2',
-    'y1',
-    'y2'
-  );
-
   /**
    * Line class
    * @class fabric.Line
@@ -64,7 +56,7 @@
      */
     y2: 0,
 
-    cacheProperties: cacheProperties,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('x1', 'x2', 'y1', 'y2'),
 
     /**
      * Constructor

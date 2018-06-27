@@ -248,7 +248,7 @@
           '<stop ',
           'offset="', (colorStop.offset * 100) + '%',
           '" style="stop-color:', colorStop.color,
-          (colorStop.opacity !== null ? ';stop-opacity: ' + colorStop.opacity : ';'),
+          (typeof colorStop.opacity !== 'undefined' ? ';stop-opacity: ' + colorStop.opacity : ';'),
           '"/>\n'
         );
       }
@@ -309,7 +309,6 @@
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */
     fromElement: function(el, instance) {
-
       /**
        *  @example:
        *
@@ -413,7 +412,7 @@
         options[prop] = 0;
       }
       propValue = parseFloat(options[prop], 10);
-      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
+      if (typeof options[prop] === 'string' && /^(\d+\.\d+)%|(\d+)%$/.test(options[prop])) {
         multFactor = 0.01;
       }
       else {

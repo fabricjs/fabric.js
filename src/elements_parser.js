@@ -5,6 +5,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
+  this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -47,12 +48,13 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
+    var _options;
     _this.resolveGradient(obj, 'fill');
     _this.resolveGradient(obj, 'stroke');
-    obj._removeTransformMatrix();
     if (obj instanceof fabric.Image) {
-      obj.parsePreserveAspectRatioAttribute(el);
+      _options = obj.parsePreserveAspectRatioAttribute(el);
     }
+    obj._removeTransformMatrix(_options);
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();
@@ -61,11 +63,12 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
 
 fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
 
-  var instanceFillValue = obj.get(property);
+  var instanceFillValue = obj[property];
   if (!(/^url\(/).test(instanceFillValue)) {
     return;
   }
-  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+  var gradientId = this.regexUrl.exec(instanceFillValue)[1];
+  this.regexUrl.lastIndex = 0;
   if (fabric.gradientDefs[this.svgUid][gradientId]) {
     obj.set(property,
       fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));

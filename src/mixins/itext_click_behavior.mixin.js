@@ -12,15 +12,20 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.__lastPointer = { };
 
-    this.on('mousedown', this.onMouseDown.bind(this));
+    this.on('mousedown', this.onMouseDown);
   },
 
+  /**
+   * Default event handler to simulate triple click
+   * @private
+   */
   onMouseDown: function(options) {
-
+    if (!this.canvas) {
+      return;
+    }
     this.__newClickTime = +new Date();
-    var newPointer = this.canvas.getPointer(options.e);
-
-    if (this.isTripleClick(newPointer, options.e)) {
+    var newPointer = options.pointer;
+    if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
     }
@@ -68,64 +73,82 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Initializes "mousedown" event handler
+   * Default event handler for the basic functionalities needed on _mouseDown
+   * can be overridden to do something different.
+   * Scope of this implementation is: find the click position, set selectionStart
+   * find selectionEnd, initialize the drawing of either cursor or selection area
    */
-  initMousedownHandler: function() {
-    this.on('mousedown', function(options) {
-      if (!this.editable || (options.e.button && options.e.button !== 1)) {
-        return;
-      }
-      var pointer = this.canvas.getPointer(options.e);
+  _mouseDownHandler: function(options) {
+    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
 
-      this.__mousedownX = pointer.x;
-      this.__mousedownY = pointer.y;
-      this.__isMousedown = true;
+    this.__isMousedown = true;
 
-      if (this.selected) {
-        this.setCursorByClick(options.e);
-      }
+    if (this.selected) {
+      this.setCursorByClick(options.e);
+    }
 
-      if (this.isEditing) {
-        this.__selectionStartOnMouseDown = this.selectionStart;
-        if (this.selectionStart === this.selectionEnd) {
-          this.abortCursorAnimation();
-        }
-        this.renderCursorOrSelection();
+    if (this.isEditing) {
+      this.__selectionStartOnMouseDown = this.selectionStart;
+      if (this.selectionStart === this.selectionEnd) {
+        this.abortCursorAnimation();
       }
-    });
+      this.renderCursorOrSelection();
+    }
   },
 
   /**
-   * @private
+   * Default event handler for the basic functionalities needed on mousedown:before
+   * can be overridden to do something different.
+   * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _isObjectMoved: function(e) {
-    var pointer = this.canvas.getPointer(e);
+  _mouseDownHandlerBefore: function(options) {
+    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+    if (this === this.canvas._activeObject) {
+      this.selected = true;
+    }
+  },
 
-    return this.__mousedownX !== pointer.x ||
-           this.__mousedownY !== pointer.y;
+  /**
+   * Initializes "mousedown" event handler
+   */
+  initMousedownHandler: function() {
+    this.on('mousedown', this._mouseDownHandler);
+    this.on('mousedown:before', this._mouseDownHandlerBefore);
   },
 
   /**
    * Initializes "mouseup" event handler
    */
   initMouseupHandler: function() {
-    this.on('mouseup', function(options) {
-      this.__isMousedown = false;
-      if (!this.editable || this._isObjectMoved(options.e) || (options.e.button && options.e.button !== 1)) {
-        return;
-      }
+    this.on('mouseup', this.mouseUpHandler);
+  },
 
-      if (this.__lastSelected && !this.__corner) {
-        this.enterEditing(options.e);
-        if (this.selectionStart === this.selectionEnd) {
-          this.initDelayedCursor(true);
-        }
-        else {
-          this.renderCursorOrSelection();
-        }
+  /**
+   * standard hander for mouse up, overridable
+   * @private
+   */
+  mouseUpHandler: function(options) {
+    this.__isMousedown = false;
+    if (!this.editable ||
+      (options.transform && options.transform.actionPerformed) ||
+      (options.e.button && options.e.button !== 1)) {
+      return;
+    }
+
+    if (this.__lastSelected && !this.__corner) {
+      this.enterEditing(options.e);
+      if (this.selectionStart === this.selectionEnd) {
+        this.initDelayedCursor(true);
       }
-      this.selected = true;
-    });
+      else {
+        this.renderCursorOrSelection();
+      }
+    }
+    this.selected = true;
   },
 
   /**

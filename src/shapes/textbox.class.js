@@ -58,20 +58,11 @@
     noScaleCache: false,
 
     /**
-     * Constructor. Some scaling related property values are forced. Visibility
-     * of controls is also fixed; only the rotation and width controls are
-     * made available.
-     * @param {String} text Text string
-     * @param {Object} [options] Options object
-     * @return {fabric.Textbox} thisArg
+     * Properties which when set cause object to change dimensions
+     * @type Object
+     * @private
      */
-    initialize: function(text, options) {
-
-      this.callSuper('initialize', text, options);
-      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
-      // add width to this list of props that effect line wrapping.
-      this._dimensionAffectingProps.push('width');
-    },
+    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
 
     /**
      * Unlike superclass's version of this function, Textbox does not update
@@ -94,7 +85,7 @@
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
-      if (this.textAlign === 'justify') {
+      if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
@@ -153,6 +144,38 @@
     },
 
     /**
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
+     * @return {Boolean}
+     */
+    isEmptyStyles: function(lineIndex) {
+      var offset = 0, nextLineIndex = lineIndex + 1, nextOffset, obj, shouldLimit = false;
+      var map = this._styleMap[lineIndex];
+      var mapNextLine = this._styleMap[lineIndex + 1];
+      if (map) {
+        lineIndex = map.line;
+        offset = map.offset;
+      }
+      if (mapNextLine) {
+        nextLineIndex = mapNextLine.line;
+        shouldLimit = nextLineIndex === lineIndex;
+        nextOffset = mapNextLine.offset;
+      }
+      obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
+      for (var p1 in obj) {
+        for (var p2 in obj[p1]) {
+          if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+            // eslint-disable-next-line no-unused-vars
+            for (var p3 in obj[p1][p2]) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    },
+
+    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
      * @private
@@ -197,6 +220,7 @@
     },
 
     /**
+    * probably broken need a fix
      * @param {Number} lineIndex
      * @private
      */
@@ -206,6 +230,7 @@
     },
 
     /**
+     * probably broken need a fix
      * @param {Number} lineIndex
      * @param {Object} style
      * @private
@@ -216,6 +241,7 @@
     },
 
     /**
+     * probably broken need a fix
      * @param {Number} lineIndex
      * @private
      */
@@ -269,10 +295,11 @@
      * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
      * @param {Number} desiredWidth width you want to wrap the line to
+     * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(_line, lineIndex, desiredWidth) {
+    _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
       var lineWidth        = 0,
           graphemeLines    = [],
           line             = [],
@@ -285,7 +312,10 @@
           infixWidth       = 0,
           largestWordWidth = 0,
           lineJustStarted = true,
-          additionalSpace = this._getWidthOfCharSpacing();
+          additionalSpace = this._getWidthOfCharSpacing(),
+          reservedSpace = reservedSpace || 0;
+
+      desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {
         // i would avoid resplitting the graphemes
         word = fabric.util.string.graphemeSplit(words[i]);
@@ -299,6 +329,9 @@
           line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
+        }
+        else {
+          lineWidth += additionalSpace;
         }
 
         if (!lineJustStarted) {
@@ -317,11 +350,29 @@
 
       i && graphemeLines.push(line);
 
-      if (largestWordWidth > this.dynamicMinWidth) {
-        this.dynamicMinWidth = largestWordWidth - additionalSpace;
+      if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+        this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
       }
 
       return graphemeLines;
+    },
+
+    /**
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @param {Number} lineIndex text to split
+     * @return {Boolean}
+     */
+    isEndOfWrapping: function(lineIndex) {
+      if (!this._styleMap[lineIndex + 1]) {
+        // is last line, return true;
+        return true;
+      }
+      if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
+        // this is last line before a line break, return true;
+        return true;
+      }
+      return false;
     },
 
     /**

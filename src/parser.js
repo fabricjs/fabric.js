@@ -35,6 +35,7 @@
         'font-size':          'fontSize',
         'font-style':         'fontStyle',
         'font-weight':        'fontWeight',
+        'letter-spacing':     'charSpacing',
         'paint-order':        'paintFirst',
         'stroke-dasharray':   'strokeDashArray',
         'stroke-linecap':     'strokeLineCap',
@@ -109,6 +110,10 @@
     }
     else if (attr === 'textAnchor' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
+    }
+    else if (attr === 'charSpacing') {
+      // parseUnit returns px and we convert it to em
+      parsed = parseUnit(value, fontSize) / fontSize * 1000;
     }
     else if (attr === 'paintFirst') {
       var fillIndex = value.indexOf('fill');
@@ -186,7 +191,7 @@
    */
   fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
-      var cos = Math.cos(args[0]), sin = Math.sin(args[0]),
+      var cos = fabric.util.cos(args[0]), sin = fabric.util.sin(args[0]),
           x = 0, y = 0;
       if (args.length === 3) {
         x = args[1];
@@ -537,7 +542,7 @@
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
-        parsedDim = { }, translateMatrix = '';
+        parsedDim = { }, translateMatrix = '', widthDiff = 0, heightDiff = 0;
 
     parsedDim.width = 0;
     parsedDim.height = 0;
@@ -573,7 +578,28 @@
     preserveAspectRatio = fabric.util.parsePreserveAspectRatioAttribute(preserveAspectRatio);
     if (preserveAspectRatio.alignX !== 'none') {
       //translate all container for the effect of Mid, Min, Max
-      scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+      if (preserveAspectRatio.meetOrSlice === 'meet') {
+        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+        // calculate additional translation to move the viewbox
+      }
+      if (preserveAspectRatio.meetOrSlice === 'slice') {
+        scaleY = scaleX = (scaleX > scaleY ? scaleX : scaleY);
+        // calculate additional translation to move the viewbox
+      }
+      widthDiff = parsedDim.width - viewBoxWidth * scaleX;
+      heightDiff = parsedDim.height - viewBoxHeight * scaleX;
+      if (preserveAspectRatio.alignX === 'Mid') {
+        widthDiff /= 2;
+      }
+      if (preserveAspectRatio.alignY === 'Mid') {
+        heightDiff /= 2;
+      }
+      if (preserveAspectRatio.alignX === 'Min') {
+        widthDiff = 0;
+      }
+      if (preserveAspectRatio.alignY === 'Min') {
+        heightDiff = 0;
+      }
     }
 
     if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0 && x === 0 && y === 0) {
@@ -588,8 +614,8 @@
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
-                  (minX * scaleX) + ' ' +
-                  (minY * scaleY) + ') ';
+                  (minX * scaleX + widthDiff) + ' ' +
+                  (minY * scaleY + heightDiff) + ') ';
 
     if (element.nodeName === 'svg') {
       el = element.ownerDocument.createElement('g');
@@ -738,7 +764,6 @@
           elList = _getMultipleNodes(doc, tagArray),
           el, j = 0, id, xlink,
           gradientDefs = { }, idsToXlinkMap = { };
-
       j = elList.length;
 
       while (j--) {

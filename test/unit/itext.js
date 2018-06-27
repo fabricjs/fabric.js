@@ -22,7 +22,7 @@
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -273,6 +273,7 @@
 
     iText.exitEditing();
     assert.ok(!iText.isEditing);
+    iText.abortCursorAnimation();
   });
 
   /*  QUnit.test('enterEditing, exitEditing eventlistener counts', function(assert) {
@@ -330,6 +331,7 @@
     assert.equal(enter, 2);
     assert.equal(exit, 2);
     assert.equal(modify, 1);
+    iText.abortCursorAnimation();
   });
 
   // TODO: read those and make tests for new functions
@@ -744,10 +746,10 @@
   //   });
   //   assert.equal(typeof iText.toSVG, 'function');
   //   if (fabric.isLikelyNode) {
-  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
+  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
   //   }
   //   else {
-  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
+  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
   //   }
   // });
 
@@ -786,6 +788,39 @@
     var iText = new fabric.IText('test foo bar-baz\nqux');
     iText.enterEditing();
     assert.equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
+    iText.abortCursorAnimation();
+  });
+
+  QUnit.test('hiddenTextarea does not move DOM', function(assert) {
+    var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
+    var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false });
+    canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
+    iText.set({
+      top: 400,
+      left: 400,
+    });
+    canvas2.add(iText);
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientWidth', {
+      get: function() { return this._clientWidth; },
+      set: function(value) { return this._clientWidth = value; },
+    });
+    Object.defineProperty(canvas2.upperCanvasEl, 'clientHeight', {
+      get: function() { return this._clientHeight; },
+      set: function(value) { return this._clientHeight = value; },
+    });
+    canvas2.upperCanvasEl._clientWidth = 100;
+    canvas2.upperCanvasEl._clientHeight = 100;
+    iText.enterEditing();
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 57, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 50, 'left is scaled with CSS');
+    iText.exitEditing();
+    canvas2.upperCanvasEl._clientWidth = 200;
+    canvas2.upperCanvasEl._clientHeight = 200;
+    iText.enterEditing();
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 114, 'top is scaled with CSS');
+    assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
+    iText.exitEditing();
+    canvas2.dispose();
   });
 
   // QUnit.test('measuring width of words', function (assert) {

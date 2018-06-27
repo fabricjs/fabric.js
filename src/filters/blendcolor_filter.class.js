@@ -50,103 +50,52 @@
      * Fragment source for the Multiply program
      */
     fragmentSource: {
-      multiply: 'precision highp float;\n' +
+      multiply: 'gl_FragColor.rgb *= uColor.rgb;\n',
+      screen: 'gl_FragColor.rgb = 1.0 - (1.0 - gl_FragColor.rgb) * (1.0 - uColor.rgb);\n',
+      add: 'gl_FragColor.rgb += uColor.rgb;\n',
+      diff: 'gl_FragColor.rgb = abs(gl_FragColor.rgb - uColor.rgb);\n',
+      subtract: 'gl_FragColor.rgb -= uColor.rgb;\n',
+      lighten: 'gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n',
+      darken: 'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n',
+      exclusion: 'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n',
+      overlay: 'if (uColor.r < 0.5) {\n' +
+          'gl_FragColor.r *= 2.0 * uColor.r;\n' +
+        '} else {\n' +
+          'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
+        '}\n' +
+        'if (uColor.g < 0.5) {\n' +
+          'gl_FragColor.g *= 2.0 * uColor.g;\n' +
+        '} else {\n' +
+          'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
+        '}\n' +
+        'if (uColor.b < 0.5) {\n' +
+          'gl_FragColor.b *= 2.0 * uColor.b;\n' +
+        '} else {\n' +
+          'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
+        '}\n',
+      tint: 'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
+        'gl_FragColor.rgb += uColor.rgb;\n',
+    },
+
+    /**
+     * build the fragment source for the filters, joining the common part with
+     * the specific one.
+     * @param {String} mode the mode of the filter, a key of this.fragmentSource
+     * @return {String} the source to be compiled
+     * @private
+     */
+    buildSource: function(mode) {
+      return 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform vec4 uColor;\n' +
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-          'color.rgb *= uColor.rgb;\n' +
           'gl_FragColor = color;\n' +
-        '}',
-      screen: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-          'color.rgb = 1.0 - (1.0 - color.rgb) * (1.0 - uColor.rgb);\n' +
-          'gl_FragColor = color;\n' +
-        '}',
-      add: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb += uColor.rgb;\n' +
-        '}',
-      diff: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb = abs(gl_FragColor.rgb - uColor.rgb);\n' +
-      '}',
-      subtract: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb -= uColor.rgb;\n' +
-        '}',
-      lighten: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n' +
-        '}',
-      darken: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n' +
-        '}',
-      exclusion: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n' +
-        '}',
-      overlay: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'if (uColor.r < 0.5) {\n' +
-            'gl_FragColor.r *= 2.0 * uColor.r;\n' +
-          '} else {\n' +
-            'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
+          'if (color.a > 0.0) {\n' +
+            this.fragmentSource[mode] +
           '}\n' +
-          'if (uColor.g < 0.5) {\n' +
-            'gl_FragColor.g *= 2.0 * uColor.g;\n' +
-          '} else {\n' +
-            'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
-          '}\n' +
-          'if (uColor.b < 0.5) {\n' +
-            'gl_FragColor.b *= 2.0 * uColor.b;\n' +
-          '} else {\n' +
-            'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
-          '}\n' +
-        '}',
-      tint: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform vec4 uColor;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-          'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
-          'gl_FragColor.rgb += uColor.rgb;\n' +
-        '}'
+        '}';
     },
 
     /**
@@ -156,9 +105,9 @@
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
     retrieveShader: function(options) {
-      var cacheKey = this.type + '_' + this.mode;
-      var shaderSource = this.fragmentSource[this.mode];
+      var cacheKey = this.type + '_' + this.mode, shaderSource;
       if (!options.programCache.hasOwnProperty(cacheKey)) {
+        shaderSource = this.buildSource(this.mode);
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }
       return options.programCache[cacheKey];

@@ -31,7 +31,7 @@
   //   'strokeDashArray':    null,
   //   'strokeLineCap':      'butt',
   //   'strokeLineJoin':     'miter',
-  //   'strokeMiterLimit':   10,
+  //   'strokeMiterLimit':   4,
   //   'scaleX':             1,
   //   'scaleY':             1,
   //   'angle':              0,
@@ -51,9 +51,6 @@
   //   'filters':            []
   // };
 
-  // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  // }
 
   function _createImageData(context) {
     var imageData = context.createImageData(3, 1);

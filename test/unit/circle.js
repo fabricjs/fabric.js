@@ -13,6 +13,13 @@
     assert.deepEqual(circle.type, 'circle');
   });
 
+  QUnit.test('constructor with radius', function(assert) {
+    assert.ok(fabric.Circle);
+    var circle = new fabric.Circle({ radius: 20 });
+    assert.equal(circle.width, 40, 'width is set');
+    assert.equal(circle.height, 40, 'height is set');
+  });
+
   QUnit.test('getRadiusX, getRadiusY', function(assert) {
     var circle = new fabric.Circle({ radius: 10 });
 
@@ -93,7 +100,7 @@
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
       'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         10,
+      'strokeMiterLimit':         4,
       'scaleX':                   1,
       'scaleY':                   1,
       'angle':                    0,

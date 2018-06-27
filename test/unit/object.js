@@ -1,6 +1,6 @@
 (function(){
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -19,7 +19,7 @@
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function createImageObject(callback) {
@@ -148,7 +148,7 @@
 
   QUnit.test('toJSON', function(assert) {
     var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"transformMatrix":null,"skewX":0,"skewY":0}';
@@ -191,7 +191,7 @@
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
       'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         10,
+      'strokeMiterLimit':         4,
       'scaleX':                   1,
       'scaleY':                   1,
       'angle':                    0,
@@ -1019,13 +1019,21 @@
     assert.equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
   });
 
+  QUnit.test('_createCacheCanvas sets object as dirty', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
+    assert.equal(object.dirty, true, 'object is dirty after creation');
+    object.dirty = false;
+    assert.equal(object.dirty, false, 'object is not dirty after specifying it');
+    object._createCacheCanvas();
+    assert.equal(object.dirty, true, 'object is dirty again if cache gets created');
+  });
+
   QUnit.test('isCacheDirty statefullCache disabled', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     object.statefullCache = false;
-    object._createCacheCanvas();
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
     object.dirty = true;
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
@@ -1038,9 +1046,6 @@
     object.statefullCache = true;
     object.propA = 'A';
     object.setupState({ propertySet: 'cacheProperties' });
-    object._createCacheCanvas();
-    assert.equal(object.isCacheDirty(), true, 'object is dirty if canvas has been just created');
-    object.setupState({ propertySet: 'cacheProperties' });
     assert.equal(object.isCacheDirty(), false, 'object is not dirty');
     object.propA = 'B';
     assert.equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');
@@ -1049,14 +1054,14 @@
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1 }, 'if no scaling is applied cache is as big as object');
+    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1, x: 10, y: 10 }, 'if no scaling is applied cache is as big as object');
     object.strokeWidth = 2;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1 }, 'cache contains the stroke');
+    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'cache contains the stroke');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3 }, 'cache is as big as the scaled object');
+    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3, x: 12, y: 12 }, 'cache is as big as the scaled object');
   });
 
   QUnit.test('_updateCacheCanvas check if cache canvas should be updated', function(assert) {
@@ -1080,7 +1085,7 @@
   });
 
   QUnit.test('_limitCacheSize limit min to 256', function(assert) {
-    fabric.perfLimitSizeTotal = 10000;
+    fabric.perfLimitSizeTotal = 50000;
     fabric.maxCacheSideLimit = 4096;
     fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
@@ -1182,9 +1187,7 @@
   });
 
   QUnit.test('_setShadow', function(assert) {
-    var el = fabric.document.createElement('canvas');
-    el.width = 600; el.height = 600;
-    var canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
     var context = canvas.contextContainer;
     var object = new fabric.Object({ scaleX: 1, scaleY: 1});
     var group = new fabric.Group();
@@ -1197,20 +1200,26 @@
       offsetY: 15
     });
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY);
-    assert.equal(context.shadowBlur, object.shadow.blur);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is set');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is set');
+    assert.equal(context.shadowBlur, object.shadow.blur, 'shadow blur is set');
+    fabric.browserShadowBlurConstant = 1.5;
+    object._setShadow(context);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is unchanged with browserConstant');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is unchanged with browserConstant');
+    assert.equal(context.shadowBlur, object.shadow.blur * 1.5, 'shadow blur is affected with browserConstant');
+    fabric.browserShadowBlurConstant = 1;
     object.scaleX = 2;
     object.scaleY = 3;
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY);
-    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX, 'shadow offsetX is affected by scaleX');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY, 'shadow offsetY is affected by scaleY');
+    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX + object.scaleY) / 2, 'shadow blur is affected by scaleY and scaleX');
     object.group = group;
     object._setShadow(context);
-    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX);
-    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY);
-    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2);
+    assert.equal(context.shadowOffsetX, object.shadow.offsetX * object.scaleX * group.scaleX, 'shadow offsetX is affected by scaleX and group.scaleX');
+    assert.equal(context.shadowOffsetY, object.shadow.offsetY * object.scaleY * group.scaleY, 'shadow offsetX is affected by scaleX and group.scaleX');
+    assert.equal(context.shadowBlur, object.shadow.blur * (object.scaleX * group.scaleX + object.scaleY * group.scaleY) / 2, 'shadow blur is affected by scales');
   });
 
   QUnit.test('willDrawShadow', function(assert) {
@@ -1218,5 +1227,23 @@
     assert.equal(object.willDrawShadow(), false, 'object will not drawShadow');
     object.shadow.offsetX = 1;
     assert.equal(object.willDrawShadow(), true, 'object will drawShadow');
+  });
+
+  QUnit.test('_set  change a property', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object._set('fill', 'red');
+    assert.equal(object.fill, 'red', 'property changed');
+  });
+  QUnit.test('_set can rise the dirty flag', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'red');
+    assert.equal(object.dirty, true, 'dirty is rised');
+  });
+  QUnit.test('_set rise dirty flag only if value changed', function(assert) {
+    var object = new fabric.Object({ fill: 'blue' });
+    object.dirty = false;
+    object._set('fill', 'blue');
+    assert.equal(object.dirty, false, 'dirty is not rised');
   });
 })();

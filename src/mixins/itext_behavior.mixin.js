@@ -15,10 +15,9 @@
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     },
 
-    onDeselect: function(options) {
+    onDeselect: function() {
       this.isEditing && this.exitEditing();
       this.selected = false;
-      fabric.Object.prototype.onDeselect.call(this, options);
     },
 
     /**
@@ -59,13 +58,13 @@
      * @private
      */
     _initCanvasHandlers: function(canvas) {
-      canvas._mouseUpITextHandler = (function() {
+      canvas._mouseUpITextHandler = function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
             obj.__isMousedown = false;
           });
         }
-      }).bind(this);
+      };
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
     },
 
@@ -151,7 +150,8 @@
      * Aborts cursor animation and clears all timeouts
      */
     abortCursorAnimation: function() {
-      var shouldClear = this._currentTickState || this._currentTickCompleteState;
+      var shouldClear = this._currentTickState || this._currentTickCompleteState,
+          canvas = this.canvas;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
@@ -161,8 +161,8 @@
       this._currentCursorOpacity = 0;
       // to clear just itext area we need to transform the context
       // it may not be worth it
-      if (shouldClear) {
-        this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
+      if (shouldClear && canvas) {
+        canvas.clearContext(canvas.contextTop || canvas.contextContainer);
       }
 
     },
@@ -332,6 +332,7 @@
       }
 
       if (this.canvas) {
+        this.canvas.calcOffset();
         this.exitEditingOnOthers(this.canvas);
       }
 
@@ -480,6 +481,7 @@
       this.text = this.hiddenTextarea.value;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
+        this.setCoords();
       }
       var newSelection = this.fromStringToGraphemeSelection(
         this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
@@ -522,11 +524,17 @@
             y: boundaries.top + boundaries.topOffset + charHeight
           },
           upperCanvas = this.canvas.upperCanvasEl,
-          maxWidth = upperCanvas.width - charHeight,
-          maxHeight = upperCanvas.height - charHeight;
+          upperCanvasWidth = upperCanvas.width,
+          upperCanvasHeight = upperCanvas.height,
+          maxWidth = upperCanvasWidth - charHeight,
+          maxHeight = upperCanvasHeight - charHeight,
+          scaleX = upperCanvas.clientWidth / upperCanvasWidth,
+          scaleY = upperCanvas.clientHeight / upperCanvasHeight;
 
       p = fabric.util.transformPoint(p, m);
       p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+      p.x *= scaleX;
+      p.y *= scaleY;
       if (p.x < 0) {
         p.x = 0;
       }
@@ -570,7 +578,7 @@
         return;
       }
 
-      this.hoverCursor = this._savedProps.overCursor;
+      this.hoverCursor = this._savedProps.hoverCursor;
       this.hasControls = this._savedProps.hasControls;
       this.borderColor = this._savedProps.borderColor;
       this.lockMovementX = this._savedProps.lockMovementX;
@@ -604,7 +612,10 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
-
+      if (this._shouldClearDimensionCache()) {
+        this.initDimensions();
+        this.setCoords();
+      }
       this.fire('editing:exited');
       isTextChanged && this.fire('modified');
       if (this.canvas) {
@@ -642,13 +653,13 @@
       if (lineStart !== lineEnd) {
         // step1 remove the trailing of lineStart
         if (this.styles[lineStart]) {
-          for (i = charStart; i < this._textLines[lineStart].length; i++) {
+          for (i = charStart; i < this._unwrappedTextLines[lineStart].length; i++) {
             delete this.styles[lineStart][i];
           }
         }
         // step2 move the trailing of lineEnd to lineStart if needed
         if (this.styles[lineEnd]) {
-          for (i = charEnd; i < this._textLines[lineEnd].length; i++) {
+          for (i = charEnd; i < this._unwrappedTextLines[lineEnd].length; i++) {
             styleObj = this.styles[lineEnd][i];
             if (styleObj) {
               this.styles[lineStart] || (this.styles[lineStart] = { });
@@ -835,9 +846,18 @@
       }
       linesLenght && this.insertNewlineStyleObject(
         cursorLoc.lineIndex, cursorLoc.charIndex + addedLines[0], linesLenght);
-      for (var i = 1; i <= linesLenght; i++) {
-        this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
+      for (var i = 1; i < linesLenght; i++) {
+        if (addedLines[i] > 0) {
+          this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
+        }
+        else if (copiedStyle) {
+          this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
+        }
         copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
+      }
+      // we use i outside the loop to get it like linesLength
+      if (addedLines[i] > 0) {
+        this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
       }
     },
 

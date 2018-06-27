@@ -3,9 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.isLikelyNode
-      ? new (require(fabric.canvasModule).Image)()
-      : fabric.document.createElement('img');
+    return fabric.document.createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -606,10 +604,8 @@
   QUnit.test('fabric.util.drawDashedLine', function(assert) {
     assert.ok(typeof fabric.util.drawDashedLine === 'function');
 
-    var el = fabric.document.createElement('canvas');
-    var canvas = fabric.isLikelyNode
-      ? fabric.createCanvasForNode()
-      : new fabric.Canvas(el);
+    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+
 
     var ctx = canvas.getContext('2d');
 
@@ -724,6 +720,13 @@
     assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
     fabric.util.clearFabricFontCache();
     assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
+  });
+
+  QUnit.test('clearFabricFontCache wrong case', function(assert) {
+    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.util.clearFabricFontCache('ARIAL');
+    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
   });
 
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {
@@ -885,7 +888,7 @@
 
   QUnit.test('drawArc', function(assert) {
     assert.ok(typeof fabric.util.drawArc === 'function');
-    var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(null, {enableRetinaScaling: false});
+    var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
     var ctx = canvas.contextContainer;
     fabric.util.drawArc(ctx, 0, 0, [
       50,
@@ -914,7 +917,7 @@
       { x: 0, y: -8.318331151877368 },
       { x: 133.33333333333331, y: 19.99999999999999 },
       { x: 100.00000000000003, y: 19.99999999999999 },
-      { x: 147.19721858646224, y: 100 }
+      { x: 147.19721858646224, y: 100 },
     ];
     assert.deepEqual(bounds, expectedBounds, 'bounds are as expected');
   });
@@ -954,5 +957,13 @@
     assert.ok(typeof fabric.util.capValue === 'function');
     var val = fabric.util.capValue(3, 80, 70);
     assert.equal(val, 70, 'max cap');
+  });
+
+  QUnit.test('fabric.util.cos', function(assert) {
+    assert.ok(typeof fabric.util.cos === 'function');
+    assert.equal(fabric.util.cos(0), 1, 'cos 0 correct');
+    assert.equal(fabric.util.cos(Math.PI / 2), 0, 'cos 90 correct');
+    assert.equal(fabric.util.cos(Math.PI), -1, 'cos 180 correct');
+    assert.equal(fabric.util.cos(3 * Math.PI / 2), 0,' cos 270 correct');
   });
 })();

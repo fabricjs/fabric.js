@@ -15,7 +15,7 @@
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -43,7 +43,7 @@
     el.setAttribute('stroke-width', 1);
     el.setAttribute('stroke-linecap', 'butt');
     el.setAttribute('stroke-linejoin', 'miter');
-    el.setAttribute('stroke-miterlimit', 10);
+    el.setAttribute('stroke-miterlimit', 4);
     return el;
   }
 
@@ -124,7 +124,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.deepEqual(path.toSVG(), '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(200.5 200.5) translate(-200, -200) " stroke-linecap="round" />\n');
+      assert.deepEqual(path.toSVG(), '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(200.5 200.5) translate(-200, -200) " stroke-linecap="round" />\n');
       done();
     });
   });
@@ -221,14 +221,12 @@
       }));
 
       var ANGLE_DEG = 90;
-      var ANGLE = ANGLE_DEG * Math.PI / 180;
-
       elPath.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
       fabric.Path.fromElement(elPath, function(path) {
 
         assert.deepEqual(
           path.get('transformMatrix'),
-          [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]
+          [0, 1, -1, 0, 0, 0]
         );
         done();
       });

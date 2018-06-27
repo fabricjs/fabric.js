@@ -56,59 +56,158 @@
      */
     lanczosLobes: 3,
 
-    // vertexSource: 'attribute vec2 aPosition;\n' +
-    //   'attribute vec2 aTexCoord;\n' +
-    //   'uniform float uStepW;\n' +
-    //   'uniform float uStepH;\n' +
-    //   'varying vec2 centerTextureCoordinate;\n' +
-    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
-    //   'void main() {\n' +
-    //       'vec2 firstOffset = vec2(uStepW, uStepH);\n' +
-    //       'vec2 secondOffset = vec2(2.0 * uStepW, 2.0 * uStepH);\n' +
-    //       'vec2 thirdOffset = vec2(3.0 * uStepW, 3.0 * uStepH);\n' +
-    //       'vec2 fourthOffset = vec2(4.0 * uStepW, 4.0 * uStepH);\n' +
-    //       'centerTextureCoordinate = aTexCoord;\n' +
-    //       'oneStepLeftTextureCoordinate = aTexCoord - firstOffset;\n' +
-    //       'twoStepsLeftTextureCoordinate = aTexCoord - secondOffset;\n' +
-    //       'threeStepsLeftTextureCoordinate = aTexCoord - thirdOffset;\n' +
-    //       'fourStepsLeftTextureCoordinate = aTexCoord - fourthOffset;\n' +
-    //       'oneStepRightTextureCoordinate = aTexCoord + firstOffset;\n' +
-    //       'twoStepsRightTextureCoordinate = aTexCoord + secondOffset;\n' +
-    //       'threeStepsRightTextureCoordinate = aTexCoord + thirdOffset;\n' +
-    //       'fourStepsRightTextureCoordinate = aTexCoord + fourthOffset;\n' +
-    //       'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
-    //   '}',
-    //
-    // fragmentSource: 'precision highp float;\n' +
-    //   'varying vec2 centerTextureCoordinate;\n' +
-    //   'varying vec2 oneStepLeftTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsLeftTextureCoordinate;\n' +
-    //   'varying vec2 oneStepRightTextureCoordinate;\n' +
-    //   'varying vec2 twoStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 threeStepsRightTextureCoordinate;\n' +
-    //   'varying vec2 fourStepsRightTextureCoordinate;\n' +
-    //   'uniform sampler2D uTexture;\n' +
-    //   'void main() {\n' +
-    //     'vec4 color = texture2D(uTexture, centerTextureCoordinate) * 0.38026;\n' +
-    //     'color += texture2D(uTexture, oneStepLeftTextureCoordinate) * 0.27667;\n' +
-    //     'color += texture2D(uTexture, oneStepRightTextureCoordinate) * 0.27667;\n' +
-    //     'color += texture2D(uTexture, twoStepsLeftTextureCoordinate) * 0.08074;\n' +
-    //     'color += texture2D(uTexture, twoStepsRightTextureCoordinate) * 0.08074;\n' +
-    //     'color += texture2D(uTexture, threeStepsLeftTextureCoordinate) * -0.02612;\n' +
-    //     'color += texture2D(uTexture, threeStepsRightTextureCoordinate) * -0.02612;\n' +
-    //     'color += texture2D(uTexture, fourStepsLeftTextureCoordinate) * -0.02143;\n' +
-    //     'color += texture2D(uTexture, fourStepsRightTextureCoordinate) * -0.02143;\n' +
-    //     'gl_FragColor = color;\n' +
-    //   '}',
+
+    /**
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
+     */
+    getUniformLocations: function(gl, program) {
+      return {
+        uDelta: gl.getUniformLocation(program, 'uDelta'),
+        uTaps: gl.getUniformLocation(program, 'uTaps'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      gl.uniform2fv(uniformLocations.uDelta, this.horizontal ? [1 / this.width, 0] : [0, 1 / this.height]);
+      gl.uniform1fv(uniformLocations.uTaps, this.taps);
+    },
+
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var filterWindow = this.getFilterWindow(), cacheKey = this.type + '_' + filterWindow;
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        var fragmentShader = this.generateShader(filterWindow);
+        options.programCache[cacheKey] = this.createProgram(options.context, fragmentShader);
+      }
+      return options.programCache[cacheKey];
+    },
+
+    getFilterWindow: function() {
+      var scale = this.tempScale;
+      return Math.ceil(this.lanczosLobes / scale);
+    },
+
+    getTaps: function() {
+      var lobeFunction = this.lanczosCreate(this.lanczosLobes), scale = this.tempScale,
+          filterWindow = this.getFilterWindow(), taps = new Array(filterWindow);
+      for (var i = 1; i <= filterWindow; i++) {
+        taps[i - 1] = lobeFunction(i * scale);
+      }
+      return taps;
+    },
+
+    /**
+     * Generate vertex and shader sources from the necessary steps numbers
+     * @param {Number} filterWindow
+     */
+    generateShader: function(filterWindow) {
+      var offsets = new Array(filterWindow),
+          fragmentShader = this.fragmentSourceTOP, filterWindow;
+
+      for (var i = 1; i <= filterWindow; i++) {
+        offsets[i - 1] = i + '.0 * uDelta';
+      }
+
+      fragmentShader += 'uniform float uTaps[' + filterWindow + '];\n';
+      fragmentShader += 'void main() {\n';
+      fragmentShader += '  vec4 color = texture2D(uTexture, vTexCoord);\n';
+      fragmentShader += '  float sum = 1.0;\n';
+
+      offsets.forEach(function(offset, i) {
+        fragmentShader += '  color += texture2D(uTexture, vTexCoord + ' + offset + ') * uTaps[' + i + '];\n';
+        fragmentShader += '  color += texture2D(uTexture, vTexCoord - ' + offset + ') * uTaps[' + i + '];\n';
+        fragmentShader += '  sum += 2.0 * uTaps[' + i + '];\n';
+      });
+      fragmentShader += '  gl_FragColor = color / sum;\n';
+      fragmentShader += '}';
+      return fragmentShader;
+    },
+
+    fragmentSourceTOP: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'uniform vec2 uDelta;\n' +
+      'varying vec2 vTexCoord;\n',
+
+    /**
+     * Apply the resize filter to the image
+     * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
+     *
+     * @param {Object} options
+     * @param {Number} options.passes The number of filters remaining to be executed
+     * @param {Boolean} options.webgl Whether to use webgl to render the filter.
+     * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
+     * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    applyTo: function(options) {
+      if (options.webgl) {
+        if (options.passes > 1 && this.isNeutralState(options)) {
+          // avoid doing something that we do not need
+          return;
+        }
+        options.passes++;
+        this.width = options.sourceWidth;
+        this.horizontal = true;
+        this.dW = Math.round(this.width * this.scaleX);
+        this.dH = options.sourceHeight;
+        this.tempScale = this.dW / this.width;
+        this.taps = this.getTaps();
+        options.destinationWidth = this.dW;
+        this._setupFrameBuffer(options);
+        this.applyToWebGL(options);
+        this._swapTextures(options);
+        options.sourceWidth = options.destinationWidth;
+
+        this.height = options.sourceHeight;
+        this.horizontal = false;
+        this.dH = Math.round(this.height * this.scaleY);
+        this.tempScale = this.dH / this.height;
+        this.taps = this.getTaps();
+        options.destinationHeight = this.dH;
+        this._setupFrameBuffer(options);
+        this.applyToWebGL(options);
+        this._swapTextures(options);
+        options.sourceHeight = options.destinationHeight;
+      }
+      else if (!this.isNeutralState(options)) {
+        this.applyTo2d(options);
+      }
+    },
+
+    isNeutralState: function(options) {
+      var scaleX = options.scaleX || this.scaleX,
+          scaleY = options.scaleY || this.scaleY;
+      return scaleX === 1 && scaleY === 1;
+    },
+
+    lanczosCreate: function(lobes) {
+      return function(x) {
+        if (x >= lobes || x <= -lobes) {
+          return 0.0;
+        }
+        if (x < 1.19209290E-07 && x > -1.19209290E-07) {
+          return 1.0;
+        }
+        x *= Math.PI;
+        var xx = x / lobes;
+        return (sin(x) / x) * sin(xx) / xx;
+      };
+    },
 
     /**
      * Applies filter to canvas element
@@ -119,11 +218,8 @@
      */
     applyTo2d: function(options) {
       var imageData = options.imageData,
-          scaleX = options.scaleX || this.scaleX,
-          scaleY = options.scaleY || this.scaleY;
-      if (scaleX === 1 && scaleY === 1) {
-        return;
-      }
+          scaleX = this.scaleX,
+          scaleY = this.scaleY;
 
       this.rcpScaleX = 1 / scaleX;
       this.rcpScaleY = 1 / scaleY;
@@ -212,20 +308,6 @@
      */
     lanczosResize: function(options, oW, oH, dW, dH) {
 
-      function lanczosCreate(lobes) {
-        return function(x) {
-          if (x > lobes) {
-            return 0;
-          }
-          x *= Math.PI;
-          if (abs(x) < 1e-16) {
-            return 1;
-          }
-          var xx = x / lobes;
-          return sin(x) * sin(xx) / x / xx;
-        };
-      }
-
       function process(u) {
         var v, i, weight, idx, a, red, green,
             blue, alpha, fX, fY;
@@ -278,9 +360,9 @@
       }
 
       var srcData = options.imageData.data,
-          destImg = options.ctx.creteImageData(dW, dH),
+          destImg = options.ctx.createImageData(dW, dH),
           destData = destImg.data,
-          lanczos = lanczosCreate(this.lanczosLobes),
+          lanczos = this.lanczosCreate(this.lanczosLobes),
           ratioX = this.rcpScaleX, ratioY = this.rcpScaleY,
           rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY,
           range2X = ceil(ratioX * this.lanczosLobes / 2),

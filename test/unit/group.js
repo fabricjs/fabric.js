@@ -1,13 +1,5 @@
 (function() {
-
-  var el = fabric.document.createElement('canvas');
-  el.width = 600; el.height = 600;
-
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode(600, 600, {enableRetinaScaling: false}) : new fabric.Canvas(el, {enableRetinaScaling: false});
-
-  // function _createImageElement() {
-  //   return fabric.isLikelyNode ? new (require(fabric.canvasModule).Image)() : fabric.document.createElement('img');
-  // }
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeGroupWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
@@ -177,7 +169,7 @@
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
       'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         10,
+      'strokeMiterLimit':         4,
       'scaleX':                   1,
       'scaleY':                   1,
       'shadow':                   null,
@@ -392,6 +384,20 @@
     });
   });
 
+  QUnit.test('fromObject restores oCoords', function(assert) {
+    var done = assert.async();
+    var group = makeGroupWith2ObjectsWithOpacity();
+
+    var groupObject = group.toObject();
+
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+      assert.ok(newGroupFromObject._objects[0].oCoords.tl, 'acoords 0 are restored');
+      assert.ok(newGroupFromObject._objects[1].oCoords.tl, 'acoords 1 are restored');
+
+      done();
+    });
+  });
+
   QUnit.test('fromObject does not delete objects from source', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
@@ -408,7 +414,7 @@
     var group = makeGroupWith2Objects();
     assert.ok(typeof group.toSVG === 'function');
 
-    var expectedSVG = '<g transform="translate(90 130)" style="">\n\t<rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(25 -25)"/>\n\t<rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(-35 10)"/>\n</g>\n';
+    var expectedSVG = '<g transform="translate(90 130)" style="">\n\t<rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(25 -25)"/>\n\t<rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(-35 10)"/>\n</g>\n';
     assert.equal(group.toSVG(), expectedSVG);
   });
 
@@ -483,7 +489,7 @@
     assert.equal(secondObjInGroup.group, group);
 
     group.remove(firstObjInGroup);
-    assert.ok(typeof firstObjInGroup.group == 'undefined');
+    assert.ok(typeof firstObjInGroup.group === 'undefined');
   });
 
   QUnit.test('insertAt', function(assert) {
@@ -507,10 +513,37 @@
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
+    g1.ownCaching = true;
     assert.equal(g1.dirty, false, 'Group has no dirty flag set');
     obj.set('fill', 'red');
     assert.equal(obj.dirty, true, 'Obj has dirty flag set');
     assert.equal(g1.dirty, true, 'Group has dirty flag set');
+  });
+
+  QUnit.test('dirty flag propagation from children up is stopped if group is not caching', function(assert) {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    g1.dirty = false;
+    obj.dirty = false;
+    g1.ownCaching = false;
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, true, 'Obj has dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+  });
+
+  QUnit.test('dirty flag propagation from children up does not happen if value does not change really', function(assert) {
+    var g1 = makeGroupWith4Objects();
+    var obj = g1.item(0);
+    obj.fill = 'red';
+    g1.dirty = false;
+    obj.dirty = false;
+    g1.ownCaching = true;
+    assert.equal(obj.dirty, false, 'Obj has no dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, false, 'Obj has no dirty flag set');
+    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
   });
 
   QUnit.test('dirty flag propagation from children up with', function(assert) {

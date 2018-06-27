@@ -255,7 +255,6 @@
      */
     _render: function(ctx) {
       this.callSuper('_render', ctx);
-      this.ctx = ctx;
     },
 
     /**
@@ -266,9 +265,9 @@
         return;
       }
       if (this.canvas && this.canvas.contextTop) {
-        var ctx = this.canvas.contextTop;
+        var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
         ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
+        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         this.transform(ctx);
         this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
         this._clearTextArea(ctx);
@@ -280,7 +279,7 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing) {
+      if (!this.isEditing || !this.canvas) {
         return;
       }
       var boundaries = this._getCursorBoundaries(), ctx;
@@ -289,7 +288,7 @@
         this.clearContextTop(true);
       }
       else {
-        ctx = this.ctx;
+        ctx = this.canvas.contextContainer;
         ctx.save();
       }
       if (this.selectionStart === this.selectionEnd) {
@@ -342,18 +341,19 @@
         return this.cursorOffsetCache;
       }
       var lineLeftOffset,
-          lineIndex = 0,
-          charIndex = 0,
+          lineIndex,
+          charIndex,
           topOffset = 0,
           leftOffset = 0,
           boundaries,
           cursorPosition = this.get2DCursorLocation(position);
-      for (var i = 0; i < cursorPosition.lineIndex; i++) {
+      charIndex = cursorPosition.charIndex;
+      lineIndex = cursorPosition.lineIndex;
+      for (var i = 0; i < lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
-
-      lineLeftOffset = this._getLineLeftOffset(cursorPosition.lineIndex);
-      var bound = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex];
+      lineLeftOffset = this._getLineLeftOffset(lineIndex);
+      var bound = this.__charBounds[lineIndex][charIndex];
       bound && (leftOffset = bound.left);
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
@@ -378,7 +378,8 @@
           charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
           multiplier = this.scaleX * this.canvas.getZoom(),
           cursorWidth = this.cursorWidth / multiplier,
-          topOffset = boundaries.topOffset;
+          topOffset = boundaries.topOffset,
+          dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
 
       topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
         - charHeight * (1 - this._fontSizeFraction);
@@ -391,7 +392,7 @@
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset - cursorWidth / 2,
-        topOffset + boundaries.top,
+        topOffset + boundaries.top + dy,
         cursorWidth,
         charHeight);
     },
@@ -405,6 +406,7 @@
 
       var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
           selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+          isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
@@ -421,14 +423,16 @@
           boxStart = this.__charBounds[startLine][startChar].left;
         }
         if (i >= startLine && i < endLine) {
-          boxEnd = this.getLineWidth(i) || 5; // WTF is this 5?
+          boxEnd = isJustify && !this.isEndOfWrapping(i) ? this.width : this.getLineWidth(i) || 5; // WTF is this 5?
         }
         else if (i === endLine) {
           if (endChar === 0) {
             boxEnd = this.__charBounds[endLine][endChar].left;
           }
           else {
-            boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
+            var charSpacing = this._getWidthOfCharSpacing();
+            boxEnd = this.__charBounds[endLine][endChar - 1].left
+              + this.__charBounds[endLine][endChar - 1].width - charSpacing;
           }
         }
         realLineHeight = lineHeight;

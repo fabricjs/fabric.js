@@ -286,7 +286,7 @@
     var ANGLE = ANGLE_DEG * Math.PI / 180;
     element.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    assert.deepEqual(parsedValue, [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]);
+    assert.deepEqual(parsedValue, [fabric.util.cos(ANGLE), fabric.util.sin(ANGLE), -fabric.util.sin(ANGLE), fabric.util.cos(ANGLE), 0, 0]);
 
     element.setAttribute('transform', 'scale(3.5)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
@@ -343,6 +343,31 @@
     fabric.loadSVGFromString(string, function(objects) {
       rect = objects[0];
       assert.ok(rect instanceof fabric.Rect);
+      done();
+    });
+  });
+
+  QUnit.test('parseSVGFromString with gradient and fill url with quotes', function(assert) {
+    var done = assert.async();
+    var string = '<?xml version="1.0" encoding="utf-8"?>' +
+    '<svg viewBox="0 0 1400 980" xmlns="http://www.w3.org/2000/svg" width="1400px" height="980px" version="1.1" >' +
+    '<linearGradient id="SVGID_11_" gradientUnits="userSpaceOnUse" x1="702.4817" y1="66.4817" x2="825.5183" y2="189.5183">' +
+    '<stop offset="0" style="stop-color:#FBB03B"/>' +
+    '<stop offset="0.2209" style="stop-color:#FBAC3A"/>' +
+    '<stop offset="0.4348" style="stop-color:#F9A037"/>' +
+    '<stop offset="0.6458" style="stop-color:#F78D32"/>' +
+    '<stop offset="0.8538" style="stop-color:#F4722A"/>' +
+    '<stop offset="1" style="stop-color:#F15A24"/>' +
+    '</linearGradient>' +
+    '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style="fill: url(\'#SVGID_11_\');"/>' +
+    '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style="fill: url(#SVGID_11_);"/>' +
+    '<path d="M 851 128 A 87 87 0 0 1 764 215 A 87 87 0 0 1 677 128 A 87 87 0 0 1 764 41 A 87 87 0 0 1 851 128 Z" class="st13" style=\'fill: url("#SVGID_11_");\'/>' +
+    '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].fill.type, 'linear', 'first path has gradient');
+      assert.equal(objects[1].fill.type, 'linear', 'second path has gradient');
+      assert.equal(objects[2].fill.type, 'linear', 'second path has gradient');
       done();
     });
   });
