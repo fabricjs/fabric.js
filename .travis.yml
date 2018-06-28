@@ -76,11 +76,11 @@ jobs:
     - stage: Visual Tests
       env: LAUNCHER=Chrome CANFAIL=TRUE
       node_js: "8"
-      script: npm run build:fast && testem:visual ci --port 8080 -f testem.json -l $LAUNCHER
+      script: npm run build:fast && testem --file testem-visual.json ci --port 8080 -f testem.json -l $LAUNCHER
     - stage: Visual Tests
       env: LAUNCHER=Firefox CANFAIL=TRUE
       node_js: "8"
-      script: npm run build:fast && testem:visual ci --port 8080 -f testem.json -l $LAUNCHER
+      script: npm run build:fast && testem --file testem-visual.json ci --port 8080 -f testem.json -l $LAUNCHER
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
