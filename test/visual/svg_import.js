@@ -6,10 +6,10 @@
   }
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
   var pixelmatchOptions = {
-    includeAA: true,
-    threshold: 0.1
+    includeAA: false,
+    threshold: 0.095
   };
-
+  fabric.Object.prototype.objectCaching = false;
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
     if (isAbsolute) { return path; };
