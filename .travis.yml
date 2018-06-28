@@ -30,6 +30,8 @@ jobs:
   fast_finish: true
   allow_failures:
     - env: LAUNCHER=Node CANFAIL=TRUE
+    - env: LAUNCHER=Firefox CANFAIL=TRUE
+    - env: LAUNCHER=Chrome CANFAIL=TRUE
   include:
     - stage: Linting and Building
       env: STEP=LINT
@@ -71,6 +73,14 @@ jobs:
     - stage: Visual Tests
       node_js: "8"
       script: npm run test:visual
+    - stage: Visual Tests
+      env: LAUNCHER=Chrome CANFAIL=TRUE
+      node_js: "8"
+      script: npm run build:fast && testem:visual ci --port 8080 -f testem.json -l $LAUNCHER
+    - stage: Visual Tests
+      env: LAUNCHER=Firefox CANFAIL=TRUE
+      node_js: "8"
+      script: npm run build:fast && testem:visual ci --port 8080 -f testem.json -l $LAUNCHER
 
 script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
 
