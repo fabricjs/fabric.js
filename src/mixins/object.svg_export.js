@@ -215,7 +215,7 @@
           clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         }
         markup.push(
-          '<clipPath id="' + clipPath.clipPathId + '" >\n\t',
+          '<clipPath id="' + clipPath.clipPathId + '" clipPathUnits="objectBoundingBox" >\n\t',
           this.clipPath.toSVG(this),
           '</clipPath>\n'
         );
