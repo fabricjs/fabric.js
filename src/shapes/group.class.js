@@ -539,7 +539,7 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
       markup.push(
-        '<g ', this.getSvgId(), 'transform="',
+        '<g ', this.getSvgCommons(), 'transform="',
         /* avoiding styles intentionally */
         this.getSvgTransform(),
         this.getSvgTransformMatrix(),

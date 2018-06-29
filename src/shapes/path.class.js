@@ -479,7 +479,7 @@
       var path = chunks.join(' ');
       addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       markup.push(
-        '<path ', this.getSvgId(),
+        '<path ', this.getSvgCommons(),
         'd="', path,
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(), addTransform,

@@ -89,7 +89,7 @@
 
       if (angle === 0) {
         markup.push(
-          '<circle ', this.getSvgId(),
+          '<circle ', this.getSvgCommons(),
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),

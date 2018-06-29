@@ -15216,8 +15216,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Returns id attribute for svg output
      * @return {String}
      */
-    getSvgId: function() {
-      return this.id ? 'id="' + this.id + '" ' : '';
+    getSvgCommons: function() {
+      return [
+        this.id ? 'id="' + this.id + '" ' : '',
+        this.clipPath ? 'clip-path="url(#' + this.clipPath.clipPathId + ')" ' : '',
+      ].join('');
     },
 
     /**
@@ -15293,7 +15296,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _createBaseSVGMarkup: function() {
-      var markup = [];
+      var markup = [], clipPath = this.clipPath;
 
       if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
@@ -15303,6 +15306,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       if (this.shadow) {
         markup.push(this.shadow.toSVG(this));
+      }
+      if (clipPath) {
+        if (clipPath.clipPathId === undefined) {
+          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        }
+        markup.push(
+          '<clipPath id="' + clipPath.clipPathId + '" >\n\t',
+          this.clipPath.toSVG(this),
+          '</clipPath>\n'
+        );
       }
       return markup;
     },
@@ -16320,7 +16333,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var markup = this._createBaseSVGMarkup(),
           p = this.calcLinePoints();
       markup.push(
-        '<line ', this.getSvgId(),
+        '<line ', this.getSvgCommons(),
         'x1="', p.x1,
         '" y1="', p.y1,
         '" x2="', p.x2,
@@ -16502,7 +16515,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (angle === 0) {
         markup.push(
-          '<circle ', this.getSvgId(),
+          '<circle ', this.getSvgCommons(),
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
@@ -16720,7 +16733,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             .join(',');
 
       markup.push(
-        '<polygon ', this.getSvgId(),
+        '<polygon ', this.getSvgCommons(),
         'points="', points,
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(), '"',
@@ -16860,7 +16873,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
       markup.push(
-        '<ellipse ', this.getSvgId(),
+        '<ellipse ', this.getSvgCommons(),
         'cx="0" cy="0" ',
         'rx="', this.rx,
         '" ry="', this.ry,
@@ -17089,7 +17102,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
-        '<rect ', this.getSvgId(),
+        '<rect ', this.getSvgCommons(),
         'x="', x, '" y="', y,
         '" rx="', this.get('rx'), '" ry="', this.get('ry'),
         '" width="', this.width, '" height="', this.height,
@@ -17285,7 +17298,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         );
       }
       markup.push(
-        '<', this.type, ' ', this.getSvgId(),
+        '<', this.type, ' ', this.getSvgCommons(),
         'points="', points.join(''),
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(),
@@ -17976,7 +17989,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var path = chunks.join(' ');
       addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       markup.push(
-        '<path ', this.getSvgId(),
+        '<path ', this.getSvgCommons(),
         'd="', path,
         '" style="', this.getSvgStyles(),
         '" transform="', this.getSvgTransform(), addTransform,
@@ -18960,7 +18973,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
       markup.push(
-        '<g ', this.getSvgId(), 'transform="',
+        '<g ', this.getSvgCommons(), 'transform="',
         /* avoiding styles intentionally */
         this.getSvgTransform(),
         this.getSvgTransformMatrix(),
@@ -19492,7 +19505,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
       markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
-      var imageMarkup = ['\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(true),
+      var imageMarkup = ['\t<image ', this.getSvgCommons(), 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
         '" style="', this.getSvgStyles(),
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -28120,7 +28133,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           style = filter === '' ? '' : ' style="' + filter + '"',
           textDecoration = this.getSvgTextDecoration(this);
       markup.push(
-        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
+        '\t<g ', this.getSvgCommons(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
         style, '>\n',
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',
