@@ -1,6 +1,6 @@
 (function(){
 
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+  // var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   QUnit.module('fabric.Object - clipPath', {
     afterEach: function() {
