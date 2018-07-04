@@ -114,7 +114,7 @@
           '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(), '"',
           this.addPaintOrder(),
-          '"/>\n'
+          '/>\n'
         );
       }
 
