@@ -375,20 +375,20 @@
       else {
         objsToRender = this._objects;
       }
-      
+
       objsToRender = objsToRender.sort(function(a, b) {
         var sortValue = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
-        
+
         if (az < bz) {
           sortValue = -1;
         }
         else if (az > bz) {
           sortValue = 1;
         }
-        
+
         return sortValue;
       });
-      
+
       return objsToRender;
     },
 
