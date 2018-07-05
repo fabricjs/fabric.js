@@ -375,6 +375,16 @@
       else {
         objsToRender = this._objects;
       }
+      
+      objsToRender = objsToRender.sort(function(a, b) {
+        var d = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
+        
+        if (az < bz) d = -1;
+        else if (az > bz) d = 1;
+        
+        return d;
+      });
+      
       return objsToRender;
     },
 
