@@ -377,12 +377,16 @@
       }
       
       objsToRender = objsToRender.sort(function(a, b) {
-        var d = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
+        var sortValue = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
         
-        if (az < bz) d = -1;
-        else if (az > bz) d = 1;
+        if (az < bz) {
+          sortValue = -1;
+        }
+        else if (az > bz) {
+          sortValue = 1;
+        }
         
-        return d;
+        return sortValue;
       });
       
       return objsToRender;
