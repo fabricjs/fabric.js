@@ -378,7 +378,7 @@
 
       return this._sortObjectsByDisplayOrder(objsToRender);
     },
-    
+
     _sortObjectsByDisplayOrder: function (objects) {
       return objects.sort(function(a, b) {
         var sortValue = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
@@ -389,7 +389,7 @@
         else if (az > bz) {
           sortValue = 1;
         }
-        
+
         return sortValue;
       });
     },
