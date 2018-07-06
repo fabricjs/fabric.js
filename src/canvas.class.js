@@ -376,7 +376,11 @@
         objsToRender = this._objects;
       }
 
-      objsToRender = objsToRender.sort(function(a, b) {
+      return this._sortObjectsByDisplayOrder(objsToRender);
+    },
+    
+    _sortObjectsByDisplayOrder: function (objects) {
+      return objects.sort(function(a, b) {
         var sortValue = 0, az = a.zIndex || 0, bz = b.zIndex || 0;
 
         if (az < bz) {
@@ -385,11 +389,7 @@
         else if (az > bz) {
           sortValue = 1;
         }
-
-        return sortValue;
       });
-
-      return objsToRender;
     },
 
     /**
@@ -1248,6 +1248,7 @@
      * @private
      */
     _searchPossibleTargets: function(objects, pointer) {
+      objects = this._sortObjectsByDisplayOrder(objects);
 
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, normalizedPointer, subTarget;
