@@ -389,6 +389,8 @@
         else if (az > bz) {
           sortValue = 1;
         }
+        
+        return sortValue;
       });
     },
 
