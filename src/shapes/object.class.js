@@ -599,7 +599,10 @@
     ).split(' '),
 
     /**
-     * a fabricObject that, without stroke define a clipping area with their opacity
+     * a fabricObject that, without stroke define a clipping area with their shape. filled in black
+     * the clipPath object gets used when the object has rendered, and the context is placed in the center
+     * of the object cacheCanvas.
+     * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
      * @type fabric.Object
      */
     clipPath: undefined,
