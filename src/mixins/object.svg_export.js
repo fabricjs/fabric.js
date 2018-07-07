@@ -215,8 +215,10 @@
           clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         }
         markup.push(
-          '<clipPath id="' + clipPath.clipPathId + '" clipPathUnits="objectBoundingBox" >\n\t',
-          this.clipPath.toSVG(this),
+          '<clipPath id="' + clipPath.clipPathId + '" ',
+          'clipPathUnits="objectBoundingBox" ',
+          'transform="translate(' + (this.width / 2) + ' , ' + (this.height / 2) + ')" >\n\t',
+          this.clipPath.toSVG(),
           '</clipPath>\n'
         );
       }
