@@ -840,7 +840,7 @@
           };
 
       if (this.clipPath) {
-        object.clipPath = this.clipPath.toObject();
+        object.clipPath = this.clipPath.toObject(propertiesToInclude);
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
