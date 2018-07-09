@@ -866,6 +866,48 @@
     canvas.renderOnAddRemove = true;
   });
 
+  QUnit.test('toSVG with exclude from export background', function(assert) {
+    assert.ok(typeof canvas.toSVG === 'function');
+    canvas.clear();
+
+    var circle = new fabric.Circle({excludeFromExport: true}),
+        rect = new fabric.Rect(),
+        imageBG = new fabric.Image({width: 0, height: 0}),
+        imageOL = new fabric.Image({width: 0, height: 0});
+
+    canvas.renderOnAddRemove = false;
+    canvas.add(circle, rect);
+
+    canvas.setBackgroundImage(imageBG);
+    canvas.setOverlayImage(imageOL);
+
+    var reviverCount = 0,
+        len = canvas.size();
+
+    function reviver(svg) {
+      reviverCount++;
+      return svg;
+    }
+
+    canvas.toSVG(null, reviver);
+    assert.equal(reviverCount, len + 1 , 'reviver should include backgroundImage and overlayImage');
+
+    reviverCount = 0;
+
+    canvas.setBackgroundImage(imageBG,canvas.renderAll.bind(canvas),{
+      excludeFromExport: true
+    });
+    canvas.setOverlayImage(imageOL,canvas.renderAll.bind(canvas),{
+      excludeFromExport: true
+    });
+    canvas.toSVG(null, reviver);
+    assert.equal(reviverCount, len - 1 , 'reviver should not include objects with excludeFromExport and backgroundImage & overlayImage');
+
+    canvas.setBackgroundImage(null);
+    canvas.setOverlayImage(null);
+    canvas.renderOnAddRemove = true;
+  });
+
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
     assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[]}');
