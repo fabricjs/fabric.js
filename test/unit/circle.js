@@ -137,6 +137,20 @@
     assert.deepEqual(circle.toObject(), augmentedProperties);
   });
 
+  QUnit.test('toSVG with full circle', function(assert) {
+    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10 });
+    var svg = circle.toSVG();
+
+    assert.equal(svg, '<circle cx="0" cy="0" r="10" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(10.5 10.5) "/>\n');
+  });
+
+  QUnit.test('toSVG with half circle', function(assert) {
+    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: Math.PI });
+    var svg = circle.toSVG();
+
+    assert.equal(svg, '<path d="M 10 0 A 10 10 0 0 1 -10 0" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(10.5 10.5) "/>\n');
+  });
+
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
