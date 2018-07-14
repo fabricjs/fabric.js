@@ -93,21 +93,21 @@
 
     /**
      * Text decoration underline.
-     * @type String
+     * @type Boolean
      * @default
      */
     underline:       false,
 
     /**
      * Text decoration overline.
-     * @type String
+     * @type Boolean
      * @default
      */
     overline:       false,
 
     /**
      * Text decoration linethrough.
-     * @type String
+     * @type Boolean
      * @default
      */
     linethrough:       false,
