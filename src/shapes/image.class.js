@@ -419,9 +419,7 @@
 
       filters = filters || this.filters || [];
       filters = filters.filter(function(filter) { return filter; });
-      if (this.group) {
-        this.set('dirty', true);
-      }
+      this.set('dirty', true);
       if (filters.length === 0) {
         this._element = this._originalElement;
         this._filteredEl = null;
