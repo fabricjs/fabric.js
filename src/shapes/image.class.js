@@ -385,10 +385,10 @@
 
     applyResizeFilters: function() {
       var filter = this.resizeFilter,
-          retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1,
           minimumScale = this.minimumScaleTrigger,
-          scaleX = this.scaleX * retinaScaling,
-          scaleY = this.scaleY * retinaScaling,
+          objectScale = this.getTotalObjectScaling(),
+          scaleX = objectScale.scaleX,
+          scaleY = objectScale.scaleY,
           elementToFilter = this._filteredEl || this._originalElement;
       if (this.group) {
         this.set('dirty', true);
@@ -397,6 +397,8 @@
         this._element = elementToFilter;
         this._filterScalingX = 1;
         this._filterScalingY = 1;
+        this._lastScaleX = 1;
+        this._lastScaleY = 1;
         return;
       }
       if (!fabric.filterBackend) {
@@ -408,8 +410,8 @@
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
-      filter.scaleX = scaleX;
-      filter.scaleY = scaleY;
+      this._lastScaleX = filter.scaleX = scaleX;
+      this._lastScaleY = filter.scaleY = scaleY;
       fabric.filterBackend.applyFilters(
         [filter], elementToFilter, sourceWidth, sourceHeight, this._element, cacheKey);
       this._filterScalingX = canvasEl.width / this._originalElement.width;
@@ -473,9 +475,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
-        this._lastScaleX = this.scaleX;
-        this._lastScaleY = this.scaleY;
+      if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
       this._stroke(ctx);
@@ -497,7 +497,8 @@
      * @private, needed to check if image needs resize
      */
     _needsResize: function() {
-      return (this.scaleX !== this._lastScaleX || this.scaleY !== this._lastScaleY);
+      var scale = this.getTotalObjectScaling();
+      return (scale.scaleX !== this._lastScaleX || scale.scaleY !== this._lastScaleY);
     },
 
     /**

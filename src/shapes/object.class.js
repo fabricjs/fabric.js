@@ -678,12 +678,10 @@
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _getCacheCanvasDimensions: function() {
-      var zoom = this.canvas && this.canvas.getZoom() || 1,
-          objectScale = this.getObjectScaling(),
-          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+      var objectScale = this.getTotalObjectScaling(),
           dim = this._getNonTransformedDimensions(),
-          zoomX = objectScale.scaleX * zoom * retina,
-          zoomY = objectScale.scaleY * zoom * retina,
+          zoomX = objectScale.scaleX,
+          zoomY = objectScale.scaleY,
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
@@ -886,6 +884,21 @@
         var scaling = this.group.getObjectScaling();
         scaleX *= scaling.scaleX;
         scaleY *= scaling.scaleY;
+      }
+      return { scaleX: scaleX, scaleY: scaleY };
+    },
+
+    /**
+     * Return the object scale factor counting also the group scaling, zoom and retina
+     * @return {Object} object with scaleX and scaleY properties
+     */
+    getTotalObjectScaling: function() {
+      var scale = this.getObjectScaling(), scaleX = scale.scaleX, scaleY = scale.scaleY;
+      if (this.canvas) {
+        var zoom = this.canvas.getZoom();
+        var retina = this.canvas.getRetinaScaling();
+        scaleX *= zoom * retina;
+        scaleY *= zoom * retina;
       }
       return { scaleX: scaleX, scaleY: scaleY };
     },
