@@ -1003,7 +1003,7 @@
   QUnit.test('getTotalObjectScaling with retina', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     canvas.enableRetinaScaling = true;
-    fabric.devicePixelRatio = 4
+    fabric.devicePixelRatio = 4;
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
     assert.deepEqual(objectScale, { scaleX: object.scaleX * 4, scaleY: object.scaleY * 4 });
