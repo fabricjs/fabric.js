@@ -137,11 +137,11 @@
     percentage: 0.06,
   });
 
-  tests.forEach(function(testArray) {
-    var testName = testArray.test;
-    var code = testArray.code;
-    var percentage = testArray.percentage;
-    var golden = testArray.golden;
+  tests.forEach(function(testObj) {
+    var testName = testObj.test;
+    var code = testObj.code;
+    var percentage = testObj.percentage;
+    var golden = testObj.golden;
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
@@ -159,9 +159,10 @@
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
           var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;
+          var okDiff = totalPixels * percentage;
           assert.ok(
-            differentPixels < totalPixels * percentage,
-            testName + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%'
+            differentPixels < okDiff,
+            testName + ' has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '%'
           );
           console.log('Different pixels:', differentPixels, '/', totalPixels, ' diff:', percDiff.toFixed(3), '%');
           done();
