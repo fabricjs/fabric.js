@@ -866,6 +866,27 @@
     canvas.renderOnAddRemove = true;
   });
 
+  QUnit.test('toSVG with exclude from export background', function(assert) {
+    var image = fabric.document.createElement('img'),
+        imageBG = new fabric.Image(image, {width: 0, height: 0}),
+        imageOL = new fabric.Image(image, {width: 0, height: 0});
+
+    canvas.renderOnAddRemove = false;
+    canvas.backgroundImage = imageBG;
+    canvas.overlayImage = imageOL;
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="0 0 600 600" xml:space="preserve">\n<desc>Created with Fabric.js 2.3.3</desc>\n<defs>\n</defs>\n<g transform="translate(0 0)">\n\t<image xlink:href="" x="0" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="0" height="0"></image>\n</g>\n<g transform="translate(0 0)">\n\t<image xlink:href="" x="0" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="0" height="0"></image>\n</g>\n</svg>';
+    var svg1 = canvas.toSVG();
+    assert.equal(svg1, expectedSVG, 'svg with bg and overlay do not match');
+    imageBG.excludeFromExport = true;
+    imageOL.excludeFromExport = true;
+    var expectedSVG2 = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="600" height="600" viewBox="0 0 600 600" xml:space="preserve">\n<desc>Created with Fabric.js 2.3.3</desc>\n<defs>\n</defs>\n</svg>';
+    var svg2 = canvas.toSVG();
+    assert.equal(svg2, expectedSVG2, 'svg without bg and overlay do not match');
+    canvas.backgroundImage = null;
+    canvas.overlayImage = null;
+    canvas.renderOnAddRemove = true;
+  });
+
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
     assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[]}');

@@ -678,6 +678,8 @@
     /**
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
+     * @param parentObject {fabric.Object} Object for which the cache is calculated
+     * (check clipPath functionality for more informations)
      * @private
      * @return {Object}.x width of object to be cached
      * @return {Object}.y height of object to be cached
@@ -687,16 +689,12 @@
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _getCacheCanvasDimensions: function(parentObject) {
-      var targetCanvas = this.canvas || (parentObject && parentObject.canvas),
-          zoom = targetCanvas && targetCanvas.getZoom() || 1,
-          objectScale = this.getObjectScaling(),
-          retina = targetCanvas && targetCanvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
+      var objectScale = this.getTotalObjectScaling(),
           dim = this._getNonTransformedDimensions(),
-          zoomX = objectScale.scaleX * zoom * retina,
-          zoomY = objectScale.scaleY * zoom * retina,
-          width, height;
-      width = dim.x * zoomX;
-      height = dim.y * zoomY;
+          zoomX = objectScale.scaleX,
+          zoomY = objectScale.scaleY,
+          width = dim.x * zoomX,
+          height = dim.y * zoomY;
       return {
         // for sure this ALIASING_LIMIT is slightly crating problem
         // in situation in wich the cache canvas gets an upper limit
@@ -902,6 +900,21 @@
         var scaling = this.group.getObjectScaling();
         scaleX *= scaling.scaleX;
         scaleY *= scaling.scaleY;
+      }
+      return { scaleX: scaleX, scaleY: scaleY };
+    },
+
+    /**
+     * Return the object scale factor counting also the group scaling, zoom and retina
+     * @return {Object} object with scaleX and scaleY properties
+     */
+    getTotalObjectScaling: function() {
+      var scale = this.getObjectScaling(), scaleX = scale.scaleX, scaleY = scale.scaleY;
+      if (this.canvas) {
+        var zoom = this.canvas.getZoom();
+        var retina = this.canvas.getRetinaScaling();
+        scaleX *= zoom * retina;
+        scaleY *= zoom * retina;
       }
       return { scaleX: scaleX, scaleY: scaleY };
     },
@@ -1646,20 +1659,18 @@
      * @param {String} [options.repeat=repeat] Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
      * @param {Number} [options.offsetX=0] Pattern horizontal offset from object's left/top corner
      * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
+     * @param {Function} [callback] Callback to invoke when image set as a pattern
      * @return {fabric.Object} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/QT3pa/|jsFiddle demo}
      * @example <caption>Set pattern</caption>
-     * fabric.util.loadImage('http://fabricjs.com/assets/escheresque_ste.png', function(img) {
-     *   object.setPatternFill({
-     *     source: img,
-     *     repeat: 'repeat'
-     *   });
-     *   canvas.renderAll();
-     * });
+     * object.setPatternFill({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
+     *   repeat: 'repeat'
+     * },canvas.renderAll.bind(canvas));
      */
-    setPatternFill: function(options) {
-      return this.set('fill', new fabric.Pattern(options));
+    setPatternFill: function(options, callback) {
+      return this.set('fill', new fabric.Pattern(options, callback));
     },
 
     /**

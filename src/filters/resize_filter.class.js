@@ -30,6 +30,8 @@
 
     /**
      * Resize type
+     * for webgl resizyType is just lanczos, for canvas2d can be:
+     * bilinear, hermite, sliceHacl, lanczos.
      * @param {String} resizeType
      * @default
      */
@@ -50,7 +52,7 @@
     scaleY: 0,
 
     /**
-     * LanczosLobes parameter for lanczos filter
+     * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
      * @param {Number} lanczosLobes
      * @default
      */

@@ -52,6 +52,9 @@
       fabric.perfLimitSizeTotal = 2097152;
       fabric.maxCacheSideLimit = 4096;
       fabric.minCacheSideLimit = 256;
+      fabric.devicePixelRatio = 1;
+      canvas.enableRetinaScaling = false;
+      canvas.setZoom(1);
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
@@ -989,13 +992,30 @@
     assert.equal(typeof deserializedObject.clipTo, 'function');
   });
 
-  QUnit.test('getObjectScale', function(assert) {
+  QUnit.test('getTotalObjectScaling with zoom', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    canvas.setZoom(3);
+    canvas.add(object);
+    var objectScale = object.getTotalObjectScaling();
+    assert.deepEqual(objectScale, { scaleX: object.scaleX * 3, scaleY: object.scaleY * 3 });
+  });
+
+  QUnit.test('getTotalObjectScaling with retina', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2});
+    canvas.enableRetinaScaling = true;
+    fabric.devicePixelRatio = 4;
+    canvas.add(object);
+    var objectScale = object.getTotalObjectScaling();
+    assert.deepEqual(objectScale, { scaleX: object.scaleX * 4, scaleY: object.scaleY * 4 });
+  });
+
+  QUnit.test('getObjectScaling', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var objectScale = object.getObjectScaling();
     assert.deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
   });
 
-  QUnit.test('getObjectScale in group', function(assert) {
+  QUnit.test('getObjectScaling in group', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var group = new fabric.Group();
     group.scaleX = 2;
