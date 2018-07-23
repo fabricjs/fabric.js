@@ -88,7 +88,7 @@
     test: 'Image resize with canvas zoom',
     code: imageResizeTest,
     golden: 'parrot.png',
-    percentage: 0.03,
+    percentage: 0.06,
   });
 
   function imageResizeTestNoZoom(canvas, callback) {
@@ -110,7 +110,7 @@
     test: 'Image resize without zoom',
     code: imageResizeTestNoZoom,
     golden: 'parrot.png',
-    percentage: 0.03,
+    percentage: 0.06,
   });
 
   function imageResizeTestGroup(canvas, callback) {
@@ -134,7 +134,7 @@
     test: 'Image resize with scaled group',
     code: imageResizeTestGroup,
     golden: 'parrot.png',
-    percentage: 0.03,
+    percentage: 0.06,
   });
 
   tests.forEach(function(testArray) {
