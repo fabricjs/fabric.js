@@ -475,7 +475,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
+      if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this._lastScaleX = this.scaleX;
         this._lastScaleY = this.scaleY;
         this.applyResizeFilters();

@@ -31,7 +31,17 @@
     return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/visual/golden/' + filename);
   }
 
-  function getImage(filename, callback) {
+  function getImage(filename, original, callback) {
+    if (fabric.isLikelyNode && original) {
+      try {
+        fs.statSync(filename);
+      }
+      catch (err) {
+        var dataUrl = original.toDataURL().split(',')[1];
+        console.log('creating original for ', filename);
+        fs.writeFileSync(filename, dataUrl, { encoding: 'base64' });
+      }
+    }
     var img = fabric.document.createElement('img');
     img.onload = function() {
       callback(img);
@@ -57,12 +67,12 @@
   var tests = [];
 
   function imageResizeTest(canvas, callback) {
-    getImage(getFixtureName('parrot.png'), function(img) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
       canvas.setDimensions({
         width: 200,
         height: 200,
       });
-      var zoom = 4;
+      var zoom = 8;
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
       canvas.setZoom(zoom);
@@ -95,7 +105,7 @@
         canvas.height = height;
         var ctx = canvas.getContext('2d');
         var output = ctx.getImageData(0, 0, width, height).data;
-        getImage(getGoldeName('parrot.png'), function(golden) {
+        getImage(getGoldeName('parrot.png'), renderedCanvas, function(golden) {
           ctx.drawImage(golden, 0, 0);
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
           var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
@@ -104,6 +114,7 @@
             differentPixels < totalPixels * percentage,
             testName + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%'
           );
+          console.log('Different pixels:', differentPixels, '/', totalPixels, ' diff:', percDiff.toFixed(3), '%');
           done();
         });
       });
