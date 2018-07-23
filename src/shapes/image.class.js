@@ -386,9 +386,11 @@
     applyResizeFilters: function() {
       var filter = this.resizeFilter,
           retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1,
+          zoom = (this.canvas && this.canvas.getZoom()) || 1,
           minimumScale = this.minimumScaleTrigger,
-          scaleX = this.scaleX * retinaScaling,
-          scaleY = this.scaleY * retinaScaling,
+          objectScale = this.getObjectScaling(),
+          scaleX = objectScale.scaleX * zoom * retinaScaling,
+          scaleY = objectScale.scaleY * zoom * retinaScaling,
           elementToFilter = this._filteredEl || this._originalElement;
       if (this.group) {
         this.set('dirty', true);
