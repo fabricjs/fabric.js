@@ -91,10 +91,57 @@
     percentage: 0.03,
   });
 
+  function imageResizeTestNoZoom(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      canvas.setDimensions({
+        width: 200,
+        height: 200,
+      });
+      var image = new fabric.Image(img);
+      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.scaleToWidth(canvas.width);
+      canvas.add(image);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'Image resize without zoom',
+    code: imageResizeTestNoZoom,
+    golden: 'parrot.png',
+    percentage: 0.03,
+  });
+
+  function imageResizeTestGroup(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      canvas.setDimensions({
+        width: 200,
+        height: 200,
+      });
+      var image = new fabric.Image(img, { strokeWidth: 0 });
+      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      var group = new fabric.Group([image]);
+      group.strokeWidth = 0;
+      group.scaleToWidth(canvas.width);
+      canvas.add(group);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'Image resize with scaled group',
+    code: imageResizeTestGroup,
+    golden: 'parrot.png',
+    percentage: 0.03,
+  });
+
   tests.forEach(function(testArray) {
     var testName = testArray.test;
     var code = testArray.code;
     var percentage = testArray.percentage;
+    var golden = testArray.golden;
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
@@ -107,7 +154,7 @@
         canvas.height = height;
         var ctx = canvas.getContext('2d');
         var output = ctx.getImageData(0, 0, width, height).data;
-        getImage(getGoldeName('parrot.png'), renderedCanvas, function(golden) {
+        getImage(getGoldeName(golden), renderedCanvas, function(golden) {
           ctx.drawImage(golden, 0, 0);
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
           var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
