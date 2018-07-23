@@ -88,18 +88,19 @@
     test: 'Image resize with canvas zoom',
     code: imageResizeTest,
     golden: 'parrot.png',
+    percentage: 0.03,
   });
 
   tests.forEach(function(testArray) {
     var testName = testArray.test;
     var code = testArray.code;
+    var percentage = testArray.percentage;
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
         var width = renderedCanvas.width;
         var height = renderedCanvas.height;
         var totalPixels = width * height;
-        var percentage = 0.01;
         var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height).data;
         var canvas = fabric.document.createElement('canvas');
         canvas.width = width;
