@@ -731,6 +731,50 @@
     assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
     assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
+  
+  QUnit.test('text unsuperscript', function(assert) {
+    var text = new fabric.Text('xxx', { styles: {
+      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
+    } });
+    assert.ok(typeof text.unsetSuperscript === 'function');
+
+    var size = text.fontSize;
+    var schema = text.unsuperscript;
+    var styleFontSize = text.styles[0][2].fontSize;
+    var styleDeltaY = text.styles[0][2].deltaY;
+    text.unsetSuperscript(1, 2).unsetSuperscript(2, 3);
+
+    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
+    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    assert.equal(text.styles[0][1].fontSize, size / schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].deltaY, schema.baseline, 'character 1: deltaY has been set');
+
+    assert.equal(text.styles[0][2].fontSize, styleFontSize / schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].deltaY, schema.baseline, 'character 2: deltaY has been decreased');
+  });
+
+  QUnit.test('text unsubscript', function(assert) {
+    var text = new fabric.Text('xxx', { styles: {
+      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
+    } });
+    assert.ok(typeof text.unsetSubscript === 'function');
+
+    var size = text.fontSize;
+    var schema = text.unsubscript;
+    var styleFontSize = text.styles[0][2].fontSize;
+    var styleDeltaY = text.styles[0][2].deltaY;
+    text.unsetSubscript(1,2).unsetSubscript(2,3);
+
+    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
+    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
+
+    assert.equal(text.styles[0][1].fontSize, size / schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].deltaY, schema.baseline, 'character 1: deltaY has been set');
+
+    assert.equal(text.styles[0][2].fontSize, styleFontSize / schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].deltaY, schema.baseline, 'character 2: deltaY has been increased');
+  });
 
   QUnit.test('getHeightOfLine measures height of aline', function(assert) {
     var text = new fabric.Text('xxx\n');
