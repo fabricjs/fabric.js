@@ -747,10 +747,10 @@
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
 
-    assert.equal(text.styles[0][1].fontSize, size / schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].fontSize, size, 'character 1: fontSize has been set');
     assert.equal(text.styles[0][1].deltaY, schema.baseline, 'character 1: deltaY has been set');
 
-    assert.equal(text.styles[0][2].fontSize, styleFontSize / schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].fontSize, styleFontSize, 'character 2: fontSize has been decreased');
     assert.equal(text.styles[0][2].deltaY, schema.baseline, 'character 2: deltaY has been decreased');
   });
 
@@ -769,10 +769,10 @@
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
 
-    assert.equal(text.styles[0][1].fontSize, size / schema.size, 'character 1: fontSize has been set');
+    assert.equal(text.styles[0][1].fontSize, size, 'character 1: fontSize has been set');
     assert.equal(text.styles[0][1].deltaY, schema.baseline, 'character 1: deltaY has been set');
 
-    assert.equal(text.styles[0][2].fontSize, styleFontSize / schema.size, 'character 2: fontSize has been decreased');
+    assert.equal(text.styles[0][2].fontSize, styleFontSize, 'character 2: fontSize has been decreased');
     assert.equal(text.styles[0][2].deltaY, schema.baseline, 'character 2: deltaY has been increased');
   });
 
