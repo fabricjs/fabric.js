@@ -163,7 +163,7 @@
       size:       0.60,
       baseline:   0
     },
-  
+
     /**
      * Unsubscript schema object (minimum overlap)
      * @type {Object}
@@ -1005,7 +1005,7 @@
     setSubscript: function(start, end) {
       return this._setScript(start, end, this.subscript);
     },
-    
+
     /**
      * Turns the character into a 'superior figure' (i.e. 'superscript')
      * @param {Number} start selection start
