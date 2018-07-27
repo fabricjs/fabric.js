@@ -731,7 +731,7 @@
     assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
     assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
-  
+
   QUnit.test('text unsuperscript', function(assert) {
     var text = new fabric.Text('xxx', { styles: {
       0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
@@ -741,7 +741,7 @@
     var size = text.fontSize;
     var schema = text.unsuperscript;
     var styleFontSize = text.styles[0][2].fontSize;
-    var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSuperscript(1, 2).setSuperscript(2, 3);
     text.unsetSuperscript(1, 2).unsetSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
@@ -763,7 +763,7 @@
     var size = text.fontSize;
     var schema = text.unsubscript;
     var styleFontSize = text.styles[0][2].fontSize;
-    var styleDeltaY = text.styles[0][2].deltaY;
+    text.setSubscript(1,2).setSubscript(2,3);
     text.unsetSubscript(1,2).unsetSubscript(2,3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
