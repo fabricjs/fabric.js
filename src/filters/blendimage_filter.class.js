@@ -151,15 +151,17 @@
         resources.blendImage = fabric.util.createCanvasElement();
       }
       canvas1 = resources.blendImage;
+      context = canvas1.getContext('2d');
       if (canvas1.width !== width || canvas1.height !== height) {
         canvas1.width = width;
         canvas1.height = height;
       }
-      context = canvas1.getContext('2d');
+      else {
+        context.clearRect(0, 0, width, height);
+      }
       context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
       context.drawImage(image._element, 0, 0, width, height);
       blendData = context.getImageData(0, 0, width, height).data;
-      context.clearRect(0, 0, width, height);
       for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
