@@ -194,7 +194,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {Object} options
    **/
   isNeutralState: function(/* options */) {
-    return false;
+    var main = this.mainParameter;
+    if (main) {
+      return fabric.Image.filters[this.type].prototype[main] === this[main];
+    }
+    else {
+      return false;
+    }
   },
 
   /**
@@ -212,15 +218,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    */
   applyTo: function(options) {
     if (options.webgl) {
-      if (options.passes > 1 && this.isNeutralState(options)) {
-        // avoid doing something that we do not need
-        return;
-      }
       this._setupFrameBuffer(options);
       this.applyToWebGL(options);
       this._swapTextures(options);
     }
-    else if (!this.isNeutralState()) {
+    else {
       this.applyTo2d(options);
     }
   },
