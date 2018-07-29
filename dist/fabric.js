@@ -2646,10 +2646,10 @@ fabric.CommonMethods = {
 
   var makeXHR = (function() {
     var factories = [
-      function() { return new fabric.window.XMLHttpRequest(); },
       function() { return new ActiveXObject('Microsoft.XMLHTTP'); },
       function() { return new ActiveXObject('Msxml2.XMLHTTP'); },
-      function() { return new ActiveXObject('Msxml2.XMLHTTP.3.0'); }
+      function() { return new ActiveXObject('Msxml2.XMLHTTP.3.0'); },
+      function() { return new XMLHttpRequest(); }
     ];
     for (var i = factories.length; i--; ) {
       try {
@@ -2676,6 +2676,7 @@ fabric.CommonMethods = {
    * @return {XMLHttpRequest} request
    */
   function request(url, options) {
+
     options || (options = { });
 
     var method = options.method ? options.method.toUpperCase() : 'GET',
@@ -7793,7 +7794,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
      * @private
      */
     _setSVGBgOverlayImage: function(markup, property, reviver) {
-      if (this[property] && !this[property].excludeFromExport && this[property].toSVG) {
+      if (this[property] && this[property].toSVG) {
         markup.push(this[property].toSVG(reviver));
       }
     },
@@ -12869,10 +12870,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _getCacheCanvasDimensions: function() {
-      var objectScale = this.getTotalObjectScaling(),
+      var zoom = this.canvas && this.canvas.getZoom() || 1,
+          objectScale = this.getObjectScaling(),
+          retina = this.canvas && this.canvas._isRetinaScaling() ? fabric.devicePixelRatio : 1,
           dim = this._getNonTransformedDimensions(),
-          zoomX = objectScale.scaleX,
-          zoomY = objectScale.scaleY,
+          zoomX = objectScale.scaleX * zoom * retina,
+          zoomY = objectScale.scaleY * zoom * retina,
           width = dim.x * zoomX,
           height = dim.y * zoomY;
       return {
@@ -13075,21 +13078,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         var scaling = this.group.getObjectScaling();
         scaleX *= scaling.scaleX;
         scaleY *= scaling.scaleY;
-      }
-      return { scaleX: scaleX, scaleY: scaleY };
-    },
-
-    /**
-     * Return the object scale factor counting also the group scaling, zoom and retina
-     * @return {Object} object with scaleX and scaleY properties
-     */
-    getTotalObjectScaling: function() {
-      var scale = this.getObjectScaling(), scaleX = scale.scaleX, scaleY = scale.scaleY;
-      if (this.canvas) {
-        var zoom = this.canvas.getZoom();
-        var retina = this.canvas.getRetinaScaling();
-        scaleX *= zoom * retina;
-        scaleY *= zoom * retina;
       }
       return { scaleX: scaleX, scaleY: scaleY };
     },
@@ -13792,18 +13780,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {String} [options.repeat=repeat] Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
      * @param {Number} [options.offsetX=0] Pattern horizontal offset from object's left/top corner
      * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
-     * @param {Function} [callback] Callback to invoke when image set as a pattern
      * @return {fabric.Object} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/QT3pa/|jsFiddle demo}
      * @example <caption>Set pattern</caption>
-     * object.setPatternFill({
-     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
-     *   repeat: 'repeat'
-     * },canvas.renderAll.bind(canvas));
+     * fabric.util.loadImage('http://fabricjs.com/assets/escheresque_ste.png', function(img) {
+     *   object.setPatternFill({
+     *     source: img,
+     *     repeat: 'repeat'
+     *   });
+     *   canvas.renderAll();
+     * });
      */
-    setPatternFill: function(options, callback) {
-      return this.set('fill', new fabric.Pattern(options, callback));
+    setPatternFill: function(options) {
+      return this.set('fill', new fabric.Pattern(options));
     },
 
     /**
@@ -14716,8 +14706,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height.
-     * See {@link https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords|When-to-call-setCoords}
+     * Sets corner position coordinates based on current angle, width and height
+     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
      * @param {Boolean} [ignoreZoom] set oCoords with or without the viewport transform.
      * @param {Boolean} [skipAbsolute] skip calculation of aCoords, usefull in setViewportTransform
      * @return {fabric.Object} thisArg
@@ -16410,7 +16400,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(), '"',
           this.addPaintOrder(),
-          '/>\n'
+          '"/>\n'
         );
       }
 
@@ -19455,10 +19445,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     applyResizeFilters: function() {
       var filter = this.resizeFilter,
+          retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1,
           minimumScale = this.minimumScaleTrigger,
-          objectScale = this.getTotalObjectScaling(),
-          scaleX = objectScale.scaleX,
-          scaleY = objectScale.scaleY,
+          scaleX = this.scaleX * retinaScaling,
+          scaleY = this.scaleY * retinaScaling,
           elementToFilter = this._filteredEl || this._originalElement;
       if (this.group) {
         this.set('dirty', true);
@@ -19467,8 +19457,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this._element = elementToFilter;
         this._filterScalingX = 1;
         this._filterScalingY = 1;
-        this._lastScaleX = 1;
-        this._lastScaleY = 1;
         return;
       }
       if (!fabric.filterBackend) {
@@ -19480,8 +19468,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
-      this._lastScaleX = filter.scaleX = scaleX;
-      this._lastScaleY = filter.scaleY = scaleY;
+      filter.scaleX = scaleX;
+      filter.scaleY = scaleY;
       fabric.filterBackend.applyFilters(
         [filter], elementToFilter, sourceWidth, sourceHeight, this._element, cacheKey);
       this._filterScalingX = canvasEl.width / this._originalElement.width;
@@ -19545,7 +19533,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
+      if (this.isMoving === false && this.resizeFilter && this._needsResize()) {
+        this._lastScaleX = this.scaleX;
+        this._lastScaleY = this.scaleY;
         this.applyResizeFilters();
       }
       this._stroke(ctx);
@@ -19567,8 +19557,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private, needed to check if image needs resize
      */
     _needsResize: function() {
-      var scale = this.getTotalObjectScaling();
-      return (scale.scaleX !== this._lastScaleX || scale.scaleY !== this._lastScaleY);
+      return (this.scaleX !== this._lastScaleX || this.scaleY !== this._lastScaleY);
     },
 
     /**
@@ -20570,13 +20559,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @param {Object} options
    **/
   isNeutralState: function(/* options */) {
-    var main = this.mainParameter;
-    if (main) {
-      return fabric.Image.filters[this.type].prototype[main] === this[main];
-    }
-    else {
-      return false;
-    }
+    return false;
   },
 
   /**
@@ -22685,8 +22668,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * Resize type
-     * for webgl resizyType is just lanczos, for canvas2d can be:
-     * bilinear, hermite, sliceHacl, lanczos.
      * @param {String} resizeType
      * @default
      */
@@ -22707,7 +22688,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     scaleY: 0,
 
     /**
-     * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
+     * LanczosLobes parameter for lanczos filter
      * @param {Number} lanczosLobes
      * @default
      */
@@ -23983,21 +23964,21 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * Text decoration underline.
-     * @type Boolean
+     * @type String
      * @default
      */
     underline:       false,
 
     /**
      * Text decoration overline.
-     * @type Boolean
+     * @type String
      * @default
      */
     overline:       false,
 
     /**
      * Text decoration linethrough.
-     * @type Boolean
+     * @type String
      * @default
      */
     linethrough:       false,
