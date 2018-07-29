@@ -148,7 +148,7 @@
           canvas1, context, image = this.image, blendData;
 
       if (!resources.blendImage) {
-        resources.blendImage = document.createElement('canvas');
+        resources.blendImage = fabric.util.createCanvasElement();
       }
       canvas1 = resources.blendImage;
       if (canvas1.width !== width || canvas1.height !== height) {
@@ -159,6 +159,7 @@
       context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
       context.drawImage(image._element, 0, 0, width, height);
       blendData = context.getImageData(0, 0, width, height).data;
+      context.clearRect(0, 0, width, height);
       for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
