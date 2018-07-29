@@ -53,17 +53,15 @@
     img.src = filename;
   }
 
-  QUnit.module('Image resize filter test', {
-    afterEach: function() {
-      fabricCanvas.setZoom(1);
-      fabricCanvas.setDimensions({
-        width: 300,
-        height: 150,
-      });
-      fabricCanvas.clear();
-      fabricCanvas.renderAll();
-    }
-  });
+  function afterEachHandler() {
+    fabricCanvas.setZoom(1);
+    fabricCanvas.setDimensions({
+      width: 300,
+      height: 150,
+    });
+    fabricCanvas.clear();
+    fabricCanvas.renderAll();
+  }
 
   var tests = [];
 
@@ -88,6 +86,7 @@
     test: 'Image resize with canvas zoom',
     code: imageResizeTest,
     golden: 'parrot.png',
+    newModule: 'Image resize filter test',
     percentage: 0.06,
   });
 
@@ -137,11 +136,70 @@
     percentage: 0.06,
   });
 
+  function blendImageTest(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      getImage(getFixtureName('very_large_image.jpg'), false, function(backdrop) {
+        var image = new fabric.Image(img);
+        var backdropImage = new fabric.Image(backdrop);
+        image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+        image.scaleToWidth(400);
+        image.applyFilters();
+        canvas.setDimensions({
+          width: 400,
+          height: 400,
+        });
+        canvas.add(image);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      });
+    });
+  }
+
+  tests.push({
+    test: 'Blend image test',
+    code: blendImageTest,
+    newModule: 'blendTest',
+    golden: 'parrotBlend.png',
+    percentage: 0.06,
+  });
+
+  function blendImageTest2(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      var image = new fabric.Image(img);
+      var backdropImage = new fabric.Image(img);
+      backdropImage.left = backdropImage.width;
+      backdropImage.scaleX = -1;
+      image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+      image.scaleToWidth(400);
+      image.applyFilters();
+      canvas.setDimensions({
+        width: 400,
+        height: 400,
+      });
+      canvas.add(image);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'Blend image test with flip',
+    code: blendImageTest2,
+    golden: 'parrotBlend2.png',
+    percentage: 0.06,
+  });
+
   tests.forEach(function(testObj) {
     var testName = testObj.test;
     var code = testObj.code;
     var percentage = testObj.percentage;
     var golden = testObj.golden;
+    var newModule = testObj.newModule;
+    if (newModule) {
+      QUnit.module(newModule, {
+        afterEach: afterEachHandler,
+      });
+    }
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {

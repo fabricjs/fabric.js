@@ -42,7 +42,7 @@
     mode: 'multiply',
 
     /**
-     * alpha value. represent the strength of the blend color operation.
+     * alpha value. represent the strength of the blend image operation.
      **/
     alpha: 1,
 
