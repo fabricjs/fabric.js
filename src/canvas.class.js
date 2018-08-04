@@ -702,10 +702,9 @@
         mouseXSign: 1,
         mouseYSign: 1,
         shiftKey: e.shiftKey,
-        altKey: e[this.centeredKey]
+        altKey: e[this.centeredKey],
+        original: fabric.util.saveObjectTransform(target),
       };
-
-      this._currentTransform.original = fabric.util.saveObjectTransform(target);
 
       this._resetCurrentTransform();
       this._beforeTransform(e);
