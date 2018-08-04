@@ -792,6 +792,30 @@
     assert.equal(rect.angle, 0);
   });
 
+  QUnit.test('saveObjectTransform', function(assert) {
+    assert.ok(typeof fabric.util.saveObjectTransform === 'function');
+    var rect = new fabric.Rect({
+      top: 1,
+      width: 100,
+      height: 100,
+      angle: 30,
+      scaleX: 2,
+      scaleY: 1,
+      flipX: true,
+      flipY: true,
+      skewX: 30,
+      skewY: 30
+    });
+    var transform = fabric.util.saveObjectTransform(rect);
+    assert.equal(transform.skewX, 30);
+    assert.equal(transform.skewY, 30);
+    assert.equal(transform.scaleX, 2);
+    assert.equal(transform.scaleY, 1);
+    assert.equal(transform.flipX, true);
+    assert.equal(transform.flipY, true);
+    assert.equal(transform.angle, 30);
+  });
+
   QUnit.test('invertTransform', function(assert) {
     assert.ok(typeof fabric.util.invertTransform === 'function');
     var m1 = [1, 2, 3, 4, 5, 6], m3;

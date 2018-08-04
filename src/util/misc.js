@@ -683,8 +683,8 @@
       return {
         scaleX: target.scaleX,
         scaleY: target.scaleY,
-        skewX: target.scaleX,
-        skewY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
         angle: target.angle,
         left: target.left,
         flipX: target.flipX,
