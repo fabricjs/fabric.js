@@ -1458,7 +1458,6 @@
       options || (options = { });
 
       var origParams = fabric.util.saveObjectTransform(this);
-      console.log(origParams)
 
       if (options.withoutTransform) {
         fabric.util.resetObjectTransform(this);
