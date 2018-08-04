@@ -706,6 +706,9 @@
         original: fabric.util.saveObjectTransform(target),
       };
 
+      this._currentTransform.original.originX = origin.x;
+      this._currentTransform.original.originY = origin.y;
+
       this._resetCurrentTransform();
       this._beforeTransform(e);
     },
