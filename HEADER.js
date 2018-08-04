@@ -98,6 +98,11 @@ fabric.minCacheSideLimit = 256;
 fabric.charWidthsCache = { };
 
 /**
+ * Cache Object for widths of chars in text rendering.
+ */
+fabric.charWidthsCache = { };
+
+/**
  * if webgl is enabled and available, textureSize will determine the size
  * of the canvas backend
  * @since 2.0.0
@@ -139,6 +144,24 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
  * @default 1
  */
 fabric.browserShadowBlurConstant = 1;
+
+/**
+ * Device Pixel Ratio
+ * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+ */
+fabric.arcToSegmentsCache = { };
+
+/**
+ * Device Pixel Ratio
+ * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+ */
+fabric.boundsOfCurveCache = { };
+
+/**
+ * Device Pixel Ratio
+ * @default true
+ */
+fabric.cachesBoundsOfCurve = true;
 
 fabric.initFilterBackend = function() {
   if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {

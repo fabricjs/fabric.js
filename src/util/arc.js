@@ -1,8 +1,6 @@
 (function() {
 
-  var arcToSegmentsCache = { },
-      boundsOfCurveCache = { },
-      _join = Array.prototype.join;
+  var _join = Array.prototype.join;
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
    * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
@@ -10,8 +8,8 @@
    */
   function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
     var argsString = _join.call(arguments);
-    if (arcToSegmentsCache[argsString]) {
-      return arcToSegmentsCache[argsString];
+    if (fabric.arcToSegmentsCache[argsString]) {
+      return fabric.arcToSegmentsCache[argsString];
     }
 
     var PI = Math.PI, th = rotateX * PI / 180,
@@ -65,7 +63,7 @@
       mTheta = th3;
       th3 += mDelta;
     }
-    arcToSegmentsCache[argsString] = result;
+    fabric.arcToSegmentsCache[argsString] = result;
     return result;
   }
 
@@ -174,8 +172,8 @@
     var argsString;
     if (fabric.cachesBoundsOfCurve) {
       argsString = _join.call(arguments);
-      if (boundsOfCurveCache[argsString]) {
-        return boundsOfCurveCache[argsString];
+      if (fabric.boundsOfCurveCache[argsString]) {
+        return fabric.boundsOfCurveCache[argsString];
       }
     }
 
@@ -247,7 +245,7 @@
       }
     ];
     if (fabric.cachesBoundsOfCurve) {
-      boundsOfCurveCache[argsString] = result;
+      fabric.boundsOfCurveCache[argsString] = result;
     }
     return result;
   }
