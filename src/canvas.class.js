@@ -1096,18 +1096,6 @@
     },
 
     /**
-     * @param {fabric.Object} target to reset transform
-     * @private
-     */
-    _resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.skewX = 0;
-      target.skewY = 0;
-      target.rotate(0);
-    },
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx to draw the selection on
      */

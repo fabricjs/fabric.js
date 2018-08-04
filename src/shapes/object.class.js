@@ -1451,28 +1451,16 @@
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
-     * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle no skew ). Introduced in 2.3.4
+     * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
       options || (options = { });
 
-      var origParams = {
-        scaleX: this.scaleX,
-        scaleY: this.scaleY,
-        skewX: this.scaleX,
-        skewY: this.scaleY,
-        angle: this.angle,
-        left: this.left,
-        top: this.top
-      };
+      var origParams = fabric.util.saveObjectTransform(this);
 
       if (options.withoutTransform) {
-        this.scaleX = 1;
-        this.scaleY = 1;
-        this.angle = 0;
-        this.skewX = 0;
-        this.skewY = 0;
+        fabric.util.resetObjectTransform(this);
       }
 
       var el = fabric.util.createCanvasElement(),
