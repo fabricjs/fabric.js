@@ -591,6 +591,9 @@
 
     /**
      * List of properties to consider when checking if cache needs refresh
+     * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+     * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+     * and refreshed at the next render
      * @type Array
      */
     cacheProperties: (
