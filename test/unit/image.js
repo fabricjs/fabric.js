@@ -656,8 +656,8 @@
       var data1 = image.toDataURL();
       var data2 = image.toDataURL();
       var data3 = image.toDataURL();
-      assert.equal(data1, data2, 'dataurl does not change 1');
-      assert.equal(data1, data3, 'dataurl does not change 2');
+      assert.ok(data1 === data2, 'dataurl does not change 1');
+      assert.ok(data1 === data3, 'dataurl does not change 2');
       done();
     });
   });
