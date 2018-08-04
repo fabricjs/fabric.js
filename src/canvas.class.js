@@ -705,16 +705,7 @@
         altKey: e[this.centeredKey]
       };
 
-      this._currentTransform.original = {
-        left: target.left,
-        top: target.top,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        originX: origin.x,
-        originY: origin.y
-      };
+      this._currentTransform.original = fabric.util.saveObjectTransform(target);
 
       this._resetCurrentTransform();
       this._beforeTransform(e);
