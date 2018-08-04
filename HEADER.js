@@ -98,11 +98,6 @@ fabric.minCacheSideLimit = 256;
 fabric.charWidthsCache = { };
 
 /**
- * Cache Object for widths of chars in text rendering.
- */
-fabric.charWidthsCache = { };
-
-/**
  * if webgl is enabled and available, textureSize will determine the size
  * of the canvas backend
  * @since 2.0.0
