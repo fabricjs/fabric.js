@@ -1458,6 +1458,8 @@
       options || (options = { });
 
       var origParams = fabric.util.saveObjectTransform(this);
+      origParams.left = this.left;
+      origParams.top = this.top;
 
       if (options.withoutTransform) {
         fabric.util.resetObjectTransform(this);
