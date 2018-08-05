@@ -79,6 +79,7 @@
       canvas.add(image);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
+      image.dispose();
     });
   }
 
@@ -102,6 +103,7 @@
       canvas.add(image);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
+      image.dispose();
     });
   }
 
@@ -126,6 +128,7 @@
       canvas.add(group);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
+      image.dispose();
     });
   }
 
@@ -140,21 +143,24 @@
     getImage(getFixtureName('parrot.png'), false, function(img) {
       console.log('got image', img)
       var image = new fabric.Image(img);
+      console.log('created image a')
       var backdropImage = new fabric.Image(img);
+      console.log('created image b')
       backdropImage.left = backdropImage.width;
       backdropImage.scaleX = -1;
       image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
-      image.scaleToWidth(400);
-      image.applyFilters();
       console.log('applied filters')
+      image.applyFilters();
+      image.scaleToWidth(400);
       canvas.setDimensions({
         width: 400,
         height: 400,
       });
       canvas.add(image);
       canvas.renderAll();
-      console.log('rendered')
       callback(canvas.lowerCanvasEl);
+      image.dispose();
+      backdropImage.dispose();
     });
   }
 
