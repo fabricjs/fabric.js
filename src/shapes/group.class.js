@@ -498,7 +498,6 @@
       this.height = height;
       if (!onlyWidthHeight) {
         this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
-
       }
     },
 
