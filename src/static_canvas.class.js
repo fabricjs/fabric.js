@@ -1673,11 +1673,20 @@
         object.dispose && object.dispose();
       });
       this._objects = [];
+      if (this.backgroundImage && this.backgroundImage.dispose) {
+        this.backgroundImage.dispose();
+      }
       this.backgroundImage = null;
+      if (this.overlayImage && this.overlayImage.dispose) {
+        this.overlayImage.dispose();
+      }
       this.overlayImage = null;
       this._iTextInstances = null;
-      this.lowerCanvasEl = null;
       this.contextContainer = null;
+      ['lowerCanvasEl'].forEach(function(element) {
+        fabric.util.cleanUpJsdomNode(this[element]);
+        this[element] = undefined;
+      });
       return this;
     },
 
