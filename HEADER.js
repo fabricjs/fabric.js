@@ -141,19 +141,23 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
 fabric.browserShadowBlurConstant = 1;
 
 /**
- * Device Pixel Ratio
- * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+ * This object contains the result of arc to beizer conversion for faster retrieving if the same arc needs to be converted again.
+ * It was an internal variable, is accessible since version 2.3.4
  */
 fabric.arcToSegmentsCache = { };
 
 /**
- * Device Pixel Ratio
- * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+ * This object keeps the results of the boundsOfCurve calculation mapped by the joined arguments necessary to calculate it.
+ * It does speed up calculation, if you parse and add always the same paths, but in case of heavy usage of freedrawing
+ * you do not get any speed benefit and you get a big object in memory.
+ * The object was a private variable before, while now is appended to the lib so that you have access to it and you
+ * can eventually clear it.
+ * It was an internal variable, is accessible since version 2.3.4
  */
 fabric.boundsOfCurveCache = { };
 
 /**
- * Device Pixel Ratio
+ * If disabled boundsOfCurveCache is not used. For apps that make heavy usage of pencil drawing probably disabling it is better
  * @default true
  */
 fabric.cachesBoundsOfCurve = true;
