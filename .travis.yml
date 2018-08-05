@@ -12,7 +12,7 @@ addons:
     - libgif-dev
     - libpng-dev
     - libpango1.0-dev
-# libjpeg-dev is already installed
+    - libjpeg-dev
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building
@@ -34,43 +34,43 @@ jobs:
     - env: LAUNCHER=Firefox CANFAIL=TRUE
     - env: LAUNCHER=Chrome CANFAIL=TRUE
   include:
-    - stage: Linting and Building
-      env: STEP=LINT
-      install: npm install eslint@4.7.x
-      script: 'npm run lint && npm run lint_tests'
-      addons:
-        apt:
-          packages: # avoid installing packages
-    - stage: Linting and Building
-      env: STEP=BUILD
-      install: npm install uglify-js@3.3.x
-      script: 'npm run build'
-      addons:
-        apt:
-          packages: # avoid installing packages
-    - stage: Unit Tests
-      env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.4.1
-      addons:
-        apt:
-          packages: # avoid installing packages
-    - stage: Unit Tests
-      env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.4.1
-      addons:
-        apt:
-          packages: # avoid installing packages
-    - stage: Unit Tests
-      env: LAUNCHER=Node CANFAIL=TRUE
-      node_js: "10"
-    - stage: Unit Tests
-      node_js: "9"
-    - stage: Unit Tests
-      node_js: "8"
-    - stage: Unit Tests
-      node_js: "6"
-    - stage: Unit Tests
-      node_js: "4"
+    # - stage: Linting and Building
+    #   env: STEP=LINT
+    #   install: npm install eslint@4.7.x
+    #   script: 'npm run lint && npm run lint_tests'
+    #   addons:
+    #     apt:
+    #       packages: # avoid installing packages
+    # - stage: Linting and Building
+    #   env: STEP=BUILD
+    #   install: npm install uglify-js@3.3.x
+    #   script: 'npm run build'
+    #   addons:
+    #     apt:
+    #       packages: # avoid installing packages
+    # - stage: Unit Tests
+    #   env: LAUNCHER=Chrome
+    #   install: npm install testem@1.18.4 qunit@2.4.1
+    #   addons:
+    #     apt:
+    #       packages: # avoid installing packages
+    # - stage: Unit Tests
+    #   env: LAUNCHER=Firefox
+    #   install: npm install testem@1.18.4 qunit@2.4.1
+    #   addons:
+    #     apt:
+    #       packages: # avoid installing packages
+    # - stage: Unit Tests
+    #   env: LAUNCHER=Node CANFAIL=TRUE
+    #   node_js: "10"
+    # - stage: Unit Tests
+    #   node_js: "9"
+    # - stage: Unit Tests
+    #   node_js: "8"
+    # - stage: Unit Tests
+    #   node_js: "6"
+    # - stage: Unit Tests
+    #   node_js: "4"
     - stage: Visual Tests
       node_js: "8"
       script: npm run test:visual
