@@ -27,7 +27,7 @@
       return fs.readFile(path, { encoding: 'utf8' }, callback);
     }
     else {
-      var path = getAbsolutePath('test/visual' + finalName);
+      var path = getAbsolutePath('/test/visual' + finalName);
       fabric.util.request(path, {
         onComplete: function(xhr) {
           callback(null, xhr.responseText);
@@ -38,7 +38,7 @@
 
   function getGolden(filename) {
     var finalName = '/golden/' + filename + '.png';
-    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/visual' + finalName);
+    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getGoldenImage(filename, callback) {

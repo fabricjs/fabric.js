@@ -1,5 +1,6 @@
 (function() {
   fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   var _pixelMatch = pixelmatch;
   if (fabric.isLikelyNode) {
     var fs = global.fs;
@@ -23,13 +24,13 @@
   }
 
   function getFixtureName(filename) {
-    var finalName = '/../fixtures/' + filename;
-    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/fixtures/' + filename);
+    var finalName = '/fixtures/' + filename;
+    return fabric.isLikelyNode ? (__dirname + '/..' + finalName) : getAbsolutePath('/test' + finalName);
   }
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/visual/golden/' + filename);
+    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getImage(filename, original, callback) {
@@ -53,17 +54,15 @@
     img.src = filename;
   }
 
-  QUnit.module('Image resize filter test', {
-    afterEach: function() {
-      fabricCanvas.setZoom(1);
-      fabricCanvas.setDimensions({
-        width: 300,
-        height: 150,
-      });
-      fabricCanvas.clear();
-      fabricCanvas.renderAll();
-    }
-  });
+  function afterEachHandler() {
+    fabricCanvas.setZoom(1);
+    fabricCanvas.setDimensions({
+      width: 300,
+      height: 150,
+    });
+    fabricCanvas.clear();
+    fabricCanvas.renderAll();
+  }
 
   var tests = [];
 
@@ -80,6 +79,7 @@
       image.scaleToWidth(canvas.width / zoom);
       canvas.add(image);
       canvas.renderAll();
+      image.dispose();
       callback(canvas.lowerCanvasEl);
     });
   }
@@ -88,6 +88,7 @@
     test: 'Image resize with canvas zoom',
     code: imageResizeTest,
     golden: 'parrot.png',
+    newModule: 'Image resize filter test',
     percentage: 0.06,
   });
 
@@ -102,6 +103,7 @@
       image.scaleToWidth(canvas.width);
       canvas.add(image);
       canvas.renderAll();
+      image.dispose();
       callback(canvas.lowerCanvasEl);
     });
   }
@@ -126,6 +128,7 @@
       group.scaleToWidth(canvas.width);
       canvas.add(group);
       canvas.renderAll();
+      image.dispose();
       callback(canvas.lowerCanvasEl);
     });
   }
@@ -137,11 +140,72 @@
     percentage: 0.06,
   });
 
+  function blendImageTest2(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      var image = new fabric.Image(img);
+      var backdropImage = new fabric.Image(img);
+      backdropImage.left = backdropImage.width;
+      backdropImage.scaleX = -1;
+      image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
+      image.applyFilters();
+      image.scaleToWidth(400);
+      canvas.setDimensions({
+        width: 400,
+        height: 400,
+      });
+      canvas.add(image);
+      canvas.renderAll();
+      image.dispose();
+      backdropImage.dispose();
+      callback(canvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'Blend image test with flip',
+    code: blendImageTest2,
+    golden: 'parrotblend2.png',
+    newModule: 'Image Blend test',
+    percentage: 0.06,
+  });
+
+  function blendImageTest(canvas, callback) {
+    getImage(getFixtureName('parrot.png'), false, function(img) {
+      getImage(getFixtureName('very_large_image.jpg'), false, function(backdrop) {
+        var image = new fabric.Image(img);
+        var backdropImage = new fabric.Image(backdrop);
+        image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+        image.scaleToWidth(400);
+        image.applyFilters();
+        canvas.setDimensions({
+          width: 400,
+          height: 400,
+        });
+        canvas.add(image);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      });
+    });
+  }
+
+  tests.push({
+    test: 'Blend image test',
+    code: blendImageTest,
+    golden: 'parrotblend.png',
+    percentage: 0.06,
+  });
+
   tests.forEach(function(testObj) {
     var testName = testObj.test;
     var code = testObj.code;
     var percentage = testObj.percentage;
     var golden = testObj.golden;
+    var newModule = testObj.newModule;
+    if (newModule) {
+      QUnit.module(newModule, {
+        afterEach: afterEachHandler,
+      });
+    }
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
@@ -154,8 +218,8 @@
         canvas.height = height;
         var ctx = canvas.getContext('2d');
         var output = ctx.getImageData(0, 0, width, height).data;
-        getImage(getGoldeName(golden), renderedCanvas, function(golden) {
-          ctx.drawImage(golden, 0, 0);
+        getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
+          ctx.drawImage(goldenImage, 0, 0);
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
           var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;

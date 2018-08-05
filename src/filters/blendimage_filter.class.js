@@ -42,7 +42,8 @@
     mode: 'multiply',
 
     /**
-     * alpha value. represent the strength of the blend color operation.
+     * alpha value. represent the strength of the blend image operation.
+     * not implemented.
      **/
     alpha: 1,
 
@@ -141,8 +142,8 @@
       var imageData = options.imageData,
           resources = options.filterBackend.resources,
           data = imageData.data, iLen = data.length,
-          width = options.imageData.width,
-          height = options.imageData.height,
+          width = imageData.width,
+          height = imageData.height,
           tr, tg, tb, ta,
           r, g, b, a,
           canvas1, context, image = this.image, blendData;
@@ -151,15 +152,17 @@
         resources.blendImage = fabric.util.createCanvasElement();
       }
       canvas1 = resources.blendImage;
+      context = canvas1.getContext('2d');
       if (canvas1.width !== width || canvas1.height !== height) {
         canvas1.width = width;
         canvas1.height = height;
       }
-      context = canvas1.getContext('2d');
+      else {
+        context.clearRect(0, 0, width, height);
+      }
       context.setTransform(image.scaleX, 0, 0, image.scaleY, image.left, image.top);
       context.drawImage(image._element, 0, 0, width, height);
       blendData = context.getImageData(0, 0, width, height).data;
-      context.clearRect(0, 0, width, height);
       for (var i = 0; i < iLen; i += 4) {
 
         r = data[i];
