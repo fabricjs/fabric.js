@@ -46,9 +46,11 @@
     }
     var img = fabric.document.createElement('img');
     img.onload = function() {
+      img.onload = null;
       callback(img);
     };
     img.onerror = function(err) {
+      img.onerror = null;
       console.log('Image loading errored', err);
     };
     img.src = filename;
@@ -79,8 +81,13 @@
       image.scaleToWidth(canvas.width / zoom);
       canvas.add(image);
       canvas.renderAll();
-      image.dispose();
       callback(canvas.lowerCanvasEl);
+      try {
+        image.dispose();
+      } catch (e) {
+        console.log(e)
+      }
+
     });
   }
 
@@ -103,8 +110,8 @@
       image.scaleToWidth(canvas.width);
       canvas.add(image);
       canvas.renderAll();
-      image.dispose();
       callback(canvas.lowerCanvasEl);
+      image.dispose();
     });
   }
 

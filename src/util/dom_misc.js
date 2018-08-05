@@ -304,8 +304,6 @@
       impl._currentSrc = null;
       impl._attributes = null;
       impl._classList = null;
-      impl._image = null;
-      impl._eventListeners = null;
     }
   }
 
