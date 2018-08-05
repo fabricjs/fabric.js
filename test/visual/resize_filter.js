@@ -147,7 +147,6 @@
       backdropImage.scaleX = -1;
       image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
       image.applyFilters();
-      console.log('applied filters')
       image.scaleToWidth(400);
       canvas.setDimensions({
         width: 400,
@@ -192,8 +191,8 @@
         canvas.height = height;
         var ctx = canvas.getContext('2d');
         var output = ctx.getImageData(0, 0, width, height).data;
-        getImage(getGoldeName(golden), renderedCanvas, function(golden) {
-          ctx.drawImage(golden, 0, 0);
+        getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
+          ctx.drawImage(goldenImage, 0, 0);
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
           var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;
