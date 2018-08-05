@@ -82,20 +82,6 @@
     },
 
     /**
-     * Intentionally left blank, to be overridden in custom filters
-     * @param {Object} options
-     **/
-    isNeutralState: function(/* options */) {
-      var _class = filters.ColorMatrix;
-      for (var i = 20; i--;) {
-        if (this.matrix[i] !== _class.prototype.matrix[i]) {
-          return false;
-        }
-      }
-      return true;
-    },
-
-    /**
      * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
      *
      * @param {Object} options

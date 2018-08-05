@@ -42,14 +42,14 @@
      * @param {Number} scaleX
      * @default
      */
-    scaleX: 0,
+    scaleX: 1,
 
     /**
      * Scale factor for resizing, y axis
      * @param {Number} scaleY
      * @default
      */
-    scaleY: 0,
+    scaleY: 1,
 
     /**
      * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
@@ -158,10 +158,6 @@
      */
     applyTo: function(options) {
       if (options.webgl) {
-        if (options.passes > 1 && this.isNeutralState(options)) {
-          // avoid doing something that we do not need
-          return;
-        }
         options.passes++;
         this.width = options.sourceWidth;
         this.horizontal = true;
@@ -186,15 +182,13 @@
         this._swapTextures(options);
         options.sourceHeight = options.destinationHeight;
       }
-      else if (!this.isNeutralState(options)) {
+      else {
         this.applyTo2d(options);
       }
     },
 
-    isNeutralState: function(options) {
-      var scaleX = options.scaleX || this.scaleX,
-          scaleY = options.scaleY || this.scaleY;
-      return scaleX === 1 && scaleY === 1;
+    isNeutralState: function() {
+      return this.scaleX === 1 && this.scaleY === 1;
     },
 
     lanczosCreate: function(lobes) {

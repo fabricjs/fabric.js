@@ -61,9 +61,6 @@
      * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
     applyTo2d: function(options) {
-      if (this.blocksize === 1) {
-        return;
-      }
       var imageData = options.imageData,
           data = imageData.data,
           iLen = imageData.height,
