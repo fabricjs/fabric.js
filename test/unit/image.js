@@ -667,11 +667,11 @@
     createImageObject(function(image) {
       var run = false;
       image.dirty = false;
-      var filter = new fabric.Image.filters.Brightness()
+      var filter = new fabric.Image.filters.Brightness();
       image.filters = [filter];
       filter.isNeutralState = function() {
         run = true;
-      }
+      };
       assert.equal(run, false, 'isNeutralState did not run yet');
       image.applyFilters();
       assert.equal(run, true, 'isNeutralState did run');
