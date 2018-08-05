@@ -656,6 +656,12 @@
       return fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
     },
 
+    /**
+     * reset an object transform state to neutral. Top and left are not accounted for
+     * @static
+     * @memberOf fabric.util
+     * @param  {fabric.Object} target object to transform
+     */
     resetObjectTransform: function (target) {
       target.scaleX = 1;
       target.scaleY = 1;
@@ -664,6 +670,27 @@
       target.flipX = false;
       target.flipY = false;
       target.rotate(0);
+    },
+
+    /**
+     * Extract Object transform values
+     * @static
+     * @memberOf fabric.util
+     * @param  {fabric.Object} target object to read from
+     * @return {Object} Components of transform
+     */
+    saveObjectTransform: function (target) {
+      return {
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
+        angle: target.angle,
+        left: target.left,
+        flipX: target.flipX,
+        flipY: target.flipY,
+        top: target.top
+      };
     },
 
     /**

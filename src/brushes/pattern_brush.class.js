@@ -9,7 +9,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     var dotWidth = 20,
         dotDistance = 5,
-        patternCanvas = fabric.document.createElement('canvas'),
+        patternCanvas = fabric.util.createCanvasElement(),
         patternCtx = patternCanvas.getContext('2d');
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
