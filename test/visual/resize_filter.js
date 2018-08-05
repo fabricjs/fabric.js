@@ -23,13 +23,13 @@
   }
 
   function getFixtureName(filename) {
-    var finalName = '/../fixtures/' + filename;
-    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/fixtures/' + filename);
+    var finalName = '/fixtures/' + filename;
+    return fabric.isLikelyNode ? (__dirname + '/..' + finalName) : getAbsolutePath('/test' + finalName);
   }
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('test/visual/golden/' + filename);
+    return fabric.isLikelyNode ? (__dirname + finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getImage(filename, original, callback) {
@@ -141,11 +141,8 @@
 
   function blendImageTest2(canvas, callback) {
     getImage(getFixtureName('parrot.png'), false, function(img) {
-      console.log('got image')
       var image = new fabric.Image(img);
-      console.log('created image a')
       var backdropImage = new fabric.Image(img);
-      console.log('created image b')
       backdropImage.left = backdropImage.width;
       backdropImage.scaleX = -1;
       image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
