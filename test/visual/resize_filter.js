@@ -1,5 +1,6 @@
 (function() {
   fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   var _pixelMatch = pixelmatch;
   if (fabric.isLikelyNode) {
     var fs = global.fs;
