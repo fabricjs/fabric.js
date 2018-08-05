@@ -191,7 +191,7 @@
   tests.push({
     test: 'Blend image test',
     code: blendImageTest,
-    golden: 'parrotBlend.png',
+    golden: 'parrotblend.png',
     percentage: 0.06,
   });
 
