@@ -12,7 +12,7 @@ addons:
     - libgif-dev
     - libpng-dev
     - libpango1.0-dev
-    - libjpeg-dev
+# libjpeg-dev is already installed
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building
@@ -76,16 +76,10 @@ jobs:
       script: npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
-      addons:
-        apt:
-          packages: # avoid installing packages
       install: npm install testem@1.18.4 qunit@2.4.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
     - stage: Visual Tests
       env: LAUNCHER=Firefox
-      addons:
-        apt:
-          packages: # avoid installing packages
       install: npm install testem@1.18.4 qunit@2.4.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
 

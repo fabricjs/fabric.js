@@ -142,7 +142,7 @@
       var backdropImage = new fabric.Image(img);
       backdropImage.left = backdropImage.width;
       backdropImage.scaleX = -1;
-      image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+      image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage }));
       image.scaleToWidth(400);
       image.applyFilters();
       canvas.setDimensions({
