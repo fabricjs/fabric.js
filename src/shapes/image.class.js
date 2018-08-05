@@ -397,8 +397,8 @@
         this._element = elementToFilter;
         this._filterScalingX = 1;
         this._filterScalingY = 1;
-        this._lastScaleX = 1;
-        this._lastScaleY = 1;
+        this._lastScaleX = scaleX;
+        this._lastScaleY = scaleY;
         return;
       }
       if (!fabric.filterBackend) {
@@ -429,7 +429,7 @@
     applyFilters: function(filters) {
 
       filters = filters || this.filters || [];
-      filters = filters.filter(function(filter) { return filter; });
+      filters = filters.filter(function(filter) { return filter && !filter.isNeutralState(); });
       if (this.group) {
         this.set('dirty', true);
       }

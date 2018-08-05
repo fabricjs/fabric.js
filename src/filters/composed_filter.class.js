@@ -51,6 +51,10 @@
         subFilters: this.subFilters.map(function(filter) { return filter.toObject(); }),
       });
     },
+
+    isNeutralState: function() {
+      return !this.subFilters.some(function(filter) { return !filter.isNeutralState(); });
+    }
   });
 
   /**
