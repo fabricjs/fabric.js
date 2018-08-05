@@ -43,6 +43,7 @@
 
     /**
      * alpha value. represent the strength of the blend image operation.
+     * not implemented.
      **/
     alpha: 1,
 
@@ -141,8 +142,8 @@
       var imageData = options.imageData,
           resources = options.filterBackend.resources,
           data = imageData.data, iLen = data.length,
-          width = options.imageData.width,
-          height = options.imageData.height,
+          width = imageData.width,
+          height = imageData.height,
           tr, tg, tb, ta,
           r, g, b, a,
           canvas1, context, image = this.image, blendData;
