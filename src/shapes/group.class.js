@@ -491,13 +491,14 @@
     _getBounds: function(aX, aY, onlyWidthHeight) {
       var minXY = new fabric.Point(min(aX), min(aY)),
           maxXY = new fabric.Point(max(aX), max(aY)),
-          top = minXY.y || 0, left = minXY.y || 0,
+          top = minXY.y || 0, left = minXY.x || 0,
           width = (maxXY.x - minXY.x) || 0,
           height = (maxXY.y - minXY.y) || 0;
       this.width = width;
       this.height = height;
       if (!onlyWidthHeight) {
         this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
+
       }
     },
 
