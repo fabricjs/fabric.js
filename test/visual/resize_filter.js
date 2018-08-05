@@ -82,12 +82,7 @@
       canvas.add(image);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
-      try {
-        image.dispose();
-      } catch (e) {
-        console.log(e)
-      }
-
+      image.dispose();
     });
   }
 
