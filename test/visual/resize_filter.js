@@ -136,32 +136,32 @@
     percentage: 0.06,
   });
 
-  function blendImageTest(canvas, callback) {
-    getImage(getFixtureName('parrot.png'), false, function(img) {
-      getImage(getFixtureName('very_large_image.jpg'), false, function(backdrop) {
-        var image = new fabric.Image(img);
-        var backdropImage = new fabric.Image(backdrop);
-        image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
-        image.scaleToWidth(400);
-        image.applyFilters();
-        canvas.setDimensions({
-          width: 400,
-          height: 400,
-        });
-        canvas.add(image);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-      });
-    });
-  }
-
-  tests.push({
-    test: 'Blend image test',
-    code: blendImageTest,
-    newModule: 'blendTest',
-    golden: 'parrotblend.png',
-    percentage: 0.06,
-  });
+  // function blendImageTest(canvas, callback) {
+  //   getImage(getFixtureName('parrot.png'), false, function(img) {
+  //     getImage(getFixtureName('very_large_image.jpg'), false, function(backdrop) {
+  //       var image = new fabric.Image(img);
+  //       var backdropImage = new fabric.Image(backdrop);
+  //       image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+  //       image.scaleToWidth(400);
+  //       image.applyFilters();
+  //       canvas.setDimensions({
+  //         width: 400,
+  //         height: 400,
+  //       });
+  //       canvas.add(image);
+  //       canvas.renderAll();
+  //       callback(canvas.lowerCanvasEl);
+  //     });
+  //   });
+  // }
+  //
+  // tests.push({
+  //   test: 'Blend image test',
+  //   code: blendImageTest,
+  //   newModule: 'blendTest',
+  //   golden: 'parrotblend.png',
+  //   percentage: 0.06,
+  // });
 
   function blendImageTest2(canvas, callback) {
     getImage(getFixtureName('parrot.png'), false, function(img) {
