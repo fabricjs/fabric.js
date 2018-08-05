@@ -159,7 +159,7 @@
     test: 'Blend image test',
     code: blendImageTest,
     newModule: 'blendTest',
-    golden: 'parrotBlend.png',
+    golden: 'parrotblend.png',
     percentage: 0.06,
   });
 
@@ -185,7 +185,7 @@
   tests.push({
     test: 'Blend image test with flip',
     code: blendImageTest2,
-    golden: 'parrotBlend2.png',
+    golden: 'parrotblend2.png',
     percentage: 0.06,
   });
 
