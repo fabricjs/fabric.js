@@ -185,10 +185,10 @@
         backend.evictCachesForKey(this.cacheKey + '_filtered');
       }
       this._cacheContext = undefined;
-      ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(function(element) {
+      ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach((function(element) {
         fabric.util.cleanUpJsdomNode(this[element]);
         this[element] = undefined;
-      });
+      }).bind(this));
     },
 
     /**

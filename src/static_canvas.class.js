@@ -1683,10 +1683,8 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      ['lowerCanvasEl'].forEach(function(element) {
-        fabric.util.cleanUpJsdomNode(this[element]);
-        this[element] = undefined;
-      });
+      fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
+      this.lowerCanvasEl = undefined;
       return this;
     },
 
