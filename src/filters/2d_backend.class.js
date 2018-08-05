@@ -52,7 +52,6 @@
         ctx: ctx,
         filterBackend: this,
       };
-      console.log('trying this')
       filters.forEach(function(filter) { filter.applyTo(pipelineState); });
       if (pipelineState.imageData.width !== sourceWidth || pipelineState.imageData.height !== sourceHeight) {
         targetCanvas.width = pipelineState.imageData.width;

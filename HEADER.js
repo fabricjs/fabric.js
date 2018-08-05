@@ -165,11 +165,9 @@ fabric.cachesBoundsOfCurve = true;
 fabric.initFilterBackend = function() {
   if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {
     console.log('max texture size: ' + fabric.maxTextureSize);
-    console.log('init3')
     return (new fabric.WebglFilterBackend({ tileSize: fabric.textureSize }));
   }
   else if (fabric.Canvas2dFilterBackend) {
-    console.log('init2')
     return (new fabric.Canvas2dFilterBackend());
   }
 };
