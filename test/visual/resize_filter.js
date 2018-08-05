@@ -183,7 +183,6 @@
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
-        console.log('callback called')
         var width = renderedCanvas.width;
         var height = renderedCanvas.height;
         var totalPixels = width * height;
