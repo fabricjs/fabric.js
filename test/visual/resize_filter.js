@@ -138,6 +138,7 @@
 
   function blendImageTest2(canvas, callback) {
     getImage(getFixtureName('parrot.png'), false, function(img) {
+      console.log('got image', img)
       var image = new fabric.Image(img);
       var backdropImage = new fabric.Image(img);
       backdropImage.left = backdropImage.width;
@@ -145,12 +146,14 @@
       image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
       image.scaleToWidth(400);
       image.applyFilters();
+      console.log('applied filters')
       canvas.setDimensions({
         width: 400,
         height: 400,
       });
       canvas.add(image);
       canvas.renderAll();
+      console.log('rendered')
       callback(canvas.lowerCanvasEl);
     });
   }
@@ -159,6 +162,7 @@
     test: 'Blend image test with flip',
     code: blendImageTest2,
     golden: 'parrotblend2.png',
+    newModule: 'Image Blend test',
     percentage: 0.06,
   });
 
@@ -176,6 +180,7 @@
     QUnit.test(testName, function(assert) {
       var done = assert.async();
       code(fabricCanvas, function(renderedCanvas) {
+        console.log('callback called')
         var width = renderedCanvas.width;
         var height = renderedCanvas.height;
         var totalPixels = width * height;
