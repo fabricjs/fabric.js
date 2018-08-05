@@ -79,8 +79,8 @@
       image.scaleToWidth(canvas.width / zoom);
       canvas.add(image);
       canvas.renderAll();
-      callback(canvas.lowerCanvasEl);
       image.dispose();
+      callback(canvas.lowerCanvasEl);
     });
   }
 
@@ -103,8 +103,8 @@
       image.scaleToWidth(canvas.width);
       canvas.add(image);
       canvas.renderAll();
-      callback(canvas.lowerCanvasEl);
       image.dispose();
+      callback(canvas.lowerCanvasEl);
     });
   }
 
@@ -128,8 +128,8 @@
       group.scaleToWidth(canvas.width);
       canvas.add(group);
       canvas.renderAll();
-      callback(canvas.lowerCanvasEl);
       image.dispose();
+      callback(canvas.lowerCanvasEl);
     });
   }
 
@@ -159,9 +159,9 @@
       });
       canvas.add(image);
       canvas.renderAll();
-      callback(canvas.lowerCanvasEl);
       image.dispose();
       backdropImage.dispose();
+      callback(canvas.lowerCanvasEl);
     });
   }
 
