@@ -31,6 +31,9 @@
      */
     minWidth: 20,
 
+    //Monu
+    minHeight: 20,
+
     /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
@@ -82,18 +85,19 @@
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if (this.dynamicMinWidth > this.width) {
-        this._set('width', this.dynamicMinWidth);
-      }
+      //Commented since we would want to rely on width set by caller
+      // if (this.dynamicMinWidth > this.width) {
+      //   this._set('width', this.dynamicMinWidth);
+      // }
+      this._set('width', this.width);
+      this._set('height', this.height);
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
-      console.log("width: ",this.width);
-      this.width = 104;
+      //commented since height should be set from caller
       // clear cache and re-calculate height
-      this.height = this.calcTextHeight();
-      console.log("Height: ",this.height);
+      // this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
@@ -400,6 +404,11 @@
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
+    },
+
+    //Monu
+    getMinHeight: function() {
+      return this.minHeight;
     },
 
     /**

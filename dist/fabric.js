@@ -30883,6 +30883,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     minWidth: 20,
 
+    //Monu
+    minHeight: 20,
+
     /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
@@ -30934,18 +30937,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if (this.dynamicMinWidth > this.width) {
-        this._set('width', this.dynamicMinWidth);
-      }
+      //Commented since we would want to rely on width set by caller
+      // if (this.dynamicMinWidth > this.width) {
+      //   this._set('width', this.dynamicMinWidth);
+      // }
+      this._set('width', this.width);
+      this._set('height', this.height);
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
-      console.log("width: ",this.width);
-      this.width = 104;
+      //commented since height should be set from caller
       // clear cache and re-calculate height
-      this.height = this.calcTextHeight();
-      console.log("Height: ",this.height);
+      // this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
@@ -31254,6 +31258,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return Math.max(this.minWidth, this.dynamicMinWidth);
     },
 
+    //Monu
+    getMinHeight: function() {
+      return this.minHeight;
+    },
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -31297,11 +31306,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         t.set('width', w);
         return true;
       }
-    }
+    }//Monu
     else if (by === 'y' && t instanceof fabric.Textbox) {
       var tw = t._getTransformedDimensions().y;
+      // alert("tw:", tw);
       var h = t.height * (localMouse.y / tw);
-      if (h >= t.getMinWidth()) {
+      if (h >= 30) {
         t.set('height', h);
         return true;
       }
