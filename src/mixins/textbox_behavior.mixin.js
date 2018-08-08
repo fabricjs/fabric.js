@@ -18,6 +18,14 @@
         return true;
       }
     }
+    else if (by === 'y' && t instanceof fabric.Textbox) {
+      var tw = t._getTransformedDimensions().y;
+      var h = t.height * (localMouse.y / tw);
+      if (h >= t.getMinWidth()) {
+        t.set('height', h);
+        return true;
+      }
+    }
     else {
       return setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform,
         lockScalingX, lockScalingY, by, lockScalingFlip, _dim);
