@@ -487,7 +487,8 @@
 
       for (j = 0, attrs = el.attributes, len = attrs.length; j < len; j++) {
         attr = attrs.item(j);
-        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href' || attr.nodeName === 'href') {
+        if (attr.nodeName === 'x' || attr.nodeName === 'y' ||
+          attr.nodeName === 'xlink:href' || attr.nodeName === 'href') {
           continue;
         }
 
