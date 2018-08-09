@@ -20,9 +20,8 @@
     }//Monu
     else if (by === 'y' && t instanceof fabric.Textbox) {
       var tw = t._getTransformedDimensions().y;
-      // alert("tw:", tw);
       var h = t.height * (localMouse.y / tw);
-      if (h >= 30) {
+      if (h >= t.getMinHeight()) {
         t.set('height', h);
         return true;
       }
