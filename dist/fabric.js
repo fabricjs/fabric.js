@@ -31255,7 +31255,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     },
 
     getMinWidth: function() {
-      return Math.max(this.minWidth, this.dynamicMinWidth);
+      // return Math.max(this.minWidth, this.dynamicMinWidth);
+      return this.minWidth;
     },
 
     //Monu

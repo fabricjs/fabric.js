@@ -403,7 +403,8 @@
     },
 
     getMinWidth: function() {
-      return Math.max(this.minWidth, this.dynamicMinWidth);
+      // return Math.max(this.minWidth, this.dynamicMinWidth);
+      return this.minWidth;
     },
 
     //Monu
