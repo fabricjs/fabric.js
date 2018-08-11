@@ -147,7 +147,6 @@
 
     assert.ok(typeof pattern.toSVG === 'function');
 
-    // TODO: test toSVG
   });
 
   QUnit.test('initPattern from object', function(assert) {
