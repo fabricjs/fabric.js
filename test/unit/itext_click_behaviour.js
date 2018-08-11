@@ -56,6 +56,7 @@
     iText.__lastSelected = true;
     iText.mouseUpHandler({ e: {} });
     assert.equal(iText.isEditing, true, 'iText entered editing');
+    iText.canvas.cancelRequestedRender();
     iText.canvas.dispose();
   });
   QUnit.test('_mouseUpHandler on a selected text in a group DOES NOT enter edit', function(assert) {
@@ -67,6 +68,7 @@
     iText.group = true;
     iText.mouseUpHandler({ e: {} });
     assert.equal(iText.isEditing, false, 'iText entered editing');
+    iText.canvas.cancelRequestedRender();
     iText.canvas.dispose();
   });
   QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function(assert) {
@@ -78,6 +80,7 @@
     iText.__corner = 'mt';
     iText.mouseUpHandler({ e: {} });
     assert.equal(iText.isEditing, false, 'iText entered editing');
+    iText.canvas.cancelRequestedRender();
     iText.canvas.dispose();
   });
 })();
