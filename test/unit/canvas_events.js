@@ -434,6 +434,7 @@
       fabric.document.dispatchEvent(event);
       assert.equal(counter, 1, 'listener executed once');
       fabric.Canvas.prototype._onMouseUp = originalMouseUp;
+      c.cancelRequestedRender();
       done();
     }, 200);
   });

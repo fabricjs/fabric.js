@@ -40,6 +40,7 @@
   });
   QUnit.test('_mouseUpHandler set selected as true', function(assert) {
     var iText = new fabric.IText('test');
+    iText.initDelayedCursor = function() {};
     assert.equal(iText.selected, undefined, 'iText has no selected property');
     assert.equal(iText.__lastSelected, undefined, 'iText has no __lastSelected property');
     iText.canvas = {
@@ -50,6 +51,7 @@
   });
   QUnit.test('_mouseUpHandler on a selected object enter edit', function(assert) {
     var iText = new fabric.IText('test');
+    iText.initDelayedCursor = function() {};
     assert.equal(iText.isEditing, false, 'iText not editing');
     iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
@@ -61,6 +63,7 @@
   });
   QUnit.test('_mouseUpHandler on a selected text in a group DOES NOT enter edit', function(assert) {
     var iText = new fabric.IText('test');
+    iText.initDelayedCursor = function() {};
     assert.equal(iText.isEditing, false, 'iText not editing');
     iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
@@ -73,6 +76,7 @@
   });
   QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function(assert) {
     var iText = new fabric.IText('test');
+    iText.initDelayedCursor = function() {};
     assert.equal(iText.isEditing, false, 'iText not editing');
     iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
