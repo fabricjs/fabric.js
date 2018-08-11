@@ -51,7 +51,7 @@
   QUnit.test('_mouseUpHandler on a selected object enter edit', function(assert) {
     var iText = new fabric.IText('test');
     assert.equal(iText.isEditing, false, 'iText not editing');
-    iText.canvas = new fabric.Canvas(null);
+    iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
     iText.__lastSelected = true;
     iText.mouseUpHandler({ e: {} });
@@ -61,7 +61,7 @@
   QUnit.test('_mouseUpHandler on a selected text in a group DOES NOT enter edit', function(assert) {
     var iText = new fabric.IText('test');
     assert.equal(iText.isEditing, false, 'iText not editing');
-    iText.canvas = new fabric.Canvas(null);
+    iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
     iText.__lastSelected = true;
     iText.group = true;
@@ -72,7 +72,7 @@
   QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function(assert) {
     var iText = new fabric.IText('test');
     assert.equal(iText.isEditing, false, 'iText not editing');
-    iText.canvas = new fabric.Canvas(null);
+    iText.canvas = new fabric.Canvas(fabric.util.createCanvasElement());
     iText.selected = true;
     iText.__lastSelected = true;
     iText.__corner = 'mt';
