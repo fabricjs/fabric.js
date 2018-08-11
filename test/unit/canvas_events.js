@@ -5,6 +5,7 @@
 
   QUnit.module('fabric.Canvas events mixin', {
     beforeEach: function() {
+      canvas.cancelRequestedRender();
       upperCanvasEl.style.display = '';
       canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
@@ -17,6 +18,7 @@
       canvas.off();
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
+      canvas.cancelRequestedRender();
     }
   });
 

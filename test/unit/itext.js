@@ -4,6 +4,7 @@
   QUnit.module('fabric.IText', {
     afterEach: function() {
       canvas.clear();
+      canvas.cancelRequestedRender();
     }
   });
 
