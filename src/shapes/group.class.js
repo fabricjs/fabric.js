@@ -220,7 +220,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var objsToObject = this.getObjects().map(function(obj) {
+      var objsToObject = this._objects.map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = obj.group.includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
@@ -243,7 +243,7 @@
         objsToObject = sourcePath;
       }
       else {
-        objsToObject = this.getObjects().map(function(obj) {
+        objsToObject = this._objects.map(function(obj) {
           var originalDefaults = obj.includeDefaultValues;
           obj.includeDefaultValues = obj.group.includeDefaultValues;
           var _obj = obj.toDatalessObject(propertiesToInclude);
@@ -251,9 +251,9 @@
           return _obj;
         });
       }
-      return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
-        objects: objsToObject
-      });
+      var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
+      obj.objects = objsToObject;
+      return obj;
     },
 
     /**
