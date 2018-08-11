@@ -80,7 +80,7 @@
      * @param {Object} target
      */
     _createGroup: function(target) {
-      var objects = this.getObjects(),
+      var objects = this._objects,
           isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
           groupObjects = isActiveLower
             ? [this._activeObject, target]

@@ -129,7 +129,7 @@
     collection.add(obj2, obj);
     assert.ok(typeof collection.getObjects === 'function', 'has getObjects method');
     var returned = collection.getObjects();
-    assert.equal(returned, collection._objects, 'return the _objects array directly');
+    assert.notEqual(returned, collection._objects, 'does not return a reference to _objects');
     returned = collection.getObjects('a');
     assert.notEqual(returned, collection._objects, 'return a new array');
     assert.equal(returned.indexOf(obj2), -1, 'object of type B is not included');
