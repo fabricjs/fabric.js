@@ -1273,6 +1273,11 @@
         'textAlign',
         'textBackgroundColor',
         'charSpacing',
+        'minHeight',
+        'name',
+        'value',
+        'textWrap',
+        'fitText',
       ].concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProperties);
       obj.styles = clone(this.styles, true);
