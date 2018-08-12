@@ -405,7 +405,7 @@
       done();
     });
   });
-  
+
   QUnit.test('parseSVGFromString nested opacity', function(assert) {
     var done = assert.async();
     var string = '<?xml version="1.0" encoding="UTF-8"?>' +
