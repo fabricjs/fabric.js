@@ -1771,6 +1771,15 @@
     assert.equal(svg, expectedSVG, 'svg is as expected');
   });
 
+  QUnit.test('requestRenderAll and cancelRequestedRender', function(assert) {
+    var canvas2 = new fabric.StaticCanvas();
+    assert.equal(canvas2.isRendering, undefined, 'no redering is in progress');
+    canvas2.requestRenderAll();
+    assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
+    canvas2.cancelRequestedRender();
+    assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
+  });
+
   // QUnit.test('backgroundImage', function(assert) {
   //   var done = assert.async();
   //   assert.deepEqual('', canvas.backgroundImage);

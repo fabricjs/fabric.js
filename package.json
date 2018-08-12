@@ -45,6 +45,7 @@
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=accessors",
     "build_export": "npm run build:fast && npm run export_dist_to_site",
+    "test:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
     "test": "istanbul cover ./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/unit",
     "test:visual": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/visual",
     "test:all": "npm run test && npm run test:visual",
