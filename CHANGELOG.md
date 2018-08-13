@@ -1,3 +1,10 @@
+**Version 2.3.5**
+ - Change: make canvas.getObjects() always return a shallow copy of the array [#5162](https://github.com/fabricjs/fabric.js/pull/5162)
+ - Fix: Improve fabric.Pattern.toSVG to look correct on offsets and no-repeat [#5164](https://github.com/fabricjs/fabric.js/pull/5164)
+ - Fix: Do not enter edit in Itext if the mouseUp is relative to a group selector [#5153](https://github.com/fabricjs/fabric.js/pull/5153)
+ - Improvement: Do not require xlink namespace in front of href attribut for svgs ( is a SVG2 new spec, unsupported ) [#5156](https://github.com/fabricjs/fabric.js/pull/5156)
+ - Fix: fix resizeFilter having the wrong cached texture, also improved interaction between filters [#5165](https://github.com/fabricjs/fabric.js/pull/5165)
+
 **Version 2.3.4**
  - Fix: ToSVG was ignoring excludeFromExport for backgroundImage and OverlayImage. [#5075](https://github.com/fabricjs/fabric.js/pull/5075)
  - Fix: ToSVG for circle with start and end angles. [#5085](https://github.com/fabricjs/fabric.js/pull/5085)
