@@ -157,11 +157,8 @@
      * @chainable
      */
     setElement: function(element, options) {
-      var backend = fabric.filterBackend;
-      if (backend && backend.evictCachesForKey) {
-        backend.evictCachesForKey(this.cacheKey);
-        backend.evictCachesForKey(this.cacheKey + '_filtered');
-      }
+      this.removeTexture(this.cacheKey);
+      this.removeTexture(this.cacheKey + '_filtered');
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
@@ -175,15 +172,21 @@
     },
 
     /**
-     * Delete cacheKey if we have a webGlBackend
-     * delete reference to image elements
+     * Delete a single texture if in webgl mode
      */
-    dispose: function() {
+    removeTexture: function(key) {
       var backend = fabric.filterBackend;
       if (backend && backend.evictCachesForKey) {
-        backend.evictCachesForKey(this.cacheKey);
-        backend.evictCachesForKey(this.cacheKey + '_filtered');
+        backend.evictCachesForKey(key);
       }
+    },
+
+    /**
+     * Delete textures, reference to elements and eventually JSDOM cleanup
+     */
+    dispose: function() {
+      this.removeTexture(this.cacheKey);
+      this.removeTexture(this.cacheKey + '_filtered');
       this._cacheContext = undefined;
       ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach((function(element) {
         fabric.util.cleanUpJsdomNode(this[element]);
@@ -407,7 +410,7 @@
         fabric.filterBackend = fabric.initFilterBackend();
       }
       var canvasEl = fabric.util.createCanvasElement(),
-          cacheKey = this._filteredEl ? this.cacheKey : (this.cacheKey + '_filtered'),
+          cacheKey = this._filteredEl ? (this.cacheKey + '_filtered') : this.cacheKey,
           sourceWidth = elementToFilter.width, sourceHeight = elementToFilter.height;
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
@@ -435,6 +438,10 @@
       if (this.group) {
         this.set('dirty', true);
       }
+
+      // needs to clear out or WEBGL will not resize correctly
+      this.removeTexture(this.cacheKey + '_filtered');
+
       if (filters.length === 0) {
         this._element = this._originalElement;
         this._filteredEl = null;
@@ -457,7 +464,12 @@
       }
       else {
         // clear the existing element to get new filter data
-        this._element.getContext('2d').clearRect(0, 0, sourceWidth, sourceHeight);
+        // also dereference the eventual resized _element
+        this._element = this._filteredEl;
+        this._filteredEl.getContext('2d').clearRect(0, 0, sourceWidth, sourceHeight);
+        // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
+        this._lastScaleX = 1;
+        this._lastScaleY = 1;
       }
       if (!fabric.filterBackend) {
         fabric.filterBackend = fabric.initFilterBackend();

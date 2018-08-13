@@ -690,6 +690,50 @@
     });
   });
 
+  QUnit.test('apply filters reset _element and _filteredEl', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
+      image.applyFilters();
+      var element = image._element;
+      var filtered = image._filteredEl;
+      image.filters = [contrast];
+      image.applyFilters();
+      assert.notEqual(image._element, element, 'image element has changed');
+      assert.notEqual(image._filteredEl, filtered, 'image _filteredEl element has changed');
+      assert.equal(image._element, image._filteredEl, 'after filtering elements are the same');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters and resize filter', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
+      var resizeFilter = new fabric.Image.filters.Resize();
+      image.filters = [contrast];
+      image.resizeFilter = resizeFilter;
+      var element = image._element;
+      var filtered = image._filteredEl;
+      image.scaleX = 0.4;
+      image.scaleY = 0.4;
+      image.applyFilters();
+      assert.notEqual(image._element, element, 'image element has changed');
+      assert.notEqual(image._filteredEl, filtered, 'image _filteredEl element has changed');
+      assert.equal(image._element, image._filteredEl, 'after filtering elements are the same');
+      image.applyResizeFilters();
+      assert.notEqual(image._element, image._filteredEl, 'after resizing the 2 elements differ');
+      assert.equal(image._lastScaleX, image.scaleX, 'after resizing we know how much we scaled');
+      assert.equal(image._lastScaleY, image.scaleY, 'after resizing we know how much we scaled');
+      image.applyFilters();
+      assert.equal(image._element, image._filteredEl, 'after filters again the elements changed');
+      assert.equal(image._lastScaleX, 1, 'lastScale X is reset');
+      assert.equal(image._lastScaleY, 1, 'lastScale Y is reset');
+      assert.equal(image._needsResize(), true, 'resizing is needed again');
+      done();
+    });
+  });
+
   QUnit.test('apply filters set the image dirty and also the group', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
