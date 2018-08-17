@@ -188,6 +188,45 @@
             data[i] = tr + r * alpha1;
             data[i + 1] = tg + g * alpha1;
             data[i + 2] = tb + b * alpha1;
+            break;
+          case 'redtag':
+            if( r > 127 && g > 127 && b > 127){
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
+            }else if(r > 127){
+              data[i] = 255;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }else if(g > 127 || b > 127){
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
+            }else{
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }
+            break;
+          case 'yellowtag':
+            if( r > 127 && g > 127 && b > 127){
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 0;
+            }else if(r < 127 || g < 127){
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
+            }else if(r < 127 && g < 127){
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }else{
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }
+            break;
         }
       }
     },

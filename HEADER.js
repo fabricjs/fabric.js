@@ -114,7 +114,7 @@ fabric.textureSize = 2048;
  * @type Boolean
  * @default
  */
-fabric.enableGLFiltering = true;
+fabric.enableGLFiltering = false;
 
 /**
  * Device Pixel Ratio
