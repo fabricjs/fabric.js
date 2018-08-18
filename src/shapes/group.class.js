@@ -78,6 +78,16 @@
 
       if (!isAlreadyGrouped) {
         var center = options && options.centerPoint;
+        // we want to set origins before calculating the bounding box.
+        // so that the topleft can be set with that in mind.
+        // if specific top and left are passed, are overwritten later
+        // with the callSuper('initialize', options)
+        if (options.originX !== undefined) {
+          this.originX = options.originX;
+        }
+        if (options.originY !== undefined) {
+          this.originY = options.originY;
+        }
         // if coming from svg i do not want to calc bounds.
         // i assume width and height are passed along options
         center || this._calcBounds();
@@ -495,6 +505,8 @@
       this.width = width;
       this.height = height;
       if (!onlyWidthHeight) {
+        // the bounding box always finds the topleft most corner.
+        // whatever is the group origin, we set up here the left/top position.
         this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
       }
     },
