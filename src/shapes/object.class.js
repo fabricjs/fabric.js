@@ -441,7 +441,9 @@
     includeDefaultValues:     true,
 
     /**
-     * Function that determines clipping of an object (context is passed as a first argument)
+     * Function that determines clipping of an object (context is passed as a first argument).
+     * If you are using code minification, ctx argument can be minified/manglied you should use
+     * as a workaround `var ctx = arguments[0];` in the function;
      * Note that context origin is at the object's center point (not left/top corner)
      * @deprecated since 2.0.0
      * @type Function
