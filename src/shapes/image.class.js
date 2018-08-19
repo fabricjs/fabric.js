@@ -144,7 +144,7 @@
      * @return {HTMLImageElement} Image element
      */
     getElement: function() {
-      return this._element;
+      return this._element || {};
     },
 
     /**
@@ -213,8 +213,8 @@
     getOriginalSize: function() {
       var element = this.getElement();
       return {
-        width: element.width,
-        height: element.height
+        width: element.naturalWidth || element.width,
+        height: element.naturalHeight || element.height
       };
     },
 
@@ -519,10 +519,7 @@
      * @private
      */
     _resetWidthHeight: function() {
-      var element = this.getElement();
-
-      this.set('width', element.width);
-      this.set('height', element.height);
+      this.set(this.getOriginalSize());
     },
 
     /**
@@ -568,20 +565,15 @@
 
     /**
      * @private
+     * Set the width and the height of the image object, using the element or the
+     * options.
      * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      this.width = options && ('width' in options)
-        ? options.width
-        : (this.getElement()
-          ? this.getElement().width || 0
-          : 0);
-
-      this.height = options && ('height' in options)
-        ? options.height
-        : (this.getElement()
-          ? this.getElement().height || 0
-          : 0);
+      options || (options = { });
+      var el = this.getElement();
+      this.width = options.width || el.naturalWidth || el.width || 0;
+      this.height = options.height || el.naturalHeight || el.height || 0;
     },
 
     /**

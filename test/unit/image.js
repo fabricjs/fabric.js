@@ -73,16 +73,12 @@
   }
 
   function _createImageObject(width, height, callback, options) {
+    options = options || {};
     var elImage = _createImageElement();
     setSrc(elImage, IMG_SRC, function() {
-      if (width !== elImage.width || height !== elImage.height) {
-        elImage.width = width;
-        elImage.height = height;
-        callback(new fabric.Image(elImage, options));
-      }
-      else {
-        callback(new fabric.Image(elImage, options));
-      }
+      options.width = width;
+      options.height = height;
+      callback(new fabric.Image(elImage, options));
     });
   }
 
