@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabric/fabric.js"
+    "url": "https://github.com/fabricjs/fabric.js"
   },
   "bugs": {
-    "url": "https://github.com/fabric/fabric.js/issues"
+    "url": "https://github.com/fabricjs/fabric.js/issues"
   },
   "license": "MIT",
   "scripts": {
