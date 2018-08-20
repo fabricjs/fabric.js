@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.3.5' };
+var fabric = fabric || { version: '2.3.6' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -6575,7 +6575,10 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
 
     /**
      * Function that determines clipping of entire canvas area
-     * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * Being passed context as first argument.
+     * If you are using code minification, ctx argument can be minified/manglied you should use
+     * as a workaround `var ctx = arguments[0];` in the function;
+     * See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
      * @deprecated since 2.0.0
      * @type Function
      * @default
@@ -8746,7 +8749,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
 
       circles.push(circle);
     }
-    var group = new fabric.Group(circles, { originX: 'center', originY: 'center' });
+    var group = new fabric.Group(circles);
     group.canvas = this.canvas;
 
     this.canvas.add(group);
@@ -8893,7 +8896,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       rects = this._getOptimizedRects(rects);
     }
 
-    var group = new fabric.Group(rects, { originX: 'center', originY: 'center' });
+    var group = new fabric.Group(rects);
     this.shadow && group.setShadow(this.shadow);
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
@@ -12702,7 +12705,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     includeDefaultValues:     true,
 
     /**
-     * Function that determines clipping of an object (context is passed as a first argument)
+     * Function that determines clipping of an object (context is passed as a first argument).
+     * If you are using code minification, ctx argument can be minified/manglied you should use
+     * as a workaround `var ctx = arguments[0];` in the function;
      * Note that context origin is at the object's center point (not left/top corner)
      * @deprecated since 2.0.0
      * @type Function
@@ -18457,6 +18462,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (!isAlreadyGrouped) {
         var center = options && options.centerPoint;
+        // we want to set origins before calculating the bounding box.
+        // so that the topleft can be set with that in mind.
+        // if specific top and left are passed, are overwritten later
+        // with the callSuper('initialize', options)
+        if (options.originX !== undefined) {
+          this.originX = options.originX;
+        }
+        if (options.originY !== undefined) {
+          this.originY = options.originY;
+        }
         // if coming from svg i do not want to calc bounds.
         // i assume width and height are passed along options
         center || this._calcBounds();
@@ -18874,6 +18889,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.width = width;
       this.height = height;
       if (!onlyWidthHeight) {
+        // the bounding box always finds the topleft most corner.
+        // whatever is the group origin, we set up here the left/top position.
         this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
       }
     },
@@ -19231,7 +19248,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {HTMLImageElement} Image element
      */
     getElement: function() {
-      return this._element;
+      return this._element || {};
     },
 
     /**
@@ -19300,8 +19317,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     getOriginalSize: function() {
       var element = this.getElement();
       return {
-        width: element.width,
-        height: element.height
+        width: element.naturalWidth || element.width,
+        height: element.naturalHeight || element.height
       };
     },
 
@@ -19606,10 +19623,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _resetWidthHeight: function() {
-      var element = this.getElement();
-
-      this.set('width', element.width);
-      this.set('height', element.height);
+      this.set(this.getOriginalSize());
     },
 
     /**
@@ -19655,20 +19669,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * @private
+     * Set the width and the height of the image object, using the element or the
+     * options.
      * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      this.width = options && ('width' in options)
-        ? options.width
-        : (this.getElement()
-          ? this.getElement().width || 0
-          : 0);
-
-      this.height = options && ('height' in options)
-        ? options.height
-        : (this.getElement()
-          ? this.getElement().height || 0
-          : 0);
+      options || (options = { });
+      var el = this.getElement();
+      this.width = options.width || el.naturalWidth || el.width || 0;
+      this.height = options.height || el.naturalHeight || el.height || 0;
     },
 
     /**
