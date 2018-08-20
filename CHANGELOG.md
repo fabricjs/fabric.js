@@ -1,3 +1,8 @@
+**Version 2.3.6**
+- Fix: Make image.class aware of naturalWidth and naturalHeight. [#5178](https://github.com/fabricjs/fabric.js/pull/5178)
+- Fix: Make 2 finger events works again [#5177](https://github.com/fabricjs/fabric.js/pull/5177)
+- Fix: Make Groups respect origin and correct position ( fix spray/circle brushes ) [#5176](https://github.com/fabricjs/fabric.js/pull/5176)
+
 **Version 2.3.5**
  - Change: make canvas.getObjects() always return a shallow copy of the array [#5162](https://github.com/fabricjs/fabric.js/pull/5162)
  - Fix: Improve fabric.Pattern.toSVG to look correct on offsets and no-repeat [#5164](https://github.com/fabricjs/fabric.js/pull/5164)
