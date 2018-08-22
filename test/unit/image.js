@@ -675,13 +675,13 @@
     });
   });
 
-  QUnit.test('apply filters do not set the image dirty if not in group', function(assert) {
+  QUnit.test('apply filters set the image dirty', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
       image.dirty = false;
       assert.equal(image.dirty, false, 'false apply filter dirty is false');
       image.applyFilters();
-      assert.equal(image.dirty, false, 'After apply filter dirty is true');
+      assert.equal(image.dirty, true, 'After apply filter dirty is true');
       done();
     });
   });
