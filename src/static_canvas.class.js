@@ -934,8 +934,9 @@
         if (path.isCacheDirty()) {
           // needed to setup a couple of variables
           path.shouldCache();
+          path.canvas = this;
           path._transformDone = true;
-          path.renderCache(this, true);
+          path.renderCache({ forClipping: true });
         }
         this.drawClipPathOnCanvas(ctx);
       }

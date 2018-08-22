@@ -1133,7 +1133,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx, forClipping) {
-      var path = this.clipPath;
+
       if (forClipping) {
         this._setClippingProperties(ctx);
       }
@@ -1143,16 +1143,20 @@
         this._setFillStyles(ctx, this);
       }
       this._render(ctx);
-      if (path) {
-        // needed to setup a couple of variables
-        // path canvas gets overridden with this one.
-        // TODO find a better solution?
-        path.canvas = this.canvas;
-        path.shouldCache();
-        path._transformDone = true;
-        path.renderCache({ forClipping: true });
-        this.drawClipPathOnCache(ctx);
-      }
+      this._drawClipPath(ctx);
+    },
+
+    _drawClipPath: function(ctx) {
+      var path = this.clipPath;
+      if (!path) { return; }
+      // needed to setup a couple of variables
+      // path canvas gets overridden with this one.
+      // TODO find a better solution?
+      path.canvas = this.canvas;
+      path.shouldCache();
+      path._transformDone = true;
+      path.renderCache({ forClipping: true });
+      this.drawClipPathOnCache(ctx);
     },
 
     /**
