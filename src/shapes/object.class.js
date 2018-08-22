@@ -626,11 +626,11 @@
      * Create a the canvas used to keep the cached copy of the object
      * @private
      */
-    _createCacheCanvas: function(parentObject) {
+    _createCacheCanvas: function() {
       this._cacheProperties = {};
       this._cacheCanvas = fabric.util.createCanvasElement();
       this._cacheContext = this._cacheCanvas.getContext('2d');
-      this._updateCacheCanvas(parentObject);
+      this._updateCacheCanvas();
       // if canvas gets created, is empty, so dirty.
       this.dirty = true;
     },
@@ -683,8 +683,6 @@
     /**
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
-     * @param parentObject {fabric.Object} Object for which the cache is calculated
-     * (check clipPath functionality for more informations)
      * @private
      * @return {Object}.x width of object to be cached
      * @return {Object}.y height of object to be cached
@@ -693,7 +691,7 @@
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
-    _getCacheCanvasDimensions: function(parentObject) {
+    _getCacheCanvasDimensions: function() {
       var objectScale = this.getTotalObjectScaling(),
           dim = this._getNonTransformedDimensions(),
           zoomX = objectScale.scaleX,
@@ -718,8 +716,8 @@
      * @private
      * @return {Boolean} true if the canvas has been resized
      */
-    _updateCacheCanvas: function(parentObject) {
-      var targetCanvas = this.canvas || (parentObject && parentObject.canvas);
+    _updateCacheCanvas: function() {
+      var targetCanvas = this.canvas;
       if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
         var target = targetCanvas._currentTransform.target,
             action = targetCanvas._currentTransform.action;
@@ -728,7 +726,7 @@
         }
       }
       var canvas = this._cacheCanvas,
-          dims = this._limitCacheSize(this._getCacheCanvasDimensions(parentObject)),
+          dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           minCacheSize = fabric.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
@@ -1051,13 +1049,14 @@
       ctx.restore();
     },
 
-    renderCache: function(parentObject, forClipping) {
+    renderCache: function(options) {
+      options = options || {};
       if (!this._cacheCanvas) {
-        this._createCacheCanvas(parentObject);
+        this._createCacheCanvas();
       }
-      if (this.isCacheDirty(false, parentObject)) {
+      if (this.isCacheDirty(false)) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-        this.drawObject(this._cacheContext, forClipping);
+        this.drawObject(this._cacheContext, options.forClipping);
         this.dirty = false;
       }
     },
@@ -1146,9 +1145,12 @@
       this._render(ctx);
       if (path) {
         // needed to setup a couple of variables
+        // path canvas gets overridden with this one.
+        // TODO find a better solution?
+        path.canvas = this.canvas;
         path.shouldCache();
         path._transformDone = true;
-        path.renderCache(this, true);
+        path.renderCache({ forClipping: true });
         this.drawClipPathOnCache(ctx);
       }
     },
@@ -1167,11 +1169,11 @@
      * @param {Boolean} skipCanvas skip canvas checks because this object is painted
      * on parent canvas.
      */
-    isCacheDirty: function(skipCanvas, parentObject) {
+    isCacheDirty: function(skipCanvas) {
       if (this.isNotVisible()) {
         return false;
       }
-      if (this._cacheCanvas && !skipCanvas && this._updateCacheCanvas(parentObject)) {
+      if (this._cacheCanvas && !skipCanvas && this._updateCacheCanvas()) {
         // in this case the context is already cleared.
         return true;
       }
