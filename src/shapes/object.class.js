@@ -441,7 +441,9 @@
     includeDefaultValues:     true,
 
     /**
-     * Function that determines clipping of an object (context is passed as a first argument)
+     * Function that determines clipping of an object (context is passed as a first argument).
+     * If you are using code minification, ctx argument can be minified/manglied you should use
+     * as a workaround `var ctx = arguments[0];` in the function;
      * Note that context origin is at the object's center point (not left/top corner)
      * @deprecated since 2.0.0
      * @type Function
@@ -591,6 +593,9 @@
 
     /**
      * List of properties to consider when checking if cache needs refresh
+     * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+     * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+     * and refreshed at the next render
      * @type Array
      */
     cacheProperties: (
@@ -623,7 +628,7 @@
      */
     _createCacheCanvas: function(parentObject) {
       this._cacheProperties = {};
-      this._cacheCanvas = fabric.document.createElement('canvas');
+      this._cacheCanvas = fabric.util.createCanvasElement();
       this._cacheContext = this._cacheCanvas.getContext('2d');
       this._updateCacheCanvas(parentObject);
       // if canvas gets created, is empty, so dirty.
@@ -1506,17 +1511,24 @@
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
+     * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
       options || (options = { });
 
+      var origParams = fabric.util.saveObjectTransform(this);
+
+      if (options.withoutTransform) {
+        fabric.util.resetObjectTransform(this);
+      }
+
       var el = fabric.util.createCanvasElement(),
-          boundingRect = this.getBoundingRect();
+          // skip canvas zoom and calculate with setCoords now.
+          boundingRect = this.getBoundingRect(true, true);
 
       el.width = boundingRect.width;
       el.height = boundingRect.height;
-      fabric.util.wrapElement(el, 'div');
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: options.enableRetinaScaling,
         renderOnAddRemove: false,
@@ -1530,11 +1542,6 @@
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
-
-      var origParams = {
-        left: this.left,
-        top: this.top
-      };
 
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 

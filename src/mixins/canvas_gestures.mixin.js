@@ -138,7 +138,11 @@
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
 
-      this._fire('scaling', target, e);
+      this._fire('scaling', {
+        target: target,
+        e: e,
+        transform: t,
+      });
     },
 
     /**
@@ -153,7 +157,11 @@
         return;
       }
       t.target.rotate(radiansToDegrees(degreesToRadians(curAngle) + t.theta));
-      this._fire('rotating', t.target, e);
+      this._fire('rotating', {
+        target: t.target,
+        e: e,
+        transform: t,
+      });
     }
   });
 })();

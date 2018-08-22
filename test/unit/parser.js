@@ -372,6 +372,40 @@
     });
   });
 
+  QUnit.test('parseSVGFromString with xlink:href', function(assert) {
+    var done = assert.async();
+    var string = '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+                 '<defs><rect id="myrect" width="300" height="100" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/></defs>' +
+                 '<use xlink:href="#myrect" x="50" y="50" ></use>' +
+                 '</svg>',
+        rect;
+
+    assert.ok(fabric.loadSVGFromString);
+
+    fabric.loadSVGFromString(string, function(objects) {
+      rect = objects[0];
+      assert.ok(rect instanceof fabric.Rect);
+      done();
+    });
+  });
+
+  QUnit.test('parseSVGFromString with href', function(assert) {
+    var done = assert.async();
+    var string = '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+                 '<defs><rect id="myrect" width="300" height="100" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/></defs>' +
+                 '<use href="#myrect" x="50" y="50" ></use>' +
+                 '</svg>',
+        rect;
+
+    assert.ok(fabric.loadSVGFromString);
+
+    fabric.loadSVGFromString(string, function(objects) {
+      rect = objects[0];
+      assert.ok(rect instanceof fabric.Rect);
+      done();
+    });
+  });
+
   QUnit.test('parseSVGFromString nested opacity', function(assert) {
     var done = assert.async();
     var string = '<?xml version="1.0" encoding="UTF-8"?>' +

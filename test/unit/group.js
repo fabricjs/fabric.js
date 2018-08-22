@@ -218,13 +218,13 @@
       strokeWidth: 0
     }];
     var expectedObject = {
-      'version': fabric.version,
-      'type':               'group',
-      'left':               50,
-      'top':                100,
-      'width':              80,
-      'height':             60,
-      'objects':            objects
+      version: fabric.version,
+      type: 'group',
+      left: 50,
+      top: 100,
+      width: 80,
+      height: 60,
+      objects: objects
     };
     assert.deepEqual(clone, expectedObject);
   });

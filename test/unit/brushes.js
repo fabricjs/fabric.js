@@ -1,6 +1,10 @@
 (function() {
   var canvas = new fabric.Canvas();
-  QUnit.module('fabric.BaseBrush');
+  QUnit.module('fabric.BaseBrush', {
+    afterEach: function() {
+      canvas.cancelRequestedRender();
+    }
+  });
   QUnit.test('fabric brush constructor', function(assert) {
     assert.ok(fabric.BaseBrush);
 
