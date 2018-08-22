@@ -255,7 +255,7 @@
       var markup = this._createBaseSVGMarkup(),
           p = this.calcLinePoints();
       markup.push(
-        '<line ', this.getSvgId(),
+        '<line ', this.getSvgCommons(),
         'x1="', p.x1,
         '" y1="', p.y1,
         '" x2="', p.x2,

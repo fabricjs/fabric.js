@@ -50,13 +50,13 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages

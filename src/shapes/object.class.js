@@ -604,6 +604,15 @@
     ).split(' '),
 
     /**
+     * a fabricObject that, without stroke define a clipping area with their shape. filled in black
+     * the clipPath object gets used when the object has rendered, and the context is placed in the center
+     * of the object cacheCanvas.
+     * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
+     * @type fabric.Object
+     */
+    clipPath: undefined,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -675,8 +684,8 @@
      * Return the dimension and the zoom level needed to create a cache canvas
      * big enough to host the object to be cached.
      * @private
-     * @param {Object} dim.x width of object to be cached
-     * @param {Object} dim.y height of object to be cached
+     * @return {Object}.x width of object to be cached
+     * @return {Object}.y height of object to be cached
      * @return {Object}.width width of canvas
      * @return {Object}.height height of canvas
      * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
@@ -708,9 +717,10 @@
      * @return {Boolean} true if the canvas has been resized
      */
     _updateCacheCanvas: function() {
-      if (this.noScaleCache && this.canvas && this.canvas._currentTransform) {
-        var target = this.canvas._currentTransform.target,
-            action = this.canvas._currentTransform.action;
+      var targetCanvas = this.canvas;
+      if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+        var target = targetCanvas._currentTransform.target,
+            action = targetCanvas._currentTransform.action;
         if (this === target && action.slice && action.slice(0, 5) === 'scale') {
           return false;
         }
@@ -827,8 +837,12 @@
             globalCompositeOperation: this.globalCompositeOperation,
             transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : null,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
-            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
+            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
           };
+
+      if (this.clipPath) {
+        object.clipPath = this.clipPath.toObject(propertiesToInclude);
+      }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
       if (!this.includeDefaultValues) {
@@ -1020,15 +1034,7 @@
       }
       this.clipTo && fabric.util.clipContext(this, ctx);
       if (this.shouldCache()) {
-        if (!this._cacheCanvas) {
-          this._createCacheCanvas();
-
-        }
-        if (this.isCacheDirty()) {
-          this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-          this.drawObject(this._cacheContext);
-          this.dirty = false;
-        }
+        this.renderCache();
         this.drawCacheOnCanvas(ctx);
       }
       else {
@@ -1041,6 +1047,18 @@
       }
       this.clipTo && ctx.restore();
       ctx.restore();
+    },
+
+    renderCache: function(options) {
+      options = options || {};
+      if (!this._cacheCanvas) {
+        this._createCacheCanvas();
+      }
+      if (this.isCacheDirty(false)) {
+        this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
+        this.drawObject(this._cacheContext, options.forClipping);
+        this.dirty = false;
+      }
     },
 
     /**
@@ -1062,6 +1080,9 @@
      */
     needsItsOwnCache: function() {
       if (this.paintFirst === 'stroke' && typeof this.shadow === 'object') {
+        return true;
+      }
+      if (this.clipPath) {
         return true;
       }
       return false;
@@ -1091,14 +1112,51 @@
     },
 
     /**
+     * Execute the drawing operation for an object clipPath
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawClipPathOnCache: function(ctx) {
+      var path = this.clipPath;
+      ctx.save();
+      // DEBUG: uncomment this line, comment the following
+      // ctx.globalAlpha = 0.4
+      ctx.globalCompositeOperation = 'destination-in';
+      //ctx.scale(1 / 2, 1 / 2);
+      path.transform(ctx);
+      ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+      ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
+      ctx.restore();
+    },
+
+    /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawObject: function(ctx) {
-      this._renderBackground(ctx);
-      this._setStrokeStyles(ctx, this);
-      this._setFillStyles(ctx, this);
+    drawObject: function(ctx, forClipping) {
+
+      if (forClipping) {
+        this._setClippingProperties(ctx);
+      }
+      else {
+        this._renderBackground(ctx);
+        this._setStrokeStyles(ctx, this);
+        this._setFillStyles(ctx, this);
+      }
       this._render(ctx);
+      this._drawClipPath(ctx);
+    },
+
+    _drawClipPath: function(ctx) {
+      var path = this.clipPath;
+      if (!path) { return; }
+      // needed to setup a couple of variables
+      // path canvas gets overridden with this one.
+      // TODO find a better solution?
+      path.canvas = this.canvas;
+      path.shouldCache();
+      path._transformDone = true;
+      path.renderCache({ forClipping: true });
+      this.drawClipPathOnCache(ctx);
     },
 
     /**
@@ -1190,6 +1248,12 @@
           ? decl.fill.toLive(ctx, this)
           : decl.fill;
       }
+    },
+
+    _setClippingProperties: function(ctx) {
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 0;
+      ctx.fillStyle = 'black';
     },
 
     /**
@@ -1803,8 +1867,11 @@
       if (typeof patterns[1] !== 'undefined') {
         object.stroke = patterns[1];
       }
-      var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
-      callback && callback(instance);
+      fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+        object.clipPath = enlivedProps[0];
+        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
+        callback && callback(instance);
+      });
     });
   };
 
