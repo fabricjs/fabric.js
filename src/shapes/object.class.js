@@ -1122,6 +1122,11 @@
       // ctx.globalAlpha = 0.4
       ctx.globalCompositeOperation = 'destination-in';
       //ctx.scale(1 / 2, 1 / 2);
+      if (path.absolutePositioned) {
+        var m = fabric.util.invertTransform(this.calcTransformMatrix());
+        console.log(m);
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
       path.transform(ctx);
       ctx.scale(1 / path.zoomX, 1 / path.zoomY);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
@@ -1182,7 +1187,10 @@
         return true;
       }
       else {
-        if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
+        if (this.dirty ||
+          (this.clipPath && this.clipPath.absolutePositioned) ||
+          (this.statefullCache && this.hasStateChanged('cacheProperties'))
+        ) {
           if (this._cacheCanvas && !skipCanvas) {
             var width = this.cacheWidth / this.zoomX;
             var height = this.cacheHeight / this.zoomY;
