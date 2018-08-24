@@ -451,8 +451,8 @@
     _render: function(ctx) {
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
-      this._renderTextDecoration(ctx, 'underline');
       this._renderText(ctx);
+      this._renderTextDecoration(ctx, 'underline');
       this._renderTextDecoration(ctx, 'overline');
       this._renderTextDecoration(ctx, 'linethrough');
     },
