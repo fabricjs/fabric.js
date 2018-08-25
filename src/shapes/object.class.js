@@ -1120,11 +1120,15 @@
       ctx.save();
       // DEBUG: uncomment this line, comment the following
       // ctx.globalAlpha = 0.4
-      ctx.globalCompositeOperation = 'destination-in';
+      if (path.inverted) {
+        ctx.globalCompositeOperation = 'destination-out';
+      }
+      else {
+        ctx.globalCompositeOperation = 'destination-in';
+      }
       //ctx.scale(1 / 2, 1 / 2);
       if (path.absolutePositioned) {
         var m = fabric.util.invertTransform(this.calcTransformMatrix());
-        console.log(m);
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       path.transform(ctx);
