@@ -5,7 +5,7 @@
 
   visualCallback.prototype.addArguments = function(argumentObj) {
     this.currentArgs = {
-      enabled: argumentObj.enabled,
+      enabled: true,
       fabric: argumentObj.fabric,
       golden: argumentObj.golden,
       diff: argumentObj.diff,
@@ -30,6 +30,8 @@
       _div.appendChild(fabricCopy);
       _div.appendChild(diff);
       node.appendChild(_div);
+      // after one run, disable
+      this.currentArgs.enabled = false;
     }
   };
 
