@@ -1,10 +1,18 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  var _pixelMatch = pixelmatch;
+  var _pixelMatch;
+  var visualCallback;
+  var fs;
   if (fabric.isLikelyNode) {
-    var fs = global.fs;
+    fs = global.fs;
     _pixelMatch = global.pixelmatch;
+    visualCallback = global.visualCallback;
+  } else {
+    _pixelMatch = pixelmatch;
+    if (window) {
+      visualCallback = window.visualCallback;
+    }
   }
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
   var pixelmatchOptions = {
@@ -56,7 +64,7 @@
     img.src = filename;
   }
 
-  function afterEachHandler() {
+  function beforeEachHandler() {
     fabricCanvas.setZoom(1);
     fabricCanvas.setDimensions({
       width: 300,
@@ -205,7 +213,7 @@
     var newModule = testObj.newModule;
     if (newModule) {
       QUnit.module(newModule, {
-        afterEach: afterEachHandler,
+        beforeEach: beforeEachHandler,
       });
     }
     QUnit.test(testName, function(assert) {
@@ -219,11 +227,17 @@
         canvas.width = width;
         canvas.height = height;
         var ctx = canvas.getContext('2d');
-        var output = ctx.getImageData(0, 0, width, height).data;
+        var output = ctx.getImageData(0, 0, width, height);
         getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
           ctx.drawImage(goldenImage, 0, 0);
+          visualCallback.addArguments({
+            enabled: true,
+            golden: canvas,
+            fabric: renderedCanvas,
+            diff: output
+          });
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-          var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
+          var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;
           var okDiff = totalPixels * percentage;
           assert.ok(

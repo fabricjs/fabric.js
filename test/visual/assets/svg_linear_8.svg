@@ -8,6 +8,6 @@
 </linearGradient>
 </defs>
 
-<rect x="0" y="0" width="200" height="100"
+<rect x="1" y="1" width="200" height="100" stroke-width="2"
     style="fill: url(#three_stops); stroke: black;"/>
 </svg>

@@ -1,8 +1,18 @@
 (function() {
-  var _pixelMatch = pixelmatch;
+  fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
+  var _pixelMatch;
+  var visualCallback;
+  var fs;
   if (fabric.isLikelyNode) {
-    var fs = global.fs;
+    fs = global.fs;
     _pixelMatch = global.pixelmatch;
+    visualCallback = global.visualCallback;
+  } else {
+    _pixelMatch = pixelmatch;
+    if (window) {
+      visualCallback = window.visualCallback;
+    }
   }
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
   var pixelmatchOptions = {
@@ -63,23 +73,28 @@
         height: height
       });
       var ctx = canvas.getContext('2d');
+      var outputImageData = ctx.getImageData(0, 0, width, height);
       ctx.drawImage(img, 0, 0);
-      var goldenImageData = ctx.getImageData(0, 0, width, height).data;
-      ctx.clearRect(0, 0, width, height);
-      var outputImageData = ctx.getImageData(0, 0, width, height).data;
+      var goldenImageData = ctx.getImageData(0, 0, width, height);
       getAsset(filename, function(err, string) {
         fabric.loadSVGFromString(string, function(objects) {
           fabricCanvas.add.apply(fabricCanvas, objects);
           fabricCanvas.renderAll();
+          visualCallback.addArguments({
+            enabled: true,
+            golden: canvas,
+            fabric: fabricCanvas.lowerCanvasEl,
+            diff: outputImageData
+          });
           var fabricImageData = fabricCanvas.contextContainer.getImageData(0, 0, width, height).data;
-          callback(fabricImageData, goldenImageData, width, height, outputImageData);
+          callback(fabricImageData, goldenImageData.data, width, height, outputImageData.data);
         });
       });
     });
   }
 
   QUnit.module('Simple svg import test', {
-    afterEach: function() {
+    beforeEach: function() {
       fabricCanvas.clear();
       fabricCanvas.renderAll();
     }

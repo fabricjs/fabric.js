@@ -48,6 +48,7 @@
     "test:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
     "test": "istanbul cover ./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/unit",
     "test:visual": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/visual",
+    "test:visual:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
     "test:all": "npm run test && npm run test:visual",
     "lint": "eslint --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests",
