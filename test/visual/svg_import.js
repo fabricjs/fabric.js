@@ -141,7 +141,6 @@
         var percDiff = differentPixels / totalPixels * 100;
         assert.ok(differentPixels < totalPixels * percentage, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%');
         done();
-        console.log('Different pixels for', filename, ':', differentPixels, '/', totalPixels, 'expected:', expectedPixels, ' diff:', percDiff.toFixed(3), '%');
       });
     });
   });

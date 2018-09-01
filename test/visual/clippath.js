@@ -214,7 +214,6 @@
             differentPixels < okDiff,
             testName + ' has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '%'
           );
-          console.log('Different pixels:', differentPixels, '/', totalPixels, ' diff:', percDiff.toFixed(3), '%');
           done();
         });
       });
