@@ -175,6 +175,79 @@
     percentage: 0.06,
   });
 
+  function clipping4(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
+    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
+    obj.fill = new fabric.Gradient({
+      type: 'linear',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 200,
+        y2: 200,
+      },
+      colorStops: [
+        {
+          offset: 0,
+          color: 'red',
+        },
+        {
+          offset: 1,
+          color: 'blue',
+        }
+      ]
+    });
+    obj.clipPath = clipPath;
+    canvas.add(obj);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'ClipPath can be transformed',
+    code: clipping4,
+    golden: 'clipping4.png',
+    percentage: 0.06,
+  });
+
+  function clipping5(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
+    var clipPath1 = new fabric.Circle({ radius: 15, rotate: 45, strokeWidth: 0, top: -100, left: -50, scaleX: 2, skewY: 45 });
+    var clipPath2 = new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 });
+    var group = new fabric.Group([clipPath, clipPath1, clipPath2]);
+    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
+    obj.fill = new fabric.Gradient({
+      type: 'linear',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 200,
+        y2: 200,
+      },
+      colorStops: [
+        {
+          offset: 0,
+          color: 'red',
+        },
+        {
+          offset: 1,
+          color: 'blue',
+        }
+      ]
+    });
+    obj.clipPath = group;
+    canvas.add(obj);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'ClipPath can be a group with many objects',
+    code: clipping5,
+    golden: 'clipping5.png',
+    percentage: 0.06,
+  });
+
   tests.forEach(function(testObj) {
     var testName = testObj.test;
     var code = testObj.code;
