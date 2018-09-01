@@ -72,6 +72,7 @@ jobs:
     - stage: Unit Tests
       node_js: "4"
     - stage: Visual Tests
+      env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "8"
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests

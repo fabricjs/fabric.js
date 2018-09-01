@@ -14,7 +14,9 @@
       visualCallback = window.visualCallback;
     }
   }
-  var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
+  var fabricCanvas = this.canvas = new fabric.Canvas(null, {
+    enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200,
+  });
   var pixelmatchOptions = {
     includeAA: false,
     threshold: 0.095
@@ -59,6 +61,7 @@
     };
     img.onerror = function(err) {
       img.onerror = null;
+      callback(img);
       console.log('Image loading errored', err);
     };
     img.src = filename;
@@ -66,10 +69,6 @@
 
   function beforeEachHandler() {
     fabricCanvas.setZoom(1);
-    fabricCanvas.setDimensions({
-      width: 300,
-      height: 150,
-    });
     fabricCanvas.clear();
     fabricCanvas.renderAll();
   }
@@ -77,12 +76,8 @@
   var tests = [];
 
   function clipping0(canvas, callback) {
-    canvas.setDimensions({
-      width: 400,
-      height: 400,
-    });
-    var clipPath = new fabric.Circle({ radius: 200, strokeWidth: 0, top: 20, left: 20 });
-    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 400, height: 400, fill: 'rgba(255,0,0,0.5)'});
+    var clipPath = new fabric.Circle({ radius: 100, strokeWidth: 0, top: -10, left: -10 });
+    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
     canvas.renderAll();
@@ -98,13 +93,9 @@
   });
 
   function clipping1(canvas, callback) {
-    canvas.setDimensions({
-      width: 400,
-      height: 400,
-    });
-    var zoom = 40;
+    var zoom = 20;
     canvas.setZoom(zoom);
-    var clipPath = new fabric.Circle({ radius: 5, strokeWidth: 0, top: 1, left: 1 });
+    var clipPath = new fabric.Circle({ radius: 5, strokeWidth: 0, top: -2, left: -2 });
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 10, height: 10, fill: 'rgba(255,0,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
@@ -116,6 +107,54 @@
     test: 'Clip a rect with a circle, with zoom',
     code: clipping1,
     golden: 'clipping1.png',
+    percentage: 0.06,
+  });
+
+  function clipping2(canvas, callback) {
+    var clipPath = new fabric.Circle({
+      radius: 100,
+      top: -100,
+      left: -100
+    });
+    var group = new fabric.Group([
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red' }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
+    ], { strokeWidth: 0 });
+    group.clipPath = clipPath;
+    canvas.add(group);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Clip a group with a circle',
+    code: clipping2,
+    golden: 'clipping2.png',
+    percentage: 0.06,
+  });
+
+  function clipping3(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 100, top: -100, left: -100 });
+    var small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
+    var small2 = new fabric.Rect({ width: 30, height: 30, top: -50, left: -50 });
+    var group = new fabric.Group([
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red', clipPath: small }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
+    ], { strokeWidth: 0 });
+    group.clipPath = clipPath;
+    canvas.add(group);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Isolation of clipPath of group and inner objects',
+    code: clipping3,
+    golden: 'clipping3.png',
     percentage: 0.06,
   });
 
@@ -141,11 +180,17 @@
         canvas.width = width;
         canvas.height = height;
         var ctx = canvas.getContext('2d');
-        var output = ctx.getImageData(0, 0, width, height).data;
+        var output = ctx.getImageData(0, 0, width, height);
         getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
           ctx.drawImage(goldenImage, 0, 0);
+          visualCallback.addArguments({
+            enabled: true,
+            golden: canvas,
+            fabric: renderedCanvas,
+            diff: output
+          });
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-          var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
+          var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;
           var okDiff = totalPixels * percentage;
           assert.ok(
