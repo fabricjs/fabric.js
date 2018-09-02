@@ -72,10 +72,13 @@
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
     "pixelmatch": "^4.0.2",
-    "console-png": "^1.2.1"
+    "chalk": "^2.4.1"
   },
   "engines": {
     "node": ">=4.0.0"
   },
-  "main": "./dist/fabric.js"
+  "main": "./dist/fabric.js",
+  "dependencies": {
+    "chalk": "^2.4.1"
+  }
 }

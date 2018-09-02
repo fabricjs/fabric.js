@@ -4,12 +4,12 @@
   var _pixelMatch;
   var visualCallback;
   var fs;
-  var consolePNG;
+  var imageDataToChalk;
   if (fabric.isLikelyNode) {
     fs = global.fs;
     _pixelMatch = global.pixelmatch;
     visualCallback = global.visualCallback;
-    consolePNG = global.consolePNG;
+    imageDataToChalk = global.imageDataToChalk;
   } else {
     _pixelMatch = pixelmatch;
     if (window) {
@@ -355,29 +355,10 @@
             testName + ' has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '%'
           );
           if (!isOK) {
-            try {
-              var outputC = fabric.document.createElement('canvas');
-              outputC.width = output.width;
-              outputC.height = output.height;
-              outputC.getContext('2d').putImageData(output, 0, 0);
-              var outputCSmall = fabric.document.createElement('canvas');
-              outputCSmall.width = 80;
-              outputCSmall.height = Math.round((80 / output.width) * output.height);
-              outputCSmall.getContext('2d').drawImage(outputC, 0, 0, outputCSmall.width, outputCSmall.height);
-              var nC = fabric.util.getNodeCanvas(outputCSmall);
-              consolePNG(nC.toBuffer('image/png'), function(err, string) {
-                console.log(string);
-                done();
-              });
-            }
-            catch (e) {
-              console.log(e)
-            }
-
+            var stringa = imageDataToChalk(output);
+            console.log(stringa);
           }
-          else {
-            done();
-          }
+          done();
         });
       });
     });
