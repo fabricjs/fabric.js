@@ -862,7 +862,9 @@
           };
 
       if (this.clipPath) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude.concat(['inverted', 'absolutePositioned']));
+        object.clipPath = this.clipPath.toObject(propertiesToInclude);
+        object.clipPath.inverted = this.clipPath.inverted;
+        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
