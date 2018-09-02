@@ -7,6 +7,8 @@ global.visualCallback = {
   addArguments: function() {},
 };
 global.imageDataToChalk = function(imageData) {
+  // actually this does not work on travis-ci, so commenting it out
+  return '';
   var block = String.fromCharCode(9608)
   var data = imageData.data;
   var width = imageData.width;
