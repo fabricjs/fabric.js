@@ -1,4 +1,5 @@
 // set the fabric famework as a global for tests
+var chalk = require('chalk');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.consolePNG = require('console-png');
@@ -6,7 +7,6 @@ global.fs = require('fs');
 global.visualCallback = {
   addArguments: function() {},
 };
-var chalk = require('chalk');
 global.imageDataToChalk = function(imageData) {
   var data = imageData.data;
   var width = imageData.width;

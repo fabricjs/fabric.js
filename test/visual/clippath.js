@@ -15,6 +15,7 @@
     if (window) {
       visualCallback = window.visualCallback;
     }
+    imageDataToChalk = function() { return ''; }
   }
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {
     enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200,
