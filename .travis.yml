@@ -86,6 +86,6 @@ jobs:
       install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
 
-script: npm run test
+script: npm run build:fast && npm run test
 
 dist: trusty
