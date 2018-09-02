@@ -8,7 +8,6 @@ global.visualCallback = {
 };
 var chalk = require('chalk');
 global.imageDataToChalk = function(imageData) {
-  var CHAR_HALF_BLOCK = String.fromCharCode(9608)
   var data = imageData.data;
   var width = imageData.width;
   var height = imageData.height;
