@@ -7,6 +7,7 @@ global.visualCallback = {
   addArguments: function() {},
 };
 global.imageDataToChalk = function(imageData) {
+  var block = String.fromCharCode(9608)
   var data = imageData.data;
   var width = imageData.width;
   var height = imageData.height;
@@ -16,7 +17,7 @@ global.imageDataToChalk = function(imageData) {
     outputString += '\n';
     for (var j = 0; j < width; j++) {
       cp = (i * width + j) * 4;
-      outputString += chalk.rgb(data[cp], data[cp + 1], data[cp + 2]).inverse(' ');
+      outputString += chalk.rgb(data[cp], data[cp + 1], data[cp + 2])(block);
     }
   }
   return outputString;
