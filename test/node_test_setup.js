@@ -1,6 +1,7 @@
 // set the fabric famework as a global for tests
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
+global.consolePNG = require('console-png');
 global.fs = require('fs');
 global.visualCallback = {
   addArguments: function() {},

@@ -71,7 +71,8 @@
     "qunit": "^2.6.1",
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
-    "pixelmatch": "^4.0.2"
+    "pixelmatch": "^4.0.2",
+    "console-png": "^1.2.1"
   },
   "engines": {
     "node": ">=4.0.0"
