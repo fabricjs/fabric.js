@@ -10,12 +10,13 @@
     _pixelMatch = global.pixelmatch;
     visualCallback = global.visualCallback;
     imageDataToChalk = global.imageDataToChalk;
-  } else {
+  }
+  else {
     _pixelMatch = pixelmatch;
     if (window) {
       visualCallback = window.visualCallback;
     }
-    imageDataToChalk = function() { return ''; }
+    imageDataToChalk = function() { return ''; };
   }
   var fabricCanvas = this.canvas = new fabric.Canvas(null, {
     enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200,
@@ -36,10 +37,10 @@
     return src;
   }
 
-  function getFixtureName(filename) {
-    var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? (__dirname + '/..' + finalName) : getAbsolutePath('/test' + finalName);
-  }
+  // function getFixtureName(filename) {
+  //   var finalName = '/fixtures/' + filename;
+  //   return fabric.isLikelyNode ? (__dirname + '/..' + finalName) : getAbsolutePath('/test' + finalName);
+  // }
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;

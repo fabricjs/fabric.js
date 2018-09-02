@@ -8,7 +8,8 @@
     fs = global.fs;
     _pixelMatch = global.pixelmatch;
     visualCallback = global.visualCallback;
-  } else {
+  }
+  else {
     _pixelMatch = pixelmatch;
     if (window) {
       visualCallback = window.visualCallback;
@@ -131,7 +132,7 @@
     ['svg_radial_13', 4],
   ].forEach(function(filenameArray) {
     var filename = filenameArray[0];
-    var expectedPixels = filenameArray[1];
+    // var expectedPixels = filenameArray[1];
     QUnit.test('Import test for file ' + filename, function(assert) {
       var done = assert.async();
       loadAndPrepareCanvasFor(filename, function(imageDataCanvas, imageDataGolden, width, height, output) {

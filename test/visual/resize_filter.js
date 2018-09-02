@@ -8,7 +8,8 @@
     fs = global.fs;
     _pixelMatch = global.pixelmatch;
     visualCallback = global.visualCallback;
-  } else {
+  }
+  else {
     _pixelMatch = pixelmatch;
     if (window) {
       visualCallback = window.visualCallback;

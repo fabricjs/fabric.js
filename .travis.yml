@@ -50,12 +50,14 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Chrome
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
@@ -77,13 +79,13 @@ jobs:
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
     - stage: Visual Tests
       env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
 
-script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+script: npm run test
 
 dist: trusty
