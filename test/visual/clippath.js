@@ -1,6 +1,7 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
+  fabric.Object.prototype.objectCaching = true;
   var _pixelMatch;
   var visualCallback;
   var fs;
@@ -365,4 +366,5 @@
       });
     });
   });
+  fabric.Object.prototype.objectCaching = false;
 })();

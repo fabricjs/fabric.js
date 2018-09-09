@@ -13,6 +13,7 @@ addons:
     - libpng-dev
     - libpango1.0-dev
     - libjpeg-dev
+    - librsvg2-dev
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building

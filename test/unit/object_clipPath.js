@@ -120,4 +120,40 @@
       done();
     });
   });
+
+  QUnit.test('_setClippingProperties fix the context props', function(assert) {
+    var canvas = new fabric.Canvas();
+    var rect = new fabric.Rect({ width: 100, height: 100 });
+    canvas.contextContainer.fillStyle = 'red';
+    canvas.contextContainer.lineWidth = 5;
+    canvas.contextContainer.globalAlpha = 0.3;
+    rect._setClippingProperties(canvas.contextContainer);
+    assert.equal(canvas.contextContainer.fillStyle, 'black', 'fillStyle is reset');
+    assert.equal(canvas.contextContainer.lineWidth, 0, 'lineWidth is reset');
+    assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
+  });
+
+  QUnit.test('_setClippingProperties fix the context props', function(assert) {
+    var canvas = new fabric.Canvas();
+    var rect = new fabric.Rect({ width: 100, height: 100 });
+    canvas.contextContainer.fillStyle = 'red';
+    canvas.contextContainer.lineWidth = 5;
+    canvas.contextContainer.globalAlpha = 0.3;
+    rect._setClippingProperties(canvas.contextContainer);
+    assert.equal(canvas.contextContainer.fillStyle, '#000000', 'fillStyle is reset');
+    assert.equal(canvas.contextContainer.lineWidth, 0, 'lineWidth is reset');
+    assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
+  });
+
+  QUnit.test('_setClippingProperties fix the context props', function(assert) {
+    var canvas = new fabric.Canvas();
+    var rect = new fabric.Rect({ width: 100, height: 100 });
+    canvas.contextContainer.fillStyle = 'red';
+    canvas.contextContainer.lineWidth = 5;
+    canvas.contextContainer.globalAlpha = 0.3;
+    rect._setClippingProperties(canvas.contextContainer);
+    assert.equal(canvas.contextContainer.fillStyle, '#000000', 'fillStyle is reset');
+    assert.equal(canvas.contextContainer.lineWidth, 0, 'lineWidth is reset');
+    assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
+  });
 })();
