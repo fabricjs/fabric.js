@@ -209,23 +209,36 @@
             }
             break;
           case 'yellowtag':
-            if( r > 127 && g > 127 && b > 127){
+            if(r>127&&g>127&&b<80){
               data[i] = 255;
               data[i + 1] = 255;
               data[i + 2] = 0;
-            }else if(r < 127 || g < 127){
-              data[i] = 255;
-              data[i + 1] = 255;
-              data[i + 2] = 255;
-            }else if(r < 127 && g < 127){
+            }else if(r<127&&g<127&&b<127){
               data[i] = 0;
               data[i + 1] = 0;
               data[i + 2] = 0;
             }else{
-              data[i] = 0;
-              data[i + 1] = 0;
-              data[i + 2] = 0;
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
             }
+            // if( r > 127 && g > 127 && b > 127){
+            //   data[i] = 255;
+            //   data[i + 1] = 255;
+            //   data[i + 2] = 0;
+            // }else if(r < 127 || g < 127){
+            //   data[i] = 255;
+            //   data[i + 1] = 255;
+            //   data[i + 2] = 255;
+            // }else if(r < 127 && g < 127){
+            //   data[i] = 0;
+            //   data[i + 1] = 0;
+            //   data[i + 2] = 0;
+            // }else{
+            //   data[i] = 0;
+            //   data[i + 1] = 0;
+            //   data[i + 2] = 0;
+            // }
             break;
         }
       }
