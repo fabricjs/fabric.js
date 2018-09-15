@@ -26,7 +26,6 @@
     includeAA: false,
     threshold: 0.095
   };
-  fabric.Object.prototype.objectCaching = true;
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -73,7 +72,8 @@
   }
 
   function beforeEachHandler() {
-    fabricCanvas.setZoom(1);
+    fabricCanvas.clipPath = null;
+    fabricCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     fabricCanvas.clear();
     fabricCanvas.renderAll();
   }
@@ -173,12 +173,13 @@
     callback(canvas.lowerCanvasEl);
   }
 
-  tests.push({
-    test: 'Isolation of clipPath of group and inner objects',
-    code: clipping3,
-    golden: 'clipping3.png',
-    percentage: 0.06,
-  });
+  // FIX ON NODE
+  // tests.push({
+  //   test: 'Isolation of clipPath of group and inner objects',
+  //   code: clipping3,
+  //   golden: 'clipping3.png',
+  //   percentage: 0.06,
+  // });
 
   function clipping4(canvas, callback) {
     var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
@@ -310,12 +311,60 @@
     callback(canvas.lowerCanvasEl);
   }
 
+  // FIX ON NODE
+  // tests.push({
+  //   test: 'Many Objects can share the same clipPath',
+  //   code: clipping7,
+  //   golden: 'clipping7.png',
+  //   percentage: 0.06,
+  // });
+
+  function clipping8(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40, absolutePositioned: true });
+    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
+    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
+    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
+    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
+    obj1.clipPath = clipPath;
+    obj2.clipPath = clipPath;
+    obj3.clipPath = clipPath;
+    canvas.add(obj1);
+    canvas.add(obj2);
+    canvas.add(obj3);
+    canvas.add(obj4);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
   tests.push({
-    test: 'Many Objects can share the same clipPath',
-    code: clipping7,
-    golden: 'clipping7.png',
+    test: 'an absolute positioned clipPath, shared',
+    code: clipping8,
+    golden: 'clipping8.png',
     percentage: 0.06,
   });
+
+  function clipping9(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 60, strokeWidth: 0, top: 10, left: 10 });
+    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
+    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
+    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
+    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
+    canvas.add(obj1);
+    canvas.add(obj2);
+    canvas.add(obj3);
+    canvas.add(obj4);
+    canvas.clipPath = clipPath;
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'a clipPath on the canvas',
+    code: clipping9,
+    golden: 'clipping9.png',
+    percentage: 0.06,
+  });
+
 
   tests.forEach(function(testObj) {
     var testName = testObj.test;
@@ -366,5 +415,4 @@
       });
     });
   });
-  fabric.Object.prototype.objectCaching = false;
 })();
