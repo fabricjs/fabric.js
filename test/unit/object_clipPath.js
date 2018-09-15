@@ -129,7 +129,7 @@
     canvas.contextContainer.globalAlpha = 0.3;
     rect._setClippingProperties(canvas.contextContainer);
     assert.equal(canvas.contextContainer.fillStyle, '#000000', 'fillStyle is reset');
-    assert.equal(canvas.contextContainer.strokeStyle, 'rgba(255, 255, 255, 0.00)', 'stroke style is reset');
+    assert.equal(new fabric.Color(canvas.contextContainer.strokeStyle).getAlpha(), 0, 'stroke style is reset');
     assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
   });
 })();
