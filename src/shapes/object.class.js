@@ -613,6 +613,27 @@
     clipPath: undefined,
 
     /**
+     * Meaningfull ONLY when the object is used as clipPath.
+     * if true, the clipPath will make the object clip to the outside of the clipPath
+     * since 2.4.0
+     * @type boolean
+     * @default false
+     */
+    inverted: false,
+
+    /**
+     * Meaningfull ONLY when the object is used as clipPath.
+     * if true, the clipPath will have its top and left relative to canvas, and will
+     * not be influenced by the object transform. This will make the clipPath relative
+     * to the canvas, but clipping just a particular object.
+     * WARNING this is beta, this feature may change or be renamed.
+     * since 2.4.0
+     * @type boolean
+     * @default false
+     */
+    absolutePositioned: false,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -842,6 +863,8 @@
 
       if (this.clipPath) {
         object.clipPath = this.clipPath.toObject(propertiesToInclude);
+        object.clipPath.inverted = this.clipPath.inverted;
+        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
@@ -1120,8 +1143,17 @@
       ctx.save();
       // DEBUG: uncomment this line, comment the following
       // ctx.globalAlpha = 0.4
-      ctx.globalCompositeOperation = 'destination-in';
+      if (path.inverted) {
+        ctx.globalCompositeOperation = 'destination-out';
+      }
+      else {
+        ctx.globalCompositeOperation = 'destination-in';
+      }
       //ctx.scale(1 / 2, 1 / 2);
+      if (path.absolutePositioned) {
+        var m = fabric.util.invertTransform(this.calcTransformMatrix());
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
       path.transform(ctx);
       ctx.scale(1 / path.zoomX, 1 / path.zoomY);
       ctx.drawImage(path._cacheCanvas, -path.cacheTranslationX, -path.cacheTranslationY);
@@ -1182,7 +1214,10 @@
         return true;
       }
       else {
-        if (this.dirty || (this.statefullCache && this.hasStateChanged('cacheProperties'))) {
+        if (this.dirty ||
+          (this.clipPath && this.clipPath.absolutePositioned) ||
+          (this.statefullCache && this.hasStateChanged('cacheProperties'))
+        ) {
           if (this._cacheCanvas && !skipCanvas) {
             var width = this.cacheWidth / this.zoomX;
             var height = this.cacheHeight / this.zoomY;
@@ -1252,8 +1287,8 @@
 
     _setClippingProperties: function(ctx) {
       ctx.globalAlpha = 1;
-      ctx.lineWidth = 0;
-      ctx.fillStyle = 'black';
+      ctx.strokeStyle = 'transparent';
+      ctx.fillStyle = '#000000';
     },
 
     /**

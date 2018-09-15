@@ -13,6 +13,7 @@ addons:
     - libpng-dev
     - libpango1.0-dev
     - libjpeg-dev
+    - librsvg2-dev
 # libcairo2-dev is preinstalled
 stages:
   - Linting and Building
@@ -50,12 +51,14 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Chrome
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
@@ -72,17 +75,18 @@ jobs:
     - stage: Unit Tests
       node_js: "4"
     - stage: Visual Tests
+      env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "8"
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
     - stage: Visual Tests
       env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.4.1
+      install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
 
-script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
+script: npm run build:fast && npm run test
 
 dist: trusty
