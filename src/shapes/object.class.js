@@ -1287,8 +1287,8 @@
 
     _setClippingProperties: function(ctx) {
       ctx.globalAlpha = 1;
-      ctx.lineWidth = 0;
-      ctx.fillStyle = 'black';
+      ctx.strokeStyle = 'transparent';
+      ctx.fillStyle = '#000000';
     },
 
     /**
