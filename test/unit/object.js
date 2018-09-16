@@ -26,25 +26,8 @@
     var elImage = _createImageElement();
     elImage.width = IMG_WIDTH;
     elImage.height = IMG_HEIGHT;
-    setSrc(elImage, IMG_SRC, function() {
-      callback(elImage);
-    });
-  }
-
-  function setSrc(img, src, callback) {
-    if (fabric.isLikelyNode) {
-      require('fs').readFile(src, function(err, imgData) {
-        if (err) {
-          throw err;
-        };
-        img.src = imgData;
-        callback && callback();
-      });
-    }
-    else {
-      img.src = src;
-      callback && callback();
-    }
+    elImage.onload = callback;
+    elImage.src = IMG_SRC;
   }
 
   QUnit.module('fabric.Object', {
