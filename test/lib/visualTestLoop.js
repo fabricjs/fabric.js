@@ -129,4 +129,4 @@
       });
     }
   }
-})(exports || this);
+})(typeof window === 'undefined' ? exports : this);

@@ -102,7 +102,7 @@
   });
 
   [
-    ['svg_stroke_1', 0],
+    ['svg_stroke_1', 220],
     ['svg_stroke_2', 0],
     ['svg_stroke_3', 0],
     ['svg_stroke_4', 8],
@@ -121,11 +121,11 @@
     ['svg_radial_1', 100],
     ['svg_radial_2', 0],
     ['svg_radial_3', 0],
-    ['svg_radial_4', 143],
-    ['svg_radial_5', 143],
-    ['svg_radial_6', 8],
+    ['svg_radial_4', 490],
+    ['svg_radial_5', 250],
+    ['svg_radial_6', 143],
     ['svg_radial_8', 0],
-    ['svg_radial_9', 8],
+    ['svg_radial_9', 150],
     ['svg_radial_10', 12],
     ['svg_radial_11', 0],
     ['svg_radial_12', 8],
