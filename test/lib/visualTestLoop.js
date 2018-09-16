@@ -97,6 +97,9 @@
     }
 
     return function testCallback(testObj) {
+      if (testObj.disabled) {
+        return;
+      }
       var testName = testObj.test;
       var code = testObj.code;
       var percentage = testObj.percentage;
