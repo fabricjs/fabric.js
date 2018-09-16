@@ -99,7 +99,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
           this.options
         );
       }
-      clipPath = new fabric.Group(container);
+      if (container.length === 1) {
+        clipPath = container[0];
+      }
+      else {
+        clipPath = new fabric.Group(container);
+      }
       gTransform = fabric.util.multiplyTransformMatrices(
         objTransformInv,
         clipPath.calcTransformMatrix()
