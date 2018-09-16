@@ -102,45 +102,45 @@
   });
 
   [
-    ['svg_stroke_1', 220],
-    ['svg_stroke_2', 0],
-    ['svg_stroke_3', 0],
-    ['svg_stroke_4', 8],
-    ['svg_stroke_5', 4],
-    ['svg_stroke_6', 83],
-    ['svg_stroke_7', 0],
-    ['svg_stroke_8', 0],
-    ['svg_linear_1', 0],
-    ['svg_linear_2', 0],
-    ['svg_linear_3', 0],
-    ['svg_linear_4', 14],
-    ['svg_linear_5', 8],
-    ['svg_linear_6', 83],
-    ['svg_linear_7', 0],
-    ['svg_linear_8', 0],
-    ['svg_radial_1', 100],
-    ['svg_radial_2', 0],
-    ['svg_radial_3', 0],
-    ['svg_radial_4', 490],
-    ['svg_radial_5', 250],
-    ['svg_radial_6', 143],
-    ['svg_radial_8', 0],
-    ['svg_radial_9', 150],
-    ['svg_radial_10', 12],
-    ['svg_radial_11', 0],
-    ['svg_radial_12', 8],
-    ['svg_radial_13', 4],
+    ['svg_stroke_1', 6],
+    ['svg_stroke_2', 6],
+    ['svg_stroke_3', 6],
+    ['svg_stroke_4', 6],
+    ['svg_stroke_5', 6],
+    ['svg_stroke_6', 6],
+    ['svg_stroke_7', 6],
+    ['svg_stroke_8', 6],
+    ['svg_linear_1', 6],
+    ['svg_linear_2', 6],
+    ['svg_linear_3', 6],
+    ['svg_linear_4', 6],
+    ['svg_linear_5', 6],
+    ['svg_linear_6', 6],
+    ['svg_linear_7', 6],
+    ['svg_linear_8', 6],
+    ['svg_radial_1', 6],
+    ['svg_radial_2', 6],
+    ['svg_radial_3', 6],
+    ['svg_radial_4', 6],
+    ['svg_radial_5', 6],
+    ['svg_radial_6', 6],
+    ['svg_radial_8', 6],
+    ['svg_radial_9', 6],
+    ['svg_radial_10', 6],
+    ['svg_radial_11', 6],
+    ['svg_radial_12', 6],
+    ['svg_radial_13', 6],
   ].forEach(function(filenameArray) {
     var filename = filenameArray[0];
+    var expectedPerc = filenameArray[1];
     // var expectedPixels = filenameArray[1];
     QUnit.test('Import test for file ' + filename, function(assert) {
       var done = assert.async();
       loadAndPrepareCanvasFor(filename, function(imageDataCanvas, imageDataGolden, width, height, output) {
-        var totalPixels = width * height;
-        var percentage = 0.01;
         var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output, width, height, pixelmatchOptions);
+        var totalPixels = width * height;
         var percDiff = differentPixels / totalPixels * 100;
-        assert.ok(differentPixels < totalPixels * percentage, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%');
+        assert.ok(percDiff < expectedPerc, 'Image ' + filename + ' has too many different pixels ' + differentPixels + ' representing ' + percDiff + '%');
         done();
       });
     });
