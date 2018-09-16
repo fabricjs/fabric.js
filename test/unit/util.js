@@ -483,10 +483,13 @@
 
   QUnit.test('fabric.util.loadImage with url for a non exsiting image', function(assert) {
     var done = assert.async();
-    fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
-      assert.equal(error, true, 'callback should be invoked with error set to true');
-      done();
-    });
+    try {
+      fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
+        assert.equal(error, true, 'callback should be invoked with error set to true');
+        done();
+      }, this);
+    }
+    catch (e) { }
   });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
