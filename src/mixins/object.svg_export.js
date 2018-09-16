@@ -211,13 +211,9 @@
         markup.push(this.shadow.toSVG(this));
       }
       if (clipPath) {
-        if (clipPath.clipPathId === undefined) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        }
+        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         markup.push(
-          '<clipPath id="' + clipPath.clipPathId + '" ',
-          'clipPathUnits="objectBoundingBox" ',
-          'transform="translate(' + (this.width / 2) + ' , ' + (this.height / 2) + ')" >\n\t',
+          '<clipPath id="' + clipPath.clipPathId + '" >\n\t',
           this.clipPath.toSVG(),
           '</clipPath>\n'
         );
