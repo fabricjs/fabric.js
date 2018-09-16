@@ -6,6 +6,8 @@ global.fs = require('fs');
 global.visualCallback = {
   addArguments: function() {},
 };
+global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
+global.getFixture = require('./lib/visualTestLoop').getFixture;
 global.imageDataToChalk = function(imageData) {
   // actually this does not work on travis-ci, so commenting it out
   return '';
