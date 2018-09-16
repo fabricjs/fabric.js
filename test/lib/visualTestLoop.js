@@ -1,8 +1,22 @@
 (function(exports) {
 
   exports.getFixture = function(name, original, callback) {
-    return getImage(getFixtureName(name), original, callback);
-  }
+    getImage(getFixtureName(name), original, callback);
+  };
+
+  exports.getAsset = function(name, callback) {
+    var finalName = getAssetName(name);
+    if (fabric.isLikelyNode) {
+      return fs.readFile(finalName, { encoding: 'utf8' }, callback);
+    }
+    else {
+      fabric.util.request(finalName, {
+        onComplete: function(xhr) {
+          callback(null, xhr.responseText);
+        }
+      });
+    }
+  };
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -12,6 +26,11 @@
     var src = imgEl.src;
     imgEl = null;
     return src;
+  }
+
+  function getAssetName(filename) {
+    var finalName = '/assets/' + filename + '.svg';
+    return fabric.isLikelyNode ? (__dirname + '/../visual' + finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getGoldeName(filename) {
@@ -51,10 +70,8 @@
   exports.visualTestLoop = function(fabricCanvas, QUnit) {
     var _pixelMatch;
     var visualCallback;
-    var fs;
     var imageDataToChalk;
     if (fabric.isLikelyNode) {
-      fs = global.fs;
       _pixelMatch = global.pixelmatch;
       visualCallback = global.visualCallback;
       imageDataToChalk = global.imageDataToChalk;
