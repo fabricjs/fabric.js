@@ -16,7 +16,7 @@
   function svgToDataURL(svgStr) {
     var encoded = encodeURIComponent(svgStr)
       .replace(/'/g, '%27')
-      .replace(/"/g, '%22')
+      .replace(/"/g, '%22');
     return 'data:image/svg+xml,' + encoded;
   }
 
@@ -31,7 +31,12 @@
       newCanvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
       callback(newCanvas);
     };
-    image.src = dataUrl;
+    if (fabric.isLikelyNode) {
+      image.src = Buffer.from(svg, 'utf-8');
+    }
+    else {
+      image.src = dataUrl;
+    }
   }
 
   var tests = [];
