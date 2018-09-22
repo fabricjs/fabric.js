@@ -13,6 +13,33 @@
     enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200,
   });
 
+  function svgToDataURL(svgStr) {
+    var encoded = encodeURIComponent(svgStr)
+      .replace(/'/g, '%27')
+      .replace(/"/g, '%22');
+    return 'data:image/svg+xml,' + encoded;
+  }
+
+  function toSVGCanvas(canvas, callback) {
+    var svg = canvas.toSVG();
+    var dataUrl = svgToDataURL(svg);
+    var image = fabric.document.createElement('img');
+    image.onload = function() {
+      var newCanvas = fabric.util.createCanvasElement();
+      newCanvas.width = canvas.width;
+      newCanvas.height = canvas.height;
+      newCanvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+      callback(newCanvas);
+    };
+    image.onerror = console.log;
+    if (fabric.isLikelyNode) {
+      image.src = dataUrl;
+    }
+    else {
+      image.src = dataUrl;
+    }
+  }
+
   var tests = [];
 
   function clipping0(canvas, callback) {
@@ -20,15 +47,14 @@
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
     test: 'Clip a rect with a circle, no zoom',
     code: clipping0,
     golden: 'clipping0.png',
-    newModule: 'Clipping shapes',
+    newModule: 'Export clippaths to SVG',
     percentage: 0.06,
   });
 
@@ -37,8 +63,7 @@
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -55,8 +80,7 @@
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 10, height: 10, fill: 'rgba(255,0,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -80,8 +104,7 @@
     ], { strokeWidth: 0 });
     group.clipPath = clipPath;
     canvas.add(group);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -91,29 +114,28 @@
     percentage: 0.06,
   });
 
-  // function clipping3(canvas, callback) {
-  //   var clipPath = new fabric.Circle({ radius: 100, top: -100, left: -100 });
-  //   var small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
-  //   var small2 = new fabric.Rect({ width: 30, height: 30, top: -50, left: -50 });
-  //   var group = new fabric.Group([
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red', clipPath: small }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
-  //   ], { strokeWidth: 0 });
-  //   group.clipPath = clipPath;
-  //   canvas.add(group);
-  //   canvas.renderAll();
-  //   callback(canvas.lowerCanvasEl);
-  // }
+  function clipping3(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 100, top: -100, left: -100 });
+    var small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
+    var small2 = new fabric.Rect({ width: 30, height: 30, top: -50, left: -50 });
+    var group = new fabric.Group([
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red', clipPath: small }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
+    ], { strokeWidth: 0 });
+    group.clipPath = clipPath;
+    canvas.add(group);
+    toSVGCanvas(canvas, callback);
+  }
 
-  // FIX ON NODE
-  // tests.push({
-  //   test: 'Isolation of clipPath of group and inner objects',
-  //   code: clipping3,
-  //   golden: 'clipping3.png',
-  //   percentage: 0.06,
-  // });
+  tests.push({
+    test: 'Isolation of clipPath of group and inner objects',
+    code: clipping3,
+    golden: 'clipping3.png',
+    percentage: 0.06,
+    disabled: true,
+  });
 
   function clipping4(canvas, callback) {
     var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
@@ -139,8 +161,7 @@
     });
     obj.clipPath = clipPath;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -177,8 +198,7 @@
     });
     obj.clipPath = group;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -186,6 +206,7 @@
     code: clipping5,
     golden: 'clipping5.png',
     percentage: 0.06,
+    disabled: true,
   });
 
   function clipping6(canvas, callback) {
@@ -216,8 +237,7 @@
     obj.clipPath = group;
     group.inverted = true;
     canvas.add(obj);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -225,33 +245,33 @@
     code: clipping6,
     golden: 'clipping6.png',
     percentage: 0.06,
+    disabled: true,
   });
 
-  // function clipping7(canvas, callback) {
-  //   var clipPath = new fabric.Circle({ radius: 30, strokeWidth: 0, top: -30, left: -30, skewY: 45 });
-  //   var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
-  //   var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
-  //   var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
-  //   var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
-  //   obj1.clipPath = clipPath;
-  //   obj2.clipPath = clipPath;
-  //   obj3.clipPath = clipPath;
-  //   obj4.clipPath = clipPath;
-  //   canvas.add(obj1);
-  //   canvas.add(obj2);
-  //   canvas.add(obj3);
-  //   canvas.add(obj4);
-  //   canvas.renderAll();
-  //   callback(canvas.lowerCanvasEl);
-  // }
+  function clipping7(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 30, strokeWidth: 0, top: -30, left: -30, skewY: 45 });
+    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
+    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
+    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
+    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
+    obj1.clipPath = clipPath;
+    obj2.clipPath = clipPath;
+    obj3.clipPath = clipPath;
+    obj4.clipPath = clipPath;
+    canvas.add(obj1);
+    canvas.add(obj2);
+    canvas.add(obj3);
+    canvas.add(obj4);
+    toSVGCanvas(canvas, callback);
+  }
 
-  // FIX ON NODE
-  // tests.push({
-  //   test: 'Many Objects can share the same clipPath',
-  //   code: clipping7,
-  //   golden: 'clipping7.png',
-  //   percentage: 0.06,
-  // });
+  tests.push({
+    test: 'Many Objects can share the same clipPath',
+    code: clipping7,
+    golden: 'clipping7.png',
+    percentage: 0.06,
+    disabled: true,
+  });
 
   function clipping8(canvas, callback) {
     var clipPath = new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40, absolutePositioned: true });
@@ -266,8 +286,7 @@
     canvas.add(obj2);
     canvas.add(obj3);
     canvas.add(obj4);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -275,6 +294,7 @@
     code: clipping8,
     golden: 'clipping8.png',
     percentage: 0.06,
+    disabled: true,
   });
 
   function clipping9(canvas, callback) {
@@ -288,8 +308,7 @@
     canvas.add(obj3);
     canvas.add(obj4);
     canvas.clipPath = clipPath;
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    toSVGCanvas(canvas, callback);
   }
 
   tests.push({
@@ -297,6 +316,7 @@
     code: clipping9,
     golden: 'clipping9.png',
     percentage: 0.06,
+    disabled: true,
   });
 
   tests.forEach(visualTestLoop(fabricCanvas, QUnit));
