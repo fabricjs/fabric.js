@@ -230,9 +230,10 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var _this = this;
       var objsToObject = this._objects.map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        obj.includeDefaultValues = _this.includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
         return _obj;
