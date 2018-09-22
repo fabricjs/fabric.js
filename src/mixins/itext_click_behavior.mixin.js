@@ -140,7 +140,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     if (this.canvas) {
-      if (this.canvas._activeObject !== this) {
+      var currentActive = this.canvas._activeObject;
+      if (currentActive && currentActive !== this) {
         // avoid running this logic when there is an active object
         // this because is possible with shift click and fast clicks,
         // to rapidly deselect and reselect this object and trigger an enterEdit
