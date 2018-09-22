@@ -298,31 +298,24 @@
      * Decides whether the canvas should be redrawn in mouseup and mousedown events.
      * @private
      * @param {Object} target
-     * @param {Object} pointer
      */
-    _shouldRender: function(target, pointer) {
+    _shouldRender: function(target) {
       var activeObject = this._activeObject;
 
-      if (activeObject && activeObject.isEditing && target === activeObject) {
+      if (
+        !!activeObject !== !!target ||
+        (activeObject && target && (activeObject !== target))
+      ) {
+        // this covers: switch of target, from target to no target, selection of target
+        // multiSelection with key and mouse
+        return true;
+      }
+      else if (activeObject && activeObject.isEditing) {
         // if we mouse up/down over a editing textbox a cursor change,
         // there is no need to re render
         return false;
       }
-      return !!(
-        (target && (
-          target.isMoving ||
-          target !== activeObject))
-        ||
-        (!target && !!activeObject)
-        ||
-        (!target && !activeObject && !this._groupSelector)
-        ||
-        (pointer &&
-          this._previousPointer &&
-          this.selection && (
-            pointer.x !== this._previousPointer.x ||
-          pointer.y !== this._previousPointer.y))
-      );
+      return false;
     },
 
     /**
@@ -334,7 +327,7 @@
      */
     __onMouseUp: function (e) {
       var target, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
+          groupSelector = this._groupSelector, shouldRender = false,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       this._cacheTransformEventData(e);
       target = this._target;
@@ -363,12 +356,12 @@
 
       if (transform) {
         this._finalizeCurrentTransform(e);
+        shouldRender = transform.actionPerformed;
       }
-
-      var shouldRender = this._shouldRender(target, this._absolutePointer);
 
       if (target || !isClick) {
         this._maybeGroupObjects(e);
+        shouldRender || (shouldRender = this._shouldRender(target));
       }
       if (target) {
         target.isMoving = false;
@@ -377,8 +370,14 @@
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
       this._groupSelector = null;
       this._currentTransform = null;
+      // reset the target information about which corner is selected
       target && (target.__corner = 0);
-      shouldRender && this.requestRenderAll();
+      if (shouldRender) {
+        this.requestRenderAll();
+      }
+      else if (!isClick) {
+        this.renderTop();
+      }
     },
 
     /**
@@ -591,7 +590,7 @@
       var pointer = this._pointer;
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
-      var shouldRender = this._shouldRender(target, pointer),
+      var shouldRender = this._shouldRender(target),
           shouldGroup = this._shouldGroup(e, target);
       if (this._shouldClearSelection(e, target)) {
         this.discardActiveObject(e);
