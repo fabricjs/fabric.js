@@ -826,8 +826,6 @@
       if (element.parentNode && fabric.svgValidParentsRegEx.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
-      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
-                 element.getAttribute('font-size') || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
@@ -840,6 +838,9 @@
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
+
+      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
+                   ownAttributes['font-size'] || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
       for (var attr in ownAttributes) {
