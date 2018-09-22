@@ -359,7 +359,7 @@
         shouldRender = transform.actionPerformed;
       }
 
-      if (target || !isClick) {
+      if (!isClick) {
         this._maybeGroupObjects(e);
         shouldRender || (shouldRender = this._shouldRender(target));
       }
