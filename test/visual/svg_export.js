@@ -31,8 +31,9 @@
       newCanvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
       callback(newCanvas);
     };
+    image.onerror = console.log;
     if (fabric.isLikelyNode) {
-      image.src = Buffer.from(svg, 'utf-8');
+      image.src = dataUrl;
     }
     else {
       image.src = dataUrl;
