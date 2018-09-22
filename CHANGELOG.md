@@ -1,3 +1,6 @@
+**Version 2.4.0**
+- Add: Add clipPath support to canvas and svg import/export. Low compatibility yet.
+
 **Version 2.3.6**
 - Fix: Make image.class aware of naturalWidth and naturalHeight. [#5178](https://github.com/fabricjs/fabric.js/pull/5178)
 - Fix: Make 2 finger events works again [#5177](https://github.com/fabricjs/fabric.js/pull/5177)
