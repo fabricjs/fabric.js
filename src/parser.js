@@ -697,7 +697,8 @@
     descendants.filter(function(el) {
       return el.nodeName.replace('svg:', '') === 'clipPath';
     }).forEach(function(el) {
-      clipPaths[el.id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function(el) {
+      var id = el.getAttribute('id');
+      clipPaths[id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function(el) {
         return fabric.svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
       });
     });
