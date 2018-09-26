@@ -1,5 +1,8 @@
+.github/
 src/
 lib/
+coverage/
+test/
 dist/all.min.js
 dist/all.min.js.gz
 dist/fabric.min.js
@@ -7,3 +10,4 @@ dist/fabric.require.js
 dist/fabric.min.js.gz
 .DS_Store
 HEADER.js
+build.js

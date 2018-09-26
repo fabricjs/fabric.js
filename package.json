@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "2.3.5",
+  "version": "2.4.0",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kangax/fabric.js"
+    "url": "https://github.com/fabricjs/fabric.js"
   },
   "bugs": {
-    "url": "https://github.com/kangax/fabric.js/issues"
+    "url": "https://github.com/fabricjs/fabric.js/issues"
   },
   "license": "MIT",
   "scripts": {
@@ -48,29 +48,31 @@
     "test:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
     "test": "istanbul cover ./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/unit",
     "test:visual": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/visual",
+    "test:visual:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
     "test:all": "npm run test && npm run test:visual",
     "lint": "eslint --config .eslintrc.json src",
-    "lint_tests": "eslint test/unit --config .eslintrc_tests",
+    "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js && cp package.json ../fabricjs.com/lib/package.json && cp -r src HEADER.js lib ../fabricjs.com/build/files/",
-    "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit && cp -r test/visual/* ../fabricjs.com/test/visual && cp -r test/fixtures/* ../fabricjs.com/test/fixtures",
-    "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
+    "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit && cp -r test/visual/* ../fabricjs.com/test/visual && cp -r test/fixtures/* ../fabricjs.com/test/fixtures && cp -r test/lib/* ../fabricjs.com/test/lib",
+    "all": "npm run build && npm run test && npm run test:visual && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
     "testem": "testem .",
     "testem:visual": "testem --file testem-visual.json",
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
-    "canvas": "1.6.x",
-    "jsdom": "9.x.x",
+    "canvas": "^1.6.12",
+    "jsdom": "^9.12.0",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
     "eslint": "4.18.x",
     "istanbul": "0.4.x",
     "onchange": "^3.x.x",
-    "qunit": "^2.4.1",
+    "qunit": "^2.6.1",
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
-    "pixelmatch": "^4.0.2"
+    "pixelmatch": "^4.0.2",
+    "chalk": "^2.4.1"
   },
   "engines": {
     "node": ">=4.0.0"

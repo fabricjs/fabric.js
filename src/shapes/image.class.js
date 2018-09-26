@@ -92,15 +92,6 @@
     stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
-     * When `true`, object is cached on an additional canvas.
-     * default to false for images
-     * since 1.7.0
-     * @type Boolean
-     * @default
-     */
-    objectCaching: false,
-
-    /**
      * key used to retrieve the texture representing this image
      * since 2.0.0
      * @type String
@@ -311,7 +302,7 @@
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
       markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
-      var imageMarkup = ['\t<image ', this.getSvgId(), 'xlink:href="', this.getSvgSrc(true),
+      var imageMarkup = ['\t<image ', this.getSvgCommons(), 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
         '" style="', this.getSvgStyles(),
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
@@ -435,9 +426,7 @@
 
       filters = filters || this.filters || [];
       filters = filters.filter(function(filter) { return filter && !filter.isNeutralState(); });
-      if (this.group) {
-        this.set('dirty', true);
-      }
+      this.set('dirty', true);
 
       // needs to clear out or WEBGL will not resize correctly
       this.removeTexture(this.cacheKey + '_filtered');

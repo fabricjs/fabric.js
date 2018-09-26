@@ -111,7 +111,7 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
       markup.push(
-        '<ellipse ', this.getSvgId(),
+        '<ellipse ', this.getSvgCommons(),
         'cx="0" cy="0" ',
         'rx="', this.rx,
         '" ry="', this.ry,

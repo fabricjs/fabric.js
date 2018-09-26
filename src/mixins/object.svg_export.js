@@ -119,8 +119,11 @@
      * Returns id attribute for svg output
      * @return {String}
      */
-    getSvgId: function() {
-      return this.id ? 'id="' + this.id + '" ' : '';
+    getSvgCommons: function() {
+      return [
+        this.id ? 'id="' + this.id + '" ' : '',
+        this.clipPath ? 'clip-path="url(#' + this.clipPath.clipPathId + ')" ' : '',
+      ].join('');
     },
 
     /**
@@ -196,7 +199,7 @@
      * @private
      */
     _createBaseSVGMarkup: function() {
-      var markup = [];
+      var markup = [], clipPath = this.clipPath;
 
       if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
@@ -206,6 +209,14 @@
       }
       if (this.shadow) {
         markup.push(this.shadow.toSVG(this));
+      }
+      if (clipPath) {
+        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        markup.push(
+          '<clipPath id="' + clipPath.clipPathId + '" >\n\t',
+          this.clipPath.toSVG(),
+          '</clipPath>\n'
+        );
       }
       return markup;
     },

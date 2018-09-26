@@ -3,6 +3,8 @@
   "serve_files": [
     "dist/fabric.js",
     "test/lib/pixelmatch.js",
+    "test/lib/visualTestLoop.js",
+    "test/lib/visualCallbackQunit.js",
     "test/visual/*.js"
   ],
   "routes": {

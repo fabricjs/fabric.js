@@ -150,7 +150,7 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
-        '<rect ', this.getSvgId(),
+        '<rect ', this.getSvgCommons(),
         'x="', x, '" y="', y,
         '" rx="', this.get('rx'), '" ry="', this.get('ry'),
         '" width="', this.width, '" height="', this.height,

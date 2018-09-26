@@ -33,7 +33,7 @@
     'rx':                       0,
     'ry':                       0,
     'skewX':                    0,
-    'skewY':                    0,
+    'skewY':                    0
   };
 
   QUnit.module('fabric.Rect');
