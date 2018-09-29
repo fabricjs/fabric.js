@@ -47,6 +47,10 @@
    * @return {Array} array containing the graphemes
    */
   function graphemeSplit(textstring) {
+
+    let grapheme = language_characters(textstring);
+    return grapheme;
+
     var i = 0, chr, graphemes = [];
     for (i = 0, chr; i < textstring.length; i++) {
       if ((chr = getWholeChar(textstring, i)) === false) {
@@ -55,6 +59,54 @@
       graphemes.push(chr);
     }
     return graphemes;
+  }
+
+ /*
+ * Split all characters into an array based on the chareacter's  language
+ * Consonant characters combined split
+ * 'தமிழ்' => ['த','மி','ழ்']
+ * "❀ヅ❤♫" => ['❀','ヅ','❤','♫']
+ */ 
+ 
+  function language_characters(text_string) {
+      
+    let canva = document.getElementById('fabric_canva');
+    let c = canva != null ? canva : document.createElement("canvas");
+    
+    if(!canva)
+      c.setAttribute("id", "fabric_canva");
+    
+    c.style.letterSpacing = "15px";
+    let ctx = c.getContext("2d");
+    ctx.font = "10px Arial";
+    let iteration = 3,n = 0,max_diff = 1.5,chars = [],text = text_string;
+    while(n < iteration){
+      chars = [];
+      for(var i = 0,max = text.length ;i<max;i++){
+        
+        let next = (typeof text[i+1] == 'undefined') ? "" : text[i+1];
+        let with_next = text[i] + next ;
+
+        let char1 = (ctx.measureText(text[i]).width);
+        let char2 = (ctx.measureText(next).width);
+        let char3 = (ctx.measureText(with_next).width);
+
+        let start = i;
+
+        if( Math.abs(char3 - (char1+char2)) >= max_diff){
+          i++;
+        }
+        
+        let end = i;
+        let char = start == end ? text[i] : with_next;
+        if(char.length)
+          chars.push(char);
+      } 
+      text = chars;
+      n++;
+    }
+
+    return chars;
   }
 
   // taken from mdn in the charAt doc page.
