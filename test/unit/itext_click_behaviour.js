@@ -61,6 +61,7 @@
     iText.renderCursorOrSelection = function() {};
     assert.equal(iText.isEditing, false, 'iText not editing');
     iText.canvas = canvas;
+    canvas._activeObject = null;
     iText.selected = true;
     iText.__lastSelected = true;
     iText.mouseUpHandler({ e: {} });
