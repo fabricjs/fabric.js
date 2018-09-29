@@ -620,7 +620,7 @@
       }
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      shouldRender && this.requestRenderAll();
+      (shouldRender || shouldGroup) && this.requestRenderAll();
     },
 
     /**

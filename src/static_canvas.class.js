@@ -931,13 +931,11 @@
         ctx.restore();
       }
       if (path) {
-        if (path.isCacheDirty()) {
-          // needed to setup a couple of variables
-          path.shouldCache();
-          path.canvas = this;
-          path._transformDone = true;
-          path.renderCache({ forClipping: true });
-        }
+        path.canvas = this;
+        // needed to setup a couple of variables
+        path.shouldCache();
+        path._transformDone = true;
+        path.renderCache({ forClipping: true });
         this.drawClipPathOnCanvas(ctx);
       }
       this._renderOverlay(ctx);
@@ -956,7 +954,7 @@
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       // DEBUG: uncomment this line, comment the following
-      // ctx.globalAlpha = 0.4
+      // ctx.globalAlpha = 0.4;
       ctx.globalCompositeOperation = 'destination-in';
       path.transform(ctx);
       ctx.scale(1 / path.zoomX, 1 / path.zoomY);

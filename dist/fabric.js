@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.4.0' };
+var fabric = fabric || { version: '2.4.1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -4056,7 +4056,8 @@ if (typeof console !== 'undefined') {
     descendants.filter(function(el) {
       return el.nodeName.replace('svg:', '') === 'clipPath';
     }).forEach(function(el) {
-      clipPaths[el.id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function(el) {
+      var id = el.getAttribute('id');
+      clipPaths[id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function(el) {
         return fabric.svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
       });
     });
@@ -4185,8 +4186,6 @@ if (typeof console !== 'undefined') {
       if (element.parentNode && fabric.svgValidParentsRegEx.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
-      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
-                 element.getAttribute('font-size') || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
@@ -4199,6 +4198,9 @@ if (typeof console !== 'undefined') {
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
+
+      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
+                   ownAttributes['font-size'] || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
       for (var attr in ownAttributes) {
@@ -4370,6 +4372,7 @@ if (typeof console !== 'undefined') {
         }
         if (!xml || !xml.documentElement) {
           callback && callback(null);
+          return false;
         }
 
         fabric.parseSVGDocument(xml.documentElement, function (results, _options, elements, allElements) {
@@ -7469,13 +7472,11 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         ctx.restore();
       }
       if (path) {
-        if (path.isCacheDirty()) {
-          // needed to setup a couple of variables
-          path.shouldCache();
-          path.canvas = this;
-          path._transformDone = true;
-          path.renderCache({ forClipping: true });
-        }
+        path.canvas = this;
+        // needed to setup a couple of variables
+        path.shouldCache();
+        path._transformDone = true;
+        path.renderCache({ forClipping: true });
         this.drawClipPathOnCanvas(ctx);
       }
       this._renderOverlay(ctx);
@@ -7494,7 +7495,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       // DEBUG: uncomment this line, comment the following
-      // ctx.globalAlpha = 0.4
+      // ctx.globalAlpha = 0.4;
       ctx.globalCompositeOperation = 'destination-in';
       path.transform(ctx);
       ctx.scale(1 / path.zoomX, 1 / path.zoomY);
@@ -9578,10 +9579,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     renderTopLayer: function(ctx) {
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this.freeDrawingBrush && this.freeDrawingBrush._render();
+        this.contextTopDirty = true;
       }
       // we render the top context - last object
       if (this.selection && this._groupSelector) {
         this._drawSelection(ctx);
+        this.contextTopDirty = true;
       }
     },
 
@@ -9596,7 +9599,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.clearContext(ctx);
       this.renderTopLayer(ctx);
       this.fire('after:render');
-      this.contextTopDirty = true;
       return this;
     },
 
@@ -11176,31 +11178,24 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Decides whether the canvas should be redrawn in mouseup and mousedown events.
      * @private
      * @param {Object} target
-     * @param {Object} pointer
      */
-    _shouldRender: function(target, pointer) {
+    _shouldRender: function(target) {
       var activeObject = this._activeObject;
 
-      if (activeObject && activeObject.isEditing && target === activeObject) {
+      if (
+        !!activeObject !== !!target ||
+        (activeObject && target && (activeObject !== target))
+      ) {
+        // this covers: switch of target, from target to no target, selection of target
+        // multiSelection with key and mouse
+        return true;
+      }
+      else if (activeObject && activeObject.isEditing) {
         // if we mouse up/down over a editing textbox a cursor change,
         // there is no need to re render
         return false;
       }
-      return !!(
-        (target && (
-          target.isMoving ||
-          target !== activeObject))
-        ||
-        (!target && !!activeObject)
-        ||
-        (!target && !activeObject && !this._groupSelector)
-        ||
-        (pointer &&
-          this._previousPointer &&
-          this.selection && (
-            pointer.x !== this._previousPointer.x ||
-          pointer.y !== this._previousPointer.y))
-      );
+      return false;
     },
 
     /**
@@ -11212,7 +11207,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __onMouseUp: function (e) {
       var target, transform = this._currentTransform,
-          groupSelector = this._groupSelector,
+          groupSelector = this._groupSelector, shouldRender = false,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       this._cacheTransformEventData(e);
       target = this._target;
@@ -11241,12 +11236,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (transform) {
         this._finalizeCurrentTransform(e);
+        shouldRender = transform.actionPerformed;
       }
 
-      var shouldRender = this._shouldRender(target, this._absolutePointer);
-
-      if (target || !isClick) {
+      if (!isClick) {
         this._maybeGroupObjects(e);
+        shouldRender || (shouldRender = this._shouldRender(target));
       }
       if (target) {
         target.isMoving = false;
@@ -11255,8 +11250,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
       this._groupSelector = null;
       this._currentTransform = null;
+      // reset the target information about which corner is selected
       target && (target.__corner = 0);
-      shouldRender && this.requestRenderAll();
+      if (shouldRender) {
+        this.requestRenderAll();
+      }
+      else if (!isClick) {
+        this.renderTop();
+      }
     },
 
     /**
@@ -11469,7 +11470,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var pointer = this._pointer;
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
-      var shouldRender = this._shouldRender(target, pointer),
+      var shouldRender = this._shouldRender(target),
           shouldGroup = this._shouldGroup(e, target);
       if (this._shouldClearSelection(e, target)) {
         this.discardActiveObject(e);
@@ -11499,7 +11500,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      shouldRender && this.requestRenderAll();
+      (shouldRender || shouldGroup) && this.requestRenderAll();
     },
 
     /**
@@ -13454,7 +13455,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (!this._cacheCanvas) {
         this._createCacheCanvas();
       }
-      if (this.isCacheDirty(false)) {
+      if (this.isCacheDirty()) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
         this.drawObject(this._cacheContext, options.forClipping);
         this.dirty = false;
@@ -18840,9 +18841,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var _includeDefaultValues = this.includeDefaultValues;
       var objsToObject = this._objects.map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
         return _obj;
@@ -18863,9 +18865,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         objsToObject = sourcePath;
       }
       else {
+        var _includeDefaultValues = this.includeDefaultValues;
         objsToObject = this._objects.map(function(obj) {
           var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = obj.group.includeDefaultValues;
+          obj.includeDefaultValues = _includeDefaultValues;
           var _obj = obj.toDatalessObject(propertiesToInclude);
           obj.includeDefaultValues = originalDefaults;
           return _obj;
@@ -19993,8 +19996,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         object.filters = filters || [];
         fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
           object.resizeFilter = resizeFilters[0];
-          var image = new fabric.Image(img, object);
-          callback(image);
+          fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+            object.clipPath = enlivedProps[0];
+            var image = new fabric.Image(img, object);
+            callback(image);
+          });
         });
       });
     }, null, object.crossOrigin);
@@ -27511,6 +27517,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)) {
       return;
+    }
+
+    if (this.canvas) {
+      var currentActive = this.canvas._activeObject;
+      if (currentActive && currentActive !== this) {
+        // avoid running this logic when there is an active object
+        // this because is possible with shift click and fast clicks,
+        // to rapidly deselect and reselect this object and trigger an enterEdit
+        return;
+      }
     }
 
     if (this.__lastSelected && !this.__corner) {
