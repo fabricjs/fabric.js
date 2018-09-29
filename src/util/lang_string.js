@@ -68,19 +68,23 @@
  */ 
 
   function language_characters(text_string) {
-      
-    let char_config = {iteration : 3, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
+        
+    let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
 
     let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = text_string;
-    
+      
     let canva = document.getElementById('fabric_canva'),
-        c = canva != null ? canva : document.createElement("canvas"),
-        ctx = c.getContext("2d");
-    if(!canva)
-      c.setAttribute("id", "fabric_canva");
-
-    ctx.font = char_config.fontsize+" "+char_config.fontfamily;
+        c = canva != null ? canva : document.createElement("canvas");
     c.style.letterSpacing = char_config.letterSpacing;
+    c.style.display = 'none';
+    
+    if(!canva){
+      c.id = "fabric_canva";
+      document.body.appendChild(c);
+    }
+
+    let ctx = c.getContext("2d");
+    ctx.font = char_config.fontsize+" "+char_config.fontfamily;
 
     while(n < char_config.iteration){
       chars = [];
