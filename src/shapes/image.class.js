@@ -662,8 +662,11 @@
         object.filters = filters || [];
         fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
           object.resizeFilter = resizeFilters[0];
-          var image = new fabric.Image(img, object);
-          callback(image);
+          fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+            object.clipPath = enlivedProps[0];
+            var image = new fabric.Image(img, object);
+            callback(image);
+          });
         });
       });
     }, null, object.crossOrigin);
