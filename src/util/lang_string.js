@@ -70,22 +70,17 @@
   function language_characters(text_string) {
         
     let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
-
     let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = text_string;
-      
     let canva = document.getElementById('fabric_canva'),
-        c = canva != null ? canva : document.createElement("canvas");
+      c = canva != null ? canva : document.createElement("canvas");
     c.style.letterSpacing = char_config.letterSpacing;
     c.style.display = 'none';
-    
     if(!canva){
       c.id = "fabric_canva";
       document.body.appendChild(c);
     }
-
     let ctx = c.getContext("2d");
     ctx.font = char_config.fontsize+" "+char_config.fontfamily;
-
     while(n < char_config.iteration){
       chars = [];
       for( i = 0,max = text.length ;i < max;i++){
