@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.4.1]
+- Fix: Avoid enterEditing if another object is the activeObject [#5261](https://github.com/fabricjs/fabric.js/pull/5261)
+- Fix: clipPath enliving for Image fromObject [#5279](https://github.com/fabricjs/fabric.js/pull/5279)
+- Fix: toDataURL and canvas clipPath [#5278](https://github.com/fabricjs/fabric.js/pull/5278)
+- Fix: early return if no xml is available [#5263](https://github.com/fabricjs/fabric.js/pull/5263)
+- Fix: clipPath svg parsing in nodejs [#5262](https://github.com/fabricjs/fabric.js/pull/5262)
+- Fix: Avoid running selection logic on mouse up [#5259](https://github.com/fabricjs/fabric.js/pull/5259)
+- Fix: fix font size parsing on SVG [#5258](https://github.com/fabricjs/fabric.js/pull/5258)
+- Fix: Avoid extra renders on mouseUp/Down [#5256](https://github.com/fabricjs/fabric.js/pull/5256)
+
 ## [2.4.0]
 - Add: Add clipPath support to canvas and svg import/export. Low compatibility yet.
 
