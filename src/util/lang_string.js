@@ -67,45 +67,40 @@
  * 'தமிழ்' => ['த','மி','ழ்']
  * "❀ヅ❤♫" => ['❀','ヅ','❤','♫']
  */ 
- 
+
   function language_characters(text_string) {
       
-    let canva = document.getElementById('fabric_canva');
-    let c = canva != null ? canva : document.createElement("canvas");
+    let char_config = {iteration : 3, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
+
+    let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = text_string;
     
+    let canva = document.getElementById('fabric_canva'),
+        c = canva != null ? canva : document.createElement("canvas"),
+        ctx = c.getContext("2d");
     if(!canva)
       c.setAttribute("id", "fabric_canva");
-    
-    c.style.letterSpacing = "15px";
-    let ctx = c.getContext("2d");
-    ctx.font = "10px Arial";
-    let iteration = 3,n = 0,max_diff = 1.5,chars = [],text = text_string;
-    while(n < iteration){
+
+    ctx.font = char_config.fontsize+" "+char_config.fontfamily;
+    c.style.letterSpacing = char_config.letterSpacing;
+
+    while(n < char_config.iteration){
       chars = [];
-      for(var i = 0,max = text.length ;i<max;i++){
-        
-        let next = (typeof text[i+1] == 'undefined') ? "" : text[i+1];
-        let with_next = text[i] + next ;
-
-        let char1 = (ctx.measureText(text[i]).width);
-        let char2 = (ctx.measureText(next).width);
-        let char3 = (ctx.measureText(with_next).width);
-
-        let start = i;
-
-        if( Math.abs(char3 - (char1+char2)) >= max_diff){
-          i++;
-        }
-        
-        let end = i;
-        let char = start == end ? text[i] : with_next;
+      for( i = 0,max = text.length ;i < max;i++){
+        next = (typeof text[i+1] == 'undefined') ? "" : text[i+1];
+        with_next = (text[i] + next);
+        char1 = (ctx.measureText(text[i]).width);
+        char2 = (ctx.measureText(next).width);
+        char3 = (ctx.measureText(with_next).width);
+        start = i;
+        i += ( Math.abs(char3 - (char1+char2) ) >= char_config.max_diff ) ? 1 : 0;
+        end = i;
+        char = start == end ? text[i] : with_next;
         if(char.length)
           chars.push(char);
       } 
       text = chars;
       n++;
     }
-
     return chars;
   }
 
