@@ -61,10 +61,24 @@
     iText.renderCursorOrSelection = function() {};
     assert.equal(iText.isEditing, false, 'iText not editing');
     iText.canvas = canvas;
+    canvas._activeObject = null;
     iText.selected = true;
     iText.__lastSelected = true;
     iText.mouseUpHandler({ e: {} });
     assert.equal(iText.isEditing, true, 'iText entered editing');
+    iText.exitEditing();
+  });
+  QUnit.test('_mouseUpHandler on a selected object does enter edit if there is an activeObject', function(assert) {
+    var iText = new fabric.IText('test');
+    iText.initDelayedCursor = function() {};
+    iText.renderCursorOrSelection = function() {};
+    assert.equal(iText.isEditing, false, 'iText not editing');
+    iText.canvas = canvas;
+    canvas._activeObject = new fabric.IText('test2');
+    iText.selected = true;
+    iText.__lastSelected = true;
+    iText.mouseUpHandler({ e: {} });
+    assert.equal(iText.isEditing, false, 'iText did not enter editing');
     iText.exitEditing();
   });
   QUnit.test('_mouseUpHandler on a selected text in a group DOES NOT enter edit', function(assert) {
