@@ -382,6 +382,20 @@
     });
   });
 
+  QUnit.test('fromObject with clipPath', function(assert) {
+    var done = assert.async();
+    // should not throw error when no callback is given
+    var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+      src: IMG_SRC,
+      clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
+    });
+    fabric.Image.fromObject(obj, function(instance){
+      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance.clipPath instanceof fabric.Rect);
+      done();
+    });
+  });
+
   QUnit.test('fromObject does not mutate data', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
