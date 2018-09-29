@@ -64,8 +64,7 @@
  /*
  * Split all characters into an array based on the chareacter's  language
  * Consonant characters combined split
- * 'தமிழ்' => ['த','மி','ழ்']
- * "❀ヅ❤♫" => ['❀','ヅ','❤','♫']
+ * Example : 'தமிழ்' => ['த','மி','ழ்']
  */ 
 
   function language_characters(text_string) {
