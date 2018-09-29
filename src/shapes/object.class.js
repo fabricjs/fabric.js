@@ -1077,7 +1077,7 @@
       if (!this._cacheCanvas) {
         this._createCacheCanvas();
       }
-      if (this.isCacheDirty(false)) {
+      if (this.isCacheDirty()) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
         this.drawObject(this._cacheContext, options.forClipping);
         this.dirty = false;
