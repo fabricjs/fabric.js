@@ -310,7 +310,7 @@
         '" width="', this._element.width || this._element.naturalWidth,
         '" height="', this._element.height || this._element.height,
         '"', clipPath,
-        '></image>\n');
+        '></image>\n', strokeSvg);
 
       if (this.stroke || this.strokeDashArray) {
         var origFill = this.fill;
@@ -327,7 +327,7 @@
       if (this.paintFirst !== 'fill') {
         // concat imageMarkup and strokeSVG in the right order.
       }
-      markup = this._createBaseSVGMarkup(imageMarkup)
+      markup = this._createBaseSVGMarkup(imageMarkup);
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
