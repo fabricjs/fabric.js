@@ -63,10 +63,9 @@
 
 
  /**
- * Split all characters into an array based on the character's  language
- * @memberOf fabric.util.string
+ * Split all characters into single unit character based on the character's language 
  * param {String} textstring String to escape
- * @return {Array} array containing the graphemes.
+ * @return {Array} array containing the graphemes with combined consonant characters.
  */
 
   function languageCharacters(textstring) {
