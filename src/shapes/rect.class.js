@@ -148,19 +148,16 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
-      markup.push(
-        '<rect ', this.getSvgCommons(),
-        'x="', x, '" y="', y,
-        '" rx="', this.get('rx'), '" ry="', this.get('ry'),
-        '" width="', this.width, '" height="', this.height,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        this.getSvgTransformMatrix(), '"',
-        this.addPaintOrder(),
-        '/>\n');
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var x = -this.width / 2, y = -this.height / 2,
+          svgString = [
+            '<rect ',
+            'x="', x, '" y="', y,
+            '" rx="', this.rx, '" ry="', this.ry,
+            '" width="', this.width, '" height="', this.height,
+            '/>\n'
+          ],
+          markup = this._createBaseSVGMarkup(svgString);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
   });

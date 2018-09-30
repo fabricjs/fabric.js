@@ -252,21 +252,17 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
-          p = this.calcLinePoints();
-      markup.push(
-        '<line ', this.getSvgCommons(),
-        'x1="', p.x1,
-        '" y1="', p.y1,
-        '" x2="', p.x2,
-        '" y2="', p.y2,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        this.getSvgTransformMatrix(),
-        '"/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var p = this.calcLinePoints(),
+          svgString = [
+            '<line ',
+            'x1="', p.x1,
+            '" y1="', p.y1,
+            '" x2="', p.x2,
+            '" y2="', p.y2,
+            '" />\n'
+          ],
+          markup = this._createBaseSVGMarkup(svgString);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
   });

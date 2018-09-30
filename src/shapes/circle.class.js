@@ -84,20 +84,16 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
+      var markup, svgString, x = 0, y = 0,
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
-        markup.push(
-          '<circle ', this.getSvgCommons(),
+        svgString = [
+          '<circle ',
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(), '"',
-          this.addPaintOrder(),
-          '/>\n'
-        );
+          '" />\n'
+        ];
       }
       else {
         var startX = fabric.util.cos(this.startAngle) * this.radius,
@@ -105,20 +101,15 @@
             endX = fabric.util.cos(this.endAngle) * this.radius,
             endY = fabric.util.sin(this.endAngle) * this.radius,
             largeFlag = angle > pi ? '1' : '0';
-
-        markup.push(
+        svgString = [
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(), '"',
-          this.addPaintOrder(),
-          '/>\n'
-        );
+          '" />\n'
+        ];
       }
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      this._createBaseSVGMarkup(svgString);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
 

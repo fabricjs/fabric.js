@@ -109,20 +109,15 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-      markup.push(
-        '<ellipse ', this.getSvgCommons(),
-        'cx="0" cy="0" ',
-        'rx="', this.rx,
-        '" ry="', this.ry,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        this.getSvgTransformMatrix(), '"',
-        this.addPaintOrder(),
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var svgString = [
+            '<ellipse ',
+            'cx="0" cy="0" ',
+            'rx="', this.rx,
+            '" ry="', this.ry,
+            '" />\n'
+          ],
+          markup = this._createBaseSVGMarkup(svgString);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
 

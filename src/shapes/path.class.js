@@ -471,24 +471,20 @@
      */
     toSVG: function(reviver) {
       var chunks = [],
-          markup = this._createBaseSVGMarkup(), addTransform = '';
+          specificTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
-      var path = chunks.join(' ');
-      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      markup.push(
-        '<path ', this.getSvgCommons(),
-        'd="', path,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(), addTransform,
-        this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
-        this.addPaintOrder(),
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var path = chunks.join(' '),
+          svgString = [
+            '<path ',
+            'd="', path,
+            '" stroke-linecap="round" ',
+            '/>\n'
+          ],
+          markup = this._createBaseSVGMarkup(svgString, specificTransform);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
 

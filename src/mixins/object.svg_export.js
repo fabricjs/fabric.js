@@ -29,7 +29,7 @@
      */
     getSvgStyles: function(skipShadow) {
 
-      var fillRule = this.fillRule,
+      var fillRule = this.fillRule ? this.fillRule : 'nonzero',
           strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
           strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
           strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
@@ -130,43 +130,13 @@
      * Returns transform-string for svg-export
      * @return {String}
      */
-    getSvgTransform: function() {
-      var angle = this.angle,
-          skewX = (this.skewX % 360),
-          skewY = (this.skewY % 360),
-          center = this.getCenterPoint(),
-
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-
-          translatePart = 'translate(' +
-                            toFixed(center.x, NUM_FRACTION_DIGITS) +
-                            ' ' +
-                            toFixed(center.y, NUM_FRACTION_DIGITS) +
-                          ')',
-
-          anglePart = angle !== 0
-            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
-            : '',
-
-          scalePart = (this.scaleX === 1 && this.scaleY === 1)
-            ? '' :
-            (' scale(' +
-              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-              ' ' +
-              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
-            ')'),
-
-          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
-
-          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
-
-          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
-
-          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
-
-      return [
-        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
-      ].join('');
+    getSvgTransform: function(specificTransform) {
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          transform = this.calcOwnMatrix(),
+          svgTransform = transform.map(function(value) {
+            return toFixed(value, NUM_FRACTION_DIGITS);
+          }).join(' ');
+      return 'matrix(' + svgTransform + ') ' + specificTransform + ' ' + this.getSvgTransformMatrix();
     },
 
     /**
@@ -198,9 +168,20 @@
     /**
      * @private
      */
-    _createBaseSVGMarkup: function() {
-      var markup = [], clipPath = this.clipPath;
-
+    _createBaseSVGMarkup: function(objectMarkup, specificTransform) {
+      var markup = [
+            '<g transform="',
+            this.getSvgTransform(specificTransform),
+            '" >\n'
+          ],
+          clipPath = this.clipPath,
+          commonPieces = [
+            this.getSvgCommons(),
+            'style="', this.getSvgStyles(), '" ',
+            this.addPaintOrder(),
+          ];
+      // insert commons in the markup, style and svgCommons
+      objectMarkup.splice(1 , 0, commonPieces);
       if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
       }
@@ -218,7 +199,9 @@
           '</clipPath>\n'
         );
       }
-      return markup;
+      markup.push(objectMarkup);
+      markup.push('</g>\n');
+      return markup.join('');
     },
 
     addPaintOrder: function() {

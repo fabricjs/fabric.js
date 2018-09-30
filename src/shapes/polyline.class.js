@@ -122,7 +122,7 @@
      */
     toSVG: function(reviver) {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          markup = this._createBaseSVGMarkup(),
+          svgString, markup,
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
@@ -131,17 +131,14 @@
           toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
         );
       }
-      markup.push(
-        '<', this.type, ' ', this.getSvgCommons(),
+      // leave the type on the first part of the array
+      svgString = [
+        '<' + this.type,
         'points="', points.join(''),
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        ' ', this.getSvgTransformMatrix(), '"',
-        this.addPaintOrder(),
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+        '" />\n'
+      ];
+      markup = this._createBaseSVGMarkup(svgString);
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
 
