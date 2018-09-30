@@ -78,26 +78,21 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
+      var markup,
           widthBy2 = this.width / 2,
           heightBy2 = this.height / 2,
           points = [
             -widthBy2 + ' ' + heightBy2,
             '0 ' + -heightBy2,
             widthBy2 + ' ' + heightBy2
-          ]
-            .join(',');
-
-      markup.push(
-        '<polygon ', this.getSvgCommons(),
-        'points="', points,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(), '"',
-        this.addPaintOrder(),
-        '/>'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+          ].join(','),
+          svgString = [
+            '<polygon ', this.getSvgCommons(),
+            'points="', points,
+            '" />'
+          ];
+      markup = this._createBaseSVGMarkup(svgString).join('');
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
   });

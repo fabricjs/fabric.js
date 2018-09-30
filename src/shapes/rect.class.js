@@ -154,9 +154,9 @@
             'x="', x, '" y="', y,
             '" rx="', this.rx, '" ry="', this.ry,
             '" width="', this.width, '" height="', this.height,
-            '/>\n'
+            '" />\n'
           ],
-          markup = this._createBaseSVGMarkup(svgString);
+          markup = this._createBaseSVGMarkup(svgString).join('');
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */

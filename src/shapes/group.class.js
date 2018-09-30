@@ -521,26 +521,14 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [];
-      if (this.shadow) {
-        markup.push(this.shadow.toSVG(this));
-      }
-      markup.push(
-        '<g ', this.getSvgCommons(), 'transform="',
-        /* avoiding styles intentionally */
-        this.getSvgTransform(),
-        '" style="',
-        this.getSvgFilter(),
-        '">\n'
-      );
+      var svgString = [], markup;
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        markup.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t', this._objects[i].toSVG(reviver));
       }
 
-      markup.push('</g>\n');
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      markup = this._createBaseSVGMarkup(svgString, { noStyle: true }).join('');
+      return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
   });

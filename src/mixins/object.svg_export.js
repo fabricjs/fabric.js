@@ -168,24 +168,27 @@
     /**
      * @private
      */
-    _createBaseSVGMarkup: function(objectMarkup, specificTransform) {
-      var markup = [
+    _createBaseSVGMarkup: function(objectMarkup, options) {
+      options = options || {};
+      var noStyle = options.noStyle,
+          markup = [
             '<g transform="',
-            this.getSvgTransform(specificTransform),
+            this.getSvgTransform(options.specificTransform),
             '" >\n'
           ],
           clipPath = this.clipPath,
           commonPieces = [
             this.getSvgCommons(),
-            'style="', this.getSvgStyles(), '" ',
-            this.addPaintOrder(),
-          ];
-      // insert commons in the markup, style and svgCommons
-      objectMarkup.splice(1 , 0, commonPieces);
-      if (this.fill && this.fill.toLive) {
+            noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
+            noStyle ? '' : this.addPaintOrder(),
+          ].join(''),
+          // insert commons in the markup, style and svgCommons
+          index = objectMarkup.indexOf('COMMON_PARTS');
+      objectMarkup[index] = commonPieces;
+      if (!noStyle && this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
       }
-      if (this.stroke && this.stroke.toLive) {
+      if (!noStyle && this.stroke && this.stroke.toLive) {
         markup.push(this.stroke.toSVG(this, false));
       }
       if (this.shadow) {
@@ -201,7 +204,7 @@
       }
       markup.push(objectMarkup);
       markup.push('</g>\n');
-      return markup.join('');
+      return markup;
     },
 
     addPaintOrder: function() {

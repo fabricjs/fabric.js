@@ -11,12 +11,12 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
+      var markup,
           offsets = this._getSVGLeftTopOffsets(),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
       this._wrapSVGTextAndBg(markup, textAndBg);
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      markup = this._createBaseSVGMarkup().join(''),
+      return reviver ? reviver(markup) : markup;
     },
 
     /**

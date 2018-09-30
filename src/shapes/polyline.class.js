@@ -137,7 +137,7 @@
         'points="', points.join(''),
         '" />\n'
       ];
-      markup = this._createBaseSVGMarkup(svgString);
+      markup = this._createBaseSVGMarkup(svgString).join('');
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */

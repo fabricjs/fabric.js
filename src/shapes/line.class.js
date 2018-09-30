@@ -261,7 +261,7 @@
             '" y2="', p.y2,
             '" />\n'
           ],
-          markup = this._createBaseSVGMarkup(svgString);
+          markup = this._createBaseSVGMarkup(svgString).join('');
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */
