@@ -136,7 +136,7 @@
           svgTransform = transform.map(function(value) {
             return toFixed(value, NUM_FRACTION_DIGITS);
           }).join(' ');
-      return 'matrix(' + svgTransform + ') ' + specificTransform + ' ' + this.getSvgTransformMatrix();
+      return 'matrix(' + svgTransform + ') ' + (specificTransform || '') + ' ' + this.getSvgTransformMatrix();
     },
 
     /**

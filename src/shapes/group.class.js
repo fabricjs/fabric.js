@@ -521,12 +521,14 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
+      var markup = [];
+      if (this.shadow) {
+        markup.push(this.shadow.toSVG(this));
+      }
       markup.push(
         '<g ', this.getSvgCommons(), 'transform="',
         /* avoiding styles intentionally */
         this.getSvgTransform(),
-        this.getSvgTransformMatrix(),
         '" style="',
         this.getSvgFilter(),
         '">\n'
