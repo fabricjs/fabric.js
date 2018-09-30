@@ -15305,7 +15305,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     getSvgStyles: function(skipShadow) {
 
-      var fillRule = this.fillRule ? this.fillRule : 'nonzero',
+      var fillRule = this.fillRule,
           strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
           strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
           strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
@@ -15406,13 +15406,43 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Returns transform-string for svg-export
      * @return {String}
      */
-    getSvgTransform: function(specificTransform) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-          transform = this.calcOwnMatrix(),
-          svgTransform = transform.map(function(value) {
-            return toFixed(value, NUM_FRACTION_DIGITS);
-          }).join(' ');
-      return 'matrix(' + svgTransform + ') ' + specificTransform + ' ' + this.getSvgTransformMatrix();
+    getSvgTransform: function() {
+      var angle = this.angle,
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
+          center = this.getCenterPoint(),
+
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+
+          translatePart = 'translate(' +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
+                            ' ' +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
+                          ')',
+
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
+
+          scalePart = (this.scaleX === 1 && this.scaleY === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+            ')'),
+
+          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
+
+          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
+
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
+
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
+
+      return [
+        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
+      ].join('');
     },
 
     /**
@@ -15444,20 +15474,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      */
-    _createBaseSVGMarkup: function(objectMarkup, specificTransform) {
-      var markup = [
-            '<g transform="',
-            this.getSvgTransform(specificTransform),
-            '" >\n'
-          ],
-          clipPath = this.clipPath,
-          commonPieces = [
-            this.getSvgCommons(),
-            'style="', this.getSvgStyles(), '" ',
-            this.addPaintOrder(),
-          ];
-      // insert commons in the markup, style and svgCommons
-      objectMarkup.splice(1 , 0, commonPieces);
+    _createBaseSVGMarkup: function() {
+      var markup = [], clipPath = this.clipPath;
+
       if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
       }
@@ -15475,9 +15494,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           '</clipPath>\n'
         );
       }
-      markup.push(objectMarkup);
-      markup.push('</g>\n');
-      return markup.join('');
+      return markup;
     },
 
     addPaintOrder: function() {
@@ -16490,17 +16507,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var p = this.calcLinePoints(),
-          svgString = [
-            '<line ',
-            'x1="', p.x1,
-            '" y1="', p.y1,
-            '" x2="', p.x2,
-            '" y2="', p.y2,
-            '" />\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString);
-      return reviver ? reviver(markup) : markup;
+      var markup = this._createBaseSVGMarkup(),
+          p = this.calcLinePoints();
+      markup.push(
+        '<line ', this.getSvgCommons(),
+        'x1="', p.x1,
+        '" y1="', p.y1,
+        '" x2="', p.x2,
+        '" y2="', p.y2,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        this.getSvgTransformMatrix(),
+        '"/>\n'
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
   });
@@ -16666,16 +16687,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup, svgString, x = 0, y = 0,
+      var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
-        svgString = [
-          '<circle ',
+        markup.push(
+          '<circle ', this.getSvgCommons(),
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
-          '" />\n'
-        ];
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+          ' ', this.getSvgTransformMatrix(), '"',
+          this.addPaintOrder(),
+          '/>\n'
+        );
       }
       else {
         var startX = fabric.util.cos(this.startAngle) * this.radius,
@@ -16683,15 +16708,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             endX = fabric.util.cos(this.endAngle) * this.radius,
             endY = fabric.util.sin(this.endAngle) * this.radius,
             largeFlag = angle > pi ? '1' : '0';
-        svgString = [
+
+        markup.push(
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '" />\n'
-        ];
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+          ' ', this.getSvgTransformMatrix(), '"',
+          this.addPaintOrder(),
+          '/>\n'
+        );
       }
-      this._createBaseSVGMarkup(svgString);
-      return reviver ? reviver(markup) : markup;
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -17018,15 +17048,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var svgString = [
-            '<ellipse ',
-            'cx="0" cy="0" ',
-            'rx="', this.rx,
-            '" ry="', this.ry,
-            '" />\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString);
-      return reviver ? reviver(markup) : markup;
+      var markup = this._createBaseSVGMarkup();
+      markup.push(
+        '<ellipse ', this.getSvgCommons(),
+        'cx="0" cy="0" ',
+        'rx="', this.rx,
+        '" ry="', this.ry,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        this.getSvgTransformMatrix(), '"',
+        this.addPaintOrder(),
+        '/>\n'
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -17242,16 +17277,19 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var x = -this.width / 2, y = -this.height / 2,
-          svgString = [
-            '<rect ',
-            'x="', x, '" y="', y,
-            '" rx="', this.rx, '" ry="', this.ry,
-            '" width="', this.width, '" height="', this.height,
-            '/>\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString);
-      return reviver ? reviver(markup) : markup;
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
+      markup.push(
+        '<rect ', this.getSvgCommons(),
+        'x="', x, '" y="', y,
+        '" rx="', this.get('rx'), '" ry="', this.get('ry'),
+        '" width="', this.width, '" height="', this.height,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        this.getSvgTransformMatrix(), '"',
+        this.addPaintOrder(),
+        '/>\n');
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
   });
@@ -17427,7 +17465,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          svgString, markup,
+          markup = this._createBaseSVGMarkup(),
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
@@ -17436,14 +17474,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
         );
       }
-      // leave the type on the first part of the array
-      svgString = [
-        '<' + this.type,
+      markup.push(
+        '<', this.type, ' ', this.getSvgCommons(),
         'points="', points.join(''),
-        '" />\n'
-      ];
-      markup = this._createBaseSVGMarkup(svgString);
-      return reviver ? reviver(markup) : markup;
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(),
+        ' ', this.getSvgTransformMatrix(), '"',
+        this.addPaintOrder(),
+        '/>\n'
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -18117,20 +18158,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var chunks = [],
-          specificTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
+          markup = this._createBaseSVGMarkup(), addTransform = '';
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
-      var path = chunks.join(' '),
-          svgString = [
-            '<path ',
-            'd="', path,
-            '" stroke-linecap="round" ',
-            '/>\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString, specificTransform);
-      return reviver ? reviver(markup) : markup;
+      var path = chunks.join(' ');
+      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
+      markup.push(
+        '<path ', this.getSvgCommons(),
+        'd="', path,
+        '" style="', this.getSvgStyles(),
+        '" transform="', this.getSvgTransform(), addTransform,
+        this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
+        this.addPaintOrder(),
+        '/>\n'
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -19580,44 +19625,48 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup, svgString = [], imageMarkup = [], strokeSvg,
-          x = -this.width / 2, y = -this.height / 2, clipPath = '';
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2, clipPath = '';
       if (this.hasCrop()) {
         var clipPathId = fabric.Object.__uid++;
-        svgString.push(
+        markup.push(
           '<clipPath id="imageCrop_' + clipPathId + '">\n',
           '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />\n',
           '</clipPath>\n'
         );
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
-      imageMarkup.push('\t<image ', 'xlink:href="', this.getSvgSrc(true),
+      markup.push('<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n');
+      var imageMarkup = ['\t<image ', this.getSvgCommons(), 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
+        '" style="', this.getSvgStyles(),
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
         // so that object's center aligns with container's left/top
         '" width="', this._element.width || this._element.naturalWidth,
         '" height="', this._element.height || this._element.height,
         '"', clipPath,
-        '></image>\n');
-
+        '></image>\n'];
+      if (this.paintFirst === 'fill') {
+        Array.prototype.push.apply(markup, imageMarkup);
+      }
       if (this.stroke || this.strokeDashArray) {
         var origFill = this.fill;
         this.fill = null;
-        strokeSvg = [
+        markup.push(
           '\t<rect ',
           'x="', x, '" y="', y,
           '" width="', this.width, '" height="', this.height,
           '" style="', this.getSvgStyles(),
           '"/>\n'
-        ];
+        );
         this.fill = origFill;
       }
       if (this.paintFirst !== 'fill') {
-        // concat imageMarkup and strokeSVG in the right order.
+        Array.prototype.push.apply(markup, imageMarkup);
       }
-      markup = this._createBaseSVGMarkup(imageMarkup)
-      return reviver ? reviver(markup) : markup;
+      markup.push('</g>\n');
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
