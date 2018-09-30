@@ -527,7 +527,7 @@
         svgString.push('\t', this._objects[i].toSVG(reviver));
       }
 
-      markup = this._createBaseSVGMarkup(svgString, { noStyle: true }).join('');
+      markup = this._createBaseSVGMarkup(svgString, { noStyle: true, withShadow: true }).join('');
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */

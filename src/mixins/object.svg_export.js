@@ -170,7 +170,7 @@
      */
     _createBaseSVGMarkup: function(objectMarkup, options) {
       options = options || {};
-      var noStyle = options.noStyle,
+      var noStyle = options.noStyle, withShadow = options.withShadow,
           markup = [
             '<g transform="',
             this.getSvgTransform(options.specificTransform),
@@ -179,8 +179,11 @@
           clipPath = this.clipPath,
           commonPieces = [
             this.getSvgCommons(),
-            noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
-            noStyle ? '' : this.addPaintOrder(),
+            'style="',
+            noStyle ? '' : this.getSvgStyles(),
+            withShadow ? '' : this.getSvgFilter(),
+            '" ',
+            noStyle ? '' : this.addPaintOrder(), ' '
           ].join(''),
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS');

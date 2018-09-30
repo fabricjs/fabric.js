@@ -302,7 +302,7 @@
         );
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
-      imageMarkup.push('\t<image ', 'xlink:href="', this.getSvgSrc(true),
+      imageMarkup.push('\t<image ', 'COMMON_PARTS', 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
@@ -310,7 +310,7 @@
         '" width="', this._element.width || this._element.naturalWidth,
         '" height="', this._element.height || this._element.height,
         '"', clipPath,
-        '></image>\n', strokeSvg);
+        '></image>\n');
 
       if (this.stroke || this.strokeDashArray) {
         var origFill = this.fill;
@@ -325,9 +325,12 @@
         this.fill = origFill;
       }
       if (this.paintFirst !== 'fill') {
-        // concat imageMarkup and strokeSVG in the right order.
+        svgString = svgString.concat(strokeSvg, imageMarkup);
       }
-      markup = this._createBaseSVGMarkup(imageMarkup);
+      else {
+        svgString = svgString.concat(imageMarkup, strokeSvg);
+      }
+      markup = this._createBaseSVGMarkup(svgString).join('');
       return reviver ? reviver(markup) : markup;
     },
     /* _TO_SVG_END_ */

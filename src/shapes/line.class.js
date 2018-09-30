@@ -254,7 +254,7 @@
     toSVG: function(reviver) {
       var p = this.calcLinePoints(),
           svgString = [
-            '<line ',
+            '<line ', 'COMMON_PARTS',
             'x1="', p.x1,
             '" y1="', p.y1,
             '" x2="', p.x2,

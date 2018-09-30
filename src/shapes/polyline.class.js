@@ -131,9 +131,8 @@
           toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
         );
       }
-      // leave the type on the first part of the array
       svgString = [
-        '<' + this.type,
+        '<' + this.type, 'COMMON_PARTS',
         'points="', points.join(''),
         '" />\n'
       ];

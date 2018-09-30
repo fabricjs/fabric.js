@@ -110,7 +110,7 @@
      */
     toSVG: function(reviver) {
       var svgString = [
-            '<ellipse ',
+            '<ellipse ', 'COMMON_PARTS',
             'cx="0" cy="0" ',
             'rx="', this.rx,
             '" ry="', this.ry,

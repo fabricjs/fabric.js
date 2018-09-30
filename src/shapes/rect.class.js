@@ -150,7 +150,7 @@
     toSVG: function(reviver) {
       var x = -this.width / 2, y = -this.height / 2,
           svgString = [
-            '<rect ',
+            '<rect ', 'COMMON_PARTS',
             'x="', x, '" y="', y,
             '" rx="', this.rx, '" ry="', this.ry,
             '" width="', this.width, '" height="', this.height,

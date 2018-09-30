@@ -89,7 +89,7 @@
 
       if (angle === 0) {
         svgString = [
-          '<circle ',
+          '<circle ', 'COMMON_PARTS',
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
           '" />\n'

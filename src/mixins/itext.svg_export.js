@@ -11,11 +11,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup,
-          offsets = this._getSVGLeftTopOffsets(),
-          textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
-      this._wrapSVGTextAndBg(markup, textAndBg);
-      markup = this._createBaseSVGMarkup().join(''),
+      var offsets = this._getSVGLeftTopOffsets(),
+          textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft),
+          internalMarkup = this._wrapSVGTextAndBg(textAndBg),
+          markup = this._createBaseSVGMarkup(internalMarkup, { noStyle: true, withShadow: true }).join('');
       return reviver ? reviver(markup) : markup;
     },
 
@@ -34,12 +33,9 @@
      * @private
      */
     _wrapSVGTextAndBg: function(markup, textAndBg) {
-      var noShadow = true, filter = this.getSvgFilter(),
-          style = filter === '' ? '' : ' style="' + filter + '"',
+      var noShadow = true,
           textDecoration = this.getSvgTextDecoration(this);
-      markup.push(
-        '\t<g ', this.getSvgCommons(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
-        style, '>\n',
+      return [
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',
         (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
@@ -50,8 +46,7 @@
         'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >',
         textAndBg.textSpans.join(''),
         '</text>\n',
-        '\t</g>\n'
-      );
+      ];
     },
 
     /**

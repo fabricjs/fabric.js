@@ -478,7 +478,7 @@
       }
       var path = chunks.join(' '),
           svgString = [
-            '<path ',
+            '<path ', 'COMMON_PARTS',
             'd="', path,
             '" stroke-linecap="round" ',
             '/>\n'

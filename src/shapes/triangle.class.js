@@ -87,7 +87,7 @@
             widthBy2 + ' ' + heightBy2
           ].join(','),
           svgString = [
-            '<polygon ', this.getSvgCommons(),
+            '<polygon ', 'COMMON_PARTS',
             'points="', points,
             '" />'
           ];
