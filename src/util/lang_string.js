@@ -62,7 +62,7 @@
   }
 
  /*
- * Split all characters into an array based on the chareacter's  language
+ * Split all characters into an array based on the character's  language
  * Consonant characters combined split
  * Example : 'தமிழ்' => ['த','மி','ழ்']
  */ 
