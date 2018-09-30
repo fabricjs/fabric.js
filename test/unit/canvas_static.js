@@ -1530,9 +1530,22 @@
   QUnit.test('options in setBackgroundImage from URL', function(assert) {
     var done = assert.async();
     canvas.setBackgroundImage(IMG_SRC, function() {
+      assert.equal(canvas.backgroundImage.canvas, canvas, 'canvas is referenced');
       assert.equal(canvas.backgroundImage.left, 50);
       assert.equal(canvas.backgroundImage.originX, 'right');
+      done();
+    }, {
+      left: 50,
+      originX: 'right'
+    });
+  });
 
+  QUnit.test('options in setOverlayImage from URL', function(assert) {
+    var done = assert.async();
+    canvas.setOverlayImage(IMG_SRC, function() {
+      assert.equal(canvas.overlayImage.canvas, canvas, 'canvas is referenced');
+      assert.equal(canvas.overlayImage.left, 50);
+      assert.equal(canvas.overlayImage.originX, 'right');
       done();
     }, {
       left: 50,
@@ -1674,26 +1687,30 @@
     assert.equal(scaling, 1, 'retina is disabled, 1');
   });
 
-  //how to test with an exception?
-  /*QUnit.test('options in setBackgroundImage from invalid URL', function(assert) {
-    var done = assert.async();
-    canvas.backgroundImage = null;
-    canvas.setBackgroundImage(IMG_SRC + '_not_exist', function( ) {
-      assert.equal(canvas.backgroundImage, null);
-      done();
-    }, {
-      left: 50,
-      originX: 'right'
-    });
-  });*/
-
   QUnit.test('options in setBackgroundImage from image instance', function(assert) {
     var done = assert.async();
     createImageObject(function(imageInstance) {
       canvas.setBackgroundImage(imageInstance, function() {
+        assert.equal(canvas.backgroundImage.canvas, canvas, 'canvas get referenced');
         assert.equal(canvas.backgroundImage.left, 100);
         assert.equal(canvas.backgroundImage.originX, 'center');
 
+        done();
+      }, {
+        left: 100,
+        originX: 'center'
+      });
+    });
+  });
+
+  QUnit.test('options in setOverlayImage from image instance', function(assert) {
+    var done = assert.async();
+    createImageObject(function(imageInstance) {
+      canvas.setOverlayImage(imageInstance, function() {
+        assert.equal(canvas.overlayImage, imageInstance);
+        assert.equal(imageInstance.left, 100);
+        assert.equal(imageInstance.originX, 'center');
+        assert.equal(imageInstance.canvas, canvas, 'canvas get referenced');
         done();
       }, {
         left: 100,
