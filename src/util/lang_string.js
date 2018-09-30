@@ -68,7 +68,6 @@
  */ 
 
   function language_characters(text_string) {
-        
     let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
     let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = text_string;
     let canva = document.getElementById('fabric_canva'),
