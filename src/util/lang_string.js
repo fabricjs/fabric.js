@@ -48,7 +48,7 @@
    */
   function graphemeSplit(textstring) {
 
-    let grapheme = language_characters(textstring);
+    let grapheme = languageCharacters(textstring);
     return grapheme;
 
     var i = 0, chr, graphemes = [];
@@ -61,22 +61,24 @@
     return graphemes;
   }
 
- /*
- * Split all characters into an array based on the character's  language
- * Consonant characters combined split
- * Example : 'தமிழ்' => ['த','மி','ழ்']
- */ 
 
-  function language_characters(text_string) {
+ /**
+ * Split all characters into an array based on the character's  language
+ * @memberOf fabric.util.string
+ * param {String} textstring String to escape
+ * @return {Array} array containing the graphemes.
+ */
+
+  function languageCharacters(textstring) {
     let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
-    let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = text_string;
-    let canva = document.getElementById('fabric_canva'),
-      c = canva != null ? canva : document.createElement("canvas");
+    let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = textstring;
+    let canva = fabric.document.getElementById('fabric_canva'),
+      c = canva != null ? canva : fabric.document.createElement("canvas");
     c.style.letterSpacing = char_config.letterSpacing;
     c.style.display = 'none';
     if(!canva){
       c.id = "fabric_canva";
-      document.body.appendChild(c);
+      fabric.document.body.appendChild(c);
     }
     let ctx = c.getContext("2d");
     ctx.font = char_config.fontsize+" "+char_config.fontfamily;
