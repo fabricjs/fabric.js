@@ -82,7 +82,7 @@
         end = i;
         char = start === end ? text[i] : withNext;
         chars.push(char);
-      } 
+      }
       text = chars;
       n++;
     }
