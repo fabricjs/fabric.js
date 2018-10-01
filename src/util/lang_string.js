@@ -51,14 +51,6 @@
     let grapheme = languageCharacters(textstring);
     return grapheme;
 
-    var i = 0, chr, graphemes = [];
-    for (i = 0, chr; i < textstring.length; i++) {
-      if ((chr = getWholeChar(textstring, i)) === false) {
-        continue;
-      }
-      graphemes.push(chr);
-    }
-    return graphemes;
   }
 
 
