@@ -1158,6 +1158,7 @@
 
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
+          globalPointer = pointer,
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
           activeTarget, activeTargetSubs;
@@ -1167,7 +1168,7 @@
       // if active group just exits.
       this.targets = [];
 
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer, globalPointer)) {
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
@@ -1175,7 +1176,7 @@
         return activeObject;
       }
       if (aObjects.length === 1 &&
-        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+        activeObject === this._searchPossibleTargets([activeObject], pointer, globalPointer)) {
         if (!this.preserveObjectStacking) {
           return activeObject;
         }
@@ -1185,7 +1186,7 @@
           this.targets = [];
         }
       }
-      var target = this._searchPossibleTargets(this._objects, pointer);
+      var target = this._searchPossibleTargets(this._objects, pointer, globalPointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
@@ -1196,13 +1197,14 @@
     /**
      * @private
      */
-    _checkTarget: function(pointer, obj) {
+    _checkTarget: function(pointer, obj, globalPointer) {
+      globalPointer = globalPointer || pointer;
       if (obj &&
           obj.visible &&
           obj.evented &&
           this.containsPoint(null, obj, pointer)){
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
-          var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
+          var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
             return true;
           }
@@ -1216,18 +1218,18 @@
     /**
      * @private
      */
-    _searchPossibleTargets: function(objects, pointer) {
+    _searchPossibleTargets: function(objects, pointer, pointerOnCanvas) {
 
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, normalizedPointer, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
-        if (this._checkTarget(pointer, objects[i])) {
+        if (this._checkTarget(pointer, objects[i], pointerOnCanvas)) {
           target = objects[i];
           if (target.subTargetCheck && target instanceof fabric.Group) {
             normalizedPointer = this._normalizePointer(target, pointer);
-            subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
+            subTarget = this._searchPossibleTargets(target._objects, normalizedPointer, pointerOnCanvas);
             subTarget && this.targets.push(subTarget);
           }
           break;
