@@ -1168,7 +1168,9 @@
       // if active group just exits.
       this.targets = [];
 
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer, globalPointer)) {
+      if (aObjects.length > 1 &&
+        !skipGroup &&
+        activeObject === this._searchPossibleTargets([activeObject],pointer, globalPointer)) {
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
