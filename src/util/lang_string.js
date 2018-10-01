@@ -47,33 +47,29 @@
    * @return {Array} array containing the graphemes
    */
   function graphemeSplit(textstring) {
-
-    let grapheme = languageCharacters(textstring);
-    return grapheme;
-
+    var languageCharacters = languageCharacters(textstring);
+    return languageCharacters;
   }
-
 
  /**
  * Split all characters into single unit character based on the character's language 
  * param {String} textstring String to escape
  * @return {Array} array containing the graphemes with combined consonant characters.
  */
-
   function languageCharacters(textstring) {
-    let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
-    let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = textstring;
-    let canva = fabric.document.getElementById('fabric_canva'),
+    var charConfig = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
+    var n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = textstring;
+    var canva = fabric.document.getElementById('fabric_canva'),
       c = canva != null ? canva : fabric.document.createElement("canvas");
-    c.style.letterSpacing = char_config.letterSpacing;
+    c.style.letterSpacing = charConfig.letterSpacing;
     c.style.display = 'none';
     if(!canva){
       c.id = "fabric_canva";
       fabric.document.body.appendChild(c);
     }
-    let ctx = c.getContext("2d");
-    ctx.font = char_config.fontsize+" "+char_config.fontfamily;
-    while(n < char_config.iteration){
+    var ctx = c.getContext("2d");
+    ctx.font = charConfig.fontsize+" "+charConfig.fontfamily;
+    while(n < charConfig.iteration){
       chars = [];
       for( i = 0,max = text.length ;i < max;i++){
         next = (typeof text[i+1] == 'undefined') ? "" : text[i+1];
@@ -82,7 +78,7 @@
         char2 = (ctx.measureText(next).width);
         char3 = (ctx.measureText(with_next).width);
         start = i;
-        i += ( Math.abs(char3 - (char1+char2) ) >= char_config.max_diff ) ? 1 : 0;
+        i += ( Math.abs(char3 - (char1+char2) ) >= charConfig.max_diff ) ? 1 : 0;
         end = i;
         char = start == end ? text[i] : with_next;
         if(char.length)
