@@ -32,7 +32,7 @@
     /**
      * @private
      */
-    _wrapSVGTextAndBg: function(markup, textAndBg) {
+    _wrapSVGTextAndBg: function(textAndBg) {
       var noShadow = true,
           textDecoration = this.getSvgTextDecoration(this);
       return [

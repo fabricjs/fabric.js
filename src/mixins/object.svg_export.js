@@ -131,10 +131,9 @@
      * @return {String}
      */
     getSvgTransform: function(specificTransform) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-          transform = this.calcOwnMatrix(),
+      var transform = this.calcOwnMatrix(),
           svgTransform = transform.map(function(value) {
-            return toFixed(value, NUM_FRACTION_DIGITS);
+            return toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
           }).join(' ');
       return 'matrix(' + svgTransform + ') ' + (specificTransform || '') + ' ' + this.getSvgTransformMatrix();
     },
@@ -171,6 +170,7 @@
     _createBaseSVGMarkup: function(objectMarkup, options) {
       options = options || {};
       var noStyle = options.noStyle, withShadow = options.withShadow,
+          reviver = options.reviver,
           markup = [
             '<g transform="',
             this.getSvgTransform(options.specificTransform),
@@ -181,7 +181,7 @@
             this.getSvgCommons(),
             'style="',
             noStyle ? '' : this.getSvgStyles(),
-            withShadow ? '' : this.getSvgFilter(),
+            withShadow ? this.getSvgFilter() : '',
             '" ',
             noStyle ? '' : this.addPaintOrder(), ' '
           ].join(''),
@@ -205,9 +205,9 @@
           '</clipPath>\n'
         );
       }
-      markup.push(objectMarkup);
+      markup.push(objectMarkup.join(''));
       markup.push('</g>\n');
-      return markup;
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
 
     addPaintOrder: function() {

@@ -132,7 +132,7 @@
         );
       }
       svgString = [
-        '<' + this.type, 'COMMON_PARTS',
+        '<' + this.type + ' ', 'COMMON_PARTS',
         'points="', points.join(''),
         '" />\n'
       ];

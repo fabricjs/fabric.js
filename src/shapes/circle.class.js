@@ -78,13 +78,14 @@
     },
 
     /* _TO_SVG_START_ */
+
     /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      var markup, svgString, x = 0, y = 0,
+    _toSVG: function() {
+      var svgString, x = 0, y = 0,
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
@@ -108,8 +109,20 @@
           '" />\n'
         ];
       }
-      markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+      return svgString;
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toSVG: function(reviver) {
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
+    },
+
+    toClipPathSVG: function(reviver) {
+      return this._createBaseClipPathSVG(this._toSVG(), { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 
