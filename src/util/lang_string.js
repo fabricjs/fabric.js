@@ -47,8 +47,8 @@
    * @return {Array} array containing the graphemes
    */
   function graphemeSplit(textstring) {
-    var languageCharacters = languageCharacters(textstring);
-    return languageCharacters;
+    var graphemesChars = languageCharacters(textstring);
+    return graphemesChars;
   }
 
  /**
