@@ -51,11 +51,11 @@
     return graphemesChars;
   }
 
- /**
- * Split all characters into single unit character based on the character's language 
- * param {String} textstring String to escape
- * @return {Array} array containing the graphemes with combined consonant characters.
- */
+  /**
+   * Split all characters into single unit character based on the character's language 
+   * param {String} textstring String to escape
+   * @return {Array} array containing the graphemes with combined consonant characters.
+   */
   function languageCharacters(textstring) {
     var charConfig = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
     var n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = textstring;
@@ -89,7 +89,7 @@
     }
     return chars;
   }
-  
+
   /**
    * String utilities
    * @namespace fabric.util.string
