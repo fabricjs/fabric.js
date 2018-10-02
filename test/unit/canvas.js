@@ -790,6 +790,36 @@
     canvas.remove(triangle);
   });
 
+  QUnit.test('findTarget with perPixelTargetFind in nested group', function(assert) {
+    assert.ok(typeof canvas.findTarget === 'function');
+    var triangle = makeTriangle({ left: 0, top: 0 }),
+        target,
+        group1 = new fabric.Group([triangle], {
+          subTargetCheck: true
+        }),
+        group2 = new fabric.Group([group1], {
+          subTargetCheck: true
+        });
+
+    canvas.add(group2);
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    });
+    assert.equal(target, group2, 'Should return the triangle by bounding box');
+    canvas.perPixelTargetFind = true;
+    target = canvas.findTarget({
+      clientX: 5, clientY: 5
+    });
+    assert.equal(target, null, 'Should return null because of transparency checks');
+    target = canvas.findTarget({
+      clientX: 15, clientY: 15
+    });
+    assert.equal(target, group2, 'Should return the group2 now');
+    assert.equal(canvas.targets[0], group1, 'First subTargets should be group1');
+    canvas.perPixelTargetFind = false;
+    canvas.remove(triangle);
+  });
+
   QUnit.test('findTarget on activegroup', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
