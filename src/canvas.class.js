@@ -1197,6 +1197,11 @@
     },
 
     /**
+     * Checks point is inside the object.
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @param {fabric.Object} obj Object to test against
+     * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+     * @return {Boolean} true if point is contained within an area of given object
      * @private
      */
     _checkTarget: function(pointer, obj, globalPointer) {
@@ -1218,6 +1223,11 @@
     },
 
     /**
+     * Method that determines what object we are interacting with.
+     * @param {Array} objects array of objects to test agains.
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @param {Object} [pointerOnCanvas] x,y object of point coordinates relative to canvas used to search per pixel target.
+     * @return {fabric.Object} object that contains pointer
      * @private
      */
     _searchPossibleTargets: function(objects, pointer, pointerOnCanvas) {
