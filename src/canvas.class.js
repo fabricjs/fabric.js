@@ -1223,8 +1223,8 @@
     },
 
     /**
-     * Method that determines what object we are interacting with.
-     * @param {Array} objects array of objects to test agains.
+     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * @param {Array} [objects] objects array to look into
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
      * @param {Object} [pointerOnCanvas] x,y object of point coordinates relative to canvas used to search per pixel target.
      * @return {fabric.Object} object that contains pointer
