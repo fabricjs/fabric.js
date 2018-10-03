@@ -1158,7 +1158,6 @@
 
       var ignoreZoom = true,
           pointer = this.getPointer(e, ignoreZoom),
-          globalPointer = pointer,
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
           activeTarget, activeTargetSubs;
@@ -1170,7 +1169,7 @@
 
       if (aObjects.length > 1 &&
         !skipGroup &&
-        activeObject === this._searchPossibleTargets([activeObject],pointer, globalPointer)) {
+        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
@@ -1178,7 +1177,7 @@
         return activeObject;
       }
       if (aObjects.length === 1 &&
-        activeObject === this._searchPossibleTargets([activeObject], pointer, globalPointer)) {
+        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           return activeObject;
         }
@@ -1188,7 +1187,7 @@
           this.targets = [];
         }
       }
-      var target = this._searchPossibleTargets(this._objects, pointer, globalPointer);
+      var target = this._searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
@@ -1225,22 +1224,23 @@
      * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
      * @param {Array} [objects] objects array to look into
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
-     * @param {Object} [pointerOnCanvas] x,y object of point coordinates relative to canvas used to search per pixel target.
      * @return {fabric.Object} object that contains pointer
      * @private
      */
-    _searchPossibleTargets: function(objects, pointer, pointerOnCanvas) {
-      pointerOnCanvas = pointerOnCanvas || pointer;
+    _searchPossibleTargets: function(objects, pointer) {
       // Cache all targets where their bounding box contains point.
-      var target, i = objects.length, normalizedPointer, subTarget;
+      var target, i = objects.length, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
-        if (this._checkTarget(pointer, objects[i], pointerOnCanvas)) {
+        var objToCheck = objects[i];
+        if (this._checkTarget(objToCheck.group && objToCheck.group.type !== 'activeSelection'
+          ? this._normalizePointer(objToCheck.group, pointer)
+          : pointer,
+        objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && target instanceof fabric.Group) {
-            normalizedPointer = this._normalizePointer(target, pointer);
-            subTarget = this._searchPossibleTargets(target._objects, normalizedPointer, pointerOnCanvas);
+            subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
           break;
