@@ -170,7 +170,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(this._toSVG, { reviver: reviver });
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
     },
 
     /**
@@ -180,27 +180,26 @@
       options = options || {};
       var noStyle = options.noStyle, withShadow = options.withShadow,
           reviver = options.reviver,
+          styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '"',
+          shadowInfo = withShadow ? 'style="' + this.getSvgFilter() + '"' : '',
           markup = [
             '<g transform="',
             this.getSvgTransform(options.specificTransform),
-            '" >\n'
+            '" ', shadowInfo, ' >\n'
           ],
           clipPath = this.clipPath,
           commonPieces = [
             this.getSvgCommons(),
-            'style="',
-            noStyle ? '' : this.getSvgStyles(),
-            withShadow ? this.getSvgFilter() : '',
-            '" ',
+            styleInfo,
             noStyle ? '' : this.addPaintOrder(), ' '
           ].join(''),
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS');
       objectMarkup[index] = commonPieces;
-      if (!noStyle && this.fill && this.fill.toLive) {
+      if (this.fill && this.fill.toLive) {
         markup.push(this.fill.toSVG(this, false));
       }
-      if (!noStyle && this.stroke && this.stroke.toLive) {
+      if (this.stroke && this.stroke.toLive) {
         markup.push(this.stroke.toSVG(this, false));
       }
       if (this.shadow) {
