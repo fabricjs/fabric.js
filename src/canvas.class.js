@@ -1205,7 +1205,6 @@
      * @private
      */
     _checkTarget: function(pointer, obj, globalPointer) {
-      globalPointer = globalPointer || pointer;
       if (obj &&
           obj.visible &&
           obj.evented &&
@@ -1231,7 +1230,7 @@
      * @private
      */
     _searchPossibleTargets: function(objects, pointer, pointerOnCanvas) {
-
+      pointerOnCanvas = pointerOnCanvas || pointer;
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, normalizedPointer, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
