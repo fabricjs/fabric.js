@@ -144,19 +144,18 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var x = -this.width / 2, y = -this.height / 2,
-          svgString = [
-            '<rect ', 'COMMON_PARTS',
-            'x="', x, '" y="', y,
-            '" rx="', this.rx, '" ry="', this.ry,
-            '" width="', this.width, '" height="', this.height,
-            '" />\n'
-          ];
-      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
+    _toSVG: function() {
+      var x = -this.width / 2, y = -this.height / 2;
+      return [
+        '<rect ', 'COMMON_PARTS',
+        'x="', x, '" y="', y,
+        '" rx="', this.rx, '" ry="', this.ry,
+        '" width="', this.width, '" height="', this.height,
+        '" />\n'
+      ];
     },
     /* _TO_SVG_END_ */
   });

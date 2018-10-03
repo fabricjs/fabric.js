@@ -81,8 +81,8 @@
 
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
     _toSVG: function() {
       var svgString, x = 0, y = 0,
@@ -110,15 +110,6 @@
         ];
       }
       return svgString;
-    },
-
-    /**
-     * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
-    toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
     },
 
     toClipPathSVG: function(reviver) {

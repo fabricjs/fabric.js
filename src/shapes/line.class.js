@@ -247,21 +247,20 @@
 
     /* _TO_SVG_START_ */
     /**
-     * Returns SVG representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * Returns svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var p = this.calcLinePoints(),
-          svgString = [
-            '<line ', 'COMMON_PARTS',
-            'x1="', p.x1,
-            '" y1="', p.y1,
-            '" x2="', p.x2,
-            '" y2="', p.y2,
-            '" />\n'
-          ];
-      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
+    _toSVG: function() {
+      var p = this.calcLinePoints();
+      return [
+        '<line ', 'COMMON_PARTS',
+        'x1="', p.x1,
+        '" y1="', p.y1,
+        '" x2="', p.x2,
+        '" y2="', p.y2,
+        '" />\n'
+      ];
     },
     /* _TO_SVG_END_ */
   });

@@ -286,11 +286,11 @@
 
     /* _TO_SVG_START_ */
     /**
-     * Returns SVG representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * Returns svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
+    _toSVG: function() {
       var svgString = [], imageMarkup = [], strokeSvg,
           x = -this.width / 2, y = -this.height / 2, clipPath = '';
       if (this.hasCrop()) {
@@ -330,7 +330,7 @@
       else {
         svgString = svgString.concat(imageMarkup, strokeSvg);
       }
-      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
+      return svgString;
     },
     /* _TO_SVG_END_ */
 

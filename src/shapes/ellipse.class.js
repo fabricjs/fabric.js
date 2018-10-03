@@ -105,18 +105,17 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var svgString = [
+    _toSVG: function() {
+      return [
         '<ellipse ', 'COMMON_PARTS',
         'cx="0" cy="0" ',
         'rx="', this.rx,
         '" ry="', this.ry,
         '" />\n'
       ];
-      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 
