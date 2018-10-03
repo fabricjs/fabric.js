@@ -291,7 +291,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup, svgString = [], imageMarkup = [], strokeSvg,
+      var svgString = [], imageMarkup = [], strokeSvg,
           x = -this.width / 2, y = -this.height / 2, clipPath = '';
       if (this.hasCrop()) {
         var clipPathId = fabric.Object.__uid++;
@@ -330,8 +330,7 @@
       else {
         svgString = svgString.concat(imageMarkup, strokeSvg);
       }
-      markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 

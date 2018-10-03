@@ -13,9 +13,9 @@
     toSVG: function(reviver) {
       var offsets = this._getSVGLeftTopOffsets(),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft),
-          internalMarkup = this._wrapSVGTextAndBg(textAndBg),
-          markup = this._createBaseSVGMarkup(internalMarkup, { noStyle: true, withShadow: true }).join('');
-      return reviver ? reviver(markup) : markup;
+          internalMarkup = this._wrapSVGTextAndBg(textAndBg);
+      return this._createBaseSVGMarkup(
+        internalMarkup, { reviver: reviver, noStyle: true, withShadow: true });
     },
 
     /**

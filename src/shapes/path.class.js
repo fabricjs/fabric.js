@@ -482,9 +482,9 @@
             'd="', path,
             '" stroke-linecap="round" ',
             '/>\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString, { specificTransform: specificTransform }).join('');
-      return reviver ? reviver(markup) : markup;
+          ];
+      return this._createBaseSVGMarkup(
+        svgString, { specificTransform: specificTransform, reviver: reviver });
     },
     /* _TO_SVG_END_ */
 

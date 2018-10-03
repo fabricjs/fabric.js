@@ -78,8 +78,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup,
-          widthBy2 = this.width / 2,
+      var widthBy2 = this.width / 2,
           heightBy2 = this.height / 2,
           points = [
             -widthBy2 + ' ' + heightBy2,
@@ -91,8 +90,7 @@
             'points="', points,
             '" />'
           ];
-      markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });

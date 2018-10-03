@@ -110,14 +110,13 @@
      */
     toSVG: function(reviver) {
       var svgString = [
-            '<ellipse ', 'COMMON_PARTS',
-            'cx="0" cy="0" ',
-            'rx="', this.rx,
-            '" ry="', this.ry,
-            '" />\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+        '<ellipse ', 'COMMON_PARTS',
+        'cx="0" cy="0" ',
+        'rx="', this.rx,
+        '" ry="', this.ry,
+        '" />\n'
+      ];
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 

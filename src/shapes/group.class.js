@@ -521,14 +521,15 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var svgString = [], markup;
+      var svgString = [];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t', this._objects[i].toSVG(reviver));
       }
 
-      markup = this._createBaseSVGMarkup(svgString, { noStyle: true, withShadow: true }).join('');
-      return reviver ? reviver(markup) : markup;
+      return this._createBaseSVGMarkup(
+        svgString,
+        { reviver: reviver, noStyle: true, withShadow: true });
     },
     /* _TO_SVG_END_ */
   });

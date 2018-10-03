@@ -155,9 +155,8 @@
             '" rx="', this.rx, '" ry="', this.ry,
             '" width="', this.width, '" height="', this.height,
             '" />\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+          ];
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });

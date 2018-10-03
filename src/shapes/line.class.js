@@ -260,9 +260,8 @@
             '" x2="', p.x2,
             '" y2="', p.y2,
             '" />\n'
-          ],
-          markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+          ];
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });

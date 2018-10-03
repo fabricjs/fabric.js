@@ -122,8 +122,7 @@
      */
     toSVG: function(reviver) {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          svgString, markup,
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          svgString, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(
@@ -136,8 +135,7 @@
         'points="', points.join(''),
         '" />\n'
       ];
-      markup = this._createBaseSVGMarkup(svgString).join('');
-      return reviver ? reviver(markup) : markup;
+      return this._createBaseSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 
