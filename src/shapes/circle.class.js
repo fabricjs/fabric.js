@@ -106,14 +106,10 @@
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '" />\n'
+          '"', 'COMMON_PARTS', ' />\n'
         ];
       }
       return svgString;
-    },
-
-    toClipPathSVG: function(reviver) {
-      return this._createBaseClipPathSVG(this._toSVG(), { reviver: reviver });
     },
     /* _TO_SVG_END_ */
 

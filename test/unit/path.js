@@ -124,7 +124,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.deepEqual(path.toSVG(), '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(200.5 200.5) translate(-200, -200) " stroke-linecap="round" />\n');
+      assert.deepEqual(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)  translate(-200, -200)  \"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n');
       done();
     });
   });

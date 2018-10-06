@@ -93,6 +93,11 @@
     assert.equal(wasRenderCalled, false, 'should not render when rx/ry are 0');
   });
 
+  QUnit.test('toSVG', function(assert) {
+    var ellipse = new fabric.Ellipse({ rx: 100, ry: 12, fill: 'red', stroke: 'blue' });
+    assert.equal(ellipse.toSVG(), '<g transform=\"matrix(1 0 0 1 100.5 12.5)  \"  >\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\" cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n', 'SVG should match');
+  });
+
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
