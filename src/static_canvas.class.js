@@ -1299,16 +1299,6 @@
 
     /**
      * @private
-     * add clipPath information for the canvas
-     */
-    _setSVGClip: function(markup) {
-      markup.push(
-
-      );
-    },
-
-    /**
-     * @private
      */
     _setSVGPreamble: function(markup, options) {
       if (options.suppressPreamble) {
