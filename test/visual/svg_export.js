@@ -134,7 +134,7 @@
     code: clipping3,
     golden: 'clipping3.png',
     percentage: 0.06,
-    disabled: true,
+    disabled: false,
   });
 
   function clipping4(canvas, callback) {
@@ -206,7 +206,7 @@
     code: clipping5,
     golden: 'clipping5.png',
     percentage: 0.06,
-    disabled: true,
+    disabled: false,
   });
 
   function clipping6(canvas, callback) {
@@ -270,7 +270,7 @@
     code: clipping7,
     golden: 'clipping7.png',
     percentage: 0.06,
-    disabled: true,
+    disabled: false,
   });
 
   function clipping8(canvas, callback) {
@@ -294,7 +294,7 @@
     code: clipping8,
     golden: 'clipping8.png',
     percentage: 0.06,
-    disabled: true,
+    disabled: false,
   });
 
   function clipping9(canvas, callback) {
@@ -316,7 +316,7 @@
     code: clipping9,
     golden: 'clipping9.png',
     percentage: 0.06,
-    disabled: true,
+    disabled: false,
   });
 
   tests.forEach(visualTestLoop(fabricCanvas, QUnit));

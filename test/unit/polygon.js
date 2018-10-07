@@ -80,6 +80,13 @@
     assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
+  QUnit.test('toSVG', function(assert) {
+    var polygon = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
+    assert.ok(typeof polygon.toSVG === 'function');
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15.5 17.5)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
+    assert.deepEqual(polygon.toSVG(), EXPECTED_SVG);
+  });
+
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromObject === 'function');

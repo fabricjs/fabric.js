@@ -67,6 +67,12 @@
     assert.ok(typeof line.complexity === 'function');
   });
 
+  QUnit.test('toSVG', function(assert) {
+    var line = new fabric.Line([11, 12, 13, 14]);
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 12.5 13.5)\"  >\n<line style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x1=\"-1\" y1=\"-1\" x2=\"1\" y2=\"1\" />\n</g>\n';
+    assert.equal(line.toSVG(), EXPECTED_SVG);
+  });
+
   QUnit.test('toObject', function(assert) {
     var line = new fabric.Line([11, 12, 13, 14]);
     assert.ok(typeof line.toObject === 'function');

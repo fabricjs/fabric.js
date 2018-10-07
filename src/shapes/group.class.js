@@ -521,24 +521,30 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-      markup.push(
-        '<g ', this.getSvgCommons(), 'transform="',
-        /* avoiding styles intentionally */
-        this.getSvgTransform(),
-        this.getSvgTransformMatrix(),
-        '" style="',
-        this.getSvgFilter(),
-        '">\n'
-      );
+      var svgString = [];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        markup.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t', this._objects[i].toSVG(reviver));
       }
 
-      markup.push('</g>\n');
+      return this._createBaseSVGMarkup(
+        svgString,
+        { reviver: reviver, noStyle: true, withShadow: true });
+    },
 
-      return reviver ? reviver(markup.join('')) : markup.join('');
+    /**
+     * Returns svg clipPath representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toClipPathSVG: function(reviver) {
+      var svgString = [];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
+      }
+
+      return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });
