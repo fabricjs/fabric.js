@@ -1274,7 +1274,7 @@
      */
     toSVG: function(options, reviver) {
       options || (options = { });
-
+      options.reviver = reviver;
       var markup = [];
 
       this._setSVGPreamble(markup, options);
@@ -1282,15 +1282,29 @@
 
       this._setSVGBgOverlayColor(markup, 'backgroundColor');
       this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
-
+      if (this.clipPath) {
+        markup.push('<g clip-path="url(#' + this.clipPath.clipPathId + ')" >\n');
+      }
       this._setSVGObjects(markup, reviver);
-
+      if (this.clipPath) {
+        markup.push('</g>\n');
+      }
       this._setSVGBgOverlayColor(markup, 'overlayColor');
       this._setSVGBgOverlayImage(markup, 'overlayImage', reviver);
 
       markup.push('</svg>');
 
       return markup.join('');
+    },
+
+    /**
+     * @private
+     * add clipPath information for the canvas
+     */
+    _setSVGClip: function(markup) {
+      markup.push(
+
+      );
     },
 
     /**
@@ -1347,8 +1361,20 @@
         '<defs>\n',
         this.createSVGFontFacesMarkup(),
         this.createSVGRefElementsMarkup(),
+        this.createSVGClipPathMarkup(options),
         '</defs>\n'
       );
+    },
+
+    createSVGClipPathMarkup: function(options) {
+      var clipPath = this.clipPath;
+      if (clipPath) {
+        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        return  '<clipPath id="' + clipPath.clipPathId + '" >\n' +
+          this.clipPath.toClipPathSVG(options.reviver) +
+          '</clipPath>\n';
+      }
+      return '';
     },
 
     /**
