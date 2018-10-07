@@ -14,7 +14,6 @@
   });
 
   function svgToDataURL(svgStr) {
-    console.log(svgStr)
     var encoded = encodeURIComponent(svgStr)
       .replace(/'/g, '%27')
       .replace(/"/g, '%22');
