@@ -793,11 +793,13 @@
   QUnit.test('findTarget with perPixelTargetFind in nested group', function(assert) {
     assert.ok(typeof canvas.findTarget === 'function');
     var triangle = makeTriangle({ left: 0, top: 0, width: 30, height: 30, fill: 'yellow' }),
+        triangle2 = makeTriangle({ left: 100, top: 120, width: 30, height: 30, angle: 100, fill: 'pink' }),
         circle = new fabric.Circle({ radius: 30, top: 0, left: 30, fill: 'blue' }),
         circle2 = new fabric.Circle({ scaleX: 2, scaleY: 2, radius: 10, top: 120, left: -20, fill: 'purple' }),
         rect = new fabric.Rect({ width: 100, height: 80, top: 50, left: 60, fill: 'green' }),
-        group1 = new fabric.Group([triangle, circle], { subTargetCheck: true }),
-        group2 = new fabric.Group([group1, circle2, rect], { subTargetCheck: true }),
+        rect2 = new fabric.Rect({ width: 50, height: 30, top: 10, left: 110, fill: 'red', skewX: 40, skewY: 20 }),
+        group1 = new fabric.Group([triangle, circle, rect2], { subTargetCheck: true }),
+        group2 = new fabric.Group([group1, circle2, rect, triangle2], { subTargetCheck: true }),
         group3 = new fabric.Group([group2], { subTargetCheck: true }),
         target;
 
@@ -824,6 +826,14 @@
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 5');
     target = canvas.findTarget({
+      clientX: 127, clientY: 37
+    });
+    assert.equal(target, null, 'Should return null because of transparency checks case 6');
+    target = canvas.findTarget({
+      clientX: 87, clientY: 139
+    });
+    assert.equal(target, null, 'Should return null because of transparency checks case 7');
+    target = canvas.findTarget({
       clientX: 15, clientY: 15
     });
     assert.equal(target, group3, 'Should return the group3 now');
@@ -836,6 +846,12 @@
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
     assert.equal(canvas.targets[0], circle, 'The deepest target should be circle');
     target = canvas.findTarget({
+      clientX: 117, clientY: 16
+    });
+    assert.equal(target, group3, 'Should return the group3 now');
+    assert.equal(canvas.targets.length, 3, 'Subtargets length should be 2');
+    assert.equal(canvas.targets[0], rect2, 'The deepest target should be rect2');
+    target = canvas.findTarget({
       clientX: 100, clientY: 90
     });
     assert.equal(target, group3, 'Should return the group3 now');
@@ -847,6 +863,12 @@
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], circle2, 'The deepest target should be circle2');
+    target = canvas.findTarget({
+      clientX: 66, clientY: 143
+    });
+    assert.equal(target, group3, 'Should return the group3 now');
+    assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
+    assert.equal(canvas.targets[0], triangle2, 'The deepest target should be triangle2');
     canvas.perPixelTargetFind = false;
     canvas.remove(group3);
   });
