@@ -848,7 +848,7 @@
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], circle2, 'The deepest target should be circle2');
     canvas.perPixelTargetFind = false;
-    canvas.remove(triangle);
+    canvas.remove(group3);
   });
 
   QUnit.test('findTarget on activegroup', function(assert) {
