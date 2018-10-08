@@ -806,23 +806,23 @@
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
-    assert.equal(target, null, 'Should return null because of transparency checks on coordinates 1');
+    assert.equal(target, null, 'Should return null because of transparency checks case 1');
     target = canvas.findTarget({
       clientX: 21, clientY: 9
     });
-    assert.equal(target, null, 'Should return null because of transparency checks on coordinates 2');
+    assert.equal(target, null, 'Should return null because of transparency checks case 2');
     target = canvas.findTarget({
       clientX: 37, clientY: 7
     });
-    assert.equal(target, null, 'Should return null because of transparency checks on coordinates 3');
+    assert.equal(target, null, 'Should return null because of transparency checks case 3');
     target = canvas.findTarget({
       clientX: 89, clientY: 47
     });
-    assert.equal(target, null, 'Should return null because of transparency checks on coordinates 4');
+    assert.equal(target, null, 'Should return null because of transparency checks case 4');
     target = canvas.findTarget({
       clientX: 16, clientY: 122
     });
-    assert.equal(target, null, 'Should return null because of transparency checks on coordinates 4');
+    assert.equal(target, null, 'Should return null because of transparency checks case 5');
     target = canvas.findTarget({
       clientX: 15, clientY: 15
     });
