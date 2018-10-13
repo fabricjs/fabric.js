@@ -1194,15 +1194,20 @@
     },
 
     /**
+     * Checks point is inside the object.
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @param {fabric.Object} obj Object to test against
+     * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+     * @return {Boolean} true if point is contained within an area of given object
      * @private
      */
-    _checkTarget: function(pointer, obj) {
+    _checkTarget: function(pointer, obj, globalPointer) {
       if (obj &&
           obj.visible &&
           obj.evented &&
           this.containsPoint(null, obj, pointer)){
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
-          var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
+          var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
             return true;
           }
@@ -1214,20 +1219,26 @@
     },
 
     /**
+     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * @param {Array} [objects] objects array to look into
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @return {fabric.Object} object that contains pointer
      * @private
      */
     _searchPossibleTargets: function(objects, pointer) {
-
       // Cache all targets where their bounding box contains point.
-      var target, i = objects.length, normalizedPointer, subTarget;
+      var target, i = objects.length, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
-        if (this._checkTarget(pointer, objects[i])) {
+        var objToCheck = objects[i];
+        if (this._checkTarget(objToCheck.group && objToCheck.group.type !== 'activeSelection'
+          ? this._normalizePointer(objToCheck.group, pointer)
+          : pointer,
+        objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && target instanceof fabric.Group) {
-            normalizedPointer = this._normalizePointer(target, pointer);
-            subTarget = this._searchPossibleTargets(target._objects, normalizedPointer);
+            subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
           break;
