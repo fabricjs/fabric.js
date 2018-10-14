@@ -1569,7 +1569,7 @@
       options || (options = { });
 
       var utils = fabric.utils, origParams = utils.saveObjectTransform(this),
-          originalShadow = this.shadow, abs = Math.abs,
+          originalShadow = this.shadow, abs = Math.abs;
 
       if (options.withoutTransform) {
         utils.resetObjectTransform(this);
@@ -1581,18 +1581,14 @@
       var el = fabric.util.createCanvasElement(),
           // skip canvas zoom and calculate with setCoords now.
           boundingRect = this.getBoundingRect(true, true),
-          shadow = this.shadow, transformOptions, signX, signY
-          shadowOffset = { x: 0, y: 0 }, shadowBlur, x = 0, y = 0;
+          shadow = this.shadow, transformOptions,
+          shadowOffset = { x: 0, y: 0 }, shadowBlur;
 
-      if (shadow && (shadow.offsetX || shadow.offsetY)) {
+      if (shadow) {
         shadowBlur = shadow.shadowBlur;
-        x = shadow.offsetX;
-        y = shadow.offsetY;
-        signX = x / abs(x);
-        signY = y / abs(y);
         transformOptions = utils.qrDecompose(this.calcTransformMatrix());
-        shadowOffset.x = (abs(x) + shadowBlur) * abs(transformOptions.scaleX);
-        shadowOffset.y = (abs(y) + shadowBlur) * abs(transformOptions.scaleY);
+        shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur) * abs(transformOptions.scaleX));
+        shadowOffset.y = 2 * Math.round((abs(shadow.offsetYy) + shadowBlur) * abs(transformOptions.scaleY));
       }
       el.width = boundingRect.width + shadowOffset.x;
       el.height = boundingRect.height + shadowOffset.y;
@@ -1602,21 +1598,13 @@
         renderOnAddRemove: false,
         skipOffscreen: false,
       });
-      // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
-      if (options.format === 'jpg') {
-        options.format = 'jpeg';
-      }
-
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
-      var point = new fabric.Point(canvas.width / 2, canvas.height / 2);
-      if (x < 0) {
-        point.x += shadowOffset.x;
-      }
-      if (y < 0) {
-        point.y += shadowOffset.y;
-      }
+      var point = new fabric.Point(
+        (canvas.width + shadowOffset.x) / 2,
+        (canvas.height + shadowOffset.y) / 2
+      );
       this.setPositionByOrigin(point, 'center', 'center');
 
       var originalCanvas = this.canvas;

@@ -99,11 +99,6 @@
     __toDataURL: function(format, quality) {
 
       var canvasEl = this.contextContainer.canvas;
-      // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
-      if (format === 'jpg') {
-        format = 'jpeg';
-      }
-
       var data = supportQuality
         ? canvasEl.toDataURL('image/' + format, quality)
         : canvasEl.toDataURL('image/' + format);
