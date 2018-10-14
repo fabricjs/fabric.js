@@ -576,13 +576,13 @@
     img.src = dataUrl;
   });
 
-  QUnit.test('toDataURL jpg', function(assert) {
+  QUnit.test('toDataURL jpeg', function(assert) {
     if (!fabric.Canvas.supports('toDataURL')) {
       window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {
       try {
-        var dataURL = canvas.toDataURL({ format: 'jpg' });
+        var dataURL = canvas.toDataURL({ format: 'jpeg' });
         assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
       }
       // node-canvas does not support jpeg data urls
