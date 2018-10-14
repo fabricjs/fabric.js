@@ -1,4 +1,16 @@
 (function() {
+  if ((fabric.isLikelyNode && process.env.launcher === 'Firefox') || navigator.userAgent.indexOf('Firefox') !== -1) {
+    fabric.browserShadowBlurConstant = 0.9;
+  }
+  if ((fabric.isLikelyNode && process.env.launcher === 'Node')) {
+    fabric.browserShadowBlurConstant = 1;
+  }
+  if ((fabric.isLikelyNode && process.env.launcher === 'Chrome') || navigator.userAgent.indexOf('Chrome') !== -1) {
+    fabric.browserShadowBlurConstant = 1.5;
+  }
+  if ((fabric.isLikelyNode && process.env.launcher === 'Edge') || navigator.userAgent.indexOf('Edge') !== -1) {
+    fabric.browserShadowBlurConstant = 1.75;
+  }
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = true;
@@ -38,7 +50,7 @@
       color: 'purple',
       offsetX: 0,
       offsetY: 0,
-      blur: 10,
+      blur: 6,
     });
     text.shadow = shadow;
     callback(text.toDataURL());
@@ -59,7 +71,7 @@
       color: 'purple',
       offsetX: -30,
       offsetY: +40,
-      blur: 15,
+      blur: 10,
     });
     text.shadow = shadow;
     callback(text.toDataURL());
