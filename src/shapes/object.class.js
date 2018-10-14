@@ -1528,7 +1528,16 @@
      * Creates an instance of fabric.Image out of an object
      * @param {Function} callback callback, invoked with an instance as a first argument
      * @param {Object} [options] for clone as image, passed to toDataURL
-     * @param {Boolean} [options.enableRetinaScaling] enable retina scaling for the cloned image
+     * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+     * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+     * @param {Number} [options.multiplier=1] Multiplier to scale by
+     * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+     * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+     * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+     * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+     * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
+     * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
+     * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
      * @return {fabric.Object} thisArg
      */
     cloneAsImage: function(callback, options) {
@@ -1553,23 +1562,41 @@
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
      * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
+     * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
       options || (options = { });
 
-      var origParams = fabric.util.saveObjectTransform(this);
+      var utils = fabric.utils, origParams = utils.saveObjectTransform(this),
+          originalShadow = this.shadow, abs = Math.abs,
 
       if (options.withoutTransform) {
-        fabric.util.resetObjectTransform(this);
+        utils.resetObjectTransform(this);
+      }
+      if (options.withoutShadow) {
+        this.shadow = null;
       }
 
       var el = fabric.util.createCanvasElement(),
           // skip canvas zoom and calculate with setCoords now.
-          boundingRect = this.getBoundingRect(true, true);
+          boundingRect = this.getBoundingRect(true, true),
+          shadow = this.shadow, transformOptions, signX, signY
+          shadowOffset = { x: 0, y: 0 }, shadowBlur, x = 0, y = 0;
 
-      el.width = boundingRect.width;
-      el.height = boundingRect.height;
+      if (shadow && (shadow.offsetX || shadow.offsetY)) {
+        shadowBlur = shadow.shadowBlur;
+        x = shadow.offsetX;
+        y = shadow.offsetY;
+        signX = x / abs(x);
+        signY = y / abs(y);
+        transformOptions = utils.qrDecompose(this.calcTransformMatrix());
+        shadowOffset.x = (abs(x) + shadowBlur) * abs(transformOptions.scaleX);
+        shadowOffset.y = (abs(y) + shadowBlur) * abs(transformOptions.scaleY);
+      }
+      el.width = boundingRect.width + shadowOffset.x;
+      el.height = boundingRect.height + shadowOffset.y;
+
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: options.enableRetinaScaling,
         renderOnAddRemove: false,
@@ -1583,12 +1610,19 @@
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
-
-      this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
+      var point = new fabric.Point(canvas.width / 2, canvas.height / 2);
+      if (x < 0) {
+        point.x += shadowOffset.x;
+      }
+      if (y < 0) {
+        point.y += shadowOffset.y;
+      }
+      this.setPositionByOrigin(point, 'center', 'center');
 
       var originalCanvas = this.canvas;
       canvas.add(this);
       var data = canvas.toDataURL(options);
+      this.shadow = originalShadow;
       this.set(origParams).setCoords();
       this.canvas = originalCanvas;
       // canvas.dispose will call image.dispose that will nullify the elements
