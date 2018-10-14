@@ -1581,14 +1581,14 @@
       var el = fabric.util.createCanvasElement(),
           // skip canvas zoom and calculate with setCoords now.
           boundingRect = this.getBoundingRect(true, true),
-          shadow = this.shadow, transformOptions,
+          shadow = this.shadow, scaling,
           shadowOffset = { x: 0, y: 0 }, shadowBlur;
 
       if (shadow) {
         shadowBlur = shadow.shadowBlur;
-        transformOptions = utils.qrDecompose(this.calcTransformMatrix());
-        shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur) * abs(transformOptions.scaleX));
-        shadowOffset.y = 2 * Math.round((abs(shadow.offsetYy) + shadowBlur) * abs(transformOptions.scaleY));
+        scaling = this.getObjectScaling();
+        shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur) * abs(scaling.scaleX));
+        shadowOffset.y = 2 * Math.round((abs(shadow.offsetY) + shadowBlur) * abs(scaling.scaleY));
       }
       el.width = boundingRect.width + shadowOffset.x;
       el.height = boundingRect.height + shadowOffset.y;
