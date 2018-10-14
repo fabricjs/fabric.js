@@ -39,7 +39,7 @@
     code: toDataURL1,
     golden: 'dataurl1.png',
     newModule: 'DataURL exports',
-    percentage: 0.06,
+    percentage: 0.09,
   });
 
   function toDataURL2(canvas, callback) {
@@ -60,7 +60,7 @@
     test: 'Text to DataURL with shadow no offset',
     code: toDataURL2,
     golden: 'dataurl2.png',
-    percentage: 0.06,
+    percentage: 0.09,
   });
 
   function toDataURL3(canvas, callback) {
@@ -81,7 +81,7 @@
     test: 'Text to DataURL with shadow large offset',
     code: toDataURL3,
     golden: 'dataurl3.png',
-    percentage: 0.06,
+    percentage: 0.09,
   });
 
   function testWrapper(test) {
