@@ -4,24 +4,6 @@
     return url + (/\?/.test(url) ? '&' : '?') + param;
   }
 
-  var makeXHR = (function() {
-    var factories = [
-      function() { return new fabric.window.XMLHttpRequest(); },
-      function() { return new ActiveXObject('Microsoft.XMLHTTP'); },
-      function() { return new ActiveXObject('Msxml2.XMLHTTP'); },
-      function() { return new ActiveXObject('Msxml2.XMLHTTP.3.0'); }
-    ];
-    for (var i = factories.length; i--; ) {
-      try {
-        var req = factories[i]();
-        if (req) {
-          return factories[i];
-        }
-      }
-      catch (err) { }
-    }
-  })();
-
   function emptyFn() { }
 
   /**
@@ -40,7 +22,7 @@
 
     var method = options.method ? options.method.toUpperCase() : 'GET',
         onComplete = options.onComplete || function() { },
-        xhr = makeXHR(),
+        xhr = new fabric.window.XMLHttpRequest(),
         body = options.body || options.parameters;
 
     /** @ignore */

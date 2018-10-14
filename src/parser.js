@@ -464,7 +464,6 @@
    */
   function parseUseDirectives(doc) {
     var nodelist = _getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
-
     while (nodelist.length && i < nodelist.length) {
       var el = nodelist[i],
           xlink = (el.getAttribute('xlink:href') || el.getAttribute('href')).substr(1),
