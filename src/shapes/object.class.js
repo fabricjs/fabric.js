@@ -1568,7 +1568,7 @@
     toDataURL: function(options) {
       options || (options = { });
 
-      var utils = fabric.utils, origParams = utils.saveObjectTransform(this),
+      var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalShadow = this.shadow, abs = Math.abs;
 
       if (options.withoutTransform) {
@@ -1585,14 +1585,15 @@
           shadowOffset = { x: 0, y: 0 }, shadowBlur;
 
       if (shadow) {
-        shadowBlur = shadow.shadowBlur;
+        shadowBlur = shadow.blur;
         scaling = this.getObjectScaling();
         shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur) * abs(scaling.scaleX));
         shadowOffset.y = 2 * Math.round((abs(shadow.offsetY) + shadowBlur) * abs(scaling.scaleY));
       }
       el.width = boundingRect.width + shadowOffset.x;
       el.height = boundingRect.height + shadowOffset.y;
-
+      el.width += el.width % 2 ? 2 - el.width % 2 : 0;
+      el.height += el.height % 2 ? 2 - el.height % 2 : 0;
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: options.enableRetinaScaling,
         renderOnAddRemove: false,
@@ -1601,11 +1602,7 @@
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
-      var point = new fabric.Point(
-        (canvas.width + shadowOffset.x) / 2,
-        (canvas.height + shadowOffset.y) / 2
-      );
-      this.setPositionByOrigin(point, 'center', 'center');
+      this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
 
       var originalCanvas = this.canvas;
       canvas.add(this);
