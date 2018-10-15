@@ -493,10 +493,12 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-      var m = object.calcTransformMatrix(),
+      var vpt = this.viewportTransform,
+          m = object.calcTransformMatrix(),
           invertedM = fabric.util.invertTransform(m),
+          matrix = fabric.util.multiplyTransformMatrices(vpt, invertedM),
           vptPointer = this.restorePointerVpt(pointer);
-      return fabric.util.transformPoint(vptPointer, invertedM);
+      return fabric.util.transformPoint(vptPointer, matrix);
     },
 
     /**
