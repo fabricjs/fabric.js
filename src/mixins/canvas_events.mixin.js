@@ -592,7 +592,7 @@
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target),
           shouldGroup = this._shouldGroup(e, target);
-      if (this._shouldClearSelection(e, target)) {
+      if (this._shouldClearSelection(e, target) && !e.shiftKey) {
         this.discardActiveObject(e);
       }
       else if (shouldGroup) {
