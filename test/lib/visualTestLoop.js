@@ -61,7 +61,7 @@
     };
     img.onerror = function(err) {
       img.onerror = null;
-      callback(img);
+      callback(null);
       console.log('Image loading errored', err);
     };
     img.src = filename;
@@ -123,7 +123,7 @@
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
           getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
-            ctx.drawImage(goldenImage, 0, 0);
+            goldenImage && ctx.drawImage(goldenImage, 0, 0);
             visualCallback.addArguments({
               enabled: true,
               golden: canvas,
