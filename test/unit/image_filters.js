@@ -13,7 +13,7 @@
   var // IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       // IMG_WIDTH   = 276,
       // IMG_HEIGHT  = 110,
-      canvas = fabric.isLikelyNode ? new (require(fabric.canvasModule))() : fabric.document.createElement('canvas'),
+      canvas = fabric.document.createElement('canvas'),
       context = canvas.getContext('2d');
 
 

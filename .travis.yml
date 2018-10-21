@@ -28,6 +28,9 @@ env:
   global:
     - LAUNCHER=Node
 
+matrix:
+  fast_finish: true
+
 jobs:
   fast_finish: true
   allow_failures:
@@ -72,6 +75,16 @@ jobs:
       node_js: "6"
     - stage: Unit Tests
       node_js: "4"
+    - stage: Unit Tests
+      env: CANVAS=canvas-prebuilt
+      node_js: "8"
+      cache:
+        directories:
+          - ''
+      install: npm install && npm remove canvas && npm install canvas-prebuilt@^1.6.11
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: Visual Tests
       env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "8"
@@ -80,10 +93,16 @@ jobs:
       env: LAUNCHER=Chrome
       install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
+      addons:
+        apt:
+          packages: # avoid installing packages
     - stage: Visual Tests
       env: LAUNCHER=Firefox
       install: npm install testem@1.18.4 qunit@2.6.1
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
+      addons:
+        apt:
+          packages: # avoid installing packages
 
 script: npm run build:fast && npm run test
 
