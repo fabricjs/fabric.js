@@ -13,7 +13,6 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-console.log(activeObject, target);
       return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
@@ -29,7 +28,6 @@ console.log(activeObject, target);
         return;
       }
       if (target === activeObject) {
-        console.log('handleGroup', target, activeObject)
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
         // if even object is not found or we are on activeObjectCorner, bail out

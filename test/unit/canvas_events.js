@@ -6,6 +6,7 @@
   QUnit.module('fabric.Canvas events mixin', {
     beforeEach: function() {
       canvas.cancelRequestedRender();
+      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       upperCanvasEl.style.display = '';
       canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
@@ -169,6 +170,66 @@
     canvas.__onMouseDown(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'a new groupSelector is created');
     canvas.__onMouseUp(e);
+  });
+
+  QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
+    var greenRect = new fabric.Rect({
+      width: 300,
+      height: 300,
+      left: 0,
+      top: 0,
+      fill: 'green',
+      selectable: false
+    });
+    canvas.add(greenRect);
+
+    // add green, half-transparent circle
+    var redCircle = new fabric.Circle({
+      radius: 40,
+      left: 200,
+      top: 100,
+      fill: 'red',
+      opacity: 0.5
+    });
+    canvas.add(redCircle);
+
+    // add green, half-transparent circle
+    var blueCircle = new fabric.Circle({
+      radius: 40,
+      left: 0,
+      top: 0,
+      fill: 'blue',
+      opacity: 0.5
+    });
+    canvas.add(blueCircle);
+    var e = { clientX: 40, clientY: 40, which: 1, target: canvas.upperCanvasEl };
+    canvas.__onMouseDown(e);
+    assert.equal(canvas._activeObject, blueCircle, 'blue circle is selected with first click');
+    canvas.__onMouseUp(e);
+    var e2 = { clientX: 240, clientY: 140, which: 1, target: canvas.upperCanvasEl, shiftKey: true };
+    canvas.__onMouseDown(e2);
+    var selection = canvas.getActiveObjects();
+    assert.equal(selection[1], blueCircle, 'blue circle is still selected');
+    assert.equal(selection[0], redCircle, 'red circle is selected with shift click');
+    canvas.__onMouseUp(e2);
+    var e3 = { clientX: 140, clientY: 90, which: 1, target: canvas.upperCanvasEl, shiftKey: true };
+    canvas.__onMouseDown(e3);
+    var selection = canvas.getActiveObjects();
+    canvas.on('mouse:down', function(options) {
+      assert.equal(options.target, greenRect, 'green rectangle was the target');
+    });
+    assert.equal(selection[1], blueCircle, 'blue circle is still selected 2');
+    assert.equal(selection[0], redCircle, 'red circle is still selected 2');
+    assert.equal(selection.length, 2, 'no other object have been selected');
+    canvas.__onMouseUp(e3);
+    var e4 = { clientX: 290, clientY: 290, which: 1, target: canvas.upperCanvasEl };
+    canvas.__onMouseDown(e4);
+    var selection = canvas.getActiveObjects();
+    canvas.on('mouse:down', function(options) {
+      assert.equal(options.target, greenRect, 'green rectangle was the target 2');
+    });
+    assert.equal(selection.length, 0, 'no other object have been selected because green rect is unselectable');
+    canvas.__onMouseUp(e4);
   });
 
   QUnit.test('mouse:up isClick = true', function(assert) {
@@ -455,7 +516,6 @@
     assert.equal(counter, 1, 'listener on window executed once');
     fabric.Canvas.prototype._onResize = originalResize;
   });
-
 
   QUnit.test('actionIsDisabled ', function(assert) {
     assert.ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
