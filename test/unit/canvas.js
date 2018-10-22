@@ -873,6 +873,33 @@
     canvas.remove(group3);
   });
 
+  QUnit.test('specific bug #5141 for subTargetCheck when canvas zoomed', function(assert) {
+    canvas.setZoom(0.5);
+    // rect accessible area should be 150 * 150
+    var rect = new fabric.Rect({
+      width: 300,
+      height: 300,
+      left: 0,
+      top: 0,
+      fill: 'green'
+    });
+    var group = new fabric.Group([rect], {
+      subTargetCheck: true
+    });
+    canvas.add(group);
+    // update coords
+    rect.setCoords();
+    var e = { clientX: 10, clientY: 10 };
+    canvas.findTarget(e);
+    assert.deepEqual(canvas.targets, [rect], 'rect should be added to subTargets');
+    var e2 = { clientX: 100, clientY: 100 };
+    canvas.findTarget(e2);
+    assert.deepEqual(canvas.targets, [rect], 'rect should be added to subTargets');
+    var e3 = { clientX: 200, clientY: 200 };
+    canvas.findTarget(e3);
+    assert.deepEqual(canvas.targets, [], 'rect shouldn\'t be added to subTargets');
+  });
+
   QUnit.test('findTarget on activegroup', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
