@@ -2282,12 +2282,28 @@ fabric.CommonMethods = {
     };
   }
 
-  var pointerX = function(event) {
-        return event.clientX;
+  var pointerX = function (event) {
+        if (event.touches && event.touches.length) {
+          return event.touches[0].clientX;
+        }
+        else if (typeof event.clientX !== unknown) {
+          return event.clientX;
+        }
+        else {
+          return 0;
+        }
       },
 
-      pointerY = function(event) {
-        return event.clientY;
+      pointerY = function (event) {
+        if (event.touches && event.touches.length) {
+          return event.touches[0].clientY;
+        }
+        else if (typeof event.clientY !== unknown) {
+          return event.clientY;
+        }
+        else {
+          return 0;
+        }
       };
 
   function _getPointer(event, pageProp, clientProp) {
@@ -11902,7 +11918,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-
       return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
@@ -11921,7 +11936,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
         // if even object is not found or we are on activeObjectCorner, bail out
-        if (!target) {
+        if (!target || !target.selectable) {
           return;
         }
       }

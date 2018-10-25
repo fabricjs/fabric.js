@@ -201,12 +201,28 @@
     };
   }
 
-  var pointerX = function(event) {
-        return event.clientX;
+  var pointerX = function (event) {
+        if (event.touches && event.touches.length) {
+          return event.touches[0].clientX;
+        }
+        else if (typeof event.clientX !== unknown) {
+          return event.clientX;
+        }
+        else {
+          return 0;
+        }
       },
 
-      pointerY = function(event) {
-        return event.clientY;
+      pointerY = function (event) {
+        if (event.touches && event.touches.length) {
+          return event.touches[0].clientY;
+        }
+        else if (typeof event.clientY !== unknown) {
+          return event.clientY;
+        }
+        else {
+          return 0;
+        }
       };
 
   function _getPointer(event, pageProp, clientProp) {
