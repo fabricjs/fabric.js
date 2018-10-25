@@ -33,7 +33,7 @@ else {
  * True when in environment that supports touch events
  * @type boolean
  */
-fabric.isTouchSupported = 'ontouchstart' in fabric.window;
+fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement || navigator.maxTouchPoints > 0;
 
 /**
  * True when in environment that's probably Node.js
@@ -11902,7 +11902,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-
       return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
             (activeObject !== target || activeObject.type === 'activeSelection');
     },
@@ -11921,7 +11920,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
         // if even object is not found or we are on activeObjectCorner, bail out
-        if (!target) {
+        if (!target || !target.selectable) {
           return;
         }
       }
