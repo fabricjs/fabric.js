@@ -101,6 +101,7 @@
       canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
     },
     afterEach: function() {
+      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
@@ -704,6 +705,59 @@
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect2, 'should return the rect2');
     canvas.remove(group);
+  });
+
+  QUnit.test('findTarget with subTargetCheck and canvas zoom', function(assert) {
+    var rect = makeRect({ left: 0, top: 0, width: 100, height: 100 }),
+        rect2 = makeRect({ left: 100, top:  100, width: 100, height: 100 }), target,
+        group = new fabric.Group([rect, rect2], { top: -150, left: -50 });
+
+    canvas.viewportTransform = [0.1, 0, 0, 0.1, 100, 200];
+    group.subTargetCheck = true;
+    canvas.add(group);
+
+    target = canvas.findTarget({
+      clientX: 96, clientY: 186
+    }, true);
+    assert.equal(target, group, 'Should return the group 96');
+    assert.equal(canvas.targets[0], rect, 'should find the target rect 96');
+    canvas.targets = [];
+
+    target = canvas.findTarget({
+      clientX: 98, clientY: 188
+    }, true);
+    assert.equal(target, group, 'Should return the group 98');
+    assert.equal(canvas.targets[0], rect, 'should find the target rect 98');
+    canvas.targets = [];
+
+    target = canvas.findTarget({
+      clientX: 100, clientY: 190
+    }, true);
+    assert.equal(target, group, 'Should return the group 100');
+    assert.equal(canvas.targets[0], rect, 'should find the target rect 100');
+    canvas.targets = [];
+
+    target = canvas.findTarget({
+      clientX: 102, clientY: 192
+    }, true);
+    assert.equal(target, group, 'Should return the group 102');
+    assert.equal(canvas.targets[0], rect, 'should find the target rect 102');
+    canvas.targets = [];
+
+    target = canvas.findTarget({
+      clientX: 104, clientY: 194
+    }, true);
+    assert.equal(target, group, 'Should return the group 104');
+    assert.equal(canvas.targets[0], rect, 'should find the target rect 104');
+    canvas.targets = [];
+
+    target = canvas.findTarget({
+      clientX: 106, clientY: 196
+    }, true);
+    assert.equal(target, group, 'Should return the group 106');
+    assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
+    canvas.targets = [];
+
   });
 
   QUnit.test('findTarget with subTargetCheck on activeObject', function(assert) {

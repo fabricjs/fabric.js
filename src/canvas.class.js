@@ -1232,10 +1232,9 @@
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
         var objToCheck = objects[i];
-        if (this._checkTarget(objToCheck.group && objToCheck.group.type !== 'activeSelection'
-          ? this._normalizePointer(objToCheck.group, pointer)
-          : pointer,
-        objToCheck, pointer)) {
+        var pointerToUse = objToCheck.group && objToCheck.group.type !== 'activeSelection' ?
+          this._normalizePointer(objToCheck.group, pointer) : pointer;
+        if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && target instanceof fabric.Group) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
