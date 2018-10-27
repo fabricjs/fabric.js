@@ -24,7 +24,6 @@
     return element;
   }
 
-
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
@@ -179,6 +178,28 @@
         assert.equal(filterFromObj.scaleX, 0.3);
         assert.equal(filterFromObj.scaleY, 0.3);
         assert.equal(filterFromObj.resizeType, 'bilinear');
+        done();
+      });
+    });
+  });
+
+  QUnit.test('toObject with normal filter and resize filter', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear' });
+      image.resizeFilter = filter;
+      var filterBg = new fabric.Image.filters.Brightness({ brightness: 0.8 });
+      image.filters = [filterBg];
+      image.scaleX = 0.3;
+      image.scaleY = 0.3;
+      var toObject = image.toObject();
+      assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
+      assert.deepEqual(toObject.filters[0], filterBg.toObject(), 'the filter is in object form now brightness');
+      fabric.Image.fromObject(toObject, function(imageFromObject) {
+        var filterFromObj = imageFromObject.resizeFilter;
+        var brightnessFromObj = imageFromObject.filters[0];
+        assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        assert.ok(brightnessFromObj instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Resize');
         done();
       });
     });

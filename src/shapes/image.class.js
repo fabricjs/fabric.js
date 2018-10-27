@@ -153,11 +153,15 @@
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
-      if (this.resizeFilter) {
-        this.applyResizeFilters();
-      }
       if (this.filters.length !== 0) {
         this.applyFilters();
+      }
+      // resizeFilters work on the already filtered copy.
+      // we need to apply resizeFilters AFTER normal filters.
+      // applyResizeFilters is run more often than normal fiters
+      // and is triggered by user interactions rather than dev code
+      if (this.resizeFilter) {
+        this.applyResizeFilters();
       }
       return this;
     },
