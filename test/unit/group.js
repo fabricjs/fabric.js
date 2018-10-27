@@ -385,6 +385,38 @@
     });
   });
 
+  QUnit.test('fromObject with clipPath', function(assert) {
+    var done = assert.async();
+    var clipPath = new fabric.Rect({
+      width: 500,
+      height: 250,
+      top: 0,
+      left: 0,
+      absolutePositioned: true
+    });
+
+    var groupObject = new fabric.Group([
+      new fabric.Rect({ width: 100, height: 100, fill: 'red' }),
+      new fabric.Rect({ width: 100, height: 100, fill: 'yellow', left: 100 }),
+      new fabric.Rect({ width: 100, height: 100, fill: 'blue', top: 100 }),
+      new fabric.Rect({ width: 100, height: 100, fill: 'green', left: 100, top: 100 })
+    ]);
+    groupObject.clipPath = clipPath;
+
+    var groupToObject = groupObject.toObject();
+
+    fabric.Group.fromObject(groupToObject, function(newGroupFromObject) {
+
+      var objectFromNewGroup = newGroupFromObject.toObject();
+
+      assert.ok(newGroupFromObject instanceof fabric.Group);
+      assert.ok(newGroupFromObject.clipPath instanceof fabric.Rect, 'clipPath has been restored');
+      assert.deepEqual(objectFromNewGroup, groupToObject, 'double serialization gives same results');
+
+      done();
+    });
+  });
+
   QUnit.test('fromObject restores oCoords', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
