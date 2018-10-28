@@ -573,6 +573,25 @@
     canvas.selectionFullyContained = false;
   });
 
+  QUnit.test('_collectObjects does not collect objects that have onSelect returning true', function(assert) {
+    canvas.selectionFullyContained = false;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
+    rect1.onSelect = function() {
+      return true;
+    };
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
+    canvas.add(rect1, rect2);
+    canvas._groupSelector = {
+      top: 20,
+      left: 20,
+      ex: 1,
+      ey: 1
+    };
+    var collected = canvas._collectObjects();
+    assert.equal(collected.length, 1, 'objects are in the same position buy only one gets selected');
+    assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
+  });
+
   QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
     var rect1Deselected = false;
     var rect3Selected = false;
