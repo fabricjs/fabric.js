@@ -592,6 +592,48 @@
     assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
   });
 
+  QUnit.test('_shouldGroup return false if onSelect return true', function(assert) {
+    var rect = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect.onSelect = function() {
+      return true;
+    };
+    canvas._activeObject = rect2;
+    var selectionKey = canvas.selectionKey;
+    var event = {};
+    event[selectionKey] = true;
+    var returned = canvas._shouldGroup(event, rect);
+    assert.equal(returned, false, 'if onSelect returns true, shouldGroup return false');
+  });
+
+  QUnit.test('_shouldGroup return true if onSelect return false and selectionKey is true', function(assert) {
+    var rect = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect.onSelect = function() {
+      return false;
+    };
+    canvas._activeObject = rect2;
+    var selectionKey = canvas.selectionKey;
+    var event = {};
+    event[selectionKey] = true;
+    var returned = canvas._shouldGroup(event, rect);
+    assert.equal(returned, true, 'if onSelect returns false, shouldGroup return true');
+  });
+
+  QUnit.test('_shouldGroup return false if selectionKey is false', function(assert) {
+    var rect = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect.onSelect = function() {
+      return false;
+    };
+    canvas._activeObject = rect2;
+    var selectionKey = canvas.selectionKey;
+    var event = {};
+    event[selectionKey] = false;
+    var returned = canvas._shouldGroup(event, rect);
+    assert.equal(returned, false, 'shouldGroup return false');
+  });
+
   QUnit.test('_fireSelectionEvents fires multiple things', function(assert) {
     var rect1Deselected = false;
     var rect3Selected = false;
