@@ -1053,9 +1053,23 @@
     assert.equal(scale, 5, 'scaleToCover is 5');
   });
 
-  // QUnit.test('fabric.util.findScaleToFit', function(assert) {
-  //   assert.ok(typeof fabric.util.findScaleToFit === 'function');
-  //   var scale = fabric.util.findScaleToFit({}, {});
-  //   assert.deepEqual(b.getContext('2d').getImageData(1,1,1,1).data, { 0: 255, 1: 0, 2: 0, 3: 255 }, 'red color has been copied');
-  // });
+  QUnit.test('fabric.util.findScaleToFit', function(assert) {
+    assert.ok(typeof fabric.util.findScaleToFit === 'function');
+    var scale = fabric.util.findScaleToFit({
+      width: 100,
+      height: 200,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 0.25, 'findScaleToFit is 0.25');
+    var scale = fabric.util.findScaleToFit({
+      width: 10,
+      height: 25,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 2, 'findScaleToFit is 2');
+  });
 })();
