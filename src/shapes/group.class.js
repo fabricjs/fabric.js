@@ -558,11 +558,12 @@
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
-        var options = fabric.util.object.clone(object, true);
-        options.clipPath = enlivedClipPath[0];
-        delete options.objects;
-        callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      var options = fabric.util.object.clone(object, true);
+      delete options.objects;
+      fabric.util.enlivenObjects([options.clipPath], function(enlivedProps) {
+        options.clipPath = enlivedProps[0];
+        var group = new fabric.Group(enlivenedObjects, options, true)
+        callback && callback(group);
       });
     });
   };
