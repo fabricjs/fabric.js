@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.4.2' };
+var fabric = fabric || { version: '2.4.3' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1178,7 +1178,7 @@ fabric.CommonMethods = {
      * @return {CanvasElement} initialized canvas element
      */
     copyCanvasElement: function(canvas) {
-      var newCanvas = fabric.document.createElement('canvas');
+      var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
       newCanvas.height = canvas.height;
       newCanvas.getContext('2d').drawImage(canvas, 0, 0);
@@ -10422,10 +10422,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
         var objToCheck = objects[i];
-        if (this._checkTarget(objToCheck.group && objToCheck.group.type !== 'activeSelection'
-          ? this._normalizePointer(objToCheck.group, pointer)
-          : pointer,
-        objToCheck, pointer)) {
+        var pointerToUse = objToCheck.group && objToCheck.group.type !== 'activeSelection' ?
+          this._normalizePointer(objToCheck.group, pointer) : pointer;
+        if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && target instanceof fabric.Group) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
@@ -11902,9 +11901,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-
       return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
-            (activeObject !== target || activeObject.type === 'activeSelection');
+            (activeObject !== target || activeObject.type === 'activeSelection') && !target.onSelect({ e: e });
     },
 
     /**
@@ -11914,6 +11912,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _handleGrouping: function (e, target) {
       var activeObject = this._activeObject;
+      // avoid multi select when shift click on a corner
       if (activeObject.__corner) {
         return;
       }
@@ -11921,7 +11920,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
         // if even object is not found or we are on activeObjectCorner, bail out
-        if (!target) {
+        if (!target || !target.selectable) {
           return;
         }
       }
@@ -11986,7 +11985,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _groupSelectedObjects: function (e) {
 
-      var group = this._collectObjects(),
+      var group = this._collectObjects(e),
           aGroup;
 
       // do not create group for 1 element only
@@ -12004,7 +12003,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _collectObjects: function() {
+    _collectObjects: function(e) {
       var group = [],
           currentObject,
           x1 = this._groupSelector.ex,
@@ -12019,7 +12018,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject || !currentObject.selectable || !currentObject.visible) {
+        if (!currentObject || !currentObject.selectable || !currentObject.visible || currentObject.onSelect({ e: e })) {
           continue;
         }
 
@@ -17247,11 +17246,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx) {
 
-      // optimize 1x1 case (used in spray brush)
-      if (this.width === 1 && this.height === 1) {
-        ctx.fillRect(-0.5, -0.5, 1, 1);
-        return;
-      }
+      // 1x1 case (used in spray brush) optimization was removed because
+      // with caching and higher zoom level this makes more damage than help
 
       var rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
@@ -19208,9 +19204,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
-      callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
+        var options = fabric.util.object.clone(object, true);
+        options.clipPath = enlivedClipPath[0];
+        delete options.objects;
+        callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      });
     });
   };
 
@@ -19532,11 +19531,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
-      if (this.resizeFilter) {
-        this.applyResizeFilters();
-      }
       if (this.filters.length !== 0) {
         this.applyFilters();
+      }
+      // resizeFilters work on the already filtered copy.
+      // we need to apply resizeFilters AFTER normal filters.
+      // applyResizeFilters is run more often than normal fiters
+      // and is triggered by user interactions rather than dev code
+      if (this.resizeFilter) {
+        this.applyResizeFilters();
       }
       return this;
     },

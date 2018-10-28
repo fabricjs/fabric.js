@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.3]
+- Fix: Shift click and onSelect function [#5348](https://github.com/fabricjs/fabric.js/pull/5348)
+- Fix: Load from Json from images with filters and resize filters [#5346](https://github.com/fabricjs/fabric.js/pull/5346)
+- Fix: Remove special case of 1x1 rect [#5345](https://github.com/fabricjs/fabric.js/pull/5345)
+- Fix: Group with clipPath restore [#5344](https://github.com/fabricjs/fabric.js/pull/5344)
+- Fix: Fix shift + click interaction with unselectable objects [#5324](https://github.com/fabricjs/fabric.js/pull/5324)
+
 ## [2.4.2]
 - Fix: Better toSVG support to enable clipPath [#5284](https://github.com/fabricjs/fabric.js/pull/5284)
 - Fix: Per pixel target find and groups and sub targets [#5287](https://github.com/fabricjs/fabric.js/pull/5287)
