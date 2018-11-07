@@ -229,14 +229,7 @@
     }
 
     // identity matrix
-    var iMatrix = [
-          1, // a
-          0, // b
-          0, // c
-          1, // d
-          0, // e
-          0  // f
-        ],
+    var iMatrix = fabric.iMatrix,
 
         // == begin transform regexp
         number = fabric.reNum,
@@ -442,25 +435,6 @@
 
   /**
    * @private
-   * to support IE8 missing getElementById on SVGdocument
-   */
-  function elementById(doc, id) {
-    var el;
-    doc.getElementById && (el = doc.getElementById(id));
-    if (el) {
-      return el;
-    }
-    var node, i, len, nodelist = doc.getElementsByTagName('*');
-    for (i = 0, len = nodelist.length; i < len; i++) {
-      node = nodelist[i];
-      if (id === node.getAttribute('id')) {
-        return node;
-      }
-    }
-  }
-
-  /**
-   * @private
    */
   function parseUseDirectives(doc) {
     var nodelist = _getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
@@ -469,7 +443,7 @@
           xlink = (el.getAttribute('xlink:href') || el.getAttribute('href')).substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
-          el2 = elementById(doc, xlink).cloneNode(true),
+          el2 = doc.getElementById(xlink).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
           parentNode, oldLength = nodelist.length, attr, j, attrs, len;
 
@@ -715,6 +689,28 @@
     }, clone(options), reviver, parsingOptions);
   };
 
+  function recursivelyParseGradientsXlink(doc, gradient) {
+    var gradientsAttrs = ['gradientTransform', 'x1', 'x2', 'y1', 'y2', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy'],
+        xlinkAttr = 'xlink:href',
+        xLink = gradient.getAttribute(xlinkAttr).substr(1),
+        referencedGradient = doc.getElementById(xLink);
+    if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
+      recursivelyParseGradientsXlink(doc, referencedGradient);
+    }
+    gradientsAttrs.forEach(function(attr) {
+      if (!gradient.hasAttribute(attr)) {
+        gradient.setAttribute(attr, referencedGradient.getAttribute(attr));
+      }
+    });
+    if (!gradient.children.length) {
+      var referenceClone = referencedGradient.cloneNode(true);
+      while (referenceClone.firstChild) {
+        gradient.appendChild(referenceClone.firstChild);
+      }
+    }
+    gradient.removeAttribute(xlinkAttr);
+  }
+
   var reFontDeclaration = new RegExp(
     '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
     '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' +
@@ -776,26 +772,14 @@
             'svg:linearGradient',
             'svg:radialGradient'],
           elList = _getMultipleNodes(doc, tagArray),
-          el, j = 0, id, xlink,
-          gradientDefs = { }, idsToXlinkMap = { };
+          el, j = 0, gradientDefs = { };
       j = elList.length;
-
       while (j--) {
         el = elList[j];
-        xlink = el.getAttribute('xlink:href');
-        id = el.getAttribute('id');
-        if (xlink) {
-          idsToXlinkMap[id] = xlink.substr(1);
+        if (el.getAttribute('xlink:href')) {
+          recursivelyParseGradientsXlink(doc, el);
         }
-        gradientDefs[id] = el;
-      }
-
-      for (id in idsToXlinkMap) {
-        var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
-        el = gradientDefs[id];
-        while (el2.firstChild) {
-          el.appendChild(el2.firstChild);
-        }
+        gradientDefs[el.getAttribute('id')] = el;
       }
       return gradientDefs;
     },
