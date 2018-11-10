@@ -2171,7 +2171,16 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: rect
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+
+    canvas._setupCurrentTransform(eventStub, rect, false);
+    t = canvas._currentTransform;
+    assert.equal(t.target, rect, 'should have rect as a target');
+    assert.equal(t.action, 'drag', 'should setup drag since the object was not selected');
+    assert.equal(t.corner, 'tl', 'tl selected');
+    assert.equal(t.shiftKey, undefined, 'shift was not pressed');
+
+    var alreadySelected = true;
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'scale', 'should target a corner and setup scale');
@@ -2186,7 +2195,7 @@
       target: rect,
       shiftKey: true
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'skewY', 'should target a corner and setup skew');
@@ -2199,7 +2208,7 @@
       clientY: canvasOffset.top + rect.oCoords.mtr.y,
       target: rect,
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'rotate', 'should target a corner and setup rotate');
