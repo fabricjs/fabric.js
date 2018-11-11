@@ -87,8 +87,6 @@
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0).set('ry', 0);
 
-    var wasRenderCalled = false;
-
     assert.equal(ellipse.isNotVisible(), false, 'isNotVisible false when rx/ry are 0 because strokeWidth is > 0');
 
     ellipse.set('strokeWidth', 0);
