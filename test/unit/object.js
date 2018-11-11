@@ -1249,4 +1249,16 @@
     object._set('fill', 'blue');
     assert.equal(object.dirty, false, 'dirty is not rised');
   });
+  QUnit.test('isNotVisible', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.equal(object.isNotVisible(), false, 'object is default visilbe');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 1 });
+    assert.equal(object.isNotVisible(), false, 'object is visilbe with width and height equal 0, but strokeWidth 1');
+    object = new fabric.Object({ opacity: 0, fill: 'blue' });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with opacity 0');
+    object = new fabric.Object({ fill: 'blue', visible: false });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with visible false');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
+  });
 })();
