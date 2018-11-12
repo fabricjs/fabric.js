@@ -83,18 +83,16 @@
     assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
-  QUnit.test('render', function(assert) {
+  QUnit.test('isNotVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0).set('ry', 0);
 
-    var wasRenderCalled = false;
+    assert.equal(ellipse.isNotVisible(), false, 'isNotVisible false when rx/ry are 0 because strokeWidth is > 0');
 
-    ellipse._render = function(){
-      wasRenderCalled = true;
-    };
-    ellipse.render({});
+    ellipse.set('strokeWidth', 0);
 
-    assert.equal(wasRenderCalled, false, 'should not render when rx/ry are 0');
+    assert.equal(ellipse.isNotVisible(), true, 'should not render anymore with also strokeWidth 0');
+
   });
 
   QUnit.test('toSVG', function(assert) {
