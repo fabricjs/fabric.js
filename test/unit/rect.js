@@ -14,6 +14,7 @@
     'strokeWidth':              1,
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':           'miter',
     'strokeMiterLimit':         4,
     'scaleX':                   1,
