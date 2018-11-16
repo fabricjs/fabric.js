@@ -322,7 +322,7 @@
     strokeDashArray:          null,
 
     /**
-     * Line offset of an object's stroke (can be a number or a %)
+     * Line offset of an object's stroke
      * @type Number
      * @default
      */
