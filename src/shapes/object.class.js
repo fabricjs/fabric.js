@@ -562,7 +562,7 @@
     dirty:                true,
 
     /**
-     * keeps the value of the last hovered coner during mouse move.
+     * keeps the value of the last hovered corner during mouse move.
      * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
      * It should be private, but there is no harm in using it as
      * a read-only property.
@@ -572,7 +572,7 @@
     __corner: 0,
 
     /**
-     * Determins if the fill or the stroke is drawn first (one of "fill" or "stroke")
+     * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
      * @type String
      * @default
      */
@@ -613,7 +613,7 @@
     clipPath: undefined,
 
     /**
-     * Meaningfull ONLY when the object is used as clipPath.
+     * Meaningful ONLY when the object is used as clipPath.
      * if true, the clipPath will make the object clip to the outside of the clipPath
      * since 2.4.0
      * @type boolean
@@ -622,7 +622,7 @@
     inverted: false,
 
     /**
-     * Meaningfull ONLY when the object is used as clipPath.
+     * Meaningful ONLY when the object is used as clipPath.
      * if true, the clipPath will have its top and left relative to canvas, and will
      * not be influenced by the object transform. This will make the clipPath relative
      * to the canvas, but clipping just a particular object.
@@ -1232,7 +1232,7 @@
     },
 
     /**
-     * Draws a background for the object big as its untrasformed dimensions
+     * Draws a background for the object big as its untransformed dimensions
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -1298,7 +1298,7 @@
      * Sets line dash
      * @param {CanvasRenderingContext2D} ctx Context to set the dash line on
      * @param {Array} dashArray array representing dashes
-     * @param {Function} alternative function to call if browaser does not support lineDash
+     * @param {Function} alternative function to call if browser does not support lineDash
      */
     _setLineDash: function(ctx, dashArray, alternative) {
       if (!dashArray) {
@@ -1465,7 +1465,7 @@
     },
 
     /**
-     * This function is an helper for svg import. it decoompose the transformMatrix
+     * This function is an helper for svg import. it decompose the transformMatrix
      * and assign properties to object.
      * untransformed coordinates
      * @private
@@ -1662,7 +1662,7 @@
      * @param {Number} [options.r1=0] Radius of start point (only for radial gradients)
      * @param {Number} [options.r2=0] Radius of end point (only for radial gradients)
      * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
-     * @param {Object} [options.gradientTransform] transforMatrix for gradient
+     * @param {Object} [options.gradientTransform] transformMatrix for gradient
      * @return {fabric.Object} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/58y8b/|jsFiddle demo}
@@ -1889,7 +1889,7 @@
 
     /**
      * Sets canvas globalCompositeOperation for specific object
-     * custom composition operation for the particular object can be specifed using globalCompositeOperation property
+     * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
     _setupCompositeOperation: function (ctx) {
