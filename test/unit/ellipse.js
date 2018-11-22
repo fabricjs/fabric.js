@@ -39,6 +39,7 @@
       'strokeWidth':              1,
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
+      'strokeDashOffset':         0,
       'strokeLineJoin':           'miter',
       'strokeMiterLimit':         4,
       'scaleX':                   1,
@@ -97,21 +98,21 @@
 
   QUnit.test('toSVG', function(assert) {
     var ellipse = new fabric.Ellipse({ rx: 100, ry: 12, fill: 'red', stroke: 'blue' });
-    assert.equal(ellipse.toSVG(), '<g transform=\"matrix(1 0 0 1 100.5 12.5)\"  >\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n', 'SVG should match');
+    assert.equal(ellipse.toSVG(), '<g transform=\"matrix(1 0 0 1 100.5 12.5)\"  >\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n', 'SVG should match');
     assert.equal(ellipse.toClipPathSVG(), '\t<ellipse transform=\"matrix(1 0 0 1 100.5 12.5)\" cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n', 'SVG clippath should match');
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
     var ellipse = new fabric.Ellipse({ rx: 100, ry: 12, fill: 'red', stroke: 'blue' });
     ellipse.clipPath = new fabric.Ellipse({ rx: 12, ry: 100, left: 60, top: -50 });
-    assert.equal(ellipse.toSVG(), '<g transform=\"matrix(1 0 0 1 100.5 12.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<ellipse transform=\"matrix(1 0 0 1 72.5 50.5)\" cx=\"0\" cy=\"0\" rx=\"12\" ry=\"100\" />\n</clipPath>\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n', 'SVG with clipPath should match');
+    assert.equal(ellipse.toSVG(), '<g transform=\"matrix(1 0 0 1 100.5 12.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<ellipse transform=\"matrix(1 0 0 1 72.5 50.5)\" cx=\"0\" cy=\"0\" rx=\"12\" ry=\"100\" />\n</clipPath>\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n', 'SVG with clipPath should match');
   });
 
   QUnit.test('toSVG with a clipPath absolute positioned', function(assert) {
     var ellipse = new fabric.Ellipse({ rx: 100, ry: 12, fill: 'red', stroke: 'blue' });
     ellipse.clipPath = new fabric.Ellipse({ rx: 12, ry: 100, left: 60, top: -50 });
     ellipse.clipPath.absolutePositioned = true;
-    assert.equal(ellipse.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 100.5 12.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<ellipse transform=\"matrix(1 0 0 1 72.5 50.5)\" cx=\"0\" cy=\"0\" rx=\"12\" ry=\"100\" />\n</clipPath>\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n</g>\n', 'SVG with clipPath should match');
+    assert.equal(ellipse.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 100.5 12.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<ellipse transform=\"matrix(1 0 0 1 72.5 50.5)\" cx=\"0\" cy=\"0\" rx=\"12\" ry=\"100\" />\n</clipPath>\n<ellipse style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" rx=\"100\" ry=\"12\" />\n</g>\n</g>\n', 'SVG with clipPath should match');
   });
 
   QUnit.test('fromElement', function(assert) {

@@ -322,6 +322,13 @@
     strokeDashArray:          null,
 
     /**
+     * Line offset of an object's stroke
+     * @type Number
+     * @default
+     */
+    strokeDashOffset: 0,
+
+    /**
      * Line endings style of an object's stroke (one of "butt", "round", "square")
      * @type String
      * @default
@@ -586,7 +593,7 @@
      */
     stateProperties: (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
-      'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
+      'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow clipTo visible backgroundColor ' +
       'skewX skewY fillRule paintFirst'
     ).split(' '),
@@ -600,7 +607,7 @@
      */
     cacheProperties: (
       'fill stroke strokeWidth strokeDashArray width height paintFirst' +
-      ' strokeLineCap strokeLineJoin strokeMiterLimit backgroundColor'
+      ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor'
     ).split(' '),
 
     /**
@@ -841,6 +848,7 @@
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
             strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
+            strokeDashOffset:         this.strokeDashOffset,
             strokeLineJoin:           this.strokeLineJoin,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
@@ -1271,6 +1279,7 @@
       if (decl.stroke) {
         ctx.lineWidth = decl.strokeWidth;
         ctx.lineCap = decl.strokeLineCap;
+        ctx.lineDashOffset = decl.strokeDashOffset;
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
         ctx.strokeStyle = decl.stroke.toLive
