@@ -21,6 +21,7 @@
     'strokeWidth':              1,
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':           'miter',
     'strokeMiterLimit':         4,
     'scaleX':                   1,
@@ -82,7 +83,7 @@
   QUnit.test('toSVG', function(assert) {
     var polyline = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
     assert.ok(typeof polyline.toSVG === 'function');
-    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15.5 17.5)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15.5 17.5)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
     assert.deepEqual(polyline.toSVG(), EXPECTED_SVG);
   });
 

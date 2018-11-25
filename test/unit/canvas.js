@@ -55,12 +55,12 @@
                       '13.99], ["z", null]]}';
 
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
@@ -1568,7 +1568,7 @@
 
   QUnit.test('loadFromJSON with custom properties on Canvas with image', function(assert) {
     var done = assert.async();
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
 + '"background":"green"}';
     var serialized = JSON.parse(JSON_STRING);
     serialized.controlsAboveOverlay = true;
@@ -2171,7 +2171,16 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: rect
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+
+    canvas._setupCurrentTransform(eventStub, rect, false);
+    t = canvas._currentTransform;
+    assert.equal(t.target, rect, 'should have rect as a target');
+    assert.equal(t.action, 'drag', 'should setup drag since the object was not selected');
+    assert.equal(t.corner, 'tl', 'tl selected');
+    assert.equal(t.shiftKey, undefined, 'shift was not pressed');
+
+    var alreadySelected = true;
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'scale', 'should target a corner and setup scale');
@@ -2186,7 +2195,7 @@
       target: rect,
       shiftKey: true
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'skewY', 'should target a corner and setup skew');
@@ -2199,7 +2208,7 @@
       clientY: canvasOffset.top + rect.oCoords.mtr.y,
       target: rect,
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'rotate', 'should target a corner and setup rotate');

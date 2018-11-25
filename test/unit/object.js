@@ -134,13 +134,13 @@
 
   QUnit.test('toJSON', function(assert) {
     var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevil","strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                         '"transformMatrix":null,"skewX":0,"skewY":0}';
@@ -176,6 +176,7 @@
       'strokeWidth':              1,
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
+      'strokeDashOffset':         0,
       'strokeLineJoin':           'miter',
       'strokeMiterLimit':         4,
       'scaleX':                   1,
@@ -210,6 +211,7 @@
       'strokeWidth':              1,
       'strokeDashArray':          [5, 2],
       'strokeLineCap':            'round',
+      'strokeDashOffset':         0,
       'strokeLineJoin':           'bevil',
       'strokeMiterLimit':         5,
       'scaleX':                   1,
@@ -1248,5 +1250,17 @@
     object.dirty = false;
     object._set('fill', 'blue');
     assert.equal(object.dirty, false, 'dirty is not rised');
+  });
+  QUnit.test('isNotVisible', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.equal(object.isNotVisible(), false, 'object is default visilbe');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 1 });
+    assert.equal(object.isNotVisible(), false, 'object is visilbe with width and height equal 0, but strokeWidth 1');
+    object = new fabric.Object({ opacity: 0, fill: 'blue' });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with opacity 0');
+    object = new fabric.Object({ fill: 'blue', visible: false });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with visible false');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
   });
 })();

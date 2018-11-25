@@ -77,5 +77,6 @@
   "engines": {
     "node": ">=4.0.0"
   },
-  "main": "./dist/fabric.js"
+  "main": "./dist/fabric.js",
+  "dependencies": {}
 }
