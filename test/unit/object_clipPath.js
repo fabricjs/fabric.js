@@ -132,4 +132,26 @@
     assert.equal(new fabric.Color(canvas.contextContainer.strokeStyle).getAlpha(), 0, 'stroke style is reset');
     assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
   });
+
+  QUnit.test('clipPath caching detection', function(assert) {
+    var cObj = new fabric.Object();
+    var clipPath = new fabric.Object();
+    cObj.statefullCache = true;
+    cObj.saveState({ propertySet: 'cacheProperties' });
+    var change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean');
+
+    cObj.clipPath = clipPath;
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache is dirty');
+
+    cObj.saveState({ propertySet: 'cacheProperties' });
+
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean again');
+
+    cObj.clipPath.fill = 'red';
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache in clipPath is detected');
+  });
 })();
