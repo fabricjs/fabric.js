@@ -158,8 +158,8 @@
 
   QUnit.test('clipPath caching detection with canvas object', function(assert) {
     var canvas = new fabric.StaticCanvas();
-    var cObj = new fabric.Object();
-    var clipPath = new fabric.Object();
+    var cObj = new fabric.Rect();
+    var clipPath = new fabric.Rect();
     canvas.add(cObj);
     clipPath.canvas = canvas;
     cObj.statefullCache = true;
