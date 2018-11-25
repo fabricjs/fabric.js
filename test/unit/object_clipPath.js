@@ -152,6 +152,31 @@
 
     cObj.clipPath.fill = 'red';
     change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, true, 'cache in clipPath is detected');
+    assert.equal(change, true, 'cache change in clipPath is detected');
+  });
+
+  QUnit.test('clipPath caching detection with canvas object', function(assert) {
+    var canvas = new fabric.StaticCanvas();
+    var cObj = new fabric.Object();
+    var clipPath = new fabric.Object();
+    canvas.add(cObj);
+    clipPath.canvas = canvas;
+    cObj.statefullCache = true;
+    cObj.saveState({ propertySet: 'cacheProperties' });
+    var change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean - canvas');
+
+    cObj.clipPath = clipPath;
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache is dirty - canvas');
+
+    cObj.saveState({ propertySet: 'cacheProperties' });
+
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean again - canvas');
+
+    cObj.clipPath.fill = 'red';
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache change in clipPath is detected - canvas');
   });
 })();
