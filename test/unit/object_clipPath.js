@@ -157,7 +157,7 @@
   });
 
   QUnit.test('clipPath caching detection with canvas object', function(assert) {
-    var canvas = new fabric.StaticCanvas();
+    var canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     var cObj = new fabric.Rect();
     var clipPath = new fabric.Rect();
     canvas.add(cObj);
