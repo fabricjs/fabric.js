@@ -595,7 +595,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow clipTo visible backgroundColor ' +
-      'skewX skewY fillRule paintFirst'
+      'skewX skewY fillRule paintFirst clipPath'
     ).split(' '),
 
     /**
@@ -607,7 +607,7 @@
      */
     cacheProperties: (
       'fill stroke strokeWidth strokeDashArray width height paintFirst' +
-      ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor'
+      ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor clipPath'
     ).split(' '),
 
     /**
