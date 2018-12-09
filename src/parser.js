@@ -846,6 +846,7 @@
 
       fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
       if (ownAttributes['font-size']) {
+        // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
         ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
       }
 
