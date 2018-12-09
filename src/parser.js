@@ -822,7 +822,7 @@
 
       var value,
           parentAttributes = { },
-          fontSize;
+          fontSize, parentFontSize;
 
       if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -844,8 +844,10 @@
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
 
-      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
-                   ownAttributes['font-size'] || fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      if (ownAttributes['font-size']) {
+        fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
+      }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
       for (var attr in ownAttributes) {
