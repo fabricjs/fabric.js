@@ -1,0 +1,6 @@
+<svg height="200" width="400" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<text x="0" y="30" style="font-size: 20px; letter-spacing: 20px">Letter-spacing in 'px'</text>
+<text x="0" y="70" style="font-size: 20px; letter-spacing: 0.5em">Letter-spacing in 'em'</text>
+<text x="0" y="100" style="font-size: 0.6em; letter-spacing: 0.5em">Letter-spacing in 'em' font-size in 'em'</text>
+<text x="0" y="140" style="letter-spacing: 0.5em">Letter-spacing in 'em' no font-size</text>
+</svg>

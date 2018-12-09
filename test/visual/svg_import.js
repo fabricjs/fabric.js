@@ -72,6 +72,7 @@
     'svg_radial_11',
     'svg_radial_12',
     'svg_radial_13',
+    'svg_text_letterspacing',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(fabricCanvas, QUnit));

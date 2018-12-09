@@ -471,15 +471,13 @@
      * of the instance
      */
     _toSVG: function() {
-      var specificTransform = this._getOffsetTransform(),
-          path = this.path.map(function(path) {
-            return path.join(' ');
-          }).join(' ');
+      var path = this.path.map(function(path) {
+        return path.join(' ');
+      }).join(' ');
       return [
         '<path ', 'COMMON_PARTS',
         'd="', path,
         '" stroke-linecap="round" ',
-        'transform="' + specificTransform + '" ',
         '/>\n'
       ];
     },

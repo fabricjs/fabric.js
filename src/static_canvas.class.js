@@ -390,6 +390,7 @@
      *   crossOrigin: 'anonymous'
      * });
      */
+    // TODO: fix stretched examples
     setBackgroundImage: function (image, callback, options) {
       return this.__setBgOverlayImage('backgroundImage', image, callback, options);
     },
@@ -1293,12 +1294,11 @@
 
       this._setSVGPreamble(markup, options);
       this._setSVGHeader(markup, options);
-
-      this._setSVGBgOverlayColor(markup, 'backgroundColor');
-      this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
       if (this.clipPath) {
         markup.push('<g clip-path="url(#' + this.clipPath.clipPathId + ')" >\n');
       }
+      this._setSVGBgOverlayColor(markup, 'backgroundColor');
+      this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
       this._setSVGObjects(markup, reviver);
       if (this.clipPath) {
         markup.push('</g>\n');

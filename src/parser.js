@@ -85,9 +85,7 @@
         value = null;
       }
       else {
-        value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
-          return parseFloat(n);
-        });
+        value = value.replace(/,/g, ' ').split(/\s+/).map(parseFloat);
       }
     }
     else if (attr === 'transformMatrix') {
@@ -129,6 +127,9 @@
       else if (fillIndex === -1 && strokeIndex > -1) {
         value = 'stroke';
       }
+    }
+    else if (attr === 'href' || attr === 'xlink:href') {
+      return value;
     }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
@@ -821,7 +822,7 @@
 
       var value,
           parentAttributes = { },
-          fontSize;
+          fontSize, parentFontSize;
 
       if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -843,8 +844,11 @@
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
 
-      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
-                   ownAttributes['font-size'] || fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      if (ownAttributes['font-size']) {
+        // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
+        ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
+      }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
       for (var attr in ownAttributes) {
