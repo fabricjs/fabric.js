@@ -398,6 +398,7 @@
     },
 
     renderTopLayer: function(ctx) {
+      ctx.save();
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this.freeDrawingBrush && this.freeDrawingBrush._render();
         this.contextTopDirty = true;
@@ -407,6 +408,7 @@
         this._drawSelection(ctx);
         this.contextTopDirty = true;
       }
+      ctx.restore();
     },
 
     /**
