@@ -846,7 +846,7 @@
 
       fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
       if (ownAttributes['font-size']) {
-        fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
+        ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
       }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
