@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.5]
+- Fix: svg import/export for canvas+clipPath and letterspacing. [#5424](https://github.com/fabricjs/fabric.js/pull/5424)
+- Fix: avoid stroke dash from group selection to leak on upper canvas [#5392](https://github.com/fabricjs/fabric.js/pull/5392)
+
 ## [2.4.4]
 - Fix: add clipPath to stateful cache check. [#5384](https://github.com/fabricjs/fabric.js/pull/5384)
 - Fix: restore draggability of small objects [#5379](https://github.com/fabricjs/fabric.js/pull/5379)
