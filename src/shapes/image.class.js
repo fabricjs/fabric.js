@@ -506,13 +506,11 @@
 
     _renderFill: function(ctx) {
       var w = this.width, h = this.height, sW = w * this._filterScalingX, sH = h * this._filterScalingY,
-          x = -w / 2, y = -h / 2, elementToDraw = this._element;
-      elementToDraw && ctx.drawImage(elementToDraw,
-        this.cropX * this._filterScalingX,
-        this.cropY * this._filterScalingY,
-        sW,
-        sH,
-        x, y, w, h);
+          x = -w / 2, y = -h / 2, elementToDraw = this._element,
+          sX = Math.max(0, this.cropX * this._filterScalingX),
+          sY = Math.max(0, this.cropY * this._filterScalingY);
+
+      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, w, h);
     },
 
     /**
