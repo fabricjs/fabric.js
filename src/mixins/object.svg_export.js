@@ -230,7 +230,7 @@
       }
       markup.push(
         '<g ',
-        this.getSvgTransform(false),
+        this.getSvgTransform(false, options.additionalTransform),
         !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
         ' >\n'
       );
