@@ -26,7 +26,6 @@
           group.includeDefaultValues = false;
           canvas.includeDefaultValues = false;
           canvas.add(group);
-          console.log(svgName, JSON.stringify(canvas.toObject()))
           canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
           canvas.renderAll();
           callback(fabricCanvas.lowerCanvasEl);
