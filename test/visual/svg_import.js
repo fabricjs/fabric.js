@@ -84,6 +84,7 @@
     'clippath-5',
     'clippath-6',
     'clippath-7',
+    'clippath-9',
     //'clippath-8',
   ].map(createTestFromSVG);
 
