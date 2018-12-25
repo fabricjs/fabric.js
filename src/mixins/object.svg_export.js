@@ -238,7 +238,7 @@
       commonPieces = [
         styleInfo,
         noStyle ? '' : this.addPaintOrder(), ' ',
-        additionalTransform ? 'transform="' + additionalTransform + '" ' : ' ',
+        additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
       objectMarkup[index] = commonPieces;
       if (this.fill && this.fill.toLive) {
