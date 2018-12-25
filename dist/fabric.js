@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.4.5' };
+var fabric = fabric || { version: '2.4.6' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -15559,7 +15559,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           absoluteClipPath = this.clipPath && this.clipPath.absolutePositioned,
           commonPieces, markup = [], clipPathMarkup,
           // insert commons in the markup, style and svgCommons
-          index = objectMarkup.indexOf('COMMON_PARTS');
+          index = objectMarkup.indexOf('COMMON_PARTS'),
+          additionalTransform = options.additionalTransform;
       if (clipPath) {
         clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
@@ -15579,7 +15580,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       );
       commonPieces = [
         styleInfo,
-        noStyle ? '' : this.addPaintOrder(), ' '
+        noStyle ? '' : this.addPaintOrder(), ' ',
+        additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
       objectMarkup[index] = commonPieces;
       if (this.fill && this.fill.toLive) {
@@ -18248,6 +18250,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return '\t' + this._createBaseClipPathSVGMarkup(
         this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform }
       );
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toSVG: function(reviver) {
+      var additionalTransform = this._getOffsetTransform();
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform  });
     },
     /* _TO_SVG_END_ */
 
