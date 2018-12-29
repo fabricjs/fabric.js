@@ -73,20 +73,22 @@
           vp = this.viewportTransform,
           translateX = (vp[4] - cropping.left) * multiplier,
           translateY = (vp[5] - cropping.top) * multiplier,
-          originalVp = this.viewportTransform,
+          originalInteractive = this.interactive,
           originalOffscreen = this.skipOffscreen,
-          originalCanvas = this.lowerCanvasEl,
+          originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           canvasEl = fabric.util.createCanvasElement();
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.interactive = false;
       this.viewportTransform = newVp;
-      this.lowerCanvasEl = canvasEl;
+      this.contextContainer = canvasEl.getContext('2d');
       // will be renderAllExport();
       this.renderAll();
-      this.viewportTransform = originalVp;
+      this.viewportTransform = vp;
       this.skipOffscreen = originalOffscreen;
-      this.lowerCanvasEl = originalCanvas;
+      this.contextContainer = originalContext;
+      this.interactive = originalInteractive;
       return canvasEl;
     },
 
