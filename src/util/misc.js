@@ -837,6 +837,6 @@
 
     findScaleToCover: function(source, destination) {
       return Math.max(destination.width / source.width, destination.height / source.height);
-    },
+    }
   };
 })(typeof exports !== 'undefined' ? exports : this);
