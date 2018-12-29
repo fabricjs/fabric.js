@@ -47,64 +47,59 @@
             top: options.top || 0,
             width: options.width || 0,
             height: options.height || 0,
-          };
-      return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
+          },
+          canvasEl = this.toCanvasElement(cropping, multiplier);
+      return this.__toDataURL(canvasEl, format, quality);
     },
 
     /**
-     * @private
+     * Create a new HTMLCanvas element painted with the current canvas content.
+     * No need to resize the actual one or repaint it.
+     * Will transfer object ownership to a new canvas, paint it, and set everything back.
+     * This is an intermediary step used to get to a dataUrl but also it is usefull to
+     * create quick image copies of a canvas without passing for the dataUrl string
+     * @param {Object} [cropping] Cropping informations
+     * @param {Number} [cropping.left] Cropping left offset.
+     * @param {Number} [cropping.top] Cropping top offset.
+     * @param {Number} [cropping.width] Cropping width.
+     * @param {Number} [cropping.height] Cropping height.
+     * @param {Number} [multiplier] a zoom factor.
      */
-    __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
-
-      var origWidth = this.width,
-          origHeight = this.height,
-          scaledWidth = (cropping.width || this.width) * multiplier,
+    toCanvasElement: function(cropping, multiplier) {
+      var scaledWidth = (cropping.width || this.width) * multiplier,
           scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
           translateX = (vp[4] - cropping.left) * multiplier,
           translateY = (vp[5] - cropping.top) * multiplier,
+          originalVp = this.viewportTransform,
+          originalOffscreen = this.skipOffscreen,
+          originalCanvas = this.lowerCanvasEl,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
-          originalInteractive = this.interactive,
-          originalSkipOffScreen = this.skipOffscreen,
-          needsResize = origWidth !== scaledWidth || origHeight !== scaledHeight;
-
+          canvasEl = fabric.util.createCanvasElement();
+      canvasEl.width = scaledWidth;
+      canvasEl.height = scaledHeight;
       this.viewportTransform = newVp;
-      this.skipOffscreen = false;
-      // setting interactive to false avoid exporting controls
-      this.interactive = false;
-      if (needsResize) {
-        this.setDimensions({ width: scaledWidth, height: scaledHeight }, { backstoreOnly: true });
-      }
-      // call a renderAll to force sync update. This will cancel the scheduled requestRenderAll
-      // from setDimensions
+      this.lowerCanvasEl = canvasEl;
+      // will be renderAllExport();
       this.renderAll();
-      var data = this.__toDataURL(format, quality, cropping);
-      this.interactive = originalInteractive;
-      this.skipOffscreen = originalSkipOffScreen;
-      this.viewportTransform = vp;
-      //setDimensions with no option object is taking care of:
-      //this.width, this.height, this.requestRenderAll()
-      if (needsResize) {
-        this.setDimensions({ width: origWidth, height: origHeight }, { backstoreOnly: true });
-      }
-      this.renderAll();
-      return data;
+      this.viewportTransform = originalVp;
+      this.skipOffscreen = originalOffscreen;
+      this.lowerCanvasEl = originalCanvas;
+      return canvasEl;
     },
 
     /**
+     * since 2.5.0 does not need to be on canvas instance anymore.
+     * leave it here for context;
      * @private
      */
-    __toDataURL: function(format, quality) {
-
-      var canvasEl = this.contextContainer.canvas;
-      var data = supportQuality
+    __toDataURL: function(canvasEl, format, quality) {
+      return supportQuality
         ? canvasEl.toDataURL('image/' + format, quality)
         : canvasEl.toDataURL('image/' + format);
-
-      return data;
-    },
+    }
   });
 
 })();
