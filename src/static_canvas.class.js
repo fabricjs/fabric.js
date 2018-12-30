@@ -94,6 +94,7 @@
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
+     * if set to false, takes precedence over the object value.
      * @type Boolean
      * @default
      */
@@ -1176,7 +1177,7 @@
         objects: this._toObjects(methodName, propertiesToInclude),
       };
       if (clipPath) {
-        clipPath = clipPath.toObject(propertiesToInclude);
+        data.clipPath = this._toObjectMethod(clipPath, methodName, propertiesToInclude);
       }
       extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
 
