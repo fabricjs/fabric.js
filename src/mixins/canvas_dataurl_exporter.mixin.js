@@ -65,25 +65,30 @@
       var scaledWidth = (cropping.width || this.width) * multiplier,
           scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
+          originalWidth = this.width,
+          originalHeight = this.height,
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
           translateX = (vp[4] - (cropping.left || 0)) * multiplier,
           translateY = (vp[5] - (cropping.top || 0)) * multiplier,
           originalInteractive = this.interactive,
-          originalOffscreen = this.skipOffscreen,
           originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           canvasEl = fabric.util.createCanvasElement();
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
-      this.skipOffscreen = false;
       this.interactive = false;
       this.viewportTransform = newVp;
+      this.width = scaledWidth;
+      this.height = scaledHeight;
+      this.calcViewportBoundaries();
       this.contextContainer = canvasEl.getContext('2d');
       // will be renderAllExport();
       this.renderAll();
       this.viewportTransform = vp;
-      this.skipOffscreen = originalOffscreen;
+      this.width = originalWidth;
+      this.height = originalHeight;
+      this.calcViewportBoundaries();
       this.contextContainer = originalContext;
       this.interactive = originalInteractive;
       return canvasEl;
