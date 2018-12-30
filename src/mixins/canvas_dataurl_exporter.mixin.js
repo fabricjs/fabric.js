@@ -80,6 +80,7 @@
           canvasEl = fabric.util.createCanvasElement();
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.skipOffscreen = false;
       this.interactive = false;
       this.viewportTransform = newVp;
       this.contextContainer = canvasEl.getContext('2d');
