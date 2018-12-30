@@ -1082,6 +1082,67 @@
       ctx.restore();
     },
 
+    /**
+     * Renders an object on a specified context, to be exported.
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {CanvasRenderingContext2D} cacheCtx Context to render when object needs cache
+     * @param {CanvasRenderingContext2D} clipPathCtx Context to render the clipPath
+     */
+    renderExport: function(ctx, cacheCtx) {
+      // do not render if width/height are zeros or object is not visible
+      if (this.isNotVisible()) {
+        return;
+      }
+      var needsCache = this.needsItsOwnCache(),
+          mainCtx = needsCache ? cacheCtx : ctx,
+          otherCtx = needsCache ? ctx : cacheCtx,
+          v = this.canvas.viewportTransform,
+          t = this.transformMatrix;
+      // ctx is our main destination canvas. before save is neutral transformed,
+      // after restore must be neutral transfromed
+      mainCtx.save();
+      mainCtx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      // setup fill rule for current object
+      this._setupCompositeOperation(mainCtx);
+      this.transform(mainCtx);
+      if (!needsCache) {
+        // we can set opacity directly
+        this._setOpacity(mainCtx);
+        // we can shadow the main canvas directly
+        this._setShadow(mainCtx, this);
+      }
+      if (t) {
+        ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
+      }
+      this.clipTo && fabric.util.clipContext(this, mainCtx);
+      this.drawObject(mainCtx);
+      if (this.clipPath) {
+        var clipPathCanvas = fabric.util.createCanvasElement();
+        clipPathCanvas.width = mainCtx.canvas.width;
+        clipPathCanvas.height = mainCtx.canvas.height;
+        var clipCtx = clipPathCanvas.getContext('2d');
+        // create a newCanvas for clipPath, since that can be recursive in objects.
+        // prepare the context for the clipPath
+        clipCtx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        this.transform(clipCtx);
+        if (t) {
+          clipCtx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
+        }
+      }
+      if (needsCache) {
+        otherCtx.save();
+        this._setOpacity(otherCtx);
+        this._setShadow(otherCtx, this);
+        otherCtx.drawImage(cacheCtx.canvas, 0, 0);
+        // clean the cache layer for next rendering
+        mainCtx.setTransform(1, 0, 0, 1, 0, 0);
+        mainCtx.clearRect(0, 0, mainCtx.canvas.width, mainCtx.canvas.height);
+        otherCtx.restore();
+      }
+      this.clipTo && mainCtx.restore();
+      mainCtx.restore();
+    },
+
     renderCache: function(options) {
       options = options || {};
       if (!this._cacheCanvas) {

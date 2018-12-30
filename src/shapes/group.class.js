@@ -278,6 +278,16 @@
       this._transformDone = false;
     },
 
+    renderExport: function(ctx, cacheCtx) {
+      if (this.isNotVisible()) {
+        return;
+      }
+      this._objects.forEach(function(object) {
+        object.renderExport(ctx, cacheCtx);
+      });
+      this._drawClipPath(ctx);
+    },
+
     /**
      * Decide if the object should cache or not. Create its own cache level
      * objectCaching is a global flag, wins over everything
