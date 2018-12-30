@@ -160,7 +160,7 @@
     /**
      * Checks if object is contained within the canvas with current viewportTransform
      * the check is done stopping at first point that appears on screen
-     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
      * @return {Boolean} true if object is fully or partially contained within canvas
      */
     isOnScreen: function(calculate) {
