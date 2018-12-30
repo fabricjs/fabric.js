@@ -86,6 +86,22 @@
     percentage: 0.09,
   });
 
+  function toDataURL31(canvas, callback) {
+    var text = new fabric.Text('Hi i m an image',
+      { strokeWidth: 0, fontSize: 60, objectCaching: false, flipX: true }
+    );
+    fabricCanvas.setDimensions({ width: text.width, height: text.height });
+    fabricCanvas.add(text);
+    callback(fabricCanvas.toDataURL());
+  }
+
+  tests.push({
+    test: 'a flipped text',
+    code: toDataURL31,
+    golden: 'dataurl31.png',
+    percentage: 0.09,
+  });
+
   function toDataURL4(canvas, callback) {
     fabricCanvas.setDimensions({ width: 800, height: 600 });
     fabricCanvas.loadFromJSON(canvasWithObjects, function() {
