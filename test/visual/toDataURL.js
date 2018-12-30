@@ -1,15 +1,28 @@
 (function() {
-  if ((fabric.isLikelyNode && process.env.launcher === 'Firefox') || navigator.userAgent.indexOf('Firefox') !== -1) {
-    fabric.browserShadowBlurConstant = 0.9;
+  if (fabric.isLikelyNode) {
+    if (process.env.launcher === 'Firefox') {
+      fabric.browserShadowBlurConstant = 0.9;
+    }
+    if (process.env.launcher === 'Node') {
+      fabric.browserShadowBlurConstant = 1;
+    }
+    if (process.env.launcher === 'Chrome') {
+      fabric.browserShadowBlurConstant = 1.5;
+    }
+    if (process.env.launcher === 'Edge') {
+      fabric.browserShadowBlurConstant = 1.75;
+    }
   }
-  if ((fabric.isLikelyNode && process.env.launcher === 'Node')) {
-    fabric.browserShadowBlurConstant = 1;
-  }
-  if ((fabric.isLikelyNode && process.env.launcher === 'Chrome') || navigator.userAgent.indexOf('Chrome') !== -1) {
-    fabric.browserShadowBlurConstant = 1.5;
-  }
-  if ((fabric.isLikelyNode && process.env.launcher === 'Edge') || navigator.userAgent.indexOf('Edge') !== -1) {
-    fabric.browserShadowBlurConstant = 1.75;
+  else {
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      fabric.browserShadowBlurConstant = 0.9;
+    }
+    if (navigator.userAgent.indexOf('Chrome') !== -1) {
+      fabric.browserShadowBlurConstant = 1.5;
+    }
+    if (navigator.userAgent.indexOf('Edge') !== -1) {
+      fabric.browserShadowBlurConstant = 1.75;
+    }
   }
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
