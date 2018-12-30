@@ -2355,6 +2355,112 @@
     assert.ok(typeof error === 'undefined', 'renderAll with clipTo does not throw');
   });
 
+  QUnit.test('isTargetTransparent', function(assert) {
+    var rect = new fabric.Rect({
+      width: 10,
+      height: 10,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    canvas.add(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
+  });
+
+  QUnit.test('isTargetTransparent without objectCaching', function(assert) {
+    var rect = new fabric.Rect({
+      width: 10,
+      height: 10,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: false,
+    });
+    canvas.add(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
+  });
+
+  QUnit.test('isTargetTransparent as active object', function(assert) {
+    var rect = new fabric.Rect({
+      width: 20,
+      height: 20,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), false, 'opaque on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), false, 'opaque on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), false, 'opaque on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), true, 'transparent 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), true, 'transparent 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), true, 'transparent 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), true, 'transparent 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent 14, 14');
+    assert.equal(canvas.isTargetTransparent(rect, 15, 15), true, 'transparent 15, 15');
+    assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
+    assert.equal(canvas.isTargetTransparent(rect, 17, 17), false, 'opaque 17, 17');
+    assert.equal(canvas.isTargetTransparent(rect, 18, 18), false, 'opaque 18, 18');
+    assert.equal(canvas.isTargetTransparent(rect, 19, 19), false, 'opaque 19, 19');
+    assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
+    assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
+    assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
+    assert.equal(canvas.isTargetTransparent(rect, 23, 23), false, 'opaque 23, 23');
+    assert.equal(canvas.isTargetTransparent(rect, 24, 24), false, 'opaque 24, 24');
+    assert.equal(canvas.isTargetTransparent(rect, 25, 25), false, 'opaque 25, 25');
+    assert.equal(canvas.isTargetTransparent(rect, 26, 26), false, 'opaque 26, 26');
+    assert.equal(canvas.isTargetTransparent(rect, 27, 27), false, 'opaque 27, 27');
+    assert.equal(canvas.isTargetTransparent(rect, 28, 28), false, 'opaque 28, 28');
+    assert.equal(canvas.isTargetTransparent(rect, 29, 29), false, 'opaque 29, 29');
+    assert.equal(canvas.isTargetTransparent(rect, 30, 30), false, 'opaque 30, 30');
+    assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
+
+  });
+
   QUnit.test('canvas inheritance', function(assert) {
 
     // this should not error out
