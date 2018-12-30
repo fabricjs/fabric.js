@@ -42,13 +42,7 @@
       var format = options.format || 'png',
           quality = options.quality || 1,
           multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? this.getRetinaScaling() : 1),
-          cropping = {
-            left: options.left || 0,
-            top: options.top || 0,
-            width: options.width || 0,
-            height: options.height || 0,
-          },
-          canvasEl = this.toCanvasElement(cropping, multiplier);
+          canvasEl = this.toCanvasElement(multiplier, options);
       return this.__toDataURL(canvasEl, format, quality);
     },
 
@@ -58,21 +52,23 @@
      * Will transfer object ownership to a new canvas, paint it, and set everything back.
      * This is an intermediary step used to get to a dataUrl but also it is usefull to
      * create quick image copies of a canvas without passing for the dataUrl string
+     * @param {Number} [multiplier] a zoom factor.
      * @param {Object} [cropping] Cropping informations
      * @param {Number} [cropping.left] Cropping left offset.
      * @param {Number} [cropping.top] Cropping top offset.
      * @param {Number} [cropping.width] Cropping width.
      * @param {Number} [cropping.height] Cropping height.
-     * @param {Number} [multiplier] a zoom factor.
      */
-    toCanvasElement: function(cropping, multiplier) {
+    toCanvasElement: function(multiplier, cropping) {
+      multiplier = multiplier || 1;
+      cropping = cropping || { };
       var scaledWidth = (cropping.width || this.width) * multiplier,
           scaledHeight = (cropping.height || this.height) * multiplier,
           zoom = this.getZoom(),
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
-          translateX = (vp[4] - cropping.left) * multiplier,
-          translateY = (vp[5] - cropping.top) * multiplier,
+          translateX = (vp[4] - (cropping.left || 0)) * multiplier,
+          translateY = (vp[5] - (cropping.top || 0)) * multiplier,
           originalInteractive = this.interactive,
           originalOffscreen = this.skipOffscreen,
           originalContext = this.contextContainer,
