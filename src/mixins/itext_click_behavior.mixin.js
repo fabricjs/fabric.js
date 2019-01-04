@@ -179,7 +179,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = newSelection;
       this.selectionEnd = newSelection;
     }
-    if (this.isEditing) {
+    if (this.isEditing && (start !== newSelection || end !== newSelection)) {
       this._fireSelectionChanged();
       this._updateTextarea();
     }
