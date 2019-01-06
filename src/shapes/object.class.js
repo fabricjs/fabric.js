@@ -1398,6 +1398,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} filler fabric.Pattern or fabric.Gradient
+     * @return {Object} offset.offsetX offset for text rendering
+     * @return {Object} offset.offsetY offset for text rendering
      */
     _applyPatternGradientTransform: function(ctx, filler) {
       if (!filler || !filler.toLive) {

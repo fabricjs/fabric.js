@@ -72,10 +72,10 @@
     });
   }
 
-  var SVG_LINEAR = '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" x1="-50" y1="-40" x2="50" y2="150">\n<stop offset="0%" style="stop-color:red;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
-  var SVG_RADIAL = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
-  var SVG_INTERNALRADIUS = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="50" cy="150" r="50" fx="-50" fy="-40">\n<stop offset="20%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:green;stop-opacity: 0"/>\n</radialGradient>\n';
-  var SVG_SWAPPED = '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" cx="-50" cy="-40" r="50" fx="50" fy="150">\n<stop offset="20%" style="stop-color:green;stop-opacity: 0"/>\n<stop offset="100%" style="stop-color:red;"/>\n</radialGradient>\n';
+  var SVG_LINEAR = '<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  x1=\"0\" y1=\"10\" x2=\"100\" y2=\"200\">\n<stop offset=\"0%\" style=\"stop-color:red;stop-opacity: 0\"/>\n<stop offset=\"100%\" style=\"stop-color:green;\"/>\n</linearGradient>\n';
+  var SVG_RADIAL = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"100\" cy=\"200\" r=\"50\" fx=\"0\" fy=\"10\">\n<stop offset=\"0%\" style=\"stop-color:red;\"/>\n<stop offset=\"100%\" style=\"stop-color:green;stop-opacity: 0\"/>\n</radialGradient>\n';
+  var SVG_INTERNALRADIUS = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"100\" cy=\"200\" r=\"50\" fx=\"0\" fy=\"10\">\n<stop offset=\"20%\" style=\"stop-color:red;\"/>\n<stop offset=\"100%\" style=\"stop-color:green;stop-opacity: 0\"/>\n</radialGradient>\n';
+  var SVG_SWAPPED = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"0\" cy=\"10\" r=\"50\" fx=\"100\" fy=\"200\">\n<stop offset=\"20%\" style=\"stop-color:green;stop-opacity: 0\"/>\n<stop offset=\"100%\" style=\"stop-color:red;\"/>\n</radialGradient>\n';
 
 
   QUnit.test('constructor linearGradient', function(assert) {

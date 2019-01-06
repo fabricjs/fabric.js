@@ -174,29 +174,25 @@
       var coords = clone(this.coords, true), i, len,
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2,
-          offsetX = object.width / 2, offsetY = object.height / 2;
+          transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
+          offsetX = object.width / 2 - this.offsetX, offsetY = object.height / 2 - this.offsetY;
       // colorStops must be sorted ascending
       colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
+
       if (object.type === 'path') {
         offsetX -= object.pathOffset.x;
         offsetY -= object.pathOffset.y;
       }
-      for (var prop in coords) {
-        if (prop === 'x1' || prop === 'x2') {
-          coords[prop] += this.offsetX - offsetX;
-        }
-        else if (prop === 'y1' || prop === 'y2') {
-          coords[prop] += this.offsetY - offsetY;
-        }
-      }
+
+      transform[4] -= offsetX;
+      transform[5] -= offsetY;
 
       commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="userSpaceOnUse"';
-      if (this.gradientTransform) {
-        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" ';
-      }
+      commonAttributes += ' gradientTransform="matrix(' + transform.join(' ') + ')" ';
+
       if (this.type === 'linear') {
         markup = [
           '<linearGradient ',
