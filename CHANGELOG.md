@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.5.0]
+- Fix: textbox transform report newScaleX and newScaleY values [#5464](https://github.com/fabricjs/fabric.js/pull/5464)
+- Fix: export of svg and gradient with transforms [#5456](https://github.com/fabricjs/fabric.js/pull/5456)
+- Fix: detection of controls in perPixelTargetFind + cache [#5455](https://github.com/fabricjs/fabric.js/pull/5455)
+- Add: added canvas.toCanvasElement method [#5452](https://github.com/fabricjs/fabric.js/pull/5452)
+
 ## [2.4.6]
 - Fix: unbreak the svg export broken in 2.4.5 [#5438](https://github.com/fabricjs/fabric.js/pull/5438)
 
