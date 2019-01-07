@@ -154,4 +154,20 @@
     assert.deepEqual(line2, expected2, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
   });
+  QUnit.test('_scaleObject with textbox', function(assert) {
+    var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
+    canvas.add(text);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + text.width,
+      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+    };
+    var originalWidth = text.width;
+    canvas._setupCurrentTransform(eventStub, text, true);
+    var scaled = canvas._scaleObject(eventStub.clientX + 20, eventStub.clientY, 'x');
+    assert.equal(scaled, true, 'return true if textbox scaled');
+    assert.equal(text.width, originalWidth + 20, 'width increased');
+    assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
+  });
 })();
