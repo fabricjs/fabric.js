@@ -592,8 +592,16 @@
       if (skewX === 0 && skewY === 0) {
         return { x: dimensions.x * this.scaleX, y: dimensions.y * this.scaleY };
       }
-      var dimX = dimensions.x / 2, dimY = dimensions.y / 2,
-          points = [
+      var dimX, dimY;
+      if (this.strokeUniform) {
+        dimX = this.width / 2;
+        dimY = this.width / 2;
+      }
+      else {
+        dimX = dimensions.x / 2;
+        dimY = dimensions.y / 2;
+      }
+      var points = [
             {
               x: -dimX,
               y: -dimY
@@ -616,7 +624,10 @@
         points[i] = fabric.util.transformPoint(points[i], transformMatrix);
       }
       bbox = fabric.util.makeBoundingBoxFromPoints(points);
-      return { x: bbox.width, y: bbox.height };
+      return this.strokeUniform ?
+        { x: bbox.width + this.strokeWidth, y: bbox.height + this.strokeWidth }
+        :
+        { x: bbox.width, y: bbox.height };
     },
 
     /*
