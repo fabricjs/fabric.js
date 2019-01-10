@@ -595,7 +595,7 @@
       var dimX, dimY;
       if (this.strokeUniform) {
         dimX = this.width / 2;
-        dimY = this.width / 2;
+        dimY = this.height / 2;
       }
       else {
         dimX = dimensions.x / 2;
