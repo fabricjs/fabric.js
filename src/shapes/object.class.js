@@ -564,7 +564,9 @@
      * When `false`, the stoke width will scale with the object.
      * When `true`, the stroke will always match the exact pixel size entered for stroke width.
      * default to false
-     * since 2.5.1
+     * @since 2.6.0
+     * @type Boolean
+     * @default false
      * @type Boolean
      * @default false
      */
