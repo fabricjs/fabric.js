@@ -29,43 +29,43 @@
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'version':                  fabric.version,
-    'type':                     'image',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':                   IMG_HEIGHT, // or does it now?
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              0,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         4,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'src':                      IMG_SRC,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'filters':                  [],
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'skewX':                    0,
-    'skewY':                    0,
-    'transformMatrix':          null,
-    'crossOrigin':              '',
-    'cropX':                    0,
-    'cropY':                    0
+    version:                  fabric.version,
+    type:                     'image',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     0,
+    top:                      0,
+    width:                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    height:                   IMG_HEIGHT, // or does it now?
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              0,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    src:                      IMG_SRC,
+    shadow:                   null,
+    visible:                  true,
+    backgroundColor:          '',
+    clipTo:                   null,
+    filters:                  [],
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    skewX:                    0,
+    skewY:                    0,
+    transformMatrix:          null,
+    crossOrigin:              '',
+    cropX:                    0,
+    cropY:                    0
   };
 
   function _createImageElement() {
@@ -778,6 +778,29 @@
       assert.equal(image.dirty, true, 'After apply filter dirty is true');
       assert.equal(group.dirty, true, 'After apply filter dirty is true');
       done();
+    });
+  });
+
+  QUnit.test('_renderFill respects source boundaries ', function (assert) {
+    fabric.Image.prototype._renderFill.call({
+      cropX: -1,
+      cropY: -1,
+      _filterScalingX: 1,
+      _filterScalingY: 1,
+      width: 300,
+      height: 300,
+      _element: {
+        naturalWidth: 200,
+        height: 200,
+      },
+    }, {
+      drawImage: function(src, sX, sY, sW, sH) {
+        console.log(sX, sY, sW, sH);
+        assert.ok(sX >= 0, 'sX should be positive');
+        assert.ok(sY >= 0, 'sY should be positive');
+        assert.ok(sW <= 200, 'sW should not be larger than image width');
+        assert.ok(sH <= 200, 'sH should  not be larger than image height');
+      }
     });
   });
 })();
