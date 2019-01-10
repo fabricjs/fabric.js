@@ -1,7 +1,7 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = false;
+  fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
   var getAsset;
   if (fabric.isLikelyNode) {
@@ -12,13 +12,21 @@
     visualTestLoop = window.visualTestLoop;
     getAsset = window.getAsset;
   }
-  var fabricCanvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
+  var fabricCanvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
 
   function createTestFromSVG(svgName) {
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
-        fabric.loadSVGFromString(string, function(objects) {
-          canvas.add.apply(canvas, objects);
+        fabric.loadSVGFromString(string, function(objects, options) {
+          // something is disabling objectCaching and i cannot find where it is.
+          objects.forEach(function(o) {
+            o.objectCaching = true;
+          });
+          var group = fabric.util.groupSVGElements(objects, options);
+          group.includeDefaultValues = false;
+          canvas.includeDefaultValues = false;
+          canvas.add(group);
+          canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
           canvas.renderAll();
           callback(fabricCanvas.lowerCanvasEl);
         });
@@ -73,6 +81,11 @@
     'svg_radial_12',
     'svg_radial_13',
     'svg_text_letterspacing',
+    'clippath-5',
+    'clippath-6',
+    'clippath-7',
+    'clippath-9',
+    //'clippath-8',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(fabricCanvas, QUnit));

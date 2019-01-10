@@ -2,8 +2,8 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "2.4.5",
-  "author": "Juriy Zaytsev <kangax@gmail.com>",
+  "version": "2.5.0",
+  "authors": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
       "name": "Andrea Bogazzi",
@@ -60,7 +60,7 @@
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
-    "canvas": "^1.6.12",
+    "canvas": "^1.6.13",
     "jsdom": "^9.12.0",
     "xmldom": "0.1.x"
   },
