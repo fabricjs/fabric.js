@@ -483,10 +483,13 @@
 
   QUnit.test('fabric.util.loadImage with url for a non exsiting image', function(assert) {
     var done = assert.async();
-    fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
-      assert.equal(error, true, 'callback should be invoked with error set to true');
-      done();
-    });
+    try {
+      fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
+        assert.equal(error, true, 'callback should be invoked with error set to true');
+        done();
+      }, this);
+    }
+    catch (e) { }
   });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
@@ -722,6 +725,13 @@
     assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
   });
 
+  QUnit.test('clearFabricFontCache wrong case', function(assert) {
+    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.util.clearFabricFontCache('ARIAL');
+    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+  });
+
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {
     assert.ok(typeof fabric.util.parsePreserveAspectRatioAttribute === 'function');
     var parsed;
@@ -783,6 +793,30 @@
     assert.equal(rect.flipX, false);
     assert.equal(rect.flipY, false);
     assert.equal(rect.angle, 0);
+  });
+
+  QUnit.test('saveObjectTransform', function(assert) {
+    assert.ok(typeof fabric.util.saveObjectTransform === 'function');
+    var rect = new fabric.Rect({
+      top: 1,
+      width: 100,
+      height: 100,
+      angle: 30,
+      scaleX: 2,
+      scaleY: 1,
+      flipX: true,
+      flipY: true,
+      skewX: 30,
+      skewY: 30
+    });
+    var transform = fabric.util.saveObjectTransform(rect);
+    assert.equal(transform.skewX, 30);
+    assert.equal(transform.skewY, 30);
+    assert.equal(transform.scaleX, 2);
+    assert.equal(transform.scaleY, 1);
+    assert.equal(transform.flipX, true);
+    assert.equal(transform.flipY, true);
+    assert.equal(transform.angle, 30);
   });
 
   QUnit.test('invertTransform', function(assert) {
@@ -958,5 +992,84 @@
     assert.equal(fabric.util.cos(Math.PI / 2), 0, 'cos 90 correct');
     assert.equal(fabric.util.cos(Math.PI), -1, 'cos 180 correct');
     assert.equal(fabric.util.cos(3 * Math.PI / 2), 0,' cos 270 correct');
+  });
+
+  QUnit.test('fabric.util.getSvgAttributes', function(assert) {
+    assert.ok(typeof fabric.util.getSvgAttributes === 'function');
+    assert.deepEqual(fabric.util.getSvgAttributes(''),
+      ['instantiated_by_use', 'style', 'id', 'class'], 'common attribs');
+    assert.deepEqual(fabric.util.getSvgAttributes('linearGradient'),
+      ['instantiated_by_use', 'style', 'id', 'class', 'x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform'],
+      'linearGradient attribs');
+    assert.deepEqual(fabric.util.getSvgAttributes('radialGradient'),
+      ['instantiated_by_use', 'style', 'id', 'class', 'gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr'],
+      'radialGradient attribs');
+    assert.deepEqual(fabric.util.getSvgAttributes('stop'),
+      ['instantiated_by_use', 'style', 'id', 'class', 'offset', 'stop-color', 'stop-opacity'],
+      'stop attribs');
+  });
+
+  QUnit.test('fabric.util.enlivenPatterns', function(assert) {
+    assert.ok(typeof fabric.util.enlivenPatterns === 'function');
+    fabric.util.enlivenPatterns([], function() {
+      assert.ok(true, 'callBack is called when no patterns are available');
+    });
+  });
+
+  QUnit.test('fabric.util.copyCanvasElement', function(assert) {
+    assert.ok(typeof fabric.util.copyCanvasElement === 'function');
+    var c = fabric.util.createCanvasElement();
+    c.width = 10;
+    c.height = 20;
+    c.getContext('2d').fillStyle = 'red';
+    c.getContext('2d').fillRect(0, 0, 10, 10);
+    var b = fabric.util.copyCanvasElement(c);
+    assert.equal(b.width, 10, 'width has been copied');
+    assert.equal(b.height, 20, 'height has been copied');
+    var data = b.getContext('2d').getImageData(1,1,1,1).data;
+    assert.equal(data[0], 255, 'red color has been copied');
+    assert.equal(data[1], 0, 'red color has been copied');
+    assert.equal(data[2], 0, 'red color has been copied');
+    assert.equal(data[3], 255, 'red color has been copied');
+  });
+
+  QUnit.test('fabric.util.findScaleToCover', function(assert) {
+    assert.ok(typeof fabric.util.findScaleToCover === 'function');
+    var scale = fabric.util.findScaleToCover({
+      width: 100,
+      height: 200,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 0.5, 'scaleToCover is 0.5');
+    var scale = fabric.util.findScaleToCover({
+      width: 10,
+      height: 25,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 5, 'scaleToCover is 5');
+  });
+
+  QUnit.test('fabric.util.findScaleToFit', function(assert) {
+    assert.ok(typeof fabric.util.findScaleToFit === 'function');
+    var scale = fabric.util.findScaleToFit({
+      width: 100,
+      height: 200,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 0.25, 'findScaleToFit is 0.25');
+    var scale = fabric.util.findScaleToFit({
+      width: 10,
+      height: 25,
+    }, {
+      width: 50,
+      height: 50,
+    });
+    assert.equal(scale, 2, 'findScaleToFit is 2');
   });
 })();

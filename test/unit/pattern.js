@@ -143,11 +143,54 @@
   });
 
   QUnit.test('toSVG', function(assert) {
+    fabric.Object.__uid = 0;
     var pattern = createPattern();
-
+    var rect = new fabric.Rect({ width: 500, height: 500 });
+    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="0.3" height="0.248">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
+    assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match');
+  });
 
-    // TODO: test toSVG
+  QUnit.test('toSVG repeat-y', function(assert) {
+    fabric.Object.__uid = 0;
+    var pattern = createPattern();
+    pattern.repeat = 'repeat-y';
+    var rect = new fabric.Rect({ width: 500, height: 500 });
+    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="1" height="0.248">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    assert.ok(typeof pattern.toSVG === 'function');
+    assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match repeat-y');
+  });
+
+  QUnit.test('toSVG repeat-x', function(assert) {
+    fabric.Object.__uid = 0;
+    var pattern = createPattern();
+    pattern.repeat = 'repeat-x';
+    var rect = new fabric.Rect({ width: 500, height: 500 });
+    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="0.3" height="1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    assert.ok(typeof pattern.toSVG === 'function');
+    assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match repeat-x');
+  });
+
+  QUnit.test('toSVG no-repeat', function(assert) {
+    fabric.Object.__uid = 0;
+    var pattern = createPattern();
+    pattern.repeat = 'no-repeat';
+    var rect = new fabric.Rect({ width: 500, height: 500 });
+    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="1" height="1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    assert.ok(typeof pattern.toSVG === 'function');
+    assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match no-repeat');
+  });
+
+  QUnit.test('toSVG no-repeat offsetX and offsetY', function(assert) {
+    fabric.Object.__uid = 0;
+    var pattern = createPattern();
+    pattern.repeat = 'no-repeat';
+    pattern.offsetX = 50;
+    pattern.offsetY = -50;
+    var rect = new fabric.Rect({ width: 500, height: 500 });
+    var expectedSVG = '<pattern id="SVGID_0" x="0.1" y="-0.1" width="1.1" height="1.1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    assert.ok(typeof pattern.toSVG === 'function');
+    assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match no-repat offsetX and offsetY');
   });
 
   QUnit.test('initPattern from object', function(assert) {

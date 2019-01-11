@@ -34,6 +34,8 @@
 
     /**
      * Start angle of the circle, moving clockwise
+     * deprectated type, this should be in degree, this was an oversight.
+     * probably will change to degrees in next major version
      * @type Number
      * @default 0
      */
@@ -41,12 +43,14 @@
 
     /**
      * End angle of the circle
+     * deprectated type, this should be in degree, this was an oversight.
+     * probably will change to degrees in next major version
      * @type Number
      * @default 2Pi
      */
     endAngle: pi * 2,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('radius'),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('radius', 'startAngle', 'endAngle'),
 
     /**
      * @private
@@ -74,26 +78,23 @@
     },
 
     /* _TO_SVG_START_ */
+
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
+    _toSVG: function() {
+      var svgString, x = 0, y = 0,
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
       if (angle === 0) {
-        markup.push(
-          '<circle ', this.getSvgId(),
+        svgString = [
+          '<circle ', 'COMMON_PARTS',
           'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(), '"',
-          this.addPaintOrder(),
-          '/>\n'
-        );
+          '" />\n'
+        ];
       }
       else {
         var startX = fabric.util.cos(this.startAngle) * this.radius,
@@ -101,20 +102,14 @@
             endX = fabric.util.cos(this.endAngle) * this.radius,
             endY = fabric.util.sin(this.endAngle) * this.radius,
             largeFlag = angle > pi ? '1' : '0';
-
-        markup.push(
+        svgString = [
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(), '"',
-          this.addPaintOrder(),
-          '"/>\n'
-        );
+          '"', 'COMMON_PARTS', ' />\n'
+        ];
       }
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      return svgString;
     },
     /* _TO_SVG_END_ */
 

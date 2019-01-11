@@ -6,7 +6,8 @@
   "globals": {
     "fabric": true,
     "QUnit": true,
-    "assert": true
+    "assert": true,
+    "pixelmatch": true
   },
   "rules": {
     "eqeqeq": 0,

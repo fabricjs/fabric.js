@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="105" height="77" xml:space="preserve">
+  <desc>Created with Fabric.js 1.0.12
+  </desc>
+  <linearGradient id="linear" gradientUnits="userSpaceOnUse" x1="52.5" y1="0" x2="0" y2="77" >
+    <stop offset="0" style="stop-color:#cc5232"/>
+    <stop offset="0.3" style="stop-color:#b0c72d"/>
+    <stop offset="0.6" style="stop-color:rgba(0,0,153,0.5)"/>
+    <stop offset="1" style="stop-color:#009999" stop-opacity="0.9"/>
+  </linearGradient>
+  <rect x="0" y="0" rx="0" ry="0" width="105" height="77" style="stroke: none; stroke-width: 0; stroke-dasharray: ; fill: url(#linear); opacity: 1;"/>
+</svg>

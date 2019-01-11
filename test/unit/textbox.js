@@ -20,8 +20,9 @@
     strokeWidth: 1,
     strokeDashArray: null,
     strokeLineCap: 'butt',
+    strokeDashOffset: 0,
     strokeLineJoin: 'miter',
-    strokeMiterLimit: 10,
+    strokeMiterLimit: 4,
     scaleX: 1,
     scaleY: 1,
     angle: 0,
@@ -51,7 +52,7 @@
     transformMatrix: null,
     charSpacing: 0,
     styles: { },
-    minWidth: 20,
+    minWidth: 20
   };
 
   QUnit.test('constructor', function(assert) {
@@ -113,5 +114,60 @@
     assert.equal(textbox.isEmptyStyles(5), true, 'style is empty at line 5');
     assert.equal(textbox.isEmptyStyles(6), false, 'style is empty at line 6');
   });
-
+  QUnit.test('wrapping with charspacing', function(assert) {
+    var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
+      width: 190,
+    });
+    assert.equal(textbox.textLines[0], 'xa xb xc xd', 'first line match expectations');
+    textbox.charSpacing = 100;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa xb xc', 'first line match expectations spacing 100');
+    textbox.charSpacing = 300;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa xb', 'first line match expectations spacing 300');
+    textbox.charSpacing = 800;
+    textbox.initDimensions();
+    assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
+  });
+  QUnit.test('wrapping with custom space', function(assert) {
+    var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
+      width: 2000,
+    });
+    var line1 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 0);
+    var expected1 =  [
+      ['x', 'a', ' ', 'x', 'b'],
+      ['x', 'c', ' ', 'x', 'd'],
+      ['x', 'e', ' ', 'y', 'a'],
+      ['y', 'b', ' ', 'i', 'd']];
+    assert.deepEqual(line1, expected1, 'wrapping without reserved');
+    assert.deepEqual(textbox.dynamicMinWidth, 40, 'wrapping without reserved');
+    var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 50);
+    var expected2 =  [
+      ['x', 'a'],
+      ['x', 'b'],
+      ['x', 'c'],
+      ['x', 'd'],
+      ['x', 'e'],
+      ['y', 'a'],
+      ['y', 'b'],
+      ['i', 'd']];
+    assert.deepEqual(line2, expected2, 'wrapping without reserved');
+    assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
+  });
+  QUnit.test('_scaleObject with textbox', function(assert) {
+    var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
+    canvas.add(text);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + text.width,
+      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+    };
+    var originalWidth = text.width;
+    canvas._setupCurrentTransform(eventStub, text, true);
+    var scaled = canvas._scaleObject(eventStub.clientX + 20, eventStub.clientY, 'x');
+    assert.equal(scaled, true, 'return true if textbox scaled');
+    assert.equal(text.width, originalWidth + 20, 'width increased');
+    assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
+  });
 })();

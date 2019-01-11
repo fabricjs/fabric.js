@@ -324,6 +324,8 @@
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
+    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
+    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
     cObj.setCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
@@ -798,6 +800,26 @@
     assert.deepEqual(coords[1].y, 142.48631561299828, 'return top right with skewY skewX angle Y');
     assert.deepEqual(coords[2].y, 142.48631561299828, 'return bottom right with skewY skewX angle Y');
     assert.deepEqual(coords[3].y, 85, 'return bottom left with skewY skewX angle Y');
+  });
+
+  QUnit.test('isPartiallyOnScreen', function(assert) {
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    cObj.left = -60;
+    cObj.top = -60;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(true), true,'object is partially onScreen');
+    cObj.left = -110;
+    cObj.top = -110;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
+    cObj.left = 50;
+    cObj.top = 50;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
+    canvas.setZoom(2);
+    assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
   });
 
 })();

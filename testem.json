@@ -1,7 +1,6 @@
 {
   "framework": "qunit",
   "serve_files": [
-    "test/fixtures/test_script.js",
     "dist/fabric.js",
     "test/unit/*.js"
   ],
@@ -25,7 +24,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test:node",
+      "command": "npm run test",
       "protocol": "tap"
     }
   },

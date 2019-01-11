@@ -14,8 +14,9 @@
     'strokeWidth':              1,
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -43,7 +44,7 @@
     el.setAttribute('stroke-width', 1);
     el.setAttribute('stroke-linecap', 'butt');
     el.setAttribute('stroke-linejoin', 'miter');
-    el.setAttribute('stroke-miterlimit', 10);
+    el.setAttribute('stroke-miterlimit', 4);
     return el;
   }
 
@@ -55,7 +56,11 @@
     getPathObject('M 100 100 L 300 100 L 200 300 z', callback);
   }
 
-  QUnit.module('fabric.Path');
+  QUnit.module('fabric.Path', {
+    beforeEach: function() {
+      fabric.Object.__uid = 0;
+    }
+  });
 
   QUnit.test('constructor', function(assert) {
     var done = assert.async();
@@ -124,8 +129,32 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.deepEqual(path.toSVG(), '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(200.5 200.5) translate(-200, -200) " stroke-linecap="round" />\n');
+      assert.deepEqual(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n');
       done();
+    });
+  });
+
+  QUnit.test('toSVG with a clipPath path', function(assert) {
+    var done = assert.async();
+    makePathObject(function(path) {
+      makePathObject(function(path2) {
+        path.clipPath = path2;
+        assert.deepEqual(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
+        done();
+      });
+    });
+  });
+
+
+  QUnit.test('toSVG with a clipPath path absolutePositioned', function(assert) {
+    var done = assert.async();
+    makePathObject(function(path) {
+      makePathObject(function(path2) {
+        path.clipPath = path2;
+        path.clipPath.absolutePositioned = true;
+        assert.deepEqual(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
+        done();
+      });
     });
   });
 

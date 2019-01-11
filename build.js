@@ -89,6 +89,9 @@ function appendFileContents(fileNames, callback) {
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
       var strData = String(data);
+      if (fileName === 'src/HEADER.js' && amdLib === false) {
+        strData = strData.replace(/\/\* _AMD_START_ \*\/[\s\S]*?\/\* _AMD_END_ \*\//g, '');
+      }
       if (noStrict) {
         strData = strData.replace(/"use strict";?\n?/, '');
       }
@@ -111,14 +114,6 @@ function ifSpecifiedInclude(moduleName, fileName) {
 
   // excluded list takes precedence over modules=ALL
   return ((isInIncludedList || includeAllModules) && !isInExcludedList) ? fileName : '';
-}
-
-function ifSpecifiedAMDInclude(amdLib) {
-  var supportedLibraries = ['requirejs'];
-  if (supportedLibraries.indexOf(amdLib) > -1) {
-    return 'src/amd/' + amdLib + '.js';
-  }
-  return '';
 }
 
 var filesToInclude = [
@@ -235,7 +230,6 @@ var filesToInclude = [
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
 
-  ifSpecifiedAMDInclude(amdLib)
 ];
 
 if (buildMinified) {
@@ -259,11 +253,6 @@ else {
         process.exit(0);
       }
 
-      // add js wrapping in AMD closure for requirejs if necessary
-      if (amdLib !== false) {
-        exec('uglifyjs fabric.js ' + amdUglifyFlags + ' -b --output fabric.js');
-      }
-
       if (amdLib !== false) {
         console.log('Built distribution to ' + distributionPath + 'fabric.js (' + amdLib + '-compatible)');
       } else {
@@ -284,24 +273,6 @@ else {
 
         exec('gzip -c fabric.min.js > fabric.min.js.gz', function (error, output) {
           console.log('Gzipped to ' + distributionPath + 'fabric.min.js.gz');
-        });
-      });
-
-      // Always build requirejs AMD module in fabric.require.js
-      // add necessary requirejs footer code to filesToInclude if we haven't before
-      if (amdLib === false) {
-        amdLib = "requirejs";
-        filesToInclude[filesToInclude.length] = ifSpecifiedAMDInclude(amdLib);
-      }
-
-      appendFileContents(filesToInclude, function() {
-        fs.writeFile('fabric.require.js', distFileContents, function (err) {
-          if (err) {
-            console.log(err);
-            throw err;
-          }
-          exec('uglifyjs fabric.require.js ' + amdUglifyFlags + ' -b --output fabric.require.js');
-          console.log('Built distribution to ' + distributionPath + 'fabric.require.js (requirejs-compatible)');
         });
       });
 

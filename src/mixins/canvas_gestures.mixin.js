@@ -53,7 +53,6 @@
 
       t.action = 'scale';
       t.originX = t.originY = 'center';
-      this._setOriginToCenter(t.target);
 
       this._scaleObjectBy(self.scale, e);
 
@@ -61,8 +60,6 @@
         t.action = 'rotate';
         this._rotateObjectByAngle(self.rotation, e);
       }
-
-      this._setCenterToOrigin(t.target);
 
       this.requestRenderAll();
       t.action = 'drag';
@@ -141,7 +138,11 @@
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
 
-      this._fire('scaling', target, e);
+      this._fire('scaling', {
+        target: target,
+        e: e,
+        transform: t,
+      });
     },
 
     /**
@@ -155,8 +156,12 @@
       if (t.target.get('lockRotation')) {
         return;
       }
-      t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
-      this._fire('rotating', t.target, e);
+      t.target.rotate(radiansToDegrees(degreesToRadians(curAngle) + t.theta));
+      this._fire('rotating', {
+        target: t.target,
+        e: e,
+        transform: t,
+      });
     }
   });
 })();
