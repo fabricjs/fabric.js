@@ -795,7 +795,6 @@
       },
     }, {
       drawImage: function(src, sX, sY, sW, sH) {
-        console.log(sX, sY, sW, sH);
         assert.ok(sX >= 0, 'sX should be positive');
         assert.ok(sY >= 0, 'sY should be positive');
         assert.ok(sW <= 200, 'sW should not be larger than image width');
