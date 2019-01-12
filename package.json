@@ -68,7 +68,7 @@
     "eslint": "4.18.x",
     "istanbul": "0.4.x",
     "onchange": "^3.x.x",
-    "qunit": "^2.6.1",
+    "qunit": "2.6.2",
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
     "pixelmatch": "^4.0.2",
