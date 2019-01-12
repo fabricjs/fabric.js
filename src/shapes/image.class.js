@@ -507,8 +507,8 @@
     _renderFill: function(ctx) {
       var elementToDraw = this._element,
           w = this.width, h = this.height,
-          sW = Math.min(elementToDraw.naturalWidth || elementToDraw.width, w) * this._filterScalingX,
-          sH = Math.min(elementToDraw.naturalHeight || elementToDraw.height, h) * this._filterScalingY,
+          sW = Math.min(elementToDraw.naturalWidth || elementToDraw.width, w * this._filterScalingX),
+          sH = Math.min(elementToDraw.naturalHeight || elementToDraw.height, h * this._filterScalingY),
           x = -w / 2, y = -h / 2,
           sX = Math.max(0, this.cropX * this._filterScalingX),
           sY = Math.max(0, this.cropY * this._filterScalingY);
