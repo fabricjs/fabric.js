@@ -17,10 +17,6 @@ stages:
   - Unit Tests
   - Visual Tests
 
-cache:
-  directories:
-    - node_modules
-
 env:
   global:
     - LAUNCHER=Node
