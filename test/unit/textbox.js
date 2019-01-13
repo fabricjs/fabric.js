@@ -52,7 +52,8 @@
     transformMatrix: null,
     charSpacing: 0,
     styles: { },
-    minWidth: 20
+    minWidth: 20,
+    splitByGrapheme: false,
   };
 
   QUnit.test('constructor', function(assert) {
