@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0]
+- Fix: avoid ie11 to throw on weird draw images [#5428](https://github.com/fabricjs/fabric.js/pull/5428)
+- Fix: a rare case of invisible clipPath [#5477](https://github.com/fabricjs/fabric.js/pull/5477)
+- Fix: testability of code under node when webgl is involved [#5478](https://github.com/fabricjs/fabric.js/pull/5478)
+- Add: Grapeheme text wrapping for Textbox (Textbox.splitByGrapheme) [#5479](https://github.com/fabricjs/fabric.js/pull/5479)
+- Add: fabric.Object.toCanvasElement [#5481](https://github.com/fabricjs/fabric.js/pull/5481)
+
 ## [2.5.0]
 - Fix: textbox transform report newScaleX and newScaleY values [#5464](https://github.com/fabricjs/fabric.js/pull/5464)
 - Fix: export of svg and gradient with transforms [#5456](https://github.com/fabricjs/fabric.js/pull/5456)
