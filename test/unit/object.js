@@ -410,74 +410,71 @@
   QUnit.test('cloneAsImage', function(assert) {
     var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
-
     assert.ok(typeof cObj.cloneAsImage === 'function');
-
-    if (!fabric.Canvas.supports('toDataURL')) {
-      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+    cObj.cloneAsImage(function(image) {
+      assert.ok(image);
+      assert.ok(image instanceof fabric.Image);
+      assert.equal(image.width, 100, 'the image has same dimension of object');
       done();
-    }
-    else {
-      cObj.cloneAsImage(function(image) {
-        assert.ok(image);
-        assert.ok(image instanceof fabric.Image);
-        assert.equal(image.width, 100, 'the image has same dimension of object');
-        done();
-      });
-    }
+    });
   });
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
     var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
-    if (!fabric.Canvas.supports('toDataURL')) {
-      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+    cObj.cloneAsImage(function(image) {
+      assert.ok(image);
+      assert.ok(image instanceof fabric.Image);
+      assert.equal(image.width, 200, 'the image has been scaled by retina');
+      fabric.devicePixelRatio = 1;
       done();
-    }
-    else {
-      cObj.cloneAsImage(function(image) {
-        assert.ok(image);
-        assert.ok(image instanceof fabric.Image);
-        assert.equal(image.width, 200, 'the image has been scaled by retina');
-        fabric.devicePixelRatio = 1;
-        done();
-      }, { enableRetinaScaling: true });
-    }
+    }, { enableRetinaScaling: true });
   });
 
-  QUnit.test('toDataURL', function(assert) {
-    // var data =
-    //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
-    //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
-    //   'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
-    //   'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
-    //   '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
-    //   'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
-    //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
-    //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+  QUnit.test('toCanvasElement', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
 
+    assert.ok(typeof cObj.toCanvasElement === 'function');
+
+    var canvasEl = cObj.toCanvasElement();
+
+    assert.ok(typeof canvasEl.getContext === 'function', 'the element returned is a canvas');
+  });
+
+  QUnit.test('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+    canvas.setZoom(2);
+    canvas.add(cObj);
+    var originaloCoords = cObj.oCoords;
+    var originalaCoords = cObj.aCoords;
+    cObj.toCanvasElement();
+    assert.deepEqual(cObj.oCoords, originaloCoords, 'cObj did not get object coords changed');
+    assert.deepEqual(cObj.aCoords, originalaCoords, 'cObj did not get absolute coords changed');
+  });
+
+
+  QUnit.test('toDataURL', function(assert) {
     var cObj = new fabric.Rect({
       width: 100, height: 100, fill: 'red', strokeWidth: 0
     });
 
     assert.ok(typeof cObj.toDataURL === 'function');
 
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var dataURL = cObj.toDataURL();
-      assert.equal(typeof dataURL, 'string');
-      assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
+    var dataURL = cObj.toDataURL();
+    assert.equal(typeof dataURL, 'string');
+    assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
 
-      try {
-        dataURL = cObj.toDataURL({ format: 'jpeg' });
-        assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
-      }
-      catch (err) {
-        fabric.log('jpeg toDataURL not supported');
-      }
+    try {
+      dataURL = cObj.toDataURL({ format: 'jpeg' });
+      assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
+    }
+    catch (err) {
+      fabric.log('jpeg toDataURL not supported');
     }
   });
 
@@ -496,16 +493,10 @@
       width: 100, height: 100, fill: 'red'
     });
     canvas.add(cObj);
+    var objCanvas = cObj.canvas;
+    cObj.toDataURL();
 
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var objCanvas = cObj.canvas;
-      cObj.toDataURL();
-
-      assert.equal(objCanvas, cObj.canvas);
-    }
+    assert.equal(objCanvas, cObj.canvas);
   });
 
   QUnit.test('isType', function(assert) {
