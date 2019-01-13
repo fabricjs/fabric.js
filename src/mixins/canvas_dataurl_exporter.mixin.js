@@ -1,7 +1,4 @@
 (function () {
-
-  var supportQuality = fabric.StaticCanvas.supports('toDataURLWithQuality');
-
   fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
@@ -43,7 +40,7 @@
           quality = options.quality || 1,
           multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? this.getRetinaScaling() : 1),
           canvasEl = this.toCanvasElement(multiplier, options);
-      return this.__toDataURL(canvasEl, format, quality);
+      return fabric.util.toDataURL(canvasEl, format, quality);
     },
 
     /**
@@ -93,17 +90,6 @@
       this.interactive = originalInteractive;
       return canvasEl;
     },
-
-    /**
-     * since 2.5.0 does not need to be on canvas instance anymore.
-     * leave it here for context;
-     * @private
-     */
-    __toDataURL: function(canvasEl, format, quality) {
-      return supportQuality
-        ? canvasEl.toDataURL('image/' + format, quality)
-        : canvasEl.toDataURL('image/' + format);
-    }
   });
 
 })();
