@@ -606,8 +606,7 @@
      * @return {String} data url
      */
     toDataURL: function(canvasEl, format, quality) {
-      return fabric.isLikelyNode ?
-        canvasEl.toDataURL('image/' + format) : canvasEl.toDataURL('image/' + format, quality);
+      return canvasEl.toDataURL('image/' + format, quality);
     },
 
     /**
