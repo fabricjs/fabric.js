@@ -31,17 +31,17 @@
     opacity: 1,
     shadow: null,
     visible: true,
-    clipTo:                   null,
-    text:                     'x',
-    fontSize:                 40,
-    fontWeight:               'normal',
-    fontFamily:               'Times New Roman',
-    fontStyle:                'normal',
-    lineHeight:               1.16,
-    underline:                false,
-    overline:                 false,
-    linethrough:              false,
-    textAlign:                'left',
+    clipTo: null,
+    text: 'x',
+    fontSize: 40,
+    fontWeight: 'normal',
+    fontFamily: 'Times New Roman',
+    fontStyle: 'normal',
+    lineHeight: 1.16,
+    underline: false,
+    overline: false,
+    linethrough: false,
+    textAlign: 'left',
     backgroundColor: '',
     textBackgroundColor: '',
     fillRule: 'nonzero',
@@ -52,7 +52,8 @@
     transformMatrix: null,
     charSpacing: 0,
     styles: { },
-    minWidth: 20
+    minWidth: 20,
+    splitByGrapheme: false,
   };
 
   QUnit.test('constructor', function(assert) {
@@ -128,6 +129,30 @@
     textbox.charSpacing = 800;
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
+  });
+  QUnit.test('wrapping with different things', function(assert) {
+    var textbox = new fabric.Textbox('xa\u200Bxb\u200Bxc\u200Cxd\u200Cxe ya yb id', {
+      width: 16,
+    });
+    assert.equal(textbox.textLines[0], 'xa', '0 line match expectations');
+    assert.equal(textbox.textLines[1], 'xb', '1 line match expectations');
+    assert.equal(textbox.textLines[2], 'xc', '2 line match expectations');
+    assert.equal(textbox.textLines[3], 'xd', '3 line match expectations');
+    assert.equal(textbox.textLines[4], 'xe', '4 line match expectations');
+    assert.equal(textbox.textLines[5], 'ya', '5 line match expectations');
+    assert.equal(textbox.textLines[6], 'yb', '6 line match expectations');
+  });
+  QUnit.test('wrapping with splitByGrapheme', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
+      width: 1,
+      splitByGrapheme: true,
+    });
+    assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[2], 'x', '2 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[3], 'b', '3 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[4], 'x', '4 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[5], 'c', '5 line match expectations splitByGrapheme');
   });
   QUnit.test('wrapping with custom space', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
