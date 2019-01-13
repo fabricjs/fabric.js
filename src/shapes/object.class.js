@@ -1175,8 +1175,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx, forClipping) {
-
+      var originalFill = this.fill, originalStroke = this.stroke;
       if (forClipping) {
+        this.fill = 'black';
+        this.stroke = '';
         this._setClippingProperties(ctx);
       }
       else {
@@ -1186,6 +1188,8 @@
       }
       this._render(ctx);
       this._drawClipPath(ctx);
+      this.fill = originalFill;
+      this.stroke = originalStroke;
     },
 
     _drawClipPath: function(ctx) {
