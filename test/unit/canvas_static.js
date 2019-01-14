@@ -482,20 +482,15 @@
 
   QUnit.test('toDataURL', function(assert) {
     assert.ok(typeof canvas.toDataURL === 'function');
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var rect = new fabric.Rect({width: 100, height: 100, fill: 'red', top: 0, left: 0});
-      canvas.add(rect);
-      var dataURL = canvas.toDataURL();
-      // don't compare actual data url, as it is often browser-dependent
-      // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-      assert.equal(typeof dataURL, 'string');
-      assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
-      //we can just compare that the dataUrl generated differs from the dataURl of an empty canvas.
-      assert.equal(dataURL.substring(200, 210) !== 'AAAAAAAAAA', true);
-    }
+    var rect = new fabric.Rect({width: 100, height: 100, fill: 'red', top: 0, left: 0});
+    canvas.add(rect);
+    var dataURL = canvas.toDataURL();
+    // don't compare actual data url, as it is often browser-dependent
+    // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
+    assert.equal(typeof dataURL, 'string');
+    assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
+    //we can just compare that the dataUrl generated differs from the dataURl of an empty canvas.
+    assert.equal(dataURL.substring(200, 210) !== 'AAAAAAAAAA', true);
   });
 
   QUnit.test('toDataURL with enableRetinaScaling: true and no multiplier', function(assert) {
@@ -604,39 +599,28 @@
   });
 
   QUnit.test('toDataURL jpeg', function(assert) {
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    try {
+      var dataURL = canvas.toDataURL({ format: 'jpeg' });
+      assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
     }
-    else {
-      try {
-        var dataURL = canvas.toDataURL({ format: 'jpeg' });
-        assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
-      }
-      // node-canvas does not support jpeg data urls
-      catch (err) {
-        assert.ok(true);
-      }
+    // node-canvas does not support jpeg data urls
+    catch (err) {
+      assert.ok(true);
     }
   });
 
   QUnit.test('toDataURL cropping', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.toDataURL === 'function');
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-      done();
-    }
-    else {
-      var croppingWidth = 75,
-          croppingHeight = 50,
-          dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
+    var croppingWidth = 75,
+        croppingHeight = 50,
+        dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
 
-      fabric.Image.fromURL(dataURL, function (img) {
-        assert.equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
-        assert.equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
-        done();
-      });
-    }
+    fabric.Image.fromURL(dataURL, function (img) {
+      assert.equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
+      assert.equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
+      done();
+    });
   });
 
   QUnit.test('centerObjectH', function(assert) {
