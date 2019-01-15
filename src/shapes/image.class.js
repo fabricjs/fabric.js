@@ -48,6 +48,7 @@
     /**
      * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')` (if available).
      * This allows for relative urls as image src.
+     * @since 2.7.0
      * @type Boolean
      * @default
      */
@@ -101,7 +102,7 @@
 
     /**
      * key used to retrieve the texture representing this image
-     * since 2.0.0
+     * @since 2.0.0
      * @type String
      * @default
      */
@@ -109,7 +110,7 @@
 
     /**
      * Image crop in pixels from original image size.
-     * since 2.0.0
+     * @since 2.0.0
      * @type Number
      * @default
      */
@@ -117,7 +118,7 @@
 
     /**
      * Image crop in pixels from original image size.
-     * since 2.0.0
+     * @since 2.0.0
      * @type Number
      * @default
      */
@@ -358,7 +359,7 @@
           return element.toDataURL();
         }
 
-        if (this.srcFromAttribute && typeof element.getAttribute === 'function') {
+        if (this.srcFromAttribute) {
           return element.getAttribute('src');
         }
         else {
