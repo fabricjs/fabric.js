@@ -19480,14 +19480,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     strokeWidth: 0,
 
     /**
-     * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')` (if available).
-     * This allows for relative urls as image src.
-     * @type Boolean
-     * @default
-     */
-    srcFromAttribute: false,
-
-    /**
      * private
      * contains last value of scaleX to detect
      * if the Image got resized after the last Render
@@ -19791,13 +19783,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (element.toDataURL) {
           return element.toDataURL();
         }
-
-        if (this.srcFromAttribute && typeof element.getAttribute === 'function') {
-          return element.getAttribute('src');
-        }
-        else {
-          return element.src;
-        }
+        return element.src;
       }
       else {
         return this.src || '';
