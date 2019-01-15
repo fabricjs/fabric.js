@@ -46,7 +46,7 @@
     strokeWidth: 0,
 
     /**
-     * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')` (if available).
+     * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')`.
      * This allows for relative urls as image src.
      * @since 2.7.0
      * @type Boolean
