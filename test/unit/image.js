@@ -25,6 +25,7 @@
   }
 
   var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_SRC_REL = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : '/fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
@@ -72,10 +73,11 @@
     return fabric.document.createElement('img');
   }
 
-  function _createImageObject(width, height, callback, options) {
+  function _createImageObject(width, height, callback, options, src) {
     options = options || {};
+    src = src || IMG_SRC;
     var elImage = _createImageElement();
-    setSrc(elImage, IMG_SRC, function() {
+    setSrc(elImage, src, function() {
       options.width = width;
       options.height = height;
       callback(new fabric.Image(elImage, options));
@@ -88,6 +90,10 @@
 
   function createSmallImageObject(callback, options) {
     return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback, options);
+  }
+
+  function createImageObjectWithSrc(callback, options, src) {
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback, options, src);
   }
 
   function setSrc(img, src, callback) {
@@ -292,6 +298,19 @@
       assert.equal(image.getSrc(), IMG_SRC);
       done();
     });
+  });
+
+  QUnit.test('getSrc with srcFromAttribute', function(assert) {
+    var done = assert.async();
+    createImageObjectWithSrc(function(image) {
+      assert.equal(image.getSrc(), IMG_SRC_REL);
+      done();
+    },
+    {
+      srcFromAttribute: true
+    },
+    IMG_SRC_REL
+    );
   });
 
   QUnit.test('getElement', function(assert) {
