@@ -600,7 +600,7 @@
         dimY = dimensions.y;
       }
       if (noSkew) {
-        return this._finalizeDiemensions(dimX, dimY);
+        return this._finalizeDiemensions(dimX * this.scaleX, dimY * this.scaleY);
       }
       else {
         dimX /= 2;
