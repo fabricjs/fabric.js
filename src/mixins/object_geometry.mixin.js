@@ -588,18 +588,23 @@
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions = this._getNonTransformedDimensions();
-      if (skewX === 0 && skewY === 0) {
-        return { x: dimensions.x * this.scaleX, y: dimensions.y * this.scaleY };
-      }
-      var dimX, dimY;
+      var dimensions = this._getNonTransformedDimensions(), dimX, dimY,
+          noSkew = skewX === 0 && skewY === 0;
+
       if (this.strokeUniform) {
-        dimX = this.width / 2;
-        dimY = this.height / 2;
+        dimX = this.width;
+        dimY = this.height;
       }
       else {
-        dimX = dimensions.x / 2;
-        dimY = dimensions.y / 2;
+        dimX = dimensions.x;
+        dimY = dimensions.y;
+      }
+      if (noSkew) {
+        return this._finalizeDiemensions(dimX, dimY);
+      }
+      else {
+        dimX /= 2;
+        dimY /= 2;
       }
       var points = [
             {
@@ -624,12 +629,23 @@
         points[i] = fabric.util.transformPoint(points[i], transformMatrix);
       }
       bbox = fabric.util.makeBoundingBoxFromPoints(points);
-      return this.strokeUniform ?
-        { x: bbox.width + this.strokeWidth, y: bbox.height + this.strokeWidth }
-        :
-        { x: bbox.width, y: bbox.height };
+      return this._finalizeDiemensions(bbox.width, bbox.height);
     },
 
+    /*
+     * Calculate object bounding boxdimensions from its properties scale, skew.
+     * @param Number width width of the bbox
+     * @param Number height height of the bbox
+     * @private
+     * @return {Object} .x finalized width dimension
+     * @return {Object} .y finalized height dimension
+     */
+    _finalizeDiemensions: function(width, height) {
+      return this.strokeUniform ?
+        { x: width + this.strokeWidth, y: height + this.strokeWidth }
+        :
+        { x: width, y: height };
+    },
     /*
      * Calculate object dimensions for controls. include padding and canvas zoom
      * private
