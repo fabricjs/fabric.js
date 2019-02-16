@@ -1170,16 +1170,11 @@
 
   QUnit.test('toDataURL', function(assert) {
     assert.ok(typeof canvas.toDataURL === 'function');
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var dataURL = canvas.toDataURL();
-      // don't compare actual data url, as it is often browser-dependent
-      // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-      assert.equal(typeof dataURL, 'string');
-      assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
-    }
+    var dataURL = canvas.toDataURL();
+    // don't compare actual data url, as it is often browser-dependent
+    // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
+    assert.equal(typeof dataURL, 'string');
+    assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
   });
 
   //  QUnit.test('getPointer', function(assert) {
