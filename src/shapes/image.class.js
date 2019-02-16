@@ -383,7 +383,7 @@
       fabric.util.loadImage(src, function(img) {
         this.setElement(img, options);
         this._setWidthHeight();
-        callback(this);
+        callback && callback(this);
       }, this, options && options.crossOrigin);
       return this;
     },
