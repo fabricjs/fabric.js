@@ -213,6 +213,7 @@
           styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
           shadowInfo = withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
           clipPath = this.clipPath,
+          vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
           absoluteClipPath = this.clipPath && this.clipPath.absolutePositioned,
           commonPieces, markup = [], clipPathMarkup,
           // insert commons in the markup, style and svgCommons
@@ -237,6 +238,7 @@
       );
       commonPieces = [
         styleInfo,
+        vectorEffect,
         noStyle ? '' : this.addPaintOrder(), ' ',
         additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
