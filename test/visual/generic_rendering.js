@@ -60,7 +60,7 @@
     test: 'Rect with strokeUniform: true',
     code: generic1,
     golden: 'generic1.png',
-    newModule: 'DataURL exports',
+    newModule: 'Generic rendering',
     percentage: 0.09,
   });
 
