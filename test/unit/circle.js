@@ -150,8 +150,8 @@
     var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: Math.PI });
     var svg = circle.toSVG();
     var svgClipPath = circle.toClipPathSVG();
-    assert.equal(svg, '<g transform=\"matrix(1 0 0 1 10.5 10.5)\"  >\n<path d=\"M 10 0 A 10 10 0 0 1 -10 0\"style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"   />\n</g>\n');
-    assert.equal(svgClipPath, '\t<path d=\"M 10 0 A 10 10 0 0 1 -10 0\"transform=\"matrix(1 0 0 1 10.5 10.5)\"  />\n', 'half circle as clipPath');
+    assert.equal(svg, '<g transform=\"matrix(1 0 0 1 10.5 10.5)\"  >\n<path d=\"M 10 0 A 10 10 0 0 1 -10 0\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"   />\n</g>\n');
+    assert.equal(svgClipPath, '\t<path d=\"M 10 0 A 10 10 0 0 1 -10 0\" transform=\"matrix(1 0 0 1 10.5 10.5)\"  />\n', 'half circle as clipPath');
   });
 
   QUnit.test('fromElement', function(assert) {

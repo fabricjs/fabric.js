@@ -131,7 +131,7 @@
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
   QUnit.test('wrapping with different things', function(assert) {
-    var textbox = new fabric.Textbox('xa\u200Bxb\u200Bxc\u200Cxd\u200Cxe ya yb id', {
+    var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
       width: 16,
     });
     assert.equal(textbox.textLines[0], 'xa', '0 line match expectations');
