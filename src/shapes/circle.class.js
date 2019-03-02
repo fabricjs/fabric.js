@@ -106,7 +106,7 @@
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '"', 'COMMON_PARTS', ' />\n'
+          '" ', 'COMMON_PARTS', ' />\n'
         ];
       }
       return svgString;

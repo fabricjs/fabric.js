@@ -48,7 +48,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       var _options;
       _this.resolveGradient(obj, 'fill');
       _this.resolveGradient(obj, 'stroke');
-      if (obj instanceof fabric.Image) {
+      if (obj instanceof fabric.Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);

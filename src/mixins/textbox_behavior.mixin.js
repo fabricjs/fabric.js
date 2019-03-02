@@ -9,13 +9,18 @@
   fabric.Canvas.prototype._setObjectScale = function(localMouse, transform,
     lockScalingX, lockScalingY, by, lockScalingFlip, _dim) {
 
-    var t = transform.target;
+    var t = transform.target, scaled,
+        scaleX = localMouse.x * t.scaleX / _dim.x,
+        scaleY = localMouse.y * t.scaleY / _dim.y;
     if (by === 'x' && t instanceof fabric.Textbox) {
       var tw = t._getTransformedDimensions().x;
       var w = t.width * (localMouse.x / tw);
+      transform.newScaleX = scaleX;
+      transform.newScaleY = scaleY;
       if (w >= t.getMinWidth()) {
+        scaled = w !== t.width;
         t.set('width', w);
-        return true;
+        return scaled;
       }
     }
     else {

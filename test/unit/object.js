@@ -134,13 +134,13 @@
 
   QUnit.test('toJSON', function(assert) {
     var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevil","strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                         '"transformMatrix":null,"skewX":0,"skewY":0}';
@@ -176,6 +176,7 @@
       'strokeWidth':              1,
       'strokeDashArray':          null,
       'strokeLineCap':            'butt',
+      'strokeDashOffset':         0,
       'strokeLineJoin':           'miter',
       'strokeMiterLimit':         4,
       'scaleX':                   1,
@@ -210,6 +211,7 @@
       'strokeWidth':              1,
       'strokeDashArray':          [5, 2],
       'strokeLineCap':            'round',
+      'strokeDashOffset':         0,
       'strokeLineJoin':           'bevil',
       'strokeMiterLimit':         5,
       'scaleX':                   1,
@@ -408,74 +410,71 @@
   QUnit.test('cloneAsImage', function(assert) {
     var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
-
     assert.ok(typeof cObj.cloneAsImage === 'function');
-
-    if (!fabric.Canvas.supports('toDataURL')) {
-      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+    cObj.cloneAsImage(function(image) {
+      assert.ok(image);
+      assert.ok(image instanceof fabric.Image);
+      assert.equal(image.width, 100, 'the image has same dimension of object');
       done();
-    }
-    else {
-      cObj.cloneAsImage(function(image) {
-        assert.ok(image);
-        assert.ok(image instanceof fabric.Image);
-        assert.equal(image.width, 100, 'the image has same dimension of object');
-        done();
-      });
-    }
+    });
   });
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
     var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
-    if (!fabric.Canvas.supports('toDataURL')) {
-      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+    cObj.cloneAsImage(function(image) {
+      assert.ok(image);
+      assert.ok(image instanceof fabric.Image);
+      assert.equal(image.width, 200, 'the image has been scaled by retina');
+      fabric.devicePixelRatio = 1;
       done();
-    }
-    else {
-      cObj.cloneAsImage(function(image) {
-        assert.ok(image);
-        assert.ok(image instanceof fabric.Image);
-        assert.equal(image.width, 200, 'the image has been scaled by retina');
-        fabric.devicePixelRatio = 1;
-        done();
-      }, { enableRetinaScaling: true });
-    }
+    }, { enableRetinaScaling: true });
   });
 
-  QUnit.test('toDataURL', function(assert) {
-    // var data =
-    //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
-    //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
-    //   'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
-    //   'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
-    //   '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
-    //   'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
-    //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
-    //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+  QUnit.test('toCanvasElement', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
 
+    assert.ok(typeof cObj.toCanvasElement === 'function');
+
+    var canvasEl = cObj.toCanvasElement();
+
+    assert.ok(typeof canvasEl.getContext === 'function', 'the element returned is a canvas');
+  });
+
+  QUnit.test('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+    canvas.setZoom(2);
+    canvas.add(cObj);
+    var originaloCoords = cObj.oCoords;
+    var originalaCoords = cObj.aCoords;
+    cObj.toCanvasElement();
+    assert.deepEqual(cObj.oCoords, originaloCoords, 'cObj did not get object coords changed');
+    assert.deepEqual(cObj.aCoords, originalaCoords, 'cObj did not get absolute coords changed');
+  });
+
+
+  QUnit.test('toDataURL', function(assert) {
     var cObj = new fabric.Rect({
       width: 100, height: 100, fill: 'red', strokeWidth: 0
     });
 
     assert.ok(typeof cObj.toDataURL === 'function');
 
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var dataURL = cObj.toDataURL();
-      assert.equal(typeof dataURL, 'string');
-      assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
+    var dataURL = cObj.toDataURL();
+    assert.equal(typeof dataURL, 'string');
+    assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
 
-      try {
-        dataURL = cObj.toDataURL({ format: 'jpeg' });
-        assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
-      }
-      catch (err) {
-        fabric.log('jpeg toDataURL not supported');
-      }
+    try {
+      dataURL = cObj.toDataURL({ format: 'jpeg' });
+      assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
+    }
+    catch (err) {
+      fabric.log('jpeg toDataURL not supported');
     }
   });
 
@@ -494,16 +493,10 @@
       width: 100, height: 100, fill: 'red'
     });
     canvas.add(cObj);
+    var objCanvas = cObj.canvas;
+    cObj.toDataURL();
 
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var objCanvas = cObj.canvas;
-      cObj.toDataURL();
-
-      assert.equal(objCanvas, cObj.canvas);
-    }
+    assert.equal(objCanvas, cObj.canvas);
   });
 
   QUnit.test('isType', function(assert) {
@@ -1248,5 +1241,17 @@
     object.dirty = false;
     object._set('fill', 'blue');
     assert.equal(object.dirty, false, 'dirty is not rised');
+  });
+  QUnit.test('isNotVisible', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.equal(object.isNotVisible(), false, 'object is default visilbe');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 1 });
+    assert.equal(object.isNotVisible(), false, 'object is visilbe with width and height equal 0, but strokeWidth 1');
+    object = new fabric.Object({ opacity: 0, fill: 'blue' });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with opacity 0');
+    object = new fabric.Object({ fill: 'blue', visible: false });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with visible false');
+    object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
+    assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
   });
 })();

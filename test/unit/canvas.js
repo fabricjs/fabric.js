@@ -55,12 +55,12 @@
                       '13.99], ["z", null]]}';
 
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
@@ -1170,16 +1170,11 @@
 
   QUnit.test('toDataURL', function(assert) {
     assert.ok(typeof canvas.toDataURL === 'function');
-    if (!fabric.Canvas.supports('toDataURL')) {
-      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-    }
-    else {
-      var dataURL = canvas.toDataURL();
-      // don't compare actual data url, as it is often browser-dependent
-      // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-      assert.equal(typeof dataURL, 'string');
-      assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
-    }
+    var dataURL = canvas.toDataURL();
+    // don't compare actual data url, as it is often browser-dependent
+    // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
+    assert.equal(typeof dataURL, 'string');
+    assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
   });
 
   //  QUnit.test('getPointer', function(assert) {
@@ -1568,7 +1563,7 @@
 
   QUnit.test('loadFromJSON with custom properties on Canvas with image', function(assert) {
     var done = assert.async();
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
 + '"background":"green"}';
     var serialized = JSON.parse(JSON_STRING);
     serialized.controlsAboveOverlay = true;
@@ -2171,7 +2166,16 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: rect
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+
+    canvas._setupCurrentTransform(eventStub, rect, false);
+    t = canvas._currentTransform;
+    assert.equal(t.target, rect, 'should have rect as a target');
+    assert.equal(t.action, 'drag', 'should setup drag since the object was not selected');
+    assert.equal(t.corner, 'tl', 'tl selected');
+    assert.equal(t.shiftKey, undefined, 'shift was not pressed');
+
+    var alreadySelected = true;
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'scale', 'should target a corner and setup scale');
@@ -2186,7 +2190,7 @@
       target: rect,
       shiftKey: true
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'skewY', 'should target a corner and setup skew');
@@ -2199,7 +2203,7 @@
       clientY: canvasOffset.top + rect.oCoords.mtr.y,
       target: rect,
     };
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'rotate', 'should target a corner and setup rotate');
@@ -2344,6 +2348,112 @@
     delete canvas.clipTo;
 
     assert.ok(typeof error === 'undefined', 'renderAll with clipTo does not throw');
+  });
+
+  QUnit.test('isTargetTransparent', function(assert) {
+    var rect = new fabric.Rect({
+      width: 10,
+      height: 10,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    canvas.add(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
+  });
+
+  QUnit.test('isTargetTransparent without objectCaching', function(assert) {
+    var rect = new fabric.Rect({
+      width: 10,
+      height: 10,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: false,
+    });
+    canvas.add(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
+  });
+
+  QUnit.test('isTargetTransparent as active object', function(assert) {
+    var rect = new fabric.Rect({
+      width: 20,
+      height: 20,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), false, 'opaque on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), false, 'opaque on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), false, 'opaque on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(rect, 10, 10), true, 'transparent 10, 10');
+    assert.equal(canvas.isTargetTransparent(rect, 11, 11), true, 'transparent 11, 11');
+    assert.equal(canvas.isTargetTransparent(rect, 12, 12), true, 'transparent 12, 12');
+    assert.equal(canvas.isTargetTransparent(rect, 13, 13), true, 'transparent 13, 13');
+    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent 14, 14');
+    assert.equal(canvas.isTargetTransparent(rect, 15, 15), true, 'transparent 15, 15');
+    assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
+    assert.equal(canvas.isTargetTransparent(rect, 17, 17), false, 'opaque 17, 17');
+    assert.equal(canvas.isTargetTransparent(rect, 18, 18), false, 'opaque 18, 18');
+    assert.equal(canvas.isTargetTransparent(rect, 19, 19), false, 'opaque 19, 19');
+    assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
+    assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
+    assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
+    assert.equal(canvas.isTargetTransparent(rect, 23, 23), false, 'opaque 23, 23');
+    assert.equal(canvas.isTargetTransparent(rect, 24, 24), false, 'opaque 24, 24');
+    assert.equal(canvas.isTargetTransparent(rect, 25, 25), false, 'opaque 25, 25');
+    assert.equal(canvas.isTargetTransparent(rect, 26, 26), false, 'opaque 26, 26');
+    assert.equal(canvas.isTargetTransparent(rect, 27, 27), false, 'opaque 27, 27');
+    assert.equal(canvas.isTargetTransparent(rect, 28, 28), false, 'opaque 28, 28');
+    assert.equal(canvas.isTargetTransparent(rect, 29, 29), false, 'opaque 29, 29');
+    assert.equal(canvas.isTargetTransparent(rect, 30, 30), false, 'opaque 30, 30');
+    assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
+
   });
 
   QUnit.test('canvas inheritance', function(assert) {

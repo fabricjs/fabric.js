@@ -20,6 +20,7 @@
     strokeWidth: 1,
     strokeDashArray: null,
     strokeLineCap: 'butt',
+    strokeDashOffset: 0,
     strokeLineJoin: 'miter',
     strokeMiterLimit: 4,
     scaleX: 1,
@@ -30,17 +31,17 @@
     opacity: 1,
     shadow: null,
     visible: true,
-    clipTo:                   null,
-    text:                     'x',
-    fontSize:                 40,
-    fontWeight:               'normal',
-    fontFamily:               'Times New Roman',
-    fontStyle:                'normal',
-    lineHeight:               1.16,
-    underline:                false,
-    overline:                 false,
-    linethrough:              false,
-    textAlign:                'left',
+    clipTo: null,
+    text: 'x',
+    fontSize: 40,
+    fontWeight: 'normal',
+    fontFamily: 'Times New Roman',
+    fontStyle: 'normal',
+    lineHeight: 1.16,
+    underline: false,
+    overline: false,
+    linethrough: false,
+    textAlign: 'left',
     backgroundColor: '',
     textBackgroundColor: '',
     fillRule: 'nonzero',
@@ -51,7 +52,8 @@
     transformMatrix: null,
     charSpacing: 0,
     styles: { },
-    minWidth: 20
+    minWidth: 20,
+    splitByGrapheme: false,
   };
 
   QUnit.test('constructor', function(assert) {
@@ -128,6 +130,30 @@
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
+  QUnit.test('wrapping with different things', function(assert) {
+    var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
+      width: 16,
+    });
+    assert.equal(textbox.textLines[0], 'xa', '0 line match expectations');
+    assert.equal(textbox.textLines[1], 'xb', '1 line match expectations');
+    assert.equal(textbox.textLines[2], 'xc', '2 line match expectations');
+    assert.equal(textbox.textLines[3], 'xd', '3 line match expectations');
+    assert.equal(textbox.textLines[4], 'xe', '4 line match expectations');
+    assert.equal(textbox.textLines[5], 'ya', '5 line match expectations');
+    assert.equal(textbox.textLines[6], 'yb', '6 line match expectations');
+  });
+  QUnit.test('wrapping with splitByGrapheme', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
+      width: 1,
+      splitByGrapheme: true,
+    });
+    assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[2], 'x', '2 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[3], 'b', '3 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[4], 'x', '4 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[5], 'c', '5 line match expectations splitByGrapheme');
+  });
   QUnit.test('wrapping with custom space', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 2000,
@@ -152,5 +178,21 @@
       ['i', 'd']];
     assert.deepEqual(line2, expected2, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
+  });
+  QUnit.test('_scaleObject with textbox', function(assert) {
+    var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
+    canvas.add(text);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + text.width,
+      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+    };
+    var originalWidth = text.width;
+    canvas._setupCurrentTransform(eventStub, text, true);
+    var scaled = canvas._scaleObject(eventStub.clientX + 20, eventStub.clientY, 'x');
+    assert.equal(scaled, true, 'return true if textbox scaled');
+    assert.equal(text.width, originalWidth + 20, 'width increased');
+    assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
   });
 })();

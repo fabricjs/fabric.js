@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.4.3' };
+var fabric = fabric || { version: '2.7.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -10,7 +10,10 @@ else if (typeof define === 'function' && define.amd) {
 }
 /* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  fabric.document = document;
+  if (document instanceof HTMLDocument)
+    fabric.document = document;
+  else
+    fabric.document = document.implementation.createHTMLDocument("");
   fabric.window = window;
 }
 else {
@@ -32,7 +35,8 @@ else {
  * True when in environment that supports touch events
  * @type boolean
  */
-fabric.isTouchSupported = 'ontouchstart' in fabric.window;
+fabric.isTouchSupported = 'ontouchstart' in fabric.window || 'ontouchstart' in fabric.document ||
+  (fabric.window && fabric.window.navigator && fabric.window.navigator.maxTouchPoints > 0);
 
 /**
  * True when in environment that's probably Node.js
@@ -51,10 +55,10 @@ fabric.SHARED_ATTRIBUTES = [
   'transform',
   'fill', 'fill-opacity', 'fill-rule',
   'opacity',
-  'stroke', 'stroke-dasharray', 'stroke-linecap',
+  'stroke', 'stroke-dasharray', 'stroke-linecap', 'stroke-dashoffset',
   'stroke-linejoin', 'stroke-miterlimit',
   'stroke-opacity', 'stroke-width',
-  'id', 'paint-order',
+  'id', 'paint-order', 'vector-effect',
   'instantiated_by_use', 'clip-path'
 ];
 /* _FROM_SVG_END_ */

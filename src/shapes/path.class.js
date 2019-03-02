@@ -471,15 +471,13 @@
      * of the instance
      */
     _toSVG: function() {
-      var specificTransform = this._getOffsetTransform(),
-          path = this.path.map(function(path) {
-            return path.join(' ');
-          }).join(' ');
+      var path = this.path.map(function(path) {
+        return path.join(' ');
+      }).join(' ');
       return [
         '<path ', 'COMMON_PARTS',
         'd="', path,
         '" stroke-linecap="round" ',
-        'transform="' + specificTransform + '" ',
         '/>\n'
       ];
     },
@@ -500,6 +498,16 @@
       return '\t' + this._createBaseClipPathSVGMarkup(
         this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform }
       );
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toSVG: function(reviver) {
+      var additionalTransform = this._getOffsetTransform();
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform  });
     },
     /* _TO_SVG_END_ */
 

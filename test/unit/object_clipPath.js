@@ -29,6 +29,7 @@
       strokeWidth:              1,
       strokeDashArray:          null,
       strokeLineCap:            'butt',
+      strokeDashOffset:         0,
       strokeLineJoin:           'miter',
       strokeMiterLimit:         4,
       scaleX:                   1,
@@ -131,5 +132,52 @@
     assert.equal(canvas.contextContainer.fillStyle, '#000000', 'fillStyle is reset');
     assert.equal(new fabric.Color(canvas.contextContainer.strokeStyle).getAlpha(), 0, 'stroke style is reset');
     assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
+  });
+
+  QUnit.test('clipPath caching detection', function(assert) {
+    var cObj = new fabric.Object();
+    var clipPath = new fabric.Object();
+    cObj.statefullCache = true;
+    cObj.saveState({ propertySet: 'cacheProperties' });
+    var change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean');
+
+    cObj.clipPath = clipPath;
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache is dirty');
+
+    cObj.saveState({ propertySet: 'cacheProperties' });
+
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean again');
+
+    cObj.clipPath.fill = 'red';
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache change in clipPath is detected');
+  });
+
+  QUnit.test('clipPath caching detection with canvas object', function(assert) {
+    var canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    var cObj = new fabric.Rect();
+    var clipPath = new fabric.Rect();
+    canvas.add(cObj);
+    clipPath.canvas = canvas;
+    cObj.statefullCache = true;
+    cObj.saveState({ propertySet: 'cacheProperties' });
+    var change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean - canvas');
+
+    cObj.clipPath = clipPath;
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache is dirty - canvas');
+
+    cObj.saveState({ propertySet: 'cacheProperties' });
+
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, false, 'cache is clean again - canvas');
+
+    cObj.clipPath.fill = 'red';
+    change = cObj.hasStateChanged('cacheProperties');
+    assert.equal(change, true, 'cache change in clipPath is detected - canvas');
   });
 })();
