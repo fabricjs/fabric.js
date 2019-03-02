@@ -68,7 +68,7 @@
      * Use this regular expression to split strings in breakable lines
      * @private
      */
-    _wordJoiners: /[ \t\r\u200B\u200C]/,
+    _wordJoiners: /[ \t\r]/,
 
     /**
      * Use this boolean property in order to split strings that have no white space concept.
