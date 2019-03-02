@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.0]
+- Add: strokeUniform property, avoid stroke scaling with paths [#5473](https://github.com/fabricjs/fabric.js/pull/5473)
+- Fix: fix bug in image setSrc [#5502](https://github.com/fabricjs/fabric.js/pull/5502)
+- Add: strokeUniform import/export svg [#5527](https://github.com/fabricjs/fabric.js/pull/5527)
+- Fix: GraphemeSplit and toSvg for circle [#5544](https://github.com/fabricjs/fabric.js/pull/5544)
+- Improvement: support running in a XML document [#5530](https://github.com/fabricjs/fabric.js/pull/5530)
+
 ## [2.6.0]
 - Fix: avoid ie11 to throw on weird draw images [#5428](https://github.com/fabricjs/fabric.js/pull/5428)
 - Fix: a rare case of invisible clipPath [#5477](https://github.com/fabricjs/fabric.js/pull/5477)

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.6.0' };
+var fabric = fabric || { version: '2.7.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -11,7 +11,10 @@ else if (typeof define === 'function' && define.amd) {
 }
 /* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  fabric.document = document;
+  if (document instanceof HTMLDocument)
+    fabric.document = document;
+  else
+    fabric.document = document.implementation.createHTMLDocument("");
   fabric.window = window;
 }
 else {
@@ -56,7 +59,7 @@ fabric.SHARED_ATTRIBUTES = [
   'stroke', 'stroke-dasharray', 'stroke-linecap', 'stroke-dashoffset',
   'stroke-linejoin', 'stroke-miterlimit',
   'stroke-opacity', 'stroke-width',
-  'id', 'paint-order',
+  'id', 'paint-order', 'vector-effect',
   'instantiated_by_use', 'clip-path'
 ];
 /* _FROM_SVG_END_ */
@@ -3411,6 +3414,7 @@ if (typeof console !== 'undefined') {
         opacity:              'opacity',
         'clip-path':          'clipPath',
         'clip-rule':          'clipRule',
+        'vector-effect':      'strokeUniform'
       },
 
       colorAttributes = {
@@ -3441,6 +3445,9 @@ if (typeof console !== 'undefined') {
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
+    }
+    else if (attr === 'vector-effect') {
+      value = value === 'non-scaling-stroke';
     }
     else if (attr === 'strokeDashArray') {
       if (value === 'none') {
@@ -9849,8 +9856,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
+     * @param {Boolean} alreadySelected true if target is already selected
+     * @param {String} corner a string representing the corner ml, mr, tl ...
+     * @param {Event} e Event object
+     * @param {fabric.Object} [target] inserted back to help overriding. Unused
      */
-    _getActionFromCorner: function(alreadySelected, corner, e) {
+    _getActionFromCorner: function(alreadySelected, corner, e /* target */) {
       if (!corner || !alreadySelected) {
         return 'drag';
       }
@@ -9881,7 +9892,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var pointer = this.getPointer(e),
           corner = target._findTargetCorner(this.getPointer(e, true)),
-          action = this._getActionFromCorner(alreadySelected, corner, e),
+          action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner);
 
       this._currentTransform = {
@@ -12958,6 +12969,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     noScaleCache:              true,
 
     /**
+     * When `false`, the stoke width will scale with the object.
+     * When `true`, the stroke will always match the exact pixel size entered for stroke width.
+     * default to false
+     * @since 2.6.0
+     * @type Boolean
+     * @default false
+     * @type Boolean
+     * @default false
+     */
+    strokeUniform:              false,
+
+    /**
      * When set to `true`, object's cache will be rerendered next render call.
      * since 1.7.0
      * @type Boolean
@@ -12992,7 +13015,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow clipTo visible backgroundColor ' +
-      'skewX skewY fillRule paintFirst clipPath'
+      'skewX skewY fillRule paintFirst clipPath strokeUniform'
     ).split(' '),
 
     /**
@@ -13003,7 +13026,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Array
      */
     cacheProperties: (
-      'fill stroke strokeWidth strokeDashArray width height paintFirst' +
+      'fill stroke strokeWidth strokeDashArray width height paintFirst strokeUniform' +
       ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor clipPath'
     ).split(' '),
 
@@ -13724,6 +13747,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       else {
         alternative && alternative(ctx);
       }
+      if (this.strokeUniform) {
+        ctx.setLineDash(ctx.getLineDash().map(function(value) { return value * ctx.lineWidth; }));
+      }
     },
 
     /**
@@ -13861,6 +13887,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       ctx.save();
+      if (this.strokeUniform) {
+        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
+      }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
       this._applyPatternGradientTransform(ctx, this.stroke);
       ctx.stroke();
@@ -15220,12 +15249,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions = this._getNonTransformedDimensions();
-      if (skewX === 0 && skewY === 0) {
-        return { x: dimensions.x * this.scaleX, y: dimensions.y * this.scaleY };
+      var dimensions = this._getNonTransformedDimensions(), dimX, dimY,
+          noSkew = skewX === 0 && skewY === 0;
+
+      if (this.strokeUniform) {
+        dimX = this.width;
+        dimY = this.height;
       }
-      var dimX = dimensions.x / 2, dimY = dimensions.y / 2,
-          points = [
+      else {
+        dimX = dimensions.x;
+        dimY = dimensions.y;
+      }
+      if (noSkew) {
+        return this._finalizeDiemensions(dimX * this.scaleX, dimY * this.scaleY);
+      }
+      else {
+        dimX /= 2;
+        dimY /= 2;
+      }
+      var points = [
             {
               x: -dimX,
               y: -dimY
@@ -15248,9 +15290,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         points[i] = fabric.util.transformPoint(points[i], transformMatrix);
       }
       bbox = fabric.util.makeBoundingBoxFromPoints(points);
-      return { x: bbox.width, y: bbox.height };
+      return this._finalizeDiemensions(bbox.width, bbox.height);
     },
 
+    /*
+     * Calculate object bounding boxdimensions from its properties scale, skew.
+     * @param Number width width of the bbox
+     * @param Number height height of the bbox
+     * @private
+     * @return {Object} .x finalized width dimension
+     * @return {Object} .y finalized height dimension
+     */
+    _finalizeDiemensions: function(width, height) {
+      return this.strokeUniform ?
+        { x: width + this.strokeWidth, y: height + this.strokeWidth }
+        :
+        { x: width, y: height };
+    },
     /*
      * Calculate object dimensions for controls. include padding and canvas zoom
      * private
@@ -15563,6 +15619,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
           shadowInfo = withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
           clipPath = this.clipPath,
+          vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
           absoluteClipPath = this.clipPath && this.clipPath.absolutePositioned,
           commonPieces, markup = [], clipPathMarkup,
           // insert commons in the markup, style and svgCommons
@@ -15587,6 +15644,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       );
       commonPieces = [
         styleInfo,
+        vectorEffect,
         noStyle ? '' : this.addPaintOrder(), ' ',
         additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
@@ -16820,7 +16878,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + this.radius + ' ' + this.radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
-          '"', 'COMMON_PARTS', ' />\n'
+          '" ', 'COMMON_PARTS', ' />\n'
         ];
       }
       return svgString;
@@ -19480,6 +19538,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     strokeWidth: 0,
 
     /**
+     * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+     * This allows for relative urls as image src.
+     * @since 2.7.0
+     * @type Boolean
+     * @default
+     */
+    srcFromAttribute: false,
+
+    /**
      * private
      * contains last value of scaleX to detect
      * if the Image got resized after the last Render
@@ -19527,7 +19594,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * key used to retrieve the texture representing this image
-     * since 2.0.0
+     * @since 2.0.0
      * @type String
      * @default
      */
@@ -19535,7 +19602,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Image crop in pixels from original image size.
-     * since 2.0.0
+     * @since 2.0.0
      * @type Number
      * @default
      */
@@ -19543,7 +19610,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Image crop in pixels from original image size.
-     * since 2.0.0
+     * @since 2.0.0
      * @type Number
      * @default
      */
@@ -19783,7 +19850,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (element.toDataURL) {
           return element.toDataURL();
         }
-        return element.src;
+
+        if (this.srcFromAttribute) {
+          return element.getAttribute('src');
+        }
+        else {
+          return element.src;
+        }
       }
       else {
         return this.src || '';
@@ -19802,7 +19875,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       fabric.util.loadImage(src, function(img) {
         this.setElement(img, options);
         this._setWidthHeight();
-        callback(this);
+        callback && callback(this);
       }, this, options && options.crossOrigin);
       return this;
     },
@@ -28663,7 +28736,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * Use this regular expression to split strings in breakable lines
      * @private
      */
-    _wordJoiners: /[ \t\r\u200B\u200C]/,
+    _wordJoiners: /[ \t\r]/,
 
     /**
      * Use this boolean property in order to split strings that have no white space concept.
@@ -28722,7 +28795,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           charCount++;
           realLineCount++;
         }
-        else if (this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
+        else if (!this.graphemeSplit && this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -28944,7 +29017,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           lineWidth += additionalSpace;
         }
 
-        if (!lineJustStarted) {
+        if (!lineJustStarted && !splitByGrapheme) {
           line.push(infix);
         }
         line = line.concat(word);
