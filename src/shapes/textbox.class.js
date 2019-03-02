@@ -68,7 +68,7 @@
      * Use this regular expression to split strings in breakable lines
      * @private
      */
-    _wordJoiners: /[ \t\r\u200B\u200C]/,
+    _wordJoiners: /[ \t\r]/,
 
     /**
      * Use this boolean property in order to split strings that have no white space concept.
@@ -127,7 +127,7 @@
           charCount++;
           realLineCount++;
         }
-        else if (this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
+        else if (!this.graphemeSplit && this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -349,7 +349,7 @@
           lineWidth += additionalSpace;
         }
 
-        if (!lineJustStarted) {
+        if (!lineJustStarted && !splitByGrapheme) {
           line.push(infix);
         }
         line = line.concat(word);
