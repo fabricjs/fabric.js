@@ -19,6 +19,17 @@
     }
   };
 
+  function createCanvasForTest(width, height) {
+    var options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
+    if (width) {
+      options.width = width;
+    }
+    if (height) {
+      options.height = height;
+    }
+    return new fabric.StaticCanvas(null, options);
+  };
+
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
     if (isAbsolute) { return path; };
@@ -73,7 +84,7 @@
     img.src = filename;
   }
 
-  exports.visualTestLoop = function(fabricCanvas, QUnit) {
+  exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
     var imageDataToChalk;
@@ -96,10 +107,7 @@
     };
 
     function beforeEachHandler() {
-      fabricCanvas.clipPath = null;
-      fabricCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-      fabricCanvas.clear();
-      fabricCanvas.renderAll();
+
     }
 
     return function testCallback(testObj) {
@@ -118,6 +126,7 @@
       }
       QUnit.test(testName, function(assert) {
         var done = assert.async();
+        var fabricCanvas = createCanvasForTest(testObj.width, testObj.height);
         code(fabricCanvas, function(renderedCanvas) {
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;
@@ -149,6 +158,7 @@
               var stringa = imageDataToChalk(output);
               console.log(stringa);
             }
+            fabricCanvas.dispose();
             done();
           });
         });
