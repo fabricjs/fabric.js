@@ -149,6 +149,7 @@
   tests.push({
     test: 'Text with strokeWidths',
     code: text5,
+    disabled: true,
     golden: 'text5.png',
     percentage: 0.06,
   });
