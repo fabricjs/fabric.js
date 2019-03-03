@@ -68,13 +68,6 @@ jobs:
       node_js: "10"
     - stage: Unit Tests
       node_js: "8"
-    - stage: Unit Tests
-      env: CANVAS=canvas-prebuilt
-      node_js: "8"
-      install: npm install && npm remove canvas && npm install canvas-prebuilt@^1.6.11 qunit@2.6.1
-      addons:
-        apt:
-          packages: # avoid installing packages
     - stage: Visual Tests
       env: LAUNCHER=Node CANFAIL=TRUE
       node_js: "8"
