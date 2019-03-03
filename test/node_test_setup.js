@@ -30,3 +30,29 @@ global.imageDataToChalk = function(imageData) {
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidePassed = true;
+
+var jsdom = require('jsdom');
+
+// make a jsdom version for tests that does not spam too much.
+class CustomResourceLoader extends jsdom.ResourceLoader {
+  fetch(url, options) {
+    return super.fetch(url, options).catch(e => {
+      throw new Error('JSDOM FETCH CATCHED');
+    });
+  }
+}
+
+var jsdom = require('jsdom');
+var virtualWindow = new jsdom.JSDOM(
+  decodeURIComponent('%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'),
+  {
+    features: {
+      FetchExternalResources: ['img']
+    },
+    resources: new CustomResourceLoader(),
+  }).window;
+fabric.document = virtualWindow.document;
+fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
+fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
+fabric.window = virtualWindow;
+DOMParser = fabric.window.DOMParser;

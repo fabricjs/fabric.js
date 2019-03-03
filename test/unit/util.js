@@ -17,7 +17,7 @@
   }
 
   var IMG_URL = fabric.isLikelyNode
-    ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
+    ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
@@ -472,12 +472,17 @@
       done();
       return;
     }
-
-    fabric.util.loadImage(IMG_URL, function(img) {
-      assert.equal(img.src || img._src, IMG_URL, 'src is set');
-      // assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
-      done();
-    }, null, 'anonymous');
+    try {
+      fabric.util.loadImage(IMG_URL, function(img) {
+        console.log('LOG:', img.src, IMG_URL)
+        assert.equal(img.src, IMG_URL, 'src is set');
+        assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
+        done();
+      }, null, 'anonymous');
+    }
+    catch (e) {
+      console.log(e);
+    }
   });
 
 
