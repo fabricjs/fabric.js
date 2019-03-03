@@ -7,7 +7,8 @@
   exports.getAsset = function(name, callback) {
     var finalName = getAssetName(name);
     if (fabric.isLikelyNode) {
-      return fs.readFile(finalName, { encoding: 'utf8' }, callback);
+      var plainFileName = finalName.replace('file://', '');
+      return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
     }
     else {
       fabric.util.request(finalName, {
@@ -28,30 +29,35 @@
     return src;
   }
 
+  function localPath(path, filename) {
+    return 'file://' + require('path').join(__dirname, path, filename)
+  }
+
   function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
-    return fabric.isLikelyNode ? (__dirname + '/../visual' + finalName) : getAbsolutePath('/test/visual' + finalName);
+    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? (__dirname + '/../visual' + finalName) : getAbsolutePath('/test/visual' + finalName);
+    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
   }
 
   function getFixtureName(filename) {
     var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? (__dirname + '/..' + finalName) : getAbsolutePath('/test' + finalName);
+    return fabric.isLikelyNode ? localPath('/..', finalName) : getAbsolutePath('/test' + finalName);
   }
 
   function getImage(filename, original, callback) {
     if (fabric.isLikelyNode && original) {
+      var plainFileName = filename.replace('file://', '');
       try {
-        fs.statSync(filename);
+        fs.statSync(plainFileName);
       }
       catch (err) {
         var dataUrl = original.toDataURL().split(',')[1];
         console.log('creating original for ', filename);
-        fs.writeFileSync(filename, dataUrl, { encoding: 'base64' });
+        fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
       }
     }
     var img = fabric.document.createElement('img');
