@@ -357,16 +357,16 @@
     el.appendChild(fabric.document.createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
-    if (typeof el.onselectstart != 'undefined') {
+    if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart, fabric.util.falseFunction);
     }
 
     // not sure if it's a good idea to test implementation details here
     // functional test would probably make more sense
-    if (typeof el.unselectable == 'string') {
+    if (typeof el.unselectable === 'string') {
       assert.equal('on', el.unselectable);
     }
-    else if (typeof el.userSelect != 'undefined') {
+    else if (typeof el.userSelect !== 'undefined') {
       assert.equal('none', el.userSelect);
     }
   });
@@ -383,13 +383,13 @@
     makeElementUnselectable(el);
     makeElementSelectable(el);
 
-    if (typeof el.onselectstart != 'undefined') {
+    if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart, null);
     }
-    if (typeof el.unselectable == 'string') {
+    if (typeof el.unselectable === 'string') {
       assert.equal('', el.unselectable);
     }
-    else if (typeof el.userSelect != 'undefined') {
+    else if (typeof el.userSelect !== 'undefined') {
       assert.equal('', el.userSelect);
     }
   });
@@ -474,7 +474,6 @@
     }
     try {
       fabric.util.loadImage(IMG_URL, function(img) {
-        console.log('LOG:', img.src, IMG_URL)
         assert.equal(img.src, IMG_URL, 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
         done();
