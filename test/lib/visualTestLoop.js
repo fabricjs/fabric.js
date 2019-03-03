@@ -114,6 +114,7 @@
       if (testObj.disabled) {
         return;
       }
+      fabric.StaticCanvas.prototype.requestRenderAll = fabric.StaticCanvas.prototype.renderAll;
       var testName = testObj.test;
       var code = testObj.code;
       var percentage = testObj.percentage;
