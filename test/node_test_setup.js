@@ -55,4 +55,5 @@ fabric.document = virtualWindow.document;
 fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
 fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
 fabric.window = virtualWindow;
+fabric.StaticCanvas.prototype.requestRenderAll = fabric.StaticCanvas.prototype.renderAll;
 DOMParser = fabric.window.DOMParser;

@@ -158,7 +158,6 @@
               var stringa = imageDataToChalk(output);
               console.log(stringa);
             }
-            fabricCanvas.dispose();
             done();
           });
         });
