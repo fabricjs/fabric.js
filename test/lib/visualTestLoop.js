@@ -85,7 +85,6 @@
   }
 
   exports.visualTestLoop = function(QUnit) {
-    console.log(QUnit)
     var _pixelMatch;
     var visualCallback;
     var imageDataToChalk;
