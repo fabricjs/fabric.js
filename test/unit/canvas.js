@@ -1290,6 +1290,22 @@
     assert.equal(canvas.toObject().objects[0].type, rect.type);
   });
 
+
+  QUnit.test('toObject with clipPath', function(assert) {
+    var canvasWithClipPath = new fabric.Canvas(null, { clipPath: new fabric.Rect() });
+    var expectedObject = {
+      'version': fabric.version,
+      objects: canvasWithClipPath.getObjects()
+    };
+    assert.ok(typeof canvasWithClipPath.toObject === 'function');
+    assert.deepEqual(expectedObject, canvasWithClipPath.toObject());
+
+    var rect = makeRect();
+    canvasWithClipPath.add(rect);
+
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.type);
+  });
+
   QUnit.test('toDatalessObject', function(assert) {
     assert.ok(typeof canvas.toDatalessObject === 'function');
     var expectedObject = {
