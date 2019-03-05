@@ -1299,7 +1299,7 @@
       objects: canvasWithClipPath.getObjects(),
       'clipPath': clipPath.toObject()
     };
-    
+
     assert.ok(typeof canvasWithClipPath.toObject === 'function');
     assert.deepEqual(JSON.stringify(expectedObject), JSON.stringify(canvasWithClipPath.toObject()));
 
