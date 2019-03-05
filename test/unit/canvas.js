@@ -1292,13 +1292,16 @@
 
 
   QUnit.test('toObject with clipPath', function(assert) {
-    var canvasWithClipPath = new fabric.Canvas(null, { clipPath: new fabric.Rect() });
+    var clipPath = makeRect();
+    var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
     var expectedObject = {
       'version': fabric.version,
-      objects: canvasWithClipPath.getObjects()
+      objects: canvasWithClipPath.getObjects(),
+      'clipPath': clipPath.toObject()
     };
+    
     assert.ok(typeof canvasWithClipPath.toObject === 'function');
-    assert.deepEqual(expectedObject, canvasWithClipPath.toObject());
+    assert.deepEqual(JSON.stringify(expectedObject), JSON.stringify(canvasWithClipPath.toObject()));
 
     var rect = makeRect();
     canvasWithClipPath.add(rect);
