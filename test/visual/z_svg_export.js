@@ -1,7 +1,7 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = true;
+  fabric.Object.prototype.objectCaching = false;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
