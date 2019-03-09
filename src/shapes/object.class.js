@@ -1621,8 +1621,10 @@
       if (shadow) {
         shadowBlur = shadow.blur;
         scaling = this.getObjectScaling();
-        shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur) * (shadow.shadowUniform ? 1 : abs(scaling.scaleX)));
-        shadowOffset.y = 2 * Math.round((abs(shadow.offsetY) + shadowBlur) * (shadow.shadowUniform ? 1 : abs(scaling.scaleY)));
+        shadowOffset.x = 2 * Math.round((abs(shadow.offsetX) + shadowBlur)
+          * (shadow.shadowUniform ? 1 : abs(scaling.scaleX)));
+        shadowOffset.y = 2 * Math.round((abs(shadow.offsetY) + shadowBlur)
+          * (shadow.shadowUniform ? 1 : abs(scaling.scaleY)));
       }
       el.width = boundingRect.width + shadowOffset.x;
       el.height = boundingRect.height + shadowOffset.y;
