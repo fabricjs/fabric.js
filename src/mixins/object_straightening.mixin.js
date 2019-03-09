@@ -59,7 +59,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Straightens object, then rerenders canvas
+   * Straightens object, then re-renders canvas
    * @param {fabric.Object} object Object to straighten
    * @return {fabric.Canvas} thisArg
    * @chainable
