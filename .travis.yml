@@ -52,47 +52,35 @@ jobs:
     - stage: Unit Tests
       env: LAUNCHER=Chrome
       script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
-      install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
       script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
-      install: npm install testem@1.18.4 qunit@2.6.1
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Node
+      node_js: "11"
+    - stage: Unit Tests
+      env: LAUNCHER=Node
       node_js: "10"
     - stage: Unit Tests
       node_js: "8"
-    - stage: Unit Tests
-      node_js: "6"
-    - stage: Unit Tests
-      node_js: "4"
-    - stage: Unit Tests
-      env: CANVAS=canvas-prebuilt
-      node_js: "8"
-      install: npm install && npm remove canvas && npm install canvas-prebuilt@^1.6.11 qunit@2.6.1
-      addons:
-        apt:
-          packages: # avoid installing packages
     - stage: Visual Tests
-      env: LAUNCHER=Node CANFAIL=TRUE
+      env: LAUNCHER=Node
       node_js: "8"
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.6.2
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Visual Tests
       env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.6.2
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
       addons:
         apt:

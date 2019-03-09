@@ -1,4 +1,5 @@
 .github/
+.nyc_output/
 src/
 lib/
 coverage/
