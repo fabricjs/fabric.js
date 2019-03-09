@@ -4,6 +4,18 @@
   fabric.Object.prototype.objectCaching = false;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
+    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
+      family: 'Ubuntu', weight: 'regular', style: 'normal'
+    });
+    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
+      family: 'Ubuntu', weight: 'bold', style: 'normal'
+    });
+    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
+      family: 'Ubuntu', weight: 'regular', style: 'italic'
+    });
+    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
+      family: 'Ubuntu', weight: 'bold', style: 'italic'
+    });
     visualTestLoop = global.visualTestLoop;
   }
   else {
@@ -149,8 +161,50 @@
   tests.push({
     test: 'Text with strokeWidths',
     code: text5,
-    disabled: true,
     golden: 'text5.png',
+    percentage: 0.06,
+  });
+
+  function text6(canvas, callback) {
+    var text = new fabric.Text('regular', {
+      left: 0,
+      top: 0,
+      fontFamily: 'Ubuntu'
+    });
+    canvas.add(text);
+
+    text = new fabric.Text('bold', {
+      left: 0,
+      top: 50,
+      fontFamily: 'Ubuntu',
+      fontWeight: 'bold'
+    });
+    canvas.add(text);
+
+    text = new fabric.Text('italic', {
+      left: 0,
+      top: 100,
+      fontFamily: 'Ubuntu',
+      fontStyle: 'italic'
+    });
+    canvas.add(text);
+
+    text = new fabric.Text('bold italic', {
+      left: 0,
+      top: 150,
+      fontFamily: 'Ubuntu',
+      fontWeight: 'bold',
+      fontStyle: 'italic'
+    });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text with custom fonts',
+    code: text6,
+    golden: 'text6.png',
     percentage: 0.06,
   });
 
