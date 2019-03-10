@@ -1385,7 +1385,7 @@
         return;
       }
 
-      var shadow = this.shadow, canvas = this.canvas,
+      var shadow = this.shadow, canvas = this.canvas, scaling,
           multX = (canvas && canvas.viewportTransform[0]) || 1,
           multY = (canvas && canvas.viewportTransform[3]) || 1;
       if (shadow.nonScaling) {
