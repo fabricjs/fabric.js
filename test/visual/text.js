@@ -162,7 +162,7 @@
     test: 'Text with strokeWidths',
     code: text5,
     golden: 'text5.png',
-    disabled: fabric.isLikelyNode,
+    disabled: true,
     percentage: 0.15,
   });
 
