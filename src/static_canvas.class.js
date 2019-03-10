@@ -1177,7 +1177,7 @@
         objects: this._toObjects(methodName, propertiesToInclude),
       };
       if (clipPath) {
-        data.clipPath = this.clipPath;
+        data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
       }
       extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
 
