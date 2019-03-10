@@ -162,7 +162,7 @@
     test: 'Text with strokeWidths',
     code: text5,
     golden: 'text5.png',
-    percentage: 0.06,
+    percentage: 0.15,
   });
 
   function text6(canvas, callback) {
