@@ -45,10 +45,10 @@
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "build_with_gestures": "node build.js modules=ALL exclude=accessors",
     "build_export": "npm run build:fast && npm run export_dist_to_site",
-    "test:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
-    "test": "istanbul cover ./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/unit",
-    "test:visual": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib test/visual",
-    "test:visual:single": "./node_modules/qunit/bin/qunit test/node_test_setup.js test/lib",
+    "test:single": "quint test/node_test_setup.js test/lib",
+    "test": "nyc qunit test/node_test_setup.js test/lib test/unit",
+    "test:visual": "qunit test/node_test_setup.js test/lib test/visual",
+    "test:visual:single": "qunit test/node_test_setup.js test/lib",
     "test:all": "npm run test && npm run test:visual",
     "lint": "eslint --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
@@ -60,22 +60,21 @@
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
-    "canvas": "^1.6.13",
-    "jsdom": "^9.12.0",
-    "xmldom": "0.1.x"
+    "canvas": "^2.3.0",
+    "jsdom": "13.1.0"
   },
   "devDependencies": {
     "eslint": "4.18.x",
-    "istanbul": "0.4.x",
+    "nyc": "13.3.x",
     "onchange": "^3.x.x",
-    "qunit": "2.6.2",
+    "qunit": "2.9.2",
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
     "pixelmatch": "^4.0.2",
     "chalk": "^2.4.1"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "main": "./dist/fabric.js",
   "dependencies": {}

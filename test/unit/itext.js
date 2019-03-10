@@ -278,18 +278,6 @@
     iText.abortCursorAnimation();
   });
 
-  /*  QUnit.test('enterEditing, exitEditing eventlistener counts', function(assert) {
-    var iText = new fabric.IText('test');
-    canvas.add(iText);
-    assert.equal(typeof iText.enterEditing, 'function');
-    assert.equal(typeof iText.exitEditing, 'function');
-    iText.enterEditing();
-    var length = iText.canvas.__eventListeners["mouse:move"].length;
-    assert.equal(iText.canvas.__eventListeners["mouse:move"], length);
-    iText.exitEditing();
-    assert.equal(iText.canvas__eventListeners["mouse:move"].length, length - 1);
-  });*/
-
   QUnit.test('event firing', function(assert) {
     var iText = new fabric.IText('test'),
         enter = 0, exit = 0, modify = 0;
@@ -335,111 +323,6 @@
     assert.equal(modify, 1);
     iText.abortCursorAnimation();
   });
-
-  // TODO: read those and make tests for new functions
-  // QUnit.test('insertChar and changed', function(assert) {
-  //   var iText = new fabric.IText('test'), changed = 0;
-  //
-  //   function textChanged () {
-  //     changed++;
-  //   }
-  //   assert.equal(typeof iText.insertChar, 'function');
-  //   iText.on('changed', textChanged);
-  //   assert.equal(changed, 0);
-  //   iText.insertChar('foo_');
-  //   assert.equal(iText.text, 'foo_test');
-  //   assert.equal(changed, 1, 'event will fire once');
-  // });
-  //
-  // QUnit.test('insertChar with style', function(assert) {
-  //   var iText = new fabric.IText('test'),
-  //       style = {fontSize: 4};
-  //
-  //   assert.equal(typeof iText.insertChar, 'function');
-  //   iText.insertChar('f', false, style);
-  //   assert.equal(iText.text, 'ftest');
-  //   assert.deepEqual(iText.styles[0][0], style);
-  // });
-  //
-  // QUnit.test('insertChar with selectionStart with style', function(assert) {
-  //   var iText = new fabric.IText('test'),
-  //       style = {fontSize: 4};
-  //   assert.equal(typeof iText.insertChar, 'function');
-  //   iText.selectionStart = 2;
-  //   iText.selectionEnd = 2;
-  //   iText.insertChar('f', false, style);
-  //   assert.equal(iText.text, 'tefst');
-  //   assert.deepEqual(iText.styles[0][2], style);
-  // });
-  //
-  //
-  // QUnit.test('insertChars', function(assert) {
-  //   var iText = new fabric.IText('test');
-  //
-  //   assert.equal(typeof iText.insertChars, 'function');
-  //
-  //   iText.insertChars('foo_');
-  //   assert.equal(iText.text, 'foo_test');
-  //
-  //   iText.text = 'test';
-  //   iText.selectionStart = iText.selectionEnd = 2;
-  //   iText.insertChars('_foo_');
-  //   assert.equal(iText.text, 'te_foo_st');
-  //
-  //   iText.text = 'test';
-  //   iText.selectionStart = 1;
-  //   iText.selectionEnd = 3;
-  //   iText.insertChars('_foo_');
-  //   assert.equal(iText.text, 't_foo_t');
-  // });
-  //
-  // QUnit.test('insertChars changed', function(assert) {
-  //   var iText = new fabric.IText('test'), changed = 0;
-  //   function textChanged () {
-  //     changed++;
-  //   }
-  //   assert.equal(typeof iText.insertChars, 'function');
-  //   iText.on('changed', textChanged);
-  //   assert.equal(changed, 0);
-  //   iText.insertChars('foo_');
-  //   assert.equal(changed, 1, 'insertChars fires the event once if there is no style');
-  //   assert.equal(iText.text, 'foo_test');
-  // });
-  //
-  // QUnit.test('insertChars changed with copied style', function(assert) {
-  //   var iText = new fabric.IText('test'), changed = 0,
-  //       style = {0: {fontSize: 20}, 1: {fontSize: 22}};
-  //   function textChanged () {
-  //     changed++;
-  //   }
-  //   fabric.copiedTextStyle = style;
-  //   assert.equal(typeof iText.insertChars, 'function');
-  //   iText.on('changed', textChanged);
-  //   assert.equal(changed, 0);
-  //   iText.insertChars('foo_', true);
-  //   assert.equal(changed, 1, 'insertChars fires once even if style is used');
-  //   assert.equal(iText.text, 'foo_test');
-  //   assert.deepEqual(iText.styles[0][0], style[0], 'style should be copied');
-  // });
-  //
-  //
-  // QUnit.test('insertNewline', function(assert) {
-  //   var iText = new fabric.IText('test');
-  //
-  //   assert.equal(typeof iText.insertNewline, 'function');
-  //
-  //   iText.selectionStart = iText.selectionEnd = 2;
-  //   iText.insertNewline();
-  //
-  //   assert.equal(iText.text, 'te\nst');
-  //
-  //   iText.text = 'test';
-  //   iText.selectionStart = 1;
-  //   iText.selectionEnd = 3;
-  //   iText.insertNewline();
-  //
-  //   assert.equal(iText.text, 't\nt');
-  // });
 
   QUnit.test('insertNewlineStyleObject', function(assert) {
     var iText = new fabric.IText('test\n2');
@@ -737,24 +620,6 @@
     assert.equal(iText.getCurrentCharColor(), '#333');
   });
 
-  // QUnit.test('toSVG', function(assert) {
-  //   var iText = new fabric.IText('test', {
-  //     styles: {
-  //       0: {
-  //         0: { fill: '#112233' },
-  //         2: { stroke: '#223344' }
-  //       }
-  //     }
-  //   });
-  //   assert.equal(typeof iText.toSVG, 'function');
-  //   if (fabric.isLikelyNode) {
-  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
-  //   }
-  //   else {
-  //     assert.equal(iText.toSVG(), '\t<g transform=\"translate(28.27 23.1)\">\n\t\t<text font-family=\"Times New Roman\" font-size=\"40\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\" >\n\t\t\t<tspan x=\"-27.77\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(17,34,51); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t\t<tspan x=\"-16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">e</tspan>\n\t\t\t<tspan x=\"1.09\" y=\"12.6\" style=\"stroke: rgb(34,51,68); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">s</tspan>\n\t\t\t<tspan x=\"16.66\" y=\"12.6\" style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: ; opacity: 1;\">t</tspan>\n\t\t</text>\n\t</g>\n');
-  //   }
-  // });
-
   QUnit.test('toSVGWithFonts', function(assert) {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
@@ -824,25 +689,4 @@
     iText.exitEditing();
     canvas2.dispose();
   });
-
-  // QUnit.test('measuring width of words', function (assert) {
-  //   var ctx = canvas.getContext('2d');
-  //   var text = 'test foo bar';
-  //   var iText = new fabric.IText(text, {
-  //     styles: {
-  //       0: {
-  //         9: { fontWeight: 'bold' },
-  //         10: { fontWeight: 'bold' },
-  //         11: { fontWeight: 'bold' },
-  //       }
-  //     }
-  //   });
-  //
-  //   var textSplitted = text.split(' ');
-  //   var measuredBy_getWidthOfWords_preservedSpaces = iText._getWidthOfWords(ctx, textSplitted.join(' '), 0, 0);
-  //   var measuredBy_getWidthOfWords_omittedSpaces   = iText._getWidthOfWords(ctx, textSplitted.join(''), 0, 0);
-  //
-  //   assert.notEqual(measuredBy_getWidthOfWords_preservedSpaces, measuredBy_getWidthOfWords_omittedSpaces);
-  // });
-
 })();

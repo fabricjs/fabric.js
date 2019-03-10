@@ -64,49 +64,51 @@
     imgEl = null;
     return src;
   }
-
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+  var IMG_SRC =
+        fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif'))
+          :
+          getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'version': fabric.version,
-    'type':                    'image',
-    'originX':                 'left',
-    'originY':                 'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':                   IMG_HEIGHT, // or does it now?
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              0,
-    'strokeDashArray':          null,
-    'strokeDashOffset':         0,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         4,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'src':                      IMG_SRC,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'filters':                  [],
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'transformMatrix':          null,
-    'crossOrigin':              '',
-    'skewX':                    0,
-    'skewY':                    0,
-    'cropX':                    0,
-    'cropY':                    0
+    version: fabric.version,
+    type: 'image',
+    originX: 'left',
+    originY: 'top',
+    left: 0,
+    top: 0,
+    width: IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    height: IMG_HEIGHT, // or does it now?
+    fill: 'rgb(0,0,0)',
+    stroke: null,
+    strokeWidth: 0,
+    strokeDashArray: null,
+    strokeDashOffset: 0,
+    strokeLineCap: 'butt',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 4,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+    opacity: 1,
+    src: IMG_SRC,
+    shadow: null,
+    visible: true,
+    backgroundColor: '',
+    clipTo: null,
+    filters: [],
+    fillRule: 'nonzero',
+    paintFirst: 'fill',
+    globalCompositeOperation: 'source-over',
+    transformMatrix: null,
+    crossOrigin: '',
+    skewX: 0,
+    skewY: 0,
+    cropX: 0,
+    cropY: 0
   };
 
   function _createImageElement() {
@@ -498,6 +500,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
@@ -513,6 +516,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 1 });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
@@ -528,6 +532,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 3 });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.devicePixelRatio * 3, 'output width is bigger by 6');
@@ -543,6 +548,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
@@ -558,6 +564,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 1 });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
@@ -573,6 +580,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 3 });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * 3, 'output width is bigger by 3');
@@ -588,6 +596,7 @@
     fabric.devicePixelRatio = 2;
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
+    c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is bigger');
@@ -1834,6 +1843,7 @@
     assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
+    canvas2.dispose();
   });
 
   // QUnit.test('backgroundImage', function(assert) {
