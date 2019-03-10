@@ -162,6 +162,7 @@
     test: 'Text with strokeWidths',
     code: text5,
     golden: 'text5.png',
+    disabled: fabric.isLikelyNode,
     percentage: 0.15,
   });
 
@@ -205,6 +206,7 @@
     test: 'Text with custom fonts',
     code: text6,
     golden: 'text6.png',
+    disabled: !fabric.isLikelyNode,
     percentage: 0.06,
   });
 
