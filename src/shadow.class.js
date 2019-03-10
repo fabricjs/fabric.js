@@ -66,7 +66,7 @@
      * @type Boolean
      * @default
      */
-    shadowUniform: false,
+    nonScaling: false,
 
     /**
      * Constructor
@@ -168,12 +168,12 @@
           offsetX: this.offsetX,
           offsetY: this.offsetY,
           affectStroke: this.affectStroke,
-          shadowUniform: this.shadowUniform
+          nonScaling: this.nonScaling
         };
       }
       var obj = { }, proto = fabric.Shadow.prototype;
 
-      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'shadowUniform'].forEach(function(prop) {
+      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'].forEach(function(prop) {
         if (this[prop] !== proto[prop]) {
           obj[prop] = this[prop];
         }
