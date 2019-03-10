@@ -1301,7 +1301,7 @@
     };
 
     assert.ok(typeof canvasWithClipPath.toObject === 'function');
-    assert.deepEqual(JSON.stringify(expectedObject), JSON.stringify(canvasWithClipPath.toObject()));
+    assert.deepEqual(expectedObject, canvasWithClipPath.toObject());
 
     var rect = makeRect();
     canvasWithClipPath.add(rect);
