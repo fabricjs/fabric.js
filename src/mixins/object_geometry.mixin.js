@@ -35,7 +35,7 @@
      * each property is an object with x, y, instance of Fabric.Point.
      * The coordinates depends from this properties: width, height, scaleX, scaleY
      * skewX, skewY, angle, strokeWidth, top, left.
-     * Those coordinates are useful to understand where an object is. They get updated
+     * Those coordinates are usefull to understand where an object is. They get updated
      * with oCoords but they do not need to be updated when zoom or panning change.
      * The coordinates get updated with @method setCoords.
      * You can calculate them without updating with @method calcCoords(true);
@@ -189,7 +189,7 @@
      * @param {Fabric.Point} pointTL Top Left point
      * @param {Fabric.Point} pointBR Top Right point
      * @param {Boolean} calculate use coordinates of current position instead of .oCoords
-     * @return {Boolean} true if the object contains the point
+     * @return {Boolean} true if the objects containe the point
      */
     _containsCenterOfCanvas: function(pointTL, pointBR, calculate) {
       // worst case scenario the object is so big that contains the screen
@@ -294,7 +294,7 @@
 
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
-     * the box is intended as aligned to axis of canvas.
+     * the box is intented as aligned to axis of canvas.
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords / .aCoords
      * @return {Object} Object with left, top, width, height properties
@@ -305,7 +305,7 @@
     },
 
     /**
-     * Returns width of an object's bounding box counting transformations
+     * Returns width of an object bounding box counting transformations
      * before 2.0 it was named getWidth();
      * @return {Number} width value
      */
@@ -382,7 +382,7 @@
     },
 
     /**
-     * Calculates and returns the .coords of an object.
+     * Calculate and returns the .coords of an object.
      * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
      */
@@ -457,7 +457,7 @@
      * Sets corner position coordinates based on current angle, width and height.
      * See {@link https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords|When-to-call-setCoords}
      * @param {Boolean} [ignoreZoom] set oCoords with or without the viewport transform.
-     * @param {Boolean} [skipAbsolute] skip calculation of aCoords, useful in setViewportTransform
+     * @param {Boolean} [skipAbsolute] skip calculation of aCoords, usefull in setViewportTransform
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -505,10 +505,10 @@
     },
 
     /**
-     * calculate transform matrix that represents the current transformations from the
-     * object's properties.
-     * @param {Boolean} [skipGroup] return transform matrix for object not counting parent transformations
-     * @return {Array} transform matrix for the object
+     * calculate trasform Matrix that represent current transformation from
+     * object properties.
+     * @param {Boolean} [skipGroup] return transformMatrix for object and not go upward with parents
+     * @return {Array} matrix Transform Matrix for the object
      */
     calcTransformMatrix: function(skipGroup) {
       if (skipGroup) {
@@ -576,7 +576,7 @@
     },
 
     /*
-     * Calculate object bounding box dimensions from its properties scale, skew.
+     * Calculate object bounding boxdimensions from its properties scale, skew.
      * @private
      * @return {Object} .x width dimension
      * @return {Object} .y height dimension
@@ -600,7 +600,7 @@
         dimY = dimensions.y;
       }
       if (noSkew) {
-        return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
+        return this._finalizeDiemensions(dimX * this.scaleX, dimY * this.scaleY);
       }
       else {
         dimX /= 2;
@@ -629,25 +629,25 @@
         points[i] = fabric.util.transformPoint(points[i], transformMatrix);
       }
       bbox = fabric.util.makeBoundingBoxFromPoints(points);
-      return this._finalizeDimensions(bbox.width, bbox.height);
+      return this._finalizeDiemensions(bbox.width, bbox.height);
     },
 
     /*
-     * Calculate object bounding box dimensions from its properties scale, skew.
+     * Calculate object bounding boxdimensions from its properties scale, skew.
      * @param Number width width of the bbox
      * @param Number height height of the bbox
      * @private
      * @return {Object} .x finalized width dimension
      * @return {Object} .y finalized height dimension
      */
-    _finalizeDimensions: function(width, height) {
+    _finalizeDiemensions: function(width, height) {
       return this.strokeUniform ?
         { x: width + this.strokeWidth, y: height + this.strokeWidth }
         :
         { x: width, y: height };
     },
     /*
-     * Calculate object dimensions for controls, including padding and canvas zoom
+     * Calculate object dimensions for controls. include padding and canvas zoom
      * private
      */
     _calculateCurrentDimensions: function()  {

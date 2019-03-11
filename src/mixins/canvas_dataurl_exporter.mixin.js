@@ -47,7 +47,7 @@
      * Create a new HTMLCanvas element painted with the current canvas content.
      * No need to resize the actual one or repaint it.
      * Will transfer object ownership to a new canvas, paint it, and set everything back.
-     * This is an intermediary step used to get to a dataUrl but also it is useful to
+     * This is an intermediary step used to get to a dataUrl but also it is usefull to
      * create quick image copies of a canvas without passing for the dataUrl string
      * @param {Number} [multiplier] a zoom factor.
      * @param {Object} [cropping] Cropping informations
