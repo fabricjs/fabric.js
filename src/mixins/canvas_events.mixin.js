@@ -665,7 +665,7 @@
 
     /**
      * Method that defines the actions when mouse is hovering the canvas.
-     * The currentTransform parameter will definde whether the user is rotating/scaling/translating
+     * The currentTransform parameter will define whether the user is rotating/scaling/translating
      * an image or neither of them (only hovering). A group selection is also possible and would cancel
      * all any other type of action.
      * In case of an image transformation only the top canvas will be rendered.
@@ -715,7 +715,7 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      this.fireSynteticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, e, {
         targetName: '_hoveredTarget',
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
@@ -731,7 +731,7 @@
      * @private
      */
     _fireEnterLeaveEvents: function(target, e) {
-      this.fireSynteticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, e, {
         targetName: '_draggedoverTarget',
         evtOut: 'dragleave',
         evtIn: 'dragenter',
@@ -739,7 +739,7 @@
     },
 
     /**
-     * Manage the syntetic in/out events for the fabric objects on the canvas
+     * Manage the synthetic in/out events for the fabric objects on the canvas
      * @param {Fabric.Object} target the target where the target from the supported events
      * @param {Event} e Event object fired
      * @param {Object} config configuration for the function to work
@@ -750,7 +750,7 @@
      * @param {String} config.evtIn name of the event to fire for in
      * @private
      */
-    fireSynteticInOutEvents: function(target, e, config) {
+    fireSyntheticInOutEvents: function(target, e, config) {
       var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
@@ -871,9 +871,9 @@
     /**
      * @private
      * @param {Event} e Event object
-     * @param {Object} transform current tranform
+     * @param {Object} transform current transform
      * @param {Number} x mouse position x from origin
-     * @param {Number} y mouse poistion y from origin
+     * @param {Number} y mouse position y from origin
      * @return {Boolean} true if the scaling occurred
      */
     _onScale: function(e, transform, x, y) {
