@@ -17739,12 +17739,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           center = this.getCenterPoint(),
 
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-
           translatePart = 'translate(' +
                             toFixed(center.x, NUM_FRACTION_DIGITS) +
                             ' ' +
                             toFixed(center.y, NUM_FRACTION_DIGITS) +
                           ')',
+
+          // translatePart = 'translate(' +
+          //                 0 +
+          //                 ' ' +
+          //                 0 +
+          //               ')',
 
           anglePart = angle !== 0
             ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
@@ -17771,6 +17776,52 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ].join('');
     },
 
+    getSvgTransformForTextGroup: function() {
+      var angle = this.angle,
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
+          center = this.getCenterPoint(),
+
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      //niloy made changes here
+          // translatePart = 'translate(' +
+          //                   toFixed(center.x, NUM_FRACTION_DIGITS) +
+          //                   ' ' +
+          //                   toFixed(center.y, NUM_FRACTION_DIGITS) +
+          //                 ')',
+
+          translatePart = 'translate(' +
+                          0 +
+                          ' ' +
+                          0 +
+                        ')',
+
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
+
+          scalePart = (this.scaleX === 1 && this.scaleY === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+            ')'),
+
+          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
+
+          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
+
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
+
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
+
+      return [
+        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
+      ].join('');
+    },
+
+
     /**
      * Returns transform-string for svg-export from the transform matrix of single elements
      * @return {String}
@@ -17780,15 +17831,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     _setSVGBg: function(textBgRects) {
+      center = this.getCenterPoint();
       if (this.backgroundColor) {
         var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
-          ' x="',
-          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+          ' x="', // niloy undid changes in x & y - introduced the center - width and center - height
+          toFixed(center.x - this.width / 2, NUM_FRACTION_DIGITS),
           '" y="',
-          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+          toFixed(center.y - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',
           toFixed(this.width, NUM_FRACTION_DIGITS),
           '" height="',
@@ -19005,6 +19057,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
+      var center = this.getCenterPoint(); // niloy made chnages here too, introduced center again
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
           angle = (this.endAngle - this.startAngle) % ( 2 * pi);
 
@@ -19595,6 +19648,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
+      // var center = this.getCenterPoint(); // niloy made chnages here too, introduced center again
       var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2;
       markup.push(
         '<rect ', this.getSvgId(),
@@ -30694,9 +30748,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @private
      */
     _getSVGLeftTopOffsets: function() {
+      center = this.getCenterPoint();
+      
       return {
-        textLeft: -this.width / 2,
-        textTop: -this.height / 2,
+        // textLeft: -this.width / 2,
+        // textTop: -this.height / 2,//, niloy made changes here
+        textLeft: center.x - this.width/2,
+        textTop: center.y - this.height/2 + 0.222,
+
         lineTop: this.getHeightOfLine(0)
       };
     },
@@ -30708,8 +30767,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var noShadow = true, filter = this.getSvgFilter(),
           style = filter === '' ? '' : ' style="' + filter + '"',
           textDecoration = this.getSvgTextDecoration(this);
-      markup.push(
-        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
+      markup.push( //niloy made changes here
+        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransformForTextGroup(), this.getSvgTransformMatrix(), '"',
         style, '>\n',
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',
