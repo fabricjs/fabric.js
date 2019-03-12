@@ -24,8 +24,11 @@
      */
     _getSVGLeftTopOffsets: function() {
       return {
-        textLeft: -this.width / 2,
-        textTop: -this.height / 2,
+        //niloy made changes here
+        // textLeft: -this.width / 2,
+        // textTop: -this.height / 2,
+        textLeft: center.x - this.width/2,
+        textTop: center.y - this.height/2 + 0.222,
         lineTop: this.getHeightOfLine(0)
       };
     },
@@ -37,8 +40,8 @@
       var noShadow = true, filter = this.getSvgFilter(),
           style = filter === '' ? '' : ' style="' + filter + '"',
           textDecoration = this.getSvgTextDecoration(this);
-      markup.push(
-        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
+      markup.push( //niloy made changes here
+        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransformForTextGroup(), this.getSvgTransformMatrix(), '"',
         style, '>\n',
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',

@@ -180,16 +180,61 @@
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
-          ' x="',
-          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+          ' x="', // niloy did changes in x & y - introduced the center - width and center - height
+          toFixed(center.x - this.width / 2, NUM_FRACTION_DIGITS),
           '" y="',
-          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+          toFixed(center.y - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',
           toFixed(this.width, NUM_FRACTION_DIGITS),
           '" height="',
           toFixed(this.height, NUM_FRACTION_DIGITS),
           '"></rect>\n');
       }
+    },
+
+    getSvgTransformForTextGroup: function() {
+      var angle = this.angle,
+          skewX = (this.skewX % 360),
+          skewY = (this.skewY % 360),
+          center = this.getCenterPoint(),
+
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      //niloy made changes here
+          // translatePart = 'translate(' +
+          //                   toFixed(center.x, NUM_FRACTION_DIGITS) +
+          //                   ' ' +
+          //                   toFixed(center.y, NUM_FRACTION_DIGITS) +
+          //                 ')',
+
+          translatePart = 'translate(' +
+                          0 +
+                          ' ' +
+                          0 +
+                        ')',
+
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
+
+          scalePart = (this.scaleX === 1 && this.scaleY === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+            ')'),
+
+          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
+
+          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
+
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 0 0) ' : '',
+
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 0)' : '';
+
+      return [
+        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
+      ].join('');
     },
 
     /**
