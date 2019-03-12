@@ -1254,4 +1254,42 @@
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
     assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
   });
+  QUnit.test('shouldCache', function(assert) {
+    var object = new fabric.Object();
+    object.objectCaching = false;
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, object should not cache');
+    object.objectCaching = true;
+    assert.equal(object.shouldCache(), true, 'if objectCaching is true, object should cache');
+    object.objectCaching = false;
+    object.clipPath = true;
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, shouldCache returns true');
+    delete object.clipPath;
+
+    object.objectCaching = true;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is true, but we are in a group, shouldCache returns false');
+
+    object.objectCaching = true;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is true, but we are in a not cached group, shouldCache returns true');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a not cached group, shouldCache returns false');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a cached group, shouldCache returns false');
+
+    object.clipPath = {};
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group cached, we cache anyway');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group not cached, we cache anyway');
+
+  });
 })();
