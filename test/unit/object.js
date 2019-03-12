@@ -1261,9 +1261,10 @@
     object.objectCaching = true;
     assert.equal(object.shouldCache(), true, 'if objectCaching is true, object should cache');
     object.objectCaching = false;
-    object.clipPath = true;
+    object.needsItsOwnCache = function () { return true; };
     assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, shouldCache returns true');
-    delete object.clipPath;
+
+    object.needsItsOwnCache = function () { return false; };
 
     object.objectCaching = true;
     object.group = { isOnACache: function() { return true; }};
@@ -1281,7 +1282,7 @@
     object.group = { isOnACache: function() { return true; }};
     assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a cached group, shouldCache returns false');
 
-    object.clipPath = {};
+    object.needsItsOwnCache = function () { return true; };
 
     object.objectCaching = false;
     object.group = { isOnACache: function() { return true; }};
@@ -1291,5 +1292,33 @@
     object.group = { isOnACache: function() { return false; }};
     assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group not cached, we cache anyway');
 
+  });
+  QUnit.test('needsItsOwnCache', function(assert) {
+    var object = new fabric.Object();
+    assert.equal(object.needsItsOwnCache(), false, 'default needsItsOwnCache is false');
+    object.clipPath = {};
+    assert.equal(object.needsItsOwnCache(), true, 'with a clipPath is true');
+    delete object.clipPath;
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return true');
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.shadow = null;
+    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return false if no shadow');
+
+    object.paintFirst = 'stroke';
+    object.stroke = '';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no stroke');
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.fill = '';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no fill');
   });
 })();
