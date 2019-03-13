@@ -87,6 +87,49 @@
     assert.deepEqual(obj, TEXTBOX_OBJECT, 'JSON OUTPUT MATCH');
   });
 
+  QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(textbox) {
+      assert.equal(textbox.text, 'x', 'properties are respected');
+      assert.ok(textbox instanceof fabric.Textbox, 'the generated object is a textbox');
+      done();
+    });
+  });
+
+  QUnit.test('isEndOfWrapping', function(assert) {
+    var textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
+      width: 70,
+    });
+    assert.equal(textbox.isEndOfWrapping(0), false, 'first line is not end of wrapping');
+    assert.equal(textbox.isEndOfWrapping(1), false, 'second line is not end of wrapping');
+    assert.equal(textbox.isEndOfWrapping(2), true, 'line before an hard break is end of wrapping');
+    assert.equal(textbox.isEndOfWrapping(3), false, 'line 3 is not end of wrapping');
+    assert.equal(textbox.isEndOfWrapping(4), false, 'line 4 is not end of wrapping');
+    assert.equal(textbox.isEndOfWrapping(5), true, 'last line is end of wrapping');
+  });
+
+  QUnit.test('_removeExtraneousStyles', function(assert) {
+    var textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
+      width: 40,
+      styles: {
+        0: { 0: { fontSize: 4 } },
+        1: { 0: { fontSize: 4 } },
+        2: { 0: { fontSize: 4 } },
+        3: { 0: { fontSize: 4 } },
+        4: { 0: { fontSize: 4 } },
+        5: { 0: { fontSize: 4 } },
+      }
+    });
+    assert.deepEqual(textbox.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
+    assert.deepEqual(textbox.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
+    assert.deepEqual(textbox.styles[5], { 0: { fontSize: 4 } }, 'style line 5 exists');
+    textbox._removeExtraneousStyles();
+    assert.equal(textbox.styles[2], undefined, 'style line 2 has been removed');
+    assert.equal(textbox.styles[3], undefined, 'style line 3 has been removed');
+    assert.equal(textbox.styles[4], undefined, 'style line 4 has been removed');
+    assert.equal(textbox.styles[5], undefined, 'style line 5 has been removed');
+  });
+
   QUnit.test('isEmptyStyles', function(assert) {
     var textbox = new fabric.Textbox('x x', { width: 5, styles: { 0: { 0: { fill: 'red' } } } });
     assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
@@ -194,5 +237,19 @@
     assert.equal(scaled, true, 'return true if textbox scaled');
     assert.equal(text.width, originalWidth + 20, 'width increased');
     assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
+  });
+  QUnit.test('_removeExtraneousStyles', function(assert) {
+    var iText = new fabric.IText('a\nq\qo', { styles: {
+      0: { 0: { fontSize: 4 } },
+      1: { 0: { fontSize: 4 } },
+      2: { 0: { fontSize: 4 } },
+      3: { 0: { fontSize: 4 } },
+      4: { 0: { fontSize: 4 } },
+    } });
+    assert.deepEqual(iText.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
+    assert.deepEqual(iText.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
+    iText._removeExtraneousStyles();
+    assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
+    assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
   });
 })();
