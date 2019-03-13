@@ -62,5 +62,33 @@
     height: 60,
   });
 
+  function shadownonscaling(canvas, callback) {
+    var obj = new fabric.Rect();
+    obj.set({
+      width: 10,
+      height: 10,
+      scaleX: 12,
+      scaleY: 3,
+      top: 10,
+      left: 5,
+      fill: '#f55',
+    });
+    obj.setShadow({ 
+      color: 'rgba(0,100,0,0.9)', blur: 5,	offsetX: 8, offsetY: 8,	nonScaling: true
+    });
+    canvas.add(obj);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Rect DropShadow with nonScaling: true',
+    code: shadownonscaling,
+    golden: 'shadownonscaling.png',
+    percentage: 0.09,
+    width: 150,
+    height: 60,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
