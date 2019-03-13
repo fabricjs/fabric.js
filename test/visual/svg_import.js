@@ -12,7 +12,6 @@
     visualTestLoop = window.visualTestLoop;
     getAsset = window.getAsset;
   }
-  var fabricCanvas = new fabric.Canvas(null, {enableRetinaScaling: false, renderOnAddRemove: false});
 
   function createTestFromSVG(svgName) {
     var test = function(canvas, callback) {
@@ -28,7 +27,7 @@
           canvas.add(group);
           canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
           canvas.renderAll();
-          callback(fabricCanvas.lowerCanvasEl);
+          callback(canvas.lowerCanvasEl);
         });
       });
     };
@@ -40,16 +39,7 @@
     };
   }
 
-  function beforeEachHandler() {
-    fabricCanvas.clipPath = null;
-    fabricCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    fabricCanvas.clear();
-    fabricCanvas.renderAll();
-  }
-
-  QUnit.module('Simple svg import test', {
-    beforeEach: beforeEachHandler,
-  });
+  QUnit.module('Simple svg import test');
 
   var tests = [
     'svg_stroke_1',
@@ -89,5 +79,5 @@
     //'clippath-8',
   ].map(createTestFromSVG);
 
-  tests.forEach(visualTestLoop(fabricCanvas, QUnit));
+  tests.forEach(visualTestLoop(QUnit));
 })();

@@ -1,56 +1,7 @@
 (function() {
 
-  // function getAbsolutePath(path) {
-  //   var isAbsolute = /^https?:/.test(path);
-  //   if (isAbsolute) { return path; };
-  //   var imgEl = _createImageElement();
-  //   imgEl.src = path;
-  //   var src = imgEl.src;
-  //   imgEl = null;
-  //   return src;
-  // }
-
-  var // IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      // IMG_WIDTH   = 276,
-      // IMG_HEIGHT  = 110,
-      canvas = fabric.document.createElement('canvas'),
+  var canvas = fabric.document.createElement('canvas'),
       context = canvas.getContext('2d');
-
-
-  // var REFERENCE_IMG_OBJECT = {
-  //   'type':               'image',
-  //   'originX':            'left',
-  //   'originY':            'top',
-  //   'left':               0,
-  //   'top':                0,
-  //   'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-  //   'height':             IMG_HEIGHT, // or does it now?
-  //   'fill':               'rgb(0,0,0)',
-  //   'stroke':             null,
-  //   'strokeWidth':        1,
-  //   'strokeDashArray':    null,
-  //   'strokeLineCap':      'butt',
-  //   'strokeLineJoin':     'miter',
-  //   'strokeMiterLimit':   4,
-  //   'scaleX':             1,
-  //   'scaleY':             1,
-  //   'angle':              0,
-  //   'flipX':              false,
-  //   'flipY':              false,
-  //   'opacity':            1,
-  //   'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
-  //   'selectable':         true,
-  //   'hasControls':        true,
-  //   'hasBorders':         true,
-  //   'hasRotatingPoint':   true,
-  //   'transparentCorners': true,
-  //   'perPixelTargetFind': false,
-  //   'shadow':             null,
-  //   'visible':            true,
-  //   'clipTo':             null,
-  //   'filters':            []
-  // };
-
 
   function _createImageData(context) {
     var imageData = context.createImageData(3, 1);
@@ -68,33 +19,6 @@
     imageData.data[11] = 1;
     return imageData;
   }
-
-  // function _createImageObject(width, height, callback) {
-  //   var elImage = _createImageElement();
-  //   elImage.width = width;
-  //   elImage.height = height;
-  //   setSrc(elImage, IMG_SRC, function() {
-  //     callback(new fabric.Image(elImage));
-  //   });
-  // }
-
-  // function createImageObject(callback) {
-  //   return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
-  // }
-
-  // function setSrc(img, src, callback) {
-  //   if (fabric.isLikelyNode) {
-  //     require('fs').readFile(src, function(err, imgData) {
-  //       if (err) { throw err; };
-  //       img.src = imgData;
-  //       callback && callback();
-  //     });
-  //   }
-  //   else {
-  //     img.src = src;
-  //     callback && callback();
-  //   }
-  // }
 
   QUnit.module('fabric.Image.filters.Brightness');
 

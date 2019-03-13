@@ -17,7 +17,7 @@
   }
 
   var IMG_URL = fabric.isLikelyNode
-    ? require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
+    ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
@@ -357,16 +357,16 @@
     el.appendChild(fabric.document.createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
-    if (typeof el.onselectstart != 'undefined') {
+    if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart, fabric.util.falseFunction);
     }
 
     // not sure if it's a good idea to test implementation details here
     // functional test would probably make more sense
-    if (typeof el.unselectable == 'string') {
+    if (typeof el.unselectable === 'string') {
       assert.equal('on', el.unselectable);
     }
-    else if (typeof el.userSelect != 'undefined') {
+    else if (typeof el.userSelect !== 'undefined') {
       assert.equal('none', el.userSelect);
     }
   });
@@ -383,13 +383,13 @@
     makeElementUnselectable(el);
     makeElementSelectable(el);
 
-    if (typeof el.onselectstart != 'undefined') {
+    if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart, null);
     }
-    if (typeof el.unselectable == 'string') {
+    if (typeof el.unselectable === 'string') {
       assert.equal('', el.unselectable);
     }
-    else if (typeof el.userSelect != 'undefined') {
+    else if (typeof el.userSelect !== 'undefined') {
       assert.equal('', el.userSelect);
     }
   });
@@ -472,12 +472,16 @@
       done();
       return;
     }
-
-    fabric.util.loadImage(IMG_URL, function(img) {
-      assert.equal(img.src || img._src, IMG_URL, 'src is set');
-      // assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
-      done();
-    }, null, 'anonymous');
+    try {
+      fabric.util.loadImage(IMG_URL, function(img) {
+        assert.equal(img.src, IMG_URL, 'src is set');
+        assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
+        done();
+      }, null, 'anonymous');
+    }
+    catch (e) {
+      console.log(e);
+    }
   });
 
 

@@ -34,14 +34,10 @@
   else {
     visualTestLoop = window.visualTestLoop;
   }
-  var fabricCanvas = this.canvas = new fabric.Canvas(null, {
-    enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200,
-  });
 
   var tests = [];
 
   function generic1(canvas, callback) {
-    canvas.setDimensions({ width: 150, height: 60 });
     var rect = new fabric.Rect({
       width: 20, height: 40, strokeWidth: 2, scaleX: 6, scaleY: 0.5, strokeUniform: true,
       fill: '', stroke: 'red'
@@ -62,7 +58,9 @@
     golden: 'generic1.png',
     newModule: 'Generic rendering',
     percentage: 0.09,
+    width: 150,
+    height: 60,
   });
 
-  tests.forEach(visualTestLoop(fabricCanvas, QUnit));
+  tests.forEach(visualTestLoop(QUnit));
 })();
