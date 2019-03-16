@@ -228,7 +228,6 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
-  ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
 
 ];
 

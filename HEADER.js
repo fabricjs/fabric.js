@@ -75,7 +75,6 @@ fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)';
 fabric.fontPaths = { };
 fabric.iMatrix = [1, 0, 0, 1, 0, 0];
-fabric.canvasModule = 'canvas';
 
 /**
  * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
