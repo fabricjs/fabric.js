@@ -1321,4 +1321,23 @@
     object.shadow = {};
     assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no fill');
   });
+  QUnit.test('hasStroke', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, strokeWidth: 3, stroke: 'black' });
+    assert.equal(object.hasStroke(), true, 'if strokeWidth is present and stroke is black hasStroke is true');
+    object.stroke = '';
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is present and stroke is empty string hasStroke is false');
+    object.stroke = 'transparent';
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is present and stroke is transparent hasStroke is false');
+    object.stroke = 'black';
+    object.strokeWidth = 0;
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is 0 and stroke is a color hasStroke is false');
+  });
+  QUnit.test('hasFill', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.equal(object.hasFill(), true, 'with a color that is not transparent, hasFill is true');
+    object.fill = '';
+    assert.equal(object.hasFill(), false, 'without a color, hasFill is false');
+    object.fill = 'transparent';
+    assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
+  });
 })();
