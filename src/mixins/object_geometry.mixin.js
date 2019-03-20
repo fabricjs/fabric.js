@@ -570,8 +570,8 @@
      */
     _getNonTransformedDimensions: function() {
       var strokeWidth = this.strokeWidth,
-          w = this.width + strokeWidth,
-          h = this.height + strokeWidth;
+          w = this.width + strokeWidth / (this.strokeUniform ? this.scaleX : 1),
+          h = this.height + strokeWidth / (this.strokeUniform ? this.scaleY : 1);
       return { x: w, y: h };
     },
 
