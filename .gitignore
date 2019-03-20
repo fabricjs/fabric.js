@@ -6,5 +6,4 @@
 before_commit
 /coverage/
 .idea/
-/dist/fabric.require.js
-/dist/fabric.min.js.gz
+
