@@ -51,7 +51,7 @@
 
     addOrRemove: function(functor, eventjsFunctor) {
       functor(fabric.window, 'resize', this._onResize);
-      if (typeof window.PointerEvent !== 'undefined') {
+      if (fabric.window && fabric.window.PointerEvent) {
         functor(this.upperCanvasEl, 'pointerdown', this._onMouseDown);
         functor(this.upperCanvasEl, 'pointermove', this._onMouseMove, addEventOptions);
         functor(this.upperCanvasEl, 'pointerout', this._onMouseOut);
