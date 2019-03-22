@@ -56,7 +56,8 @@
         functor(this.upperCanvasEl, 'pointermove', this._onMouseMove, addEventOptions);
         functor(this.upperCanvasEl, 'pointerout', this._onMouseOut);
         functor(this.upperCanvasEl, 'pointerenter', this._onMouseEnter);
-      } else {
+      }
+      else {
         functor(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         functor(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
         functor(this.upperCanvasEl, 'mouseout', this._onMouseOut);

@@ -216,7 +216,7 @@
           return ev.touches[0].force;
         }
         // MouseEvent, PointerEvent (ev.pointerType: "mouse")
-        if (ev.pointerType === "mouse" || typeof ev.pressure !== "number") {
+        if (ev.pointerType === 'mouse' || typeof ev.pressure !== 'number') {
           return 0.5;
         }
         // PointerEvent (ev.pointerType: pen" | "touch")

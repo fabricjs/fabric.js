@@ -1275,7 +1275,7 @@
         pointer,
         fabric.util.invertTransform(this.viewportTransform)
       );
-      if (typeof pointer.pressure !== "undefined") p.pressure = pointer.pressure;
+      if (typeof pointer.pressure !== 'undefined') {p.pressure = pointer.pressure;}
       return p;
     },
 
