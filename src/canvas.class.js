@@ -1307,6 +1307,7 @@
       }
 
       var pointer = getPointer(e),
+          pressure = pointer.pressure,
           upperCanvasEl = this.upperCanvasEl,
           bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
@@ -1342,7 +1343,8 @@
 
       return {
         x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
+        y: pointer.y * cssScale.height,
+        pressure: pressure
       };
     },
 
