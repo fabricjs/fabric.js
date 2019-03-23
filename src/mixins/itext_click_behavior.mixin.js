@@ -197,6 +197,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         height = 0,
         charIndex = 0,
         lineIndex = 0,
+        missingNewlineOffset = this.splitByGrapheme ? 0 : 1,
         lineLeftOffset,
         line;
 
@@ -205,7 +206,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         height += this.getHeightOfLine(i) * this.scaleY;
         lineIndex = i;
         if (i > 0) {
-          charIndex += this._textLines[i - 1].length + 1;
+          charIndex += this._textLines[i - 1].length + missingNewlineOffset;
         }
       }
       else {

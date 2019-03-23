@@ -166,8 +166,8 @@
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-      var len = lines.length;
+      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines,
+          len = lines.length, missingNewlineOffset = this.splitByGrapheme ? 0 : 1;
       for (var i = 0; i < len; i++) {
         if (selectionStart <= lines[i].length) {
           return {
@@ -175,7 +175,7 @@
             charIndex: selectionStart
           };
         }
-        selectionStart -= lines[i].length + 1;
+        selectionStart -= lines[i].length + missingNewlineOffset;
       }
       return {
         lineIndex: i - 1,
