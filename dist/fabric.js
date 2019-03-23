@@ -10544,6 +10544,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       var pointer = getPointer(e),
+          pressure = pointer.pressure,
           upperCanvasEl = this.upperCanvasEl,
           bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
@@ -10579,7 +10580,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       return {
         x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
+        y: pointer.y * cssScale.height,
+        pressure: pressure
       };
     },
 
