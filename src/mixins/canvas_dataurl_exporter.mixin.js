@@ -71,9 +71,11 @@
           originalInteractive = this.interactive,
           originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
+          originalRetina = this.enableRetinaScaling,
           canvasEl = fabric.util.createCanvasElement();
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
       this.width = scaledWidth;
@@ -88,6 +90,7 @@
       this.calcViewportBoundaries();
       this.contextContainer = originalContext;
       this.interactive = originalInteractive;
+      this.enableRetinaScaling = originalRetina;
       return canvasEl;
     },
   });
