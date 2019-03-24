@@ -62,7 +62,7 @@
     var clipPath = new fabric.Text('text as clipPath');
     var rect = new fabric.Rect({ width: 200, height: 100 });
     rect.clipPath = clipPath;
-    fabric.Object.NUM_FRACTION_DIGITS = 2;
     assert.equal(removeTranslate(rect.toSVG()), removeTranslate(EXPECTED));
+    fabric.Object.NUM_FRACTION_DIGITS = 2;
   });
 })();
