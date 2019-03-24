@@ -132,7 +132,7 @@
     assert.ok(typeof shadow.toObject === 'function');
 
     var object = shadow.toObject();
-    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false}');
+    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
   });
 
   QUnit.test('clone with affectStroke', function(assert) {

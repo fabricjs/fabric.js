@@ -1254,4 +1254,90 @@
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
     assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
   });
+  QUnit.test('shouldCache', function(assert) {
+    var object = new fabric.Object();
+    object.objectCaching = false;
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, object should not cache');
+    object.objectCaching = true;
+    assert.equal(object.shouldCache(), true, 'if objectCaching is true, object should cache');
+    object.objectCaching = false;
+    object.needsItsOwnCache = function () { return true; };
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, shouldCache returns true');
+
+    object.needsItsOwnCache = function () { return false; };
+
+    object.objectCaching = true;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is true, but we are in a group, shouldCache returns false');
+
+    object.objectCaching = true;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is true, but we are in a not cached group, shouldCache returns true');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a not cached group, shouldCache returns false');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a cached group, shouldCache returns false');
+
+    object.needsItsOwnCache = function () { return true; };
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return true; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group cached, we cache anyway');
+
+    object.objectCaching = false;
+    object.group = { isOnACache: function() { return false; }};
+    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group not cached, we cache anyway');
+
+  });
+  QUnit.test('needsItsOwnCache', function(assert) {
+    var object = new fabric.Object();
+    assert.equal(object.needsItsOwnCache(), false, 'default needsItsOwnCache is false');
+    object.clipPath = {};
+    assert.equal(object.needsItsOwnCache(), true, 'with a clipPath is true');
+    delete object.clipPath;
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return true');
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.shadow = null;
+    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return false if no shadow');
+
+    object.paintFirst = 'stroke';
+    object.stroke = '';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no stroke');
+
+    object.paintFirst = 'stroke';
+    object.stroke = 'black';
+    object.fill = '';
+    object.shadow = {};
+    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no fill');
+  });
+  QUnit.test('hasStroke', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, strokeWidth: 3, stroke: 'black' });
+    assert.equal(object.hasStroke(), true, 'if strokeWidth is present and stroke is black hasStroke is true');
+    object.stroke = '';
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is present and stroke is empty string hasStroke is false');
+    object.stroke = 'transparent';
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is present and stroke is transparent hasStroke is false');
+    object.stroke = 'black';
+    object.strokeWidth = 0;
+    assert.equal(object.hasStroke(), false, 'if strokeWidth is 0 and stroke is a color hasStroke is false');
+  });
+  QUnit.test('hasFill', function(assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.equal(object.hasFill(), true, 'with a color that is not transparent, hasFill is true');
+    object.fill = '';
+    assert.equal(object.hasFill(), false, 'without a color, hasFill is false');
+    object.fill = 'transparent';
+    assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
+  });
 })();

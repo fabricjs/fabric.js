@@ -1290,12 +1290,67 @@
     assert.equal(canvas.toObject().objects[0].type, rect.type);
   });
 
+
+  QUnit.test('toObject with clipPath', function(assert) {
+    var clipPath = makeRect();
+    var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
+    var expectedObject = {
+      'version': fabric.version,
+      objects: canvasWithClipPath.getObjects(),
+      clipPath: {
+        type: 'rect',
+        version: fabric.version,
+        originX: 'left',
+        originY: 'top',
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        fill: 'rgb(0,0,0)',
+        stroke: null,
+        strokeWidth: 1,
+        strokeDashArray: null,
+        strokeLineCap: 'butt',
+        strokeDashOffset: 0,
+        strokeLineJoin: 'miter',
+        strokeMiterLimit: 4,
+        scaleX: 1,
+        scaleY: 1,
+        angle: 0,
+        flipX: false,
+        flipY: false,
+        opacity: 1,
+        shadow: null,
+        visible: true,
+        clipTo: null,
+        backgroundColor: '',
+        fillRule: 'nonzero',
+        paintFirst: 'fill',
+        globalCompositeOperation: 'source-over',
+        transformMatrix: null,
+        skewX: 0,
+        skewY: 0,
+        rx: 0,
+        ry: 0
+      }
+    };
+
+    assert.ok(typeof canvasWithClipPath.toObject === 'function');
+    assert.deepEqual(expectedObject, canvasWithClipPath.toObject());
+
+    var rect = makeRect();
+    canvasWithClipPath.add(rect);
+
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.type);
+  });
+
   QUnit.test('toDatalessObject', function(assert) {
     assert.ok(typeof canvas.toDatalessObject === 'function');
     var expectedObject = {
       'version': fabric.version,
       objects: canvas.getObjects()
     };
+
     assert.deepEqual(expectedObject, canvas.toDatalessObject());
 
     var rect = makeRect();

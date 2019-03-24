@@ -658,6 +658,21 @@
     iText.abortCursorAnimation();
   });
 
+  QUnit.test('_removeExtraneousStyles', function(assert) {
+    var iText = new fabric.IText('a\nq\qo', { styles: {
+      0: { 0: { fontSize: 4 } },
+      1: { 0: { fontSize: 4 } },
+      2: { 0: { fontSize: 4 } },
+      3: { 0: { fontSize: 4 } },
+      4: { 0: { fontSize: 4 } },
+    } });
+    assert.deepEqual(iText.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
+    assert.deepEqual(iText.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
+    iText._removeExtraneousStyles();
+    assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
+    assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
+  });
+
   QUnit.test('hiddenTextarea does not move DOM', function(assert) {
     var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
     var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false });
