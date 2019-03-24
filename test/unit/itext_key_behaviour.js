@@ -341,4 +341,11 @@
     assert.equal(iText.styles[2][0].fill, 'col5', 'style 2 0 has been inserted col5');
     assert.equal(iText.styles[2][1].fill, 'blue', 'style 2 1 has been inserted blue');
   });
+
+  QUnit.test('missingNewlineOffset', function(assert) {
+    var iText = new fabric.IText('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂');
+
+    var offset = iText.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'it returns always 1');
+  });
 })();
