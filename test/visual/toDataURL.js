@@ -215,6 +215,133 @@
     height: 1800,
   });
 
+  function toDataURL10(fabricCanvas, callback) {
+    fabricCanvas.enableRetinaScaling = true;
+    fabric.devicePixelRatio = 2;
+    fabricCanvas.setDimensions({
+      width: 300,
+      height: 300,
+    });
+    var shadow = {
+      color: 'rgba(0,0,0,0.6)',
+      blur: 1,
+      offsetX: 50,
+      offsetY: 10,
+      opacity: 0.6,
+    };
+
+    var rect = new fabric.Rect({
+      left: 10,
+      top: 10,
+      fill:  '#FF0000',
+      stroke: '#000',
+      width: 100,
+      height: 100,
+      strokeWidth: 10,
+      opacity: .8
+    });
+
+    rect.setShadow(shadow);
+    fabricCanvas.add(rect);
+    var dataUrl = fabricCanvas.toDataURL({ multiplier: 0.5 });
+    callback(dataUrl);
+  }
+
+  tests.push({
+    test: 'shadow offsets dataUrl with retina',
+    code: toDataURL10,
+    // use the same golden on purpose
+    golden: 'dataurl10.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  function toDataURL11(fabricCanvas, callback) {
+    fabricCanvas.enableRetinaScaling = false;
+    fabric.devicePixelRatio = 1;
+    fabricCanvas.setDimensions({
+      width: 300,
+      height: 300,
+    });
+    var shadow = {
+      color: 'rgba(0,0,0,0.6)',
+      blur: 1,
+      offsetX: 50,
+      offsetY: 10,
+      opacity: 0.6,
+    };
+
+    var rect = new fabric.Rect({
+      left: 10,
+      top: 10,
+      fill:  '#FF0000',
+      stroke: '#000',
+      width: 100,
+      height: 100,
+      strokeWidth: 10,
+      opacity: .8
+    });
+
+    rect.setShadow(shadow);
+    fabricCanvas.add(rect);
+    var dataUrl = fabricCanvas.toDataURL({ multiplier: 0.5 });
+    callback(dataUrl);
+  }
+
+  tests.push({
+    test: 'shadow offsets dataUrl without retina',
+    code: toDataURL11,
+    // use the same golden on purpose
+    golden: 'dataurl10.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  function toDataURL12(fabricCanvas, callback) {
+    fabricCanvas.enableRetinaScaling = 2;
+    fabric.devicePixelRatio = 2;
+    fabricCanvas.setDimensions({
+      width: 300,
+      height: 300,
+    });
+    var shadow = {
+      color: 'rgba(0,0,0,0.6)',
+      blur: 1,
+      offsetX: 50,
+      offsetY: 10,
+      opacity: 0.6,
+    };
+
+    var rect = new fabric.Rect({
+      left: 10,
+      top: 10,
+      fill:  '#FF0000',
+      stroke: '#000',
+      width: 100,
+      height: 100,
+      strokeWidth: 10,
+      opacity: .8
+    });
+
+    rect.setShadow(shadow);
+    fabricCanvas.add(rect);
+    var dataUrl = fabricCanvas.toDataURL({ multiplier: 0.5, enableRetinaScaling: true });
+    fabric.devicePixelRatio = 1;
+    callback(dataUrl);
+  }
+
+  tests.push({
+    test: 'shadow offsets dataUrl with retina and retinaScaling enable in export',
+    code: toDataURL12,
+    // use the same golden on purpose
+    golden: 'dataurl12.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
 
   function testWrapper(test) {
     var actualTest = test.code;
