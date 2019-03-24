@@ -216,6 +216,15 @@
     shadow:               null,
 
     /**
+     * When 'true', style information is not retained when copying text to the clipboard,
+     * making pasted text use destination style.
+     * Defaults to 'false'.
+     * @type Boolean
+     * @default
+     */
+    disableStyleCopying:  false,
+
+    /**
      * @private
      */
     _fontSizeFraction: 0.222,
