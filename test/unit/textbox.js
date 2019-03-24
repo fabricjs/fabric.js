@@ -239,7 +239,7 @@
     assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
   });
   QUnit.test('_removeExtraneousStyles', function(assert) {
-    var iText = new fabric.IText('a\nq\qo', { styles: {
+    var iText = new fabric.Textbox('a\nq\qo', { styles: {
       0: { 0: { fontSize: 4 } },
       1: { 0: { fontSize: 4 } },
       2: { 0: { fontSize: 4 } },
@@ -252,4 +252,113 @@
     assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
     assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
   });
+
+  QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
+    var iText = new fabric.Textbox('由石墨分裂的石墨分裂由石墨分裂由石墨分裂的石墨分裂',
+      { width: 120, splitByGrapheme: true });
+    var loc = iText.get2DCursorLocation();
+
+    // [ [ '由', '石', '墨' ],
+    //   [ '分', '裂', '的' ],
+    //   [ '石', '墨', '分' ],
+    //   [ '裂', '由', '石' ],
+    //   [ '墨', '分', '裂' ],
+    //   [ '由', '石', '墨' ],
+    //   [ '分', '裂', '的' ],
+    //   [ '石', '墨', '分' ],
+    //   [ '裂' ] ]
+
+    assert.equal(loc.lineIndex, 0);
+    assert.equal(loc.charIndex, 0);
+
+    // '由石墨|分裂的石墨分裂由石墨分裂由石墨分裂的石墨分裂'
+    iText.selectionStart = iText.selectionEnd = 4;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 1, 'selection end 4 line 1');
+    assert.equal(loc.charIndex, 1, 'selection end 4 char 1');
+
+    iText.selectionStart = iText.selectionEnd = 7;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 2, 'selection end 7 line 2');
+    assert.equal(loc.charIndex, 1, 'selection end 7 char 1');
+
+    iText.selectionStart = iText.selectionEnd = 14;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 4, 'selection end 14 line 4');
+    assert.equal(loc.charIndex, 2, 'selection end 14 char 2');
+  });
+
+  QUnit.test('missingNewlineOffset with splitByGrapheme', function(assert) {
+    var texbox = new fabric.Textbox('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂',
+      { width: 160, splitByGrapheme: true });
+
+    // [ [ '由', '石', '墨' ],
+    //   [ '分', '裂', '的', '石' ],
+    //   [ '墨', '分' ],
+    //   [ '裂' ],
+    //   [ '由', '石', '墨', '分' ],
+    //   [ '裂', '由', '石', '墨' ],
+    //   [ '分', '裂', '的', '石' ],
+    //   [ '墨', '分', '裂' ] ]
+
+    var offset = texbox.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'line 0 is interrupted by a \n so has an offset of 1');
+
+    offset = texbox.missingNewlineOffset(1);
+    assert.equal(offset, 0, 'line 1 is wrapped without a \n so it does have an extra char count');
+  });
+
+  QUnit.test('missingNewlineOffset with normal split', function(assert) {
+    var texbox = new fabric.Textbox('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂',
+      { width: 160 });
+
+    var offset = texbox.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'it returns always 1');
+    var offset = texbox.missingNewlineOffset(1);
+    assert.equal(offset, 1, 'it returns always 1');
+    var offset = texbox.missingNewlineOffset(2);
+    assert.equal(offset, 1, 'it returns always 1');
+  });
+
+  QUnit.test('_getLineStyle', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg\noee eee', {
+      styles: {
+        1: { 0: { fontSize: 4 } },
+      },
+      width: 80,
+    });
+
+    assert.equal(textbox._getLineStyle(0), false, 'wrapped line 0 has no style');
+    assert.equal(textbox._getLineStyle(1), false, 'wrapped line 1 has no style');
+    assert.equal(textbox._getLineStyle(4), true, 'wrapped line 2 has style');
+  });
+
+  QUnit.test('_setLineStyle', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg\noee eee', {
+      styles: {
+        1: { 0: { fontSize: 4 } },
+      },
+      width: 80,
+    });
+
+    assert.equal(textbox._getLineStyle(0), false, 'wrapped line 0 has no style');
+    assert.equal(textbox._getLineStyle(1), false, 'wrapped line 1 has no style');
+    assert.equal(textbox._getLineStyle(2), false, 'wrapped line 2 has no style');
+    assert.equal(textbox._getLineStyle(3), false, 'wrapped line 3 has no style');
+
+    assert.deepEqual(textbox.styles[0], undefined, 'style is undefined');
+    textbox._setLineStyle(0);
+
+    assert.equal(textbox._getLineStyle(0), true, 'wrapped line 0 has style');
+    assert.equal(textbox._getLineStyle(1), true, 'wrapped line 1 has style');
+    assert.equal(textbox._getLineStyle(2), true, 'wrapped line 2 has style');
+    assert.equal(textbox._getLineStyle(3), true, 'wrapped line 3 has style');
+
+    assert.deepEqual(textbox.styles[0], {}, 'style is an empty object');
+  });
+
+
 })();
