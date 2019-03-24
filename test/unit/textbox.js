@@ -292,27 +292,27 @@
   });
 
   QUnit.test('missingNewlineOffset with splitByGrapheme', function(assert) {
-    var texbox = new fabric.Textbox('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂',
-      { width: 160, splitByGrapheme: true });
+    var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
+      { width: 80, splitByGrapheme: true });
 
-    // [ [ '由', '石', '墨' ],
-    //   [ '分', '裂', '的', '石' ],
-    //   [ '墨', '分' ],
-    //   [ '裂' ],
-    //   [ '由', '石', '墨', '分' ],
-    //   [ '裂', '由', '石', '墨' ],
-    //   [ '分', '裂', '的', '石' ],
-    //   [ '墨', '分', '裂' ] ]
+    // [ [ 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a' ],
+    //   [ 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a' ] ]
 
-    var offset = texbox.missingNewlineOffset(0);
+    var offset = textbox.missingNewlineOffset(0);
     assert.equal(offset, 1, 'line 0 is interrupted by a \n so has an offset of 1');
 
-    offset = texbox.missingNewlineOffset(1);
+    offset = textbox.missingNewlineOffset(1);
     assert.equal(offset, 0, 'line 1 is wrapped without a \n so it does have an extra char count');
   });
 
   QUnit.test('missingNewlineOffset with normal split', function(assert) {
-    var texbox = new fabric.Textbox('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂',
+    var texbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
       { width: 160 });
 
     var offset = texbox.missingNewlineOffset(0);
