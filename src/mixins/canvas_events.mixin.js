@@ -50,7 +50,7 @@
     },
 
     addOrRemove: function(functor, eventjsFunctor) {
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       functor(fabric.window, 'resize', this._onResize);
       functor(this.upperCanvasEl, eventTypePrefix + 'down', this._onMouseDown);
       functor(this.upperCanvasEl, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
@@ -80,7 +80,7 @@
     removeListeners: function() {
       this.addOrRemove(removeListener, 'remove');
       // if you dispose on a mouseDown, before mouse up, you need to clean document to...
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
@@ -150,7 +150,7 @@
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       target && target.fire(eventTypePrefix + 'out', { e: e });
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
@@ -242,7 +242,7 @@
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       removeListener(this.upperCanvasEl, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
 
@@ -263,7 +263,7 @@
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
       this._resetTransformEventData();
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
@@ -433,7 +433,7 @@
             absolutePointer: this._absolutePointer,
             transform: this._currentTransform
           },
-          eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       this.fire('mouse:' + eventType, options);
       target && target.fire(eventTypePrefix + eventType, options);
       for (var i = 0; i < targets.length; i++) {
@@ -721,7 +721,7 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var eventTypePrefix = this.get('enablePointerEvents') ? 'pointer' : 'mouse';
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       this.fireSyntheticInOutEvents(target, e, {
         targetName: '_hoveredTarget',
         canvasEvtOut: 'mouse:out',
