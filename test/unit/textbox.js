@@ -254,8 +254,8 @@
   });
 
   QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
-    var iText = new fabric.Textbox('由石墨分裂的石墨分裂由石墨分裂由石墨分裂的石墨分裂',
-      { width: 120, splitByGrapheme: true });
+    var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
+      { width: 60, splitByGrapheme: true });
     var loc = iText.get2DCursorLocation();
 
     // [ [ '由', '石', '墨' ],
