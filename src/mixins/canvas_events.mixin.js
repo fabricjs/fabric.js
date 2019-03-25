@@ -151,8 +151,7 @@
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
-      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
-      target && target.fire(eventTypePrefix + 'out', { e: e });
+      target && target.fire('mouseout', { e: e });
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
           if (obj.isEditing) {
@@ -436,12 +435,11 @@
             pointer: this._pointer,
             absolutePointer: this._absolutePointer,
             transform: this._currentTransform
-          },
-          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+          };
       this.fire('mouse:' + eventType, options);
-      target && target.fire(eventTypePrefix + eventType, options);
+      target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
-        targets[i].fire(eventTypePrefix + eventType, options);
+        targets[i].fire('mouse' + eventType, options);
       }
     },
 
@@ -725,13 +723,12 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       this.fireSyntheticInOutEvents(target, e, {
         targetName: '_hoveredTarget',
         canvasEvtOut: 'mouse:out',
-        evtOut: eventTypePrefix + 'out',
+        evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
-        evtIn: eventTypePrefix + 'over',
+        evtIn: 'mouseover',
       });
     },
 
