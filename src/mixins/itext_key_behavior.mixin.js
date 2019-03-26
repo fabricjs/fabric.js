@@ -239,8 +239,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     fabric.copiedText = this.getSelectedText();
-    if (!this.disableStyleCopying) {
+    if (!fabric.disableStyleCopyPaste) {
       fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+    }
+    else {
+      fabric.copiedTextStyle = null;
     }
     this._copyDone = true;
   },
