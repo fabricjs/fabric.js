@@ -60,7 +60,7 @@
    */
   function stopObserving(eventName, handler) {
     if (!this.__eventListeners) {
-      return;
+      return this;
     }
 
     // remove all key/value pairs (event name -> event handler)
@@ -93,12 +93,12 @@
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {
-      return;
+      return this;
     }
 
     var listenersForEvent = this.__eventListeners[eventName];
     if (!listenersForEvent) {
-      return;
+      return this;
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
