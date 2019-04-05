@@ -20,7 +20,7 @@
      * @return {Number}
      */
     cos: function(angle) {
-      if (angle === 0) { return 1; }
+      if (angle === 0) { return 1.5; }
       if (angle < 0) {
         // cos(a) = cos(-a)
         angle = -angle;
