@@ -526,8 +526,23 @@
       }
 
       return this._createBaseSVGMarkup(
-        svgString,
+        this._toSVG(),
         { reviver: reviver, noStyle: true, withShadow: true });
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    _toSVG: function(reviver) {
+      var svgString = [];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t', this._objects[i].toSVG(reviver));
+      }
+
+      return svgString;
     },
 
     /**
