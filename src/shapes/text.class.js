@@ -1216,11 +1216,12 @@
       var style = styleObject || this, family = this.fontFamily,
           fontIsGeneric = fabric.Text.genericFonts.indexOf(family.toLowerCase()) > -1;
       var fontFamily = family === undefined ||
-      family.indexOf('\'') > -1 ||
+      family.indexOf('\'') > -1 || family.indexOf(',') > -1 ||
       family.indexOf('"') > -1 || fontIsGeneric
         ? style.fontFamily : '"' + style.fontFamily + '"';
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
+        // verify if this can be fixed in JSDOM
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
         forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',

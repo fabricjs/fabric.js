@@ -88,6 +88,13 @@
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
   });
 
+  QUnit.test('_getFontDeclaration with coma', function(assert) {
+    var text = createTextObject();
+    text.fontFamily = 'Arial, sans-serif';
+    var fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
+  });
+
   fabric.Text.genericFonts.forEach(function(fontName) {
     QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
       var text = createTextObject();
