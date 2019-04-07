@@ -723,7 +723,7 @@
 
     /**
      * Return the dimension and the zoom level needed to create a cache canvas
-     * big enough to host the object to be cached.
+     * big enough to host the object to be cached. 
      * @private
      * @return {Object}.x width of object to be cached
      * @return {Object}.y height of object to be cached
