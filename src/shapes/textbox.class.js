@@ -99,10 +99,8 @@
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
-      if (this.textAlign.indexOf('justify') !== -1) {
-        // once text is measured we need to make space fatter to make justified text.
-        this.enlargeSpaces();
-      }
+      // once text is measured we need to make space fatter to make justified text.
+      this.enlargeSpaces();
       // clear cache and re-calculate height
       this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });

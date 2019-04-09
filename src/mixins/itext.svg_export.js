@@ -112,7 +112,7 @@
     _setSVGTextLineText: function(textSpans, lineIndex, textLeftOffset, textTopOffset) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
-          isJustify = this.textAlign.indexOf('justify') !== -1,
+          isJustify = this._getLineTextAlign(lineIndex).indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
           charsToRender = '',

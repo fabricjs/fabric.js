@@ -759,4 +759,16 @@
     assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
+
+  QUnit.test('_getLineTextAlign returns textAlign', function(assert) {
+    var text = new fabric.Text('');
+    assert.equal(text._getLineTextAlign(), 'left');
+    assert.equal(text._getLineTextAlign(0), 'left');
+    assert.equal(text._getLineTextAlign(1), 'left');
+
+    text.textAlign = 'justify-right';
+    assert.equal(text._getLineTextAlign(), 'justify-right');
+    assert.equal(text._getLineTextAlign(0), 'justify-right');
+    assert.equal(text._getLineTextAlign(1), 'justify-right');
+  });
 })();

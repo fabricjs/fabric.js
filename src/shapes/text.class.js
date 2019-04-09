@@ -368,10 +368,8 @@
       this._splitText();
       this._clearCache();
       this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
-      if (this.textAlign.indexOf('justify') !== -1) {
-        // once text is measured we need to make space fatter to make justified text.
-        this.enlargeSpaces();
-      }
+      // once text is measured we need to make space fatter to make justified text.
+      this.enlargeSpaces();
       this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
@@ -380,9 +378,13 @@
      * Enlarge space boxes and shift the others
      */
     enlargeSpaces: function() {
-      var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
+      var align, diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (this.textAlign !== 'justify' && (i === len - 1 || this.isEndOfWrapping(i))) {
+        align = this._getLineTextAlign(i);
+        if (align.indexOf('justify') === -1) {
+          continue;
+        }
+        if (align !== 'justify' && (i === len - 1 || this.isEndOfWrapping(i))) {
           continue;
         }
         accumulatedSpace = 0;
@@ -889,7 +891,7 @@
     _renderChars: function(method, ctx, line, left, top, lineIndex) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
-          isJustify = this.textAlign.indexOf('justify') !== -1,
+          isJustify = this._getLineTextAlign(lineIndex).indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
           charsToRender = '',
@@ -1049,20 +1051,31 @@
      * @return {Number} Line left offset
      */
     _getLineLeftOffset: function(lineIndex) {
-      var lineWidth = this.getLineWidth(lineIndex);
-      if (this.textAlign === 'center') {
+      var lineWidth = this.getLineWidth(lineIndex),
+          align = this._getLineTextAlign(lineIndex);
+      if (align === 'center') {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'right') {
+      if (align === 'right') {
         return this.width - lineWidth;
       }
-      if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
+      if (align === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
+      if (align === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;
+    },
+
+    /**
+     * @private
+     * @param {Number} lineIndex index text line
+     * @return {Number} Text alignment for that text line. Default implementation returns textAlign property. Overridable.
+     * Possible values: "left", "center", "right", "justify", "justify-left", "justify-center" or "justify-right".
+     */
+    _getLineTextAlign: function() {
+      return this.textAlign;
     },
 
     /**

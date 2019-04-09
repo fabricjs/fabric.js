@@ -406,7 +406,6 @@
 
       var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
           selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
-          isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
           startLine = start.lineIndex,
@@ -417,7 +416,8 @@
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getLineLeftOffset(i) || 0,
             lineHeight = this.getHeightOfLine(i),
-            realLineHeight = 0, boxStart = 0, boxEnd = 0;
+            realLineHeight = 0, boxStart = 0, boxEnd = 0,
+            isJustify = this._getLineTextAlign(i).indexOf('justify') !== -1;
 
         if (i === startLine) {
           boxStart = this.__charBounds[startLine][startChar].left;
