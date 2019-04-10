@@ -139,8 +139,7 @@
             (allowIntersect && currentObject.containsPoint(selectionX1Y1)) ||
             (allowIntersect && currentObject.containsPoint(selectionX2Y2))
         ) {
-          
-            group.push(currentObject);
+          group.push(currentObject);
           // only add one object if it's a click
           if (isClick) {
             break;
@@ -148,7 +147,7 @@
         }
       }
 
-      if(group.length > 1) {
+      if (group.length > 1) {
         group = group.filter(function(object) {
           return !object.onSelect({ e: e });
         });
