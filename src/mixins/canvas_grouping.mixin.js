@@ -149,7 +149,9 @@
       }
 
       if(group.length > 1) {
-        group = group.filter((object) => !object.onSelect({ e: e }));
+        group = group.filter(function(object) {
+          return !object.onSelect({ e: e });
+        });
       }
 
       return group;
