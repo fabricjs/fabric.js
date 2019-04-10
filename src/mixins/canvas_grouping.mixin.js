@@ -130,7 +130,7 @@
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject || !currentObject.selectable || !currentObject.visible || currentObject.onSelect({ e: e })) {
+        if (!currentObject || !currentObject.selectable || !currentObject.visible) {
           continue;
         }
 
@@ -139,7 +139,11 @@
             (allowIntersect && currentObject.containsPoint(selectionX1Y1)) ||
             (allowIntersect && currentObject.containsPoint(selectionX2Y2))
         ) {
-          group.push(currentObject);
+          if(currentObject.onSelect({ e: e })) {
+            group.push(currentObject);
+          } else {
+            continue;
+          }
 
           // only add one object if it's a click
           if (isClick) {
