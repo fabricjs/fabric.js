@@ -566,6 +566,96 @@
     },
 
     /**
+     * Sets brush color of freeDrawingBrush
+     * @param {String}              color       Color to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */
+    setBrushColor: function(color) {
+        this.freeDrawingBrush.color = color;
+        return this;
+    },
+
+    /**
+     * Sets width of freeDrawingBrush
+     * @param {Number}              width       Width to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */
+    setBrushWidth: function(width) {
+        this.freeDrawingBrush.width = width;
+        return this;
+    },
+
+    /**
+     * Sets brush shadow of freeDrawingBrush
+     * @param {Object|String}        shadow       Brush shadow to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */    
+    setBrushShadow: function(shadow) {
+        this.freeDrawingBrush.shadow = shadow;
+        return this;
+    },
+
+    /**
+     * Sets shadow blur of freeDrawingBrush
+     * @param {Number}        blur               Blur of shadow to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */        
+    setBrushShadowBlur: function(blur) {
+        this.freeDrawingBrush.shadow.blur = blur;
+        return this;
+    },
+
+    /**
+     * Sets x offset of a shadow for freeDrawingBrush
+     * @param {Number}        x               X offset of a blur to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */    
+    setBrushShadowXOffset: function(x) {
+        this.freeDrawingBrush.shadow.offsetX = x;
+        return this;
+    },
+
+    /**
+     * Sets y offset of a shadow for freeDrawingBrush
+     * @param {Number}        y               Y offset of a blur to set freeDrawingBrush to
+     * @return {fabric.Canvas} instance
+     */     
+    setBrushShadowYOffset: function(y) {
+        this.freeDrawingBrush.shadow.offsetY = y;
+        return this;
+    },
+
+    /**
+     * Sets freeDrawingBrush to pencil
+     * @param {fabric.Canvas}        canv               Canvas to set new brush to for freeDrawingBrush
+     * @return {fabric.Canvas} instance
+     */      
+    setPencilBrush: function(canv) {
+        this.freeDrawingBrush = new fabric['PencilBrush'](canv);
+        return this;
+    },
+
+    /**
+     * Sets freeDrawingBrush to circle
+     * @param {fabric.Canvas}        canv               Canvas to set new brush to for freeDrawingBrush
+     * @return {fabric.Canvas} instance
+     */         
+    setCircleBrush: function(canv) {
+        this.freeDrawingBrush = new fabric['CircleBrush'](canv);
+        return this;
+    },
+
+    /**
+     * Sets freeDrawingBrush to spray
+     * @param {fabric.Canvas}        canv               Canvas to set new brush to for freeDrawingBrush
+     * @return {fabric.Canvas} instance
+     */      
+    setSprayBrush: function(value) {
+        this.freeDrawingBrush = new fabric['SprayBrush'](value);
+        return this;
+    },   
+
+    /**
      * Returns canvas width (in px)
      * @return {Number}
      */
