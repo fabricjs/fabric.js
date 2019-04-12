@@ -650,7 +650,7 @@
      * @param {fabric.Canvas}        canv               Canvas to set new brush to for freeDrawingBrush
      * @return {fabric.Canvas} instance
      */      
-    setSprayBrush: function(value) {
+    setSprayBrush: function(canv) {
       this.freeDrawingBrush = new fabric.SprayBrush(canv);
       return this;
     },
