@@ -571,8 +571,8 @@
      * @return {fabric.Canvas} instance
      */
     setBrushColor: function(color) {
-        this.freeDrawingBrush.color = color;
-        return this;
+      this.freeDrawingBrush.color = color;
+      return this;
     },
 
     /**
@@ -581,8 +581,8 @@
      * @return {fabric.Canvas} instance
      */
     setBrushWidth: function(width) {
-        this.freeDrawingBrush.width = width;
-        return this;
+      this.freeDrawingBrush.width = width;
+      return this;
     },
 
     /**
@@ -591,8 +591,8 @@
      * @return {fabric.Canvas} instance
      */    
     setBrushShadow: function(shadow) {
-        this.freeDrawingBrush.shadow = shadow;
-        return this;
+      this.freeDrawingBrush.shadow = shadow;
+      return this;
     },
 
     /**
@@ -601,8 +601,8 @@
      * @return {fabric.Canvas} instance
      */        
     setBrushShadowBlur: function(blur) {
-        this.freeDrawingBrush.shadow.blur = blur;
-        return this;
+      this.freeDrawingBrush.shadow.blur = blur;
+      return this;
     },
 
     /**
@@ -611,8 +611,8 @@
      * @return {fabric.Canvas} instance
      */    
     setBrushShadowXOffset: function(x) {
-        this.freeDrawingBrush.shadow.offsetX = x;
-        return this;
+      this.freeDrawingBrush.shadow.offsetX = x;
+      return this;
     },
 
     /**
@@ -621,8 +621,8 @@
      * @return {fabric.Canvas} instance
      */     
     setBrushShadowYOffset: function(y) {
-        this.freeDrawingBrush.shadow.offsetY = y;
-        return this;
+      this.freeDrawingBrush.shadow.offsetY = y;
+      return this;
     },
 
     /**
@@ -631,8 +631,8 @@
      * @return {fabric.Canvas} instance
      */      
     setPencilBrush: function(canv) {
-        this.freeDrawingBrush = new fabric['PencilBrush'](canv);
-        return this;
+      this.freeDrawingBrush = new fabric['PencilBrush'](canv);
+      return this;
     },
 
     /**
@@ -641,8 +641,8 @@
      * @return {fabric.Canvas} instance
      */         
     setCircleBrush: function(canv) {
-        this.freeDrawingBrush = new fabric['CircleBrush'](canv);
-        return this;
+      this.freeDrawingBrush = new fabric['CircleBrush'](canv);
+      return this;
     },
 
     /**
@@ -651,8 +651,8 @@
      * @return {fabric.Canvas} instance
      */      
     setSprayBrush: function(value) {
-        this.freeDrawingBrush = new fabric['SprayBrush'](value);
-        return this;
+      this.freeDrawingBrush = new fabric['SprayBrush'](value);
+      return this;
     },   
 
     /**
