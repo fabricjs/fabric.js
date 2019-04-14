@@ -565,7 +565,7 @@
     assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
   });
 
-  QUnit.test('mouseEnter removes __corner', function(assert) {
+  QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
