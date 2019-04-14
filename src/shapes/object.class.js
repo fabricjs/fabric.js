@@ -1489,6 +1489,17 @@
 
     /**
      * @private
+     * function that actually render something on the context.
+     * empty here to allow Obects to work on tests to benchmark fabric functionalites
+     * not related to rendering
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render: function(/* ctx */) {
+
+    },
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
