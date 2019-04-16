@@ -592,6 +592,53 @@
     assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
   });
 
+  QUnit.test('_collectObjects does not call onSelect on objects that are not intersected', function(assert) {
+    canvas.selectionFullyContained = false;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var onSelectRect1CallCount = 0;
+    var onSelectRect2CallCount = 0;
+    rect1.onSelect = function() {
+      onSelectRect1CallCount++;
+      return false;
+    };
+    rect2.onSelect = function() {
+      onSelectRect2CallCount++;
+      return false;
+    };
+    canvas.add(rect1, rect2);
+    // Intersects none
+    canvas._groupSelector = {
+      top: 1,
+      left: 1,
+      ex: 25,
+      ey: 25
+    };
+    canvas._collectObjects();
+    var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
+    assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
+    // Intersects one
+    canvas._groupSelector = {
+      top: 5,
+      left: 5,
+      ex: 0,
+      ey: 0
+    };
+    canvas._collectObjects();
+    assert.equal(onSelectRect1CallCount, 0, 'rect1 onSelect was not called. It will be called in _setActiveObject()');
+    assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
+    // Intersects both
+    canvas._groupSelector = {
+      top: 5,
+      left: 15,
+      ex: 0,
+      ey: 0
+    };
+    canvas._collectObjects();
+    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called');
+    assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
+  });
+
   QUnit.test('_shouldGroup return false if onSelect return true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
