@@ -324,7 +324,7 @@
           reservedSpace = reservedSpace || 0;
       // fix a difference between split and graphemeSplit
       if (words.length === 0) {
-        words.push('');
+        words.push([]);
       }
       desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {

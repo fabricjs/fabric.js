@@ -222,6 +222,16 @@
     assert.deepEqual(line2, expected2, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
   });
+  QUnit.test('wrapping an empty line', function(assert) {
+    var textbox = new fabric.Textbox('', {
+      width: 10,
+    });
+    var line1 = textbox._wrapLine('', 0, 100, 0);
+    assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
+    textbox.splitByGrapheme = true;
+    var line2 = textbox._wrapLine('', 0, 100, 0);
+    assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
+  });
   QUnit.test('_scaleObject with textbox', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
