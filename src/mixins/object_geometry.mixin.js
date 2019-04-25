@@ -461,14 +461,12 @@
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setCoords: function(ignoreZoom, skipAbsolute) {
-      this.oCoords = this.calcCoords(ignoreZoom);
-      if (!skipAbsolute) {
-        this.aCoords = this.calcCoords(true);
-      }
+    setCoords: function() {
+      this.oCoords = this.calcCoords();
+      this.aCoords = this.calcCoords(true);
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      ignoreZoom || (this._setCornerCoords && this._setCornerCoords());
+      this._setCornerCoords && this._setCornerCoords();
 
       return this;
     },
