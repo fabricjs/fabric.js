@@ -103,11 +103,13 @@
     afterEach: function() {
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
+      canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
       canvas.calcOffset();
+      canvas.cancelRequestedRender();
       upperCanvasEl.style.display = 'none';
     }
   });
@@ -293,6 +295,25 @@
     canvas.remove(canvas.item(0));
 
     assert.equal(isFired, true, 'removing active object should fire "before:selection:cleared"');
+  });
+
+  QUnit.test('before:selection:cleared gets target the active object', function(assert) {
+    var passedTarget;
+    canvas.on('before:selection:cleared', function(options) {
+      passedTarget = options.target;
+    });
+    var rect = new fabric.Rect();
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.discardActiveObject();
+    assert.equal(passedTarget, rect, 'options.target was the removed object');
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    canvas.setActiveObject(activeSelection);
+    canvas.discardActiveObject();
+    assert.equal(passedTarget, activeSelection, 'removing an activeSelection pass that as a target');
   });
 
   QUnit.test('selection:cleared', function(assert) {
@@ -2043,7 +2064,7 @@
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false });
+    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2065,6 +2086,7 @@
     assert.ok(typeof canvas.dispose === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
+    canvas.cancelRequestedRender();
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     if (!fabric.isLikelyNode) {
@@ -2134,7 +2156,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });
@@ -2153,7 +2175,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });
