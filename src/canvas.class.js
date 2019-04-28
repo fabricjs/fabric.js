@@ -1588,9 +1588,9 @@
      * @chainable
      */
     discardActiveObject: function (e) {
-      var currentActives = this.getActiveObjects();
+      var currentActives = this.getActiveObjects(), activeObject = this.getActiveObject();
       if (currentActives.length) {
-        this.fire('before:selection:cleared', { target: currentActives[0], e: e });
+        this.fire('before:selection:cleared', { target: activeObject, e: e });
       }
       this._discardActiveObject(e);
       this._fireSelectionEvents(currentActives, e);
