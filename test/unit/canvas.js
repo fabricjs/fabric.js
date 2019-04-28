@@ -103,11 +103,13 @@
     afterEach: function() {
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
+      canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
       canvas.calcOffset();
+      canvas.cancelRequestedRender();
       upperCanvasEl.style.display = 'none';
     }
   });
@@ -2062,7 +2064,7 @@
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false });
+    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2084,6 +2086,7 @@
     assert.ok(typeof canvas.dispose === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
+    canvas.cancelRequestedRender();
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     if (!fabric.isLikelyNode) {
@@ -2153,7 +2156,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });
@@ -2172,7 +2175,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });
