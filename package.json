@@ -60,7 +60,7 @@
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
-    "canvas": "^2.3.0",
+    "canvas": "^2.5.0",
     "jsdom": "13.1.0"
   },
   "devDependencies": {
