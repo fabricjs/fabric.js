@@ -11,7 +11,8 @@ addons:
     - libpango1.0-dev
     - libjpeg-dev
     - librsvg2-dev
-# libcairo2-dev is preinstalled
+    - libcairo2-dev
+
 stages:
   - Linting and Building
   - Unit Tests
