@@ -709,6 +709,7 @@
         theta: degreesToRadians(target.angle),
         // end of unsure
         width: target.width * target.scaleX,
+        height: target.height * target.scaleY,
         mouseXSign: 1,
         mouseYSign: 1,
         shiftKey: e.shiftKey,
