@@ -61,11 +61,20 @@
       this.points = points || [];
       this.callSuper('initialize', options);
       var calcDim = this._calcDimensions();
+      calcDim.left -= this.strokeWidth / 2;
+      calcDim.top -= this.strokeWidth / 2;
+      var correctLeftTop = this.translateToGivenOrigin(
+        { x: calcDim.left - this.strokeWidth / 2, y: calcDim.top - this.strokeWidth / 2 },
+        'left',
+        'top',
+        this.originX,
+        this.originY
+      );
       if (typeof options.left === 'undefined') {
-        this.left = calcDim.left;
+        this.left = correctLeftTop.x;
       }
       if (typeof options.top === 'undefined') {
-        this.top = calcDim.top;
+        this.top = correctLeftTop.y;
       }
       this.width = calcDim.width;
       this.height = calcDim.height;
