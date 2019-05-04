@@ -72,9 +72,12 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
-
-    callback(new fabric.Polygon(points, extend(parsedAttributes, options)));
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
+        strokeWidth = parsedAttributes.strokeWidth;
+    parsedAttributes.strokeWidth = 0;
+    var polygon = new fabric.Polygon(points, extend(parsedAttributes, options));
+    polygon.strokeWidth = strokeWidth;
+    callback(polygon);
   };
   /* _FROM_SVG_END_ */
 
