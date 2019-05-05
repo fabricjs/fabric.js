@@ -65,6 +65,8 @@
 
     _setPositionDimensions: function(options) {
       var calcDim = this._calcDimensions(options), correctLeftTop;
+      this.width = calcDim.width;
+      this.height = calcDim.height;
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
           { x: calcDim.left - this.strokeWidth / 2, y: calcDim.top - this.strokeWidth / 2 },
@@ -80,8 +82,6 @@
       if (typeof options.top === 'undefined') {
         this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
       }
-      this.width = calcDim.width;
-      this.height = calcDim.height;
       this.pathOffset = {
         x: calcDim.left + this.width / 2,
         y: calcDim.top + this.height / 2

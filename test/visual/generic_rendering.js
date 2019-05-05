@@ -84,5 +84,49 @@
     height: 60,
   });
 
+  function polygonWithStroke(canvas, callback) {
+    canvas.set({backgroundColor: '#AAAA77'})
+    var p1 = new fabric.Polygon([
+      {x: 0, y: 216},
+      {x: 125, y: 433},
+      {x: 375, y: 433},
+      {x: 500, y: 216},
+      {x: 375, y: 0},
+      {x: 125, y: 0}
+    ],
+    {
+      fill: 'white'
+    });
+    canvas.add(p1);
+    var p2 = new fabric.Polygon([
+      {x: 0, y: 216},
+      {x: 125, y: 433},
+      {x: 375, y: 433},
+      {x: 500, y: 216},
+      {x: 375, y: 0},
+      {x: 125, y: 0}
+    ],
+    {
+      fill: 'transparent',
+      stroke: '#00AAFFAA',
+      strokeWidth: 15,
+      originX: 'center',
+      originY: 'center'
+    });
+    canvas.add(p2);
+    canvas.setZoom(0.4);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'polygon postion independently from strokeWidth and origin',
+    code: polygonWithStroke,
+    golden: 'polygonWithStroke.png',
+    percentage: 0.09,
+    width: 210,
+    height: 210,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
