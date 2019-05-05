@@ -85,7 +85,7 @@
   });
 
   function polygonWithStroke(canvas, callback) {
-    canvas.set({backgroundColor: '#AAAA77'})
+    canvas.set({backgroundColor: '#AAAA77'});
     var p1 = new fabric.Polygon([
       {x: 0, y: 216},
       {x: 125, y: 433},
