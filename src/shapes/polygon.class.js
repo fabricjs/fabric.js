@@ -64,21 +64,7 @@
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  fabric.Polygon.fromElement = function(element, callback, options) {
-    if (!element) {
-      return callback(null);
-    }
-
-    options || (options = { });
-
-    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
-        strokeWidth = parsedAttributes.strokeWidth;
-    parsedAttributes.strokeWidth = 0;
-    var polygon = new fabric.Polygon(points, extend(parsedAttributes, options));
-    polygon.strokeWidth = strokeWidth;
-    callback(polygon);
-  };
+  fabric.Polygon.fromElement = fabric.Polyline.fromElementGenerator('Polygon');
   /* _FROM_SVG_END_ */
 
   /**
