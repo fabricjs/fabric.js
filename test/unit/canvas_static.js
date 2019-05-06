@@ -40,7 +40,7 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
@@ -145,8 +145,8 @@
 
   // force creation of static canvas
   // TODO: fix this
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 200, height: 200});
-  var canvas2 = this.canvas2 = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 200, height: 200});
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {renderOnAddRemove: false, enableRetinaScaling: false, width: 200, height: 200});
+  var canvas2 = this.canvas2 = new fabric.StaticCanvas(null, {renderOnAddRemove: false, enableRetinaScaling: false, width: 200, height: 200});
 
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
@@ -167,10 +167,17 @@
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
+      canvas.cancelRequestedRender();
+      canvas2.cancelRequestedRender();
+    },
+    afterEach: function() {
+      canvas.cancelRequestedRender();
+      canvas2.cancelRequestedRender();
     }
   });
 
   QUnit.test('initialProperties', function(assert) {
+    var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
     assert.ok('overlayColor' in canvas);
     assert.ok('backgroundImage' in canvas);
@@ -888,7 +895,7 @@
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
-    var canvasClip = new fabric.StaticCanvas(null, { width: 400, height: 400 });
+    var canvasClip = new fabric.StaticCanvas(null, { width: 400, height: 400, renderOnAddRemove: false });
     canvasClip.clipPath = new fabric.Rect({ width: 200, height: 200 });
     canvasClip.add(new fabric.Circle({ radius: 200 }));
     var svg = canvasClip.toSVG();
@@ -1030,7 +1037,7 @@
     var rect = makeRect();
     canvas.add(rect);
     var cObject = canvas.toObject();
-    var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10 };
+    var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10, top: 0, left: 0 };
     assert.deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
     canvas.includeDefaultValues = true;
   });
@@ -1473,7 +1480,7 @@
   });
 
   QUnit.test('dispose clear references', function(assert) {
-    var canvas2 = new fabric.Canvas();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     canvas2.add(makeRect(), makeRect(), makeRect());
     canvas2.dispose();
@@ -1551,6 +1558,7 @@
     assert.equal(canvas.lowerCanvasEl.style.height, 200 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getWidth(), 250, 'Should be as the backstore only value');
     assert.equal(canvas.getHeight(), 350, 'Should be as the backstore only value');
+    canvas.cancelRequestedRender();
   });
 
   QUnit.test('fxRemove', function(assert) {
@@ -1563,16 +1571,14 @@
     var callbackFired = false;
     function onComplete(){
       callbackFired = true;
+      assert.equal(canvas.item(0), undefined);
+      assert.ok(callbackFired);
+      canvas.cancelRequestedRender();
+      done();
     }
 
     assert.ok(canvas.item(0) === rect);
     assert.equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
-
-    setTimeout(function() {
-      assert.equal(canvas.item(0), undefined);
-      assert.ok(callbackFired);
-      done();
-    }, 1000);
   });
 
   QUnit.test('options in setBackgroundImage from URL', function(assert) {
@@ -1843,7 +1849,6 @@
     assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
-    canvas2.dispose();
   });
 
   // QUnit.test('backgroundImage', function(assert) {
