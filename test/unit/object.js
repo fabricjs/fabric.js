@@ -272,7 +272,7 @@
 
   QUnit.test('toObject without default values', function(assert) {
 
-    var emptyObjectRepr = { version: fabric.version, type: 'object' };
+    var emptyObjectRepr = { version: fabric.version, type: 'object', top: 0, left: 0 };
 
     var augmentedObjectRepr = {
       version: fabric.version,
@@ -293,7 +293,7 @@
     var cObj = new fabric.Object(),
         toObjectObj;
     cObj.includeDefaultValues = false;
-    assert.deepEqual(emptyObjectRepr, cObj.toObject());
+    assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always mantained');
 
     cObj.set('left', 10)
       .set('top', 20)

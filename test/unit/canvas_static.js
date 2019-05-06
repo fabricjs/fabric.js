@@ -145,8 +145,8 @@
 
   // force creation of static canvas
   // TODO: fix this
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 200, height: 200});
-  var canvas2 = this.canvas2 = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 200, height: 200});
+  var canvas = this.canvas = new fabric.StaticCanvas(null, {renderOnAddRemove: false, enableRetinaScaling: false, width: 200, height: 200});
+  var canvas2 = this.canvas2 = new fabric.StaticCanvas(null, {renderOnAddRemove: false, enableRetinaScaling: false, width: 200, height: 200});
 
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
@@ -167,10 +167,17 @@
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
+      canvas.cancelRequestedRender();
+      canvas2.cancelRequestedRender();
+    },
+    afterEach: function() {
+      canvas.cancelRequestedRender();
+      canvas2.cancelRequestedRender();
     }
   });
 
   QUnit.test('initialProperties', function(assert) {
+    var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
     assert.ok('overlayColor' in canvas);
     assert.ok('backgroundImage' in canvas);
@@ -888,7 +895,7 @@
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
-    var canvasClip = new fabric.StaticCanvas(null, { width: 400, height: 400 });
+    var canvasClip = new fabric.StaticCanvas(null, { width: 400, height: 400, renderOnAddRemove: false });
     canvasClip.clipPath = new fabric.Rect({ width: 200, height: 200 });
     canvasClip.add(new fabric.Circle({ radius: 200 }));
     var svg = canvasClip.toSVG();
@@ -1030,7 +1037,7 @@
     var rect = makeRect();
     canvas.add(rect);
     var cObject = canvas.toObject();
-    var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10 };
+    var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10, top: 0, left: 0 };
     assert.deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
     canvas.includeDefaultValues = true;
   });
@@ -1473,7 +1480,7 @@
   });
 
   QUnit.test('dispose clear references', function(assert) {
-    var canvas2 = new fabric.Canvas();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     canvas2.add(makeRect(), makeRect(), makeRect());
     canvas2.dispose();
@@ -1551,6 +1558,7 @@
     assert.equal(canvas.lowerCanvasEl.style.height, 200 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getWidth(), 250, 'Should be as the backstore only value');
     assert.equal(canvas.getHeight(), 350, 'Should be as the backstore only value');
+    canvas.cancelRequestedRender();
   });
 
   QUnit.test('fxRemove', function(assert) {
@@ -1563,16 +1571,14 @@
     var callbackFired = false;
     function onComplete(){
       callbackFired = true;
+      assert.equal(canvas.item(0), undefined);
+      assert.ok(callbackFired);
+      canvas.cancelRequestedRender();
+      done();
     }
 
     assert.ok(canvas.item(0) === rect);
     assert.equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
-
-    setTimeout(function() {
-      assert.equal(canvas.item(0), undefined);
-      assert.ok(callbackFired);
-      done();
-    }, 1000);
   });
 
   QUnit.test('options in setBackgroundImage from URL', function(assert) {
@@ -1843,7 +1849,6 @@
     assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
-    canvas2.dispose();
   });
 
   // QUnit.test('backgroundImage', function(assert) {
