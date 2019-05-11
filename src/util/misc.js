@@ -410,15 +410,18 @@
     enlivenObjects: function(objects, callback, namespace, reviver) {
       objects = objects || [];
 
-      function onLoaded() {
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback(enlivenedObjects);
-        }
-      }
-
       var enlivenedObjects = [],
           numLoadedObjects = 0,
           numTotalObjects = objects.length;
+
+      function onLoaded() {
+        if (++numLoadedObjects === numTotalObjects) {
+          callback && callback(enlivenedObjects.filter(function(obj) {
+            // filter out undefined objects (objects that gave error)
+            return obj;
+          }));
+        }
+      }
 
       if (!numTotalObjects) {
         callback && callback(enlivenedObjects);
