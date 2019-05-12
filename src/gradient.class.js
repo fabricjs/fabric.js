@@ -192,8 +192,8 @@
 
       commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="userSpaceOnUse"';
-      commonAttributes += ' gradientTransform="' + fabric.util.matrixToSVG(transform) + ' ' + (withViewport ?
-        options.additionalTransform : '') + '" ';
+      commonAttributes += ' gradientTransform="' + (withViewport ?
+        options.additionalTransform + ' ' : '') + fabric.util.matrixToSVG(transform) + '" ';
 
       if (this.type === 'linear') {
         markup = [

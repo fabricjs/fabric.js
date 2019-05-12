@@ -1019,6 +1019,8 @@
             v[5] + (fill.offsetY || 0)
           );
         }
+        var m = fill.gradientTransform || fill.patternTransform;
+        m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         ctx.fill();
         ctx.restore();
       }
@@ -1405,8 +1407,8 @@
             if (fill && fill.toLive) {
               var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
                   object = {
-                    width: _this.width / shouldTransform ? vpt[0] : 1,
-                    height: _this.height / shouldTransform ? vpt[3] : 1
+                    width: _this.width / (shouldTransform ? vpt[0] : 1),
+                    height: _this.height / (shouldTransform ? vpt[3] : 1)
                   };
               return fill.toSVG(
                 object,
@@ -1516,7 +1518,6 @@
       if (filler.toLive) {
         var repeat = filler.repeat, iVpt = fabric.util.invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
             additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
-        console.log(filler);
         markup.push(
           '<rect transform="' + additionalTransform + ' translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
           ' x="', filler.offsetX - finalWidth / 2,
