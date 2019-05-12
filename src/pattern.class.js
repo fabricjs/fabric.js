@@ -124,7 +124,7 @@
      * @param {fabric.Object} object
      * @return {String} SVG representation of a pattern
      */
-    toSVG: function(object) {
+    toSVG: function(object, options) {
       var patternSource = typeof this.source === 'function' ? this.source() : this.source,
           patternWidth = patternSource.width / object.width,
           patternHeight = patternSource.height / object.height,
