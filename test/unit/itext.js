@@ -278,6 +278,34 @@
     iText.abortCursorAnimation();
   });
 
+  QUnit.test('enterEditing, exitEditing and saved props', function(assert) {
+    var iText = new fabric.IText('test');
+
+    var _savedProps = {
+      hasControls: iText.hasControls,
+      borderColor: iText.borderColor,
+      lockMovementX: iText.lockMovementX,
+      lockMovementY: iText.lockMovementY,
+      hoverCursor: iText.hoverCursor,
+      selectable: iText.selectable,
+      defaultCursor: iText.canvas && iText.canvas.defaultCursor,
+      moveCursor: iText.canvas && iText.canvas.moveCursor
+    };
+    iText.enterEditing();
+    assert.deepEqual(_savedProps, iText._savedProps, 'iText saves a copy of important props');
+    assert.equal(iText.selectable, false, 'selectable is set to false');
+    assert.equal(iText.hasControls, false, 'hasControls is set to false');
+    iText.exitEditing();
+    iText.abortCursorAnimation();
+    assert.equal(iText.selectable, true, 'selectable is set back to true');
+    assert.equal(iText.hasControls, true, 'hasControls is set back to true');
+    iText.selectable = false;
+    iText.enterEditing();
+    iText.exitEditing();
+    assert.equal(iText.selectable, false, 'selectable is set back to initial value');
+    iText.abortCursorAnimation();
+  });
+
   QUnit.test('event firing', function(assert) {
     var iText = new fabric.IText('test'),
         enter = 0, exit = 0, modify = 0;

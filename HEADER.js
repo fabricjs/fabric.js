@@ -115,6 +115,15 @@ fabric.charWidthsCache = { };
 fabric.textureSize = 2048;
 
 /**
+ * When 'true', style information is not retained when copy/pasting text, making
+ * pasted text use destination style.
+ * Defaults to 'false'.
+ * @type Boolean
+ * @default
+ */
+fabric.disableStyleCopyPaste = false;
+
+/**
  * Enable webgl for filtering picture is available
  * A filtering backend will be initialized, this will both take memory and
  * time since a default 2048x2048 canvas will be created for the gl context
@@ -169,6 +178,15 @@ fabric.boundsOfCurveCache = { };
  * @default true
  */
 fabric.cachesBoundsOfCurve = true;
+
+/**
+ * Skip performance testing of setupGLContext and force the use of putImageData that seems to be the one that works best on
+ * Chrome + old hardware. if your users are experiencing empty images after filtering you may try to force this to true
+ * this has to be set before instantiating the filtering backend ( before filtering the first image )
+ * @type Boolean
+ * @default false
+ */
+fabric.forceGLPutImageData = false;
 
 fabric.initFilterBackend = function() {
   if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {

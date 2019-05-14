@@ -88,6 +88,13 @@
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
   });
 
+  QUnit.test('_getFontDeclaration with coma', function(assert) {
+    var text = createTextObject();
+    text.fontFamily = 'Arial, sans-serif';
+    var fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
+  });
+
   fabric.Text.genericFonts.forEach(function(fontName) {
     QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
       var text = createTextObject();
@@ -752,4 +759,89 @@
     assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
+
+  QUnit.test('_deleteStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    text._deleteStyleDeclaration(0, 10);
+    assert.equal(text.styles[0][10], undefined, 'style has been removed');
+  });
+
+  QUnit.test('_setStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(typeof text._setStyleDeclaration, 'function', 'function exists');
+    var newStyle = { fontSize: 10 };
+    text._setStyleDeclaration(0, 10, newStyle);
+    assert.equal(text.styles[0][10], newStyle, 'style has been changed');
+  });
+
+  QUnit.test('styleHas', function(assert) {
+    var textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+        },
+        1: {
+          0: { fontFamily: 'Arial' },
+          1: { fontFamily: 'Arial' },
+          2: { fontFamily: 'Arial' },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(textbox.styleHas('fontSize'), true, 'style has fontSize');
+    assert.equal(textbox.styleHas('fontSize', 0), true, 'style has fontSize on line 0');
+    assert.equal(textbox.styleHas('fontSize', 1), false, 'style does not have fontSize on line 1');
+    assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
+    assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
+    assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
 })();

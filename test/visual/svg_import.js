@@ -75,7 +75,8 @@
     'clippath-6',
     'clippath-7',
     'clippath-9',
-    'vector-effect'
+    'vector-effect',
+    'svg-with-no-dim-rect'
     //'clippath-8',
   ].map(createTestFromSVG);
 

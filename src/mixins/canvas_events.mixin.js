@@ -50,34 +50,28 @@
     },
 
     addOrRemove: function(functor, eventjsFunctor) {
+      var canvasElement = this.upperCanvasEl,
+          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
       functor(fabric.window, 'resize', this._onResize);
-      if (fabric.window && fabric.window.PointerEvent) {
-        functor(this.upperCanvasEl, 'pointerdown', this._onMouseDown);
-        functor(this.upperCanvasEl, 'pointermove', this._onMouseMove, addEventOptions);
-        functor(this.upperCanvasEl, 'pointerout', this._onMouseOut);
-        functor(this.upperCanvasEl, 'pointerenter', this._onMouseEnter);
-      }
-      else {
-        functor(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-        functor(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-        functor(this.upperCanvasEl, 'mouseout', this._onMouseOut);
-        functor(this.upperCanvasEl, 'mouseenter', this._onMouseEnter);
-        functor(this.upperCanvasEl, 'touchstart', this._onMouseDown, addEventOptions);
-        functor(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
-      }
-      functor(this.upperCanvasEl, 'wheel', this._onMouseWheel);
-      functor(this.upperCanvasEl, 'contextmenu', this._onContextMenu);
-      functor(this.upperCanvasEl, 'dblclick', this._onDoubleClick);
-      functor(this.upperCanvasEl, 'dragover', this._onDragOver);
-      functor(this.upperCanvasEl, 'dragenter', this._onDragEnter);
-      functor(this.upperCanvasEl, 'dragleave', this._onDragLeave);
-      functor(this.upperCanvasEl, 'drop', this._onDrop);
+      functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
+      functor(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+      functor(canvasElement, eventTypePrefix + 'out', this._onMouseOut);
+      functor(canvasElement, eventTypePrefix + 'enter', this._onMouseEnter);
+      functor(canvasElement, 'wheel', this._onMouseWheel);
+      functor(canvasElement, 'contextmenu', this._onContextMenu);
+      functor(canvasElement, 'dblclick', this._onDoubleClick);
+      functor(canvasElement, 'touchstart', this._onMouseDown, addEventOptions);
+      functor(canvasElement, 'touchmove', this._onMouseMove, addEventOptions);
+      functor(canvasElement, 'dragover', this._onDragOver);
+      functor(canvasElement, 'dragenter', this._onDragEnter);
+      functor(canvasElement, 'dragleave', this._onDragLeave);
+      functor(canvasElement, 'drop', this._onDrop);
       if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
-        eventjs[eventjsFunctor](this.upperCanvasEl, 'gesture', this._onGesture);
-        eventjs[eventjsFunctor](this.upperCanvasEl, 'drag', this._onDrag);
-        eventjs[eventjsFunctor](this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        eventjs[eventjsFunctor](this.upperCanvasEl, 'shake', this._onShake);
-        eventjs[eventjsFunctor](this.upperCanvasEl, 'longpress', this._onLongPress);
+        eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
+        eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
+        eventjs[eventjsFunctor](canvasElement, 'orientation', this._onOrientationChange);
+        eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
+        eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
       }
     },
 
@@ -87,9 +81,10 @@
     removeListeners: function() {
       this.addOrRemove(removeListener, 'remove');
       // if you dispose on a mouseDown, before mouse up, you need to clean document to...
-      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+      removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
-      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
     },
 
@@ -171,7 +166,13 @@
      * @param {Event} e Event object fired on mouseenter
      */
     _onMouseEnter: function(e) {
-      if (!this.findTarget(e)) {
+      // This find target and consequent 'mouse:over' is used to
+      // clear old instances on hovered target.
+      // calling findTarget has the side effect of killing target.__corner.
+      // as a short term fix we are not firing this if we are currently transforming.
+      // as a long term fix we need to separate the action of finding a target with the
+      // side effects we added to it.
+      if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
         this._hoveredTarget = null;
       }
@@ -247,16 +248,18 @@
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
+      var canvasElement = this.upperCanvasEl,
+          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+      removeListener(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+      removeListener(canvasElement, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (e.type === 'touchstart') {
         // Unbind mousedown to prevent double triggers from touch devices
-        removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+        removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
       }
       else {
-        addListener(fabric.document, 'mouseup', this._onMouseUp);
-        addListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+        addListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
+        addListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       }
     },
 
@@ -267,21 +270,24 @@
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
       this._resetTransformEventData();
-      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      var canvasElement = this.upperCanvasEl,
+          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+
+      removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
 
-      removeListener(fabric.document, 'mousemove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove, addEventOptions);
-      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove, addEventOptions);
+      addListener(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+      addListener(canvasElement, 'touchmove', this._onMouseMove, addEventOptions);
 
       if (e.type === 'touchend') {
         // Wait 400ms before rebinding mousedown to prevent double triggers
         // from touch devices
         var _this = this;
         setTimeout(function() {
-          addListener(_this.upperCanvasEl, 'mousedown', _this._onMouseDown);
+          addListener(_this.upperCanvasEl, eventTypePrefix + 'down', _this._onMouseDown);
         }, 400);
       }
     },

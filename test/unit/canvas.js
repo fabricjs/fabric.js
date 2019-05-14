@@ -54,7 +54,7 @@
                       '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
@@ -103,11 +103,13 @@
     afterEach: function() {
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
+      canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
       canvas.calcOffset();
+      canvas.cancelRequestedRender();
       upperCanvasEl.style.display = 'none';
     }
   });
@@ -293,6 +295,25 @@
     canvas.remove(canvas.item(0));
 
     assert.equal(isFired, true, 'removing active object should fire "before:selection:cleared"');
+  });
+
+  QUnit.test('before:selection:cleared gets target the active object', function(assert) {
+    var passedTarget;
+    canvas.on('before:selection:cleared', function(options) {
+      passedTarget = options.target;
+    });
+    var rect = new fabric.Rect();
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.discardActiveObject();
+    assert.equal(passedTarget, rect, 'options.target was the removed object');
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    canvas.setActiveObject(activeSelection);
+    canvas.discardActiveObject();
+    assert.equal(passedTarget, activeSelection, 'removing an activeSelection pass that as a target');
   });
 
   QUnit.test('selection:cleared', function(assert) {
@@ -590,6 +611,53 @@
     var collected = canvas._collectObjects();
     assert.equal(collected.length, 1, 'objects are in the same position buy only one gets selected');
     assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
+  });
+
+  QUnit.test('_collectObjects does not call onSelect on objects that are not intersected', function(assert) {
+    canvas.selectionFullyContained = false;
+    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+    var onSelectRect1CallCount = 0;
+    var onSelectRect2CallCount = 0;
+    rect1.onSelect = function() {
+      onSelectRect1CallCount++;
+      return false;
+    };
+    rect2.onSelect = function() {
+      onSelectRect2CallCount++;
+      return false;
+    };
+    canvas.add(rect1, rect2);
+    // Intersects none
+    canvas._groupSelector = {
+      top: 1,
+      left: 1,
+      ex: 25,
+      ey: 25
+    };
+    canvas._collectObjects();
+    var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
+    assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
+    // Intersects one
+    canvas._groupSelector = {
+      top: 5,
+      left: 5,
+      ex: 0,
+      ey: 0
+    };
+    canvas._collectObjects();
+    assert.equal(onSelectRect1CallCount, 0, 'rect1 onSelect was not called. It will be called in _setActiveObject()');
+    assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
+    // Intersects both
+    canvas._groupSelector = {
+      top: 5,
+      left: 15,
+      ex: 0,
+      ey: 0
+    };
+    canvas._collectObjects();
+    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called');
+    assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
   });
 
   QUnit.test('_shouldGroup return false if onSelect return true', function(assert) {
@@ -1996,7 +2064,7 @@
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false });
+    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2018,6 +2086,7 @@
     assert.ok(typeof canvas.dispose === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
+    canvas.cancelRequestedRender();
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     if (!fabric.isLikelyNode) {
@@ -2087,7 +2156,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });
@@ -2106,7 +2175,7 @@
 
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
-
+      clone.renderAll();
       done();
     });
   });

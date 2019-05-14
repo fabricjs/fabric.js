@@ -222,6 +222,16 @@
     assert.deepEqual(line2, expected2, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
   });
+  QUnit.test('wrapping an empty line', function(assert) {
+    var textbox = new fabric.Textbox('', {
+      width: 10,
+    });
+    var line1 = textbox._wrapLine('', 0, 100, 0);
+    assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
+    textbox.splitByGrapheme = true;
+    var line2 = textbox._wrapLine('', 0, 100, 0);
+    assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
+  });
   QUnit.test('_scaleObject with textbox', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
@@ -239,7 +249,7 @@
     assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
   });
   QUnit.test('_removeExtraneousStyles', function(assert) {
-    var iText = new fabric.IText('a\nq\qo', { styles: {
+    var iText = new fabric.Textbox('a\nq\qo', { styles: {
       0: { 0: { fontSize: 4 } },
       1: { 0: { fontSize: 4 } },
       2: { 0: { fontSize: 4 } },
@@ -252,4 +262,194 @@
     assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
     assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
   });
+
+  QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
+    var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
+      { width: 60, splitByGrapheme: true });
+    var loc = iText.get2DCursorLocation();
+
+    // [ [ '由', '石', '墨' ],
+    //   [ '分', '裂', '的' ],
+    //   [ '石', '墨', '分' ],
+    //   [ '裂', '由', '石' ],
+    //   [ '墨', '分', '裂' ],
+    //   [ '由', '石', '墨' ],
+    //   [ '分', '裂', '的' ],
+    //   [ '石', '墨', '分' ],
+    //   [ '裂' ] ]
+
+    assert.equal(loc.lineIndex, 0);
+    assert.equal(loc.charIndex, 0);
+
+    // '由石墨|分裂的石墨分裂由石墨分裂由石墨分裂的石墨分裂'
+    iText.selectionStart = iText.selectionEnd = 4;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 1, 'selection end 4 line 1');
+    assert.equal(loc.charIndex, 1, 'selection end 4 char 1');
+
+    iText.selectionStart = iText.selectionEnd = 7;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 2, 'selection end 7 line 2');
+    assert.equal(loc.charIndex, 1, 'selection end 7 char 1');
+
+    iText.selectionStart = iText.selectionEnd = 14;
+    loc = iText.get2DCursorLocation();
+
+    assert.equal(loc.lineIndex, 4, 'selection end 14 line 4');
+    assert.equal(loc.charIndex, 2, 'selection end 14 char 2');
+  });
+
+  QUnit.test('missingNewlineOffset with splitByGrapheme', function(assert) {
+    var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
+      { width: 80, splitByGrapheme: true });
+
+    // [ [ 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a' ],
+    //   [ 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a', 'a' ],
+    //   [ 'a', 'a', 'a' ] ]
+
+    var offset = textbox.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'line 0 is interrupted by a \n so has an offset of 1');
+
+    offset = textbox.missingNewlineOffset(1);
+    assert.equal(offset, 0, 'line 1 is wrapped without a \n so it does have an extra char count');
+  });
+
+  QUnit.test('missingNewlineOffset with normal split', function(assert) {
+    var texbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
+      { width: 160 });
+
+    var offset = texbox.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'it returns always 1');
+    var offset = texbox.missingNewlineOffset(1);
+    assert.equal(offset, 1, 'it returns always 1');
+    var offset = texbox.missingNewlineOffset(2);
+    assert.equal(offset, 1, 'it returns always 1');
+  });
+
+  QUnit.test('_getLineStyle', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg\noee eee', {
+      styles: {
+        1: { 0: { fontSize: 4 } },
+      },
+      width: 80,
+    });
+
+    assert.equal(textbox._getLineStyle(0), false, 'wrapped line 0 has no style');
+    assert.equal(textbox._getLineStyle(1), false, 'wrapped line 1 has no style');
+    assert.equal(textbox._getLineStyle(4), true, 'wrapped line 2 has style');
+  });
+
+  QUnit.test('_setLineStyle', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg\noee eee', {
+      styles: {
+        1: { 0: { fontSize: 4 } },
+      },
+      width: 80,
+    });
+
+    assert.equal(textbox._getLineStyle(0), false, 'wrapped line 0 has no style');
+    assert.equal(textbox._getLineStyle(1), false, 'wrapped line 1 has no style');
+    assert.equal(textbox._getLineStyle(2), false, 'wrapped line 2 has no style');
+    assert.equal(textbox._getLineStyle(3), false, 'wrapped line 3 has no style');
+
+    assert.deepEqual(textbox.styles[0], undefined, 'style is undefined');
+    textbox._setLineStyle(0);
+
+    assert.equal(textbox._getLineStyle(0), true, 'wrapped line 0 has style');
+    assert.equal(textbox._getLineStyle(1), true, 'wrapped line 1 has style');
+    assert.equal(textbox._getLineStyle(2), true, 'wrapped line 2 has style');
+    assert.equal(textbox._getLineStyle(3), true, 'wrapped line 3 has style');
+
+    assert.deepEqual(textbox.styles[0], {}, 'style is an empty object');
+  });
+
+  QUnit.test('_deleteStyleDeclaration', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    textbox._deleteStyleDeclaration(2, 2);
+    assert.equal(textbox.styles[0][10], undefined, 'style has been removed');
+  });
+
+  QUnit.test('_setStyleDeclaration', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(typeof textbox._setStyleDeclaration, 'function', 'function exists');
+    var newStyle = { fontSize: 10 };
+    textbox._setStyleDeclaration(2, 2, newStyle);
+    assert.equal(textbox.styles[0][10], newStyle, 'style has been changed');
+  });
+
+  QUnit.test('styleHas', function(assert) {
+    var textbox = new fabric.Textbox('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          4: { fontFamily: 'Arial' },
+          5: { fontFamily: 'Arial' },
+          6: { fontFamily: 'Arial' },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(textbox.styleHas('fontSize'), true, 'style has fontSize');
+    assert.equal(textbox.styleHas('fontSize', 0), true, 'style has fontSize on line 0');
+    // assert.equal(textbox.styleHas('fontSize', 1), false, 'style does not have fontSize on line 1');
+    assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
+    // assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
+    assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
 })();

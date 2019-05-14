@@ -87,10 +87,31 @@
 
   QUnit.test('initialize', function(assert) {
     var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0 });
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
 
     assert.equal(path.left, 100);
     assert.equal(path.top, 0);
+    done();
+  });
+
+  QUnit.test('initialize with strokeWidth', function(assert) {
+    var done = assert.async();
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { strokeWidth: 50 });
+
+    assert.equal(path.left, 75);
+    assert.equal(path.top, 75);
+    done();
+  });
+
+  QUnit.test('initialize with strokeWidth with originX and originY', function(assert) {
+    var done = assert.async();
+    var path = new fabric.Path(
+      'M 100 100 L 200 100 L 170 200 z',
+      { strokeWidth: 0, originX: 'center', originY: 'center' }
+    );
+
+    assert.equal(path.left, 150);
+    assert.equal(path.top, 150);
     done();
   });
 
