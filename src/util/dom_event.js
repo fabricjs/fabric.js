@@ -184,7 +184,7 @@
   fabric.util.removeListener = removeListener;
 
   /**
-   * Cross-browser wrapper for getting event's coordinates and pressure
+   * Cross-browser wrapper for getting event's coordinates
    * @memberOf fabric.util
    * @param {Event} event Event object
    */
@@ -197,8 +197,7 @@
         scroll = fabric.util.getScrollLeftTop(element);
     return {
       x: pointerX(event) + scroll.left,
-      y: pointerY(event) + scroll.top,
-      pressure: pressure(event)
+      y: pointerY(event) + scroll.top
     };
   }
 
@@ -208,19 +207,6 @@
 
       pointerY = function(event) {
         return event.clientY;
-      },
-
-      pressure = function(ev) {
-        // TouchEvent
-        if (ev.touches && ev.touches.length > 0) {
-          return ev.touches[0].force;
-        }
-        // MouseEvent, PointerEvent (ev.pointerType: "mouse")
-        if (ev.pointerType === 'mouse' || typeof ev.pressure !== 'number') {
-          return 0.5;
-        }
-        // PointerEvent (ev.pointerType: pen" | "touch")
-        return ev.pressure;
       };
 
   function _getPointer(event, pageProp, clientProp) {
