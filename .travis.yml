@@ -88,4 +88,4 @@ jobs:
 
 script: npm run build:fast && npm run test
 
-dist: trusty
+dist: xenial
