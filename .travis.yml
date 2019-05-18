@@ -11,7 +11,8 @@ addons:
     - libpango1.0-dev
     - libjpeg-dev
     - librsvg2-dev
-# libcairo2-dev is preinstalled
+    - libcairo2-dev
+
 stages:
   - Linting and Building
   - Unit Tests
@@ -71,8 +72,14 @@ jobs:
       node_js: "8"
     - stage: Visual Tests
       env: LAUNCHER=Node
-      node_js: "8"
+      node_js: "10"
       script: npm run build:fast && npm run test:visual
+    - stage: Visual Tests
+      env: LAUNCHER=Node
+      node_js: "10"
+      script: npm run build:fast && npm run test:visual
+      before_install: brew install pkg-config cairo pango libpng jpeg giflib librsvg
+      os: osx
     - stage: Visual Tests
       env: LAUNCHER=Chrome
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
