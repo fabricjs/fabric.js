@@ -2,6 +2,7 @@
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = false;
+  fabric.Object.NUM_FRACTION_DIGITS = 4;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
