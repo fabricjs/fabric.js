@@ -1826,7 +1826,30 @@
       },
     });
     var svg = canvas2.toSVG();
-    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -150 -75)\"  x1=\"0\" y1=\"0\" x2=\"300\" y2=\"0\">\n<stop offset="0%" style="stop-color:black;"/>\n<stop offset="100%" style="stop-color:white;"/>\n</linearGradient>\n</defs>\n<rect transform="translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 0 0) matrix(1 0 0 1 -150 -75)\"  x1=\"0\" y1=\"0\" x2=\"300\" y2=\"0\">\n<stop offset="0%" style="stop-color:black;"/>\n<stop offset="100%" style="stop-color:white;"/>\n</linearGradient>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
+    assert.equal(svg, expectedSVG, 'svg is as expected');
+  });
+
+  QUnit.test('toSVG with background gradient and transforms', function(assert) {
+    fabric.Object.__uid = 0;
+    var canvas2 = new fabric.StaticCanvas();
+    canvas2.viewportTransform = [1, 2, 3, 4, 5, 6];
+    canvas2.backgroundColor = new fabric.Gradient({
+      type: 'linear',
+      gradientTransform: [0.2, 0.3, 0.4, 0.5, -3, -5],
+      colorStops: [
+        { offset: 0, color: 'black' },
+        { offset: 1, color: 'white' },
+      ],
+      coords: {
+        x1: 0,
+        x2: 300,
+        y1: 0,
+        y2: 0,
+      },
+    });
+    var svg = canvas2.toSVG();
+    var expectedSVG = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"300\" height=\"150\" viewBox=\"-5 -1.5 300 37.5\" xml:space=\"preserve\">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 2 3 4 5 6) matrix(0.2 0.3 0.4 0.5 -153 -23.75)\"  x1=\"0\" y1=\"0\" x2=\"300\" y2=\"0\">\n<stop offset=\"0%\" style=\"stop-color:black;\"/>\n<stop offset=\"100%\" style=\"stop-color:white;\"/>\n</linearGradient>\n</defs>\n<rect transform=\"matrix(-2 1 1.5 -0.5 1 -2) translate(150,75)\" x=\"-150\" y=\"-75\" width=\"300\" height=\"150\" fill=\"url(#SVGID_0)\"></rect>\n</svg>';
     assert.equal(svg, expectedSVG, 'svg is as expected');
   });
 
@@ -1838,7 +1861,7 @@
       repeat: 'repeat',
     });
     var svg = canvas2.toSVG();
-    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_0" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href=""></image>\n</pattern>\n</defs>\n<rect transform="translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_0" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href=""></image>\n</pattern>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
     assert.equal(svg, expectedSVG, 'svg is as expected');
   });
 

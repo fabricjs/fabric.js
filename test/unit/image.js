@@ -25,7 +25,7 @@
   }
 
   var IMG_SRC     = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '/fixtures/test_image.gif',
+      IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 

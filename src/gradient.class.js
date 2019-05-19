@@ -170,12 +170,13 @@
      * @param {Object} object Object to create a gradient for
      * @return {String} SVG representation of an gradient (linear/radial)
      */
-    toSVG: function(object) {
-      var coords = clone(this.coords, true), i, len,
+    toSVG: function(object, options) {
+      var coords = clone(this.coords, true), i, len, options = options || {},
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2,
           transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
-          offsetX = object.width / 2 - this.offsetX, offsetY = object.height / 2 - this.offsetY;
+          offsetX = object.width / 2 - this.offsetX, offsetY = object.height / 2 - this.offsetY,
+          withViewport = !!options.additionalTransform;
       // colorStops must be sorted ascending
       colorStops.sort(function(a, b) {
         return a.offset - b.offset;
@@ -191,7 +192,8 @@
 
       commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="userSpaceOnUse"';
-      commonAttributes += ' gradientTransform="matrix(' + transform.join(' ') + ')" ';
+      commonAttributes += ' gradientTransform="' + (withViewport ?
+        options.additionalTransform + ' ' : '') + fabric.util.matrixToSVG(transform) + '" ';
 
       if (this.type === 'linear') {
         markup = [
