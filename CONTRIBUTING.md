@@ -24,7 +24,7 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 
 ### Issue tracker guidelines
 
-- **Search:** Before opening a new issue please [search](https://github.com/kangax/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues.
+- **Search:** Before opening a new issue please [search](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues.
 
 - **Title:** Choose an informative title.
 
@@ -34,7 +34,7 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 perfect, but even a simple script demonstrating the error would suffice. You could use [this jsfiddle template](http://jsfiddle.net/fabricjs/Da7SP/) as a
 starting point.
 
-- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/kangax/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console.
+- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console.
 
 ## Pull requests
 
@@ -44,11 +44,11 @@ We are very grateful for your pull requests! This is your chance to improve Fabr
 
 Here are a few notes you should take into account:
 
-- **Code style, notes:** Make sure you have complied with the [guidelines](https://github.com/kangax/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
+- **Code style, notes:** Make sure you have complied with the [guidelines](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
 
-- **Distribution files:** Do your changes only in the [source files](https://github.com/kangax/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/kangax/fabric.js/tree/master/dist) in your commit.
+- **Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
 
-- **Add tests**: Tests are always a great addition - invest a little time and expand the [unit tests suite](https://github.com/kangax/fabric.js/tree/master/test/unit). More informations about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/kangax/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
+- **Add tests**: Tests are always a great addition - invest a little time and expand the [unit tests suite](https://github.com/fabricjs/fabric.js/tree/master/test/unit). More informations about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
 
 - **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs).
 
@@ -56,7 +56,7 @@ Here are a few notes you should take into account:
 
 - **One pull request per feature/bug**. If you want to do more than one thing, send multiple pull requests.
 
-- **And there you go!** If you still have questions we're always happy to help. Also feel free to consult [wiki](https://github.com/kangax/fabric.js/wiki/How-to-contribute-to-Fabric).
+- **And there you go!** If you still have questions we're always happy to help. Also feel free to consult [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric).
 
 [Fabric's google group]: https://groups.google.com/forum/#!forum/fabricjs
 [stackoverflow]: http://stackoverflow.com/questions/tagged/fabricjs

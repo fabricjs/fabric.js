@@ -65,7 +65,7 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Node
-      node_js: "11"
+      node_js: "12"
     - stage: Unit Tests
       env: LAUNCHER=Node
       node_js: "10"
