@@ -598,7 +598,7 @@
     assert.equal(ret, object, 'fire is chainable when firing a registerd event');
     ret = object.off('hi');
     assert.equal(ret, object, 'off is chainable');
-  })
+  });
 
   QUnit.test('observable', function(assert) {
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
