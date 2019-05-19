@@ -1257,6 +1257,16 @@
     });
   });
 
+  QUnit.test('loadFromJSON with clipPath', function(assert) {
+    var done = assert.async();
+    var json = '{"clipPath": {"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
+    canvas.loadFromJSON(json, function() {
+      canvas.renderAll();
+      assert.equal('text', canvas.clipPath.type);
+      done();
+    });
+  });
+
   QUnit.test('sendToBack', function(assert) {
     assert.ok(typeof canvas.sendToBack === 'function');
 
