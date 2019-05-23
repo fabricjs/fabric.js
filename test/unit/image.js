@@ -437,6 +437,13 @@
     });
   });
 
+  QUnit.skip('fromOject validates object or throws error (before doing anything else)'), function(assert) {
+    // check src attribute presence
+    // validated src attribute is a string
+    // validate src attribute is a valid url
+    // validate none or either presence of [scaleX, scaleY] OR [width, height] BUT NOT BOTH. (ignoring any scaleX and scaleY which value is 1)
+  }
+
   QUnit.test('fromObject does not mutate data', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
