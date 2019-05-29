@@ -10,7 +10,7 @@ else if (typeof define === 'function' && define.amd) {
 }
 /* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  if (document instanceof HTMLDocument) {
+  if (document instanceof (typeof HTMLDocument !== 'undefined' ? HTMLDocument : Document)) {
     fabric.document = document;
   }
   else {
