@@ -246,7 +246,7 @@
     assert.ok(fabric.parsePointsAttribute);
 
     var element = fabric.document.createElement('polygon');
-    element.setAttribute('points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
+    element.setAttribute('points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3E-2, 10,-1     ');
 
     var actualPoints = fabric.parsePointsAttribute(element.getAttribute('points'));
 
@@ -304,9 +304,9 @@
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
     assert.deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
 
-    element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
+    element.setAttribute('transform', 'matrix(1,2,3.3,-4,5E1,6e-1)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    assert.deepEqual(parsedValue, [1,2,3,4,5,6]);
+    assert.deepEqual(parsedValue, [1,2,3.3,-4,50,0.6]);
 
     element.setAttribute('transform', 'translate(21,31) translate(11,22)');
     parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
