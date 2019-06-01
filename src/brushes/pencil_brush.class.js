@@ -11,7 +11,7 @@
      * @type Number
      * @default 0.5
      */
-    decimate: 1,
+    decimate: 0.4,
 
     /**
      * Constructor
@@ -227,6 +227,9 @@
      * Decimate poins array with the decimate value
      */
     decimatePoints: function(points, distance) {
+      if (points.length <= 2) {
+        return points;
+      }
       var zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
           i, l = points.length - 1, lastPoint = points[0], newPoints = [lastPoint],
           cDistance;
@@ -251,6 +254,7 @@
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
       }
+      console.log(JSON.stringify(this._points.map(p => ({ x: fabric.util.toFixed(p.x,3), y: fabric.util.toFixed(p.y,3) }))));
       var pathData = this.convertPointsToSVGPath(this._points).join('');
       if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
