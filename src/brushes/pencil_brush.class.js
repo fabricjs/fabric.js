@@ -9,7 +9,7 @@
     /**
      * Discard points that are less than `decimate` pixel distant from each other
      * @type Number
-     * @default 0.5
+     * @default 0.4
      */
     decimate: 0.4,
 
@@ -254,7 +254,6 @@
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
       }
-      console.log(JSON.stringify(this._points.map(p => ({ x: fabric.util.toFixed(p.x,3), y: fabric.util.toFixed(p.y,3) }))));
       var pathData = this.convertPointsToSVGPath(this._points).join('');
       if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
