@@ -69,7 +69,6 @@
           translateX = (vp[4] - (cropping.left || 0)) * multiplier,
           translateY = (vp[5] - (cropping.top || 0)) * multiplier,
           originalInteractive = this.interactive,
-          originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
           canvasEl = fabric.util.createCanvasElement();
@@ -81,14 +80,12 @@
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = canvasEl.getContext('2d');
       // will be renderAllExport();
-      this.renderAll();
+      this.renderCanvas(canvasEl.getContext('2d'), this._objects);
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = originalContext;
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
       return canvasEl;
