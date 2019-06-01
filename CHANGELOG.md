@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.1.0]
+- Fix: unbreak IE10. [#5678](https://github.com/fabricjs/fabric.js/pull/5678)
+- Improvement: Support scientific notation with uppercase E. [#5731](https://github.com/fabricjs/fabric.js/pull/5731)
+- Add: PencilBrush brush now support `decimate` property to remove dots that are too near to each other. [#5718](https://github.com/fabricjs/fabric.js/pull/5718)
+
 ## [3.0.0]
 - Breaking: removed support for node 4 and 6. [#5356](https://github.com/fabricjs/fabric.js/pull/5356)
 - Breaking: changed objectCaching meaning to disable caching only if possible. [#5566](https://github.com/fabricjs/fabric.js/pull/5566)
