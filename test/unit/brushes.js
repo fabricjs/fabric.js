@@ -26,7 +26,7 @@
     var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
     brush.onMouseDown(pointer);
     var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-    assert.equal(pathData, 'M 9.999 9.999 L 10.001 10.001', 'path data create a small line that looks like a point');
+    assert.equal(pathData, 'M 9.999 10 L 10.001 10', 'path data create a small line that looks like a point');
   });
   QUnit.test('fabric pencil brush multiple points', function(assert) {
     var brush = new fabric.PencilBrush(canvas);
@@ -37,7 +37,7 @@
     brush.onMouseMove(pointer);
     brush.onMouseMove(pointer);
     var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-    assert.equal(pathData, 'M 9.999 9.999 L 10.001 10.001', 'path data create a small line that looks like a point');
+    assert.equal(pathData, 'M 9.999 10 L 10.001 10', 'path data create a small line that looks like a point');
     assert.equal(brush._points.length, 2, 'concident points are discarded');
   });
   QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
