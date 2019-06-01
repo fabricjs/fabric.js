@@ -196,7 +196,7 @@
         multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
         multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
       }
-      path.push('L ', p1.x + multSignX * width, ' ', p1.y + multSignX * width);
+      path.push('L ', p1.x + multSignX * width, ' ', p1.y + multSignY * width);
       return path;
     },
 
