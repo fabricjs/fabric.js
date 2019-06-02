@@ -60,15 +60,28 @@
       options = options || {};
       this.points = points || [];
       this.callSuper('initialize', options);
-      var calcDim = this._calcDimensions();
-      if (typeof options.left === 'undefined') {
-        this.left = calcDim.left;
-      }
-      if (typeof options.top === 'undefined') {
-        this.top = calcDim.top;
-      }
+      this._setPositionDimensions(options);
+    },
+
+    _setPositionDimensions: function(options) {
+      var calcDim = this._calcDimensions(options), correctLeftTop;
       this.width = calcDim.width;
       this.height = calcDim.height;
+      if (!options.fromSVG) {
+        correctLeftTop = this.translateToGivenOrigin(
+          { x: calcDim.left - this.strokeWidth / 2, y: calcDim.top - this.strokeWidth / 2 },
+          'left',
+          'top',
+          this.originX,
+          this.originY
+        );
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+      }
+      if (typeof options.top === 'undefined') {
+        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+      }
       this.pathOffset = {
         x: calcDim.left + this.width / 2,
         y: calcDim.top + this.height / 2
@@ -117,12 +130,11 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
+    _toSVG: function() {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          markup = this._createBaseSVGMarkup(),
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
@@ -131,17 +143,11 @@
           toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
         );
       }
-      markup.push(
-        '<', this.type, ' ', this.getSvgId(),
+      return [
+        '<' + this.type + ' ', 'COMMON_PARTS',
         'points="', points.join(''),
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(),
-        ' ', this.getSvgTransformMatrix(), '"',
-        this.addPaintOrder(),
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+        '" />\n'
+      ];
     },
     /* _TO_SVG_END_ */
 
@@ -221,17 +227,22 @@
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  fabric.Polyline.fromElement = function(element, callback, options) {
-    if (!element) {
-      return callback(null);
-    }
-    options || (options = { });
+  fabric.Polyline.fromElementGenerator = function(_class) {
+    return function(element, callback, options) {
+      if (!element) {
+        return callback(null);
+      }
+      options || (options = { });
 
-    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-
-    callback(new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options)));
+      var points = fabric.parsePointsAttribute(element.getAttribute('points')),
+          parsedAttributes = fabric.parseAttributes(element, fabric[_class].ATTRIBUTE_NAMES);
+      parsedAttributes.fromSVG = true;
+      callback(new fabric[_class](points, extend(parsedAttributes, options)));
+    };
   };
+
+  fabric.Polyline.fromElement = fabric.Polyline.fromElementGenerator('Polyline');
+
   /* _FROM_SVG_END_ */
 
   /**

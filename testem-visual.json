@@ -1,0 +1,36 @@
+{
+  "framework": "qunit",
+  "serve_files": [
+    "dist/fabric.js",
+    "test/lib/pixelmatch.js",
+    "test/lib/visualTestLoop.js",
+    "test/lib/visualCallbackQunit.js",
+    "test/visual/*.js"
+  ],
+  "routes": {
+    "/fixtures": "test/fixtures"
+  },
+  "test_page": "tests.mustache?hidepassed&hideskipped&timeout=60000",
+  "browser_args": {
+    "Chrome": [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ],
+    "Firefox": [ "--headless" ]
+  },
+  "launch_in_dev": [
+    "Chrome",
+    "Node",
+    "Firefox"
+  ],
+  "launch_in_ci": [
+    "Chrome",
+    "Node",
+    "Firefox"
+  ],
+  "launchers": {
+    "Node": {
+      "command": "npm run test:visual",
+      "protocol": "tap"
+    }
+  },
+  "timeout": 540,
+  "parallel": 4
+}

@@ -276,6 +276,18 @@
     assert.equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
   });
 
+  QUnit.test('copy with fabric.disableStyleCopyPaste', function(assert) {
+    var event = { stopPropagation: function(){}, preventDefault: function(){} };
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    iText.selectionStart = 0;
+    iText.selectionEnd = 2;
+    fabric.disableStyleCopyPaste = true;
+    iText.copy(event);
+    assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    assert.equal(fabric.copiedTextStyle, null, 'style is not cloned');
+    fabric.disableStyleCopyPaste = false;
+  });
+
   QUnit.test('removeChars', function(assert) {
     var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
     assert.ok(typeof iText.removeChars === 'function');
@@ -340,5 +352,12 @@
     assert.equal(iText.styles[1][0].fill, 'col4', 'style 1 0 has been inserted col4');
     assert.equal(iText.styles[2][0].fill, 'col5', 'style 2 0 has been inserted col5');
     assert.equal(iText.styles[2][1].fill, 'blue', 'style 2 1 has been inserted blue');
+  });
+
+  QUnit.test('missingNewlineOffset', function(assert) {
+    var iText = new fabric.IText('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂');
+
+    var offset = iText.missingNewlineOffset(0);
+    assert.equal(offset, 1, 'it returns always 1');
   });
 })();

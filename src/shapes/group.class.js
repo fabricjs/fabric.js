@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max;
 
@@ -77,15 +76,18 @@
         this._objects[i].group = this;
       }
 
-      if (options.originX) {
-        this.originX = options.originX;
-      }
-      if (options.originY) {
-        this.originY = options.originY;
-      }
-
       if (!isAlreadyGrouped) {
         var center = options && options.centerPoint;
+        // we want to set origins before calculating the bounding box.
+        // so that the topleft can be set with that in mind.
+        // if specific top and left are passed, are overwritten later
+        // with the callSuper('initialize', options)
+        if (options.originX !== undefined) {
+          this.originX = options.originX;
+        }
+        if (options.originY !== undefined) {
+          this.originY = options.originY;
+        }
         // if coming from svg i do not want to calc bounds.
         // i assume width and height are passed along options
         center || this._calcBounds();
@@ -215,12 +217,11 @@
         }
       }
       if (key === 'canvas') {
-        i = this._objects.length;
         while (i--) {
           this._objects[i]._set(key, value);
         }
       }
-      this.callSuper('_set', key, value);
+      fabric.Object.prototype._set.call(this, key, value);
     },
 
     /**
@@ -229,16 +230,17 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var objsToObject = this.getObjects().map(function(obj) {
+      var _includeDefaultValues = this.includeDefaultValues;
+      var objsToObject = this._objects.map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = obj.group.includeDefaultValues;
+        obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
         return _obj;
       });
-      return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: objsToObject
-      });
+      var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
+      obj.objects = objsToObject;
+      return obj;
     },
 
     /**
@@ -252,17 +254,18 @@
         objsToObject = sourcePath;
       }
       else {
-        objsToObject = this.getObjects().map(function(obj) {
+        var _includeDefaultValues = this.includeDefaultValues;
+        objsToObject = this._objects.map(function(obj) {
           var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = obj.group.includeDefaultValues;
+          obj.includeDefaultValues = _includeDefaultValues;
           var _obj = obj.toDatalessObject(propertiesToInclude);
           obj.includeDefaultValues = originalDefaults;
           return _obj;
         });
       }
-      return extend(this.callSuper('toDatalessObject', propertiesToInclude), {
-        objects: objsToObject
-      });
+      var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
+      obj.objects = objsToObject;
+      return obj;
     },
 
     /**
@@ -277,15 +280,13 @@
 
     /**
      * Decide if the object should cache or not. Create its own cache level
-     * objectCaching is a global flag, wins over everything
      * needsItsOwnCache should be used when the object drawing method requires
      * a cache step. None of the fabric classes requires it.
-     * Generally you do not cache objects in groups because the group outside is cached.
+     * Generally you do not cache objects in groups because the group is already cached.
      * @return {Boolean}
      */
     shouldCache: function() {
-      var ownCache = this.objectCaching && (!this.group || this.needsItsOwnCache() || !this.group.isOnACache());
-      this.ownCaching = ownCache;
+      var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
         for (var i = 0, len = this._objects.length; i < len; i++) {
           if (this._objects[i].willDrawShadow()) {
@@ -303,7 +304,7 @@
      */
     willDrawShadow: function() {
       if (this.shadow) {
-        return this.callSuper('willDrawShadow');
+        return fabric.Object.prototype.willDrawShadow.call(this);
       }
       for (var i = 0, len = this._objects.length; i < len; i++) {
         if (this._objects[i].willDrawShadow()) {
@@ -329,13 +330,14 @@
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].render(ctx);
       }
+      this._drawClipPath(ctx);
     },
 
     /**
      * Check if cache is dirty
      */
-    isCacheDirty: function() {
-      if (this.callSuper('isCacheDirty')) {
+    isCacheDirty: function(skipCanvas) {
+      if (this.callSuper('isCacheDirty', skipCanvas)) {
         return true;
       }
       if (!this.statefullCache) {
@@ -489,7 +491,7 @@
         }
       }
 
-      this.set(this._getBounds(aX, aY, onlyWidthHeight));
+      this._getBounds(aX, aY, onlyWidthHeight);
     },
 
     /**
@@ -498,28 +500,16 @@
     _getBounds: function(aX, aY, onlyWidthHeight) {
       var minXY = new fabric.Point(min(aX), min(aY)),
           maxXY = new fabric.Point(max(aX), max(aY)),
-          obj = {
-            width: (maxXY.x - minXY.x) || 0,
-            height: (maxXY.y - minXY.y) || 0
-          };
-
+          top = minXY.y || 0, left = minXY.x || 0,
+          width = (maxXY.x - minXY.x) || 0,
+          height = (maxXY.y - minXY.y) || 0;
+      this.width = width;
+      this.height = height;
       if (!onlyWidthHeight) {
-        obj.left = minXY.x || 0;
-        obj.top = minXY.y || 0;
-        if (this.originX === 'center') {
-          obj.left += obj.width / 2;
-        }
-        if (this.originX === 'right') {
-          obj.left += obj.width;
-        }
-        if (this.originY === 'center') {
-          obj.top += obj.height / 2;
-        }
-        if (this.originY === 'bottom') {
-          obj.top += obj.height;
-        }
+        // the bounding box always finds the topleft most corner.
+        // whatever is the group origin, we set up here the left/top position.
+        this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
       }
-      return obj;
     },
 
     /* _TO_SVG_START_ */
@@ -529,24 +519,45 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-      markup.push(
-        '<g ', this.getSvgId(), 'transform="',
-        /* avoiding styles intentionally */
-        this.getSvgTransform(),
-        this.getSvgTransformMatrix(),
-        '" style="',
-        this.getSvgFilter(),
-        '">\n'
-      );
+      var svgString = [];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        markup.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t', this._objects[i].toSVG(reviver));
       }
 
-      markup.push('</g>\n');
+      return this._createBaseSVGMarkup(
+        this._toSVG(),
+        { reviver: reviver, noStyle: true, withShadow: true });
+    },
 
-      return reviver ? reviver(markup.join('')) : markup.join('');
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    _toSVG: function(reviver) {
+      var svgString = [];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t', this._objects[i].toSVG(reviver));
+      }
+
+      return svgString;
+    },
+
+    /**
+     * Returns svg clipPath representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toClipPathSVG: function(reviver) {
+      var svgString = [];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
+      }
+
+      return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });
@@ -560,9 +571,12 @@
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
-      callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
+        var options = fabric.util.object.clone(object, true);
+        options.clipPath = enlivedClipPath[0];
+        delete options.objects;
+        callback && callback(new fabric.Group(enlivenedObjects, options, true));
+      });
     });
   };
 

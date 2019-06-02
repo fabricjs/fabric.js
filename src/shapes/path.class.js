@@ -8,6 +8,7 @@
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
       drawArc = fabric.util.drawArc,
+      toFixed = fabric.util.toFixed,
       commandLengths = {
         m: 2,
         l: 2,
@@ -85,31 +86,7 @@
         this.path = this._parsePath();
       }
 
-      this._setPositionDimensions(options);
-    },
-
-    /**
-     * @private
-     * @param {Object} options Options object
-     */
-    _setPositionDimensions: function(options) {
-      var calcDim = this._parseDimensions();
-
-      this.width = calcDim.width;
-      this.height = calcDim.height;
-
-      if (typeof options.left === 'undefined') {
-        this.left = calcDim.left;
-      }
-
-      if (typeof options.top === 'undefined') {
-        this.top = calcDim.top;
-      }
-
-      this.pathOffset = this.pathOffset || {
-        x: calcDim.left + this.width / 2,
-        y: calcDim.top + this.height / 2
-      };
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options);
     },
 
     /**
@@ -442,12 +419,9 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var o = extend(this.callSuper('toObject', propertiesToInclude), {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         path: this.path.map(function(item) { return item.slice(); }),
-        top: this.top,
-        left: this.left,
       });
-      return o;
     },
 
     /**
@@ -466,29 +440,47 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
+     */
+    _toSVG: function() {
+      var path = this.path.map(function(path) {
+        return path.join(' ');
+      }).join(' ');
+      return [
+        '<path ', 'COMMON_PARTS',
+        'd="', path,
+        '" stroke-linecap="round" ',
+        '/>\n'
+      ];
+    },
+
+    _getOffsetTransform: function() {
+      var digits = fabric.Object.NUM_FRACTION_DIGITS;
+      return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
+          toFixed(-this.pathOffset.y, digits) + ')';
+    },
+
+    /**
+     * Returns svg clipPath representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toClipPathSVG: function(reviver) {
+      var additionalTransform = this._getOffsetTransform();
+      return '\t' + this._createBaseClipPathSVGMarkup(
+        this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform }
+      );
+    },
+
+    /**
+     * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var chunks = [],
-          markup = this._createBaseSVGMarkup(), addTransform = '';
-
-      for (var i = 0, len = this.path.length; i < len; i++) {
-        chunks.push(this.path[i].join(' '));
-      }
-      var path = chunks.join(' ');
-      addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      markup.push(
-        '<path ', this.getSvgId(),
-        'd="', path,
-        '" style="', this.getSvgStyles(),
-        '" transform="', this.getSvgTransform(), addTransform,
-        this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
-        this.addPaintOrder(),
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var additionalTransform = this._getOffsetTransform();
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform  });
     },
     /* _TO_SVG_END_ */
 
@@ -552,7 +544,7 @@
     /**
      * @private
      */
-    _parseDimensions: function() {
+    _calcDimensions: function() {
 
       var aX = [],
           aY = [],
@@ -861,16 +853,14 @@
           maxX = max(aX) || 0,
           maxY = max(aY) || 0,
           deltaX = maxX - minX,
-          deltaY = maxY - minY,
+          deltaY = maxY - minY;
 
-          o = {
-            left: minX,
-            top: minY,
-            width: deltaX,
-            height: deltaY
-          };
-
-      return o;
+      return {
+        left: minX,
+        top: minY,
+        width: deltaX,
+        height: deltaY
+      };
     }
   });
 
@@ -915,6 +905,7 @@
    */
   fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+    parsedAttributes.fromSVG = true;
     callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */

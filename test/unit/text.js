@@ -22,8 +22,9 @@
     'strokeWidth':               1,
     'strokeDashArray':           null,
     'strokeLineCap':             'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':            'miter',
-    'strokeMiterLimit':          10,
+    'strokeMiterLimit':          4,
     'scaleX':                    1,
     'scaleY':                    1,
     'angle':                     0,
@@ -77,7 +78,7 @@
     var text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
-    assert.ok(typeof fontDecl == 'string', 'it returns a string');
+    assert.ok(typeof fontDecl === 'string', 'it returns a string');
     assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
     text.fontFamily = '"Times New Roman"';
     fontDecl = text._getFontDeclaration();
@@ -85,6 +86,25 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+  });
+
+  QUnit.test('_getFontDeclaration with coma', function(assert) {
+    var text = createTextObject();
+    text.fontFamily = 'Arial, sans-serif';
+    var fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
+  });
+
+  fabric.Text.genericFonts.forEach(function(fontName) {
+    QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
+      var text = createTextObject();
+      text.fontFamily = fontName;
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName, 'it does not quote ' + fontName);
+      text.fontFamily = fontName.toUpperCase();
+      var fontDecl = text._getFontDeclaration();
+      assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
+    });
   });
 
   QUnit.test('toObject', function(assert) {
@@ -191,7 +211,7 @@
       assert.ok(text instanceof fabric.Text);
       var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
         left: 0,
-        top: -14.59,
+        top: -14.05,
         width: 8,
         height: 18.08,
         fontSize: 16,
@@ -233,7 +253,7 @@
       var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-        top:              -82.43,
+        top:              -88.03,
         width:            CHAR_WIDTH,
         height:           138.99,
         fill:             'rgb(255,255,255)',
@@ -598,11 +618,11 @@
     });
     fabric.Object.NUM_FRACTION_DIGITS = 1;
     var SVG_1 = iText.toSVG();
-    // var SVG_1_EXPECTED = '\t<g transform="translate(124.5 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124" y="12.6" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.9" y="12.6" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.1" y="12.6" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.6" y="12.6" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.4" y="12.6" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.4" y="12.6" >foo bar-baz</tspan></text>\n\t</g>\n';
+    // var SVG_1_EXPECTED = '\t<g transform="translate(124.5 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124" y="12.6" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.9" y="12.6" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.1" y="12.6" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.6" y="12.6" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.4" y="12.6" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.4" y="12.6" >foo bar-baz</tspan></text>\n\t</g>\n';
     //assert.equal(SVG_1, SVG_1_EXPECTED, 'numbers have max 1 decimal');
     fabric.Object.NUM_FRACTION_DIGITS = 3;
     var SVG_2 = iText.toSVG();
-    // var SVG_2_EXPECTED = '\t<g transform="translate(124.484 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-123.984" y="12.566" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.871" y="12.566" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.117" y="12.566" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.551" y="12.566" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.438" y="12.566" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.438" y="12.566" >foo bar-baz</tspan></text>\n\t</g>\n';
+    // var SVG_2_EXPECTED = '\t<g transform="translate(124.484 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-123.984" y="12.566" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.871" y="12.566" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.117" y="12.566" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.551" y="12.566" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.438" y="12.566" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.438" y="12.566" >foo bar-baz</tspan></text>\n\t</g>\n';
     //assert.equal(SVG_2, SVG_2_EXPECTED, 'numbers have max 3 decimal');
     assert.ok(SVG_2.length > SVG_1.length, 'SVG 2 has more decimal');
     // put back to 2 or break all tests
@@ -728,4 +748,100 @@
     assert.equal(Math.round(height2), 52, 'height of empty line is ok');
     assert.equal(height1, height2, 'should have same height');
   });
+
+  QUnit.test('_measureChar handles 0 width chars', function(assert) {
+    fabric.charWidthsCache = {};
+    var zwc =  '\u200b';
+    var text = new fabric.Text('');
+    var style = text.getCompleteStyleDeclaration(0, 0);
+    var box = text._measureChar('a', style, zwc, style);
+    var box2 = text._measureChar('a', style, zwc, style);
+    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
+  });
+
+  QUnit.test('_deleteStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    text._deleteStyleDeclaration(0, 10);
+    assert.equal(text.styles[0][10], undefined, 'style has been removed');
+  });
+
+  QUnit.test('_setStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(typeof text._setStyleDeclaration, 'function', 'function exists');
+    var newStyle = { fontSize: 10 };
+    text._setStyleDeclaration(0, 10, newStyle);
+    assert.equal(text.styles[0][10], newStyle, 'style has been changed');
+  });
+
+  QUnit.test('styleHas', function(assert) {
+    var textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+        },
+        1: {
+          0: { fontFamily: 'Arial' },
+          1: { fontFamily: 'Arial' },
+          2: { fontFamily: 'Arial' },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(textbox.styleHas('fontSize'), true, 'style has fontSize');
+    assert.equal(textbox.styleHas('fontSize', 0), true, 'style has fontSize on line 0');
+    assert.equal(textbox.styleHas('fontSize', 1), false, 'style does not have fontSize on line 1');
+    assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
+    assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
+    assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
 })();

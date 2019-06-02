@@ -12,8 +12,8 @@
     'type':                     'polygon',
     'originX':                  'left',
     'originY':                  'top',
-    'left':                     10,
-    'top':                      12,
+    'left':                     9.5,
+    'top':                      11.5,
     'width':                    10,
     'height':                   10,
     'fill':                     'rgb(0,0,0)',
@@ -21,8 +21,9 @@
     'strokeWidth':              1,
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -80,6 +81,13 @@
     assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
+  QUnit.test('toSVG', function(assert) {
+    var polygon = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
+    assert.ok(typeof polygon.toSVG === 'function');
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15 17)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
+    assert.deepEqual(polygon.toSVG(), EXPECTED_SVG);
+  });
+
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromObject === 'function');
@@ -113,20 +121,22 @@
     });
   });
 
-  QUnit.test('fromElement with empty points', function(assert) {
+  QUnit.test('fromElement with points', function(assert) {
     var elPolygon = fabric.document.createElement('polygon');
     elPolygon.setAttribute('points', '10,12 20,22');
     fabric.Polygon.fromElement(elPolygon, function(polygon) {
       assert.ok(polygon instanceof fabric.Polygon);
       var expected = fabric.util.object.extend(
         fabric.util.object.clone(REFERENCE_OBJECT), {
-          points: [{ x: 10, y: 12 }, { x: 20, y: 22 }]
+          points: [{ x: 10, y: 12 }, { x: 20, y: 22 }],
+          left: 10,
+          top: 12
         });
       assert.deepEqual(polygon.toObject(), expected);
     });
   });
 
-  QUnit.test('fromElement with empty points', function(assert) {
+  QUnit.test('fromElement with points and custom attributes', function(assert) {
     var elPolygonWithAttrs = fabric.document.createElement('polygon');
     elPolygonWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolygonWithAttrs.setAttribute('fill', 'rgb(255,255,255)');

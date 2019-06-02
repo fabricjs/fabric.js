@@ -26,7 +26,9 @@
 
     /**
      * Returns true if object has a style property or has it ina specified line
-     * @param {Number} lineIndex
+     * This function is used to detect if a text will use a particular property or not.
+     * @param {String} property to check for
+     * @param {Number} lineIndex to check the style on
      * @return {Boolean}
      */
     styleHas: function(property, lineIndex) {
@@ -36,7 +38,7 @@
       if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
         return false;
       }
-      var obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
+      var obj = typeof lineIndex === 'undefined' ? this.styles : { 0: this.styles[lineIndex] };
       // eslint-disable-next-line
       for (var p1 in obj) {
         // eslint-disable-next-line
@@ -147,7 +149,7 @@
       var loc = this.get2DCursorLocation(index);
 
       if (!this._getLineStyle(loc.lineIndex)) {
-        this._setLineStyle(loc.lineIndex, {});
+        this._setLineStyle(loc.lineIndex);
       }
 
       if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
@@ -166,8 +168,8 @@
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-      var len = lines.length;
+      var lines = skipWrapping ? this._unwrappedTextLines : this._textLines,
+          len = lines.length;
       for (var i = 0; i < len; i++) {
         if (selectionStart <= lines[i].length) {
           return {
@@ -175,7 +177,7 @@
             charIndex: selectionStart
           };
         }
-        selectionStart -= lines[i].length + 1;
+        selectionStart -= lines[i].length + this.missingNewlineOffset(i);
       }
       return {
         lineIndex: i - 1,
@@ -295,19 +297,20 @@
 
     /**
      * @param {Number} lineIndex
+     * @return {Boolean} if the line exists or not
      * @private
      */
     _getLineStyle: function(lineIndex) {
-      return this.styles[lineIndex];
+      return !!this.styles[lineIndex];
     },
 
     /**
+     * Set the line style to an empty object so that is initialized
      * @param {Number} lineIndex
-     * @param {Object} style
      * @private
      */
-    _setLineStyle: function(lineIndex, style) {
-      this.styles[lineIndex] = style;
+    _setLineStyle: function(lineIndex) {
+      this.styles[lineIndex] = {};
     },
 
     /**

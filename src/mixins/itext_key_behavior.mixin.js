@@ -12,9 +12,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('data-fabric-hiddentextarea', '');
     this.hiddenTextarea.setAttribute('wrap', 'off');
     var style = this._calcTextareaPosition();
+    // line-height: 1px; was removed from the style to fix this:
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top +
     '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
-    ' line-height: 1px; paddingｰtop: ' + style.fontSize + ';';
+    ' paddingｰtop: ' + style.fontSize + ';';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -189,7 +191,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     if (insertedText.length) {
-      if (fromPaste && insertedText.join('') === fabric.copiedText) {
+      if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }
       else {
@@ -237,7 +239,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     fabric.copiedText = this.getSelectedText();
-    fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+    if (!fabric.disableStyleCopyPaste) {
+      fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+    }
+    else {
+      fabric.copiedTextStyle = null;
+    }
     this._copyDone = true;
   },
 
@@ -294,7 +301,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
         indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
         textAfterCursor = this._textLines[lineIndex].slice(charIndex);
-    return textAfterCursor.length + indexOnOtherLine + 2;
+    return textAfterCursor.length + indexOnOtherLine + 1 + this.missingNewlineOffset(lineIndex);
   },
 
   /**
@@ -329,9 +336,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var charIndex = cursorLocation.charIndex,
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
         indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
-        textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex);
+        textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
+        missingNewlineOffset = this.missingNewlineOffset(lineIndex - 1);
     // return a negative offset
-    return -this._textLines[lineIndex - 1].length + indexOnOtherLine - textBeforeCursor.length;
+    return -this._textLines[lineIndex - 1].length
+     + indexOnOtherLine - textBeforeCursor.length + (1 - missingNewlineOffset);
   },
 
   /**

@@ -12,8 +12,8 @@
     'type':                     'polyline',
     'originX':                  'left',
     'originY':                  'top',
-    'left':                     10,
-    'top':                      12,
+    'left':                     9.5,
+    'top':                      11.5,
     'width':                    10,
     'height':                   10,
     'fill':                     'rgb(0,0,0)',
@@ -21,8 +21,9 @@
     'strokeWidth':              1,
     'strokeDashArray':          null,
     'strokeLineCap':            'butt',
+    'strokeDashOffset':         0,
     'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
+    'strokeMiterLimit':         4,
     'scaleX':                   1,
     'scaleY':                   1,
     'angle':                    0,
@@ -79,6 +80,13 @@
     assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
+  QUnit.test('toSVG', function(assert) {
+    var polyline = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
+    assert.ok(typeof polyline.toSVG === 'function');
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15 17)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
+    assert.deepEqual(polyline.toSVG(), EXPECTED_SVG);
+  });
+
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polyline.fromObject === 'function');
@@ -112,9 +120,13 @@
   QUnit.test('fromElement', function(assert) {
     var elPolyline = fabric.document.createElement('polyline');
     elPolyline.setAttribute('points', '10,12 20,22');
+    elPolyline.setAttribute('stroke-width', 1);
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
       assert.ok(polyline instanceof fabric.Polyline);
-      assert.deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+      var obj = fabric.util.object.extend({}, REFERENCE_OBJECT);
+      obj.top = 12;
+      obj.left = 10;
+      assert.deepEqual(polyline.toObject(), obj);
     });
   });
 

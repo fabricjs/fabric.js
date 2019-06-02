@@ -24,65 +24,63 @@
     return element;
   }
 
-
-  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+  var IMG_SRC     = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'version':                  fabric.version,
-    'type':                     'image',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':                   IMG_HEIGHT, // or does it now?
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              0,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'src':                      IMG_SRC,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'filters':                  [],
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'skewX':                    0,
-    'skewY':                    0,
-    'transformMatrix':          null,
-    'crossOrigin':              '',
-    'cropX':                    0,
-    'cropY':                    0
+    version:                  fabric.version,
+    type:                     'image',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     0,
+    top:                      0,
+    width:                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    height:                   IMG_HEIGHT, // or does it now?
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              0,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    src:                      IMG_SRC,
+    shadow:                   null,
+    visible:                  true,
+    backgroundColor:          '',
+    clipTo:                   null,
+    filters:                  [],
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    skewX:                    0,
+    skewY:                    0,
+    transformMatrix:          null,
+    crossOrigin:              '',
+    cropX:                    0,
+    cropY:                    0
   };
 
   function _createImageElement() {
     return fabric.document.createElement('img');
   }
 
-  function _createImageObject(width, height, callback, options) {
+  function _createImageObject(width, height, callback, options, src) {
+    options = options || {};
+    src = src || IMG_SRC;
     var elImage = _createImageElement();
-    setSrc(elImage, IMG_SRC, function() {
-      if (width !== elImage.width || height !== elImage.height) {
-        elImage.width = width;
-        elImage.height = height;
-        callback(new fabric.Image(elImage, options));
-      }
-      else {
-        callback(new fabric.Image(elImage, options));
-      }
+    setSrc(elImage, src, function() {
+      options.width = width;
+      options.height = height;
+      callback(new fabric.Image(elImage, options));
     });
   }
 
@@ -92,6 +90,10 @@
 
   function createSmallImageObject(callback, options) {
     return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback, options);
+  }
+
+  function createImageObjectWithSrc(callback, options, src) {
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback, options, src);
   }
 
   function setSrc(img, src, callback) {
@@ -188,6 +190,28 @@
     });
   });
 
+  QUnit.test('toObject with normal filter and resize filter', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear' });
+      image.resizeFilter = filter;
+      var filterBg = new fabric.Image.filters.Brightness({ brightness: 0.8 });
+      image.filters = [filterBg];
+      image.scaleX = 0.3;
+      image.scaleY = 0.3;
+      var toObject = image.toObject();
+      assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
+      assert.deepEqual(toObject.filters[0], filterBg.toObject(), 'the filter is in object form now brightness');
+      fabric.Image.fromObject(toObject, function(imageFromObject) {
+        var filterFromObj = imageFromObject.resizeFilter;
+        var brightnessFromObj = imageFromObject.filters[0];
+        assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        assert.ok(brightnessFromObj instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Resize');
+        done();
+      });
+    });
+  });
+
   QUnit.test('toObject with applied resize filter', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
@@ -224,7 +248,7 @@
     });
   });
 
-  QUnit.test('toSVG wit crop', function(assert) {
+  QUnit.test('toSVG with crop', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
       image.cropX = 1;
@@ -232,7 +256,7 @@
       image.width -= 2;
       image.height -= 2;
       fabric.Object.__uid = 1;
-      var expectedSVG = '<clipPath id="imageCrop_1">\n\t<rect x="-137" y="-54" width="274" height="108" />\n</clipPath>\n<g transform="translate(137 54)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110" clip-path="url(#imageCrop_1)" ></image>\n</g>\n';
+      var expectedSVG = '<g transform=\"matrix(1 0 0 1 137 54)\"  >\n<clipPath id=\"imageCrop_1\">\n\t<rect x=\"-137\" y=\"-54\" width=\"274\" height=\"108\" />\n</clipPath>\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" clip-path=\"url(#imageCrop_1)\" ></image>\n</g>\n';
       assert.equal(image.toSVG(), expectedSVG);
       done();
     });
@@ -261,7 +285,7 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toSVG === 'function');
-      var expectedSVG = '<g transform="translate(138 55)">\n\t<image xlink:href="' + IMG_SRC + '" x="-138" y="-55" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" width="276" height="110"></image>\n</g>\n';
+      var expectedSVG = '<g transform=\"matrix(1 0 0 1 138 55)\"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\"></image>\n</g>\n';
       assert.equal(image.toSVG(), expectedSVG);
       done();
     });
@@ -274,6 +298,19 @@
       assert.equal(image.getSrc(), IMG_SRC);
       done();
     });
+  });
+
+  QUnit.test('getSrc with srcFromAttribute', function(assert) {
+    var done = assert.async();
+    createImageObjectWithSrc(function(image) {
+      assert.equal(image.getSrc(), IMG_SRC_REL);
+      done();
+    },
+    {
+      srcFromAttribute: true
+    },
+    IMG_SRC_REL
+    );
   });
 
   QUnit.test('getElement', function(assert) {
@@ -382,6 +419,20 @@
     });
     fabric.Image.fromObject(obj, function(instance){
       assert.ok(instance instanceof fabric.Image);
+      done();
+    });
+  });
+
+  QUnit.test('fromObject with clipPath', function(assert) {
+    var done = assert.async();
+    // should not throw error when no callback is given
+    var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+      src: IMG_SRC,
+      clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
+    });
+    fabric.Image.fromObject(obj, function(instance){
+      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance.clipPath instanceof fabric.Rect);
       done();
     });
   });
@@ -656,19 +707,80 @@
       var data1 = image.toDataURL();
       var data2 = image.toDataURL();
       var data3 = image.toDataURL();
-      assert.equal(data1, data2, 'dataurl does not change 1');
-      assert.equal(data1, data3, 'dataurl does not change 2');
+      assert.ok(data1 === data2, 'dataurl does not change 1');
+      assert.ok(data1 === data3, 'dataurl does not change 2');
       done();
     });
   });
 
-  QUnit.test('apply filters do not set the image dirty if not in group', function(assert) {
+  QUnit.test('apply filters run isNeutralState implementation of filters', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var run = false;
+      image.dirty = false;
+      var filter = new fabric.Image.filters.Brightness();
+      image.filters = [filter];
+      filter.isNeutralState = function() {
+        run = true;
+      };
+      assert.equal(run, false, 'isNeutralState did not run yet');
+      image.applyFilters();
+      assert.equal(run, true, 'isNeutralState did run');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters set the image dirty', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
       image.dirty = false;
       assert.equal(image.dirty, false, 'false apply filter dirty is false');
       image.applyFilters();
-      assert.equal(image.dirty, false, 'After apply filter dirty is true');
+      assert.equal(image.dirty, true, 'After apply filter dirty is true');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters reset _element and _filteredEl', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
+      image.applyFilters();
+      var element = image._element;
+      var filtered = image._filteredEl;
+      image.filters = [contrast];
+      image.applyFilters();
+      assert.notEqual(image._element, element, 'image element has changed');
+      assert.notEqual(image._filteredEl, filtered, 'image _filteredEl element has changed');
+      assert.equal(image._element, image._filteredEl, 'after filtering elements are the same');
+      done();
+    });
+  });
+
+  QUnit.test('apply filters and resize filter', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
+      var resizeFilter = new fabric.Image.filters.Resize();
+      image.filters = [contrast];
+      image.resizeFilter = resizeFilter;
+      var element = image._element;
+      var filtered = image._filteredEl;
+      image.scaleX = 0.4;
+      image.scaleY = 0.4;
+      image.applyFilters();
+      assert.notEqual(image._element, element, 'image element has changed');
+      assert.notEqual(image._filteredEl, filtered, 'image _filteredEl element has changed');
+      assert.equal(image._element, image._filteredEl, 'after filtering elements are the same');
+      image.applyResizeFilters();
+      assert.notEqual(image._element, image._filteredEl, 'after resizing the 2 elements differ');
+      assert.equal(image._lastScaleX, image.scaleX, 'after resizing we know how much we scaled');
+      assert.equal(image._lastScaleY, image.scaleY, 'after resizing we know how much we scaled');
+      image.applyFilters();
+      assert.equal(image._element, image._filteredEl, 'after filters again the elements changed');
+      assert.equal(image._lastScaleX, 1, 'lastScale X is reset');
+      assert.equal(image._lastScaleY, 1, 'lastScale Y is reset');
+      assert.equal(image._needsResize(), true, 'resizing is needed again');
       done();
     });
   });
@@ -685,6 +797,28 @@
       assert.equal(image.dirty, true, 'After apply filter dirty is true');
       assert.equal(group.dirty, true, 'After apply filter dirty is true');
       done();
+    });
+  });
+
+  QUnit.test('_renderFill respects source boundaries ', function (assert) {
+    fabric.Image.prototype._renderFill.call({
+      cropX: -1,
+      cropY: -1,
+      _filterScalingX: 1,
+      _filterScalingY: 1,
+      width: 300,
+      height: 300,
+      _element: {
+        naturalWidth: 200,
+        height: 200,
+      },
+    }, {
+      drawImage: function(src, sX, sY, sW, sH) {
+        assert.ok(sX >= 0, 'sX should be positive');
+        assert.ok(sY >= 0, 'sY should be positive');
+        assert.ok(sW <= 200, 'sW should not be larger than image width');
+        assert.ok(sH <= 200, 'sH should  not be larger than image height');
+      }
     });
   });
 })();

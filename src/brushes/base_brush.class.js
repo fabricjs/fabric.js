@@ -112,6 +112,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.shadowOffsetY = this.shadow.offsetY * zoom;
   },
 
+  needsFullRender: function() {
+    var color = new fabric.Color(this.color);
+    return color.getAlpha() < 1 || !!this.shadow;
+  },
+
   /**
    * Removes brush shadow styles
    * @private

@@ -1,5 +1,6 @@
 .DS_Store
 *.iml
+/.nyc_output/
 /node_modules/
 /npm-debug.log
 before_commit

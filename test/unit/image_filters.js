@@ -1,56 +1,7 @@
 (function() {
 
-  // function getAbsolutePath(path) {
-  //   var isAbsolute = /^https?:/.test(path);
-  //   if (isAbsolute) { return path; };
-  //   var imgEl = _createImageElement();
-  //   imgEl.src = path;
-  //   var src = imgEl.src;
-  //   imgEl = null;
-  //   return src;
-  // }
-
-  var // IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      // IMG_WIDTH   = 276,
-      // IMG_HEIGHT  = 110,
-      canvas = fabric.isLikelyNode ? new (require(fabric.canvasModule))() : fabric.document.createElement('canvas'),
+  var canvas = fabric.document.createElement('canvas'),
       context = canvas.getContext('2d');
-
-
-  // var REFERENCE_IMG_OBJECT = {
-  //   'type':               'image',
-  //   'originX':            'left',
-  //   'originY':            'top',
-  //   'left':               0,
-  //   'top':                0,
-  //   'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-  //   'height':             IMG_HEIGHT, // or does it now?
-  //   'fill':               'rgb(0,0,0)',
-  //   'stroke':             null,
-  //   'strokeWidth':        1,
-  //   'strokeDashArray':    null,
-  //   'strokeLineCap':      'butt',
-  //   'strokeLineJoin':     'miter',
-  //   'strokeMiterLimit':   10,
-  //   'scaleX':             1,
-  //   'scaleY':             1,
-  //   'angle':              0,
-  //   'flipX':              false,
-  //   'flipY':              false,
-  //   'opacity':            1,
-  //   'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
-  //   'selectable':         true,
-  //   'hasControls':        true,
-  //   'hasBorders':         true,
-  //   'hasRotatingPoint':   true,
-  //   'transparentCorners': true,
-  //   'perPixelTargetFind': false,
-  //   'shadow':             null,
-  //   'visible':            true,
-  //   'clipTo':             null,
-  //   'filters':            []
-  // };
-
 
   function _createImageData(context) {
     var imageData = context.createImageData(3, 1);
@@ -68,33 +19,6 @@
     imageData.data[11] = 1;
     return imageData;
   }
-
-  // function _createImageObject(width, height, callback) {
-  //   var elImage = _createImageElement();
-  //   elImage.width = width;
-  //   elImage.height = height;
-  //   setSrc(elImage, IMG_SRC, function() {
-  //     callback(new fabric.Image(elImage));
-  //   });
-  // }
-
-  // function createImageObject(callback) {
-  //   return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
-  // }
-
-  // function setSrc(img, src, callback) {
-  //   if (fabric.isLikelyNode) {
-  //     require('fs').readFile(src, function(err, imgData) {
-  //       if (err) { throw err; };
-  //       img.src = imgData;
-  //       callback && callback();
-  //     });
-  //   }
-  //   else {
-  //     img.src = src;
-  //     callback && callback();
-  //   }
-  // }
 
   QUnit.module('fabric.Image.filters.Brightness');
 
@@ -163,6 +87,14 @@
     var object = filter.toObject();
 
     assert.deepEqual(fabric.Image.filters.Brightness.fromObject(object), filter);
+  });
+
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Brightness();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when brightness is 0');
+    filter.brightness = 0.15;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when brightness change');
   });
 
   QUnit.module('fabric.Image.filters.Composed');
@@ -236,6 +168,18 @@
     assert.ok(newFilter instanceof fabric.Image.filters.Composed, 'should inherit from fabric.Image.filters.Composed');
     assert.ok(newFilter.subFilters[0] instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Brightness');
     assert.ok(newFilter.subFilters[1] instanceof fabric.Image.filters.Contrast, 'should inherit from fabric.Image.filters.Contrast');
+  });
+
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Composed();
+    var brightness = new fabric.Image.filters.Brightness();
+    var contrast = new fabric.Image.filters.Contrast();
+    filter.subFilters.push(brightness);
+    filter.subFilters.push(contrast);
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when all filters are neutral');
+    filter.subFilters[0].brightness = 0.15;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when one subfilter changes');
   });
 
 
@@ -338,6 +282,19 @@
     assert.deepEqual(fabric.Image.filters.ColorMatrix.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.ColorMatrix();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when matrix is identity');
+    filter.matrix = [
+      0, 1, 0, 0, 0.2,
+      0, 0, 1, 0, 0.1,
+      1, 0, 0, 0, 0.3,
+      0, 0, 0, 1, 0
+    ];
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when matrix changes');
+  });
+
   QUnit.module('fabric.Image.filters.HueRotation');
 
   QUnit.test('constructor', function(assert) {
@@ -409,6 +366,14 @@
     assert.deepEqual(fabric.Image.filters.HueRotation.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.HueRotation();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when rotation is 0');
+    filter.rotation = 0.6;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when rotation changes');
+  });
+
   QUnit.module('fabric.Image.filters.Contrast');
 
   QUnit.test('constructor', function(assert) {
@@ -476,6 +441,14 @@
     var object = filter.toObject();
 
     assert.deepEqual(fabric.Image.filters.Contrast.fromObject(object), filter);
+  });
+
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Contrast();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when contrast is 0');
+    filter.contrast = 0.6;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when contrast changes');
   });
 
   QUnit.module('fabric.Image.filters.Saturation');
@@ -547,6 +520,14 @@
     assert.deepEqual(fabric.Image.filters.Saturation.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Saturation();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when saturation is 0');
+    filter.saturation = 0.6;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when saturation changes');
+  });
+
   QUnit.module('fabric.Image.filters.Gamma');
 
   QUnit.test('constructor', function(assert) {
@@ -616,6 +597,14 @@
     assert.deepEqual(fabric.Image.filters.Gamma.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Gamma();
+
+    assert.ok(filter.isNeutralState(), 'Is neutral when gamma is 1');
+    filter.gamma = [1.5, 1.5, 1.5];
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when gamma changes');
+  });
+
   QUnit.module('fabric.Image.filters.Convolute');
 
   QUnit.test('constructor', function(assert) {
@@ -664,6 +653,11 @@
     var object = filter.toObject();
 
     assert.deepEqual(fabric.Image.filters.Convolute.fromObject(object), filter);
+  });
+
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Convolute();
+    assert.notOk(filter.isNeutralState(), 'Is not neutral');
   });
 
   QUnit.module('fabric.Image.filters.Grayscale');
@@ -742,6 +736,10 @@
     assert.deepEqual(fabric.Image.filters.Grayscale.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Grayscale();
+    assert.notOk(filter.isNeutralState(), 'Is never neutral');
+  });
 
   QUnit.module('fabric.Image.filters.Invert');
 
@@ -798,6 +796,12 @@
     assert.deepEqual(fabric.Image.filters.Invert.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Invert();
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when default');
+    filter.invert = false;
+    assert.ok(filter.isNeutralState(), 'Is not neutral when default');
+  });
 
   QUnit.module('fabric.Image.filters.Noise');
 
@@ -857,6 +861,12 @@
     assert.deepEqual(fabric.Image.filters.Noise.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Noise();
+    assert.ok(filter.isNeutralState(), 'Is neutral when noise is 0');
+    filter.noise = 1;
+    assert.notOk(filter.isNeutralState(), 'Is no neutral when noise change');
+  });
 
   QUnit.module('fabric.Image.filters.Pixelate');
 
@@ -917,6 +927,13 @@
     assert.deepEqual(fabric.Image.filters.Pixelate.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Pixelate();
+    filter.blocksize = 1;
+    assert.ok(filter.isNeutralState(), 'Is neutral when blockSize is 1');
+    filter.blocksize = 4;
+    assert.notOk(filter.isNeutralState(), 'Is no neutral when blockSize change');
+  });
 
   QUnit.module('fabric.Image.filters.RemoveColor');
 
@@ -980,6 +997,11 @@
     assert.deepEqual(fabric.Image.filters.RemoveColor.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.RemoveColor();
+    assert.notOk(filter.isNeutralState(), 'Is never neutral');
+  });
+
   QUnit.module('fabric.Image.filters.Sepia');
 
   QUnit.test('constructor', function(assert) {
@@ -1024,6 +1046,11 @@
     assert.deepEqual(fabric.Image.filters.Sepia.fromObject(object), filter);
   });
 
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Sepia();
+    assert.notOk(filter.isNeutralState(), 'Is never neutral');
+  });
+
   QUnit.module('fabric.Image.filters.Resize');
 
   QUnit.test('constructor', function(assert) {
@@ -1040,8 +1067,8 @@
 
     assert.equal(filter.resizeType, 'hermite');
     assert.equal(filter.lanczosLobes, 3);
-    assert.equal(filter.scaleX, 0);
-    assert.equal(filter.scaleY, 0);
+    assert.equal(filter.scaleX, 1);
+    assert.equal(filter.scaleY, 1);
 
     var filter2 = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
     assert.equal(filter2.resizeType, 'bilinear');
@@ -1060,11 +1087,11 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":0,"scaleY":0,"resizeType":"hermite","lanczosLobes":3}');
+    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":1,"scaleY":1,"resizeType":"hermite","lanczosLobes":3}');
 
     filter.resizeType = 'bilinear';
     object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":0,"scaleY":0,"resizeType":"bilinear","lanczosLobes":3}');
+    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":1,"scaleY":1,"resizeType":"bilinear","lanczosLobes":3}');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -1079,18 +1106,20 @@
     filter.scaleY = 0.8;
     assert.deepEqual(fabric.Image.filters.Resize.fromObject(filter.toObject()), filter);
   });
-  // QUnit.test('fromObject', function(assert) {
-  //   var done = assert.async();
-  //   createImageObject(function(image) {
-  //     var filter = new fabric.Image.filters.Mask({mask: image});
 
-  //     var object = filter.toObject();
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Resize();
+    assert.ok(filter.isNeutralState(), 'If scale is 1');
+    filter.scaleX = 1.4;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when gamma changes');
+  });
 
-  //     fabric.Image.filters.Mask.fromObject(object, function(filterObj) {
-  //       assert.deepEqual(filterObj, filter);
+  QUnit.module('fabric.Image.filters.Blur');
 
-  //       done();
-  //     });
-  //   });
-  // });
+  QUnit.test('isNeutralState', function(assert) {
+    var filter = new fabric.Image.filters.Blur();
+    assert.ok(filter.isNeutralState(), 'Is neutral when blur is 0');
+    filter.blur = 0.3;
+    assert.notOk(filter.isNeutralState(), 'Is not neutral when blur changes');
+  });
 })();

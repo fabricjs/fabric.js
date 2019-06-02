@@ -10,13 +10,22 @@
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
-          offsets = this._getSVGLeftTopOffsets(),
+    _toSVG: function() {
+      var offsets = this._getSVGLeftTopOffsets(),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
-      this._wrapSVGTextAndBg(markup, textAndBg);
+      return this._wrapSVGTextAndBg(textAndBg);
+    },
 
-      return reviver ? reviver(markup.join('')) : markup.join('');
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toSVG: function(reviver) {
+      return this._createBaseSVGMarkup(
+        this._toSVG(),
+        { reviver: reviver, noStyle: true, withShadow: true }
+      );
     },
 
     /**
@@ -33,13 +42,10 @@
     /**
      * @private
      */
-    _wrapSVGTextAndBg: function(markup, textAndBg) {
-      var noShadow = true, filter = this.getSvgFilter(),
-          style = filter === '' ? '' : ' style="' + filter + '"',
+    _wrapSVGTextAndBg: function(textAndBg) {
+      var noShadow = true,
           textDecoration = this.getSvgTextDecoration(this);
-      markup.push(
-        '\t<g ', this.getSvgId(), 'transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '"',
-        style, '>\n',
+      return [
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',
         (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ' : ''),
@@ -49,9 +55,8 @@
         (textDecoration ? 'text-decoration="' + textDecoration + '" ' : ''),
         'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >',
         textAndBg.textSpans.join(''),
-        '</text>\n',
-        '\t</g>\n'
-      );
+        '</text>\n'
+      ];
     },
 
     /**

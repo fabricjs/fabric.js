@@ -93,21 +93,21 @@
 
     /**
      * Text decoration underline.
-     * @type String
+     * @type Boolean
      * @default
      */
     underline:       false,
 
     /**
      * Text decoration overline.
-     * @type String
+     * @type Boolean
      * @default
      */
     overline:       false,
 
     /**
      * Text decoration linethrough.
-     * @type String
+     * @type Boolean
      * @default
      */
     linethrough:       false,
@@ -417,6 +417,16 @@
     },
 
     /**
+     * Detect if a line has a linebreak and so we need to account for it when moving
+     * and counting style.
+     * It return always for text and Itext.
+     * @return Number
+     */
+    missingNewlineOffset: function() {
+      return 1;
+    },
+
+    /**
      * Returns string representation of an instance
      * @return {String} String representation of text object
      */
@@ -635,30 +645,30 @@
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
           fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE, kernedWidth;
 
-      if (previousChar && fontCache[previousChar]) {
+      if (previousChar && fontCache[previousChar] !== undefined) {
         previousWidth = fontCache[previousChar];
       }
-      if (fontCache[_char]) {
+      if (fontCache[_char] !== undefined) {
         kernedWidth = width = fontCache[_char];
       }
-      if (stylesAreEqual && fontCache[couple]) {
+      if (stylesAreEqual && fontCache[couple] !== undefined) {
         coupleWidth = fontCache[couple];
         kernedWidth = coupleWidth - previousWidth;
       }
-      if (!width || !previousWidth || !coupleWidth) {
+      if (width === undefined || previousWidth === undefined || coupleWidth === undefined) {
         var ctx = this.getMeasuringContext();
         // send a TRUE to specify measuring font size CACHE_FONT_SIZE
         this._setTextStyles(ctx, charStyle, true);
       }
-      if (!width) {
+      if (width === undefined) {
         kernedWidth = width = ctx.measureText(_char).width;
         fontCache[_char] = width;
       }
-      if (!previousWidth && stylesAreEqual && previousChar) {
+      if (previousWidth === undefined && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
         fontCache[previousChar] = previousWidth;
       }
-      if (stylesAreEqual && !coupleWidth) {
+      if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth;
@@ -1138,7 +1148,8 @@
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill;
+          maxHeight, currentFill, lastFill,
+          charSpacing = this._getWidthOfCharSpacing();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -1186,7 +1197,7 @@
         currentDecoration && currentFill && ctx.fillRect(
           leftOffset + lineLeftOffset + boxStart,
           top + this.offsets[type] * size + dy,
-          boxWidth,
+          boxWidth - charSpacing,
           this.fontSize / 15
         );
         topOffset += heightOfLine;
@@ -1202,13 +1213,15 @@
      * @returns {String} font declaration formatted for canvas context.
      */
     _getFontDeclaration: function(styleObject, forMeasuring) {
-      var style = styleObject || this;
-      var fontFamily = style.fontFamily === undefined ||
-      style.fontFamily.indexOf('\'') > -1 ||
-      style.fontFamily.indexOf('"') > -1
+      var style = styleObject || this, family = this.fontFamily,
+          fontIsGeneric = fabric.Text.genericFonts.indexOf(family.toLowerCase()) > -1;
+      var fontFamily = family === undefined ||
+      family.indexOf('\'') > -1 || family.indexOf(',') > -1 ||
+      family.indexOf('"') > -1 || fontIsGeneric
         ? style.fontFamily : '"' + style.fontFamily + '"';
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
+        // verify if this can be fixed in JSDOM
         (fabric.isLikelyNode ? style.fontWeight : style.fontStyle),
         (fabric.isLikelyNode ? style.fontStyle : style.fontWeight),
         forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
@@ -1387,6 +1400,8 @@
     }
 
     textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+    var originalStrokeWidth = options.strokeWidth;
+    options.strokeWidth = 0;
 
     var text = new fabric.Text(textContent, options),
         textHeightScaleFactor = text.getScaledHeight() / text.height,
@@ -1407,7 +1422,8 @@
     }
     text.set({
       left: text.left - offX,
-      top: text.top - (textHeight - text.fontSize * (0.18 + text._fontSizeFraction)) / text.lineHeight
+      top: text.top - (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) / text.lineHeight,
+      strokeWidth: typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
     });
     callback(text);
   };
@@ -1423,6 +1439,8 @@
   fabric.Text.fromObject = function(object, callback) {
     return fabric.Object._fromObject('Text', object, callback, 'text');
   };
+
+  fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
 

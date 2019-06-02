@@ -1,10 +1,7 @@
 language: node_js
 
-services:
-  - docker
-
 node_js:
-  - "6"
+  - "10"
 
 addons:
   apt:
@@ -12,10 +9,16 @@ addons:
     - libgif-dev
     - libpng-dev
     - libpango1.0-dev
-# libcairo2-dev is preinstalled
+    - libjpeg8-dev
+    - librsvg2-dev
+    - libcairo2-dev
+    - g++-4.9
+
 stages:
   - Linting and Building
-  - test
+  - Unit Tests
+  - Visual Tests
+  - Extra OS
 
 cache:
   directories:
@@ -25,7 +28,14 @@ env:
   global:
     - LAUNCHER=Node
 
+matrix:
+  fast_finish: true
+
 jobs:
+  fast_finish: true
+  allow_failures:
+    - env: CANFAIL=TRUE
+    - env: LAUNCHER=Node CANFAIL=TRUE
   include:
     - stage: Linting and Building
       env: STEP=LINT
@@ -36,32 +46,58 @@ jobs:
           packages: # avoid installing packages
     - stage: Linting and Building
       env: STEP=BUILD
-      install: npm install uglify-js@3.1.x
+      install: npm install uglify-js@3.3.x
       script: 'npm run build'
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Unit Tests
       env: LAUNCHER=Chrome
-      install: npm install testem@1.18.4 qunit@2.4.1
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
+    - stage: Unit Tests
       env: LAUNCHER=Firefox
-      install: npm install testem@1.18.4 qunit@2.4.1
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: test
-      node_js: "9"
-    - stage: test
+    - stage: Unit Tests
+      env: LAUNCHER=Node
+      node_js: "12"
+    - stage: Unit Tests
+      env: LAUNCHER=Node
+      node_js: "10"
+    - stage: Unit Tests
       node_js: "8"
-    - stage: test
-      node_js: "6"
-    - stage: test
-      node_js: "4"
+    - stage: Visual Tests
+      env: LAUNCHER=Node CANFAIL=TRUE
+      node_js: "10"
+      script: npm run build:fast && npm run test:visual
+    - stage: Visual Tests
+      env: LAUNCHER=Chrome
+      script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: Visual Tests
+      env: LAUNCHER=Firefox
+      script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
+      addons:
+        apt:
+          packages: # avoid installing packages
+    - stage: Extra OS
+      env: CANFAIL=TRUE
+      node_js: "10"
+      script: npm run build:fast && npm run test:visual
+      before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
+      os: osx
+    - stage: Extra OS
+      env: CANFAIL=TRUE
+      node_js: "10"
+      script: npm run build:fast && npm run test:visual
+      os: windows
+script: npm run build:fast && npm run test
 
-script: 'npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER'
-
-dist: trusty
+dist: xenial

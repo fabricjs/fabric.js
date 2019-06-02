@@ -65,6 +65,20 @@
     _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
 
     /**
+     * Use this regular expression to split strings in breakable lines
+     * @private
+     */
+    _wordJoiners: /[ \t\r]/,
+
+    /**
+     * Use this boolean property in order to split strings that have no white space concept.
+     * this is a cheap way to help with chinese/japaense
+     * @type Boolean
+     * @since 2.6.0
+     */
+    splitByGrapheme: false,
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -113,7 +127,7 @@
           charCount++;
           realLineCount++;
         }
-        else if (this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
+        else if (!this.splitByGrapheme && this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -129,7 +143,7 @@
     },
 
     /**
-     * Returns true if object has a style property or has it ina specified line
+     * Returns true if object has a style property or has it on a specified line
      * @param {Number} lineIndex
      * @return {Boolean}
      */
@@ -215,39 +229,31 @@
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
-
       delete this.styles[lineIndex][charIndex];
     },
 
     /**
-    * probably broken need a fix
+     * probably broken need a fix
+     * Returns the real style line that correspond to the wrapped lineIndex line
+     * Used just to verify if the line does exist or not.
      * @param {Number} lineIndex
+     * @returns {Boolean} if the line exists or not
      * @private
      */
     _getLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
-      return this.styles[map.line];
+      return !!this.styles[map.line];
     },
 
     /**
-     * probably broken need a fix
+     * Set the line style to an empty object so that is initialized
      * @param {Number} lineIndex
      * @param {Object} style
      * @private
      */
-    _setLineStyle: function(lineIndex, style) {
+    _setLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
-      this.styles[map.line] = style;
-    },
-
-    /**
-     * probably broken need a fix
-     * @param {Number} lineIndex
-     * @private
-     */
-    _deleteLineStyle: function(lineIndex) {
-      var map = this._styleMap[lineIndex];
-      delete this.styles[map.line];
+      this.styles[map.line] = {};
     },
 
     /**
@@ -300,25 +306,29 @@
      * to.
      */
     _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
-      var lineWidth        = 0,
-          graphemeLines    = [],
-          line             = [],
+      var lineWidth = 0,
+          splitByGrapheme = this.splitByGrapheme,
+          graphemeLines = [],
+          line = [],
           // spaces in different languges?
-          words            = _line.split(this._reSpaceAndTab),
-          word             = '',
-          offset           = 0,
-          infix            = ' ',
-          wordWidth        = 0,
-          infixWidth       = 0,
+          words = splitByGrapheme ? fabric.util.string.graphemeSplit(_line) : _line.split(this._wordJoiners),
+          word = '',
+          offset = 0,
+          infix = splitByGrapheme ? '' : ' ',
+          wordWidth = 0,
+          infixWidth = 0,
           largestWordWidth = 0,
           lineJustStarted = true,
-          additionalSpace = this._getWidthOfCharSpacing(),
+          additionalSpace = splitByGrapheme ? 0 : this._getWidthOfCharSpacing(),
           reservedSpace = reservedSpace || 0;
-
+      // fix a difference between split and graphemeSplit
+      if (words.length === 0) {
+        words.push([]);
+      }
       desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {
-        // i would avoid resplitting the graphemes
-        word = fabric.util.string.graphemeSplit(words[i]);
+        // if using splitByGrapheme words are already in graphemes.
+        word = splitByGrapheme ? words[i] : fabric.util.string.graphemeSplit(words[i]);
         wordWidth = this._measureWord(word, lineIndex, offset);
         offset += word.length;
 
@@ -334,7 +344,7 @@
           lineWidth += additionalSpace;
         }
 
-        if (!lineJustStarted) {
+        if (!lineJustStarted && !splitByGrapheme) {
           line.push(infix);
         }
         line = line.concat(word);
@@ -376,6 +386,18 @@
     },
 
     /**
+     * Detect if a line has a linebreak and so we need to account for it when moving
+     * and counting style.
+     * @return Number
+     */
+    missingNewlineOffset: function(lineIndex) {
+      if (this.splitByGrapheme) {
+        return this.isEndOfWrapping(lineIndex) ? 1 : 0;
+      }
+      return 1;
+    },
+
+    /**
     * Gets lines of text to render in the Textbox. This function calculates
     * text wrapping on the fly every time it is called.
     * @param {String} text text to split
@@ -386,7 +408,6 @@
       var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
           graphemeLines = this._wrapText(newText.lines, this.width),
           lines = new Array(graphemeLines.length);
-
       for (var i = 0; i < graphemeLines.length; i++) {
         lines[i] = graphemeLines[i].join('');
       }
@@ -399,6 +420,20 @@
       return Math.max(this.minWidth, this.dynamicMinWidth);
     },
 
+    _removeExtraneousStyles: function() {
+      var linesToKeep = {};
+      for (var prop in this._styleMap) {
+        if (this._textLines[prop]) {
+          linesToKeep[this._styleMap[prop].line] = 1;
+        }
+      }
+      for (var prop in this.styles) {
+        if (!linesToKeep[prop]) {
+          delete this.styles[prop];
+        }
+      }
+    },
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -406,7 +441,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
     }
   });
 

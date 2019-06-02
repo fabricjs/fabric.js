@@ -1,0 +1,46 @@
+<html>
+<body>
+  <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+  <div id="c" ></div>
+</body>
+<script>
+var div = document.getElementById('c');
+var fileselect = document.getElementById('fileselect');
+
+function downloadHandler(e) {
+  var url = e.target.toDataURL();
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = e.target.getAttribute('file-name').replace('.svg', '.png');
+  a.click();
+}
+
+function handleFile(f) {
+  var reader = new FileReader();
+  var canvas = document.createElement('canvas');
+  div.appendChild(canvas)
+  reader.onload = function(e) {
+    var image = new Image();
+    image.onload = function() {
+      canvas.setAttribute('file-name', f.name)
+      canvas.addEventListener('click', downloadHandler);
+      canvas.width = image.width;
+      canvas.height = image.height;
+      canvas.getContext('2d').drawImage(image, 0, 0);
+    }
+    image.src = e.target.result;
+  }
+  reader.readAsDataURL(f);
+}
+
+
+function FileSelectHandler(e) {
+	var files = e.target.files || e.dataTransfer.files;
+	// process all File objects
+	for (var i = 0, f; f = files[i]; i++) {
+    handleFile(f);
+	}
+}
+fileselect.addEventListener("change", FileSelectHandler, false);
+</script>
+</html>

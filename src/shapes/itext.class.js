@@ -261,36 +261,29 @@
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      if (this.canvas && this.canvas.contextTop) {
-        var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        this.transform(ctx);
-        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-        this._clearTextArea(ctx);
-        skipRestore || ctx.restore();
-      }
+      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(ctx);
+      this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+      this._clearTextArea(ctx);
+      skipRestore || ctx.restore();
     },
 
     /**
      * Renders cursor or selection (depending on what exists)
+     * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(), ctx;
-      if (this.canvas && this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        this.clearContextTop(true);
-      }
-      else {
-        ctx = this.canvas.contextContainer;
-        ctx.save();
-      }
+      var boundaries = this._getCursorBoundaries(),
+          ctx = this.canvas.contextTop;
+      this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
       }
@@ -341,18 +334,19 @@
         return this.cursorOffsetCache;
       }
       var lineLeftOffset,
-          lineIndex = 0,
-          charIndex = 0,
+          lineIndex,
+          charIndex,
           topOffset = 0,
           leftOffset = 0,
           boundaries,
           cursorPosition = this.get2DCursorLocation(position);
-      for (var i = 0; i < cursorPosition.lineIndex; i++) {
+      charIndex = cursorPosition.charIndex;
+      lineIndex = cursorPosition.lineIndex;
+      for (var i = 0; i < lineIndex; i++) {
         topOffset += this.getHeightOfLine(i);
       }
-
-      lineLeftOffset = this._getLineLeftOffset(cursorPosition.lineIndex);
-      var bound = this.__charBounds[cursorPosition.lineIndex][cursorPosition.charIndex];
+      lineLeftOffset = this._getLineLeftOffset(lineIndex);
+      var bound = this.__charBounds[lineIndex][charIndex];
       bound && (leftOffset = bound.left);
       if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
         leftOffset -= this._getWidthOfCharSpacing();
@@ -429,7 +423,9 @@
             boxEnd = this.__charBounds[endLine][endChar].left;
           }
           else {
-            boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width;
+            var charSpacing = this._getWidthOfCharSpacing();
+            boxEnd = this.__charBounds[endLine][endChar - 1].left
+              + this.__charBounds[endLine][endChar - 1].width - charSpacing;
           }
         }
         realLineHeight = lineHeight;

@@ -228,7 +228,6 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
-  ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
 
 ];
 
@@ -251,11 +250,6 @@ else {
       }
       if (buildFast) {
         process.exit(0);
-      }
-
-      // add js wrapping in AMD closure for requirejs if necessary
-      if (amdLib !== false) {
-        exec('uglifyjs fabric.js ' + amdUglifyFlags + ' -b --output fabric.js');
       }
 
       if (amdLib !== false) {

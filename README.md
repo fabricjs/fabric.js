@@ -6,9 +6,9 @@
 
 <!-- build/coverage status, climate -->
 
-[![Build Status](https://secure.travis-ci.org/kangax/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+[![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
-[![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
+[![Coverage Status](https://coveralls.io/repos/fabricjs/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
@@ -42,14 +42,14 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 
 ### Goals
 
-- Unit tested (4800+ assertion, 1050+ tests at the moment, 76%+ coverage)
+- Unit tested (1150+ tests at the moment, 79%+ coverage)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
+- Runs on a server under [Node.js](http://nodejs.org/) (active stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 - Follows [Semantic Versioning](http://semver.org/)
 
 ### Supported browsers
