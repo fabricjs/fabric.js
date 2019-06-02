@@ -71,16 +71,17 @@
           originalInteractive = this.interactive,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
-          canvasEl = fabric.util.createCanvasElement();
+          canvasEl = fabric.util.createCanvasElement(),
+          originalContextTop = this.contextTop;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.contextTop = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      // will be renderAllExport();
       this.renderCanvas(canvasEl.getContext('2d'), this._objects);
       this.viewportTransform = vp;
       this.width = originalWidth;
@@ -88,6 +89,7 @@
       this.calcViewportBoundaries();
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
+      this.contextTop = originalContextTop;
       return canvasEl;
     },
   });
