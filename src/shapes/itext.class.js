@@ -277,20 +277,15 @@
 
     /**
      * Renders cursor or selection (depending on what exists)
+     * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(), ctx;
-      if (this.canvas && this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        this.clearContextTop(true);
-      }
-      else {
-        ctx = this.canvas.contextContainer;
-        ctx.save();
-      }
+      var boundaries = this._getCursorBoundaries(),
+          ctx = this.canvas.contextTop;
+      this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
       }
