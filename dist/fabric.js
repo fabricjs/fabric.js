@@ -12294,28 +12294,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           translateX = (vp[4] - (cropping.left || 0)) * multiplier,
           translateY = (vp[5] - (cropping.top || 0)) * multiplier,
           originalInteractive = this.interactive,
-          originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
-          canvasEl = fabric.util.createCanvasElement();
+          canvasEl = fabric.util.createCanvasElement(),
+          originalContextTop = this.contextTop;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.contextTop = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = canvasEl.getContext('2d');
-      // will be renderAllExport();
-      this.renderAll();
+      this.renderCanvas(canvasEl.getContext('2d'), this._objects);
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = originalContext;
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
+      this.contextTop = originalContextTop;
       return canvasEl;
     },
   });
@@ -24089,6 +24088,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * range bewteen 0 and 1.
      */
     blur: 0,
+    /**
+     * Matrix for the convolute operation.
+     */
+    matrix: [],
+    /**
+     * Radius of the filter.
+     */
+    radius: 0,
 
     mainParameter: 'blur',
 
@@ -24118,55 +24125,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     },
 
     simpleBlur: function(options) {
-      var resources = options.filterBackend.resources, canvas1, canvas2,
-          width = options.imageData.width,
-          height = options.imageData.height;
-
-      if (!resources.blurLayer1) {
-        resources.blurLayer1 = fabric.util.createCanvasElement();
-        resources.blurLayer2 = fabric.util.createCanvasElement();
-      }
-      canvas1 = resources.blurLayer1;
-      canvas2 = resources.blurLayer2;
-      if (canvas1.width !== width || canvas1.height !== height) {
-        canvas2.width = canvas1.width = width;
-        canvas2.height = canvas1.height = height;
-      }
-      var ctx1 = canvas1.getContext('2d'),
-          ctx2 = canvas2.getContext('2d'),
-          nSamples = 15,
-          random, percent, j, i,
-          blur = this.blur * 0.06 * 0.5;
-
-      // load first canvas
-      ctx1.putImageData(options.imageData, 0, 0);
-      ctx2.clearRect(0, 0, width, height);
-
-      for (i = -nSamples; i <= nSamples; i++) {
-        random = (Math.random() - 0.5) / 4;
-        percent = i / nSamples;
-        j = blur * percent * width + random;
-        ctx2.globalAlpha = 1 - Math.abs(percent);
-        ctx2.drawImage(canvas1, j, random);
-        ctx1.drawImage(canvas2, 0, 0);
-        ctx2.globalAlpha = 1;
-        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-      }
-      for (i = -nSamples; i <= nSamples; i++) {
-        random = (Math.random() - 0.5) / 4;
-        percent = i / nSamples;
-        j = blur * percent * height + random;
-        ctx2.globalAlpha = 1 - Math.abs(percent);
-        ctx2.drawImage(canvas1, random, j);
-        ctx1.drawImage(canvas2, 0, 0);
-        ctx2.globalAlpha = 1;
-        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-      }
-      options.ctx.drawImage(canvas1, 0, 0);
-      var newImageData = options.ctx.getImageData(0, 0, canvas1.width, canvas1.height);
-      ctx1.globalAlpha = 1;
-      ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
-      return newImageData;
+      this.radius = parseInt(100 * this.blur, 10);
+      this.matrix = this.makeMatrix(this.radius);
+      this.doGaussian(
+        options.imageData.data,
+        options.imageData.width,
+        options.imageData.height
+      );
+      return options.imageData;
     },
 
     /**
@@ -24219,6 +24185,134 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       return delta;
     },
+
+    /**
+     * Creates matrix for convolute operation.
+     * @param radius Radius of matrix.
+     * @return {Array} a numeric array with delta values
+     */
+    makeMatrix: function(radius) {
+      var r = Math.ceil(radius);
+      var rows = r * 2 + 1;
+      var matrix = [];
+      var sigma = radius / 3;
+      var sigma22 = 2 * sigma * sigma;
+      var sigmaPi2 = 2 * Math.PI * sigma;
+      var sqrtSigmaPi2 = Math.sqrt(sigmaPi2);
+      var radius2 = radius * radius;
+      var total = 0;
+      var index = 0;
+      for (var row = -r; row <= r; row++) {
+        var distance = row * row;
+        if (distance > radius2) matrix[index] = 0;
+        else matrix[index] = Math.exp(-distance / sigma22) / sqrtSigmaPi2;
+        total += matrix[index];
+        index++;
+      }
+      for (var i = 0; i < rows; i++) {
+        matrix[i] /= total;
+      }
+
+      return matrix;
+    },
+
+    /**
+     * Apply gaussian filter to pixels.
+     * @param pixels Pixels data array.
+     * @param width Width of the image.
+     * @param height Height of the image.
+     * @param outPixels Array where blurred image should be populated. If not
+     * passed, result will be applied directly to pixels argument.
+     */
+    doGaussian: function(pixels, width, height, outPixels) {
+      var radius = this.radius;
+      var matrix = this.matrix;
+      outPixels = outPixels || pixels;
+      var buff = [];
+      var idx = 0;
+      var k, f, idxF, alpha, r, g, b, a;
+      for (var y = 0; y < height; y++) {
+        var offset = y * width;
+        for (var x = 0; x < width; x++, idx += 4) {
+          r = 0;
+          g = 0;
+          b = 0;
+          a = 0;
+          for (var n = 0, i = -radius; i <= radius; ++i, ++n) {
+            var ix = x + i;
+            if (ix < 0) {
+              ix = 0;
+            } else if (ix >= width) {
+              ix = width - 1;
+            }
+
+            f = matrix[n];
+            idxF = (offset + ix) << 2;
+            alpha = pixels[idxF + 3];
+            k = alpha / 255;
+            r += pixels[idxF] * f * k;
+            g += pixels[idxF + 1] * f * k;
+            b += pixels[idxF + 2] * f * k;
+            a += alpha * f;
+          }
+          if (a === 0) {
+            k = 0;
+          } else {
+            k = 255 / a;
+          }
+          buff[idx] = r * k;
+          buff[idx + 1] = g * k;
+          buff[idx + 2] = b * k;
+          buff[idx + 3] = a;
+        }
+      }
+
+      for (var x = 0; x < width; x++) {
+        for (var y = 0; y < height; y++) {
+          idx = (y * width + x) << 2;
+          r = 0;
+          g = 0;
+          b = 0;
+          a = 0;
+          for (var n = 0, i = -radius; i <= radius; ++i, ++n) {
+            var iy = y + i;
+            if (iy < 0) {
+              iy = 0;
+            } else if (iy >= height) {
+              iy = height - 1;
+            }
+            f = matrix[n];
+            idxF = (iy * width + x) << 2;
+            alpha = buff[idxF + 3];
+            k = alpha / 255;
+            r += buff[idxF] * f * k;
+            g += buff[idxF + 1] * f * k;
+            b += buff[idxF + 2] * f * k;
+            a += alpha * f;
+          }
+          if (a === 0) {
+            outPixels[idx] = outPixels[idx + 1] = outPixels[
+            idx + 2
+              ] = outPixels[idx + 3] = 0;
+          } else {
+            k = 255 / a;
+            outPixels[idx] = this.clamp(r * k);
+            outPixels[idx + 1] = this.clamp(g * k);
+            outPixels[idx + 2] = this.clamp(b * k);
+            outPixels[idx + 3] = this.clamp(a);
+          }
+        }
+      }
+    },
+
+    /**
+     * Restric value to the range 0-255.
+     * @param v Value to restrict.
+     * @return {number} Value between the specified range.
+     */
+    clamp: function(v) {
+      return v < 255 ? (v > 0 ? v | 0 : 0) : 255;
+    }
   });
 
   /**
@@ -26588,36 +26682,29 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      if (this.canvas && this.canvas.contextTop) {
-        var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        this.transform(ctx);
-        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-        this._clearTextArea(ctx);
-        skipRestore || ctx.restore();
-      }
+      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(ctx);
+      this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+      this._clearTextArea(ctx);
+      skipRestore || ctx.restore();
     },
 
     /**
      * Renders cursor or selection (depending on what exists)
+     * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(), ctx;
-      if (this.canvas && this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        this.clearContextTop(true);
-      }
-      else {
-        ctx = this.canvas.contextContainer;
-        ctx.save();
-      }
+      var boundaries = this._getCursorBoundaries(),
+          ctx = this.canvas.contextTop;
+      this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
       }
