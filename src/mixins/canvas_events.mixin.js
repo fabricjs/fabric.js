@@ -534,7 +534,7 @@
         fabric.util.clipContext(this, this.contextTop);
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseDown(pointer, e);
+      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
       this._handleEvent(e, 'down');
     },
 
@@ -545,7 +545,7 @@
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         var pointer = this.getPointer(e);
-        this.freeDrawingBrush.onMouseMove(pointer, e);
+        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
       this.setCursor(this.freeDrawingCursor);
       this._handleEvent(e, 'move');
@@ -560,7 +560,8 @@
       if (this.clipTo) {
         this.contextTop.restore();
       }
-      this.freeDrawingBrush.onMouseUp(e);
+      var pointer = this.getPointer(e);
+      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer });
       this._handleEvent(e, 'up');
     },
 
