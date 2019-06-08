@@ -125,6 +125,7 @@
      * If you are using code minification, ctx argument can be minified/manglied you should use
      * as a workaround `var ctx = arguments[0];` in the function;
      * See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
+     * Will be removed in the next major version. Do not use.
      * @deprecated since 2.0.0
      * @type Function
      * @default
@@ -133,7 +134,10 @@
 
     /**
      * Indicates whether object controls (borders/controls) are rendered above overlay image
+     * In fabric 4.0 controls are moved on the upperCanvas by default and this property will
+     * be removed ( will behave as if the value is true )
      * @type Boolean
+     * @deprecated since 3.2.0
      * @default
      */
     controlsAboveOverlay: false,
@@ -276,10 +280,17 @@
       if (!this._isRetinaScaling()) {
         return;
       }
-      this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
-      this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
+      var scaleRatio = fabric.devicePixelRatio;
+      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
+      if (this.enableRetinaScalingUpper && this.upperCanvasEl) {
+        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
+      }
+    },
 
-      this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
+    __initRetinaScaling: function(scaleRatio, canvas, context) {
+      canvas.setAttribute('width', this.width * scaleRatio);
+      canvas.setAttribute('height', this.height * scaleRatio);
+      context.scale(scaleRatio, scaleRatio);
     },
 
     /**
@@ -925,7 +936,7 @@
      * @chainable
      */
     renderCanvas: function(ctx, objects) {
-      var v = this.viewportTransform, path = this.clipPath;
+      var v = this.viewportTransform, path = this.clipPath, controlsOnUpper = this.controlsOnUpper;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
@@ -940,7 +951,7 @@
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this._renderObjects(ctx, objects);
       ctx.restore();
-      if (!this.controlsAboveOverlay && this.interactive) {
+      if (!this.controlsAboveOverlay && this.interactive && !controlsOnUpper) {
         this.drawControls(ctx);
       }
       if (this.clipTo) {
@@ -955,8 +966,8 @@
         this.drawClipPathOnCanvas(ctx);
       }
       this._renderOverlay(ctx);
-      if (this.controlsAboveOverlay && this.interactive) {
-        this.drawControls(ctx);
+      if (this.controlsAboveOverlay && this.interactive || controlsOnUpper) {
+        this.drawControls(controlsOnUpper ? this.contextTop : ctx);
       }
       this.fire('after:render', { ctx: ctx, });
     },

@@ -331,6 +331,29 @@
     fireMiddleClick: false,
 
     /**
+     * Indicates if the upperCanvas is retina enhanced
+     * inserted to enable the feature but to not introduce a breaking change.
+     * In fabric 4.0 will be removed and the single enableRetinaScaling will influence
+     * both canvases.
+     * @type Boolean
+     * @since 3.2.0
+     * @deprected, will be removed in 4.0
+     * @default false
+     */
+    enableRetinaScalingUpper: true,
+
+    /**
+     * Indicates if the controls are drawn on the upperCanvas
+     * inserted to enable the feature but to not introduce a breaking change.
+     * In fabric 4.0 will be removed and it will behave with this property se to true
+     * @type Boolean
+     * @since 3.2.0
+     * @deprected, will be removed in 4.0
+     * @default false
+     */
+    controlsOnUpper: true,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -1309,7 +1332,7 @@
           bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
-          cssScale;
+          cssScale, upperRetina = this.enableRetinaScalingUpper;
 
       if (!boundsWidth || !boundsHeight ) {
         if ('top' in bounds && 'bottom' in bounds) {
@@ -1349,22 +1372,24 @@
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
+      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
+          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
       // there is no need to create a new upperCanvas element if we have already one.
-      if (this.upperCanvasEl) {
-        this.upperCanvasEl.className = '';
+      if (upperCanvasEl) {
+        upperCanvasEl.className = '';
       }
       else {
-        this.upperCanvasEl = this._createCanvasElement();
+        upperCanvasEl = this._createCanvasElement();
+        this.upperCanvasEl = upperCanvasEl;
       }
-      fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
+      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
-      this.wrapperEl.appendChild(this.upperCanvasEl);
+      this.wrapperEl.appendChild(upperCanvasEl);
 
-      this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
-      this._applyCanvasStyle(this.upperCanvasEl);
-      this.contextTop = this.upperCanvasEl.getContext('2d');
+      this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
+      this._applyCanvasStyle(upperCanvasEl);
+      this.contextTop = upperCanvasEl.getContext('2d');
     },
 
     /**
