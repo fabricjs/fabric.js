@@ -79,6 +79,18 @@
     splitByGrapheme: false,
 
     /**
+     * Use this number property in order to split strings to multiple lines.
+     * @type Number
+     */
+    multipleLines: 10,
+
+    /**
+     * Use this boolean property in order to replace the multiple lines' last string.
+     * @type String
+     */
+    ellipsisCtrl: true,
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -308,6 +320,8 @@
     _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
       var lineWidth = 0,
           splitByGrapheme = this.splitByGrapheme,
+          multipleLines = this.multipleLines,
+          ellipsisCtrl = this.ellipsisCtrl,
           graphemeLines = [],
           line = [],
           // spaces in different languges?
@@ -364,7 +378,17 @@
         this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
       }
 
-      return graphemeLines;
+      if (graphemeLines.length > multipleLines){
+        var lastLineIndex = multipleLines - 1;
+        var lastLine = graphemeLines[lastLineIndex];
+        if (ellipsisCtrl){
+          lastLine[lastLine.length - 1] = '...';
+        }
+        return graphemeLines.filter(function(e,i){return i <= lastLineIndex;});
+      }
+      else {
+        return graphemeLines;
+      }
     },
 
     /**
