@@ -544,10 +544,11 @@
      * @return {String}
      */
     getSvgStyles: function() {
-      var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+      var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
+            'opacity: ' + this.opacity + ';' : '',
           visibility = this.visible ? '' : ' visibility: hidden;';
       return [
-        'opacity: ', opacity, ';',
+        opacity,
         visibility
       ].join('');
     },
