@@ -519,15 +519,9 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var svgString = [];
-
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t', this._objects[i].toSVG(reviver));
-      }
-
       return this._createBaseSVGMarkup(
         this._toSVG(),
-        { reviver: reviver, noStyle: true, withShadow: true });
+        { reviver: reviver, withShadow: true });
     },
 
     /**
@@ -543,6 +537,19 @@
       }
 
       return svgString;
+    },
+
+    /**
+     * Returns styles-string for svg-export, specific version for group
+     * @return {String}
+     */
+    getSvgStyles: function() {
+      var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+          visibility = this.visible ? '' : ' visibility: hidden;';
+      return [
+        'opacity: ', opacity, ';',
+        visibility
+      ].join('');
     },
 
     /**
