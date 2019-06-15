@@ -172,7 +172,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
+      return this._createBaseSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
@@ -181,7 +181,7 @@
      * @return {String} svg representation of an instance
      */
     toClipPathSVG: function(reviver) {
-      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(), { reviver: reviver });
+      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**

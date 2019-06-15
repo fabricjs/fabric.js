@@ -806,8 +806,7 @@
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
 
-    var reviverCount = 0,
-        len = canvas.size() + group.size() + pathGroup.size();
+    var reviverCount = 0;
 
     function reviver(svg) {
       reviverCount++;
@@ -815,7 +814,7 @@
     }
 
     canvas.toSVG(null, reviver);
-    assert.equal(reviverCount, len);
+    assert.equal(reviverCount, 14);
 
     canvas.renderOnAddRemove = true;
   });
