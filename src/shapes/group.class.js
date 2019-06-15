@@ -530,12 +530,12 @@
      * @return {String} svg representation of an instance
      */
     _toSVG: function(reviver) {
-      var svgString = [];
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
-
+      svgString.push('</g>\n');
       return svgString;
     },
 
