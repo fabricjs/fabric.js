@@ -26,7 +26,6 @@
   }
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = false;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
@@ -52,6 +51,9 @@
     golden: 'dataurl1.png',
     newModule: 'DataURL exports',
     percentage: 0.09,
+    beforeEachHandler: function() {
+      fabric.Object.prototype.objectCaching = false;
+    }
   });
 
   function toDataURL2(canvas, callback) {

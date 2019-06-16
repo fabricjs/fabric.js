@@ -1,8 +1,6 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = false;
-  fabric.Object.NUM_FRACTION_DIGITS = 4;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
@@ -54,6 +52,10 @@
     golden: 'clipping0.png',
     newModule: 'Export clippaths to SVG',
     percentage: 0.06,
+    beforeEachHandler: function() {
+      fabric.Object.NUM_FRACTION_DIGITS = 4;
+      fabric.Object.prototype.objectCaching = false;
+    }
   });
 
   function clipping01(canvas, callback) {
