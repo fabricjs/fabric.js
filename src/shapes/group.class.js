@@ -538,6 +538,7 @@
           visibility = this.visible ? '' : ' visibility: hidden;';
       return [
         opacity,
+        this.getSvgFilter(),
         visibility
       ].join('');
     },
