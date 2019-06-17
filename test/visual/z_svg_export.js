@@ -393,8 +393,8 @@
     code: group1,
     golden: 'group-svg-1.png',
     percentage: 0.06,
-    width: 290,
-    height: 400,
+    width: 210,
+    height: 230,
   });
   tests.forEach(visualTestLoop(QUnit));
 })();
