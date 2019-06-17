@@ -243,6 +243,12 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
+      // ignore events from other pointers
+      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+        return;
+      }
+
+      this._cachePointerId(e);
       this.__onMouseDown(e);
       this._resetTransformEventData();
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
@@ -268,8 +274,14 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
+      // ignore events from other pointers
+      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+        return;
+      }
+
       this.__onMouseUp(e);
       this._resetTransformEventData();
+      this._resetPointerId();
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
 
@@ -297,6 +309,11 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
+      // ignore events from other pointers
+      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+        return;
+      }
+
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
@@ -640,6 +657,14 @@
     },
 
     /**
+     * @private
+     * @param {Event} event Event object
+     */
+    _getPointerId: function(event) {
+      return this.enablePointerEvents ? event.pointerId : 1;
+    },
+
+    /**
      * reset cache form common information needed during event processing
      * @private
      */
@@ -647,6 +672,13 @@
       this._target = null;
       this._pointer = null;
       this._absolutePointer = null;
+    },
+
+    /**
+     * @private
+     */
+    _resetPointerId: function() {
+      this._pointerId = null;
     },
 
     /**
@@ -660,6 +692,14 @@
       this._pointer = this.getPointer(e, true);
       this._absolutePointer = this.restorePointerVpt(this._pointer);
       this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e) || null;
+    },
+
+    /**
+     * @private
+     * @param {Event} event Event object fired on event
+     */
+    _cachePointerId: function(event) {
+      this._pointerId = this._getPointerId(event);
     },
 
     /**
@@ -694,9 +734,6 @@
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
-        return;
-      }
-      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
