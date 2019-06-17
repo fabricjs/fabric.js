@@ -1,7 +1,6 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = false;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
@@ -47,6 +46,9 @@
     percentage: 0.06,
     width: 300,
     height: 300,
+    beforeEachHandler: function() {
+      fabric.Object.prototype.objectCaching = false;
+    }
   });
 
   function text2(canvas, callback) {

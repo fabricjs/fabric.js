@@ -107,10 +107,6 @@
       threshold: 0.095
     };
 
-    function beforeEachHandler() {
-
-    }
-
     return function testCallback(testObj) {
       if (testObj.disabled) {
         return;
@@ -123,7 +119,7 @@
       var newModule = testObj.newModule;
       if (newModule) {
         QUnit.module(newModule, {
-          beforeEach: beforeEachHandler,
+          beforeEach: testObj.beforeEachHandler,
         });
       }
       QUnit.test(testName, function(assert) {

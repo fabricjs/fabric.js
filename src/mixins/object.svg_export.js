@@ -172,7 +172,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
+      return this._createBaseSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
@@ -181,7 +181,7 @@
      * @return {String} svg representation of an instance
      */
     toClipPathSVG: function(reviver) {
-      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(), { reviver: reviver });
+      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
@@ -206,13 +206,14 @@
      */
     _createBaseSVGMarkup: function(objectMarkup, options) {
       options = options || {};
-      var noStyle = options.noStyle, withShadow = options.withShadow,
+      var noStyle = options.noStyle,
           reviver = options.reviver,
           styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
-          shadowInfo = withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
+          shadowInfo = options.withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
           clipPath = this.clipPath,
           vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
-          absoluteClipPath = this.clipPath && this.clipPath.absolutePositioned,
+          absoluteClipPath = clipPath && clipPath.absolutePositioned,
+          stroke = this.stroke, fill = this.fill, shadow = this.shadow,
           commonPieces, markup = [], clipPathMarkup,
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
@@ -220,7 +221,7 @@
       if (clipPath) {
         clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
-          this.clipPath.toClipPathSVG(reviver) +
+          clipPath.toClipPathSVG(reviver) +
           '</clipPath>\n';
       }
       if (absoluteClipPath) {
@@ -241,14 +242,14 @@
         additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
       objectMarkup[index] = commonPieces;
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this));
+      if (fill && fill.toLive) {
+        markup.push(fill.toSVG(this));
       }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this));
+      if (stroke && stroke.toLive) {
+        markup.push(stroke.toSVG(this));
       }
-      if (this.shadow) {
-        markup.push(this.shadow.toSVG(this));
+      if (shadow) {
+        markup.push(shadow.toSVG(this));
       }
       if (clipPath) {
         markup.push(clipPathMarkup);

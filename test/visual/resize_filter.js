@@ -1,7 +1,6 @@
 (function() {
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = false;
   var visualTestLoop;
   var getFixture;
   if (fabric.isLikelyNode) {
@@ -37,6 +36,9 @@
     percentage: 0.08,
     width: 200,
     hieght: 200,
+    beforeEachHandler: function() {
+      fabric.Object.prototype.objectCaching = false;
+    }
   });
 
   function imageResizeTestNoZoom(canvas, callback) {
