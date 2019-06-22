@@ -110,7 +110,7 @@
      * @private
      */
     _reset: function() {
-      this._points.length = 0;
+      this._points = [];
       this._setBrushStyles();
       this._setShadow();
     },
@@ -239,6 +239,9 @@
           lastPoint = points[i];
           newPoints.push(lastPoint);
         }
+      }
+      if (newPoints.length === 1) {
+        newPoints.push(new fabric.Point(newPoints[0].x, newPoints[0].y));
       }
       return newPoints;
     },
