@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '3.1.0' };
+var fabric = fabric || { version: '3.2.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -8728,7 +8728,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @private
      */
     _reset: function() {
-      this._points.length = 0;
+      this._points = [];
       this._setBrushStyles();
       this._setShadow();
     },
@@ -8857,6 +8857,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
           lastPoint = points[i];
           newPoints.push(lastPoint);
         }
+      }
+      if (newPoints.length === 1) {
+        newPoints.push(new fabric.Point(newPoints[0].x, newPoints[0].y));
       }
       return newPoints;
     },
@@ -11583,7 +11586,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         fabric.util.clipContext(this, this.contextTop);
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseDown(pointer);
+      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
       this._handleEvent(e, 'down');
     },
 
@@ -11594,7 +11597,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         var pointer = this.getPointer(e);
-        this.freeDrawingBrush.onMouseMove(pointer);
+        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
       this.setCursor(this.freeDrawingCursor);
       this._handleEvent(e, 'move');
@@ -11609,7 +11612,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this.clipTo) {
         this.contextTop.restore();
       }
-      this.freeDrawingBrush.onMouseUp();
+      var pointer = this.getPointer(e);
+      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer });
       this._handleEvent(e, 'up');
     },
 
@@ -12294,28 +12298,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           translateX = (vp[4] - (cropping.left || 0)) * multiplier,
           translateY = (vp[5] - (cropping.top || 0)) * multiplier,
           originalInteractive = this.interactive,
-          originalContext = this.contextContainer,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
-          canvasEl = fabric.util.createCanvasElement();
+          canvasEl = fabric.util.createCanvasElement(),
+          originalContextTop = this.contextTop;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
+      this.contextTop = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = canvasEl.getContext('2d');
-      // will be renderAllExport();
-      this.renderAll();
+      this.renderCanvas(canvasEl.getContext('2d'), this._objects);
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;
       this.calcViewportBoundaries();
-      this.contextContainer = originalContext;
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
+      this.contextTop = originalContextTop;
       return canvasEl;
     },
   });
@@ -12946,6 +12949,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Transform matrix (similar to SVG's transform matrix)
+     * This property has been depreacted. Since caching and and qrDecompose this
+     * property can be handled with the standard top,left,scaleX,scaleY,angle and skewX.
+     * A documentation example on how to parse and merge a transformMatrix will be provided before
+     * completely removing it in fabric 4.0
+     * If you are starting a project now, DO NOT use it.
+     * @deprecated since 3.2.0
      * @type Array
      */
     transformMatrix:          null,
@@ -15803,7 +15812,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver });
+      return this._createBaseSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
@@ -15812,7 +15821,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toClipPathSVG: function(reviver) {
-      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(), { reviver: reviver });
+      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
@@ -15837,13 +15846,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _createBaseSVGMarkup: function(objectMarkup, options) {
       options = options || {};
-      var noStyle = options.noStyle, withShadow = options.withShadow,
+      var noStyle = options.noStyle,
           reviver = options.reviver,
           styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
-          shadowInfo = withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
+          shadowInfo = options.withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
           clipPath = this.clipPath,
           vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
-          absoluteClipPath = this.clipPath && this.clipPath.absolutePositioned,
+          absoluteClipPath = clipPath && clipPath.absolutePositioned,
+          stroke = this.stroke, fill = this.fill, shadow = this.shadow,
           commonPieces, markup = [], clipPathMarkup,
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
@@ -15851,7 +15861,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (clipPath) {
         clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
-          this.clipPath.toClipPathSVG(reviver) +
+          clipPath.toClipPathSVG(reviver) +
           '</clipPath>\n';
       }
       if (absoluteClipPath) {
@@ -15872,14 +15882,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
       ].join('');
       objectMarkup[index] = commonPieces;
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this));
+      if (fill && fill.toLive) {
+        markup.push(fill.toSVG(this));
       }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this));
+      if (stroke && stroke.toLive) {
+        markup.push(stroke.toSVG(this));
       }
-      if (this.shadow) {
-        markup.push(this.shadow.toSVG(this));
+      if (shadow) {
+        markup.push(shadow.toSVG(this));
       }
       if (clipPath) {
         markup.push(clipPathMarkup);
@@ -19481,31 +19491,29 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      var svgString = [];
+    _toSVG: function(reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
-
-      return this._createBaseSVGMarkup(
-        this._toSVG(),
-        { reviver: reviver, noStyle: true, withShadow: true });
+      svgString.push('</g>\n');
+      return svgString;
     },
 
     /**
-     * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * Returns styles-string for svg-export, specific version for group
+     * @return {String}
      */
-    _toSVG: function(reviver) {
-      var svgString = [];
-
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t', this._objects[i].toSVG(reviver));
-      }
-
-      return svgString;
+    getSvgStyles: function() {
+      var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
+      return [
+        opacity,
+        this.getSvgFilter(),
+        visibility
+      ].join('');
     },
 
     /**
@@ -26588,36 +26596,29 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      if (this.canvas && this.canvas.contextTop) {
-        var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        this.transform(ctx);
-        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
-        this._clearTextArea(ctx);
-        skipRestore || ctx.restore();
-      }
+      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(ctx);
+      this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+      this._clearTextArea(ctx);
+      skipRestore || ctx.restore();
     },
 
     /**
      * Renders cursor or selection (depending on what exists)
+     * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(), ctx;
-      if (this.canvas && this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        this.clearContextTop(true);
-      }
-      else {
-        ctx = this.canvas.contextContainer;
-        ctx.save();
-      }
+      var boundaries = this._getCursorBoundaries(),
+          ctx = this.canvas.contextTop;
+      this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
       }
