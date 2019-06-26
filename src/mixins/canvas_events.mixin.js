@@ -244,11 +244,11 @@
      */
     _onMouseDown: function (e) {
       // ignore events from other pointers
-      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+      if (this._pointerId !== undefined && this._pointerId !== this._getPointerId(e)) {
         return;
       }
 
-      this._cachePointerId(e);
+      this._rememberPointerId(e);
       this.__onMouseDown(e);
       this._resetTransformEventData();
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
@@ -275,7 +275,7 @@
      */
     _onMouseUp: function (e) {
       // ignore events from other pointers
-      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+      if (this._pointerId !== this._getPointerId(e)) {
         return;
       }
 
@@ -310,7 +310,7 @@
      */
     _onMouseMove: function (e) {
       // ignore events from other pointers
-      if (this._pointerId && this._pointerId !== this._getPointerId(e)) {
+      if (this._pointerId !== this._getPointerId(e)) {
         return;
       }
 
@@ -661,7 +661,15 @@
      * @param {Event} event Event object
      */
     _getPointerId: function(event) {
-      return this.enablePointerEvents ? event.pointerId : 1;
+      if (this.enablePointerEvents) {
+        return event.pointerId;
+      }
+
+      if (event.changedTouches) {
+        return event.changedTouches[0].identifier;
+      }
+
+      return 0;
     },
 
     /**
@@ -678,7 +686,7 @@
      * @private
      */
     _resetPointerId: function() {
-      this._pointerId = null;
+      this._pointerId = undefined;
     },
 
     /**
@@ -698,7 +706,7 @@
      * @private
      * @param {Event} event Event object fired on event
      */
-    _cachePointerId: function(event) {
+    _rememberPointerId: function(event) {
       this._pointerId = this._getPointerId(event);
     },
 
