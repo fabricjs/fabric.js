@@ -16,7 +16,7 @@
       addEventOptions = { passive: false };
 
   function checkClick(e, value) {
-    return 'which' in e ? e.which === value : e.button === value - 1;
+    return e.button === value - 1;
   }
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
@@ -37,6 +37,22 @@
     ],
 
     /**
+     * Contains the list of pointers actually on the screen in mouseDown/mouseMove
+     * added on mousedown/pointerdown/touchstart, remove on mouseup/pointerup/touchend
+     * pointer format can change without notice until this array is marked as private.
+     * @type Number[]
+     * @private
+     */
+    activePointers: null,
+
+    /**
+     * Contains the id of the pointer that owns the fabric transform
+     * @type Number
+     * @private
+     */
+    mainPointerId: null,
+
+    /**
      * Adds mouse listeners to canvas
      * @private
      */
@@ -44,14 +60,23 @@
       // in case we initialized the class twice. This should not happen normally
       // but in some kind of applications where the canvas element may be changed
       // this is a workaround to having double listeners.
+      this.activePointers = [];
       this.removeListeners();
       this._bindEvents();
       this.addOrRemove(addListener, 'add');
     },
 
+    /**
+     * return an event prefix pointer or mouse.
+     * @private
+     */
+    _getEventPrefix: function () {
+      return this.enablePointerEvents ? 'pointer' : 'mouse';
+    },
+
     addOrRemove: function(functor, eventjsFunctor) {
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+          eventTypePrefix = this._getEventPrefix();
       functor(fabric.window, 'resize', this._onResize);
       functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
       functor(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
@@ -81,7 +106,7 @@
     removeListeners: function() {
       this.addOrRemove(removeListener, 'remove');
       // if you dispose on a mouseDown, before mouse up, you need to clean document to...
-      var eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+      var eventTypePrefix = this._getEventPrefix();
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
@@ -239,19 +264,78 @@
     },
 
     /**
+     * Return a the id of an event.
+     * returns either the pointerId or the identifier or 0 for the mouse event
+     * @private
+     * @param {Event} event Event object
+     */
+    getPointerId: function(event) {
+      if (this.enablePointerEvents) {
+        return event.pointerId;
+      }
+
+      var changedTouches = event.changedTouches;
+      if (changedTouches) {
+        return changedTouches[0] && changedTouches[0].identifier;
+      }
+
+      return 0;
+    },
+
+    /**
+     * Add a pointer to the active list.
+     * @private
+     * @param {Event} evt Event object
+     */
+    _addPointer: function(evt) {
+      var id = this.getPointerId(evt), activePointers = this.activePointers;
+      activePointers.push(id);
+      if (activePointers.length === 1) {
+        // first event, the main one.
+        this.mainPointerId = id;
+      }
+    },
+
+    /**
+     * Determines if an event has the id of the event that is considered main
+     * @private
+     * @param {evt} event Event object
+     */
+    _isMainEvent: function(evt) {
+      return this.getPointerId(evt) !== this.mainPointerId;
+    },
+
+    /**
+     * Remove a pointer from the active list.
+     * @private
+     * @param {evt} event Event object
+     */
+    _removePointer: function(evt) {
+      var id = this.getPointerId(evt);
+      this.activePointers = this.activePointers.filter(function(_id) {
+        return _id !== id;
+      });
+      if (id === this.mainPointerId) {
+        this.mainPointerId = null;
+      }
+    },
+
+    /**
      * @private
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
+      this._addPointer(e);
       this.__onMouseDown(e);
       this._resetTransformEventData();
       addListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
 
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+          eventTypePrefix = this._getEventPrefix();
       removeListener(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       removeListener(canvasElement, 'touchmove', this._onMouseMove, addEventOptions);
+
 
       if (e.type === 'touchstart') {
         // Unbind mousedown to prevent double triggers from touch devices
@@ -268,10 +352,11 @@
      * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
+      this._removePointer(e);
       this.__onMouseUp(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this.enablePointerEvents ? 'pointer' : 'mouse';
+          eventTypePrefix = this._getEventPrefix();
 
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onMouseUp, addEventOptions);
@@ -365,6 +450,10 @@
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
+        return;
+      }
+
+      if (!this._isMainEvent(e)) {
         return;
       }
 
@@ -534,7 +623,7 @@
         fabric.util.clipContext(this, this.contextTop);
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
+      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer, activePointers: this.activePointers });
       this._handleEvent(e, 'down');
     },
 
@@ -545,7 +634,7 @@
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         var pointer = this.getPointer(e);
-        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
+        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer, activePointers: this.activePointers });
       }
       this.setCursor(this.freeDrawingCursor);
       this._handleEvent(e, 'move');
@@ -561,7 +650,7 @@
         this.contextTop.restore();
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer });
+      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer, activePointers: this.activePointers });
       this._handleEvent(e, 'up');
     },
 
@@ -594,6 +683,10 @@
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
+        return;
+      }
+
+      if (!this._isMainEvent(e)) {
         return;
       }
 
@@ -696,7 +789,8 @@
         this._onMouseMoveInDrawingMode(e);
         return;
       }
-      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
+
+      if (!this._isMainEvent(e)) {
         return;
       }
 
