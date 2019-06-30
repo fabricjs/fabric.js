@@ -31,8 +31,6 @@
    * @param {Event} event Event object
    */
   function getPointer(event) {
-    event || (event = fabric.window.event);
-
     var element = event.target,
         scroll = fabric.util.getScrollLeftTop(element),
         _evt = getTouchInfo(event);
