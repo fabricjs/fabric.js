@@ -1720,9 +1720,4 @@
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
   }
-
-  if (fabric.isTouchSupported) {
-    /** @ignore */
-    fabric.Canvas.prototype._setCursorFromEvent = function() { };
-  }
 })();

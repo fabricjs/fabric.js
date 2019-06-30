@@ -191,46 +191,21 @@
   function getPointer(event) {
     event || (event = fabric.window.event);
 
-    var element = event.target ||
-                  (typeof event.srcElement !== unknown ? event.srcElement : null),
-
-        scroll = fabric.util.getScrollLeftTop(element);
+    var element = event.target,
+        scroll = fabric.util.getScrollLeftTop(element),
+        _evt = getTouchInfo(event);
     return {
-      x: pointerX(event) + scroll.left,
-      y: pointerY(event) + scroll.top
+      x: _evt.clientX + scroll.left,
+      y: _evt.clientY + scroll.top
     };
   }
 
-  var pointerX = function(event) {
-        return event.clientX;
-      },
-
-      pointerY = function(event) {
-        return event.clientY;
-      };
-
-  function _getPointer(event, pageProp, clientProp) {
-    var touchProp = event.type === 'touchend' ? 'changedTouches' : 'touches';
-    var pointer, eventTouchProp = event[touchProp];
-
-    if (eventTouchProp && eventTouchProp[0]) {
-      pointer = eventTouchProp[0][clientProp];
+  function getTouchInfo(event) {
+    var touchProp = event.changedTouches;
+    if (touchProp && touchProp[0]) {
+      return touchProp[0];
     }
-
-    if (typeof pointer === 'undefined') {
-      pointer = event[clientProp];
-    }
-
-    return pointer;
-  }
-
-  if (fabric.isTouchSupported) {
-    pointerX = function(event) {
-      return _getPointer(event, 'pageX', 'clientX');
-    };
-    pointerY = function(event) {
-      return _getPointer(event, 'pageY', 'clientY');
-    };
+    return event;
   }
 
   fabric.util.getPointer = getPointer;

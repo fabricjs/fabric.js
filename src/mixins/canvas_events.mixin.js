@@ -16,7 +16,7 @@
       addEventOptions = { passive: false };
 
   function checkClick(e, value) {
-    return e.button === value - 1;
+    return e.button && (e.button === value - 1);
   }
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
@@ -453,9 +453,9 @@
         return;
       }
 
-      if (!this._isMainEvent(e)) {
-        return;
-      }
+      // if (!this._isMainEvent(e)) {
+      //   // return;
+      // }
 
       if (transform) {
         this._finalizeCurrentTransform(e);
@@ -686,9 +686,9 @@
         return;
       }
 
-      if (!this._isMainEvent(e)) {
-        return;
-      }
+      // if (!this._isMainEvent(e)) {
+      //   // return;
+      // }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) {
@@ -790,9 +790,9 @@
         return;
       }
 
-      if (!this._isMainEvent(e)) {
-        return;
-      }
+      // if (!this._isMainEvent(e)) {
+      //   // return;
+      // }
 
       var groupSelector = this._groupSelector;
 
