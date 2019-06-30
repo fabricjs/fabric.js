@@ -61,7 +61,7 @@
   },
   "optionalDependencies": {
     "canvas": "^2.6.0",
-    "jsdom": "15.1.0"
+    "jsdom": "^15.1.0"
   },
   "devDependencies": {
     "eslint": "4.18.x",

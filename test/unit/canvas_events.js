@@ -103,19 +103,19 @@
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
     canvas.isDrawingMode = false;
-    canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 0, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse down fired');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'rightclick did not fire a mouse:down event');
     canvas.fireRightClick = true;
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'rightclick did fire a mouse:down event');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'middleClick did not fire a mouse:down event');
     canvas.fireMiddleClick = true;
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'middleClick did fire a mouse:down event');
   });
 

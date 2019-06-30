@@ -9,7 +9,7 @@
    * @param {String} eventName
    * @param {Function} handler
    */
-  fabric.util.addListener = function (element, eventName, handler, options) {
+  fabric.util.addListener = function(element, eventName, handler, options) {
     element && element.addEventListener(eventName, handler, couldUseAttachEvent ? false : options);
   };
 
@@ -21,24 +21,9 @@
    * @param {String} eventName
    * @param {Function} handler
    */
-  fabric.util.removeListener = function (element, eventName, handler, options) {
+  fabric.util.removeListener = function(element, eventName, handler, options) {
     element && element.removeEventListener(eventName, handler, couldUseAttachEvent ? false : options);
   };
-
-  /**
-   * Cross-browser wrapper for getting event's coordinates
-   * @memberOf fabric.util
-   * @param {Event} event Event object
-   */
-  function getPointer(event) {
-    var element = event.target,
-        scroll = fabric.util.getScrollLeftTop(element),
-        _evt = getTouchInfo(event);
-    return {
-      x: _evt.clientX + scroll.left,
-      y: _evt.clientY + scroll.top
-    };
-  }
 
   function getTouchInfo(event) {
     var touchProp = event.changedTouches;
@@ -48,6 +33,13 @@
     return event;
   }
 
-  fabric.util.getPointer = getPointer;
-
+  fabric.util.getPointer = function(event) {
+    var element = event.target,
+        scroll = fabric.util.getScrollLeftTop(element),
+        _evt = getTouchInfo(event);
+    return {
+      x: _evt.clientX + scroll.left,
+      y: _evt.clientY + scroll.top
+    };
+  };
 })();
