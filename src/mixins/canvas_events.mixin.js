@@ -303,7 +303,7 @@
      * @param {evt} event Event object
      */
     _isMainEvent: function(evt) {
-      return this.getPointerId(evt) !== this.mainPointerId;
+      return this.activePointers.length <= 1 || this.getPointerId(evt) === this.mainPointerId;
     },
 
     /**
@@ -330,6 +330,9 @@
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
+      if (this.activePointers.length > 1) {
+        return
+      }
       addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
       // Unbind mousedown to prevent double triggers from touch devices
@@ -356,18 +359,21 @@
      */
     _onTouchEnd: function(e) {
       this.__onMouseUp(e);
+      this._removePointer(e);
       this._resetTransformEventData();
+      if (this.activePointers.length > 0) {
+        return;
+      }
       var eventTypePrefix = this._getEventPrefix();
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
-
-      // Wait 400ms before rebinding mousedown to prevent double triggers
-      // from touch devices
       var _this = this;
       if (this._willAddMouseDown) {
         clearTimeout(this._willAddMouseDown);
       }
       this._willAddMouseDown = setTimeout(function() {
+        // Wait 400ms before rebinding mousedown to prevent double triggers
+        // from touch devices
         addListener(_this.upperCanvasEl, eventTypePrefix + 'down', _this._onMouseDown);
         _this._willAddMouseDown = 0;
       }, 400);
@@ -379,6 +385,7 @@
      */
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
+      this._removePointer(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
@@ -438,7 +445,6 @@
       var target, transform = this._currentTransform,
           groupSelector = this._groupSelector, shouldRender = false,
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
-      this._removePointer(e);
       this._cacheTransformEventData(e);
       target = this._target;
       this._handleEvent(e, 'up:before');
@@ -464,10 +470,9 @@
         return;
       }
 
-      // if (!this._isMainEvent(e)) {
-      //   // return;
-      // }
-
+      if (!this._isMainEvent(e)) {
+        return;
+      }
       if (transform) {
         this._finalizeCurrentTransform(e);
         shouldRender = transform.actionPerformed;
@@ -698,9 +703,9 @@
         return;
       }
 
-      // if (!this._isMainEvent(e)) {
-      //   // return;
-      // }
+      if (!this._isMainEvent(e)) {
+        return;
+      }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) {
@@ -802,9 +807,9 @@
         return;
       }
 
-      // if (!this._isMainEvent(e)) {
-      //   // return;
-      // }
+      if (!this._isMainEvent(e)) {
+        return;
+      }
 
       var groupSelector = this._groupSelector;
 
