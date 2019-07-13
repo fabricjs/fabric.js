@@ -37,20 +37,11 @@
     ],
 
     /**
-     * Contains the list of pointers actually on the screen in mouseDown/mouseMove
-     * added on mousedown/pointerdown/touchstart, remove on mouseup/pointerup/touchend
-     * pointer format can change without notice until this array is marked as private.
-     * @type Number[]
-     * @private
-     */
-    activePointers: null,
-
-    /**
-     * Contains the id of the pointer that owns the fabric transform
+     * Contains the id of the touch event that owns the fabric transform
      * @type Number
      * @private
      */
-    mainPointerId: null,
+    mainTouchId: null,
 
     /**
      * Adds mouse listeners to canvas
@@ -60,7 +51,6 @@
       // in case we initialized the class twice. This should not happen normally
       // but in some kind of applications where the canvas element may be changed
       // this is a workaround to having double listeners.
-      this.activePointers = [];
       this.removeListeners();
       this._bindEvents();
       this.addOrRemove(addListener, 'add');
@@ -85,11 +75,13 @@
       functor(canvasElement, 'wheel', this._onMouseWheel);
       functor(canvasElement, 'contextmenu', this._onContextMenu);
       functor(canvasElement, 'dblclick', this._onDoubleClick);
-      functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
       functor(canvasElement, 'dragover', this._onDragOver);
       functor(canvasElement, 'dragenter', this._onDragEnter);
       functor(canvasElement, 'dragleave', this._onDragLeave);
       functor(canvasElement, 'drop', this._onDrop);
+      if (!this.enablePointerEvents) {
+        functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
+      }
       if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
         eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
         eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
@@ -268,33 +260,20 @@
      * Return a the id of an event.
      * returns either the pointerId or the identifier or 0 for the mouse event
      * @private
-     * @param {Event} event Event object
+     * @param {Event} evt Event object
      */
-    getPointerId: function(event) {
-      if (this.enablePointerEvents) {
-        return event.pointerId;
-      }
+    getPointerId: function(evt) {
+      var changedTouches = evt.changedTouches;
 
-      var changedTouches = event.changedTouches;
       if (changedTouches) {
         return changedTouches[0] && changedTouches[0].identifier;
       }
 
-      return 0;
-    },
-
-    /**
-     * Add a pointer to the active list.
-     * @private
-     * @param {Event} evt Event object
-     */
-    _addPointer: function(evt) {
-      var id = this.getPointerId(evt), activePointers = this.activePointers;
-      activePointers.push(id);
-      if (activePointers.length === 1) {
-        // first event, the main one.
-        this.mainPointerId = id;
+      if (this.enablePointerEvents) {
+        return evt.pointerId;
       }
+
+      return -1;
     },
 
     /**
@@ -303,22 +282,19 @@
      * @param {evt} event Event object
      */
     _isMainEvent: function(evt) {
-      return this.activePointers.length <= 1 || this.getPointerId(evt) === this.mainPointerId;
-    },
-
-    /**
-     * Remove a pointer from the active list.
-     * @private
-     * @param {evt} event Event object
-     */
-    _removePointer: function(evt) {
-      var id = this.getPointerId(evt);
-      this.activePointers = this.activePointers.filter(function(_id) {
-        return _id !== id;
-      });
-      if (id === this.mainPointerId) {
-        this.mainPointerId = null;
+      if (evt.isPrimary === true) {
+        return true;
       }
+      if (evt.isPrimary === false) {
+        return false;
+      }
+      if (evt.type === 'touchend' && evt.touches.length === 0) {
+        return true;
+      }
+      if (evt.changedTouches) {
+        return evt.changedTouches[0].identifier === this.mainTouchId;
+      }
+      return true;
     },
 
     /**
@@ -326,13 +302,14 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchStart: function(e) {
+      e.preventDefault();
+      if (this.mainTouchId === null) {
+        this.mainTouchId = this.getPointerId(e);
+      }
       this.__onMouseDown(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
-      if (this.activePointers.length > 1) {
-        return
-      }
       addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
       // Unbind mousedown to prevent double triggers from touch devices
@@ -358,12 +335,13 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchEnd: function(e) {
-      this.__onMouseUp(e);
-      this._removePointer(e);
-      this._resetTransformEventData();
-      if (this.activePointers.length > 0) {
+      if (e.touches.length > 0) {
+        // if there are still touches stop here
         return;
       }
+      this.__onMouseUp(e);
+      this._resetTransformEventData();
+      this.mainTouchId = null;
       var eventTypePrefix = this._getEventPrefix();
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
@@ -385,7 +363,6 @@
      */
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
-      this._removePointer(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
@@ -639,7 +616,7 @@
         fabric.util.clipContext(this, this.contextTop);
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer, activePointers: this.activePointers });
+      this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
       this._handleEvent(e, 'down');
     },
 
@@ -650,7 +627,7 @@
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         var pointer = this.getPointer(e);
-        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer, activePointers: this.activePointers });
+        this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
       this.setCursor(this.freeDrawingCursor);
       this._handleEvent(e, 'move');
@@ -666,7 +643,7 @@
         this.contextTop.restore();
       }
       var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer, activePointers: this.activePointers });
+      this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer });
       this._handleEvent(e, 'up');
     },
 
@@ -679,7 +656,6 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-      this._addPointer(e);
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'down:before');
       var target = this._target;
