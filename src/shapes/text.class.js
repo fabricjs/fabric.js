@@ -633,7 +633,7 @@
      * possibly overridden to accommodate different measure logic or
      * to hook some external lib for character measurement
      * @private
-     * @param {String} char to be measured
+     * @param {String} _char, char to be measured
      * @param {Object} charStyle style of char to be measured
      * @param {String} [previousChar] previous char
      * @param {Object} [prevCharStyle] style of previous char
@@ -679,12 +679,12 @@
 
     /**
      * Computes height of character at given position
-     * @param {Number} line the line number
-     * @param {Number} char the character number
+     * @param {Number} line the line index number
+     * @param {Number} _char the character index number
      * @return {Number} fontSize of the character
      */
-    getHeightOfChar: function(line, char) {
-      return this.getValueOfPropertyAt(line, char, 'fontSize');
+    getHeightOfChar: function(line, _char) {
+      return this.getValueOfPropertyAt(line, _char, 'fontSize');
     },
 
     /**
