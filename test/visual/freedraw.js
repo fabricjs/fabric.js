@@ -34,15 +34,15 @@
   else {
     visualTestLoop = window.visualTestLoop;
   }
-
+  var options = { e: { pointerId: 1 } };
   function pointDrawer(points, brush) {
-    brush.onMouseDown(points[0]);
+    brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.onMouseMove(points[i]);
+      brush.onMouseMove(points[i], options);
     }
-    brush.onMouseUp();
+    brush.onMouseUp(options);
   }
 
   var tests = [];
