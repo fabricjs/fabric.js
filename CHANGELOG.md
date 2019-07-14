@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.3.0]
+- Differently support multi mouse events, fix multi touch on various browser [#5785](https://github.com/fabricjs/fabric.js/pull/5785)
+- Word boundary search update on grapheme clusters [#5788](https://github.com/fabricjs/fabric.js/pull/5788)
+- Enable deps free version [#5786](https://github.com/fabricjs/fabric.js/pull/5786)
+- Remove variables named as reserved words [#5782](https://github.com/fabricjs/fabric.js/pull/5782)
+
 ## [3.2.0]
 - Fix: Better handling of upperCanvas in toCanvasElement. [#5736](https://github.com/fabricjs/fabric.js/pull/5736)
 - Add: Pass raw event information to brushes [#5687](https://github.com/fabricjs/fabric.js/pull/5687)
