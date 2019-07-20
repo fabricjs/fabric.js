@@ -74,12 +74,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     if (gradientDef) {
       var gradient = fabric.Gradient.fromElement(gradientDef, obj);
 
-      if ((property + "Opacity") in obj) {
-        var multiplier = obj[property + "Opacity"];
-        if (multiplier != 1) {
+      if ((property + 'Opacity') in obj) {
+        var multiplier = obj[property + 'Opacity'];
+        if (multiplier !== 1) {
           gradient = new fabric.Gradient(gradient);
-          for (var i = 0; i < gradient.colorStops.length; i++)
+          for (var i = 0; i < gradient.colorStops.length; i++) {
             gradient.colorStops[i].opacity *= multiplier;
+          }
         }
       }
 

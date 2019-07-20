@@ -466,9 +466,9 @@
 
     fabric.loadSVGFromString(string, function(objects) {
       assert.equal(objects[0].fill.colorStops[0].opacity, 0.5);
-      assert.equal(objects[0].fill.colorStops[0].color, "rgb(255,0,0)");
+      assert.equal(objects[0].fill.colorStops[0].color, 'rgb(255,0,0)');
       assert.equal(objects[0].fill.colorStops[1].opacity, 0.5);
-      assert.equal(objects[0].fill.colorStops[1].color, "rgb(0,255,0)");
+      assert.equal(objects[0].fill.colorStops[1].color, 'rgb(0,255,0)');
       done();
     });
   });
