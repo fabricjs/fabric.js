@@ -46,8 +46,8 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     var _this = this;
     return function(obj) {
       var _options;
-      _this.resolveGradient(obj, 'fill');
-      _this.resolveGradient(obj, 'stroke');
+      _this.resolveGradient(obj, el, 'fill');
+      _this.resolveGradient(obj, el, 'stroke');
       if (obj instanceof fabric.Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
@@ -69,18 +69,19 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     return fabric[storage][this.svgUid][id];
   };
 
-  proto.resolveGradient = function(obj, property) {
+  proto.resolveGradient = function(obj, el, property) {
     var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
     if (gradientDef) {
       var gradient = fabric.Gradient.fromElement(gradientDef, obj);
 
-      if ((property + 'Opacity') in obj) {
-        var multiplier = obj[property + 'Opacity'];
-        if (multiplier !== 1) {
-          gradient = new fabric.Gradient(gradient);
-          for (var i = 0; i < gradient.colorStops.length; i++) {
-            gradient.colorStops[i].opacity *= multiplier;
-          }
+      var opacityAttr = el.getAttribute(property + '-opacity');
+      var multiplier = parseFloat(opacityAttr) / (/%$/.test(opacityAttr) ? 100 : 1);
+      multiplier = multiplier < 0 ? 0 : multiplier > 1 ? 1 : multiplier;
+
+      if (!isNaN(multiplier) && (multiplier !== 1)) {
+        gradient = new fabric.Gradient(gradient);
+        for (var i = 0; i < gradient.colorStops.length; i++) {
+          gradient.colorStops[i].opacity *= multiplier;
         }
       }
 
