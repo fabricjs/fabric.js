@@ -4,6 +4,10 @@
     return false;
   }
 
+  function defaultEasing(t, b, c, d) {
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+  }
+
   /**
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
@@ -28,7 +32,7 @@
           onChange = options.onChange || noop,
           abort = options.abort || noop,
           onComplete = options.onComplete || noop,
-          easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;},
+          easing = options.easing || defaultEasing,
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
           byValue = options.byValue || endValue - startValue;
@@ -49,7 +53,7 @@
         }
         if (time > finish) {
           onChange(endValue, 1, 1);
-          options.onComplete && options.onComplete(endValue, 1, 1);
+          onComplete(endValue, 1, 1);
           return;
         }
         else {
