@@ -72,7 +72,18 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   proto.resolveGradient = function(obj, property) {
     var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
     if (gradientDef) {
-      obj.set(property, fabric.Gradient.fromElement(gradientDef, obj));
+      var gradient = fabric.Gradient.fromElement(gradientDef, obj);
+
+      if ((property + "Opacity") in obj) {
+        var multiplier = obj[property + "Opacity"];
+        if (multiplier != 1) {
+          gradient = new fabric.Gradient(gradient);
+          for (var i = 0; i < gradient.colorStops.length; i++)
+            gradient.colorStops[i].opacity *= multiplier;
+        }
+      }
+
+      obj.set(property, gradient);
     }
   };
 
