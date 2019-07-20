@@ -1,7 +1,7 @@
 (function() {
 
   /* _FROM_SVG_START_ */
-  function getColorStop(el) {
+  function getColorStop(el, multiplier) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset') || 0,
         color, colorAlpha, opacity, i;
@@ -41,7 +41,7 @@
     color = new fabric.Color(color);
     colorAlpha = color.getAlpha();
     opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
-    opacity *= colorAlpha;
+    opacity *= colorAlpha * multiplier;
 
     return {
       offset: offset,
@@ -301,12 +301,13 @@
      * @static
      * @memberOf fabric.Gradient
      * @param {SVGGradientElement} el SVG gradient element
+     * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
      * @param {fabric.Object} instance
      * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */
-    fromElement: function(el, instance) {
+    fromElement: function(el, opacityAttr, instance) {
       /**
        *  @example:
        *
@@ -340,6 +341,12 @@
        *
        */
 
+      var multiplier = parseFloat(opacityAttr) / (/%$/.test(opacityAttr) ? 100 : 1);
+      multiplier = multiplier < 0 ? 0 : multiplier > 1 ? 1 : multiplier;
+      if (isNaN(multiplier)) {
+        multiplier = 1;
+      }
+
       var colorStopEls = el.getElementsByTagName('stop'),
           type,
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
@@ -362,7 +369,7 @@
       }
 
       for (i = colorStopEls.length; i--; ) {
-        colorStops.push(getColorStop(colorStopEls[i]));
+        colorStops.push(getColorStop(colorStopEls[i], multiplier));
       }
 
       ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);
