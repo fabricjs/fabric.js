@@ -451,6 +451,28 @@
     });
   });
 
+  QUnit.test('parseSVGFromString path fill-opacity with gradient', function(assert) {
+    var done = assert.async();
+    var string = '<?xml version="1.0" encoding="UTF-8"?>' +
+    '<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="300" height="400" ' +
+      'viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" ' +
+      'xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">' +
+        '<linearGradient id="red-to-red">' +
+          '<stop offset="0%" stop-color="#00ff00" stop-opacity="0.5"/>' +
+          '<stop offset="100%" stop-color="#ff0000"/>' +
+        '</linearGradient>' +
+        '<path d="M 0 0 l 100 0 l 0 100 l -100 0 z" fill="url(#red-to-red)" fill-opacity="0.5"/>' +
+    '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].fill.colorStops[0].opacity, 0.5);
+      assert.equal(objects[0].fill.colorStops[0].color, 'rgb(255,0,0)');
+      assert.equal(objects[0].fill.colorStops[1].opacity, 0.25);
+      assert.equal(objects[0].fill.colorStops[1].color, 'rgb(0,255,0)');
+      done();
+    });
+  });
+
   QUnit.test('parseSVGFromString with svg:namespace', function(assert) {
     var done = assert.async();
     var string = '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
