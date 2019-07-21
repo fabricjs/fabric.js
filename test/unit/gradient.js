@@ -209,7 +209,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -250,7 +250,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -283,7 +283,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -315,7 +315,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100, top: 0, left: 0 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -350,7 +350,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -369,13 +369,13 @@
     element.setAttribute('y2', 'Infinity');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 60);
     assert.equal(gradient.coords.y1, 20);
     assert.equal(gradient.coords.x2, 40);
     assert.equal(gradient.coords.y2, 200);
     object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
-    gradient = fabric.Gradient.fromElement(element, '', object);
+    gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 70);
     assert.equal(gradient.coords.y1, 70);
     assert.equal(gradient.coords.x2, 50);
@@ -394,7 +394,7 @@
     element.setAttribute('r', '100%');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 60, 'should change with width height');
     assert.equal(gradient.coords.y1, 40, 'should change with width height');
     assert.equal(gradient.coords.x2, 20, 'should change with width height');
@@ -403,7 +403,7 @@
     assert.equal(gradient.coords.r2, 200, 'should change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
-    gradient = fabric.Gradient.fromElement(element, '', object);
+    gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 70, 'should change with top left');
     assert.equal(gradient.coords.y1, 50, 'should change with top left');
     assert.equal(gradient.coords.x2, 30, 'should change with top left');
@@ -425,7 +425,7 @@
     element.setAttribute('gradientUnits', 'userSpaceOnUse');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 30, 'should not change with width height');
     assert.equal(gradient.coords.y1, 20, 'should not change with width height');
     assert.equal(gradient.coords.x2, 15, 'should not change with width height');
@@ -434,7 +434,7 @@
     assert.equal(gradient.coords.r2, 100, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 50, left: 60 });
-    gradient = fabric.Gradient.fromElement(element, '', object);
+    gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 30, 'should not change with top left');
     assert.equal(gradient.coords.y1, 20, 'should not change with top left');
     assert.equal(gradient.coords.x2, 15, 'should not change with top left');
@@ -455,14 +455,14 @@
     element.setAttribute('gradientUnits', 'userSpaceOnUse');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 30, 'should not change with width height');
     assert.equal(gradient.coords.y1, 20, 'should not change with width height');
     assert.equal(gradient.coords.x2, 15, 'should not change with width height');
     assert.equal(gradient.coords.y2, 18, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 40, left: 40 });
-    gradient = fabric.Gradient.fromElement(element, '', object);
+    gradient = fabric.Gradient.fromElement(element, object, '');
     assert.equal(gradient.coords.x1, 30, 'should not change with top left');
     assert.equal(gradient.coords.y1, 20, 'should not change with top left');
     assert.equal(gradient.coords.x2, 15, 'should not change with top left');
@@ -486,7 +486,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -519,7 +519,7 @@
     element.appendChild(stop2);
     element.setAttribute('gradientTransform', 'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)');
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -568,7 +568,7 @@
     element.appendChild(stop4);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -625,7 +625,7 @@
     element.appendChild(stop4);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, '', object);
+    var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 

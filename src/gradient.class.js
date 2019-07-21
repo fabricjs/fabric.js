@@ -301,13 +301,13 @@
      * @static
      * @memberOf fabric.Gradient
      * @param {SVGGradientElement} el SVG gradient element
-     * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
      * @param {fabric.Object} instance
+     * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
      * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */
-    fromElement: function(el, opacityAttr, instance) {
+    fromElement: function(el, instance, opacityAttr) {
       /**
        *  @example:
        *
