@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 180 180">
+<defs>
+<linearGradient id="three_stops_1">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699"/>
+    <stop offset="100%" style="stop-color: #66cc99;"/>
+</linearGradient>
+<linearGradient id="three_stops_2">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 0.5"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 0.9"/>
+</linearGradient>
+<linearGradient id="three_stops_3" gradientTransform="rotate(45)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_4" gradientTransform="rotate(90)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_5" gradientTransform="rotate(90) translate(0.5, 0)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_6" gradientTransform="translate(0.5, 0) rotate(90)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_7" gradientTransform="translate(0, 0.5) rotate(90)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_8" gradientTransform="translate(0, 0.5) scale(2, 1)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_9" gradientTransform="translate(0, 0.5) scale(1, 2)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_10" gradientTransform="translate(0.5, 0.5) scale(-1, 2)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+<linearGradient id="three_stops_11" gradientTransform="skewX(30)">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
+</linearGradient>
+</defs>
+
+  <polygon points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_1); stroke: black;"/>
+  <polygon transform="translate(45, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_2); stroke: black;"/>
+  <polygon fill-opacity="0.5" transform="translate(90, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_2); stroke: black;"/>
+  <polygon transform="translate(135, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_3); stroke: black;"/>
+  <polygon transform="translate(0, 45)" points="5,5 80,5 80,40 5,40 5,35 75,35 75,10 5,10" style="fill: url(#three_stops_4); stroke: black;"/>
+  <polygon transform="translate(90, 45)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_5); stroke: black;"/>
+  <polygon transform="translate(135, 45)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_6); stroke: black;"/>
+  <polygon transform="translate(0, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_7); stroke: black;"/>
+  <polygon transform="translate(45, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_8); stroke: black;"/>
+  <polygon transform="translate(90, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_9); stroke: black;"/>
+  <polygon transform="translate(135, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_10); stroke: black;"/>
+  <polygon transform="translate(0, 135)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_11); stroke: black;"/>
+
+</svg>
