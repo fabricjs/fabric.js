@@ -2,6 +2,9 @@
 
 var fabric = fabric || { version: '3.3.0' };
 if (typeof exports !== 'undefined') {
+  if (typeof module !== 'undefined') {
+    (module.exports = fabric).fabric = fabric;
+  }
   exports.fabric = fabric;
 }
 /* _AMD_START_ */
