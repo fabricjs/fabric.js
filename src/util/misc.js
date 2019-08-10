@@ -165,9 +165,15 @@
     /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
+     * @param {Array} transform 6 number trasnform matrix
      * @return {Object} Object with left, top, width, height properties
      */
-    makeBoundingBoxFromPoints: function(points) {
+    makeBoundingBoxFromPoints: function(points, transform) {
+      if (transform) {
+        points = points.map(function(point) {
+          return fabric.util.transformPoint(point, transform);
+        });
+      }
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
           minX = fabric.util.array.min(xPoints),
           maxX = fabric.util.array.max(xPoints),
@@ -658,7 +664,7 @@
     },
 
     /**
-     * Decomposes standard 2x2 matrix into transform componentes
+     * Decomposes standard 2x3 matrix into transform componentes
      * @static
      * @memberOf fabric.util
      * @param  {Array} a transformMatrix
@@ -679,6 +685,61 @@
         translateX: a[4],
         translateY: a[5]
       };
+    },
+
+    calcRotateMatrix: function(options) {
+      if (!options.angle) {
+        return fabric.iMatrix.concat();
+      }
+      var theta = fabric.util.degreesToRadians(options.angle),
+          cos = fabric.util.cos(theta),
+          sin = fabric.util.sin(theta);
+      return [cos, sin, -sin, cos, 0, 0];
+    },
+
+    calcDimensionsMatrix: function(options) {
+      var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
+          scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
+          scaleMatrix = [scaleX, 0, 0, scaleY, 0, 0];
+      if (options.skewX) {
+        scaleMatrix = fabric.util.multiplyTransformMatrices(
+          scaleMatrix,
+          [1, 0, Math.tan(fabric.util.degreesToRadians(options.skewX)), 1],
+          true);
+      }
+      if (options.skewY) {
+        scaleMatrix = fabric.util.multiplyTransformMatrices(
+          scaleMatrix,
+          [1, Math.tan(fabric.util.degreesToRadians(options.skewY)), 0, 1],
+          true);
+      }
+      return scaleMatrix;
+    },
+
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle]
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.translateX]
+     * @param  {Number} [options.translateY]
+     * @return {Array[Number]} transform matrix
+     */
+    componeMatrix: function(options) {
+      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0];
+      if (options.angle) {
+        matrix = fabric.util.multiplyTransformMatrices(matrix, fabric.util.calcRotateMatrix(options));
+      }
+      if (options.scaleX || options.scaleY || options.skewX || options.skewY) {
+        matrix = fabric.util.multiplyTransformMatrices(matrix, fabric.util.calcDimensionsMatrix(options));
+      }
+      return matrix;
     },
 
     customTransformMatrix: function(scaleX, scaleY, skewX) {

@@ -56,19 +56,18 @@
     <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 1"/>
     <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 1"/>
 </linearGradient>
+<polygon id="base" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" />
 </defs>
-
-  <polygon points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_1); stroke: black;"/>
-  <polygon transform="translate(45, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_2); stroke: black;"/>
-  <polygon fill-opacity="0.5" transform="translate(90, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_2); stroke: black;"/>
-  <polygon transform="translate(135, 0)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_3); stroke: black;"/>
+  <use href="#base" style="fill: url(#three_stops_1); stroke: black;"/>
+  <use href="#base"  transform="translate(45, 0)" style="fill: url(#three_stops_2); stroke: black;"/>
+  <use href="#base"  fill-opacity="0.5" transform="translate(90, 0)" style="fill: url(#three_stops_2); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 0)" style="fill: url(#three_stops_3); stroke: black;"/>
   <polygon transform="translate(0, 45)" points="5,5 80,5 80,40 5,40 5,35 75,35 75,10 5,10" style="fill: url(#three_stops_4); stroke: black;"/>
-  <polygon transform="translate(90, 45)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_5); stroke: black;"/>
-  <polygon transform="translate(135, 45)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_6); stroke: black;"/>
-  <polygon transform="translate(0, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_7); stroke: black;"/>
-  <polygon transform="translate(45, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_8); stroke: black;"/>
-  <polygon transform="translate(90, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_9); stroke: black;"/>
-  <polygon transform="translate(135, 90)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_10); stroke: black;"/>
-  <polygon transform="translate(0, 135)" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" style="fill: url(#three_stops_11); stroke: black;"/>
-
+  <use href="#base"  transform="translate(90, 45)" style="fill: url(#three_stops_5); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 45)" style="fill: url(#three_stops_6); stroke: black;"/>
+  <use href="#base"  transform="translate(0, 90)" style="fill: url(#three_stops_7); stroke: black;"/>
+  <use href="#base"  transform="translate(45, 90)"  style="fill: url(#three_stops_8); stroke: black;"/>
+  <use href="#base"  transform="translate(90, 90)" style="fill: url(#three_stops_9); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 90)" style="fill: url(#three_stops_10); stroke: black;"/>
+  <use href="#base"  transform="translate(0, 135)" style="fill: url(#three_stops_11); stroke: black;"/>
 </svg>
