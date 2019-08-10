@@ -212,11 +212,12 @@
     var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
-
+    assert.equal(gradient.type, 'linear');
     assert.equal(gradient.coords.x1, 0);
     assert.equal(gradient.coords.y1, 0);
-    assert.equal(gradient.coords.x2, 100);
+    assert.equal(gradient.coords.x2, 1);
     assert.equal(gradient.coords.y2, 0);
+    assert.equal(gradient.gradientUnits, 'percentage');
 
     assert.equal(gradient.colorStops[0].offset, 1);
     assert.equal(gradient.colorStops[1].offset, 0);
@@ -254,10 +255,11 @@
 
     assert.ok(gradient instanceof fabric.Gradient);
 
-    assert.equal(gradient.coords.x1, 20);
-    assert.equal(gradient.coords.y1, 0.4);
-    assert.equal(gradient.coords.x2, 40000);
-    assert.equal(gradient.coords.y2, 40);
+    assert.equal(gradient.coords.x1, 0.1);
+    assert.equal(gradient.coords.y1, 0.002);
+    assert.equal(gradient.coords.x2, 200);
+    assert.equal(gradient.coords.y2, 0.2);
+    assert.equal(gradient.gradientUnits, 'percentage');
   });
 
   QUnit.test('fromElement linearGradient with floats percentage - userSpaceOnUse', function(assert) {
@@ -282,15 +284,20 @@
     element.appendChild(stop1);
     element.appendChild(stop2);
 
-    var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var object = new fabric.Object({left: 10, top: 15, width: 200, height: 200 });
+    var gradient = fabric.Gradient.fromElement(element, object, '', {
+      viewBoxWidth: 400,
+      viewBoxHeight: 300,
+    });
 
     assert.ok(gradient instanceof fabric.Gradient);
-
-    assert.equal(gradient.coords.x1, 0.1);
-    assert.equal(gradient.coords.y1, 0.002);
+    assert.equal(gradient.gradientUnits, 'pixels');
+    assert.equal(gradient.offsetX, -10);
+    assert.equal(gradient.offsetY, -15);
+    assert.equal(gradient.coords.x1, 40);
+    assert.equal(gradient.coords.y1, 0.6);
     assert.equal(gradient.coords.x2, 200);
-    assert.equal(gradient.coords.y2, 0.2);
+    assert.equal(gradient.coords.y2, 60);
   });
 
   QUnit.test('fromElement linearGradient with Infinity', function(assert) {
@@ -314,14 +321,14 @@
     element.appendChild(stop1);
     element.appendChild(stop2);
 
-    var object = new fabric.Object({ width: 100, height: 100, top: 0, left: 0 });
+    var object = new fabric.Object({ width: 100, height: 300, top: 20, left: 30 });
     var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
 
     assert.equal(gradient.coords.x1, 0);
-    assert.equal(gradient.coords.y1, 100);
-    assert.equal(gradient.coords.x2, 100);
+    assert.equal(gradient.coords.y1, 1);
+    assert.equal(gradient.coords.x2, 1);
     assert.equal(gradient.coords.y2, 0);
 
     assert.equal(gradient.colorStops[0].offset, 1);
@@ -370,16 +377,16 @@
 
     var object = new fabric.Object({ width: 200, height: 200 });
     var gradient = fabric.Gradient.fromElement(element, object, '');
-    assert.equal(gradient.coords.x1, 60);
-    assert.equal(gradient.coords.y1, 20);
-    assert.equal(gradient.coords.x2, 40);
-    assert.equal(gradient.coords.y2, 200);
+    assert.equal(gradient.coords.x1, 0.3);
+    assert.equal(gradient.coords.y1, 0.1);
+    assert.equal(gradient.coords.x2, 0.2);
+    assert.equal(gradient.coords.y2, 1);
     object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
     gradient = fabric.Gradient.fromElement(element, object, '');
-    assert.equal(gradient.coords.x1, 70);
-    assert.equal(gradient.coords.y1, 70);
-    assert.equal(gradient.coords.x2, 50);
-    assert.equal(gradient.coords.y2, 250);
+    assert.equal(gradient.coords.x1, 0.3, 'top and left do not change the output');
+    assert.equal(gradient.coords.y1, 0.1, 'top and left do not change the output');
+    assert.equal(gradient.coords.x2, 0.2, 'top and left do not change the output');
+    assert.equal(gradient.coords.y2, 1, 'top and left do not change the output');
   });
 
   QUnit.test('fromElement with x1,x2,y1,2 radial', function(assert) {
@@ -395,21 +402,21 @@
 
     var object = new fabric.Object({ width: 200, height: 200 });
     var gradient = fabric.Gradient.fromElement(element, object, '');
-    assert.equal(gradient.coords.x1, 60, 'should change with width height');
-    assert.equal(gradient.coords.y1, 40, 'should change with width height');
-    assert.equal(gradient.coords.x2, 20, 'should change with width height');
-    assert.equal(gradient.coords.y2, 200, 'should change with width height');
-    assert.equal(gradient.coords.r1, 0, 'should change with width height');
-    assert.equal(gradient.coords.r2, 200, 'should change with width height');
+    assert.equal(gradient.coords.x1, 0.3, 'should not change with width height');
+    assert.equal(gradient.coords.y1, 0.2, 'should not change with width height');
+    assert.equal(gradient.coords.x2, 0.1, 'should not change with width height');
+    assert.equal(gradient.coords.y2, 1, 'should not change with width height');
+    assert.equal(gradient.coords.r1, 0, 'should not change with width height');
+    assert.equal(gradient.coords.r2, 1, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
     gradient = fabric.Gradient.fromElement(element, object, '');
-    assert.equal(gradient.coords.x1, 70, 'should change with top left');
-    assert.equal(gradient.coords.y1, 50, 'should change with top left');
-    assert.equal(gradient.coords.x2, 30, 'should change with top left');
-    assert.equal(gradient.coords.y2, 210, 'should change with top left');
-    assert.equal(gradient.coords.r1, 10, 'should change with top left');
-    assert.equal(gradient.coords.r2, 210, 'should change with top left');
+    assert.equal(gradient.coords.x1, 0.3, 'should not change with top left');
+    assert.equal(gradient.coords.y1, 0.2, 'should not change with top left');
+    assert.equal(gradient.coords.x2, 0.1, 'should not change with top left');
+    assert.equal(gradient.coords.y2, 1, 'should not change with top left');
+    assert.equal(gradient.coords.r1, 0, 'should not change with top left');
+    assert.equal(gradient.coords.r2, 1, 'should not change with top left');
   });
 
   QUnit.test('fromElement with x1,x2,y1,2 radial userSpaceOnUse', function(assert) {
@@ -469,7 +476,7 @@
     assert.equal(gradient.coords.y2, 18, 'should not change with top left');
   });
 
-  QUnit.test('fromElement radialGradient', function(assert) {
+  QUnit.test('fromElement radialGradient defaults', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var element = fabric.document.createElement('radialGradient');
@@ -486,14 +493,16 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, '', {});
 
     assert.ok(gradient instanceof fabric.Gradient);
 
-    assert.equal(gradient.coords.x1, 50);
-    assert.equal(gradient.coords.y1, 50);
-    assert.equal(gradient.coords.x2, 50);
-    assert.equal(gradient.coords.y2, 50);
+    assert.equal(gradient.coords.x1, 0.5);
+    assert.equal(gradient.coords.y1, 0.5);
+    assert.equal(gradient.coords.x2, 0.5);
+    assert.equal(gradient.coords.y2, 0.5);
+    assert.equal(gradient.coords.r1, 0);
+    assert.equal(gradient.coords.r2, 0.5);
 
     assert.equal(gradient.colorStops[0].offset, 1);
     assert.equal(gradient.colorStops[1].offset, 0);
@@ -519,20 +528,7 @@
     element.appendChild(stop2);
     element.setAttribute('gradientTransform', 'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)');
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
-
-    assert.ok(gradient instanceof fabric.Gradient);
-
-    assert.equal(gradient.coords.x1, 50);
-    assert.equal(gradient.coords.y1, 50);
-    assert.equal(gradient.coords.x2, 50);
-    assert.equal(gradient.coords.y2, 50);
-
-    assert.equal(gradient.colorStops[0].offset, 1);
-    assert.equal(gradient.colorStops[1].offset, 0);
-
-    assert.equal(gradient.colorStops[0].color, 'rgb(0,0,0)');
-    assert.equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
+    var gradient = fabric.Gradient.fromElement(element, object, '', {});
     assert.deepEqual(gradient.gradientTransform, [3.321, -0.6998, 0.4077, 1.9347, -440.9168, -408.0598]);
   });
 
@@ -574,7 +570,7 @@
 
     assert.equal(gradient.coords.x1, 0);
     assert.equal(gradient.coords.y1, 0);
-    assert.equal(gradient.coords.x2, 100);
+    assert.equal(gradient.coords.x2, 1);
     assert.equal(gradient.coords.y2, 0);
 
     assert.equal(gradient.colorStops[0].offset, 1);
@@ -628,11 +624,6 @@
     var gradient = fabric.Gradient.fromElement(element, object, '');
 
     assert.ok(gradient instanceof fabric.Gradient);
-
-    assert.equal(gradient.coords.x1, 50);
-    assert.equal(gradient.coords.y1, 50);
-    assert.equal(gradient.coords.x2, 50);
-    assert.equal(gradient.coords.y2, 50);
 
     assert.equal(gradient.colorStops[0].offset, 1);
     assert.equal(gradient.colorStops[1].offset, 0.75);
