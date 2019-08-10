@@ -165,7 +165,7 @@
     /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
-     * @param {Array} transform 6 number trasnform matrix
+     * @param {Array} [transform] 6 number trasnform matrix
      * @return {Object} Object with left, top, width, height properties
      */
     makeBoundingBoxFromPoints: function(points, transform) {
