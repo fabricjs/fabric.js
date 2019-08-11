@@ -1474,7 +1474,7 @@
       var t = filler.gradientTransform || filler.patternTransform;
       var offsetX = -this.width / 2 + filler.offsetX || 0,
           offsetY = -this.height / 2 + filler.offsetY || 0;
-      // ctx.translate(offsetX, offsetY);
+
       if (filler.gradientUnits === 'percentage') {
         ctx.transform(this.width, 0, 0, this.height, offsetX, offsetY);
       }

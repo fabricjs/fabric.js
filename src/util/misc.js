@@ -165,14 +165,14 @@
     /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
-     * @param {Array} [transform] 6 number trasnform matrix
+     * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
      */
     makeBoundingBoxFromPoints: function(points, transform) {
       if (transform) {
-        points = points.map(function(point) {
-          return fabric.util.transformPoint(point, transform);
-        });
+        for (var i = 0; i < points.length; i++) {
+          points[i] = fabric.util.transformPoint(points[i], transform);
+        }
       }
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
           minX = fabric.util.array.min(xPoints),
@@ -687,6 +687,16 @@
       };
     },
 
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle] angle in degrees
+     * @return {Array[Number]} transform matrix
+     */
     calcRotateMatrix: function(options) {
       if (!options.angle) {
         return fabric.iMatrix.concat();
@@ -697,20 +707,45 @@
       return [cos, sin, -sin, cos, 0, 0];
     },
 
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet.
+     * is called DimensionsTransformMatrix because those properties are the one that influence
+     * the size of the resulting box of the object.
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @return {Array[Number]} transform matrix
+     */
     calcDimensionsMatrix: function(options) {
       var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
           scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
-          scaleMatrix = [scaleX, 0, 0, scaleY, 0, 0];
+          scaleMatrix = [
+            options.flipX ? -scaleX : scaleX,
+            0,
+            0,
+            options.flipY ? -scaleY : scaleY,
+            0,
+            0],
+          multiply = fabric.util.multiplyTransformMatrices,
+          degreesToRadians = fabric.util.degreesToRadians;
       if (options.skewX) {
-        scaleMatrix = fabric.util.multiplyTransformMatrices(
+        scaleMatrix = multiply(
           scaleMatrix,
-          [1, 0, Math.tan(fabric.util.degreesToRadians(options.skewX)), 1],
+          [1, 0, Math.tan(degreesToRadians(options.skewX)), 1],
           true);
       }
       if (options.skewY) {
-        scaleMatrix = fabric.util.multiplyTransformMatrices(
+        scaleMatrix = multiply(
           scaleMatrix,
-          [1, Math.tan(fabric.util.degreesToRadians(options.skewY)), 0, 1],
+          [1, Math.tan(degreesToRadians(options.skewY)), 0, 1],
           true);
       }
       return scaleMatrix;
@@ -718,13 +753,16 @@
 
     /**
      * Returns a transform matrix starting from an object of the same kind of
-     * the one returned from qrDecompose
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
      * @static
      * @memberOf fabric.util
      * @param  {Object} options
      * @param  {Number} [options.angle]
      * @param  {Number} [options.scaleX]
      * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.translateX]
@@ -732,20 +770,30 @@
      * @return {Array[Number]} transform matrix
      */
     componeMatrix: function(options) {
-      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0];
+      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
+          multiply = fabric.util.multiplyTransformMatrices;
       if (options.angle) {
-        matrix = fabric.util.multiplyTransformMatrices(matrix, fabric.util.calcRotateMatrix(options));
+        matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
       }
-      if (options.scaleX || options.scaleY || options.skewX || options.skewY) {
-        matrix = fabric.util.multiplyTransformMatrices(matrix, fabric.util.calcDimensionsMatrix(options));
+      if (options.scaleX || options.scaleY || options.skewX || options.skewY || options.flipX || options.flipY) {
+        matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
       }
       return matrix;
     },
 
+    /**
+     * Returns a transform matrix that has the same effect of scaleX, scaleY and skewX.
+     * Is deprecated for composeMatrix. Please do not use it.
+     * @static
+     * @deprecated since 3.4.0
+     * @memberOf fabric.util
+     * @param  {Number} scaleX
+     * @param  {Number} scaleY
+     * @param  {Number} skewX
+     * @return {Array[Number]} transform matrix
+     */
     customTransformMatrix: function(scaleX, scaleY, skewX) {
-      var skewMatrixX = [1, 0, abs(Math.tan(skewX * PiBy180)), 1],
-          scaleMatrix = [abs(scaleX), 0, 0, abs(scaleY)];
-      return fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+      return fabric.util.componeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
     },
 
     /**
