@@ -541,6 +541,14 @@
       return cache.value;
     },
 
+    /*
+     * Calculate object dimensions from its properties
+     * @private
+     * @deprecated since 3.4.0, please use fabric.util._calcDimensionsTransformMatrix
+     * not including or including flipX, flipY to emulate the flipping boolean
+     * @return {Object} .x width dimension
+     * @return {Object} .y height dimension
+     */
     _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
       return fabric.util.calcDimensionsMatrix({
         skewX: skewX,
@@ -613,9 +621,13 @@
               x: dimX,
               y: dimY
             }],
-          transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY, false),
-          bbox;
-      bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+          transformMatrix = fabric.util.calcDimensionsMatrix({
+            scaleX: this.scaleX,
+            scaleY: this.scaleY,
+            skewX: this.skewX,
+            skewY: this.skewY,
+          }),
+          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
       return this._finalizeDimensions(bbox.width, bbox.height);
     },
 

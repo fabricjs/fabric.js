@@ -143,7 +143,7 @@
     assert.equal(object.coords.x2, gradient.coords.x2);
     assert.equal(object.coords.y1, gradient.coords.y1);
     assert.equal(object.coords.y2, gradient.coords.y2);
-
+    assert.equal(object.gradientUnits, gradient.gradientUnits);
     assert.equal(object.type, gradient.type);
     assert.deepEqual(object.gradientTransform, gradient.gradientTransform);
     assert.equal(object.colorStops, gradient.colorStops);
@@ -640,6 +640,8 @@
     assert.equal(gradient.colorStops[2].opacity, 1);
     assert.equal(gradient.colorStops[3].opacity, 1);
   });
+
+
 
   QUnit.test('forObject linearGradient', function(assert) {
     assert.ok(typeof fabric.Gradient.forObject === 'function');
