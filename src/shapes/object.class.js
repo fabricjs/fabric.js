@@ -1772,6 +1772,7 @@
 
     /**
      * Sets gradient (fill or stroke) of an object
+     * percentages for x1,x2,y1,y2,r1,r2 together with gradientUnits 'pixels', are not supported.
      * <b>Backwards incompatibility note:</b> This method was named "setGradientFill" until v1.1.0
      * @param {String} property Property name 'stroke' or 'fill'
      * @param {Object} [options] Options object
@@ -1786,6 +1787,7 @@
      * @param {Object} [options.gradientTransform] transformMatrix for gradient
      * @return {fabric.Object} thisArg
      * @chainable
+     * @deprecated since 3.4.0
      * @see {@link http://jsfiddle.net/fabricjs/58y8b/|jsFiddle demo}
      * @example <caption>Set linear gradient</caption>
      * object.setGradient('fill', {
@@ -1830,7 +1832,7 @@
         x2: options.x2,
         y2: options.y2
       };
-
+      gradient.gradientUnits = options.gradientUnits || 'pixels';
       if (options.r1 || options.r2) {
         gradient.coords.r1 = options.r1;
         gradient.coords.r2 = options.r2;

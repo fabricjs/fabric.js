@@ -664,7 +664,7 @@
     },
 
     /**
-     * Decomposes standard 2x3 matrix into transform componentes
+     * Decomposes standard 2x3 matrix into transform components
      * @static
      * @memberOf fabric.util
      * @param  {Array} a transformMatrix

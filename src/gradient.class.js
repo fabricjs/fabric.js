@@ -96,8 +96,10 @@
     offsetY: 0,
 
     /**
-     * A transform matrix to apply to the gradient before paiting.
-     * It shares the same name with the svg property but behaves differently.
+     * A transform matrix to apply to the gradient before painting.
+     * Imported from svg gradients, is not applied with the current transform in the center.
+     * Before this transform is applied, the origin point is at the top left corner of the object
+     * plus the addition of offsetY and offsetX.
      * @type Array[Number]
      * @default null
      */
@@ -105,7 +107,7 @@
 
     /**
      * coordinates units for coords.
-     * If `pixels`, the number of cords are in the same unit of width/ height.
+     * If `pixels`, the number of coords are in the same unit of width / height.
      * If set as `percentage` the coords are still a number, but 1 means 100% of width
      * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
      * @type String pixels || percentage
@@ -123,24 +125,25 @@
     /**
      * Constructor
      * @param {Object} options Options object with type, coords, gradientUnits and colorStops
-     * @param {Object} [options.type] gradient type
+     * @param {Object} [options.type] gradient type linear or radial
      * @param {Object} [options.gradientUnits] gradient units
      * @param {Object} [options.offsetX] SVG import compatibility
      * @param {Object} [options.offsetY] SVG import compatibility
-     * @param {Object} options.coords contains the coords of the gradient
      * @param {Array[Object]} options.colorStops contains the colorstops.
-     * @param {Number} [options.coords.x1]
-     * @param {Number} [options.coords.y1]
-     * @param {Number} [options.coords.x2]
-     * @param {Number} [options.coords.y2]
-     * @param {Number} [options.coords.r1]
-     * @param {Number} [options.coords.r2]
+     * @param {Object} options.coords contains the coords of the gradient
+     * @param {Number} [options.coords.x1] X coordiante of the first point for linear or of the focal point for radial
+     * @param {Number} [options.coords.y1] Y coordiante of the first point for linear or of the focal point for radial
+     * @param {Number} [options.coords.x2] X coordiante of the second point for linear or of the center point for radial
+     * @param {Number} [options.coords.y2] Y coordiante of the second point for linear or of the center point for radial
+     * @param {Number} [options.coords.r1] only for radial gradient, radius of the inner circle
+     * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
      * @return {fabric.Gradient} thisArg
      */
     initialize: function(options) {
       options || (options = { });
+      options.coords || (options.coords = { });
 
-      var coords = { }, _this = this;
+      var coords, _this = this;
 
       // sets everything, then coords and colorstops get sets again
       Object.keys(options).forEach(function(option) {
@@ -340,6 +343,12 @@
      * @param {SVGGradientElement} el SVG gradient element
      * @param {fabric.Object} instance
      * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
+     * @param {Object} svgOptions an object containing the size of the SVG in order to parse correctly graidents
+     * that uses gradientUnits as 'userSpaceOnUse' and percentages.
+     * @param {Object.number} viewBoxWidth width part of the viewBox attribute on svg
+     * @param {Object.number} viewBoxHeight height part of the viewBox attribute on svg
+     * @param {Object.number} width width part of the svg tag if viewBox is not specified
+     * @param {Object.number} height height part of the svg tag if viewBox is not specified
      * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
@@ -431,14 +440,20 @@
 
     /**
      * Returns {@link fabric.Gradient} instance from its object representation
+     * this function is uniquely used by Object.setGradient and is deprecated with it.
      * @static
+     * @deprecated since 3.4.0
      * @memberOf fabric.Gradient
      * @param {Object} obj
      * @param {Object} [options] Options object
      */
     forObject: function(obj, options) {
       options || (options = { });
-      __convertPercentUnitsToValues(obj, options.coords);
+      __convertPercentUnitsToValues(obj, options.coords, options.gradientUnits, {
+        // those values are to avoid errors. this function is uniquely used by
+        viewBoxWidth: 100,
+        viewBoxHeight: 100,
+      });
       return new fabric.Gradient(options);
     }
   });
