@@ -216,23 +216,33 @@
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2,
           transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
-          offsetX = object.width / 2 - this.offsetX, offsetY = object.height / 2 - this.offsetY,
-          withViewport = !!options.additionalTransform;
+          offsetX = -this.offsetX, offsetY = -this.offsetY,
+          withViewport = !!options.additionalTransform,
+          gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
       // colorStops must be sorted ascending
       colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
 
+      if (gradientUnits === 'objectBoundingBox') {
+        offsetX /= object.width;
+        offsetY /= object.height;
+      }
+      else {
+        offsetX += object.width / 2;
+        offsetY += object.height / 2;
+      }
       if (object.type === 'path') {
         offsetX -= object.pathOffset.x;
         offsetY -= object.pathOffset.y;
       }
 
+
       transform[4] -= offsetX;
       transform[5] -= offsetY;
 
       commonAttributes = 'id="SVGID_' + this.id +
-                     '" gradientUnits="userSpaceOnUse"';
+                     '" gradientUnits="' + gradientUnits + '"';
       commonAttributes += ' gradientTransform="' + (withViewport ?
         options.additionalTransform + ' ' : '') + fabric.util.matrixToSVG(transform) + '" ';
 
