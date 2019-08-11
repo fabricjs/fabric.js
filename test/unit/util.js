@@ -917,6 +917,27 @@
     assert.equal(options.translateY, 200, 'imatrix has translateY 200');
   });
 
+  QUnit.test('composeMatrix with defaults', function(assert) {
+    assert.ok(typeof fabric.util.composeMatrix === 'function');
+    var matrix = fabric.util.composeMatrix({
+      scaleX: 2,
+      scaleY: 3,
+      skewX: 28,
+      angle: 11,
+      translateX: 100,
+      translateY: 200,
+    }).map(function(val) {
+      return fabric.util.toFixed(val, 2);
+    });
+    assert.deepEqual(matrix, [1.96, 0.38, 0.47, 3.15, 100, 200], 'default is identity matrix');
+  });
+
+  QUnit.test('composeMatrix with options', function(assert) {
+    assert.ok(typeof fabric.util.composeMatrix === 'function');
+    var matrix = fabric.util.composeMatrix({});
+    assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
+  });
+
   QUnit.test('drawArc', function(assert) {
     assert.ok(typeof fabric.util.drawArc === 'function');
     var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});

@@ -769,7 +769,7 @@
      * @param  {Number} [options.translateY]
      * @return {Array[Number]} transform matrix
      */
-    componeMatrix: function(options) {
+    composeMatrix: function(options) {
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
           multiply = fabric.util.multiplyTransformMatrices;
       if (options.angle) {
@@ -793,7 +793,7 @@
      * @return {Array[Number]} transform matrix
      */
     customTransformMatrix: function(scaleX, scaleY, skewX) {
-      return fabric.util.componeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
+      return fabric.util.composeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
     },
 
     /**
