@@ -523,22 +523,22 @@
       return matrix;
     },
 
+    /**
+     * calculate transform matrix that represents the current transformations from the
+     * object's properties, this matrix does not include the group transformation
+     * @return {Array} transform matrix for the object
+     */
     calcOwnMatrix: function() {
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
-      var matrix = this._calcTranslateMatrix(),
-          rotateMatrix,
-          dimensionMatrix = this._calcDimensionsTransformMatrix(this.skewX, this.skewY, true);
-      if (this.angle) {
-        rotateMatrix = this._calcRotateMatrix();
-        matrix = multiplyMatrices(matrix, rotateMatrix);
-      }
-      matrix = multiplyMatrices(matrix, dimensionMatrix);
+      var tMatrix = this._calcTranslateMatrix();
+      this.translateX = tMatrix[4];
+      this.translateY = tMatrix[5];
       cache.key = key;
-      cache.value = matrix;
-      return matrix;
+      cache.value = fabric.util.composeMatrix(this);
+      return cache.value;
     },
 
     _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {

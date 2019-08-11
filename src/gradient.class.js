@@ -197,6 +197,7 @@
         colorStops: this.colorStops,
         offsetX: this.offsetX,
         offsetY: this.offsetY,
+        gradientUnits: this.gradientUnits,
         gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
       };
       fabric.util.populateWithProperties(this, object, propertiesToInclude);

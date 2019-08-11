@@ -3,7 +3,6 @@
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
-      abs = Math.abs,
       PiBy180 = Math.PI / 180,
       PiBy2 = Math.PI / 2;
 
