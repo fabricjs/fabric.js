@@ -641,8 +641,6 @@
     assert.equal(gradient.colorStops[3].opacity, 1);
   });
 
-
-
   QUnit.test('forObject linearGradient', function(assert) {
     assert.ok(typeof fabric.Gradient.forObject === 'function');
 
