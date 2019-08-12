@@ -2,9 +2,10 @@
 
   QUnit.module('fabric.Gradient');
 
-  function createLinearGradient() {
+  function createLinearGradient(units) {
     return new fabric.Gradient({
       type: 'linear',
+      gradientUnits: units || 'pixels',
       coords: {
         x1: 0,
         y1: 10,
@@ -18,9 +19,10 @@
     });
   }
 
-  function createRadialGradient() {
+  function createRadialGradient(units) {
     return new fabric.Gradient({
       type: 'radial',
+      gradientUnits: units || 'pixels',
       coords: {
         x1: 0,
         y1: 10,
@@ -76,7 +78,8 @@
   var SVG_RADIAL = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"100\" cy=\"200\" r=\"50\" fx=\"0\" fy=\"10\">\n<stop offset=\"0%\" style=\"stop-color:red;\"/>\n<stop offset=\"100%\" style=\"stop-color:green;stop-opacity: 0\"/>\n</radialGradient>\n';
   var SVG_INTERNALRADIUS = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"100\" cy=\"200\" r=\"50\" fx=\"0\" fy=\"10\">\n<stop offset=\"20%\" style=\"stop-color:red;\"/>\n<stop offset=\"100%\" style=\"stop-color:green;stop-opacity: 0\"/>\n</radialGradient>\n';
   var SVG_SWAPPED = '<radialGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 -50 -50)\"  cx=\"0\" cy=\"10\" r=\"50\" fx=\"100\" fy=\"200\">\n<stop offset=\"20%\" style=\"stop-color:green;stop-opacity: 0\"/>\n<stop offset=\"100%\" style=\"stop-color:red;\"/>\n</radialGradient>\n';
-
+  var SVG_LINEAR_PERCENTAGE = '<linearGradient id=\"SVGID_0\" gradientUnits=\"objectBoundingBox\" gradientTransform=\"matrix(1 0 0 1 0 0)\"  x1=\"0\" y1=\"10\" x2=\"100\" y2=\"200\">\n<stop offset=\"0%\" style=\"stop-color:red;stop-opacity: 0\"/>\n<stop offset=\"100%\" style=\"stop-color:green;\"/>\n</linearGradient>\n';
+  var SVG_RADIAL_PERCENTAGE = '<radialGradient id=\"SVGID_0\" gradientUnits=\"objectBoundingBox\" gradientTransform=\"matrix(1 0 0 1 0 0)\"  cx=\"100\" cy=\"200\" r=\"50\" fx=\"0\" fy=\"10\">\n<stop offset=\"0%\" style=\"stop-color:red;\"/>\n<stop offset=\"100%\" style=\"stop-color:green;stop-opacity: 0\"/>\n</radialGradient>\n';
 
   QUnit.test('constructor linearGradient', function(assert) {
     assert.ok(fabric.Gradient);
@@ -761,11 +764,25 @@
     assert.equal(gradient.toSVG(obj), SVG_INTERNALRADIUS);
   });
 
-  QUnit.test('toSVG radial with r1 > 0', function(assert) {
+  QUnit.test('toSVG radial with r1 > 0 swapped', function(assert) {
     fabric.Object.__uid = 0;
     var gradient = createRadialGradientSwapped();
     var obj = new fabric.Object({ width: 100, height: 100 });
     assert.equal(gradient.toSVG(obj), SVG_SWAPPED);
+  });
+
+  QUnit.test('toSVG linear objectBoundingBox', function(assert) {
+    fabric.Object.__uid = 0;
+    var gradient = createLinearGradient('percentage');
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    assert.equal(gradient.toSVG(obj), SVG_LINEAR_PERCENTAGE);
+  });
+
+  QUnit.test('toSVG radial objectBoundingBox', function(assert) {
+    fabric.Object.__uid = 0;
+    var gradient = createRadialGradient('percentage');
+    var obj = new fabric.Object({ width: 100, height: 100 });
+    assert.equal(gradient.toSVG(obj), SVG_RADIAL_PERCENTAGE);
   });
 
 })();
