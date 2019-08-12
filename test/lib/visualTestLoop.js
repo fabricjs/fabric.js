@@ -49,6 +49,7 @@
     var finalName = '/assets/' + filename + '.svg';
     return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
   }
+  exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;

@@ -58,6 +58,7 @@
     'svg_linear_6',
     'svg_linear_7',
     'svg_linear_8',
+    'svg_linear_9',
     'svg_radial_1',
     'svg_radial_2',
     'svg_radial_3',
@@ -76,7 +77,7 @@
     'clippath-7',
     'clippath-9',
     'vector-effect',
-    'svg-with-no-dim-rect'
+    'svg-with-no-dim-rect',
     //'clippath-8',
   ].map(createTestFromSVG);
 
