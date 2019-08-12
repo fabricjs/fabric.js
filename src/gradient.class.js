@@ -150,7 +150,12 @@
         _this[option] = options[option];
       });
 
-      !this.id && (this.id = fabric.Object.__uid++);
+      if (this.id) {
+        this.id += '_' + fabric.Object.__uid++;
+      }
+      else {
+        this.id = fabric.Object.__uid++;
+      }
 
       coords = {
         x1: options.coords.x1 || 0,
