@@ -2,11 +2,14 @@
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
   var visualTestLoop;
+  var getAssetName;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
+    getAssetName = global.getAssetName;
   }
   else {
     visualTestLoop = window.visualTestLoop;
+    getAssetName = window.getAssetName;
   }
 
   function svgToDataURL(svgStr) {
@@ -388,13 +391,21 @@
     });
   }
 
+  function multipleGradients(canvas, callback) {
+    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
+      var group = fabric.util.groupSVGElements(objects);
+      canvas.add(group);
+      toSVGCanvas(canvas, callback);
+    });
+  }
+
   tests.push({
-    test: 'Group with opacity and shadow',
-    code: group1,
-    golden: 'group-svg-1.png',
+    test: 'Multiple gradients import',
+    code: multipleGradients,
+    golden: 'multipleGradients.png',
     percentage: 0.06,
-    width: 210,
-    height: 230,
+    width: 760,
+    height: 760,
   });
   tests.forEach(visualTestLoop(QUnit));
 })();

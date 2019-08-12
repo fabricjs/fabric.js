@@ -9,6 +9,7 @@ global.visualCallback = {
 global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
 global.getFixture = require('./lib/visualTestLoop').getFixture;
 global.getAsset = require('./lib/visualTestLoop').getAsset;
+global.getAssetName = require('./lib/visualTestLoop').getAssetName;
 global.imageDataToChalk = function(imageData) {
   // actually this does not work on travis-ci, so commenting it out
   return '';
