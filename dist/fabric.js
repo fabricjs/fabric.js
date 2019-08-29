@@ -10814,6 +10814,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       oldObjects.forEach(function(oldObject) {
         if (objects.indexOf(oldObject) === -1) {
           somethingChanged = true;
+          opt.object = oldObject;
           oldObject.fire('deselected', opt);
           removed.push(oldObject);
         }
@@ -10821,6 +10822,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       objects.forEach(function(object) {
         if (oldObjects.indexOf(object) === -1) {
           somethingChanged = true;
+          opt.object = object;
           object.fire('selected', opt);
           added.push(object);
         }
