@@ -1310,7 +1310,7 @@ fabric.CommonMethods = {
      * @memberOf fabric.util
      * @param  {Object} options
      * @param  {Number} [options.angle] angle in degrees
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     calcRotateMatrix: function(options) {
       if (!options.angle) {
@@ -1337,7 +1337,7 @@ fabric.CommonMethods = {
      * @param  {Boolean} [options.flipY]
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.skewX]
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     calcDimensionsMatrix: function(options) {
       var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
@@ -1382,7 +1382,7 @@ fabric.CommonMethods = {
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.translateX]
      * @param  {Number} [options.translateY]
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     composeMatrix: function(options) {
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
@@ -1405,7 +1405,7 @@ fabric.CommonMethods = {
      * @param  {Number} scaleX
      * @param  {Number} scaleY
      * @param  {Number} skewX
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     customTransformMatrix: function(scaleX, scaleY, skewX) {
       return fabric.util.composeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
@@ -5788,7 +5788,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * Imported from svg gradients, is not applied with the current transform in the center.
      * Before this transform is applied, the origin point is at the top left corner of the object
      * plus the addition of offsetY and offsetX.
-     * @type Number[]
+     * @type Array[Number]
      * @default null
      */
     gradientTransform: null,
@@ -5798,15 +5798,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * If `pixels`, the number of coords are in the same unit of width / height.
      * If set as `percentage` the coords are still a number, but 1 means 100% of width
      * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
-     * allowed values pixels or percentage.
-     * @type String
+     * @type String pixels || percentage
      * @default 'pixels'
      */
     gradientUnits: 'pixels',
 
     /**
-     * Gradient type linear or radial
-     * @type String
+     * Gradient type
+     * @type String linear || radial
      * @default 'pixels'
      */
     type: 'linear',
@@ -5818,7 +5817,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {Object} [options.gradientUnits] gradient units
      * @param {Object} [options.offsetX] SVG import compatibility
      * @param {Object} [options.offsetY] SVG import compatibility
-     * @param {Object[]} options.colorStops contains the colorstops.
+     * @param {Array[Object]} options.colorStops contains the colorstops.
      * @param {Object} options.coords contains the coords of the gradient
      * @param {Number} [options.coords.x1] X coordiante of the first point for linear or of the focal point for radial
      * @param {Number} [options.coords.y1] Y coordiante of the first point for linear or of the focal point for radial
@@ -20386,8 +20385,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * needed to check if image needs resize
-     * @private
+     * @private, needed to check if image needs resize
      */
     _needsResize: function() {
       var scale = this.getTotalObjectScaling();
