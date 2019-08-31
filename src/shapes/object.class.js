@@ -1903,6 +1903,7 @@
      * @param {Function} [callback] Callback to invoke when image set as a pattern
      * @return {fabric.Object} thisArg
      * @chainable
+     * @deprecated since 3.5.0
      * @see {@link http://jsfiddle.net/fabricjs/QT3pa/|jsFiddle demo}
      * @example <caption>Set pattern</caption>
      * object.setPatternFill({
@@ -1923,6 +1924,7 @@
      * @param {Number} [options.offsetY=0] Shadow vertical offset
      * @return {fabric.Object} thisArg
      * @chainable
+     * @deprecated since 3.5.0
      * @see {@link http://jsfiddle.net/fabricjs/7gvJG/|jsFiddle demo}
      * @example <caption>Set shadow with string notation</caption>
      * object.setShadow('2px 2px 10px rgba(0,0,0,0.2)');
@@ -1944,6 +1946,7 @@
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
      * @param {String} color Color value
      * @return {fabric.Object} thisArg
+     * @deprecated since 3.5.0
      * @chainable
      */
     setColor: function(color) {
