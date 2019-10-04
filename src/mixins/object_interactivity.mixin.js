@@ -43,21 +43,44 @@
           continue;
         }
 
-        lines = this._getImageLines(this.oCoords[i].corner);
+        lines = fabric.util.object.clone(this._getImageLines(this.oCoords[i].corner), true);
+
+        var t = 'topline',
+            b = 'bottomline',
+            l = 'leftline',
+            r = 'rightline',
+            size = this.cornerRegionSize;
+
+        lines[t].d.x += size;
+        lines[t].o.x -= size;
+        lines[t].d.y += size;
+        lines[t].o.y += size;
+        lines[b].d.x += size;
+        lines[b].o.x -= size;
+        lines[b].d.y -= size;
+        lines[b].o.y -= size;
+        lines[l].d.x -= size;
+        lines[l].o.x -= size;
+        lines[l].d.y -= size;
+        lines[l].o.y += size;
+        lines[r].d.x += size;
+        lines[r].o.x += size;
+        lines[r].d.y += size;
+        lines[r].o.y -= size;
 
         // debugging
 
-        // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
 
-        // canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
 
-        // canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
 
-        // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
+        // canvas.getContext('2d').fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
         xPoints = this._findCrossPoints({ x: ex, y: ey }, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {

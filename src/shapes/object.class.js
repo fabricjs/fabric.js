@@ -170,6 +170,13 @@
     cornerSize:               13,
 
     /**
+     * Size of object's controlling corners' touch/click region (in pixels)
+     * @type Number
+     * @default
+     */
+    cornerRegionSize:         0,
+
+    /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
      * @default
