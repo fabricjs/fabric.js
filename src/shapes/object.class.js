@@ -1919,7 +1919,7 @@
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   fabric.Object._fromObject = function(className, object, callback, extraParam) {
-    var klass = fabric[className];
+    var klass = typeof className === 'function' ? className : fabric[className];
     object = clone(object, true);
     fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
       if (typeof patterns[0] !== 'undefined') {
