@@ -605,7 +605,7 @@
         fabric.charWidthsCache[fontFamily] = { };
       }
       var cache = fabric.charWidthsCache[fontFamily],
-          cacheProp = decl.fontStyle.toLowerCase() + '_' + (decl.fontWeight + '') + '_'+( decl.fontSize + '').toLowerCase();
+          cacheProp = `${decl.fontStyle.toLowerCase()}_${decl.fontWeight}_${decl.fontSize}`.toLowerCase();
       if (!cache[cacheProp]) {
         cache[cacheProp] = { };
       }
