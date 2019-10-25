@@ -396,12 +396,12 @@
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
   });
 
-  QUnit.test('getFontCache works with fontWeight and fontCache numbers', function(assert) {
-    var text = new fabric.Text('xxx', { fontWeight: 400, fontCache: 15 });
+  QUnit.test('getFontCache works with fontWeight and fontSize numbers', function(assert) {
+    var text = new fabric.Text('xxx', { fontWeight: 400, fontSize: 15 });
     text.initDimensions();
     var cache = fabric.charWidthsCache[text.fontFamily.toLowerCase()];
     var cacheProp = text.fontStyle + '_400_15';
-    assert.equal(cacheProp in cache, true, 'fontWeight and fontCache is converted to string');
+    assert.equal(cacheProp in cache, true, 'fontWeight and fontSize is converted to string');
   });
 
   QUnit.test('getFontCache is case insensitive', function(assert) {
