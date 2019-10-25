@@ -752,11 +752,11 @@
   QUnit.test('_measureChar handles 0 width chars', function(assert) {
     fabric.charWidthsCache = {};
     var zwc =  '\u200b';
-    var text = new fabric.Text('');
+    var text = new fabric.Text('',{fontSize:10});
     var style = text.getCompleteStyleDeclaration(0, 0);
     var box = text._measureChar('a', style, zwc, style);
     var box2 = text._measureChar('a', style, zwc, style);
-    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal_10[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 
