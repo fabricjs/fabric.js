@@ -22,7 +22,7 @@
    * @param {Function} [options.abort] Additional function with logic. If returns true, onComplete is called.
    */
   function animate(options) {
-
+    var cancel = false;
     requestAnimFrame(function(timestamp) {
       options || (options = { });
 
@@ -47,7 +47,12 @@
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
             valuePerc = Math.abs((current - startValue) / byValue);
-        if (abort()) {
+        if (cancel) {
+          return;
+        }
+        if (abort(current, valuePerc, timePerc)) {
+          // remove this in 4.0
+          // does to even make sense to abort and run onComplete?
           onComplete(endValue, 1, 1);
           return;
         }
@@ -62,6 +67,9 @@
         }
       })(start);
     });
+    return function() {
+      cancel = true;
+    };
   }
 
   var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
