@@ -276,17 +276,10 @@
       if (!this._isRetinaScaling()) {
         return;
       }
-      var scaleRatio = fabric.devicePixelRatio;
-      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
-      if (this.enableRetinaScalingUpper && this.upperCanvasEl) {
-        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
-      }
-    },
+      this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
+      this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
 
-    __initRetinaScaling: function(scaleRatio, canvas, context) {
-      canvas.setAttribute('width', this.width * scaleRatio);
-      canvas.setAttribute('height', this.height * scaleRatio);
-      context.scale(scaleRatio, scaleRatio);
+      this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
     },
 
     /**

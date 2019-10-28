@@ -1310,7 +1310,7 @@ fabric.CommonMethods = {
      * @memberOf fabric.util
      * @param  {Object} options
      * @param  {Number} [options.angle] angle in degrees
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     calcRotateMatrix: function(options) {
       if (!options.angle) {
@@ -1337,7 +1337,7 @@ fabric.CommonMethods = {
      * @param  {Boolean} [options.flipY]
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.skewX]
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     calcDimensionsMatrix: function(options) {
       var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
@@ -1382,7 +1382,7 @@ fabric.CommonMethods = {
      * @param  {Number} [options.skewX]
      * @param  {Number} [options.translateX]
      * @param  {Number} [options.translateY]
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     composeMatrix: function(options) {
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
@@ -1405,7 +1405,7 @@ fabric.CommonMethods = {
      * @param  {Number} scaleX
      * @param  {Number} scaleY
      * @param  {Number} skewX
-     * @return {Number[]} transform matrix
+     * @return {Array[Number]} transform matrix
      */
     customTransformMatrix: function(scaleX, scaleY, skewX) {
       return fabric.util.composeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
@@ -5788,7 +5788,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * Imported from svg gradients, is not applied with the current transform in the center.
      * Before this transform is applied, the origin point is at the top left corner of the object
      * plus the addition of offsetY and offsetX.
-     * @type Number[]
+     * @type Array[Number]
      * @default null
      */
     gradientTransform: null,
@@ -5798,15 +5798,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * If `pixels`, the number of coords are in the same unit of width / height.
      * If set as `percentage` the coords are still a number, but 1 means 100% of width
      * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
-     * allowed values pixels or percentage.
-     * @type String
+     * @type String pixels || percentage
      * @default 'pixels'
      */
     gradientUnits: 'pixels',
 
     /**
-     * Gradient type linear or radial
-     * @type String
+     * Gradient type
+     * @type String linear || radial
      * @default 'pixels'
      */
     type: 'linear',
@@ -5818,7 +5817,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {Object} [options.gradientUnits] gradient units
      * @param {Object} [options.offsetX] SVG import compatibility
      * @param {Object} [options.offsetY] SVG import compatibility
-     * @param {Object[]} options.colorStops contains the colorstops.
+     * @param {Array[Object]} options.colorStops contains the colorstops.
      * @param {Object} options.coords contains the coords of the gradient
      * @param {Number} [options.coords.x1] X coordiante of the first point for linear or of the focal point for radial
      * @param {Number} [options.coords.y1] Y coordiante of the first point for linear or of the focal point for radial
@@ -6873,17 +6872,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       if (!this._isRetinaScaling()) {
         return;
       }
-      var scaleRatio = fabric.devicePixelRatio;
-      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
-      if (this.enableRetinaScalingUpper && this.upperCanvasEl) {
-        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
-      }
-    },
+      this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
+      this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
 
-    __initRetinaScaling: function(scaleRatio, canvas, context) {
-      canvas.setAttribute('width', this.width * scaleRatio);
-      canvas.setAttribute('height', this.height * scaleRatio);
-      context.scale(scaleRatio, scaleRatio);
+      this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
     },
 
     /**
@@ -9659,18 +9651,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     fireMiddleClick: false,
 
     /**
-     * Indicates if the upperCanvas is retina enhanced
-     * inserted to enable the feature but to not introduce a breaking change.
-     * In fabric 4.0 will be removed and the single enableRetinaScaling will influence
-     * both canvases.
-     * @type Boolean
-     * @since 3.2.0
-     * @deprecated, will be removed in 4.0
-     * @default false
-     */
-    enableRetinaScalingUpper: true,
-
-    /**
      * @private
      */
     _initInteractive: function() {
@@ -10649,7 +10629,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
           boundsHeight = bounds.height || 0,
-          cssScale, upperRetina = this.enableRetinaScalingUpper;
+          cssScale;
 
       if (!boundsWidth || !boundsHeight ) {
         if ('top' in bounds && 'bottom' in bounds) {
@@ -10689,24 +10669,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
-          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
+      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
 
       // there is no need to create a new upperCanvas element if we have already one.
-      if (upperCanvasEl) {
-        upperCanvasEl.className = '';
+      if (this.upperCanvasEl) {
+        this.upperCanvasEl.className = '';
       }
       else {
-        upperCanvasEl = this._createCanvasElement();
-        this.upperCanvasEl = upperCanvasEl;
+        this.upperCanvasEl = this._createCanvasElement();
       }
-      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
+      fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
-      this.wrapperEl.appendChild(upperCanvasEl);
+      this.wrapperEl.appendChild(this.upperCanvasEl);
 
-      this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
-      this._applyCanvasStyle(upperCanvasEl);
-      this.contextTop = upperCanvasEl.getContext('2d');
+      this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
+      this._applyCanvasStyle(this.upperCanvasEl);
+      this.contextTop = this.upperCanvasEl.getContext('2d');
     },
 
     /**
@@ -14583,7 +14561,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Function} [callback] Callback to invoke when image set as a pattern
      * @return {fabric.Object} thisArg
      * @chainable
-     * @deprecated since 3.5.0
      * @see {@link http://jsfiddle.net/fabricjs/QT3pa/|jsFiddle demo}
      * @example <caption>Set pattern</caption>
      * object.setPatternFill({
@@ -14604,7 +14581,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Number} [options.offsetY=0] Shadow vertical offset
      * @return {fabric.Object} thisArg
      * @chainable
-     * @deprecated since 3.5.0
      * @see {@link http://jsfiddle.net/fabricjs/7gvJG/|jsFiddle demo}
      * @example <caption>Set shadow with string notation</caption>
      * object.setShadow('2px 2px 10px rgba(0,0,0,0.2)');
@@ -14626,7 +14602,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
      * @param {String} color Color value
      * @return {fabric.Object} thisArg
-     * @deprecated since 3.5.0
      * @chainable
      */
     setColor: function(color) {
@@ -20410,8 +20385,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * needed to check if image needs resize
-     * @private
+     * @private, needed to check if image needs resize
      */
     _needsResize: function() {
       var scale = this.getTotalObjectScaling();
