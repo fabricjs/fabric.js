@@ -565,7 +565,7 @@
      * @return {Object} .y height dimension
      */
     _getNonTransformedDimensions: function() {
-      var strokeWidth = this.strokeUniform ? 0 : this.strokeWidth,
+      var strokeWidth = this.strokeWidth,
           w = this.width + strokeWidth,
           h = this.height + strokeWidth;
       return { x: w, y: h };

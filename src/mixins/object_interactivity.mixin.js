@@ -194,7 +194,7 @@
      */
     drawBordersInGroup: function(ctx, options, styleOverride) {
       styleOverride = styleOverride || {};
-      var p = this._getNonTransformedDimensions(),
+      var p = { x: options.width, y: options.height },
           matrix = fabric.util.composeMatrix({
             scaleX: options.scaleX,
             scaleY: options.scaleY,
