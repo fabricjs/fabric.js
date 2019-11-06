@@ -1381,9 +1381,6 @@
       else {
         alternative && alternative(ctx);
       }
-      if (this.strokeUniform) {
-        ctx.setLineDash(ctx.getLineDash().map(function(value) { return value * ctx.lineWidth; }));
-      }
     },
 
     /**
