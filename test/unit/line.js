@@ -93,7 +93,7 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
-    var namespace        = 'http://www.w3.org/2000/svg'
+    var namespace        = 'http://www.w3.org/2000/svg';
     var lineEl           = fabric.document.createElementNS(namespace, 'line'),
         x1               = 11,
         y1               = 23,

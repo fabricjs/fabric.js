@@ -280,7 +280,7 @@
     var parsedValue;
 
     assert.ok(fabric.parseTransformAttribute);
-    var namespace = 'http://www.w3.org/2000/svg'
+    var namespace = 'http://www.w3.org/2000/svg';
     var element = fabric.document.createElementNS(namespace, 'path');
 
     //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'

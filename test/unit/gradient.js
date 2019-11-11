@@ -491,7 +491,7 @@
   QUnit.test('fromElement radialGradient defaults', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var namespace = 'http://www.w3.org/2000/svg' 
+    var namespace = 'http://www.w3.org/2000/svg';
     var element = fabric.document.createElementNS(namespace, 'radialGradient');
     var stop1 = fabric.document.createElementNS(namespace, 'stop');
     var stop2 = fabric.document.createElementNS(namespace, 'stop');
