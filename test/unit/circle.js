@@ -157,7 +157,7 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
-    var elCircle         = fabric.document.createElement('circle'),
+    var elCircle         = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -194,7 +194,7 @@
       assert.equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var elFaultyCircle = fabric.document.createElement('circle');
+      var elFaultyCircle = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       elFaultyCircle.setAttribute('r', '-10');
 
       var error;

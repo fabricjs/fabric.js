@@ -118,7 +118,7 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
-    var elEllipse        = fabric.document.createElement('ellipse'),
+    var elEllipse        = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,

@@ -105,7 +105,7 @@
   QUnit.test('fabric.Rect.fromElement', function(assert) {
     assert.ok(typeof fabric.Rect.fromElement === 'function');
 
-    var elRect = fabric.document.createElement('rect');
+    var elRect = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     fabric.Rect.fromElement(elRect, function(rect) {
       var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
       expectedObject.visible = false;
@@ -115,7 +115,7 @@
   });
 
   QUnit.test('fabric.Rect.fromElement with custom attributes', function(assert) {
-    var elRectWithAttrs = fabric.document.createElement('rect');
+    var elRectWithAttrs = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
     elRectWithAttrs.setAttribute('x', 10);
     elRectWithAttrs.setAttribute('y', 20);

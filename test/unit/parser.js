@@ -1,7 +1,7 @@
 (function(){
 
   function makeElement() {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     var attributes = {
       'cx':           101,
       'x':            102,
@@ -40,7 +40,7 @@
   });
 
   QUnit.test('parseAttributesNoneValues', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('fill', 'none');
     element.setAttribute('stroke', 'none');
 
@@ -48,29 +48,29 @@
   });
 
   QUnit.test('parseAttributesFillRule', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('fill-rule', 'evenodd');
 
     assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
   });
 
   QUnit.test('parseAttributesFillRuleWithoutTransformation', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('fill-rule', 'inherit');
 
     assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'inherit' });
   });
 
   QUnit.test('parseAttributesTransform', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('transform', 'translate(5, 10)');
     assert.deepEqual(fabric.parseAttributes(element, ['transform']), { transformMatrix: [1, 0, 0, 1, 5, 10] });
   });
 
   QUnit.test('parseAttributesWithParent', function(assert) {
-    var element = fabric.document.createElement('path');
-    var parent = fabric.document.createElement('g');
-    var grandParent = fabric.document.createElement('g');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var parent = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var grandParent = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
@@ -84,9 +84,9 @@
   });
 
   QUnit.test('parseAttributesWithGrandParentSvg', function(assert) {
-    var element = fabric.document.createElement('path'),
-        parent = fabric.document.createElement('g'),
-        grandParent = fabric.document.createElement('svg');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path'),
+        parent = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+        grandParent = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
@@ -128,7 +128,7 @@
   QUnit.test('parseStyleAttribute', function(assert) {
     assert.ok(fabric.parseStyleAttribute);
 
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
     var styleObj = fabric.parseStyleAttribute(element);
     // TODO: looks like this still fails with % values
@@ -142,7 +142,7 @@
   });
 
   QUnit.test('parseStyleAttribute with one pair', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'left:10px');
 
     var expectedObject = {
@@ -163,7 +163,7 @@
   });
 
   QUnit.test('parseStyleAttribute with value normalization', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
 
     var expectedObject = {
@@ -174,7 +174,7 @@
   });
 
   QUnit.test('parseStyleAttribute with short font declaration', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
     var styleObj = fabric.parseStyleAttribute(element);
     if (styleObj.font) {
@@ -206,7 +206,7 @@
   });
 
   QUnit.test('parseAttributes (style to have higher priority than attribute)', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'fill:red');
     element.setAttribute('fill', 'green');
 
@@ -233,7 +233,7 @@
   });
 
   QUnit.test('parse 0 attribute', function(assert) {
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('opacity', 0);
 
     var expectedObject = {
@@ -245,7 +245,7 @@
   QUnit.test('parsePointsAttribute', function(assert) {
     assert.ok(fabric.parsePointsAttribute);
 
-    var element = fabric.document.createElement('polygon');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     element.setAttribute('points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3E-2, 10,-1     ');
 
     var actualPoints = fabric.parsePointsAttribute(element.getAttribute('points'));
@@ -270,7 +270,7 @@
     var parsedValue;
 
     assert.ok(fabric.parseTransformAttribute);
-    var element = fabric.document.createElement('path');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
 
@@ -319,8 +319,8 @@
   });
 
   QUnit.test('parseNestedTransformAttribute', function(assert) {
-    var element = fabric.document.createElement('path');
-    var parent = fabric.document.createElement('g');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var parent = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'g');
     parent.appendChild(element);
 
     parent.setAttribute('transform', 'translate(50)');
@@ -568,7 +568,7 @@
   });
 
   QUnit.test('fill-opacity attribute with fill attribute', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -580,7 +580,7 @@
   });
 
   QUnit.test('fill-opacity attribute without fill attribute', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -591,7 +591,7 @@
   });
 
   QUnit.test('fill-opacity attribute with fill none', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('fill-opacity', opacityValue);
@@ -602,7 +602,7 @@
   });
 
   QUnit.test('stroke-opacity attribute with stroke attribute', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
@@ -614,7 +614,7 @@
   });
 
   QUnit.test('stroke-opacity attribute without stroke attribute', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
@@ -624,7 +624,7 @@
   });
 
   QUnit.test('stroke-opacity attribute with stroke none', function(assert) {
-    var el = fabric.document.createElement('rect');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttribute('stroke-opacity', opacityValue);
@@ -667,7 +667,7 @@
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
     assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
 
-    var elPolygon = fabric.document.createElement('polygon'),
+    var elPolygon = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
         expectedStyle = {
           'fill': '',
           'stroke': '#0000FF'

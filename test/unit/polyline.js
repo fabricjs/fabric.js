@@ -99,7 +99,7 @@
 
   QUnit.test('fromElement without points', function(assert) {
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
-    var elPolylineWithoutPoints = fabric.document.createElement('polyline');
+    var elPolylineWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
@@ -108,7 +108,7 @@
   });
 
   QUnit.test('fromElement with empty points', function(assert) {
-    var elPolylineWithEmptyPoints = fabric.document.createElement('polyline');
+    var elPolylineWithEmptyPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     elPolylineWithEmptyPoints.setAttribute('points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
       var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
@@ -118,7 +118,7 @@
   });
 
   QUnit.test('fromElement', function(assert) {
-    var elPolyline = fabric.document.createElement('polyline');
+    var elPolyline = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     elPolyline.setAttribute('points', '10,12 20,22');
     elPolyline.setAttribute('stroke-width', 1);
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
@@ -131,7 +131,7 @@
   });
 
   QUnit.test('fromElement with custom attr', function(assert) {
-    var elPolylineWithAttrs = fabric.document.createElement('polyline');
+    var elPolylineWithAttrs = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolylineWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
     elPolylineWithAttrs.setAttribute('opacity', '0.34');

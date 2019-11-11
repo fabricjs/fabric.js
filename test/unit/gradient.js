@@ -197,7 +197,7 @@
   QUnit.test('fromElement linearGradient', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     var stop1 = fabric.document.createElement('stop');
     var stop2 = fabric.document.createElement('stop');
 
@@ -234,7 +234,7 @@
   QUnit.test('fromElement linearGradient with floats percentage - objectBoundingBox', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     element.setAttribute('gradientUnits', 'objectBoundingBox');
     element.setAttribute('x1', '10%');
     element.setAttribute('y1', '0.2%');
@@ -268,7 +268,7 @@
   QUnit.test('fromElement linearGradient with floats percentage - userSpaceOnUse', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     element.setAttribute('gradientUnits', 'userSpaceOnUse');
     element.setAttribute('x1', '10%');
     element.setAttribute('y1', '0.2%');
@@ -306,7 +306,7 @@
   QUnit.test('fromElement linearGradient with Infinity', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     var stop1 = fabric.document.createElement('stop');
     var stop2 = fabric.document.createElement('stop');
 
@@ -371,7 +371,7 @@
   QUnit.test('fromElement with x1,x2,y1,2 linear', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
 
     element.setAttribute('x1', '30%');
     element.setAttribute('x2', '20%');
@@ -395,7 +395,7 @@
   QUnit.test('fromElement with x1,x2,y1,2 radial', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('radialGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
 
     element.setAttribute('fx', '30%');
     element.setAttribute('fy', '20%');
@@ -456,7 +456,7 @@
   QUnit.test('fromElement with x1,x2,y1,2 linear userSpaceOnUse', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
 
     element.setAttribute('x1', '30');
     element.setAttribute('y1', '20');
@@ -517,7 +517,7 @@
   QUnit.test('fromElement radialGradient with transform', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('radialGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
     var stop1 = fabric.document.createElement('stop');
     var stop2 = fabric.document.createElement('stop');
 
@@ -538,7 +538,7 @@
   QUnit.test('fromElement linearGradient colorStop attributes/styles', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('linearGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     var stop1 = fabric.document.createElement('stop');
     var stop2 = fabric.document.createElement('stop');
     var stop3 = fabric.document.createElement('stop');
@@ -595,7 +595,7 @@
   QUnit.test('fromElement radialGradient colorStop attributes/styles', function(assert) {
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
-    var element = fabric.document.createElement('radialGradient');
+    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
     var stop1 = fabric.document.createElement('stop');
     var stop2 = fabric.document.createElement('stop');
     var stop3 = fabric.document.createElement('stop');

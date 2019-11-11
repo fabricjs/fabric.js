@@ -223,7 +223,7 @@
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
 
-    var elTextWithAttrs = fabric.document.createElement('text');
+    var elTextWithAttrs = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttribute('x', 10);

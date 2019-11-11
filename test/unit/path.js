@@ -37,7 +37,7 @@
   };
 
   function getPathElement(path) {
-    var el = fabric.document.createElement('path');
+    var el = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
     el.setAttribute('d', path);
     el.setAttribute('fill', 'red');
     el.setAttribute('stroke', 'blue');
@@ -243,7 +243,7 @@
   QUnit.test('fromElement', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
-    var elPath = fabric.document.createElement('path');
+    var elPath = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttribute('fill', 'red');

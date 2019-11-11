@@ -93,7 +93,7 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
-    var lineEl           = fabric.document.createElement('line'),
+    var lineEl           = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'line'),
         x1               = 11,
         y1               = 23,
         x2               = 34,
@@ -130,7 +130,7 @@
       assert.equal(oLine.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var lineElWithMissingAttributes = fabric.document.createElement('line');
+      var lineElWithMissingAttributes = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'line');
       lineElWithMissingAttributes.setAttribute('x1', 10);
       lineElWithMissingAttributes.setAttribute('y1', 20);
 
@@ -161,7 +161,7 @@
   });
 
   QUnit.test('stroke-width in a style', function(assert) {
-    var lineEl = fabric.document.createElement('line');
+    var lineEl = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'line');
     lineEl.setAttribute('style', 'stroke-width:4');
     fabric.Line.fromElement(lineEl, function(oLine) {
       assert.ok(4, oLine.strokeWidth);

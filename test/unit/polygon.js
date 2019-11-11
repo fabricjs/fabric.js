@@ -104,7 +104,7 @@
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
 
-    var elPolygonWithoutPoints = fabric.document.createElement('polygon');
+    var elPolygonWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
     fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
       assert.deepEqual(polygon.toObject(), empty_object);
@@ -122,7 +122,7 @@
   });
 
   QUnit.test('fromElement with points', function(assert) {
-    var elPolygon = fabric.document.createElement('polygon');
+    var elPolygon = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     elPolygon.setAttribute('points', '10,12 20,22');
     fabric.Polygon.fromElement(elPolygon, function(polygon) {
       assert.ok(polygon instanceof fabric.Polygon);
