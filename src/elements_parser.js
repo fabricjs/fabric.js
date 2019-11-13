@@ -66,7 +66,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
     var id = this.regexUrl.exec(value)[1];
     this.regexUrl.lastIndex = 0;
-    console.log('clipPath', value, id, fabric[storage][this.svgUid], obj);
     return fabric[storage][this.svgUid][id];
   };
 
