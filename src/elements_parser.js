@@ -66,6 +66,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
     var id = this.regexUrl.exec(value)[1];
     this.regexUrl.lastIndex = 0;
+    console.log('clipPath', value, id, fabric[storage][this.svgUid], obj);
     return fabric[storage][this.svgUid][id];
   };
 
@@ -111,6 +112,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         objTransformInv,
         clipPath.calcTransformMatrix()
       );
+      if (clipPath.clipPath) {
+        this.resolveClipPath(clipPath);
+      }
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.flipX = false;
       clipPath.flipY = false;
