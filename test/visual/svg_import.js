@@ -78,6 +78,7 @@
     'clippath-9',
     'vector-effect',
     'svg-with-no-dim-rect',
+    'notoemoji-person',
     //'clippath-8',
   ].map(createTestFromSVG);
 
