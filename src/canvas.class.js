@@ -1541,6 +1541,7 @@
       var currentActives = this.getActiveObjects();
       this._setActiveObject(object, e);
       this._fireSelectionEvents(currentActives, e);
+      this.renderAll();
       return this;
     },
 
