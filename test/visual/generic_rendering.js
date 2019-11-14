@@ -242,5 +242,23 @@
     height: 300,
   });
 
+  function objectsInActiveSelections(canvas, callback) {
+    canvas.setZoom(0.1);
+    var rect1 = new fabric.Rect({ fill: 'purple', top: 30, left: 50, width: 30, height: 100, angle: 10 });
+    var rect2 = new fabric.Rect({ fill: 'green', top: 150, left: 10, width: 300, height: 30, angle: -10 });
+    var selection = new fabric.ActiveSelection([rect1, rect2]);
+    var output = rect1.toCanvasElement();
+    callback(output);
+  }
+
+  tests.push({
+    test: 'objects in activeSelection toCanvasElement',
+    code: objectsInActiveSelections,
+    golden: 'objectsInActiveSelections.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
