@@ -574,10 +574,11 @@
     if (typeof objects === 'string') {
       // it has to be an url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
-        var group = fabric.util.groupSVGElements(elements, object);
+        var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
         callback && callback(group);
       });
+      return;
     }
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
