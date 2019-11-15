@@ -1,59 +1,60 @@
 (function() {
   var canvas = this.canvas = new fabric.Canvas();
 
+  var ITEXT_OBJECT = {
+    version:                  fabric.version,
+    type:                     'text',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     0,
+    top:                      0,
+    width:                    20,
+    height:                   45.2,
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              1,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    shadow:                   null,
+    visible:                  true,
+    clipTo:                   null,
+    text:                     'x',
+    fontSize:                 40,
+    fontWeight:               'normal',
+    fontFamily:               'Times New Roman',
+    fontStyle:                'normal',
+    lineHeight:               1.3,
+    underline:                false,
+    overline:                 false,
+    linethrough:              false,
+    textAlign:                'left',
+    backgroundColor:          '',
+    textBackgroundColor:      '',
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    skewX:                    0,
+    skewY:                    0,
+    transformMatrix:          null,
+    charSpacing:              0,
+    styles:                     { }
+  };
+
+
   QUnit.module('fabric.IText', function(hooks) {
     hooks.afterEach(function() {
       canvas.clear();
       canvas.cancelRequestedRender();
     });
-
-    var ITEXT_OBJECT = {
-      'version':                  fabric.version,
-      'type':                     'text',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     0,
-      'top':                      0,
-      'width':                    20,
-      'height':                   45.2,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'shadow':                   null,
-      'visible':                  true,
-      'clipTo':                   null,
-      'text':                     'x',
-      'fontSize':                 40,
-      'fontWeight':               'normal',
-      'fontFamily':               'Times New Roman',
-      'fontStyle':                'normal',
-      'lineHeight':               1.3,
-      'underline':                false,
-      'overline':                 false,
-      'linethrough':              false,
-      'textAlign':                'left',
-      'backgroundColor':          '',
-      'textBackgroundColor':      '',
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'skewX':                    0,
-      'skewY':                    0,
-      'transformMatrix':          null,
-      'charSpacing':              0,
-      styles:                     { }
-    };
 
     QUnit.test('constructor', function(assert) {
       var iText = new fabric.IText('test');
@@ -366,11 +367,11 @@
     QUnit.test('shiftLineStyles', function(assert) {
       var iText = new fabric.IText('test\ntest\ntest', {
         styles: {
-          '1': {
-            '0': { 'fill': 'red' },
-            '1': { 'fill': 'red' },
-            '2': { 'fill': 'red' },
-            '3': { 'fill': 'red' }
+          1: {
+            0: { fill: 'red' },
+            1: { fill: 'red' },
+            2: { fill: 'red' },
+            3: { fill: 'red' }
           }
         }
       });
@@ -379,21 +380,21 @@
 
       iText.shiftLineStyles(0, +1);
       assert.deepEqual(iText.styles, {
-        '2': {
-          '0': { 'fill': 'red' },
-          '1': { 'fill': 'red' },
-          '2': { 'fill': 'red' },
-          '3': { 'fill': 'red' }
+        2: {
+          0: { fill: 'red' },
+          1: { fill: 'red' },
+          2: { fill: 'red' },
+          3: { fill: 'red' }
         }
       });
 
       iText.shiftLineStyles(0, -1);
       assert.deepEqual(iText.styles, {
-        '1': {
-          '0': { 'fill': 'red' },
-          '1': { 'fill': 'red' },
-          '2': { 'fill': 'red' },
-          '3': { 'fill': 'red' }
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'red' },
+          2: { fill: 'red' },
+          3: { fill: 'red' }
         }
       });
     });
@@ -698,6 +699,7 @@
       assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
       assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
     });
+
 
     QUnit.module('fabric.IText with canvas.enableRetinaScaling = false', function() {
       QUnit.test('hiddenTextarea does not move DOM', function(assert) {
