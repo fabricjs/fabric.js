@@ -139,6 +139,14 @@
     assert.equal(textbox.isEmptyStyles(1), true, 'style is empty at line 1');
   });
 
+  QUnit.test('isEmptyStyles does not crash on null styles', function(assert) {
+    var textbox = new fabric.Textbox('x x', { width: 5 });
+    textbox.styles = null;
+    assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
+    assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
+    assert.equal(textbox.isEmptyStyles(1), true, 'style is empty');
+  });
+
   QUnit.test('isEmptyStyles alternate lines', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe\nya yb', {
       width: 5,
