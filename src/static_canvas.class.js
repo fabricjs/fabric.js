@@ -1013,12 +1013,9 @@
           ? fill.toLive(ctx, this)
           : fill;
         if (needsVpt) {
-          ctx.transform(
-            v[0], v[1], v[2], v[3],
-            v[4] + (fill.offsetX || 0),
-            v[5] + (fill.offsetY || 0)
-          );
+          ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
+        ctx.transform(1, 0, 0, 1, fill.offsetX, fill.offsetY);
         var m = fill.gradientTransform || fill.patternTransform;
         m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         ctx.fill();
