@@ -12,7 +12,6 @@ addons:
     - libjpeg8-dev
     - librsvg2-dev
     - libcairo2-dev
-    - g++-4.9
 
 stages:
   - Linting and Building
