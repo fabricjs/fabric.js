@@ -2,7 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
+  let fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
 
   if (fabric.Shadow) {
@@ -79,7 +79,7 @@
         options = this._parseShadow(options);
       }
 
-      for (var prop in options) {
+      for (let prop in options) {
         this[prop] = options[prop];
       }
 
@@ -120,7 +120,7 @@
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      let fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
           offset = fabric.util.rotateVector(
             { x: this.offsetX, y: this.offsetY },
             fabric.util.degreesToRadians(-object.angle)),
@@ -171,7 +171,7 @@
           nonScaling: this.nonScaling
         };
       }
-      var obj = { }, proto = fabric.Shadow.prototype;
+      let obj = { }, proto = fabric.Shadow.prototype;
 
       ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'].forEach(function(prop) {
         if (this[prop] !== proto[prop]) {
