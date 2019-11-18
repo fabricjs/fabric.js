@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "10"
+  - "12"
 
 addons:
   apt:
@@ -12,7 +12,6 @@ addons:
     - libjpeg8-dev
     - librsvg2-dev
     - libcairo2-dev
-    - g++-4.9
 
 stages:
   - Linting and Building
@@ -65,6 +64,9 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Node
+      node_js: "13"
+    - stage: Unit Tests
+      env: LAUNCHER=Node
       node_js: "12"
     - stage: Unit Tests
       env: LAUNCHER=Node
@@ -73,7 +75,7 @@ jobs:
       node_js: "8"
     - stage: Visual Tests
       env: LAUNCHER=Node
-      node_js: "10"
+      node_js: "12"
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
@@ -100,4 +102,4 @@ jobs:
       os: windows
 script: npm run build:fast && npm run test
 
-dist: xenial
+dist: bionic
