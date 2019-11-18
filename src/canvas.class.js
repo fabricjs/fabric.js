@@ -907,7 +907,7 @@
 
       transform.newScaleX = scaleX;
       transform.newScaleY = scaleY;
-      if (by === 'x' && target instanceof fabric.Textbox) {
+      if (fabric.Textbox && by === 'x' && target instanceof fabric.Textbox) {
         var w = target.width * (localMouse.x / _dim.x);
         if (w >= target.getMinWidth()) {
           scaled = w !== target.width;
