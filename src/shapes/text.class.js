@@ -34,6 +34,7 @@
       'text',
       'charSpacing',
       'textAlign',
+      'verticalAlign',
       'styles',
     ],
 
@@ -121,6 +122,13 @@
     textAlign:            'left',
 
     /**
+     * Vertical alignment. Possible values: "top", "middle", "bottom".
+     * @type String
+     * @default
+     */
+    verticalAlign:         'top',
+
+    /**
      * Font style . Possible values: "", "normal", "italic" or "oblique".
      * @type String
      * @default
@@ -175,6 +183,7 @@
       'overline',
       'linethrough',
       'textAlign',
+      'verticalAlign',
       'fontStyle',
       'lineHeight',
       'textBackgroundColor',
@@ -193,6 +202,7 @@
       'overline',
       'linethrough',
       'textAlign',
+      'verticalAlign',
       'fontStyle',
       'lineHeight',
       'textBackgroundColor',
@@ -798,7 +808,18 @@
         lineHeight = this.getHeightOfLine(i);
         height += (i === len - 1 ? lineHeight / this.lineHeight : lineHeight);
       }
-      return height;
+      return Math.max(height, this.height);
+    },
+
+    /**
+     * @private
+     * @return {Number} Total height of all lines.
+     */
+    _getTotalLineHeights: function() {
+      var _this = this;
+      return this._textLines.reduce(function(total, line, index) {
+        return total + _this.getHeightOfLine(index);
+      }, 0);
     },
 
     /**
@@ -814,7 +835,14 @@
      * @return {Number} Top offset
      */
     _getTopOffset: function() {
-      return -this.height / 2;
+      switch (this.verticalAlign) {
+        case 'middle':
+          return -this._getTotalLineHeights() / 2;
+        case 'bottom':
+          return this.height / 2 - this._getTotalLineHeights();
+        default:
+          return -this.height / 2;
+      }
     },
 
     /**

@@ -186,6 +186,21 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * @private
+   * @return {Number} Start Y position for pointer position.
+   */
+  _getSelectionStartOffsetY: function () {
+    switch (this.verticalAlign) {
+      case 'middle':
+        return this.height / 2 - this._getTotalLineHeights() / 2;
+      case 'bottom':
+        return this.height - this._getTotalLineHeights();
+      default:
+        return 0;
+    }
+  },
+
+  /**
    * Returns index of a character corresponding to where an object was clicked
    * @param {Event} e Event object
    * @return {Number} Index of a character
@@ -198,10 +213,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         charIndex = 0,
         lineIndex = 0,
         lineLeftOffset,
-        line;
+        line,
+        startY = this._getSelectionStartOffsetY();
 
     for (var i = 0, len = this._textLines.length; i < len; i++) {
-      if (height <= mouseOffset.y) {
+      if ((startY + height) <= mouseOffset.y) {
         height += this.getHeightOfLine(i) * this.scaleY;
         lineIndex = i;
         if (i > 0) {

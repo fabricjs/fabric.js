@@ -29,12 +29,12 @@
     },
 
     /**
-     * @private
-     */
+       * @private
+       */
     _getSVGLeftTopOffsets: function() {
       return {
         textLeft: -this.width / 2,
-        textTop: -this.height / 2,
+        textTop: this._getTopOffset(),
         lineTop: this.getHeightOfLine(0)
       };
     },
