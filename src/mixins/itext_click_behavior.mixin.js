@@ -214,7 +214,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         lineIndex = 0,
         lineLeftOffset,
         line,
-        startY = this._getSelectionStartOffsetY();
+        startY = this._getSelectionStartOffsetY() * (this.scaleY || 1);
 
     for (var i = 0, len = this._textLines.length; i < len; i++) {
       if ((startY + height) <= mouseOffset.y) {
