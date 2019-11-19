@@ -1,4 +1,4 @@
-fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions) {
+fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
   this.elements = elements;
   this.callback = callback;
   this.options = options;
@@ -6,6 +6,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
+  this.doc = doc;
 };
 
 (function(proto) {
@@ -96,7 +97,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       // move the clipPath tag as sibling to the real element that is using it
       var clipPathTag = clipPath[0].parentNode;
       var clipPathOwner = usingElement;
-      while (clipPathOwner.getAttribute('clip-path') !== obj.clipPath && clipPathOwner.parentNode) {
+      while (clipPathOwner.parentNode && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
         clipPathOwner = clipPathOwner.parentNode;
       }
       clipPathOwner.parentNode.appendChild(clipPathTag);
@@ -120,7 +121,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner.parentNode);
+        this.resolveClipPath(clipPath, clipPathOwner);
       }
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.flipX = false;

@@ -55,7 +55,9 @@
       colorAttributes = {
         stroke: 'strokeOpacity',
         fill:   'fillOpacity'
-      };
+      },
+
+      fSize = 'font-size', cPath = 'clip-path';
 
   fabric.svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
   fabric.svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
@@ -847,13 +849,21 @@
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      ownAttributes = extend(ownAttributes,
-        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
-
+      var cssAttrs = extend(
+        getGlobalStylesForElement(element, svgUid),
+        fabric.parseStyleAttribute(element)
+      );
+      ownAttributes = extend(
+        ownAttributes,
+        cssAttrs
+      );
+      if (cssAttrs[cPath]) {
+        element.setAttribute(cPath, cssAttrs[cPath]);
+      }
       fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
-      if (ownAttributes['font-size']) {
+      if (ownAttributes[fSize]) {
         // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
-        ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
+        ownAttributes[fSize] = fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
       }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
