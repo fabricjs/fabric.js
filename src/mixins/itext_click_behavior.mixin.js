@@ -110,6 +110,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this === this.canvas._activeObject) {
       this.selected = true;
     }
+    else {
+      this.selected = false;
+    }
   },
 
   /**
