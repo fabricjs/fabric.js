@@ -79,7 +79,9 @@
     'vector-effect',
     'svg-with-no-dim-rect',
     'notoemoji-person',
-    //'clippath-8',
+    // 'clippath-8',
+    'emoji-b',
+    'gold-logo'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
