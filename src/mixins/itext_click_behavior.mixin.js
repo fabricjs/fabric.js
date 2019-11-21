@@ -61,15 +61,25 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * Default handler for double click, select a word
+   */
+  doubleClickHandler: function(options) {
+    this.selectWord(this.getSelectionStartFromPointer(options.e));
+  },
+
+  /**
+   * Default handler for triple click, select a line
+   */
+  tripleClickHandler: function(options) {
+    this.selectLine(this.getSelectionStartFromPointer(options.e));
+  },
+
+  /**
    * Initializes double and triple click event handlers
    */
   initClicks: function() {
-    this.on('mousedblclick', function(options) {
-      this.selectWord(this.getSelectionStartFromPointer(options.e));
-    });
-    this.on('tripleclick', function(options) {
-      this.selectLine(this.getSelectionStartFromPointer(options.e));
-    });
+    this.on('mousedblclick', this.doubleClickHandler);
+    this.on('tripleclick', this.tripleClickHandler);
   },
 
   /**
@@ -107,6 +117,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
       return;
     }
+    // we want to avoid that an object that was selected and then becomes unselectable,
+    // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
   },
 
