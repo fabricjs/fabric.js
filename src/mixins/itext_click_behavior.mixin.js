@@ -107,12 +107,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
       return;
     }
-    if (this === this.canvas._activeObject) {
-      this.selected = true;
-    }
-    else {
-      this.selected = false;
-    }
+    this.selected = this === this.canvas._activeObject;
   },
 
   /**
