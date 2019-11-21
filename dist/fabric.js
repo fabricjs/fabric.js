@@ -74,7 +74,6 @@ fabric.SHARED_ATTRIBUTES = [
  */
 fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
-fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
 fabric.fontPaths = { };
 fabric.iMatrix = [1, 0, 0, 1, 0, 0];
 
@@ -2752,13 +2751,29 @@ fabric.CommonMethods = {
  * Wrapper around `console.log` (when available)
  * @param {*} [values] Values to log
  */
-fabric.log = console.log;
+fabric.log = function() { };
 
 /**
  * Wrapper around `console.warn` (when available)
  * @param {*} [values] Values to log as a warning
  */
-fabric.warn = console.warn;
+fabric.warn = function() { };
+
+/* eslint-disable */
+if (typeof console !== 'undefined') {
+
+  ['log', 'warn'].forEach(function(methodName) {
+
+    if (typeof console[methodName] !== 'undefined' &&
+        typeof console[methodName].apply === 'function') {
+
+      fabric[methodName] = function() {
+        return console[methodName].apply(console, arguments);
+      };
+    }
+  });
+}
+/* eslint-enable */
 
 
 (function() {
@@ -3368,9 +3383,7 @@ fabric.warn = console.warn;
       colorAttributes = {
         stroke: 'strokeOpacity',
         fill:   'fillOpacity'
-      },
-
-      fSize = 'font-size', cPath = 'clip-path';
+      };
 
   fabric.svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
   fabric.svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
@@ -4162,21 +4175,13 @@ fabric.warn = console.warn;
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      var cssAttrs = extend(
-        getGlobalStylesForElement(element, svgUid),
-        fabric.parseStyleAttribute(element)
-      );
-      ownAttributes = extend(
-        ownAttributes,
-        cssAttrs
-      );
-      if (cssAttrs[cPath]) {
-        element.setAttribute(cPath, cssAttrs[cPath]);
-      }
+      ownAttributes = extend(ownAttributes,
+        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
+
       fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
-      if (ownAttributes[fSize]) {
+      if (ownAttributes['font-size']) {
         // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
-        ownAttributes[fSize] = fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
+        ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
       }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
@@ -4392,7 +4397,7 @@ fabric.warn = console.warn;
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
+fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions) {
   this.elements = elements;
   this.callback = callback;
   this.options = options;
@@ -4400,7 +4405,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
-  this.doc = doc;
 };
 
 (function(proto) {
@@ -4447,7 +4451,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, el);
+      _this.resolveClipPath(obj);
       _this.reviver && _this.reviver(el, obj);
       _this.instances[index] = obj;
       _this.checkIfDone();
@@ -4455,13 +4459,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   };
 
   proto.extractPropertyDefinition = function(obj, property, storage) {
-    var value = obj[property], regex = this.regexUrl;
-    if (!regex.test(value)) {
+    var value = obj[property];
+    if (!(/^url\(/).test(value)) {
       return;
     }
-    regex.lastIndex = 0;
-    var id = regex.exec(value)[1];
-    regex.lastIndex = 0;
+    var id = this.regexUrl.exec(value)[1];
+    this.regexUrl.lastIndex = 0;
     return fabric[storage][this.svgUid][id];
   };
 
@@ -4482,19 +4485,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     };
   };
 
-  proto.resolveClipPath = function(obj, usingElement) {
+  proto.resolveClipPath = function(obj) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
         element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
       container = [];
       objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
-      // move the clipPath tag as sibling to the real element that is using it
-      var clipPathTag = clipPath[0].parentNode;
-      var clipPathOwner = usingElement;
-      while (clipPathOwner.parentNode && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
-        clipPathOwner = clipPathOwner.parentNode;
-      }
-      clipPathOwner.parentNode.appendChild(clipPathTag);
       for (var i = 0; i < clipPath.length; i++) {
         element = clipPath[i];
         klass = this.findTag(element);
@@ -4515,7 +4511,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
+        this.resolveClipPath(clipPath);
       }
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.flipX = false;
@@ -18707,7 +18703,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           coords = [],
           currentPath,
           parsed,
-          re = fabric.rePathCommand,
+          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
           match,
           coordsStr;
 
@@ -28032,7 +28028,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
       return;
     }
-    this.selected = this === this.canvas._activeObject;
+    if (this === this.canvas._activeObject) {
+      this.selected = true;
+    }
   },
 
   /**
