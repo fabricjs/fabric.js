@@ -130,7 +130,7 @@
           patternHeight = patternSource.height / object.height,
           patternOffsetX = this.offsetX / object.width,
           patternOffsetY = this.offsetY / object.height,
-          patternImgSrc = '';
+          patternImgSrc = '', patternTransform = '';
       if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
         patternHeight = 1;
         if (patternOffsetY) {
@@ -150,12 +150,15 @@
       else if (patternSource.toDataURL) {
         patternImgSrc = patternSource.toDataURL();
       }
+      if (this.patternTransform) {
+        patternTransform = ' patternTransform="' + fabric.util.matrixToSVG(this.patternTransform) + '" ';
+      }
 
       return '<pattern id="SVGID_' + this.id +
                     '" x="' + patternOffsetX +
                     '" y="' + patternOffsetY +
                     '" width="' + patternWidth +
-                    '" height="' + patternHeight + '">\n' +
+                    '" height="' + patternHeight + '"' + patternTransform + '>\n' +
                '<image x="0" y="0"' +
                       ' width="' + patternSource.width +
                       '" height="' + patternSource.height +
