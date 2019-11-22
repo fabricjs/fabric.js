@@ -1,4 +1,5 @@
 (function() {
+  var getFixture;
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.browserShadowBlurConstant = 0.9;
@@ -12,6 +13,7 @@
     if (process.env.launcher === 'Edge') {
       fabric.browserShadowBlurConstant = 1.75;
     }
+    getFixture = global.getFixture;
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
@@ -23,6 +25,7 @@
     if (navigator.userAgent.indexOf('Edge') !== -1) {
       fabric.browserShadowBlurConstant = 1.75;
     }
+    getFixture = window.getFixture;
   }
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
@@ -240,6 +243,72 @@
     percentage: 0.09,
     width: 300,
     height: 300,
+  });
+
+  function objectsInActiveSelections(canvas, callback) {
+    canvas.setZoom(0.1);
+    var rect1 = new fabric.Rect({ fill: 'purple', top: 30, left: 50, width: 30, height: 100, angle: 10 });
+    var rect2 = new fabric.Rect({ fill: 'green', top: 150, left: 10, width: 300, height: 30, angle: -10 });
+    new fabric.ActiveSelection([rect1, rect2]);
+    var output = rect1.toCanvasElement();
+    callback(output);
+  }
+
+  tests.push({
+    test: 'objects in activeSelection toCanvasElement',
+    code: objectsInActiveSelections,
+    golden: 'objectsInActiveSelections.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  function canvasPattern(fabricCanvas, callback) {
+    getFixture('diet.jpeg', false, function(img) {
+      var pattern = new fabric.Pattern({
+        source: img,
+        repeat: 'repeat',
+        offsetX: -120,
+        offsetY: 50
+      });
+      fabricCanvas.backgroundColor = pattern;
+      var canvas = fabricCanvas.toCanvasElement();
+      callback(canvas);
+    });
+  }
+
+  tests.push({
+    test: 'canvas with background pattern and export',
+    code: canvasPattern,
+    // use the same golden on purpose
+    golden: 'canvasPattern.png',
+    percentage: 0.09,
+    width: 500,
+    height: 500,
+  });
+
+  function canvasPatternMultiplier(fabricCanvas, callback) {
+    getFixture('diet.jpeg', false, function(img2) {
+      var pattern = new fabric.Pattern({
+        source: img2,
+        repeat: 'repeat',
+        offsetX: -120,
+        offsetY: 50
+      });
+      fabricCanvas.backgroundColor = pattern;
+      var canvas = fabricCanvas.toCanvasElement(0.3);
+      callback(canvas);
+    });
+  }
+
+  tests.push({
+    test: 'canvas with background pattern and multiplier',
+    code: canvasPatternMultiplier,
+    // use the same golden on purpose
+    golden: 'canvasPatternMultiplier.png',
+    percentage: 0.09,
+    width: 500,
+    height: 500,
   });
 
   tests.forEach(visualTestLoop(QUnit));

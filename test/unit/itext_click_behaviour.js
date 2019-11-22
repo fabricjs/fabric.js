@@ -7,8 +7,58 @@
       canvas.clear();
       canvas.cancelRequestedRender();
     });
-
-
+    QUnit.test('doubleClickHandler', function(assert) {
+      var iText = new fabric.IText('test need some word\nsecond line');
+      iText.canvas = canvas;
+      var eventData = {
+        which: 1,
+        target: canvas.upperCanvasEl,
+        clientX: 40,
+        clientY: 10
+      };
+      iText.doubleClickHandler({
+        e: eventData
+      });
+      assert.equal(iText.selectionStart, 0, 'dblClcik selection start is');
+      assert.equal(iText.selectionEnd, 4, 'dblClcik selection end is');
+      var eventData = {
+        which: 1,
+        target: canvas.upperCanvasEl,
+        clientX: 40,
+        clientY: 60
+      };
+      iText.doubleClickHandler({
+        e: eventData
+      });
+      assert.equal(iText.selectionStart, 19, 'second dblClcik selection start is');
+      assert.equal(iText.selectionEnd, 26, 'second dblClcik selection end is');
+    });
+    QUnit.test('tripleClickHandler', function(assert) {
+      var iText = new fabric.IText('test need some word\nsecond line');
+      iText.canvas = canvas;
+      var eventData = {
+        which: 1,
+        target: canvas.upperCanvasEl,
+        clientX: 40,
+        clientY: 10
+      };
+      iText.tripleClickHandler({
+        e: eventData
+      });
+      assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
+      assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
+      var eventData = {
+        which: 1,
+        target: canvas.upperCanvasEl,
+        clientX: 40,
+        clientY: 60
+      };
+      iText.tripleClickHandler({
+        e: eventData
+      });
+      assert.equal(iText.selectionStart, 20, 'second tripleClick selection start is');
+      assert.equal(iText.selectionEnd, 31, 'second tripleClick selection end is');
+    });
     QUnit.test('_getNewSelectionStartFromOffset end of line', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
       var index = 10;
