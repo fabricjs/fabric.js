@@ -1,8 +1,11 @@
 (function(){
-
-  var canvas = new fabric.Canvas();
-
+  var canvas;
   QUnit.module('iText click interaction', function(hooks) {
+    hooks.beforeEach(function() {
+      canvas = new fabric.Canvas(null, {
+        enableRetinaScaling: false
+      });
+    });
     hooks.afterEach(function() {
       canvas.clear();
       canvas.cancelRequestedRender();
@@ -164,7 +167,6 @@
       hooks.beforeEach(function() {
         canvas.enableRetinaScaling = false;
       });
-
       QUnit.test('click on editing itext make selection:changed fire', function(assert) {
         var done = assert.async();
         var eventData = {
@@ -210,9 +212,11 @@
 
     QUnit.module('iText click interaction with canvas.enableRetinaScaling = true', function(hooks) {
       hooks.beforeEach(function() {
-        canvas.enableRetinaScaling = true;
+        fabric.devicePixelRatio = 2;
+        canvas = new fabric.Canvas(null, {
+          enableRetinaScaling: true,
+        });
       });
-
       QUnit.test('click on editing itext make selection:changed fire', function(assert) {
         var done = assert.async();
         var eventData = {
