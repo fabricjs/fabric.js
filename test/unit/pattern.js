@@ -146,7 +146,8 @@
     fabric.Object.__uid = 0;
     var pattern = createPattern();
     var rect = new fabric.Rect({ width: 500, height: 500 });
-    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="0.3" height="0.248">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+
+    var expectedSVG = '<pattern id=\"SVGID_0\" x=\"0\" y=\"0\" width=\"0.3\" height=\"0.248\" >\n\t<g transform=\"matrix(1 0 0 1 0 0)\" >\n\t\t<image x=\"0\" y=\"0\" width=\"150\" height=\"124\" xlink:href=\"' + img.src + '\"></image>\n\t</g>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
     assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match');
   });
@@ -156,7 +157,7 @@
     var pattern = createPattern();
     pattern.repeat = 'repeat-y';
     var rect = new fabric.Rect({ width: 500, height: 500 });
-    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="1" height="0.248">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    var expectedSVG = '<pattern id=\"SVGID_0\" x=\"0\" y=\"0\" width=\"1\" height=\"0.248\" >\n\t<g transform=\"matrix(1 0 0 1 0 0)\" >\n\t\t<image x=\"0\" y=\"0\" width=\"150\" height=\"124\" xlink:href=\"' + img.src + '\"></image>\n\t</g>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
     assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match repeat-y');
   });
@@ -166,7 +167,7 @@
     var pattern = createPattern();
     pattern.repeat = 'repeat-x';
     var rect = new fabric.Rect({ width: 500, height: 500 });
-    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="0.3" height="1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    var expectedSVG = '<pattern id=\"SVGID_0\" x=\"0\" y=\"0\" width=\"0.3\" height=\"1\" >\n\t<g transform=\"matrix(1 0 0 1 0 0)\" >\n\t\t<image x=\"0\" y=\"0\" width=\"150\" height=\"124\" xlink:href=\"' + img.src + '\"></image>\n\t</g>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
     assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match repeat-x');
   });
@@ -176,7 +177,7 @@
     var pattern = createPattern();
     pattern.repeat = 'no-repeat';
     var rect = new fabric.Rect({ width: 500, height: 500 });
-    var expectedSVG = '<pattern id="SVGID_0" x="0" y="0" width="1" height="1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    var expectedSVG = '<pattern id=\"SVGID_0\" x=\"0\" y=\"0\" width=\"1\" height=\"1\" >\n\t<g transform=\"matrix(1 0 0 1 0 0)\" >\n\t\t<image x=\"0\" y=\"0\" width=\"150\" height=\"124\" xlink:href=\"' + img.src + '\"></image>\n\t</g>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
     assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match no-repeat');
   });
@@ -188,7 +189,7 @@
     pattern.offsetX = 50;
     pattern.offsetY = -50;
     var rect = new fabric.Rect({ width: 500, height: 500 });
-    var expectedSVG = '<pattern id="SVGID_0" x="0.1" y="-0.1" width="1.1" height="1.1">\n<image x="0" y="0" width="150" height="124" xlink:href="' + img.src + '"></image>\n</pattern>\n';
+    var expectedSVG = '<pattern id=\"SVGID_0\" x=\"0.1\" y=\"-0.1\" width=\"1.1\" height=\"1.1\" >\n\t<g transform=\"matrix(1 0 0 1 0 0)\" >\n\t\t<image x=\"0\" y=\"0\" width=\"150\" height=\"124\" xlink:href=\"' + img.src + '\"></image>\n\t</g>\n</pattern>\n';
     assert.ok(typeof pattern.toSVG === 'function');
     assert.equal(pattern.toSVG(rect), expectedSVG, 'SVG match no-repat offsetX and offsetY');
   });

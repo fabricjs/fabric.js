@@ -126,18 +126,21 @@
      */
     toSVG: function(object) {
       var patternSource = typeof this.source === 'function' ? this.source() : this.source,
-          patternWidth = patternSource.width / object.width,
-          patternHeight = patternSource.height / object.height,
-          patternOffsetX = this.offsetX / object.width,
-          patternOffsetY = this.offsetY / object.height,
-          patternImgSrc = '', patternTransform = '';
-      if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
+          width = object.width, height = object.height,
+          patternWidth = patternSource.width / width,
+          patternHeight = patternSource.height / height,
+          patternOffsetX = this.offsetX / width,
+          patternOffsetY = this.offsetY / height,
+          repeat = this.repeat,
+          patternImgSrc = '', matrix = (this.patternTransform || fabric.iMatrix).concat();
+
+      if (repeat === 'repeat-x' || repeat === 'no-repeat') {
         patternHeight = 1;
         if (patternOffsetY) {
           patternHeight += Math.abs(patternOffsetY);
         }
       }
-      if (this.repeat === 'repeat-y' || this.repeat === 'no-repeat') {
+      if (repeat === 'repeat-y' || repeat === 'no-repeat') {
         patternWidth = 1;
         if (patternOffsetX) {
           patternWidth += Math.abs(patternOffsetX);
@@ -150,20 +153,20 @@
       else if (patternSource.toDataURL) {
         patternImgSrc = patternSource.toDataURL();
       }
-      if (this.patternTransform) {
-        patternTransform = ' patternTransform="' + fabric.util.matrixToSVG(this.patternTransform) + '" ';
-      }
 
       return '<pattern id="SVGID_' + this.id +
                     '" x="' + patternOffsetX +
                     '" y="' + patternOffsetY +
                     '" width="' + patternWidth +
-                    '" height="' + patternHeight + '"' + patternTransform + '>\n' +
-               '<image x="0" y="0"' +
+                    '" height="' + patternHeight +
+                    '" >\n' +
+               '\t<g transform="' + fabric.util.matrixToSVG(matrix) + '" >\n' +
+               '\t\t<image x="0" y="0"' +
                       ' width="' + patternSource.width +
                       '" height="' + patternSource.height +
                       '" xlink:href="' + patternImgSrc +
                '"></image>\n' +
+               '\t</g>\n' +
              '</pattern>\n';
     },
     /* _TO_SVG_END_ */
