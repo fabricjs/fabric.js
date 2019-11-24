@@ -531,6 +531,10 @@
     assert.equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
     object._setLineDash(canvas.contextContainer, object.strokeDashArray, null);
     assert.equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
+
+    assert.equal(canvas.contextContainer.getLineDash().length, 6, 'object pushed line dash to canvas');
+    object._setLineDash(canvas.contextContainer, [], null);
+    assert.equal(canvas.contextContainer.getLineDash().length, 6, 'bailed immediately as array empty');
   });
 
   QUnit.test('straighten', function(assert) {
