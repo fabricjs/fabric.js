@@ -1368,7 +1368,7 @@
      * @param {Function} alternative function to call if browser does not support lineDash
      */
     _setLineDash: function(ctx, dashArray, alternative) {
-      if (!dashArray) {
+      if (!dashArray || dashArray.length === 0) {
         return;
       }
       // Spec requires the concatenation of two copies the dash list when the number of elements is odd
