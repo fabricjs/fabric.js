@@ -8,6 +8,7 @@ global.visualCallback = {
 };
 global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
 global.getFixture = require('./lib/visualTestLoop').getFixture;
+global.getFixtureName = require('./lib/visualTestLoop').getFixtureName;
 global.getAsset = require('./lib/visualTestLoop').getAsset;
 global.getAssetName = require('./lib/visualTestLoop').getAssetName;
 global.imageDataToChalk = function(imageData) {

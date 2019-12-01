@@ -475,7 +475,7 @@
       }
 
       patterns.forEach(function (p, index) {
-        if (p && p.source) {
+        if (p && p.source !== undefined) {
           new fabric.Pattern(p, function(pattern) {
             enlivenedPatterns[index] = pattern;
             onLoaded();

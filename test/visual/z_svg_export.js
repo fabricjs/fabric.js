@@ -3,13 +3,16 @@
   fabric.isWebglSupported = false;
   var visualTestLoop;
   var getAssetName;
+  var getFixture;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
     getAssetName = global.getAssetName;
+    getFixture = global.getFixture;
   }
   else {
     visualTestLoop = window.visualTestLoop;
     getAssetName = window.getAssetName;
+    getFixture = window.getFixture;
   }
 
   function svgToDataURL(svgStr) {
@@ -31,12 +34,7 @@
       callback(newCanvas);
     };
     image.onerror = console.log;
-    if (fabric.isLikelyNode) {
-      image.src = dataUrl;
-    }
-    else {
-      image.src = dataUrl;
-    }
+    image.src = dataUrl;
   }
 
   var tests = [];
@@ -415,6 +413,34 @@
     percentage: 0.06,
     width: 760,
     height: 760,
+  });
+
+  function multiplePatternsWithTransforms(canvas, callback) {
+    var jsonData = '{"version":"3.5.1","objects":[{"type":"rect","version":"3.5.1","left":421.63,"top":197.93,"width":1920,"height":800,"fill":{"type":"pattern","source":"","repeat":"","crossOrigin":"Anonymous","offsetX":0,"offsetY":0,"patternTransform":[0.2,0,0,0.2,3,3]},"scaleX":0.14,"scaleY":0.14,"angle":334.31},{"type":"rect","version":"3.5.1","left":45,"top":-9,"width":1920,"height":800,"fill":{"type":"pattern","source":"","repeat":"no-repeat","crossOrigin":"Anonymous","offsetX":0,"offsetY":0,"patternTransform":[1.8,0,0,1.8,0,0]},"scaleX":0.2,"scaleY":0.2,"angle":15,"skewX":-17.44},{"type":"rect","version":"3.5.1","left":61.91,"top":175.88,"width":1920,"height":800,"fill":{"type":"pattern","source":"","repeat":"","crossOrigin":"Anonymous","offsetX":0,"offsetY":0,"patternTransform":[0.8660254037844387,-0.49999999999999994,0.49999999999999994,0.8660254037844387,0,0]},"scaleX":0.21,"scaleY":0.21,"angle":15}]}';
+    canvas.loadFromJSON(jsonData, function() {
+      getFixture('diet.jpeg', false, function(img2) {
+        var canvasEl = fabric.util.createCanvasElement();
+        canvasEl.width = img2.width;
+        canvasEl.height = img2.height;
+        canvasEl.getContext('2d').drawImage(img2, 0, 0);
+        var src = canvasEl.toDataURL();
+        img2.src = src;
+        canvas.getObjects().forEach(function(obj) {
+          obj.fill.source = img2;
+        });
+        canvas.renderAll();
+        toSVGCanvas(canvas, callback);
+      });
+    });
+  }
+
+  tests.push({
+    test: 'Multiple patterns transforms',
+    code: multiplePatternsWithTransforms,
+    golden: 'multiplePatternsWithTransforms.png',
+    percentage: 0.06,
+    width: 700,
+    height: 700,
   });
   tests.forEach(visualTestLoop(QUnit));
 })();

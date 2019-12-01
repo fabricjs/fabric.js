@@ -60,7 +60,7 @@
     var finalName = '/fixtures/' + filename;
     return fabric.isLikelyNode ? localPath('/..', finalName) : getAbsolutePath('/test' + finalName);
   }
-
+  exports.getFixtureName = getFixtureName;
   function getImage(filename, original, callback) {
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
