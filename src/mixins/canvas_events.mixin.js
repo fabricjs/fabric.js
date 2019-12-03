@@ -777,7 +777,7 @@
     __onMouseMove: function (e) {
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
-      var target, pointer;
+      var target, pointer, _this = this;
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
@@ -803,6 +803,14 @@
         target = this.findTarget(e) || null;
         this._setCursorFromEvent(e, target);
         this._fireOverOutEvents(target, e);
+        // handle triggering on SubTargets
+        this.targets.map(function(subTarget,k){
+          _this._fireOverOutEvents(subTarget, e, '_hoveredTarget' + (_this.targets.length - k - 1));
+        });
+        // hoverCursor should come from top-most subtarget
+        this.targets.slice(0).reverse().map(function(subTarget){
+          _this._setCursorFromEvent(e, subTarget);
+        });
       }
       else {
         this._transformObject(e);
@@ -815,11 +823,12 @@
      * Manage the mouseout, mouseover events for the fabric object on the canvas
      * @param {Fabric.Object} target the target where the target from the mousemove event
      * @param {Event} e Event object fired on mousemove
+     * @param {String} targetName property on the canvas where the target is stored
      * @private
      */
-    _fireOverOutEvents: function(target, e) {
+    _fireOverOutEvents: function(target, e, targetName) {
       this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_hoveredTarget',
+        targetName: targetName || '_hoveredTarget',
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
@@ -866,6 +875,7 @@
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
         oldTarget.fire(config.evtOut, outOpt);
+        delete this[config.targetName]; // de-reference old target to prevent leaks
       }
       if (inFires) {
         canvasEvtIn && this.fire(canvasEvtIn, inOpt);
