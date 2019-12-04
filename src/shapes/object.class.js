@@ -2116,4 +2116,23 @@
    */
   fabric.Object.__uid = 0;
 
+  /**
+   * A GUID for tracking hovered targets and sub targets
+   * simply tracking via subTargets[index] is not reliable
+   */
+  function generateGUID() {
+    // https://stackoverflow.com/questions/8012002/create-a-unique-number-with-javascript-time
+    return new Date().valueOf().toString(36) + Math.random().toString(36).substr(2);
+    // return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    //   var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    //   return v.toString(16);
+    // });
+  }
+  fabric.Object.prototype.__defineGetter__('__guid', function(){
+    if (!this.__myGUID) {
+      this.__myGUID = generateGUID();
+    }
+    return this.__myGUID;
+  });
+
 })(typeof exports !== 'undefined' ? exports : this);

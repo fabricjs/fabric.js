@@ -65,6 +65,10 @@
       this._initStatic(el, options);
       this._initInteractive();
       this._createCacheCanvas();
+      this._hoveredTargets = {};
+      this._hoveredTargetsOrdered = [];
+      this._draggedoverTargets = {};
+      this._draggedoverTargetsOrdered = [];
     },
 
     /**
@@ -1477,8 +1481,21 @@
         this.fire('selection:cleared', { target: obj });
         obj.fire('deselected');
       }
-      if (this._hoveredTarget === obj) {
-        this._hoveredTarget = null;
+      if (this._hoveredTargets[obj.__guid]) {
+        var hoveredOrderedIndex = this._hoveredTargetsOrdered.indexOf(obj.__guid);
+        if (hoveredOrderedIndex > -1) {
+          this._hoveredTargetsOrdered.splice(hoveredOrderedIndex, 1);
+        }
+        this._hoveredTargets[obj.__guid] = null;
+        delete this._hoveredTargets[obj.__guid];
+      }
+      if (this._draggedoverTargets[obj.__guid]) {
+        var draggedoverOrderedIndex = this._draggedoverTargetsOrdered.indexOf(obj.__guid);
+        if (draggedoverOrderedIndex > -1) {
+          this._draggedoverTargetsOrdered.splice(draggedoverOrderedIndex, 1);
+        }
+        this._draggedoverTargets[obj.__guid] = null;
+        delete this._draggedoverTargets[obj.__guid];
       }
       this.callSuper('_onObjectRemoved', obj);
     },

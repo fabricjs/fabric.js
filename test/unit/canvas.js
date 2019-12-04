@@ -276,9 +276,17 @@
   QUnit.test('remove actual hovered target', function(assert) {
     var rect1 = makeRect();
     canvas.add(rect1);
-    canvas._hoveredTarget = rect1;
+    canvas._hoveredTargetsOrdered.push(rect1.__guid);
+    canvas._hoveredTargets[rect1.__guid] = rect1;
     canvas.remove(rect1);
-    assert.equal(canvas._hoveredTarget, null, 'reference to hovered target should be removed');
+    assert.equal(
+      canvas._hoveredTargetsOrdered.indexOf(rect1.__guid),
+      -1,
+      'reference to hovered target should be removed');
+    assert.equal(
+      typeof canvas._hoveredTargetsOrdered[rect1.__guid],
+      'undefined',
+      'reference to hovered target should be removed');
   });
 
   QUnit.test('before:selection:cleared', function(assert) {
@@ -340,7 +348,8 @@
     canvas.on('selection:created', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
     canvas._createActiveSelection(rect2, {});
-    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
+    assert.equal(canvas._hoveredTargetsOrdered.indexOf(canvas.getActiveObject().__guid), 0, 'the created selection is also hovered');
+    assert.equal(canvas._hoveredTargets[canvas.getActiveObject().__guid], canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
   });
@@ -364,7 +373,13 @@
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
     canvas._updateActiveSelection(rect3, {});
     assert.equal(isFired, true, 'selection:updated fired');
-    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
+    assert.equal(canvas._hoveredTargetsOrdered.indexOf(canvas.getActiveObject().__guid),
+      0,
+      'hovered target is updated');
+    assert.equal(canvas._hoveredTargets[canvas.getActiveObject().__guid],
+      canvas.getActiveObject(),
+      'hovered target is updated');
+
     canvas.off('selection:updated');
   });
 

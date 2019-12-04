@@ -168,7 +168,6 @@
     _onMouseOut: function(e) {
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
-      this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
@@ -176,6 +175,13 @@
             obj.hiddenTextarea.focus();
           }
         });
+      }
+      var hoveredOrderedIndex = this._hoveredTargetsOrdered.indexOf(target ? target.__guid : null);
+      if (hoveredOrderedIndex > -1) {
+        // de-ref to prevent memory leaks
+        this._hoveredTargetsOrdered.splice(hoveredOrderedIndex,1);
+        this._hoveredTargets[target ? target.__guid : null] = null;
+        delete this._hoveredTargets[target ? target.__guid : null];
       }
     },
 
@@ -192,7 +198,8 @@
       // side effects we added to it.
       if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
-        this._hoveredTarget = null;
+        this._hoveredTargets = {};
+        this._hoveredTargetsOrdered = [];
       }
     },
 
@@ -231,7 +238,7 @@
     _onDragOver: function(e) {
       e.preventDefault();
       var target = this._simpleEventHandler('dragover', e);
-      this._fireEnterLeaveEvents(target, e);
+      this._fireEnterLeaveEvents([target].concat(this.targets), e);
     },
 
     /**
@@ -801,12 +808,12 @@
       }
       else if (!this._currentTransform) {
         target = this.findTarget(e) || null;
+
+        // console.log(target, this.targets);
+
         this._setCursorFromEvent(e, target);
-        this._fireOverOutEvents(target, e);
-        // handle triggering on SubTargets
-        this.targets.map(function(subTarget,k){
-          _this._fireOverOutEvents(subTarget, e, '_hoveredTarget' + (_this.targets.length - k - 1));
-        });
+        this._fireOverOutEvents([target].concat(this.targets), e);
+
         // hoverCursor should come from top-most subtarget
         this.targets.slice(0).reverse().map(function(subTarget){
           _this._setCursorFromEvent(e, subTarget);
@@ -821,14 +828,14 @@
 
     /**
      * Manage the mouseout, mouseover events for the fabric object on the canvas
-     * @param {Fabric.Object} target the target where the target from the mousemove event
+     * @param {Array} [fabric.Object] target Array of targets from the mousemove event
      * @param {Event} e Event object fired on mousemove
      * @param {String} targetName property on the canvas where the target is stored
      * @private
      */
-    _fireOverOutEvents: function(target, e, targetName) {
-      this.fireSyntheticInOutEvents(target, e, {
-        targetName: targetName || '_hoveredTarget',
+    _fireOverOutEvents: function(targets, e) {
+      this.fireSyntheticInOutEvents(targets, e, {
+        targetName: '_hoveredTargets',
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
@@ -842,9 +849,9 @@
      * @param {Event} e Event object fired on ondrag
      * @private
      */
-    _fireEnterLeaveEvents: function(target, e) {
-      this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_draggedoverTarget',
+    _fireEnterLeaveEvents: function(targets, e) {
+      this.fireSyntheticInOutEvents(targets, e, {
+        targetName: '_draggedoverTargets',
         evtOut: 'dragleave',
         evtIn: 'dragenter',
       });
@@ -852,7 +859,7 @@
 
     /**
      * Manage the synthetic in/out events for the fabric objects on the canvas
-     * @param {Fabric.Object} target the target where the target from the supported events
+     * @param {Array} targets [fabric.Object] targets from the supported events
      * @param {Event} e Event object fired
      * @param {Object} config configuration for the function to work
      * @param {String} config.targetName property on the canvas where the old target is stored
@@ -862,24 +869,71 @@
      * @param {String} config.evtIn name of the event to fire for in
      * @private
      */
-    fireSyntheticInOutEvents: function(target, e, config) {
-      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
-          targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
-      if (targetChanged) {
-        inOpt = { e: e, target: target, previousTarget: oldTarget };
-        outOpt = { e: e, target: oldTarget, nextTarget: target };
-        this[config.targetName] = target;
+    fireSyntheticInOutEvents: function(targets, e, config) {
+      targets = targets || [];
+      var _this = this,
+          targetsKeyed = {},
+          targetGuidsOrdered = [],
+          oldTargets = this[config.targetName],
+          oldTargetsOrdered = this[config.targetName + 'Ordered'],
+          outFires,
+          inFires,
+          targetsChanged,
+          canvasEvtIn = config.canvasEvtIn,
+          canvasEvtOut = config.canvasEvtOut;
+
+      // array => object conversion for comparison
+      targets && targets.map(function(target){
+        if (target) {
+          targetsKeyed[target.__guid] = target;
+        }
+        if (target) {
+          targetGuidsOrdered.push(target.__guid);
+        };
+      });
+
+      var string1 = JSON.stringify(Object.keys(oldTargets));
+      var string2 = JSON.stringify(Object.keys(targetsKeyed));
+      targetsChanged = string1 !== string2;
+
+      if (targetsChanged) {
+        this[config.targetName] = targetsKeyed;
+        this[config.targetName + 'Ordered'] = targetGuidsOrdered;
       }
-      inFires = target && targetChanged;
-      outFires = oldTarget && targetChanged;
+
+      inFires = targets.length && targetsChanged;
+      outFires = Object.keys(oldTargets).length && targetsChanged;
+
       if (outFires) {
-        canvasEvtOut && this.fire(canvasEvtOut, outOpt);
-        oldTarget.fire(config.evtOut, outOpt);
-        delete this[config.targetName]; // de-reference old target to prevent leaks
+        oldTargetsOrdered.map(function(uuid){
+          var oldTarget = oldTargets[uuid];
+          if (!oldTarget){
+            return;
+          }
+          var outOpt = {
+            e: e,
+            target: oldTarget,
+            previousTargets: oldTargets,
+            previousTargetsOrdered: oldTargetsOrdered
+          };
+          canvasEvtOut && _this.fire(canvasEvtOut, outOpt);
+          oldTarget.fire(config.evtOut, outOpt);
+        });
       }
       if (inFires) {
-        canvasEvtIn && this.fire(canvasEvtIn, inOpt);
-        target.fire(config.evtIn, inOpt);
+        targets.map(function(target){
+          if (!target){
+            return;
+          }
+          var inOpt = {
+            e: e,
+            target: target,
+            previousTargets: oldTargets,
+            previousTargetsOrdered: oldTargetsOrdered
+          };
+          canvasEvtIn && _this.fire(canvasEvtIn, inOpt);
+          target.fire(config.evtIn, inOpt);
+        });
       }
     },
 
