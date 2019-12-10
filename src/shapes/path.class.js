@@ -497,46 +497,83 @@
      */
     _parsePath: function() {
       var result = [],
-          coords = [],
-          currentPath,
-          parsed,
-          re = fabric.rePathCommand,
-          match,
-          coordsStr;
+          rNumber = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?\s*`,
+          rCommaWsp = String.raw`(?:\s,?\s*|,\s*)`,
+          rNumberCommaWsp = `(${rNumber})${rCommaWsp}`,
+          rFlagCommaWsp = `([01])${rCommaWsp}?`,
+          rCoordinatePair = String.raw`(${rNumber})${rCommaWsp}?(${rNumber})`,
+          rArcSeq = (`${rNumberCommaWsp}?`).repeat(2) + rNumberCommaWsp + rFlagCommaWsp.repeat(2) + rCoordinatePair,
+          regPathInstructions = /([MmLlHhVvCcSsQqTtAaZz])\s*/,
+          regCoordinateSequence = new RegExp(rNumber, 'g'),
+          regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
+          pathData = [], // JS representation of the path data
+          instruction, // current instruction context
+          startMoveto = false;
 
-      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
-        currentPath = this.path[i];
-
-        coordsStr = currentPath.slice(1).trim();
-        coords.length = 0;
-
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
+      this.path.join(' ').split(regPathInstructions).forEach(function(data) {
+        if (!data) return;
+        if (!startMoveto) {
+          if (data == 'M' || data == 'm') {
+            startMoveto = true;
+          } else return;
         }
+        // instruction item
+        if (regPathInstructions.test(data)) {
+          instruction = data;
 
-        coordsParsed = [currentPath.charAt(0)];
+          // z - instruction w/o data
+          if (instruction == 'Z' || instruction == 'z') {
+            pathData.push('z');
+          }
+          // data item
+        } else {
+          /* jshint boss: true */
+          if (instruction == 'A' || instruction == 'a') {
+            const newData = [];
+            for (var args; (args = regArcArgumentSequence.exec(data));) {
+              for (let i = 1; i < args.length; i++) {
+                newData.push(args[i]);
+              }
+            }
+            data = newData;
+          } else {
+            data = data.match(regCoordinateSequence);
+          }
+          if (!data) return;
 
-        for (var j = 0, jlen = coords.length; j < jlen; j++) {
-          parsed = parseFloat(coords[j]);
-          if (!isNaN(parsed)) {
-            coordsParsed.push(parsed);
+          data = data.map(Number);
+          // Subsequent moveto pairs of coordinates are threated as implicit lineto commands
+          // http://www.w3.org/TR/SVG/paths.html#PathDataMovetoCommands
+          if (instruction == 'M' || instruction == 'm') {
+            pathData.push({
+              instruction: pathData.length == 0 ? 'M' : instruction,
+              data       : data.splice(0, 2),
+            });
+            instruction = instruction == 'M' ? 'L' : 'l';
+          }
+
+          for (let pair = commandLengths[instruction.toLowerCase()]; data.length;) {
+            pathData.push({
+              instruction,
+              data: data.splice(0, pair),
+            });
           }
         }
+      });
 
-        var command = coordsParsed[0],
-            commandLength = commandLengths[command.toLowerCase()],
-            repeatedCommand = repeatedCommands[command] || command;
-
-        if (coordsParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
-            command = repeatedCommand;
-          }
-        }
-        else {
-          result.push(coordsParsed);
-        }
+      // First moveto is actually absolute. Subsequent coordinates were separated above.
+      if (pathData.length && pathData[0].instruction == 'm') {
+        pathData[0].instruction = 'M';
       }
+
+      pathData.forEach(function(command) {
+        var arr = [command.instruction];
+        if (command.data) {
+          console.log(command.data);
+          arr = arr.concat(command.data);
+        }
+        result.push(arr);
+      });
 
       return result;
     },
