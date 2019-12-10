@@ -569,7 +569,6 @@
       pathData.forEach(function(command) {
         var arr = [command.instruction];
         if (command.data) {
-          console.log(command.data);
           arr = arr.concat(command.data);
         }
         result.push(arr);
