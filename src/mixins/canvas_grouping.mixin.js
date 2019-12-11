@@ -52,22 +52,38 @@
           currentActiveObjects = activeSelection._objects.slice(0);
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
-        this._hoveredTargets = {};
-        this._hoveredTargets[activeSelection.__guid] = activeSelection;
-        this._hoveredTargetsOrdered = [activeSelection.__guid];
+        this._hoveredTarget = target;
+        // ISSUE-4115: clear out any additional hovered targets that were set?
+        // should we fire mouse:out on those?
+        var keys = Object.keys(this);
+        for (var i = 0; i < keys.length; i++){
+          var key = keys[i];
+          if (key.indexOf('_hoveredTarget') > -1){
+            this[key] = null;
+          }
+        }
+        // ISSUE-4115: loop through this.targets and assign them as hovered as well?
+        // why don't we fire mouse:over here?
+        for (var i = 0; i < this.targets.length; i++){
+          this['_hoveredTarget' + i] = this.targets[i];
+        }
         if (activeSelection.size() === 1) {
           // activate last remaining object
           this._setActiveObject(activeSelection.item(0), e);
-          this._hoveredTargets = {};
-          this._hoveredTargets[target.__guid] = target;
-          this._hoveredTargetsOrdered = [target.__guid];
         }
       }
       else {
         activeSelection.addWithUpdate(target);
-        this._hoveredTargets = {};
-        this._hoveredTargets[activeSelection.__guid] = activeSelection;
-        this._hoveredTargetsOrdered = [activeSelection.__guid];
+        this._hoveredTarget = activeSelection;
+        // ISSUE-4115: clear out any additional hovered targets that were set?
+        // should we fire mouse:out on those?
+        var keys = Object.keys(this);
+        for (var i = 0; i < keys.length; i++){
+          var key = keys[i];
+          if (key.indexOf('_hoveredTarget') > -1){
+            this[key] = null;
+          }
+        }
       }
       this._fireSelectionEvents(currentActiveObjects, e);
     },
@@ -77,9 +93,8 @@
      */
     _createActiveSelection: function(target, e) {
       var currentActives = this.getActiveObjects(), group = this._createGroup(target);
-      this._hoveredTargets = {};
-      this._hoveredTargets[group.__guid] = group;
-      this._hoveredTargetsOrdered = [group.__guid];
+      this._hoveredTarget = group;
+      // ISSUE 4115: should we consider subTargets here?
       this._setActiveObject(group, e);
       this._fireSelectionEvents(currentActives, e);
     },

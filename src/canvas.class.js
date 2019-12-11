@@ -65,10 +65,6 @@
       this._initStatic(el, options);
       this._initInteractive();
       this._createCacheCanvas();
-      this._hoveredTargets = {};
-      this._hoveredTargetsOrdered = [];
-      this._draggedoverTargets = {};
-      this._draggedoverTargetsOrdered = [];
     },
 
     /**
@@ -1481,21 +1477,21 @@
         this.fire('selection:cleared', { target: obj });
         obj.fire('deselected');
       }
-      if (this._hoveredTargets[obj.__guid]) {
-        var hoveredOrderedIndex = this._hoveredTargetsOrdered.indexOf(obj.__guid);
-        if (hoveredOrderedIndex > -1) {
-          this._hoveredTargetsOrdered.splice(hoveredOrderedIndex, 1);
+      // TODO: need a way to cleanly check if obj is one of _hoveredTargetN and de-ref it
+      // if (obj === this._hoveredTarget){
+      //   this._hoveredTarget = null;
+      // }
+      // is there a more sane way than looping through ALL properties of *this* ?
+      // i wanted to put them into a ._hoveredTargets[Array]
+      // but, that complicates the logic of fireSyntheticInOutEvents
+      var keys = Object.keys(this);
+      for (var i = 0; i < keys.length; i++){
+        var key = keys[i];
+        if (key.indexOf('_hoveredTarget') > -1){
+          if (obj === this[key]){
+            this[key] = null;
+          }
         }
-        this._hoveredTargets[obj.__guid] = null;
-        delete this._hoveredTargets[obj.__guid];
-      }
-      if (this._draggedoverTargets[obj.__guid]) {
-        var draggedoverOrderedIndex = this._draggedoverTargetsOrdered.indexOf(obj.__guid);
-        if (draggedoverOrderedIndex > -1) {
-          this._draggedoverTargetsOrdered.splice(draggedoverOrderedIndex, 1);
-        }
-        this._draggedoverTargets[obj.__guid] = null;
-        delete this._draggedoverTargets[obj.__guid];
       }
       this.callSuper('_onObjectRemoved', obj);
     },

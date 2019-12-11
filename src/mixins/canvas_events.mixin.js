@@ -166,22 +166,32 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseOut: function(e) {
+      console.log('_onMouseOut',e);
+
+      // pre-ISSUE-4115
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
       target && target.fire('mouseout', { e: e });
+
+      // post-ISSUE-4115
+      // should we really be firing mouseOut on ALL _hoveredTargets?
+      // maybe just the top-level one? I dunno...
+      var keys = Object.keys(this);
+      for (var i = 0; i < keys.length; i++){
+        var key = keys[i];
+        if (key.indexOf('_hoveredTarget') > -1){
+          var target = this[key];
+          this.fire('mouse:out', { target: target, e: e });
+          target && target.fire('mouseout', { e: e });
+        }
+      }
+
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
           if (obj.isEditing) {
             obj.hiddenTextarea.focus();
           }
         });
-      }
-      var hoveredOrderedIndex = this._hoveredTargetsOrdered.indexOf(target ? target.__guid : null);
-      if (hoveredOrderedIndex > -1) {
-        // de-ref to prevent memory leaks
-        this._hoveredTargetsOrdered.splice(hoveredOrderedIndex,1);
-        this._hoveredTargets[target ? target.__guid : null] = null;
-        delete this._hoveredTargets[target ? target.__guid : null];
       }
     },
 
@@ -198,8 +208,16 @@
       // side effects we added to it.
       if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
-        this._hoveredTargets = {};
-        this._hoveredTargetsOrdered = [];
+        // PRE-ISSUE-4115
+        // this._hoveredTarget = null;
+        // POST-ISSUE-4115
+        var keys = Object.keys(this);
+        for (var i = 0; i < keys.length; i++){
+          var key = keys[i];
+          if (key.indexOf('_hoveredTarget') > -1){
+            this[key] = null;
+          }
+        }
       }
     },
 
@@ -812,7 +830,7 @@
         this._fireOverOutEvents(target, e);
         // handle triggering on SubTargets
         this.targets.map(function(subTarget,k){
-          _this._fireOverOutEvents(subTarget, e, '_hoveredTarget' + (k)); // also tried _this.targets.length - k
+          _this._fireOverOutEvents(subTarget, e, '_hoveredTarget' + k);
         });
         // hoverCursor should come from top-most subtarget
         this.targets.slice(0).reverse().map(function(subTarget){
@@ -871,10 +889,11 @@
       var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
-        inOpt = { e: e, target: target, previousTarget: oldTarget };
-        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        inOpt = {e: e, target: target, previousTarget: oldTarget};
+        outOpt = {e: e, target: oldTarget, nextTarget: target};
         this[config.targetName] = target;
-
+        console.log(config.targetName, target); //
+      }
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
         oldTarget.fire(config.evtOut, outOpt);

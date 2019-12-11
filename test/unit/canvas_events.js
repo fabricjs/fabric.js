@@ -537,12 +537,9 @@
     var event = fabric.document.createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
-    var obj = new fabric.Object();
-    c._hoveredTargets[obj.__guid] = obj;
-    c._hoveredTargetsOrdered = [obj.__guid];
+    c._hoveredTarget = new fabric.Object();
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(canvas._hoveredTargetsOrdered.indexOf(obj.__guid), -1, 'reference to hovered target should be removed');
-    assert.equal(typeof canvas._hoveredTargetsOrdered[obj.__guid], 'undefined', 'reference to hovered target should be removed');
+    assert.equal(c._hoveredTarget, null, '_hoveredTarget has been removed');
   });
 
   QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
@@ -550,12 +547,10 @@
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
-    c._hoveredTargets[obj.__guid] = obj;
-    c._hoveredTargetsOrdered = [obj.__guid];
+    c._hoveredTarget = obj;
     c.currentTransform = {};
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(c._hoveredTargetsOrdered.indexOf(obj.__guid), 0, '_hoveredTarget has not been removed');
-    assert.equal(c._hoveredTargets[obj.__guid], obj, '_hoveredTarget has not been removed');
+    assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
   });
 
   QUnit.test('mouseEnter removes __corner', function(assert) {
