@@ -74,11 +74,8 @@ fabric.SHARED_ATTRIBUTES = [
  */
 fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
-fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
-fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };
 fabric.iMatrix = [1, 0, 0, 1, 0, 0];
-fabric.svgNS = 'http://www.w3.org/2000/svg';
 
 /**
  * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
@@ -2754,13 +2751,29 @@ fabric.CommonMethods = {
  * Wrapper around `console.log` (when available)
  * @param {*} [values] Values to log
  */
-fabric.log = console.log;
+fabric.log = function() { };
 
 /**
  * Wrapper around `console.warn` (when available)
  * @param {*} [values] Values to log as a warning
  */
-fabric.warn = console.warn;
+fabric.warn = function() { };
+
+/* eslint-disable */
+if (typeof console !== 'undefined') {
+
+  ['log', 'warn'].forEach(function(methodName) {
+
+    if (typeof console[methodName] !== 'undefined' &&
+        typeof console[methodName].apply === 'function') {
+
+      fabric[methodName] = function() {
+        return console[methodName].apply(console, arguments);
+      };
+    }
+  });
+}
+/* eslint-enable */
 
 
 (function() {
@@ -3370,9 +3383,7 @@ fabric.warn = console.warn;
       colorAttributes = {
         stroke: 'strokeOpacity',
         fill:   'fillOpacity'
-      },
-
-      fSize = 'font-size', cPath = 'clip-path';
+      };
 
   fabric.svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
   fabric.svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
@@ -3787,14 +3798,14 @@ fabric.warn = console.warn;
           y = el.getAttribute('y') || 0,
           el2 = elementById(doc, xlink).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
-          parentNode, oldLength = nodelist.length, attr, j, attrs, len, namespace = fabric.svgNS;
+          parentNode, oldLength = nodelist.length, attr, j, attrs, len;
 
       applyViewboxTransform(el2);
       if (/^svg$/i.test(el2.nodeName)) {
-        var el3 = el2.ownerDocument.createElementNS(namespace, 'g');
+        var el3 = el2.ownerDocument.createElement('g');
         for (j = 0, attrs = el2.attributes, len = attrs.length; j < len; j++) {
           attr = attrs.item(j);
-          el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue);
+          el3.setAttribute(attr.nodeName, attr.nodeValue);
         }
         // el2.firstChild != null
         while (el2.firstChild) {
@@ -3939,7 +3950,7 @@ fabric.warn = console.warn;
                   (minY * scaleY + heightDiff) + ') ';
     parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
-      el = element.ownerDocument.createElementNS(fabric.svgNS, 'g');
+      el = element.ownerDocument.createElement('g');
       // element.firstChild != null
       while (element.firstChild) {
         el.appendChild(element.firstChild);
@@ -4164,21 +4175,13 @@ fabric.warn = console.warn;
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      var cssAttrs = extend(
-        getGlobalStylesForElement(element, svgUid),
-        fabric.parseStyleAttribute(element)
-      );
-      ownAttributes = extend(
-        ownAttributes,
-        cssAttrs
-      );
-      if (cssAttrs[cPath]) {
-        element.setAttribute(cPath, cssAttrs[cPath]);
-      }
+      ownAttributes = extend(ownAttributes,
+        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
+
       fontSize = parentFontSize = parentAttributes.fontSize || fabric.Text.DEFAULT_SVG_FONT_SIZE;
-      if (ownAttributes[fSize]) {
+      if (ownAttributes['font-size']) {
         // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
-        ownAttributes[fSize] = fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
+        ownAttributes['font-size'] = fontSize = parseUnit(ownAttributes['font-size'], parentFontSize);
       }
 
       var normalizedAttr, normalizedValue, normalizedStyle = {};
@@ -4394,7 +4397,7 @@ fabric.warn = console.warn;
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
+fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions) {
   this.elements = elements;
   this.callback = callback;
   this.options = options;
@@ -4402,7 +4405,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
-  this.doc = doc;
 };
 
 (function(proto) {
@@ -4449,7 +4451,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, el);
+      _this.resolveClipPath(obj);
       _this.reviver && _this.reviver(el, obj);
       _this.instances[index] = obj;
       _this.checkIfDone();
@@ -4457,13 +4459,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   };
 
   proto.extractPropertyDefinition = function(obj, property, storage) {
-    var value = obj[property], regex = this.regexUrl;
-    if (!regex.test(value)) {
+    var value = obj[property];
+    if (!(/^url\(/).test(value)) {
       return;
     }
-    regex.lastIndex = 0;
-    var id = regex.exec(value)[1];
-    regex.lastIndex = 0;
+    var id = this.regexUrl.exec(value)[1];
+    this.regexUrl.lastIndex = 0;
     return fabric[storage][this.svgUid][id];
   };
 
@@ -4484,19 +4485,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     };
   };
 
-  proto.resolveClipPath = function(obj, usingElement) {
+  proto.resolveClipPath = function(obj) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
         element, klass, objTransformInv, container, gTransform, options;
     if (clipPath) {
       container = [];
       objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
-      // move the clipPath tag as sibling to the real element that is using it
-      var clipPathTag = clipPath[0].parentNode;
-      var clipPathOwner = usingElement;
-      while (clipPathOwner.parentNode && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
-        clipPathOwner = clipPathOwner.parentNode;
-      }
-      clipPathOwner.parentNode.appendChild(clipPathTag);
       for (var i = 0; i < clipPath.length; i++) {
         element = clipPath[i];
         klass = this.findTag(element);
@@ -4517,7 +4511,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
+        this.resolveClipPath(clipPath);
       }
       var options = fabric.util.qrDecompose(gTransform);
       clipPath.flipX = false;
@@ -9658,20 +9652,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     fireMiddleClick: false,
 
     /**
-     * Keep track of the hovered target
-     * @type fabric.Object
-     * @private
-     */
-    _hoveredTarget: null,
-
-    /**
-     * hold the list of nested targets hovered
-     * @type fabric.Object
-     * @private
-     */
-    _hoveredTargets: [],
-
-    /**
      * @private
      */
     _initInteractive: function() {
@@ -11886,24 +11866,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _fireOverOutEvents: function(target, e) {
       this.fireSyntheticInOutEvents(target, e, {
-        oldTarget: this._hoveredTarget,
+        targetName: '_hoveredTarget',
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
         evtIn: 'mouseover',
       });
-      this.targets.forEach(function(_target, index) {
-        this.fireSyntheticInOutEvents(_target, e, {
-          oldTarget: this._hoveredTargets[index],
-          canvasEvtOut: 'mouse:out',
-          evtOut: 'mouseout',
-          canvasEvtIn: 'mouse:over',
-          evtIn: 'mouseover',
-        });
-      });
-      // whatever it happened, the target is not the hovered target.
-      this._hoveredTarget = target;
-      this._hoveredTargets = this.targets.concat();
     },
 
     /**
@@ -11933,11 +11901,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     fireSyntheticInOutEvents: function(target, e, config) {
-      var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
+      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
         inOpt = { e: e, target: target, previousTarget: oldTarget };
         outOpt = { e: e, target: oldTarget, nextTarget: target };
+        this[config.targetName] = target;
       }
       inFires = target && targetChanged;
       outFires = oldTarget && targetChanged;
@@ -14058,7 +14027,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Function} alternative function to call if browser does not support lineDash
      */
     _setLineDash: function(ctx, dashArray, alternative) {
-      if (!dashArray || dashArray.length === 0) {
+      if (!dashArray) {
         return;
       }
       // Spec requires the concatenation of two copies the dash list when the number of elements is odd
@@ -18734,7 +18703,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           coords = [],
           currentPath,
           parsed,
-          re = fabric.rePathCommand,
+          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
           match,
           coordsStr;
 
@@ -27307,17 +27276,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var text = this._text,
-          index     = this._reSpace.test(text[selectionStart]) ? selectionStart - 1 : selectionStart,
-          _char     = text[index],
-          // wrong
-          reNonWord = fabric.reNonWord;
+      var index     = this._reSpace.test(this._text[selectionStart]) ? selectionStart - 1 : selectionStart,
+          _char     = this._text[index],
+          reNonWord = /[ \n\.,;!\?\-]/;
 
-      while (!reNonWord.test(_char) && index > 0 && index < text.length) {
+      while (!reNonWord.test(_char) && index > 0 && index < this._text.length) {
         index += direction;
-        _char = text[index];
+        _char = this._text[index];
       }
-      if (reNonWord.test(_char)) {
+      if (reNonWord.test(_char) && _char !== '\n') {
         index += direction === 1 ? 0 : 1;
       }
       return index;
@@ -28015,31 +27982,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Default handler for double click, select a word
-   */
-  doubleClickHandler: function(options) {
-    if (!this.isEditing) {
-      return;
-    }
-    this.selectWord(this.getSelectionStartFromPointer(options.e));
-  },
-
-  /**
-   * Default handler for triple click, select a line
-   */
-  tripleClickHandler: function(options) {
-    if (!this.isEditing) {
-      return;
-    }
-    this.selectLine(this.getSelectionStartFromPointer(options.e));
-  },
-
-  /**
    * Initializes double and triple click event handlers
    */
   initClicks: function() {
-    this.on('mousedblclick', this.doubleClickHandler);
-    this.on('tripleclick', this.tripleClickHandler);
+    this.on('mousedblclick', function(options) {
+      this.selectWord(this.getSelectionStartFromPointer(options.e));
+    });
+    this.on('tripleclick', function(options) {
+      this.selectLine(this.getSelectionStartFromPointer(options.e));
+    });
   },
 
   /**
@@ -28077,9 +28028,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
       return;
     }
-    // we want to avoid that an object that was selected and then becomes unselectable,
-    // may trigger editing mode in some way.
-    this.selected = this === this.canvas._activeObject;
+    if (this === this.canvas._activeObject) {
+      this.selected = true;
+    }
   },
 
   /**
