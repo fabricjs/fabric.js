@@ -472,11 +472,10 @@
           y = el.getAttribute('y') || 0,
           el2 = elementById(doc, xlink).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
-          parentNode, oldLength = nodelist.length, attr, j, attrs, len;
+          parentNode, oldLength = nodelist.length, attr, j, attrs, len, namespace = fabric.svgNS;
 
       applyViewboxTransform(el2);
       if (/^svg$/i.test(el2.nodeName)) {
-        var namespace = 'http://www.w3.org/2000/svg';
         var el3 = el2.ownerDocument.createElementNS(namespace, 'g');
         for (j = 0, attrs = el2.attributes, len = attrs.length; j < len; j++) {
           attr = attrs.item(j);
@@ -625,7 +624,7 @@
                   (minY * scaleY + heightDiff) + ') ';
     parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
-      el = element.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'g');
+      el = element.ownerDocument.createElementNS(fabric.svgNS, 'g');
       // element.firstChild != null
       while (element.firstChild) {
         el.appendChild(element.firstChild);
