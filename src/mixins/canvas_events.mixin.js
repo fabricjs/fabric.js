@@ -819,12 +819,24 @@
      */
     _fireOverOutEvents: function(target, e) {
       this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_hoveredTarget',
+        oldTarget: this._hoveredTarget,
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
         evtIn: 'mouseover',
       });
+      this.targets.forEach(function(_target, index) {
+        this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: this._hoveredTargets[index],
+          canvasEvtOut: 'mouse:out',
+          evtOut: 'mouseout',
+          canvasEvtIn: 'mouse:over',
+          evtIn: 'mouseover',
+        });
+      });
+      // whatever it happened, the target is not the hovered target.
+      this._hoveredTarget = target;
+      this._hoveredTargets = this.targets.concat();
     },
 
     /**
@@ -854,12 +866,11 @@
      * @private
      */
     fireSyntheticInOutEvents: function(target, e, config) {
-      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+      var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
         inOpt = { e: e, target: target, previousTarget: oldTarget };
         outOpt = { e: e, target: oldTarget, nextTarget: target };
-        this[config.targetName] = target;
       }
       inFires = target && targetChanged;
       outFires = oldTarget && targetChanged;
