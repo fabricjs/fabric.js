@@ -835,7 +835,6 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      var _this = this;
       this.fireSyntheticInOutEvents(target, e, {
         oldTarget: this._hoveredTarget,
         canvasEvtOut: 'mouse:out',
@@ -843,6 +842,7 @@
         canvasEvtIn: 'mouse:over',
         evtIn: 'mouseover',
       });
+      var _this = this;
       this.targets.forEach(function(_target, index) {
         _this.fireSyntheticInOutEvents(_target, e, {
           oldTarget: _this._hoveredTargets[index],
