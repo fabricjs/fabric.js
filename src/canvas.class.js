@@ -332,7 +332,7 @@
 
     /**
      * Keep track of the subTargets for Mouse Events
-     * @type Array[fabric.Object]
+     * @type fabric.Object[]
      */
     targets: [],
 
@@ -345,7 +345,7 @@
 
     /**
      * hold the list of nested targets hovered
-     * @type Array[fabric.Object]
+     * @type fabric.Object[]
      * @private
      */
     _hoveredTargets: [],
