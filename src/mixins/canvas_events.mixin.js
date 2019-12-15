@@ -170,6 +170,7 @@
 
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
+      this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
 
       var _this = this;
@@ -177,6 +178,7 @@
         _this.fire('mouse:out', { target: target, e: e });
         _target && target.fire('mouseout', { e: e });
       });
+      this._hoveredTargets = [];
 
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
@@ -812,14 +814,6 @@
         target = this.findTarget(e) || null;
         this._setCursorFromEvent(e, target);
         this._fireOverOutEvents(target, e);
-        // handle triggering on SubTargets
-        this.targets.map(function(subTarget,k){
-          _this._fireOverOutEvents(subTarget, e, '_hoveredTarget' + k);
-        });
-        // hoverCursor should come from top-most subtarget
-        this.targets.slice(0).reverse().map(function(subTarget){
-          _this._setCursorFromEvent(e, subTarget);
-        });
       }
       else {
         this._transformObject(e);
@@ -886,6 +880,7 @@
 
     /**
      * Manage the synthetic in/out events for the fabric objects on the canvas
+     * @param {Fabric.Object} target the target where the target from the supported events
      * @param {Event} e Event object fired
      * @param {Object} config configuration for the function to work
      * @param {String} config.targetName property on the canvas where the old target is stored
@@ -902,6 +897,8 @@
         inOpt = { e: e, target: target, previousTarget: oldTarget };
         outOpt = { e: e, target: oldTarget, nextTarget: target };
       }
+      inFires = target && targetChanged;
+      outFires = oldTarget && targetChanged;
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
         oldTarget.fire(config.evtOut, outOpt);
