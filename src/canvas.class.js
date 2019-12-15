@@ -331,6 +331,12 @@
     fireMiddleClick: false,
 
     /**
+     * Keep track of the subTargets for Mouse Events
+     * @type Array[fabric.Object]
+     */
+    targets: [],
+
+    /**
      * Keep track of the hovered target
      * @type fabric.Object
      * @private

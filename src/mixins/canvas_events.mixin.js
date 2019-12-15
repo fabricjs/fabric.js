@@ -901,11 +901,11 @@
       outFires = oldTarget && targetChanged;
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
-        oldTarget.fire(config.evtOut, outOpt);
+        oldTarget && oldTarget.fire(config.evtOut, outOpt);
       }
       if (inFires) {
         canvasEvtIn && this.fire(canvasEvtIn, inOpt);
-        target.fire(config.evtIn, inOpt);
+        target && target.fire(config.evtIn, inOpt);
       }
     },
 
