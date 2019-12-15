@@ -788,7 +788,7 @@
     __onMouseMove: function (e) {
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
-      var target, pointer, _this = this;
+      var target, pointer;
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
