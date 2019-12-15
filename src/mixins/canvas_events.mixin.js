@@ -852,11 +852,17 @@
      * @private
      */
     _fireEnterLeaveEvents: function(target, e) {
-      this.fireSyntheticInOutEvents(target, e, {
-        oldTarget: '_draggedoverTarget',
-        evtOut: 'dragleave',
-        evtIn: 'dragenter',
+      var _this = this, _draggedoverTarget = this._draggedoverTarget,
+          _hoveredTargets = this._hoveredTargets, targets = this.targets,
+          diff = _hoveredTargets.length - targets.length;
+      [target].concat(targets, new Array(diff > 0 ? diff : 0)).forEach(function(_target, index) {
+        _this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: index === 0 ? _draggedoverTarget : _hoveredTargets[index - 1],
+          evtOut: 'dragleave',
+          evtIn: 'dragenter',
+        });
       });
+      this._draggedoverTarget = target;
     },
 
     /**
