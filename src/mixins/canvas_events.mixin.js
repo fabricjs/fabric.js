@@ -829,37 +829,18 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      this.fireSyntheticInOutEvents(target, e, {
-        oldTarget: this._hoveredTarget,
-        canvasEvtOut: 'mouse:out',
-        evtOut: 'mouseout',
-        canvasEvtIn: 'mouse:over',
-        evtIn: 'mouseover',
-      });
-      var _this = this;
-      this.targets.forEach(function(_target, index) {
+      var _this = this, _hoveredTarget = this._hoveredTarget,
+          _hoveredTargets = this._hoveredTargets, targets = this.targets,
+          diff = _hoveredTargets.length - targets.length;
+      [target].concat(targets, new Array(diff > 0 ? diff : 0)).forEach(function(_target, index) {
         _this.fireSyntheticInOutEvents(_target, e, {
-          oldTarget: _this._hoveredTargets[index],
+          oldTarget: index === 0 ? _hoveredTarget : _hoveredTargets[index - 1],
           canvasEvtOut: 'mouse:out',
           evtOut: 'mouseout',
           canvasEvtIn: 'mouse:over',
           evtIn: 'mouseover',
         });
       });
-      var remainingTargetsLength = this._hoveredTargets.length - this.targets.length;
-      if (remainingTargetsLength > 0){
-        for (var i = 0; i < remainingTargetsLength; i++){
-          var _remainingTargetIndex = i + this.targets.length - 1;
-          this.fireSyntheticInOutEvents(null, e, {
-            oldTarget: this._hoveredTargets[_remainingTargetIndex],
-            canvasEvtOut: 'mouse:out',
-            evtOut: 'mouseout',
-            canvasEvtIn: 'mouse:over',
-            evtIn: 'mouseover',
-          });
-        }
-      }
-      // whatever it happened, the target is not the hovered target.
       this._hoveredTarget = target;
       this._hoveredTargets = this.targets.concat();
     },
@@ -901,11 +882,11 @@
       outFires = oldTarget && targetChanged;
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
-        oldTarget && oldTarget.fire(config.evtOut, outOpt);
+        oldTarget.fire(config.evtOut, outOpt);
       }
       if (inFires) {
         canvasEvtIn && this.fire(canvasEvtIn, inOpt);
-        target && target.fire(config.evtIn, inOpt);
+        target.fire(config.evtIn, inOpt);
       }
     },
 
