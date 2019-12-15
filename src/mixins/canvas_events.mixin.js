@@ -168,23 +168,15 @@
     _onMouseOut: function(e) {
       console.log('_onMouseOut',e);
 
-      // pre-ISSUE-4115
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
       target && target.fire('mouseout', { e: e });
 
-      // post-ISSUE-4115
-      // should we really be firing mouseOut on ALL _hoveredTargets?
-      // maybe just the top-level one? I dunno...
-      var keys = Object.keys(this);
-      for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
-        if (key.indexOf('_hoveredTarget') > -1){
-          var target = this[key];
-          this.fire('mouse:out', { target: target, e: e });
-          target && target.fire('mouseout', { e: e });
-        }
-      }
+      var _this = this;
+      this._hoveredTargets.forEach(function(_target){
+        _this.fire('mouse:out', { target: target, e: e });
+        _target && target.fire('mouseout', { e: e });
+      });
 
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
@@ -208,16 +200,8 @@
       // side effects we added to it.
       if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
-        // PRE-ISSUE-4115
-        // this._hoveredTarget = null;
-        // POST-ISSUE-4115
-        var keys = Object.keys(this);
-        for (var i = 0; i < keys.length; i++){
-          var key = keys[i];
-          if (key.indexOf('_hoveredTarget') > -1){
-            this[key] = null;
-          }
-        }
+        this._hoveredTarget = null;
+        this._hoveredTargets = [];
       }
     },
 
