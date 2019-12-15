@@ -818,6 +818,7 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
+      var _this = this;
       this.fireSyntheticInOutEvents(target, e, {
         oldTarget: this._hoveredTarget,
         canvasEvtOut: 'mouse:out',
@@ -826,14 +827,27 @@
         evtIn: 'mouseover',
       });
       this.targets.forEach(function(_target, index) {
-        this.fireSyntheticInOutEvents(_target, e, {
-          oldTarget: this._hoveredTargets[index],
+        _this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: _this._hoveredTargets[index],
           canvasEvtOut: 'mouse:out',
           evtOut: 'mouseout',
           canvasEvtIn: 'mouse:over',
           evtIn: 'mouseover',
         });
       });
+      var remainingTargetsLength = this._hoveredTargets.length - this.targets.length;
+      if (remainingTargetsLength > 0){
+        for (var i = 0; i < remainingTargetsLength; i++){
+          var _remainingTargetIndex = i + this.targets.length - 1;
+          this.fireSyntheticInOutEvents(null, e, {
+            oldTarget: this._hoveredTargets[_remainingTargetIndex],
+            canvasEvtOut: 'mouse:out',
+            evtOut: 'mouseout',
+            canvasEvtIn: 'mouse:over',
+            evtIn: 'mouseover',
+          });
+        }
+      }
       // whatever it happened, the target is not the hovered target.
       this._hoveredTarget = target;
       this._hoveredTargets = this.targets.concat();
@@ -847,7 +861,7 @@
      */
     _fireEnterLeaveEvents: function(target, e) {
       this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_draggedoverTarget',
+        oldTarget: '_draggedoverTarget',
         evtOut: 'dragleave',
         evtIn: 'dragenter',
       });
