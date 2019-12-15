@@ -64,6 +64,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Default handler for double click, select a word
    */
   doubleClickHandler: function(options) {
+    if (!this.isEditing) {
+      return;
+    }
     this.selectWord(this.getSelectionStartFromPointer(options.e));
   },
 
@@ -71,6 +74,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Default handler for triple click, select a line
    */
   tripleClickHandler: function(options) {
+    if (!this.isEditing) {
+      return;
+    }
     this.selectLine(this.getSelectionStartFromPointer(options.e));
   },
 

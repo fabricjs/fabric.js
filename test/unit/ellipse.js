@@ -118,7 +118,8 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
-    var elEllipse        = fabric.document.createElement('ellipse'),
+    var namespace        = 'http://www.w3.org/2000/svg';
+    var elEllipse        = fabric.document.createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,
@@ -131,17 +132,17 @@
         strokeLineJoin   = 'bevil',
         strokeMiterLimit = 5;
 
-    elEllipse.setAttribute('rx', rx);
-    elEllipse.setAttribute('ry', ry);
-    elEllipse.setAttribute('cx', left);
-    elEllipse.setAttribute('cy', top);
-    elEllipse.setAttribute('fill', fill);
-    elEllipse.setAttribute('opacity', opacity);
-    elEllipse.setAttribute('stroke-width', strokeWidth);
-    elEllipse.setAttribute('stroke-dasharray', '5, 2');
-    elEllipse.setAttribute('stroke-linecap', strokeLineCap);
-    elEllipse.setAttribute('stroke-linejoin', strokeLineJoin);
-    elEllipse.setAttribute('stroke-miterlimit', strokeMiterLimit);
+    elEllipse.setAttributeNS(namespace, 'rx', rx);
+    elEllipse.setAttributeNS(namespace, 'ry', ry);
+    elEllipse.setAttributeNS(namespace, 'cx', left);
+    elEllipse.setAttributeNS(namespace, 'cy', top);
+    elEllipse.setAttributeNS(namespace, 'fill', fill);
+    elEllipse.setAttributeNS(namespace, 'opacity', opacity);
+    elEllipse.setAttributeNS(namespace, 'stroke-width', strokeWidth);
+    elEllipse.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elEllipse.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
+    elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
+    elEllipse.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
     fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
       assert.ok(oEllipse instanceof fabric.Ellipse);

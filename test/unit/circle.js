@@ -157,7 +157,8 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
-    var elCircle         = fabric.document.createElement('circle'),
+    var namespace        = 'http://www.w3.org/2000/svg';
+    var elCircle         = fabric.document.createElementNS(namespace, 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -170,16 +171,16 @@
         strokeMiterLimit = 5;
 
 
-    elCircle.setAttribute('r', radius);
-    elCircle.setAttribute('cx', left);
-    elCircle.setAttribute('cy', top);
-    elCircle.setAttribute('fill', fill);
-    elCircle.setAttribute('opacity', opacity);
-    elCircle.setAttribute('stroke-width', strokeWidth);
-    elCircle.setAttribute('stroke-dasharray', '5, 2');
-    elCircle.setAttribute('stroke-linecap', strokeLineCap);
-    elCircle.setAttribute('stroke-linejoin', strokeLineJoin);
-    elCircle.setAttribute('stroke-miterlimit', strokeMiterLimit);
+    elCircle.setAttributeNS(namespace, 'r', radius);
+    elCircle.setAttributeNS(namespace, 'cx', left);
+    elCircle.setAttributeNS(namespace, 'cy', top);
+    elCircle.setAttributeNS(namespace, 'fill', fill);
+    elCircle.setAttributeNS(namespace, 'opacity', opacity);
+    elCircle.setAttributeNS(namespace, 'stroke-width', strokeWidth);
+    elCircle.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elCircle.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
+    elCircle.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
+    elCircle.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
     fabric.Circle.fromElement(elCircle, function(oCircle) {
       assert.ok(oCircle instanceof fabric.Circle);
@@ -194,8 +195,8 @@
       assert.equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var elFaultyCircle = fabric.document.createElement('circle');
-      elFaultyCircle.setAttribute('r', '-10');
+      var elFaultyCircle = fabric.document.createElementNS(namespace, 'circle');
+      elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
 
       var error;
       try {

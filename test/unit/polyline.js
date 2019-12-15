@@ -99,7 +99,7 @@
 
   QUnit.test('fromElement without points', function(assert) {
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
-    var elPolylineWithoutPoints = fabric.document.createElement('polyline');
+    var elPolylineWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
@@ -108,8 +108,9 @@
   });
 
   QUnit.test('fromElement with empty points', function(assert) {
-    var elPolylineWithEmptyPoints = fabric.document.createElement('polyline');
-    elPolylineWithEmptyPoints.setAttribute('points', '');
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elPolylineWithEmptyPoints = fabric.document.createElementNS(namespace, 'polyline');
+    elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
       var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
       empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
@@ -118,9 +119,10 @@
   });
 
   QUnit.test('fromElement', function(assert) {
-    var elPolyline = fabric.document.createElement('polyline');
-    elPolyline.setAttribute('points', '10,12 20,22');
-    elPolyline.setAttribute('stroke-width', 1);
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elPolyline = fabric.document.createElementNS(namespace, 'polyline');
+    elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
+    elPolyline.setAttributeNS(namespace, 'stroke-width', 1);
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
       assert.ok(polyline instanceof fabric.Polyline);
       var obj = fabric.util.object.extend({}, REFERENCE_OBJECT);
@@ -131,17 +133,18 @@
   });
 
   QUnit.test('fromElement with custom attr', function(assert) {
-    var elPolylineWithAttrs = fabric.document.createElement('polyline');
-    elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
-    elPolylineWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elPolylineWithAttrs.setAttribute('opacity', '0.34');
-    elPolylineWithAttrs.setAttribute('stroke-width', '3');
-    elPolylineWithAttrs.setAttribute('stroke', 'blue');
-    elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
-    elPolylineWithAttrs.setAttribute('stroke-dasharray', '5, 2');
-    elPolylineWithAttrs.setAttribute('stroke-linecap', 'round');
-    elPolylineWithAttrs.setAttribute('stroke-linejoin', 'bevil');
-    elPolylineWithAttrs.setAttribute('stroke-miterlimit', '5');
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elPolylineWithAttrs = fabric.document.createElementNS(namespace, 'polyline');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-width', '3');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2)');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
 
     fabric.Polyline.fromElement(elPolylineWithAttrs, function(polylineWithAttrs) {
       var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];

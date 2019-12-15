@@ -846,18 +846,44 @@
 
     /**
      * Manage the mouseout, mouseover events for the fabric object on the canvas
+     * @param {Fabric.Object} target the target where the target from the mousemove event
      * @param {Event} e Event object fired on mousemove
-     * @param {String} targetName property on the canvas where the target is stored
      * @private
      */
-    _fireOverOutEvents: function(target, e, targetName) {
+    _fireOverOutEvents: function(target, e) {
+      var _this = this;
       this.fireSyntheticInOutEvents(target, e, {
-        targetName: targetName || '_hoveredTarget',
+        oldTarget: this._hoveredTarget,
         canvasEvtOut: 'mouse:out',
         evtOut: 'mouseout',
         canvasEvtIn: 'mouse:over',
         evtIn: 'mouseover',
       });
+      this.targets.forEach(function(_target, index) {
+        _this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: _this._hoveredTargets[index],
+          canvasEvtOut: 'mouse:out',
+          evtOut: 'mouseout',
+          canvasEvtIn: 'mouse:over',
+          evtIn: 'mouseover',
+        });
+      });
+      var remainingTargetsLength = this._hoveredTargets.length - this.targets.length;
+      if (remainingTargetsLength > 0){
+        for (var i = 0; i < remainingTargetsLength; i++){
+          var _remainingTargetIndex = i + this.targets.length - 1;
+          this.fireSyntheticInOutEvents(null, e, {
+            oldTarget: this._hoveredTargets[_remainingTargetIndex],
+            canvasEvtOut: 'mouse:out',
+            evtOut: 'mouseout',
+            canvasEvtIn: 'mouse:over',
+            evtIn: 'mouseover',
+          });
+        }
+      }
+      // whatever it happened, the target is not the hovered target.
+      this._hoveredTarget = target;
+      this._hoveredTargets = this.targets.concat();
     },
 
     /**
@@ -868,7 +894,7 @@
      */
     _fireEnterLeaveEvents: function(target, e) {
       this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_draggedoverTarget',
+        oldTarget: '_draggedoverTarget',
         evtOut: 'dragleave',
         evtIn: 'dragenter',
       });
@@ -886,13 +912,11 @@
      * @private
      */
     fireSyntheticInOutEvents: function(target, e, config) {
-      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+      var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
-        inOpt = {e: e, target: target, previousTarget: oldTarget};
-        outOpt = {e: e, target: oldTarget, nextTarget: target};
-        this[config.targetName] = target;
-        console.log(config.targetName, target); //
+        inOpt = { e: e, target: target, previousTarget: oldTarget };
+        outOpt = { e: e, target: oldTarget, nextTarget: target };
       }
       if (outFires) {
         canvasEvtOut && this.fire(canvasEvtOut, outOpt);
