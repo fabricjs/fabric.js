@@ -242,7 +242,7 @@
     _onDragOver: function(e) {
       e.preventDefault();
       var target = this._simpleEventHandler('dragover', e);
-      this._fireEnterLeaveEvents([target].concat(this.targets), e);
+      this._fireEnterLeaveEvents(target, e);
     },
 
     /**
