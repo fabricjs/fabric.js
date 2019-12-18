@@ -857,8 +857,13 @@
     _fireEnterLeaveEvents: function(target, e) {
       var _this = this, _draggedoverTarget = this._draggedoverTarget,
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
-          diff = _hoveredTargets.length - targets.length;
-      [target].concat(targets, new Array(diff > 0 ? diff : 0)).forEach(function(_target, index) {
+          diff = _hoveredTargets.length - targets.length,
+          diffArrayLength = diff > 0 ? diff : 0,
+          diffArray = [];
+      for (var i = 0; i < diffArrayLength; i++){
+        diffArray.push(null);
+      }
+      [target].concat(targets, diffArray).forEach(function(_target, index) {
         _this.fireSyntheticInOutEvents(_target, e, {
           oldTarget: index === 0 ? _draggedoverTarget : _hoveredTargets[index - 1],
           evtOut: 'dragleave',
