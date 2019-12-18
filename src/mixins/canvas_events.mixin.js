@@ -166,8 +166,6 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseOut: function(e) {
-      console.log('_onMouseOut',e);
-
       var target = this._hoveredTarget;
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
@@ -831,8 +829,9 @@
     _fireOverOutEvents: function(target, e) {
       var _this = this, _hoveredTarget = this._hoveredTarget,
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
-          diff = _hoveredTargets.length - targets.length;
-      [target].concat(targets, new Array(diff > 0 ? diff : 0)).forEach(function(_target, index) {
+          diff = _hoveredTargets.length - targets.length,
+          diffArrayLength = diff > 0 ? diff : 0;
+      [target].concat(targets, new Array(diffArrayLength).fill(null)).forEach(function(_target, index) {
         _this.fireSyntheticInOutEvents(_target, e, {
           oldTarget: index === 0 ? _hoveredTarget : _hoveredTargets[index - 1],
           canvasEvtOut: 'mouse:out',
