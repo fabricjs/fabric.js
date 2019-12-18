@@ -170,6 +170,14 @@
       this.fire('mouse:out', { target: target, e: e });
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
+
+      var _this = this;
+      this._hoveredTargets.forEach(function(_target){
+        _this.fire('mouse:out', { target: target, e: e });
+        _target && target.fire('mouseout', { e: e });
+      });
+      this._hoveredTargets = [];
+
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
           if (obj.isEditing) {
@@ -193,6 +201,7 @@
       if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
         this._hoveredTarget = null;
+        this._hoveredTargets = [];
       }
     },
 
@@ -818,13 +827,25 @@
      * @private
      */
     _fireOverOutEvents: function(target, e) {
-      this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_hoveredTarget',
-        canvasEvtOut: 'mouse:out',
-        evtOut: 'mouseout',
-        canvasEvtIn: 'mouse:over',
-        evtIn: 'mouseover',
+      var _this = this, _hoveredTarget = this._hoveredTarget,
+          _hoveredTargets = this._hoveredTargets, targets = this.targets,
+          diff = _hoveredTargets.length - targets.length,
+          diffArrayLength = diff > 0 ? diff : 0,
+          diffArray = [];
+      for (var i = 0; i < diffArrayLength; i++){
+        diffArray.push(null);
+      }
+      [target].concat(targets, diffArray).forEach(function(_target, index) {
+        _this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: index === 0 ? _hoveredTarget : _hoveredTargets[index - 1],
+          canvasEvtOut: 'mouse:out',
+          evtOut: 'mouseout',
+          canvasEvtIn: 'mouse:over',
+          evtIn: 'mouseover',
+        });
       });
+      this._hoveredTarget = target;
+      this._hoveredTargets = this.targets.concat();
     },
 
     /**
@@ -834,11 +855,22 @@
      * @private
      */
     _fireEnterLeaveEvents: function(target, e) {
-      this.fireSyntheticInOutEvents(target, e, {
-        targetName: '_draggedoverTarget',
-        evtOut: 'dragleave',
-        evtIn: 'dragenter',
+      var _this = this, _draggedoverTarget = this._draggedoverTarget,
+          _hoveredTargets = this._hoveredTargets, targets = this.targets,
+          diff = _hoveredTargets.length - targets.length,
+          diffArrayLength = diff > 0 ? diff : 0,
+          diffArray = [];
+      for (var i = 0; i < diffArrayLength; i++){
+        diffArray.push(null);
+      }
+      [target].concat(targets, diffArray).forEach(function(_target, index) {
+        _this.fireSyntheticInOutEvents(_target, e, {
+          oldTarget: index === 0 ? _draggedoverTarget : _hoveredTargets[index - 1],
+          evtOut: 'dragleave',
+          evtIn: 'dragenter',
+        });
       });
+      this._draggedoverTarget = target;
     },
 
     /**
@@ -854,12 +886,11 @@
      * @private
      */
     fireSyntheticInOutEvents: function(target, e, config) {
-      var inOpt, outOpt, oldTarget = this[config.targetName], outFires, inFires,
+      var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
         inOpt = { e: e, target: target, previousTarget: oldTarget };
         outOpt = { e: e, target: oldTarget, nextTarget: target };
-        this[config.targetName] = target;
       }
       inFires = target && targetChanged;
       outFires = oldTarget && targetChanged;
@@ -1024,6 +1055,13 @@
                     && target._findTargetCorner(this.getPointer(e, true));
 
       if (!corner) {
+        if (target.subTargetCheck){
+          // hoverCursor should come from top-most subTarget,
+          // so we walk the array backwards
+          this.targets.concat().reverse().map(function(_target){
+            hoverCursor = _target.hoverCursor || hoverCursor;
+          });
+        }
         this.setCursor(hoverCursor);
       }
       else {
