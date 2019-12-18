@@ -829,9 +829,8 @@
     _fireOverOutEvents: function(target, e) {
       var _this = this, _hoveredTarget = this._hoveredTarget,
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
-          diff = _hoveredTargets.length - targets.length,
-          diffArrayLength = diff > 0 ? diff : 0;
-      [target].concat(targets, new Array(diffArrayLength).fill(null)).forEach(function(_target, index) {
+          diff = _hoveredTargets.length - targets.length;
+      [target].concat(targets, new Array(diff > 0 ? diff : 0).fill(null)).forEach(function(_target, index) {
         _this.fireSyntheticInOutEvents(_target, e, {
           oldTarget: index === 0 ? _hoveredTarget : _hoveredTargets[index - 1],
           canvasEvtOut: 'mouse:out',
