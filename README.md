@@ -1,9 +1,4 @@
 ### Fabric
-
-<!-- chat, support -->
-
-[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/kangax/fabric.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)

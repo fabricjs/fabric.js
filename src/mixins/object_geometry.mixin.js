@@ -11,6 +11,8 @@
 
   var degreesToRadians = fabric.util.degreesToRadians,
       multiplyMatrices = fabric.util.multiplyTransformMatrices,
+      scaleSkewStyleHandler = fabric.controlHandlers.scaleSkewCursorStyleHandler,
+      scaleStyleHandler = fabric.controlHandlers.scaleCursorStyleHandler,
       transformPoint = fabric.util.transformPoint;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
@@ -54,13 +56,67 @@
     matrixCache: null,
 
     /**
+     * custom controls interface
+     */
+    controls: {
+      ml: new fabric.Control({
+        name: 'ml',
+        position: { x: -0.5, y: 0 },
+        cursorStyleHandler: scaleSkewStyleHandler,
+      }),
+      mr: new fabric.Control({
+        name: 'mr',
+        position: { x: 0.5, y: 0 },
+        cursorStyleHandler: scaleSkewStyleHandler
+      }),
+      mb: new fabric.Control({
+        name: 'mb',
+        position: { x: 0, y: 0.5 },
+        cursorStyleHandler: scaleSkewStyleHandler
+      }),
+      mt: new fabric.Control({
+        name: 'mt',
+        position: { x: 0, y: -0.5 },
+        cursorStyleHandler: scaleSkewStyleHandler,
+      }),
+      tl: new fabric.Control({
+        name: 'tl',
+        position: { x: -0.5, y: -0.5 },
+        cursorStyleHandler: scaleStyleHandler,
+      }),
+      tr: new fabric.Control({
+        name: 'tr',
+        position: { x: 0.5, y: -0.5 },
+        cursorStyleHandler: scaleStyleHandler,
+      }),
+      bl: new fabric.Control({
+        name: 'bl',
+        position: { x: -0.5, y: 0.5 },
+        cursorStyleHandler: scaleStyleHandler,
+      }),
+      br: new fabric.Control({
+        name: 'br',
+        position: { x: 0.5, y: 0.5 },
+        cursorStyleHandler: scaleStyleHandler,
+      }),
+      mtr: new fabric.Control({
+        name: 'mtr',
+        position: { x: 0, y: -0.5 },
+        actionHandler: fabric.controlHandlers.rotationWithSnapping,
+        cursorStyleHandler: fabric.controlHandlers.rotationStyleHandler,
+        offsetY: -40,
+        withConnection: true,
+      }),
+    },
+
+    /**
      * return correct set of coordinates for intersection
      */
     getCoords: function(absolute, calculate) {
       if (!this.oCoords) {
         this.setCoords();
       }
-      var coords = absolute ? this.aCoords : this.oCoords;
+      var coords = absolute ? this.aCoords : this.lineCoords;
       return getCoords(calculate ? this.calcCoords(absolute) : coords);
     },
 
@@ -109,9 +165,8 @@
      */
     isContainedWithinObject: function(other, absolute, calculate) {
       var points = this.getCoords(absolute, calculate),
-          i = 0, lines = other._getImageLines(
-            calculate ? other.calcCoords(absolute) : absolute ? other.aCoords : other.oCoords
-          );
+          otherCoords = absolute ? other.aCoords : other.lineCoords,
+          i = 0, lines = other._getImageLines(otherCoords);
       for (; i < 4; i++) {
         if (!other.containsPoint(points[i], lines)) {
           return false;
@@ -148,11 +203,9 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point, lines, absolute, calculate) {
-      var lines = lines || this._getImageLines(
-            calculate ? this.calcCoords(absolute) : absolute ? this.aCoords : this.oCoords
-          ),
+      var coords = calculate ? this.calcLineCoords(absolute) : absolute ? this.aCoords : this.lineCoords,
+          lines = lines || this._getImageLines(coords),
           xPoints = this._findCrossPoints(point, lines);
-
       // if xPoints is odd then point is inside the object
       return (xPoints !== 0 && xPoints % 2 === 1);
     },
@@ -222,7 +275,8 @@
      * @param {Object} oCoords Coordinates of the object corners
      */
     _getImageLines: function(oCoords) {
-      return {
+
+      var lines = {
         topline: {
           o: oCoords.tl,
           d: oCoords.tr
@@ -240,6 +294,23 @@
           d: oCoords.tl
         }
       };
+
+      // // debugging
+      // if (this.canvas.contextTop) {
+      //   this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
+      //   this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
+      //
+      //   this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
+      //   this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
+      //
+      //   this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
+      //   this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
+      //
+      //   this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
+      //   this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
+      // }
+
+      return lines;
     },
 
     /**
@@ -387,70 +458,87 @@
      * @chainable
      */
     calcCoords: function(absolute) {
+      // this is a compatibility function to avoid removing calcCoords now.
+      if (absolute) {
+        return this.calcACoords();
+      }
+      return this.calcOCoords();
+    },
+
+    calcLineCoords: function(ignoreZoom) {
+      if (!this.aCoords) { this.aCoords = this.calcACoords(); }
+      var vpt = this.getViewportTransform();
+      var padding = this.padding, angle = degreesToRadians(this.angle),
+          cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
+          cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
+          cosPMinusSinP = cosP - sinP, aCoords = this.aCoords;
+
+      var lineCoords = {
+        tl: { x: aCoords.tl.x, y: aCoords.tl.y },
+        tr: { x: aCoords.tr.x, y: aCoords.tr.y },
+        bl: { x: aCoords.bl.x, y: aCoords.bl.y },
+        br: { x: aCoords.br.x, y: aCoords.br.y },
+      };
+
+      if (!ignoreZoom) {
+        lineCoords.tl = transformPoint(aCoords.tl, vpt);
+        lineCoords.tr = transformPoint(aCoords.tr, vpt);
+        lineCoords.bl = transformPoint(aCoords.bl, vpt);
+        lineCoords.br = transformPoint(aCoords.br, vpt);
+      }
+
+      if (padding) {
+        lineCoords.tl.x -= cosPMinusSinP;
+        lineCoords.tl.y -= cosPSinP;
+        lineCoords.tr.x += cosPSinP;
+        lineCoords.tr.y -= cosPMinusSinP;
+        lineCoords.bl.x -= cosPSinP;
+        lineCoords.bl.y += cosPMinusSinP;
+        lineCoords.br.x += cosPMinusSinP;
+        lineCoords.br.y += cosPSinP;
+      }
+
+      return lineCoords;
+    },
+
+    calcOCoords: function() {
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
           startMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           vpt = this.getViewportTransform(),
-          finalMatrix = absolute ? startMatrix : multiplyMatrices(vpt, startMatrix),
+          finalMatrix = multiplyMatrices(vpt, startMatrix),
           dim = this._getTransformedDimensions(),
-          w = dim.x / 2, h = dim.y / 2,
-          tl = transformPoint({ x: -w, y: -h }, finalMatrix),
-          tr = transformPoint({ x: w, y: -h }, finalMatrix),
-          bl = transformPoint({ x: -w, y: h }, finalMatrix),
-          br = transformPoint({ x: w, y: h }, finalMatrix);
-      if (!absolute) {
-        var padding = this.padding, angle = degreesToRadians(this.angle),
-            cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
-            cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
-            cosPMinusSinP = cosP - sinP;
-        if (padding) {
-          tl.x -= cosPMinusSinP;
-          tl.y -= cosPSinP;
-          tr.x += cosPSinP;
-          tr.y -= cosPMinusSinP;
-          bl.x -= cosPSinP;
-          bl.y += cosPMinusSinP;
-          br.x += cosPMinusSinP;
-          br.y += cosPSinP;
-        }
-        var ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
-            mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
-            mr  = new fabric.Point((br.x + tr.x) / 2, (br.y + tr.y) / 2),
-            mb  = new fabric.Point((br.x + bl.x) / 2, (br.y + bl.y) / 2),
-            mtr = new fabric.Point(mt.x + sin * this.rotatingPointOffset, mt.y - cos * this.rotatingPointOffset);
-      }
+          coords = {};
+      this.forEachControl(function(control, fabricObject, key) {
+        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
+      });
 
-      // if (!absolute) {
-      //   var canvas = this.canvas;
-      //   setTimeout(function() {
-      //     canvas.contextTop.clearRect(0, 0, 700, 700);
-      //     canvas.contextTop.fillStyle = 'green';
-      //     canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-      //     canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-      //     canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-      //     canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-      //     canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-      //     canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-      //     canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-      //     canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-      //     canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
-      //   }, 50);
-      // }
-
-      var coords = {
-        // corners
-        tl: tl, tr: tr, br: br, bl: bl,
-      };
-      if (!absolute) {
-        // middle
-        coords.ml = ml;
-        coords.mt = mt;
-        coords.mr = mr;
-        coords.mb = mb;
-        // rotating point
-        coords.mtr = mtr;
-      }
+      // debug code
+      // var canvas = this.canvas;
+      // setTimeout(function() {
+      //   canvas.contextTop.clearRect(0, 0, 700, 700);
+      //   canvas.contextTop.fillStyle = 'green';
+      //   Object.keys(coords).forEach(function(key) {
+      //     var control = coords[key];
+      //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+      //   });
+      // }, 50);
       return coords;
+    },
+
+    calcACoords: function() {
+      var rotateMatrix = this._calcRotateMatrix(),
+          translateMatrix = this._calcTranslateMatrix(),
+          finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
+          dim = this._getTransformedDimensions(),
+          w = dim.x / 2, h = dim.y / 2;
+      return {
+        // corners
+        tl: transformPoint({ x: -w, y: -h }, finalMatrix),
+        tr: transformPoint({ x: w, y: -h }, finalMatrix),
+        bl: transformPoint({ x: -w, y: h }, finalMatrix),
+        br: transformPoint({ x: w, y: h }, finalMatrix)
+      };
     },
 
     /**
@@ -462,11 +550,12 @@
      * @chainable
      */
     setCoords: function(ignoreZoom, skipAbsolute) {
-      this.oCoords = this.calcCoords(ignoreZoom);
+      // this.oCoords = this.calcCoords(ignoreZoom);
       if (!skipAbsolute) {
-        this.aCoords = this.calcCoords(true);
+        this.aCoords = this.calcACoords();
       }
-
+      this.oCoords = this.calcOCoords();
+      this.lineCoords = this.calcLineCoords(ignoreZoom);
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       ignoreZoom || (this._setCornerCoords && this._setCornerCoords());
 
@@ -652,7 +741,7 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          p = fabric.util.transformPoint(dim, vpt, true);
+          p = transformPoint(dim, vpt, true);
 
       return p.scalarAdd(2 * this.padding);
     },

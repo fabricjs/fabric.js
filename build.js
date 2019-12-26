@@ -149,6 +149,9 @@ var filesToInclude = [
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
+  'src/controls.actions.js',
+  'src/controls.render.js',
+  'src/control.class.js',
 
   ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
   ifSpecifiedInclude('pattern', 'src/pattern.class.js'),

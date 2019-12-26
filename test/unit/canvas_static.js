@@ -1097,12 +1097,12 @@
       foobar: 123
     };
     assert.deepEqual(expectedObject, canvas.toObject(['freeDrawingColor', 'foobar']));
-
     var rect = makeRect();
+    rect.foobar = 456;
     canvas.add(rect);
 
-    assert.ok(!('rotatingPointOffset' in canvas.toObject(['smthelse']).objects[0]));
-    assert.ok('rotatingPointOffset' in canvas.toObject(['rotatingPointOffset']).objects[0]);
+    assert.ok(!('foobar' in canvas.toObject(['smthelse']).objects[0]));
+    assert.ok('foobar' in canvas.toObject(['foobar']).objects[0]);
   });
 
   QUnit.test('isEmpty', function(assert) {
