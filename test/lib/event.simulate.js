@@ -6,7 +6,7 @@
  * - options: optional object to fine-tune event properties - pointerX, pointerY, ctrlKey, etc.
  *
  **/
-(function(global) {
+(function(exports) {
   function extendObject(destination, source) {
     for (var prop in source) {
       destination[prop] = source[prop];
@@ -14,9 +14,9 @@
     return destination;
   }
   var eventMatchers = {
-    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
-    'MouseEvents': /^(?:click|mouse(?:down|up|over|move|out))$/,
-    'KeyboardEvent': /^(?:key(?:up|down|press))$/
+    HTMLEvents: /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+    MouseEvents: /^(?:click|mouse(?:down|up|over|move|out))$/,
+    KeyboardEvent: /^(?:key(?:up|down|press))$/
   };
   var defaultOptions = {
     pointerX: 0,
@@ -30,13 +30,13 @@
     cancelable: true
   };
 
-  global.simulateEvent = function(element, eventName) {
+  exports.simulateEvent = function(element, eventName) {
 
     var options = extendObject(extendObject({ }, defaultOptions), arguments[2] || { }),
         oEvent,
         eventType;
 
-    element = typeof element == 'string' ? document.getElementById(element) : element;
+    element = typeof element === 'string' ? fabric.document.getElementById(element) : element;
 
     for (var name in eventMatchers) {
       if (eventMatchers[name].test(eventName)) {
@@ -49,23 +49,23 @@
       throw new SyntaxError('This event is not supported');
     }
 
-    if (document.createEvent) {
+    if (fabric.document.createEvent) {
       try {
         // Opera doesn't support event types like "KeyboardEvent",
         // but allows to create event of type "HTMLEvents", then fire key event on it
-        oEvent = document.createEvent(eventType);
+        oEvent = fabric.document.createEvent(eventType);
       }
-      catch(err) {
-        oEvent = document.createEvent('HTMLEvents');
+      catch (err) {
+        oEvent = fabric.document.createEvent('HTMLEvents');
       }
 
-      if (eventType == 'HTMLEvents') {
+      if (eventType === 'HTMLEvents') {
         oEvent.initEvent(eventName, options.bubbles, options.cancelable);
       }
       else if (eventType === 'KeyboardEvent') {
         // TODO (kangax): this needs to be tested
         if (oEvent.initKeyEvent) {
-          oEvent.initKeyEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
+          oEvent.initKeyEvent(eventName, options.bubbles, options.cancelable, fabric.document.defaultView,
             options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.keyCode,
             options.charCode);
         }
@@ -74,7 +74,7 @@
         }
       }
       else {
-        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
+        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, fabric.document.defaultView,
           options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
           options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
       }
@@ -83,9 +83,9 @@
     else {
       options.clientX = options.pointerX;
       options.clientY = options.pointerY;
-      oEvent = extendObject(document.createEventObject(), options);
+      oEvent = extendObject(fabric.document.createEventObject(), options);
       element.fireEvent('on' + eventName, oEvent);
     }
     return element;
-  }
-})(this);
+  };
+})(typeof window === 'undefined' ? exports : this);

@@ -1,4 +1,11 @@
 (function() {
+  var simulateEvent;
+  if (fabric.isLikelyNode) {
+    simulateEvent = global.simulateEvent;
+  }
+  else {
+    simulateEvent = window.simulateEvent;
+  }
 
   var SUB_TARGETS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"activeSelection","left":-152,"top":656.25,"width":356.5,"height":356.5,"scaleX":0.45,"scaleY":0.45,"objects":[]},{"type":"group","left":11,"top":6,"width":511.5,"height":511.5,"objects":[{"type":"rect","left":-255.75,"top":-255.75,"width":50,"height":50,"fill":"#6ce798","scaleX":10.03,"scaleY":10.03,"opacity":0.8},{"type":"group","left":-179.75,"top":22,"width":356.5,"height":356.5,"scaleX":0.54,"scaleY":0.54,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":-202.75,"top":-228.5,"width":356.5,"height":356.5,"scaleX":0.61,"scaleY":0.61,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":138.3,"top":-90.22,"width":356.5,"height":356.5,"scaleX":0.42,"scaleY":0.42,"angle":62.73,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]}]}]}';
 
@@ -481,6 +488,68 @@
       c.upperCanvasEl.dispatchEvent(event);
       assert.equal(counter, 1, eventname + ' fabric event fired');
     });
+  });
+
+  QUnit.test('mouseover and mouseout with subtarget check', function(assert) {
+    var rect1 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 0, strokeWidth: 0, name: 'rect1' });
+    var rect2 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 5, strokeWidth: 0, name: 'rect2' });
+    var rect3 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 5, strokeWidth: 0, name: 'rect3' });
+    var rect4 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 0, strokeWidth: 0, name: 'rect4' });
+    var rect5 = new fabric.Rect({ width: 5, height: 5, left: 2.5, top: 2.5, strokeWidth: 0, name: 'rect5' });
+    var group1 = new fabric.Group([rect1, rect2], { subTargetCheck: true, name: 'group1' });
+    var group2 = new fabric.Group([rect3, rect4], { subTargetCheck: true, name: 'group2' });
+    // a group with 2 groups, with 2 rects each, one group left one group right
+    // each with 2 rects vertically aligned
+    var group = new fabric.Group([group1, group2], { subTargetCheck: true, name: 'group' });
+    var c = new fabric.Canvas();
+    var targetArray = [];
+    var targetOutArray = [];
+    c.on('mouse:over', function(opt) {
+      targetArray.push(opt.target);
+    });
+    c.on('mouse:out', function(opt) {
+      targetOutArray.push(opt.target);
+    });
+    c.add(group, rect5);
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 1, pointerY: 1
+    });
+    assert.equal(targetArray[0], group, 'first hit is group');
+    assert.equal(targetArray[2], group2, 'then hit group2');
+    assert.equal(targetArray[1], rect4, 'then hit rect4');
+    assert.equal(targetOutArray.length, 0, 'no target out');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 5, pointerY: 5
+    });
+    assert.equal(targetArray[0], rect5, 'first hit is target5');
+    assert.equal(targetArray.length, 1, 'only one target');
+    assert.equal(targetOutArray[0], group, 'first targetOutArray is group');
+    assert.equal(targetOutArray[2], group2, 'then targetOutArray group2');
+    assert.equal(targetOutArray[1], rect4, 'then targetOutArray rect4');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 9, pointerY: 9
+    });
+    assert.equal(targetArray[0], group, 'first hit is group');
+    assert.equal(targetArray[2], group1, 'then hit group1');
+    assert.equal(targetArray[1], rect2, 'then hit rect2');
+    assert.equal(targetOutArray.length, 1, 'only one target out when moving away from rect 5');
+    assert.equal(targetOutArray[0], rect5, 'rect5 fires out');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 9, pointerY: 1
+    });
+    assert.equal(targetArray[0], rect1, 'the only target changing is rect1');
+    assert.equal(targetArray.length, 1, 'only one target entering ');
+    assert.equal(targetOutArray.length, 1, 'one target out');
+    assert.equal(targetOutArray[0], rect2, 'the only target out is rect2');
   });
 
   QUnit.test('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
