@@ -1,6 +1,7 @@
 {
   "framework": "qunit",
   "serve_files": [
+    "test/lib/event.simulate.js",
     "dist/fabric.js",
     "test/unit/*.js"
   ],
