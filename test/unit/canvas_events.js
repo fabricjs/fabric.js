@@ -504,11 +504,13 @@
     var c = new fabric.Canvas();
     var targetArray = [];
     var targetOutArray = [];
-    c.on('mouse:over', function(opt) {
-      targetArray.push(opt.target);
-    });
-    c.on('mouse:out', function(opt) {
-      targetOutArray.push(opt.target);
+    [rect1, rect2, rect3, rect4, rect5, group1, group2, group].forEach(function(t) {
+      t.on('mouseover', function(opt) {
+        targetArray.push(opt.target);
+      });
+      t.on('mouseout', function(opt) {
+        targetOutArray.push(opt.target);
+      });
     });
     c.add(group, rect5);
     simulateEvent(c.upperCanvasEl, 'mousemove', {
