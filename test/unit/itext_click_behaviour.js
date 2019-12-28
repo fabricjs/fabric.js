@@ -195,6 +195,7 @@
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText did not entered editing');
       iText.exitEditing();
+      canvas.renderAll();
     });
 
     QUnit.module('iText click interaction with canvas.enableRetinaScaling = false', function(hooks) {
