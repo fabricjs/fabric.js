@@ -706,6 +706,7 @@
         var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
         var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false, enableRetinaScaling: false });
         canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
+        canvas2.cancelRequestedRender();
         iText.set({
           top: 400,
           left: 400,
@@ -722,24 +723,29 @@
         canvas2.upperCanvasEl._clientWidth = 100;
         canvas2.upperCanvasEl._clientHeight = 100;
         iText.enterEditing();
+        canvas2.cancelRequestedRender();
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 57, 'top is scaled with CSS');
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 50, 'left is scaled with CSS');
         iText.exitEditing();
+        canvas2.cancelRequestedRender();
         canvas2.upperCanvasEl._clientWidth = 200;
         canvas2.upperCanvasEl._clientHeight = 200;
         iText.enterEditing();
+        canvas2.cancelRequestedRender();
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 114, 'top is scaled with CSS');
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
         iText.exitEditing();
-        canvas2.dispose();
+        canvas2.cancelRequestedRender();
       });
     });
 
     QUnit.module('fabric.IText with canvas.enableRetinaScaling = true', function() {
       QUnit.test('hiddenTextarea does not move DOM', function(assert) {
+        fabric.devicePixelRatio = 2;
         var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
         var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false, enableRetinaScaling: true });
         canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
+        canvas2.cancelRequestedRender();
         iText.set({
           top: 400,
           left: 400,
@@ -756,16 +762,20 @@
         canvas2.upperCanvasEl._clientWidth = 100;
         canvas2.upperCanvasEl._clientHeight = 100;
         iText.enterEditing();
-        assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 28, 'top is scaled with CSS');
-        assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 25, 'left is scaled with CSS');
-        iText.exitEditing();
-        canvas2.upperCanvasEl._clientWidth = 200;
-        canvas2.upperCanvasEl._clientHeight = 200;
-        iText.enterEditing();
+        canvas2.cancelRequestedRender();
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 57, 'top is scaled with CSS');
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 50, 'left is scaled with CSS');
         iText.exitEditing();
-        canvas2.dispose();
+        canvas2.cancelRequestedRender();
+        canvas2.upperCanvasEl._clientWidth = 200;
+        canvas2.upperCanvasEl._clientHeight = 200;
+        iText.enterEditing();
+        canvas2.cancelRequestedRender();
+        assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.top)), 114, 'top is scaled with CSS');
+        assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
+        iText.exitEditing();
+        canvas2.cancelRequestedRender();
+        fabric.devicePixelRatio = 1;
       });
     });
   });
