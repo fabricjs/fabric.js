@@ -1,5 +1,5 @@
 {
-  "name": "fabric",
+  "name": "fabric-weidian",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
   "version": "3.1.0",
