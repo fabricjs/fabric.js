@@ -573,8 +573,10 @@
 
     /*
      * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param {Number} skewX, a value to override current skewX
-     * @param {Number} skewY, a value to override current skewY
+     * The skewX and skewY parameters are used in the skewing logic path and
+     * do not provide something useful to common use cases.
+     * @param {Number} [skewX], a value to override current skewX
+     * @param {Number} [skewY], a value to override current skewY
      * @private
      * @return {Object} .x width dimension
      * @return {Object} .y height dimension
@@ -624,8 +626,8 @@
           transformMatrix = fabric.util.calcDimensionsMatrix({
             scaleX: this.scaleX,
             scaleY: this.scaleY,
-            skewX: this.skewX,
-            skewY: this.skewY,
+            skewX: skewX,
+            skewY: skewY,
           }),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
       return this._finalizeDimensions(bbox.width, bbox.height);
