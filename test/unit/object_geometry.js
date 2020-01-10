@@ -882,4 +882,16 @@
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
   });
 
+  QUnit.test('_getTransformedDimensions', function(assert) {
+    var cObj = new fabric.Object({
+      left: 50, top: 50, width: 100, height: 100, strokeWidth: 2,
+      scaleX: 3, scaleY: 4, skewX: 45, skewY: 45,
+    });
+    var dim = cObj._getTransformedDimensions();
+    assert.equal(Math.round(dim.x), 918, 'width is 918');
+    assert.equal(dim.y, 816, 'height is 816');
+    var dim2 = cObj._getTransformedDimensions(0, 0);
+    assert.equal(dim2.x, 306, 'width without skew is 306');
+    assert.equal(dim2.y, 408, 'height without skew is 408');
+  });
 })();
