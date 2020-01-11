@@ -71,7 +71,8 @@
     "testem": "^1.18.4",
     "uglify-js": "3.3.x",
     "pixelmatch": "^4.0.2",
-    "chalk": "^2.4.1"
+    "chalk": "^2.4.1",
+    "gl": "^4.4.0"
   },
   "engines": {
     "node": ">=8.0.0"

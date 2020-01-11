@@ -83,10 +83,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 0);\n' +
-          'for (float h = 0.0; h < 3.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 3.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 1), uStepH * (h - 1));\n' +
-              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 3.0 + w)];\n' +
+          'for (int h = 0; h < 3; h+=1) {\n' +
+            'for (int w = 0; w < 3; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 1), uStepH * float(h - 1));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[h * 3 + w];\n' +
             '}\n' +
           '}\n' +
           'gl_FragColor = color;\n' +
@@ -99,10 +99,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 1);\n' +
-          'for (float h = 0.0; h < 3.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 3.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 1.0), uStepH * (h - 1.0));\n' +
-              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 3.0 + w)];\n' +
+          'for (int h = 0; h < 3; h+=1) {\n' +
+            'for (int w = 0; w < 3; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 1), uStepH * float(h - 1));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[h * 3 + w];\n' +
             '}\n' +
           '}\n' +
           'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
@@ -117,10 +117,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 0);\n' +
-          'for (float h = 0.0; h < 5.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 5.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n' +
-              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 5.0 + w)];\n' +
+          'for (int h = 0; h < 5; h+=1) {\n' +
+            'for (int w = 0; w < 5; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 2), uStepH * float(h - 2));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[h * 5 + w];\n' +
             '}\n' +
           '}\n' +
           'gl_FragColor = color;\n' +
@@ -133,10 +133,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 1);\n' +
-          'for (float h = 0.0; h < 5.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 5.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n' +
-              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 5.0 + w)];\n' +
+          'for (int h = 0; h < 5; h+=1) {\n' +
+            'for (int w = 0; w < 5; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 2), uStepH * float(h - 2));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[h * 5 + w];\n' +
             '}\n' +
           '}\n' +
           'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
@@ -151,10 +151,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 0);\n' +
-          'for (float h = 0.0; h < 7.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 7.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n' +
-              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 7.0 + w)];\n' +
+          'for (int h = 0; h < 7; h+=1) {\n' +
+            'for (int w = 0; w < 7; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 3), uStepH * float(h - 3));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[h * 7 + w];\n' +
             '}\n' +
           '}\n' +
           'gl_FragColor = color;\n' +
@@ -167,10 +167,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 1);\n' +
-          'for (float h = 0.0; h < 7.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 7.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n' +
-              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 7.0 + w)];\n' +
+          'for (int h = 0; h < 7; h+=1) {\n' +
+            'for (int w = 0; w < 7; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 3), uStepH * float(h - 3));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[h * 7 + w];\n' +
             '}\n' +
           '}\n' +
           'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
@@ -185,10 +185,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 0);\n' +
-          'for (float h = 0.0; h < 9.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 9.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n' +
-              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];\n' +
+          'for (int h = 0; h < 9; h+=1) {\n' +
+            'for (int w = 0; w < 9; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 4), uStepH * float(h - 4));\n' +
+              'color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[h * 9 + w];\n' +
             '}\n' +
           '}\n' +
           'gl_FragColor = color;\n' +
@@ -201,10 +201,10 @@
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = vec4(0, 0, 0, 1);\n' +
-          'for (float h = 0.0; h < 9.0; h+=1.0) {\n' +
-            'for (float w = 0.0; w < 9.0; w+=1.0) {\n' +
-              'vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n' +
-              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];\n' +
+          'for (int h = 0; h < 9; h+=1) {\n' +
+            'for (int w = 0; w < 9; w+=1) {\n' +
+              'vec2 matrixPos = vec2(uStepW * float(w - 4), uStepH * float(h - 4));\n' +
+              'color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[h * 9 + w];\n' +
             '}\n' +
           '}\n' +
           'float alpha = texture2D(uTexture, vTexCoord).a;\n' +
@@ -311,7 +311,7 @@
      */
     getUniformLocations: function(gl, program) {
       return {
-        uMatrix: gl.getUniformLocation(program, 'uMatrix'),
+        uMatrix: gl.getUniformLocation(program, 'uMatrix[0]'),
         uOpaque: gl.getUniformLocation(program, 'uOpaque'),
         uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
         uSize: gl.getUniformLocation(program, 'uSize'),

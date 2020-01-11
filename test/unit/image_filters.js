@@ -1,4 +1,10 @@
+if (fabric.isLikelyNode) {
+  gl = require('gl'); // eslint-disable-line no-undef
+}
+
 (function() {
+
+  fabric.webGlPrecision = 'highp';
 
   var canvas = fabric.document.createElement('canvas'),
       context = canvas.getContext('2d');
@@ -18,6 +24,69 @@
     imageData.data[10] = 3;
     imageData.data[11] = 1;
     return imageData;
+  }
+
+  function _runFilterGL(filter, data) {
+    var frame = Math.round(Math.sqrt(data.length / 4));
+    var glContext;
+    if (fabric.isLikelyNode) {
+      glContext = gl(frame, frame); // eslint-disable-line no-undef
+    }
+    else {
+      var glCanvas = fabric.document.createElement('canvas');
+      glContext = glCanvas.getContext('webgl');
+    }
+    var imageData = context.createImageData(frame, frame);
+    data.forEach(function(el, i) {
+      imageData.data[i] = el;
+    });
+    var sourceTexture = fabric.WebglFilterBackend.prototype.createTexture(
+      glContext,
+      frame,
+      frame,
+      imageData
+    );
+    var targetTexture = fabric.WebglFilterBackend.prototype.createTexture(
+      glContext,
+      frame,
+      frame
+    );
+    var destinationTexture = fabric.WebglFilterBackend.prototype.createTexture(
+      glContext,
+      frame,
+      frame
+    );
+    var filterBackend = {
+      getCachedTexture: function() {return destinationTexture;},
+    };
+    var retData = new Uint8Array(data.length); // eslint-disable-line no-undef
+    filter.applyTo({
+      context: glContext,
+      passes: 1,
+      webgl: true,
+      originalTexture: sourceTexture,
+      sourceTexture: sourceTexture,
+      targetTexture: targetTexture,
+      programCache: {},
+      filterBackend: filterBackend,
+      originalWidth: frame,
+      originalHeight: frame,
+      sourceWidth: frame,
+      sourceHeight: frame,
+      destinationWidth: frame,
+      destinationHeight: frame,
+      aPosition: new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]), // eslint-disable-line no-undef
+    });
+    glContext.readPixels(
+      0,
+      0,
+      frame,
+      frame,
+      glContext.RGBA,
+      glContext.UNSIGNED_BYTE,
+      retData
+    );
+    return retData;
   }
 
   QUnit.module('fabric.Image.filters.Brightness');
@@ -629,6 +698,30 @@
   QUnit.test('applyTo2d', function(assert) {
     var filter = new fabric.Image.filters.Convolute();
     assert.ok(typeof filter.applyTo2d === 'function');
+  });
+
+  QUnit.test('applyToGL values', function(assert) {
+    var filter = new fabric.Image.filters.Convolute({
+      matrix: [
+        0, 1, 0,
+        1, 2, 1,
+        0, 1, 0
+      ]
+    });
+    var pixelData = new Uint8Array([ // eslint-disable-line no-undef
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+    ]);
+    var expected = new Uint8Array([ // eslint-disable-line no-undef
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+      1, 2, 3, 255, 2, 4, 6, 255, 1, 2, 3, 255,
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+    ]);
+    var output = _runFilterGL(filter, pixelData);
+    output.forEach(function(el, i) {
+      assert.equal(el, expected[i]);
+    });
   });
 
   QUnit.test('toObject', function(assert) {
