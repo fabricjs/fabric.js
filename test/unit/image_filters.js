@@ -631,6 +631,40 @@
     assert.ok(typeof filter.applyTo2d === 'function');
   });
 
+  QUnit.test('applyTo2d values', function(assert) {
+    var filter = new fabric.Image.filters.Convolute({
+      matrix: [
+        0, 1, 0,
+        1, 2, 1,
+        0, 1, 0,
+      ]
+    });
+    var pixelData = new Uint8Array([ // eslint-disable-line no-undef
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+    ]);
+    var expected = new Uint8Array([ // eslint-disable-line no-undef
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+      1, 2, 3, 255, 2, 4, 6, 255, 1, 2, 3, 255,
+      0, 0, 0, 255, 1, 2, 3, 255, 0, 0, 0, 255,
+    ]);
+    var imageData = context.createImageData(3, 3);
+    pixelData.forEach(function(el, i) {
+      imageData.data[i] = el;
+    });
+    var outCanvas = fabric.document.createElement('canvas');
+    var options = {
+      imageData: imageData,
+      ctx: outCanvas.getContext('2d'),
+    };
+    filter.applyTo2d(options);
+    var data = options.imageData.data;
+    data.forEach(function(el, i) {
+      assert.equal(el, expected[i]);
+    });
+  });
+
   QUnit.test('toObject', function(assert) {
     var filter = new fabric.Image.filters.Convolute({opaque: 1});
     assert.ok(typeof filter.toObject === 'function');
