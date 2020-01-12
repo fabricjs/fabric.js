@@ -245,7 +245,7 @@
     code: text7,
     golden: 'text7.png',
     disabled: !fabric.isLikelyNode,
-    percentage: 0.02,
+    percentage: 0.05,
   });
 
   tests.forEach(visualTestLoop(QUnit));
