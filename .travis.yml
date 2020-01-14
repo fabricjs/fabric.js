@@ -58,7 +58,7 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
-      script: npm run build:fast && xvfb-run -s "-ac -screen 0 1024x768x24" testem ci --port 8080 -f testem.json -l $LAUNCHER
+      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
@@ -100,7 +100,7 @@ jobs:
       node_js: "10"
       script: npm run build:fast && npm run test:visual
       os: windows
-script: npm run build:fast && npm run test
+script: npm run build:fast && xvfb-run -s "-ac -screen 0 1024x768x24" npm run test
 
 dist: bionic
 services:
