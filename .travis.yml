@@ -100,7 +100,7 @@ jobs:
       node_js: "10"
       script: npm run build:fast && npm run test:visual
       os: windows
-script: npm run build:fast && xvfb-run -s "-ac -screen 0 1024x768x24" npm run test
+script: npm run build:fast && npm run test
 
 dist: bionic
 services:
