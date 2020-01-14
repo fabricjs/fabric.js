@@ -757,7 +757,7 @@ if (fabric.isLikelyNode) {
       assert.equal(el, expected[i]);
     });
   });
-  
+
   QUnit.test('toObject', function(assert) {
     var filter = new fabric.Image.filters.Convolute({opaque: 1});
     assert.ok(typeof filter.toObject === 'function');
