@@ -383,9 +383,9 @@
   });
 
   QUnit.test('drawControls', function(assert) {
-    var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
-
-    var dummyContext = canvas.getContext('2d');
+    var cObj = new fabric.Object(), _canvas = fabric.document.createElement('canvas');
+    cObj.canvas = canvas;
+    var dummyContext = _canvas.getContext('2d');
     assert.ok(typeof cObj.drawControls === 'function');
     assert.equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });

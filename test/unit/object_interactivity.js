@@ -149,7 +149,26 @@
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
     assert.equal(cObj._findTargetCorner({ x: 0, y: 0 }), false);
+  });
 
+  QUnit.test('_findTargetCorner for touches', function(assert) {
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    cObj.setCoords();
+    cObj.canvas = {
+      _activeObject: cObj
+    };
+    var pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.cornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.cornerSize / 3
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr), 'br', 'cornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event cornerSize/3 near br returns br');
+    pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.touchCornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.touchCornerSize / 3,
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
   });
 
   QUnit.test('_calculateCurrentDimensions', function(assert) {

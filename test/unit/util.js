@@ -1097,4 +1097,14 @@
     });
     assert.equal(scale, 2, 'findScaleToFit is 2');
   });
+
+  QUnit.test('fabric.util.isTouchEvent', function(assert) {
+    assert.ok(typeof fabric.util.isTouchEvent === 'function');
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchstart' }));
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchend' }));
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchmove' }));
+    assert.ok(fabric.util.isTouchEvent({ pointerType: 'touch' }));
+    assert.notOk(fabric.util.isTouchEvent({ type: 'mousedown' }));
+    assert.notOk(fabric.util.isTouchEvent({ pointerType: 'mouse' }));
+  });
 })();
