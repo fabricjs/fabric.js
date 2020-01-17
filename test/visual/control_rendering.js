@@ -1,5 +1,4 @@
 (function() {
-  var getFixture;
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.browserShadowBlurConstant = 0.9;
@@ -13,7 +12,6 @@
     if (process.env.launcher === 'Edge') {
       fabric.browserShadowBlurConstant = 1.75;
     }
-    getFixture = global.getFixture;
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
@@ -25,7 +23,6 @@
     if (navigator.userAgent.indexOf('Edge') !== -1) {
       fabric.browserShadowBlurConstant = 1.75;
     }
-    getFixture = window.getFixture;
   }
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
