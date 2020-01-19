@@ -16,38 +16,40 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
-   * @fires object:modified
-   * @fires object:rotated
-   * @fires object:scaled
-   * @fires object:moved
-   * @fires object:skewed
-   * @fires object:rotating
-   * @fires object:scaling
-   * @fires object:moving
-   * @fires object:skewing
+   * @fires object:modified at the end of a transform or any change when statefull is true
+   * @fires object:rotated at the end of a rotation transform
+   * @fires object:scaled at the end of a scale transform
+   * @fires object:moved at the end of translation transform
+   * @fires object:skewed at the end of a skew transform
+   * @fires object:rotating while an object is being rotated from the control
+   * @fires object:scaling while an object is being scaled by controls
+   * @fires object:moving while an object is being dragged
+   * @fires object:skewing while an object is being skewed from the controls
    * @fires object:selected this event is deprecated. use selection:created
    *
-   * @fires before:transform
+   * @fires before:transform before a transform is is started
    * @fires before:selection:cleared
    * @fires selection:cleared
    * @fires selection:updated
    * @fires selection:created
    *
-   * @fires path:created
+   * @fires path:created after a drawing operation ends and the path is added
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
-   * @fires mouse:down:before
-   * @fires mouse:move:before
-   * @fires mouse:up:before
+   * @fires mouse:down:before  on mouse down, before the inner fabric logic runs
+   * @fires mouse:move:before on mouse move, before the inner fabric logic runs
+   * @fires mouse:up:before on mouse up, before the inner fabric logic runs
    * @fires mouse:over
    * @fires mouse:out
-   * @fires mouse:dblclick
+   * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
    *
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
    * @fires drop
+   * @fires after:render at the end of the render process, receives the context in the callback
+   * @fires before:render at start the render process, receives the context in the callback
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
