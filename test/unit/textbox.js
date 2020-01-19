@@ -240,21 +240,55 @@
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
-  QUnit.test('_scaleObject with textbox', function(assert) {
+  QUnit.test('texbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
+    canvas.setActiveObject(text);
     var canvasEl = canvas.getElement(),
         canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.width,
       clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+      type: 'mousedown',
     };
     var originalWidth = text.width;
-    canvas._setupCurrentTransform(eventStub, text, true);
-    var scaled = canvas._scaleObject(eventStub.clientX + 20, eventStub.clientY, 'x');
-    assert.equal(scaled, true, 'return true if textbox scaled');
+    canvas.__onMouseDown(eventStub);
+    canvas.__onMouseMove({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mousemove',
+    });
+    canvas.__onMouseUp({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mouseup',
+    });
     assert.equal(text.width, originalWidth + 20, 'width increased');
-    assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
+  });
+  QUnit.test('texbox will change width from the ml corner', function(assert) {
+    var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + text.left,
+      clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
+      type: 'mousedown',
+    };
+    var originalWidth = text.width;
+    canvas.__onMouseDown(eventStub);
+    canvas.__onMouseMove({
+      clientX: eventStub.clientX - 20,
+      clientY: eventStub.clientY,
+      type: 'mousemove',
+    });
+    canvas.__onMouseUp({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mouseup',
+    });
+    assert.equal(text.width, originalWidth + 20, 'width increased');
   });
   QUnit.test('_removeExtraneousStyles', function(assert) {
     var iText = new fabric.Textbox('a\nq\qo', { styles: {

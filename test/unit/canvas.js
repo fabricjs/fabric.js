@@ -139,37 +139,37 @@
   });
 
   QUnit.test('preserveObjectStacking', function(assert) {
-    assert.ok(typeof canvas.preserveObjectStacking == 'boolean');
+    assert.ok(typeof canvas.preserveObjectStacking === 'boolean');
     assert.ok(!canvas.preserveObjectStacking, 'default is false');
   });
 
-  QUnit.test('uniScaleTransform', function(assert) {
-    assert.ok(typeof canvas.uniScaleTransform == 'boolean');
-    assert.ok(!canvas.uniScaleTransform, 'default is false');
+  QUnit.test('uniformScaling', function(assert) {
+    assert.ok(typeof canvas.uniformScaling === 'boolean');
+    assert.ok(canvas.uniformScaling, 'default is true');
   });
 
   QUnit.test('uniScaleKey', function(assert) {
-    assert.ok(typeof canvas.uniScaleKey == 'string');
+    assert.ok(typeof canvas.uniScaleKey === 'string');
     assert.equal(canvas.uniScaleKey, 'shiftKey', 'default is shift');
   });
 
   QUnit.test('centeredScaling', function(assert) {
-    assert.ok(typeof canvas.centeredScaling == 'boolean');
+    assert.ok(typeof canvas.centeredScaling === 'boolean');
     assert.ok(!canvas.centeredScaling, 'default is false');
   });
 
   QUnit.test('centeredRotation', function(assert) {
-    assert.ok(typeof canvas.centeredRotation == 'boolean');
+    assert.ok(typeof canvas.centeredRotation === 'boolean');
     assert.ok(!canvas.centeredRotation, 'default is false');
   });
 
   QUnit.test('centeredKey', function(assert) {
-    assert.ok(typeof canvas.centeredKey == 'string');
+    assert.ok(typeof canvas.centeredKey === 'string');
     assert.equal(canvas.centeredKey, 'altKey', 'default is alt');
   });
 
   QUnit.test('altActionKey', function(assert) {
-    assert.ok(typeof canvas.altActionKey == 'string');
+    assert.ok(typeof canvas.altActionKey === 'string');
     assert.equal(canvas.altActionKey, 'shiftKey', 'default is shift');
   });
 
@@ -765,7 +765,6 @@
   });
 
   QUnit.test('findTarget preserveObjectStacking false', function(assert) {
-    assert.ok(typeof canvas.findTarget === 'function');
     canvas.preserveObjectStacking = false;
     var rect = makeRect({ left: 0, top: 0 }),
         rectOver = makeRect({ left: 0, top: 0 }),
@@ -1120,7 +1119,7 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    var group = new fabric.ActiveSelection([rect1, rect2]);
+    var group = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 8, clientY: 8
@@ -2038,7 +2037,7 @@
     assert.equal(canvas._objects[1], rect2);
     assert.equal(canvas._objects[2], circle1);
     assert.equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.ActiveSelection([rect2, circle2, rect1, circle1]);
+    var aGroup = new fabric.ActiveSelection([rect2, circle2, rect1, circle1], { canvas: canvas });
     // before rendering objects are ordered in insert order
     assert.equal(aGroup._objects[0], rect2);
     assert.equal(aGroup._objects[1], circle2);
@@ -2322,72 +2321,55 @@
     assert.equal(t.corner, 'ml', 'ml selected');
     assert.equal(t.originX, 'right', 'origin in opposite direction');
 
-    eventStub = {
-      clientX: canvasOffset.left + rect.oCoords.mtr.x,
-      clientY: canvasOffset.top + rect.oCoords.mtr.y,
-      target: rect,
-    };
-    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
-    t = canvas._currentTransform;
-    assert.equal(t.target, rect, 'should have rect as a target');
-    assert.equal(t.action, 'rotate', 'should target a corner and setup rotate');
-    assert.equal(t.corner, 'mtr', 'mtr selected');
-    assert.equal(t.originX, 'center', 'origin in center');
-    assert.equal(t.originY, 'center', 'origin in center');
-    canvas._currentTransform = false;
+    // to be replaced with new api test
+    // eventStub = {
+    //   clientX: canvasOffset.left + rect.oCoords.mtr.x,
+    //   clientY: canvasOffset.top + rect.oCoords.mtr.y,
+    //   target: rect,
+    // };
+    // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
+    // t = canvas._currentTransform;
+    // assert.equal(t.target, rect, 'should have rect as a target');
+    // assert.equal(t.action, 'mtr', 'should target a corner and setup rotate');
+    // assert.equal(t.corner, 'mtr', 'mtr selected');
+    // assert.equal(t.originX, 'center', 'origin in center');
+    // assert.equal(t.originY, 'center', 'origin in center');
+    // canvas._currentTransform = false;
   });
 
-  QUnit.test('_rotateObject', function(assert) {
-    assert.ok(typeof canvas._rotateObject === 'function');
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-    canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-    var eventStub = {
-      clientX: canvasOffset.left + rect.oCoords.mtr.x,
-      clientY: canvasOffset.top + rect.oCoords.mtr.y,
-      target: rect,
-    };
-    canvas._setupCurrentTransform(eventStub, rect);
-    var rotated = canvas._rotateObject(30, 30, 'equally');
-    assert.equal(rotated, true, 'return true if a rotation happened');
-    rotated = canvas._rotateObject(30, 30);
-    assert.equal(rotated, false, 'return true if no rotation happened');
-  });
-
-  QUnit.test('_rotateObject do not change origins', function(assert) {
-    assert.ok(typeof canvas._rotateObject === 'function');
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50, originX: 'right', originY: 'bottom' });
-    canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-    var eventStub = {
-      clientX: canvasOffset.left + rect.oCoords.mtr.x,
-      clientY: canvasOffset.top + rect.oCoords.mtr.y,
-      target: rect,
-    };
-    canvas._setupCurrentTransform(eventStub, rect);
-    assert.equal(rect.originX, 'right');
-    assert.equal(rect.originY, 'bottom');
-  });
-
-  QUnit.test('_scaleObject', function(assert) {
-    assert.ok(typeof canvas._scaleObject === 'function');
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-    canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-    var eventStub = {
-      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
-      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
-      target: rect
-    };
-    canvas._setupCurrentTransform(eventStub, rect);
-    var scaled = canvas._scaleObject(30, 30, 'equally');
-    assert.equal(scaled, true, 'return true if scaling happened');
-    scaled = canvas._scaleObject(30, 30, 'equally');
-    assert.equal(scaled, false, 'return false if no movement happen');
-  });
+  // QUnit.test('_rotateObject', function(assert) {
+  //   assert.ok(typeof canvas._rotateObject === 'function');
+  //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+  //   canvas.add(rect);
+  //   var canvasEl = canvas.getElement(),
+  //       canvasOffset = fabric.util.getElementOffset(canvasEl);
+  //   var eventStub = {
+  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
+  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
+  //     target: rect,
+  //   };
+  //   canvas._setupCurrentTransform(eventStub, rect);
+  //   var rotated = canvas._rotateObject(30, 30, 'equally');
+  //   assert.equal(rotated, true, 'return true if a rotation happened');
+  //   rotated = canvas._rotateObject(30, 30);
+  //   assert.equal(rotated, false, 'return true if no rotation happened');
+  // });
+  //
+  // QUnit.test('_rotateObject do not change origins', function(assert) {
+  //   assert.ok(typeof canvas._rotateObject === 'function');
+  //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50, originX: 'right', originY: 'bottom' });
+  //   canvas.add(rect);
+  //   var canvasEl = canvas.getElement(),
+  //       canvasOffset = fabric.util.getElementOffset(canvasEl);
+  //   var eventStub = {
+  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
+  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
+  //     target: rect,
+  //   };
+  //   canvas._setupCurrentTransform(eventStub, rect);
+  //   assert.equal(rect.originX, 'right');
+  //   assert.equal(rect.originY, 'bottom');
+  // });
 
   QUnit.test('containsPoint in viewport transform', function(assert) {
     canvas.viewportTransform = [2, 0, 0, 2, 50, 50];

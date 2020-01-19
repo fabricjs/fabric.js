@@ -774,7 +774,8 @@
       if (options.angle) {
         matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
       }
-      if (options.scaleX || options.scaleY || options.skewX || options.skewY || options.flipX || options.flipY) {
+      if (options.scaleX !== 1 || options.scaleY !== 1 ||
+          options.skewX || options.skewY || options.flipX || options.flipY) {
         matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
       }
       return matrix;

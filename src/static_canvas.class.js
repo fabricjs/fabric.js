@@ -176,15 +176,6 @@
     overlayVpt: true,
 
     /**
-     * Callback; invoked right before object is about to be scaled/rotated
-     * @deprecated since 2.3.0
-     * Use before:transform event
-     */
-    onBeforeScaleRotate: function () {
-      /* NOOP */
-    },
-
-    /**
      * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
      * @type Boolean
      * @default
@@ -1861,7 +1852,7 @@
    * @example <caption>JSON without additional properties</caption>
    * var json = canvas.toJSON();
    * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
    * @example <caption>JSON without default values</caption>
    * canvas.includeDefaultValues = false;
    * var json = canvas.toJSON();

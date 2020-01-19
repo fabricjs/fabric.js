@@ -5,18 +5,12 @@
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
-     * The object interactivity controls.
-     * @private
-     */
-    _controlsVisibility: null,
-
-    /**
      * Determines which corner has been clicked
      * @private
      * @param {Object} pointer The pointer indicating the mouse position
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
-    _findTargetCorner: function(pointer) {
+    _findTargetCorner: function(pointer, forTouch) {
       // objects in group, anykind, are not self modificable,
       // must not return an hovered corner.
       if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
@@ -26,38 +20,31 @@
       var ex = pointer.x,
           ey = pointer.y,
           xPoints,
-          lines;
+          lines, keys = Object.keys(this.oCoords),
+          j = keys.length - 1, i;
       this.__corner = 0;
-      for (var i in this.oCoords) {
 
+      // cycle in reverse order so we pick first the one on top
+      for (; j >= 0; j--) {
+        i = keys[j];
         if (!this.isControlVisible(i)) {
           continue;
         }
 
-        if (i === 'mtr' && !this.hasRotatingPoint) {
-          continue;
-        }
-
-        if (this.get('lockUniScaling') &&
-           (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
-          continue;
-        }
-
-        lines = this._getImageLines(this.oCoords[i].corner);
-
+        lines = this._getImageLines(forTouch ? this.oCoords[i].touchCorner : this.oCoords[i].corner);
         // debugging
 
-        // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
+        // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
+        // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
+        //
+        // this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
+        // this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
+        //
+        // this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
+        // this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
+        //
+        // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
+        // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
         xPoints = this._findCrossPoints({ x: ex, y: ey }, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
@@ -69,24 +56,42 @@
     },
 
     /**
+     * Calls a function for each control. The function gets called,
+     * with the control, the object that is calling the iterator and the control's key
+     * @param {Function} fn function to iterate over the controls over
+     */
+    forEachControl: function(fn) {
+      for (var i in this.controls) {
+        fn(this.controls[i], this, i);
+      };
+    },
+
+    /**
      * Sets the coordinates of the draggable boxes in the corners of
      * the image used to scale/rotate it.
+     * note: if we would switch to ROUND corner area, all of this would disappear.
+     * everything would resolve to a single point and a pythagorean theorem for the distance
      * @private
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
           newTheta = degreesToRadians(45 - this.angle),
+          cosTheta = fabric.util.cos(newTheta),
+          sinTheta = fabric.util.sin(newTheta),
           /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
           /* 0.707106 stands for sqrt(2)/2 */
           cornerHypotenuse = this.cornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
-          sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta),
+          touchHypotenuse = this.touchCornerSize * 0.707106,
+          cosHalfOffset = cornerHypotenuse * cosTheta,
+          sinHalfOffset = cornerHypotenuse * sinTheta,
+          touchCosHalfOffset = touchHypotenuse * cosTheta,
+          touchSinHalfOffset = touchHypotenuse * sinTheta,
           x, y;
 
-      for (var point in coords) {
-        x = coords[point].x;
-        y = coords[point].y;
-        coords[point].corner = {
+      for (var control in coords) {
+        x = coords[control].x;
+        y = coords[control].y;
+        coords[control].corner = {
           tl: {
             x: x - sinHalfOffset,
             y: y - cosHalfOffset
@@ -102,6 +107,24 @@
           br: {
             x: x + sinHalfOffset,
             y: y + cosHalfOffset
+          }
+        };
+        coords[control].touchCorner = {
+          tl: {
+            x: x - touchSinHalfOffset,
+            y: y - touchCosHalfOffset
+          },
+          tr: {
+            x: x + touchCosHalfOffset,
+            y: y - touchSinHalfOffset
+          },
+          bl: {
+            x: x - touchCosHalfOffset,
+            y: y + touchSinHalfOffset
+          },
+          br: {
+            x: x + touchSinHalfOffset,
+            y: y + touchCosHalfOffset
           }
         };
       }
@@ -150,12 +173,9 @@
           strokeWidth = 1 / this.borderScaleFactor,
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
-          drawRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
-            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
             styleOverride.hasControls : this.hasControls,
-          rotatingPointOffset = typeof styleOverride.rotatingPointOffset !== 'undefined' ?
-            styleOverride.rotatingPointOffset : this.rotatingPointOffset;
+          shouldStroke = false;
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -168,16 +188,25 @@
         height
       );
 
-      if (drawRotatingPoint && this.isControlVisible('mtr') && hasControls) {
-
-        var rotateHeight = -height / 2;
-
-        ctx.beginPath();
-        ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight - rotatingPointOffset);
-        ctx.stroke();
+      if (hasControls) {
+        this.forEachControl(function(control) {
+          // in this moment, the ctx is centered on the object.
+          // width and height of the above function are the size of the bbox.
+          ctx.beginPath();
+          if (control.withConnection && control.getVisibility()) {
+            // reset movement for each control
+            shouldStroke = true;
+            ctx.moveTo(control.x * width, control.y * height);
+            ctx.lineTo(
+              control.x * width + control.offsetX,
+              control.y * height + control.offsetY
+            );
+          }
+        });
+        if (shouldStroke) {
+          ctx.stroke();
+        }
       }
-
       ctx.restore();
       return this;
     },
@@ -231,73 +260,18 @@
      */
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
-      var wh = this._calculateCurrentDimensions(),
-          width = wh.x,
-          height = wh.y,
-          scaleOffset = styleOverride.cornerSize || this.cornerSize,
-          left = -(width + scaleOffset) / 2,
-          top = -(height + scaleOffset) / 2,
-          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
-            styleOverride.transparentCorners : this.transparentCorners,
-          hasRotatingPoint = typeof styleOverride.hasRotatingPoint !== 'undefined' ?
-            styleOverride.hasRotatingPoint : this.hasRotatingPoint,
-          methodName = transparentCorners ? 'stroke' : 'fill';
-
       ctx.save();
+      ctx.setTransform(this.canvas.getRetinaScaling(), 0, 0, this.canvas.getRetinaScaling(), 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
         ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
-
-      // top-left
-      this._drawControl('tl', ctx, methodName,
-        left,
-        top, styleOverride);
-
-      // top-right
-      this._drawControl('tr', ctx, methodName,
-        left + width,
-        top, styleOverride);
-
-      // bottom-left
-      this._drawControl('bl', ctx, methodName,
-        left,
-        top + height, styleOverride);
-
-      // bottom-right
-      this._drawControl('br', ctx, methodName,
-        left + width,
-        top + height, styleOverride);
-
-      if (!this.get('lockUniScaling')) {
-
-        // middle-top
-        this._drawControl('mt', ctx, methodName,
-          left + width / 2,
-          top, styleOverride);
-
-        // middle-bottom
-        this._drawControl('mb', ctx, methodName,
-          left + width / 2,
-          top + height, styleOverride);
-
-        // middle-right
-        this._drawControl('mr', ctx, methodName,
-          left + width,
-          top + height / 2, styleOverride);
-
-        // middle-left
-        this._drawControl('ml', ctx, methodName,
-          left,
-          top + height / 2, styleOverride);
-      }
-
-      // middle-top-rotate
-      if (hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
-          left + width / 2,
-          top - this.rotatingPointOffset, styleOverride);
+      this.setCoords(false);
+      for (var c in this.controls) {
+        this.controls[c].render(ctx,
+          this.oCoords[c].x,
+          this.oCoords[c].y, styleOverride, this);
       }
 
       ctx.restore();
@@ -306,50 +280,23 @@
     },
 
     /**
-     * @private
-     */
-    _drawControl: function(control, ctx, methodName, left, top, styleOverride) {
-      styleOverride = styleOverride || {};
-      if (!this.isControlVisible(control)) {
-        return;
-      }
-      var size = this.cornerSize, stroke = !this.transparentCorners && this.cornerStrokeColor;
-      switch (styleOverride.cornerStyle || this.cornerStyle) {
-        case 'circle':
-          ctx.beginPath();
-          ctx.arc(left + size / 2, top + size / 2, size / 2, 0, 2 * Math.PI, false);
-          ctx[methodName]();
-          if (stroke) {
-            ctx.stroke();
-          }
-          break;
-        default:
-          this.transparentCorners || ctx.clearRect(left, top, size, size);
-          ctx[methodName + 'Rect'](left, top, size, size);
-          if (stroke) {
-            ctx.strokeRect(left, top, size, size);
-          }
-      }
-    },
-
-    /**
      * Returns true if the specified control is visible, false otherwise.
-     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @param {String} controlKey The key of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
-    isControlVisible: function(controlName) {
-      return this._getControlsVisibility()[controlName];
+    isControlVisible: function(controlKey) {
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
     },
 
     /**
      * Sets the visibility of the specified control.
-     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @param {String} controlKey The key of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
      * @param {Boolean} visible true to set the specified control visible, false otherwise
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setControlVisible: function(controlName, visible) {
-      this._getControlsVisibility()[controlName] = visible;
+    setControlVisible: function(controlKey, visible) {
+      this.controls[controlKey].setVisibility(visible, this, controlKey);
       return this;
     },
 
@@ -383,20 +330,11 @@
      * @returns {Object}
      */
     _getControlsVisibility: function() {
-      if (!this._controlsVisibility) {
-        this._controlsVisibility = {
-          tl: true,
-          tr: true,
-          br: true,
-          bl: true,
-          ml: true,
-          mt: true,
-          mr: true,
-          mb: true,
-          mtr: true
-        };
-      }
-      return this._controlsVisibility;
+      var visibility = {};
+      this.forEachControl(function(control, fabricObject, key) {
+        visibility[key] = control.getVisibility(fabricObject, key);
+      });
+      return visibility;
     },
 
     /**

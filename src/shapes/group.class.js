@@ -107,9 +107,9 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsACoords: function() {
-      var ignoreZoom = true, skipAbsolute = true;
+      var ignoreZoom = true;
       for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(ignoreZoom, skipAbsolute);
+        this._objects[i].setCoords(ignoreZoom);
       }
     },
 
@@ -132,14 +132,14 @@
     _updateObjectCoords: function(object, center) {
       var objectLeft = object.left,
           objectTop = object.top,
-          ignoreZoom = true, skipAbsolute = true;
+          ignoreZoom = true;
 
       object.set({
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
       object.group = this;
-      object.setCoords(ignoreZoom, skipAbsolute);
+      object.setCoords(ignoreZoom);
     },
 
     /**
@@ -486,8 +486,8 @@
         o.setCoords(ignoreZoom);
         for (j = 0; j < jLen; j++) {
           prop = props[j];
-          aX.push(o.oCoords[prop].x);
-          aY.push(o.oCoords[prop].y);
+          aX.push(o.aCoords[prop].x);
+          aY.push(o.aCoords[prop].y);
         }
       }
 
