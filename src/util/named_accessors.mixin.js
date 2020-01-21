@@ -188,22 +188,6 @@
 
   /** @lends fabric.Object.Prototype */
   /**
-   * Retrieves object's {@link fabric.Object#clipTo|clipping function}
-   * @method getClipTo
-   * @memberOf fabric.Object.prototype
-   * @return {Function}
-   */
-
-  /**
-   * Sets object's {@link fabric.Object#clipTo|clipping function}
-   * @method setClipTo
-   * @memberOf fabric.Object.prototype
-   * @param {Function} clipTo Clipping function
-   * @return {fabric.Object} thisArg
-   * @chainable
-   */
-
-  /**
    * Retrieves object's {@link fabric.Object#transformMatrix|transformMatrix}
    * @method getTransformMatrix
    * @memberOf fabric.Object.prototype

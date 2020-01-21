@@ -23,7 +23,6 @@
    * @fires object:scaling while an object is being scaled by controls
    * @fires object:moving while an object is being dragged
    * @fires object:skewing while an object is being skewed from the controls
-   * @fires object:selected this event is deprecated. use selection:created
    *
    * @fires before:transform before a transform is is started
    * @fires before:selection:cleared
@@ -1150,11 +1149,6 @@
         somethingChanged && this.fire('selection:updated', opt);
       }
       else if (objects.length > 0) {
-        // deprecated event
-        if (objects.length === 1) {
-          opt.target = added[0];
-          this.fire('object:selected', opt);
-        }
         opt.selected = added;
         // added for backward compatibility
         opt.target = this._activeObject;
