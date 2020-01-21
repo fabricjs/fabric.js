@@ -62,7 +62,7 @@
      */
     forEachControl: function(fn) {
       for (var i in this.controls) {
-        fn(this.controls[i], this, i);
+        fn(this.controls[i], i, this);
       };
     },
 
@@ -189,11 +189,11 @@
       );
 
       if (hasControls) {
-        this.forEachControl(function(control) {
+        this.forEachControl(function(control, key, fabricObject) {
           // in this moment, the ctx is centered on the object.
           // width and height of the above function are the size of the bbox.
           ctx.beginPath();
-          if (control.withConnection && control.getVisibility()) {
+          if (control.withConnection && control.getVisibility(fabricObject, key)) {
             // reset movement for each control
             shouldStroke = true;
             ctx.moveTo(control.x * width, control.y * height);
@@ -331,7 +331,7 @@
      */
     _getControlsVisibility: function() {
       var visibility = {};
-      this.forEachControl(function(control, fabricObject, key) {
+      this.forEachControl(function(control, key, fabricObject) {
         visibility[key] = control.getVisibility(fabricObject, key);
       });
       return visibility;

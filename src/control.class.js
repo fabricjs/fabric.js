@@ -213,7 +213,7 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!this.getVisibility()) {
+      if (!this.getVisibility(fabricObject, this.name)) {
         return;
       }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
