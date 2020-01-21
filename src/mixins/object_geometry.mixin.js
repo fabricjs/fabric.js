@@ -459,7 +459,7 @@
           finalMatrix = multiplyMatrices(vpt, startMatrix),
           dim = this._getTransformedDimensions(),
           coords = {};
-      this.forEachControl(function(control, fabricObject, key) {
+      this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
       });
 
