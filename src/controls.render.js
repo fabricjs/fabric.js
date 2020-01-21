@@ -8,7 +8,7 @@
 
   function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    if (!this.getVisibility(fabricObject, this.name)) {
+    if (!this.getVisibility(fabricObject)) {
       return;
     }
     var size = styleOverride.cornerSize || fabricObject.cornerSize,
@@ -32,7 +32,7 @@
 
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    if (!this.getVisibility(fabricObject, this.name)) {
+    if (!this.getVisibility(fabricObject)) {
       return;
     }
     var size = styleOverride.cornerSize || fabricObject.cornerSize,

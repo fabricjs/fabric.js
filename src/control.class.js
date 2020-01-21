@@ -156,7 +156,7 @@
      * @param {fabric.Object} object on which the control is displayed
      * @return {Boolean}
      */
-    getVisibility: function(/*fabricObject, name */) {
+    getVisibility: function(/*fabricObject */) {
       return this.visible;
     },
 
@@ -213,7 +213,7 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!this.getVisibility(fabricObject, this.name)) {
+      if (!this.getVisibility(fabricObject)) {
         return;
       }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {

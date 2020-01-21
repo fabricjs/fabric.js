@@ -193,7 +193,7 @@
           // in this moment, the ctx is centered on the object.
           // width and height of the above function are the size of the bbox.
           ctx.beginPath();
-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
+          if (control.withConnection && control.getVisibility(fabricObject)) {
             // reset movement for each control
             shouldStroke = true;
             ctx.moveTo(control.x * width, control.y * height);
@@ -285,7 +285,7 @@
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
-      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this);
     },
 
     /**
@@ -332,7 +332,7 @@
     _getControlsVisibility: function() {
       var visibility = {};
       this.forEachControl(function(control, key, fabricObject) {
-        visibility[key] = control.getVisibility(fabricObject, key);
+        visibility[key] = control.getVisibility(fabricObject);
       });
       return visibility;
     },
