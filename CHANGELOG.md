@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.0.0-beta.3]
+
+fix: control offset rendering code had extras `beginPath` that would clear all but not the last of them 
+
 ## [4.0.0-beta.2]
 
 fix: Control.getVisibility will always receive the fabric.Object argument.
