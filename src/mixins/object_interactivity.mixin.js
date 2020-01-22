@@ -189,10 +189,10 @@
       );
 
       if (hasControls) {
+        ctx.beginPath();
         this.forEachControl(function(control, key, fabricObject) {
           // in this moment, the ctx is centered on the object.
           // width and height of the above function are the size of the bbox.
-          ctx.beginPath();
           if (control.withConnection && control.getVisibility(fabricObject)) {
             // reset movement for each control
             shouldStroke = true;
