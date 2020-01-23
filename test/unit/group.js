@@ -747,6 +747,10 @@
     assert.equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetX different than 0');
     group3.shadow = { offsetX: 0, offsetY: -2 };
     assert.equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself has shadow and one offsetY different than 0');
+    rect1.shadow = { offsetX: 1, offsetY: 2, };
+    group3.shadow = { offsetX: 0, offsetY: 0 };
+    assert.equal(group3.willDrawShadow(), true, 'group will cast shadow because group itself will not, but rect 1 will');
+
   });
 
   QUnit.test('group shouldCache', function(assert) {

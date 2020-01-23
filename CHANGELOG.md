@@ -1,12 +1,16 @@
 # Changelog
 
+## [4.0.0-beta.4]
+
+fix(fabric.Group): will draw shadow will call parent method.
+
 ## [4.0.0-beta.3]
 
-fix: control offset rendering code had extras `beginPath` that would clear all but not the last of them [#6114](https://github.com/fabricjs/fabric.js/pull/6114)
+fix(controls): control offset rendering code had extras `beginPath` that would clear all but not the last of them [#6114](https://github.com/fabricjs/fabric.js/pull/6114)
 
 ## [4.0.0-beta.2]
 
-fix: Control.getVisibility will always receive the fabric.Object argument.
+fix(controls): Control.getVisibility will always receive the fabric.Object argument.
 
 ## [4.0.0-beta.1]
 
