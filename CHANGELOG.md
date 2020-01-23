@@ -2,7 +2,7 @@
 
 ## [4.0.0-beta.4]
 
-fix(fabric.Group): will draw shadow will call parent method.
+fix(fabric.Group): will draw shadow will call parent method. [#6116](https://github.com/fabricjs/fabric.js/pull/6116)
 
 ## [4.0.0-beta.3]
 
