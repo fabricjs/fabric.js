@@ -1023,6 +1023,19 @@
     });
   });
 
+  QUnit.test('getObjectScaling in group with object rotated', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, angle: 45 });
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 3;
+    object.group = group;
+    var objectScale = object.getObjectScaling();
+    assert.deepEqual(objectScale, {
+      scaleX: 1,
+      scaleY: 1,
+    });
+  });
+
   QUnit.test('dirty flag on set property', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     object.cacheProperties = ['propA', 'propB'];

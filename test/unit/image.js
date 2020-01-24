@@ -774,8 +774,8 @@
       assert.equal(image._element, image._filteredEl, 'after filtering elements are the same');
       image.applyResizeFilters();
       assert.notEqual(image._element, image._filteredEl, 'after resizing the 2 elements differ');
-      assert.equal(image._lastScaleX, image.scaleX, 'after resizing we know how much we scaled');
-      assert.equal(image._lastScaleY, image.scaleY, 'after resizing we know how much we scaled');
+      assert.equal(image._lastScaleX.toFixed(2), image.scaleX, 'after resizing we know how much we scaled');
+      assert.equal(image._lastScaleY.toFixed(2), image.scaleY, 'after resizing we know how much we scaled');
       image.applyFilters();
       assert.equal(image._element, image._filteredEl, 'after filters again the elements changed');
       assert.equal(image._lastScaleX, 1, 'lastScale X is reset');
