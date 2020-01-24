@@ -3,7 +3,7 @@
 ## [3.6.3]
 
 backport: fix(fabric.Group): will draw shadow will call parent method. [#6116](https://github.com/fabricjs/fabric.js/pull/6116)
-
+backport: fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. [#6118](https://github.com/fabricjs/fabric.js/pull/6118)
 
 ## [4.0.0-beta.5]
 
