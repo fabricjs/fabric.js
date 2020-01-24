@@ -943,7 +943,7 @@
      */
     getObjectScaling: function() {
       var options = fabric.util.qrDecompose(this.calcTransformMatrix());
-      return { scaleX: options.scaleX, scaleY: options.scaleY };
+      return { scaleX: Math.abs(options.scaleX), scaleY: Math.abs(options.scaleY) };
     },
 
     /**
