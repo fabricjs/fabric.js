@@ -1545,7 +1545,13 @@
 
       ctx.save();
       if (this.strokeUniform) {
-        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
+        var scaleX = this.scaleX;
+        var scaleY = this.scaleY;
+        if (this.group) {
+          scaleX *= this.group.scaleX;
+          scaleY *= this.group.scaleY;
+        }
+        ctx.scale(1 / scaleX, 1 / scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
       if (this.stroke.toLive && this.stroke.gradientUnits === 'percentage') {

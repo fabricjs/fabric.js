@@ -194,7 +194,7 @@
      */
     drawBordersInGroup: function(ctx, options, styleOverride) {
       styleOverride = styleOverride || {};
-      var p = this._getNonTransformedDimensions(),
+      var p = { x: options.width, y: options.height },
           matrix = fabric.util.composeMatrix({
             scaleX: options.scaleX,
             scaleY: options.scaleY,
@@ -202,8 +202,8 @@
           }),
           wh = fabric.util.transformPoint(p, matrix),
           strokeWidth = 1 / this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth;
+          width = wh.x + strokeWidth / (this.strokeUniform ? options.scaleX : 1),
+          height = wh.y + strokeWidth / (this.strokeUniform ? options.scaleY : 1);
 
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
