@@ -1030,9 +1030,11 @@
     group.scaleY = 3;
     object.group = group;
     var objectScale = object.getObjectScaling();
+    objectScale.scaleX = objectScale.scaleX.toFixed(3);
+    objectScale.scaleY = objectScale.scaleY.toFixed(3);
     assert.deepEqual(objectScale, {
-      scaleX: 1,
-      scaleY: 1,
+      scaleX: '7.649',
+      scaleY: '4.707',
     });
   });
 
