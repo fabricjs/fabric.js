@@ -9,6 +9,7 @@ exemptLabels:
   - clipPath
   - docs
   - feature
+  - possible_feature
   - fix-next
   - itext
   - low_priority
