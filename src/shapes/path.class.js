@@ -8,6 +8,7 @@
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
       drawArc = fabric.util.drawArc,
+      toFixed = fabric.util.toFixed,
       commandLengths = {
         m: 2,
         l: 2,
@@ -52,19 +53,9 @@
      */
     path: null,
 
-    /**
-     * Minimum X from points values, necessary to offset points
-     * @type Number
-     * @default
-     */
-    minX: 0,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('path', 'fillRule'),
 
-    /**
-     * Minimum Y from points values, necessary to offset points
-     * @type Number
-     * @default
-     */
-    minY: 0,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('path'),
 
     /**
      * Constructor
@@ -74,10 +65,7 @@
      */
     initialize: function(path, options) {
       options = options || { };
-
-      if (options) {
-        this.setOptions(options);
-      }
+      this.callSuper('initialize', options);
 
       if (!path) {
         path = [];
@@ -98,49 +86,7 @@
         this.path = this._parsePath();
       }
 
-      this._setPositionDimensions(options);
-
-      if (options.sourcePath) {
-        this.setSourcePath(options.sourcePath);
-      }
-      if (this.objectCaching) {
-        this._createCacheCanvas();
-        this.setupState({ propertySet: 'cacheProperties' });
-      }
-    },
-
-    /**
-     * @private
-     * @param {Object} options Options object
-     */
-    _setPositionDimensions: function(options) {
-      var calcDim = this._parseDimensions();
-
-      this.minX = calcDim.left;
-      this.minY = calcDim.top;
-      this.width = calcDim.width;
-      this.height = calcDim.height;
-
-      if (typeof options.left === 'undefined') {
-        this.left = calcDim.left + (this.originX === 'center'
-          ? this.width / 2
-          : this.originX === 'right'
-            ? this.width
-            : 0);
-      }
-
-      if (typeof options.top === 'undefined') {
-        this.top = calcDim.top + (this.originY === 'center'
-          ? this.height / 2
-          : this.originY === 'bottom'
-            ? this.height
-            : 0);
-      }
-
-      this.pathOffset = this.pathOffset || {
-        x: this.minX + this.width / 2,
-        y: this.minY + this.height / 2
-      };
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options);
     },
 
     /**
@@ -160,11 +106,6 @@
           tempY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
-
-      if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
-      }
 
       ctx.beginPath();
 
@@ -460,8 +401,7 @@
      */
     _render: function(ctx) {
       this._renderPathCommands(ctx);
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -479,10 +419,9 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var o = extend(this.callSuper('toObject', ['sourcePath', 'pathOffset'].concat(propertiesToInclude)), {
-        path: this.path.map(function(item) { return item.slice() })
+      return extend(this.callSuper('toObject', propertiesToInclude), {
+        path: this.path.map(function(item) { return item.slice(); }),
       });
-      return o;
     },
 
     /**
@@ -491,41 +430,57 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
-      var o = this.toObject(propertiesToInclude);
-      if (this.sourcePath) {
-        o.path = this.sourcePath;
+      var o = this.toObject(['sourcePath'].concat(propertiesToInclude));
+      if (o.sourcePath) {
+        delete o.path;
       }
-      delete o.sourcePath;
       return o;
     },
 
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
+     */
+    _toSVG: function() {
+      var path = this.path.map(function(path) {
+        return path.join(' ');
+      }).join(' ');
+      return [
+        '<path ', 'COMMON_PARTS',
+        'd="', path,
+        '" stroke-linecap="round" ',
+        '/>\n'
+      ];
+    },
+
+    _getOffsetTransform: function() {
+      var digits = fabric.Object.NUM_FRACTION_DIGITS;
+      return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
+          toFixed(-this.pathOffset.y, digits) + ')';
+    },
+
+    /**
+     * Returns svg clipPath representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toClipPathSVG: function(reviver) {
+      var additionalTransform = this._getOffsetTransform();
+      return '\t' + this._createBaseClipPathSVGMarkup(
+        this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform }
+      );
+    },
+
+    /**
+     * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var chunks = [],
-          markup = this._createBaseSVGMarkup(), addTransform = '';
-
-      for (var i = 0, len = this.path.length; i < len; i++) {
-        chunks.push(this.path[i].join(' '));
-      }
-      var path = chunks.join(' ');
-      if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
-      }
-      markup.push(
-        '<path ', this.getSvgId(),
-          'd="', path,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(), addTransform,
-          this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
-        '/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      var additionalTransform = this._getOffsetTransform();
+      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform  });
     },
     /* _TO_SVG_END_ */
 
@@ -545,7 +500,7 @@
           coords = [],
           currentPath,
           parsed,
-          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
+          re = fabric.rePathCommand,
           match,
           coordsStr;
 
@@ -589,7 +544,7 @@
     /**
      * @private
      */
-    _parseDimensions: function() {
+    _calcDimensions: function() {
 
       var aX = [],
           aY = [],
@@ -677,8 +632,6 @@
             break;
 
           case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
             controlX = current[3];
             controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
@@ -686,9 +639,11 @@
               current[2],
               controlX,
               controlY,
-              x,
-              y
+              current[5],
+              current[6]
             );
+            x = current[5];
+            y = current[6];
             break;
 
           case 's': // shorthand cubic bezierCurveTo, relative
@@ -898,16 +853,14 @@
           maxX = max(aX) || 0,
           maxY = max(aY) || 0,
           deltaX = maxX - minX,
-          deltaY = maxY - minY,
+          deltaY = maxY - minY;
 
-          o = {
-            left: minX,
-            top: minY,
-            width: deltaX,
-            height: deltaY
-          };
-
-      return o;
+      return {
+        left: minX,
+        top: minY,
+        width: deltaX,
+        height: deltaY
+      };
     }
   });
 
@@ -919,24 +872,16 @@
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
    */
   fabric.Path.fromObject = function(object, callback) {
-    // remove this pattern rom 2.0, accept just object.
-    var path;
-    if (typeof object.path === 'string') {
-      fabric.loadSVGFromURL(object.path, function (elements) {
-        var pathUrl = object.path;
-        path = elements[0];
-        delete object.path;
-
-        fabric.util.object.extend(path, object);
-        path.setSourcePath(pathUrl);
-
+    if (typeof object.sourcePath === 'string') {
+      var pathUrl = object.sourcePath;
+      fabric.loadSVGFromURL(pathUrl, function (elements) {
+        var path = elements[0];
+        path.setOptions(object);
         callback && callback(path);
       });
     }
     else {
-      path = new fabric.Path(object.path, object);
-      callback && callback(path);
-      return path;
+      fabric.Object._fromObject('Path', object, callback, 'path');
     }
   };
 
@@ -956,20 +901,13 @@
    * @param {SVGElement} element to parse
    * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    * @param {Object} [options] Options object
+   * @param {Function} [callback] Options callback invoked after parsing is finished
    */
   fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-    callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
+    parsedAttributes.fromSVG = true;
+    callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
-
-  /**
-   * Indicates that instances of this type are async
-   * @static
-   * @memberOf fabric.Path
-   * @type Boolean
-   * @default
-   */
-  fabric.Path.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);

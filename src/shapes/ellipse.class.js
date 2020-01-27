@@ -3,8 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      piBy2   = Math.PI * 2,
-      extend = fabric.util.object.extend;
+      piBy2   = Math.PI * 2;
 
   if (fabric.Ellipse) {
     fabric.warn('fabric.Ellipse is already defined.');
@@ -40,6 +39,8 @@
      * @default
      */
     ry:   0,
+
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
 
     /**
      * Constructor
@@ -104,58 +105,38 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
-      if (this.group && this.group.type === 'path-group') {
-        x = this.left + this.rx;
-        y = this.top + this.ry;
-      }
-      markup.push(
-        '<ellipse ', this.getSvgId(),
-          'cx="', x, '" cy="', y, '" ',
-          'rx="', this.rx,
-          '" ry="', this.ry,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          this.getSvgTransformMatrix(),
-        '"/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+    _toSVG: function() {
+      return [
+        '<ellipse ', 'COMMON_PARTS',
+        'cx="0" cy="0" ',
+        'rx="', this.rx,
+        '" ry="', this.ry,
+        '" />\n'
+      ];
     },
     /* _TO_SVG_END_ */
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry / this.rx, 0, 0);
       ctx.arc(
-        noTransform ? this.left + this.rx : 0,
-        noTransform ? (this.top + this.ry) * this.rx / this.ry : 0,
+        0,
+        0,
         this.rx,
         0,
         piBy2,
         false);
       ctx.restore();
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
-
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return 1;
-    }
   });
 
   /* _FROM_SVG_START_ */
@@ -172,22 +153,16 @@
    * @static
    * @memberOf fabric.Ellipse
    * @param {SVGElement} element Element to parse
-   * @param {Object} [options] Options object
+   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @return {fabric.Ellipse}
    */
-  fabric.Ellipse.fromElement = function(element, options) {
-    options || (options = { });
+  fabric.Ellipse.fromElement = function(element, callback) {
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
 
-    parsedAttributes.left = parsedAttributes.left || 0;
-    parsedAttributes.top = parsedAttributes.top || 0;
-
-    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
-
-    ellipse.top -= ellipse.ry;
-    ellipse.left -= ellipse.rx;
-    return ellipse;
+    parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
+    parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
+    callback(new fabric.Ellipse(parsedAttributes));
   };
   /* _FROM_SVG_END_ */
 
@@ -200,9 +175,7 @@
    * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromObject = function(object, callback) {
-    var ellipse = new fabric.Ellipse(object);
-    callback && callback(ellipse);
-    return ellipse;
+    return fabric.Object._fromObject('Ellipse', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

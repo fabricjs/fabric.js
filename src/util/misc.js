@@ -3,13 +3,56 @@
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
-      abs = Math.abs,
-      PiBy180 = Math.PI / 180;
+      PiBy180 = Math.PI / 180,
+      PiBy2 = Math.PI / 2;
 
   /**
    * @namespace fabric.util
    */
   fabric.util = {
+
+    /**
+     * Calculate the cos of an angle, avoiding returning floats for known results
+     * @static
+     * @memberOf fabric.util
+     * @param {Number} angle the angle in radians or in degree
+     * @return {Number}
+     */
+    cos: function(angle) {
+      if (angle === 0) { return 1; }
+      if (angle < 0) {
+        // cos(a) = cos(-a)
+        angle = -angle;
+      }
+      var angleSlice = angle / PiBy2;
+      switch (angleSlice) {
+        case 1: case 3: return 0;
+        case 2: return -1;
+      }
+      return Math.cos(angle);
+    },
+
+    /**
+     * Calculate the sin of an angle, avoiding returning floats for known results
+     * @static
+     * @memberOf fabric.util
+     * @param {Number} angle the angle in radians or in degree
+     * @return {Number}
+     */
+    sin: function(angle) {
+      if (angle === 0) { return 0; }
+      var angleSlice = angle / PiBy2, sign = 1;
+      if (angle < 0) {
+        // sin(-a) = -sin(a)
+        sign = -1;
+      }
+      switch (angleSlice) {
+        case 1: return sign;
+        case 2: return 0;
+        case 3: return -sign;
+      }
+      return Math.sin(angle);
+    },
 
     /**
      * Removes value from an array.
@@ -86,8 +129,8 @@
      * @return {Object} The new rotated point
      */
     rotateVector: function(vector, radians) {
-      var sin = Math.sin(radians),
-          cos = Math.cos(radians),
+      var sin = fabric.util.sin(radians),
+          cos = fabric.util.cos(radians),
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
       return {
@@ -121,17 +164,23 @@
     /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
+     * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
      */
-    makeBoundingBoxFromPoints: function(points) {
+    makeBoundingBoxFromPoints: function(points, transform) {
+      if (transform) {
+        for (var i = 0; i < points.length; i++) {
+          points[i] = fabric.util.transformPoint(points[i], transform);
+        }
+      }
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
           minX = fabric.util.array.min(xPoints),
           maxX = fabric.util.array.max(xPoints),
-          width = Math.abs(minX - maxX),
+          width = maxX - minX,
           yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
           minY = fabric.util.array.min(yPoints),
           maxY = fabric.util.array.max(yPoints),
-          height = Math.abs(minY - maxY);
+          height = maxY - minY;
 
       return {
         left: minX,
@@ -230,6 +279,33 @@
     },
 
     /**
+     * Returns array of attributes for given svg that fabric parses
+     * @memberOf fabric.util
+     * @param {String} type Type of svg element (eg. 'circle')
+     * @return {Array} string names of supported attributes
+     */
+    getSvgAttributes: function(type) {
+      var attributes = [
+        'instantiated_by_use',
+        'style',
+        'id',
+        'class'
+      ];
+      switch (type) {
+        case 'linearGradient':
+          attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
+          break;
+        case 'radialGradient':
+          attributes = attributes.concat(['gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr']);
+          break;
+        case 'stop':
+          attributes = attributes.concat(['offset', 'stop-color', 'stop-opacity']);
+          break;
+      }
+      return attributes;
+    },
+
+    /**
      * Returns object of given namespace
      * @memberOf fabric.util
      * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
@@ -268,11 +344,12 @@
       var img = fabric.util.createImage();
 
       /** @ignore */
-      img.onload = function () {
+      var onLoadCallback = function () {
         callback && callback.call(context, img);
         img = img.onload = img.onerror = null;
       };
 
+      img.onload = onLoadCallback;
       /** @ignore */
       img.onerror = function() {
         fabric.log('Error loading ' + img.src);
@@ -288,7 +365,41 @@
         img.crossOrigin = crossOrigin;
       }
 
+      // IE10 / IE11-Fix: SVG contents from data: URI
+      // will only be available if the IMG is present
+      // in the DOM (and visible)
+      if (url.substring(0,14) === 'data:image/svg') {
+        img.onload = null;
+        fabric.util.loadImageInDom(img, onLoadCallback);
+      }
+
       img.src = url;
+    },
+
+    /**
+     * Attaches SVG image with data: URL to the dom
+     * @memberOf fabric.util
+     * @param {Object} img Image object with data:image/svg src
+     * @param {Function} callback Callback; invoked with loaded image
+     * @return {Object} DOM element (div containing the SVG image)
+     */
+    loadImageInDom: function(img, onLoadCallback) {
+      var div = fabric.document.createElement('div');
+      div.style.width = div.style.height = '1px';
+      div.style.left = div.style.top = '-100%';
+      div.style.position = 'absolute';
+      div.appendChild(img);
+      fabric.document.querySelector('body').appendChild(div);
+      /**
+       * Wrap in function to:
+       *   1. Call existing callback
+       *   2. Cleanup DOM
+       */
+      img.onload = function () {
+        onLoadCallback();
+        div.parentNode.removeChild(div);
+        div = null;
+      };
     },
 
     /**
@@ -304,15 +415,18 @@
     enlivenObjects: function(objects, callback, namespace, reviver) {
       objects = objects || [];
 
-      function onLoaded() {
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback(enlivenedObjects);
-        }
-      }
-
       var enlivenedObjects = [],
           numLoadedObjects = 0,
           numTotalObjects = objects.length;
+
+      function onLoaded() {
+        if (++numLoadedObjects === numTotalObjects) {
+          callback && callback(enlivenedObjects.filter(function(obj) {
+            // filter out undefined objects (objects that gave error)
+            return obj;
+          }));
+        }
+      }
 
       if (!numTotalObjects) {
         callback && callback(enlivenedObjects);
@@ -326,18 +440,49 @@
           return;
         }
         var klass = fabric.util.getKlass(o.type, namespace);
-        if (klass.async) {
-          klass.fromObject(o, function (obj, error) {
-            if (!error) {
-              enlivenedObjects[index] = obj;
-              reviver && reviver(o, enlivenedObjects[index]);
-            }
+        klass.fromObject(o, function (obj, error) {
+          error || (enlivenedObjects[index] = obj);
+          reviver && reviver(o, obj, error);
+          onLoaded();
+        });
+      });
+    },
+
+    /**
+     * Create and wait for loading of patterns
+     * @static
+     * @memberOf fabric.util
+     * @param {Array} patterns Objects to enliven
+     * @param {Function} callback Callback to invoke when all objects are created
+     * called after each fabric object created.
+     */
+    enlivenPatterns: function(patterns, callback) {
+      patterns = patterns || [];
+
+      function onLoaded() {
+        if (++numLoadedPatterns === numPatterns) {
+          callback && callback(enlivenedPatterns);
+        }
+      }
+
+      var enlivenedPatterns = [],
+          numLoadedPatterns = 0,
+          numPatterns = patterns.length;
+
+      if (!numPatterns) {
+        callback && callback(enlivenedPatterns);
+        return;
+      }
+
+      patterns.forEach(function (p, index) {
+        if (p && p.source) {
+          new fabric.Pattern(p, function(pattern) {
+            enlivenedPatterns[index] = pattern;
             onLoaded();
           });
         }
         else {
-          enlivenedObjects[index] = klass.fromObject(o);
-          reviver && reviver(o, enlivenedObjects[index]);
+          enlivenedPatterns[index] = p;
           onLoaded();
         }
       });
@@ -350,15 +495,28 @@
      * @param {Array} elements SVG elements to group
      * @param {Object} [options] Options object
      * @param {String} path Value to set sourcePath to
-     * @return {fabric.Object|fabric.PathGroup}
+     * @return {fabric.Object|fabric.Group}
      */
     groupSVGElements: function(elements, options, path) {
       var object;
-
-      object = new fabric.PathGroup(elements, options);
-
+      if (elements && elements.length === 1) {
+        return elements[0];
+      }
+      if (options) {
+        if (options.width && options.height) {
+          options.centerPoint = {
+            x: options.width / 2,
+            y: options.height / 2
+          };
+        }
+        else {
+          delete options.width;
+          delete options.height;
+        }
+      }
+      object = new fabric.Group(elements, options);
       if (typeof path !== 'undefined') {
-        object.setSourcePath(path);
+        object.sourcePath = path;
       }
       return object;
     },
@@ -369,7 +527,7 @@
      * @memberOf fabric.util
      * @param {Object} source Source object
      * @param {Object} destination Destination object
-     * @return {Array} properties Propertie names to include
+     * @return {Array} properties Properties names to include
      */
     populateWithProperties: function(source, destination, properties) {
       if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
@@ -422,21 +580,41 @@
     },
 
     /**
-     * Creates canvas element and initializes it via excanvas if necessary
+     * Creates canvas element
      * @static
      * @memberOf fabric.util
-     * @param {CanvasElement} [canvasEl] optional canvas element to initialize;
-     * when not given, element is created implicitly
      * @return {CanvasElement} initialized canvas element
      */
-    createCanvasElement: function(canvasEl) {
-      canvasEl || (canvasEl = fabric.document.createElement('canvas'));
-      /* eslint-disable camelcase */
-      if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(canvasEl);
-      }
-      /* eslint-enable camelcase */
-      return canvasEl;
+    createCanvasElement: function() {
+      return fabric.document.createElement('canvas');
+    },
+
+    /**
+     * Creates a canvas element that is a copy of another and is also painted
+     * @param {CanvasElement} canvas to copy size and content of
+     * @static
+     * @memberOf fabric.util
+     * @return {CanvasElement} initialized canvas element
+     */
+    copyCanvasElement: function(canvas) {
+      var newCanvas = fabric.util.createCanvasElement();
+      newCanvas.width = canvas.width;
+      newCanvas.height = canvas.height;
+      newCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      return newCanvas;
+    },
+
+    /**
+     * since 2.6.0 moved from canvas instance to utility.
+     * @param {CanvasElement} canvasEl to copy size and content of
+     * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
+     * @param {Number} quality <= 1 and > 0
+     * @static
+     * @memberOf fabric.util
+     * @return {String} data url
+     */
+    toDataURL: function(canvasEl, format, quality) {
+      return canvasEl.toDataURL('image/' + format, quality);
     },
 
     /**
@@ -446,45 +624,13 @@
      * @return {HTMLImageElement} HTML image element
      */
     createImage: function() {
-      return fabric.isLikelyNode
-        ? new (require('canvas').Image)()
-        : fabric.document.createElement('img');
-    },
-
-    /**
-     * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
-     * @static
-     * @memberOf fabric.util
-     * @param {Object} klass "Class" to create accessors for
-     */
-    createAccessors: function(klass) {
-      var proto = klass.prototype, i, propName,
-          capitalizedPropName, setterName, getterName;
-
-      for (i = proto.stateProperties.length; i--; ) {
-
-        propName = proto.stateProperties[i];
-        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1);
-        setterName = 'set' + capitalizedPropName;
-        getterName = 'get' + capitalizedPropName;
-
-        // using `new Function` for better introspection
-        if (!proto[getterName]) {
-          proto[getterName] = (function(property) {
-            return new Function('return this.get("' + property + '")');
-          })(propName);
-        }
-        if (!proto[setterName]) {
-          proto[setterName] = (function(property) {
-            return new Function('value', 'return this.set("' + property + '", value)');
-          })(propName);
-        }
-      }
+      return fabric.document.createElement('img');
     },
 
     /**
      * @static
      * @memberOf fabric.util
+     * @deprecated since 2.0.0
      * @param {fabric.Object} receiver Object implementing `clipTo` method
      * @param {CanvasRenderingContext2D} ctx Context to clip
      */
@@ -517,7 +663,7 @@
     },
 
     /**
-     * Decomposes standard 2x2 matrix into transform componentes
+     * Decomposes standard 2x3 matrix into transform components
      * @static
      * @memberOf fabric.util
      * @param  {Array} a transformMatrix
@@ -540,12 +686,122 @@
       };
     },
 
-    customTransformMatrix: function(scaleX, scaleY, skewX) {
-      var skewMatrixX = [1, 0, abs(Math.tan(skewX * PiBy180)), 1],
-          scaleMatrix = [abs(scaleX), 0, 0, abs(scaleY)];
-      return fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle] angle in degrees
+     * @return {Number[]} transform matrix
+     */
+    calcRotateMatrix: function(options) {
+      if (!options.angle) {
+        return fabric.iMatrix.concat();
+      }
+      var theta = fabric.util.degreesToRadians(options.angle),
+          cos = fabric.util.cos(theta),
+          sin = fabric.util.sin(theta);
+      return [cos, sin, -sin, cos, 0, 0];
     },
 
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet.
+     * is called DimensionsTransformMatrix because those properties are the one that influence
+     * the size of the resulting box of the object.
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @return {Number[]} transform matrix
+     */
+    calcDimensionsMatrix: function(options) {
+      var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
+          scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
+          scaleMatrix = [
+            options.flipX ? -scaleX : scaleX,
+            0,
+            0,
+            options.flipY ? -scaleY : scaleY,
+            0,
+            0],
+          multiply = fabric.util.multiplyTransformMatrices,
+          degreesToRadians = fabric.util.degreesToRadians;
+      if (options.skewX) {
+        scaleMatrix = multiply(
+          scaleMatrix,
+          [1, 0, Math.tan(degreesToRadians(options.skewX)), 1],
+          true);
+      }
+      if (options.skewY) {
+        scaleMatrix = multiply(
+          scaleMatrix,
+          [1, Math.tan(degreesToRadians(options.skewY)), 0, 1],
+          true);
+      }
+      return scaleMatrix;
+    },
+
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle]
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.translateX]
+     * @param  {Number} [options.translateY]
+     * @return {Number[]} transform matrix
+     */
+    composeMatrix: function(options) {
+      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
+          multiply = fabric.util.multiplyTransformMatrices;
+      if (options.angle) {
+        matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
+      }
+      if (options.scaleX !== 1 || options.scaleY !== 1 ||
+          options.skewX || options.skewY || options.flipX || options.flipY) {
+        matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
+      }
+      return matrix;
+    },
+
+    /**
+     * Returns a transform matrix that has the same effect of scaleX, scaleY and skewX.
+     * Is deprecated for composeMatrix. Please do not use it.
+     * @static
+     * @deprecated since 3.4.0
+     * @memberOf fabric.util
+     * @param  {Number} scaleX
+     * @param  {Number} scaleY
+     * @param  {Number} skewX
+     * @return {Number[]} transform matrix
+     */
+    customTransformMatrix: function(scaleX, scaleY, skewX) {
+      return fabric.util.composeMatrix({ scaleX: scaleX, scaleY: scaleY, skewX: skewX });
+    },
+
+    /**
+     * reset an object transform state to neutral. Top and left are not accounted for
+     * @static
+     * @memberOf fabric.util
+     * @param  {fabric.Object} target object to transform
+     */
     resetObjectTransform: function (target) {
       target.scaleX = 1;
       target.scaleY = 1;
@@ -553,7 +809,28 @@
       target.skewY = 0;
       target.flipX = false;
       target.flipY = false;
-      target.setAngle(0);
+      target.rotate(0);
+    },
+
+    /**
+     * Extract Object transform values
+     * @static
+     * @memberOf fabric.util
+     * @param  {fabric.Object} target object to read from
+     * @return {Object} Components of transform
+     */
+    saveObjectTransform: function (target) {
+      return {
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
+        angle: target.angle,
+        left: target.left,
+        flipX: target.flipX,
+        flipY: target.flipY,
+        top: target.top
+      };
     },
 
     /**
@@ -640,18 +917,65 @@
     },
 
     /**
-     * Clear char widths cache for a font family.
+     * Clear char widths cache for the given font family or all the cache if no
+     * fontFamily is specified.
+     * Use it if you know you are loading fonts in a lazy way and you are not waiting
+     * for custom fonts to load properly when adding text objects to the canvas.
+     * If a text object is added when its own font is not loaded yet, you will get wrong
+     * measurement and so wrong bounding boxes.
+     * After the font cache is cleared, either change the textObject text content or call
+     * initDimensions() to trigger a recalculation
      * @memberOf fabric.util
      * @param {String} [fontFamily] font family to clear
      */
     clearFabricFontCache: function(fontFamily) {
+      fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
         fabric.charWidthsCache = { };
       }
       else if (fabric.charWidthsCache[fontFamily]) {
         delete fabric.charWidthsCache[fontFamily];
       }
+    },
+
+    /**
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
+     * @memberOf fabric.util
+     * @param {Number} ar aspect ratio
+     * @param {Number} maximumArea Maximum area you want to achieve
+     * @return {Object.x} Limited dimensions by X
+     * @return {Object.y} Limited dimensions by Y
+     */
+    limitDimsByArea: function(ar, maximumArea) {
+      var roughWidth = Math.sqrt(maximumArea * ar),
+          perfLimitSizeY = Math.floor(maximumArea / roughWidth);
+      return { x: Math.floor(roughWidth), y: perfLimitSizeY };
+    },
+
+    capValue: function(min, value, max) {
+      return Math.max(min, Math.min(value, max));
+    },
+
+    findScaleToFit: function(source, destination) {
+      return Math.min(destination.width / source.width, destination.height / source.height);
+    },
+
+    findScaleToCover: function(source, destination) {
+      return Math.max(destination.width / source.width, destination.height / source.height);
+    },
+
+    /**
+     * given an array of 6 number returns something like `"matrix(...numbers)"`
+     * @memberOf fabric.util
+     * @param {Array} trasnform an array with 6 numbers
+     * @return {String} transform matrix for svg
+     * @return {Object.y} Limited dimensions by Y
+     */
+    matrixToSVG: function(transform) {
+      return 'matrix(' + transform.map(function(value) {
+        return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
+      }).join(' ') + ')';
     }
   };
-
 })(typeof exports !== 'undefined' ? exports : this);

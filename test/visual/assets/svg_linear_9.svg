@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760"
+         xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 380 380">
+<defs>
+<linearGradient id="three_stops_1" x1="10%" x2="90%" y1="10%" y2="25%">
+    <stop offset="0%" style="stop-color: green"/>
+    <stop offset="4.5%" style="stop-color: white"/>
+    <stop offset="5%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699"/>
+    <stop offset="95%" style="stop-color: #66cc99;"/>
+    <stop offset="99.5%" style="stop-color: blue;"/>
+    <stop offset="100%" style="stop-color: red"/>
+</linearGradient>
+<linearGradient id="basic_space" gradientUnits="userSpaceOnUse" x1="2%" x2="18%" y1="3%" y2="1%" >
+    <stop offset="0%" style="stop-color: green"/>
+    <stop offset="4.5%" style="stop-color: white"/>
+    <stop offset="5%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699"/>
+    <stop offset="95%" style="stop-color: #66cc99;"/>
+    <stop offset="99.5%" style="stop-color: blue;"/>
+    <stop offset="100%" style="stop-color: red"/>
+</linearGradient>
+<linearGradient id="three_stops_2" xlink:href="#three_stops_1">
+    <stop offset="0%" style="stop-color: #ffcc00;"/>
+    <stop offset="33.3%" style="stop-color: #cc6699; stop-opacity: 0.5"/>
+    <stop offset="100%" style="stop-color: #66cc99; stop-opacity: 0.9"/>
+</linearGradient>
+<linearGradient id="three_stops_3" gradientTransform="rotate(45)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_4" gradientTransform="rotate(45)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_5" gradientTransform="rotate(90) translate(0.5, 0)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_6" gradientTransform="translate(0.5, 0) rotate(90)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_7" gradientTransform="translate(0, 0.5) rotate(90)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_8" gradientTransform="translate(0, 0.5) scale(2, 1)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_9" gradientTransform="translate(0, 0.5) scale(1, 2)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_10" gradientTransform="translate(0.5, 0.5) scale(-1, 2)" xlink:href="#three_stops_1">
+</linearGradient>
+<linearGradient id="three_stops_11" gradientTransform="skewX(30)" xlink:href="#three_stops_1">
+</linearGradient>
+<radialGradient id="radial_1" gradientUnits="objectBoundingBox" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_2" gradientUnits="objectBoundingBox" cx="0.5" cy="0.1" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_3" gradientTransform="rotate(45)" gradientUnits="objectBoundingBox" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_4" gradientTransform="rotate(90)" cx="0.5" cy="0.1" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_5" fx="0.5" fy="0.9" cx="0.5" cy="0.2" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_6" gradientTransform="rotate(30)" fx="0.4" fy="0.7" cx="0.5" cy="0.2" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+<radialGradient id="radial_7" gradientUnits="rotate(90)" r="0.8" xlink:href="#three_stops_1">
+</radialGradient>
+
+<linearGradient id="basic_space_2" x1="20%" x2="-2%" y1="-3%" y2="-1%" gradientTransform="rotate(45)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_3" gradientTransform="rotate(45)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_4" gradientTransform="rotate(45)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_5" gradientTransform="rotate(90) translate(0.5, 0)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_6" gradientTransform="translate(15, 0) rotate(90)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_7" gradientTransform="translate(0, 15) rotate(90)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_8" gradientTransform="translate(0, 8) scale(2, 1)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_9" gradientTransform="translate(0, 0.5) scale(1, 2)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_10" gradientTransform="translate(50, 5) scale(-1, 2)" xlink:href="#basic_space">
+</linearGradient>
+<linearGradient id="basic_space_11" gradientTransform="skewX(30)" xlink:href="#basic_space">
+</linearGradient>
+<radialGradient id="basic_space_r_1" r="80%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_2" cx="50%" cy="10%" r="80%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_3" gradientTransform="rotate(45)" gradientUnits="objectBoundingBox" r="18%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_4" gradientTransform="rotate(90)" cx="50%" cy="10%" r="80%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_5" fx="50%" fy="90%" cx="50%" cy="20%" r="80%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_6" gradientTransform="rotate(30)" fx="4%" fy="7%" cx="50" cy="20" r="18%" xlink:href="#basic_space">
+</radialGradient>
+<radialGradient id="basic_space_r_7" gradientTransform="rotate(90)" r="80%" xlink:href="#basic_space">
+</radialGradient>
+
+<polygon id="base" points="5,5 35,5 35,40 5,40 5,35 30,35 30,10 5,10" />
+<rect width="35" height="80" id="base2" />
+</defs>
+  <use href="#base" style="fill: url(#three_stops_1); stroke: black;"/>
+  <use href="#base"  transform="translate(45, 0)" style="fill: url(#three_stops_2); stroke: black;"/>
+  <use href="#base"  fill-opacity="0.5" transform="translate(90, 0)" style="fill: url(#three_stops_2); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 0)" style="fill: url(#three_stops_3); stroke: black;"/>
+  <polygon transform="translate(0, 45)" points="5,5 80,5 80,25 5,25 5,20 75,20 75,10 5,10" style="fill: url(#three_stops_4); stroke: black;"/>
+  <use href="#base"  transform="translate(90, 45)" style="fill: url(#three_stops_5); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 45)" style="fill: url(#three_stops_6); stroke: black;"/>
+  <use href="#base"  transform="translate(0, 90)" style="fill: url(#three_stops_7); stroke: black;"/>
+  <use href="#base"  transform="translate(45, 90)"  style="fill: url(#three_stops_8); stroke: black;"/>
+  <use href="#base"  transform="translate(90, 90)" style="fill: url(#three_stops_9); stroke: black;"/>
+  <use href="#base"  transform="translate(135, 90)" style="fill: url(#three_stops_10); stroke: black;"/>
+  <use href="#base"  transform="translate(0, 135)" style="fill: url(#three_stops_11); stroke: black;"/>
+  <use href="#base2"  transform="translate(185, 5)" style="fill: url(#radial_1); stroke: black;"/>
+  <use href="#base2"  transform="translate(235, 5)" style="fill: url(#radial_2); stroke: black;"/>
+  <use href="#base2"  transform="translate(285, 5)" style="fill: url(#radial_3); stroke: black;"/>
+  <use href="#base2"  transform="translate(335, 5)" style="fill: url(#radial_4); stroke: black;"/>
+  <use href="#base2"  transform="translate(185, 95)" style="fill: url(#radial_5); stroke: black;"/>
+  <use href="#base2"  transform="translate(235, 95)" style="fill: url(#radial_6); stroke: black;"/>
+  <use href="#base2"  transform="translate(285, 95)" style="fill: url(#radial_7); stroke: black;"/>
+  <g transform="translate(0, 190)">
+    <use href="#base" style="fill: url(#basic_space); stroke: black;"/>
+    <use href="#base"  transform="translate(45, 0)" style="fill: url(#basic_space_2); stroke: black;"/>
+    <use href="#base"  fill-opacity="0.5" transform="translate(90, 0)" style="fill: url(#basic_space_2); stroke: black;"/>
+    <use href="#base"  transform="translate(135, 0)" style="fill: url(#basic_space_3); stroke: black;"/>
+    <polygon transform="translate(0, 45)" points="5,5 80,5 80,25 5,25 5,20 75,20 75,10 5,10" style="fill: url(#basic_space_4); stroke: black;"/>
+    <use href="#base"  transform="translate(90, 45)" style="fill: url(#basic_space_5); stroke: black;"/>
+    <use href="#base"  transform="translate(135, 45)" style="fill: url(#basic_space_6); stroke: black;"/>
+    <use href="#base"  transform="translate(0, 90)" style="fill: url(#basic_space_7); stroke: black;"/>
+    <use href="#base"  transform="translate(45, 90)"  style="fill: url(#basic_space_8); stroke: black;"/>
+    <use href="#base"  transform="translate(90, 90)" style="fill: url(#basic_space_9); stroke: black;"/>
+    <use href="#base"  transform="translate(135, 90)" style="fill: url(#basic_space_10); stroke: black;"/>
+    <use href="#base"  transform="translate(0, 135)" style="fill: url(#basic_space_11); stroke: black;"/>
+    <use href="#base2"  transform="translate(185, 5)" style="fill: url(#basic_space_r_1); stroke: black;"/>
+    <use href="#base2"  transform="translate(235, 5)" style="fill: url(#basic_space_r_2); stroke: black;"/>
+    <use href="#base2"  transform="translate(285, 5)" style="fill: url(#basic_space_r_3); stroke: black;"/>
+    <use href="#base2"  transform="translate(335, 5)" style="fill: url(#basic_space_r_4); stroke: black;"/>
+    <use href="#base2"  transform="translate(185, 95)" style="fill: url(#basic_space_r_5); stroke: black;"/>
+    <use href="#base2"  transform="translate(235, 95)" style="fill: url(#basic_space_r_6); stroke: black;"/>
+    <use href="#base2"  transform="translate(285, 95)" style="fill: url(#basic_space_r_7); stroke: black;"/>
+  </g>
+</svg>

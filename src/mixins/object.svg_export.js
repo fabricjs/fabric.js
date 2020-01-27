@@ -1,6 +1,5 @@
 /* _TO_SVG_START_ */
 (function() {
-
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -20,6 +19,8 @@
     }
   }
 
+  var toFixed = fabric.util.toFixed;
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
      * Returns styles-string for svg-export
@@ -28,9 +29,10 @@
      */
     getSvgStyles: function(skipShadow) {
 
-      var fillRule = this.fillRule,
+      var fillRule = this.fillRule ? this.fillRule : 'nonzero',
           strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
           strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
+          strokeDashOffset = this.strokeDashOffset ? this.strokeDashOffset : '0',
           strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
           strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
           strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
@@ -45,6 +47,7 @@
         'stroke-width: ', strokeWidth, '; ',
         'stroke-dasharray: ', strokeDashArray, '; ',
         'stroke-linecap: ', strokeLineCap, '; ',
+        'stroke-dashoffset: ', strokeDashOffset, '; ',
         'stroke-linejoin: ', strokeLineJoin, '; ',
         'stroke-miterlimit: ', strokeMiterLimit, '; ',
         fill,
@@ -53,6 +56,57 @@
         filter,
         visibility
       ].join('');
+    },
+
+    /**
+     * Returns styles-string for svg-export
+     * @param {Object} style the object from which to retrieve style properties
+     * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
+     * @return {String}
+     */
+    getSvgSpanStyles: function(style, useWhiteSpace) {
+      var term = '; ';
+      var fontFamily = style.fontFamily ?
+        'font-family: ' + (((style.fontFamily.indexOf('\'') === -1 && style.fontFamily.indexOf('"') === -1) ?
+          '\'' + style.fontFamily  + '\'' : style.fontFamily)) + term : '';
+      var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
+          fontFamily = fontFamily,
+          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
+          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
+          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
+          fill = style.fill ? getSvgColorString('fill', style.fill) : '',
+          stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+          textDecoration = this.getSvgTextDecoration(style),
+          deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
+      if (textDecoration) {
+        textDecoration = 'text-decoration: ' + textDecoration + term;
+      }
+
+      return [
+        stroke,
+        strokeWidth,
+        fontFamily,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        textDecoration,
+        fill,
+        deltaY,
+        useWhiteSpace ? 'white-space: pre; ' : ''
+      ].join('');
+    },
+
+    /**
+     * Returns text-decoration property for svg-export
+     * @param {Object} style the object from which to retrieve style properties
+     * @return {String}
+     */
+    getSvgTextDecoration: function(style) {
+      if ('overline' in style || 'underline' in style || 'linethrough' in style) {
+        return (style.overline ? 'overline ' : '') +
+          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '');
+      }
+      return '';
     },
 
     /**
@@ -67,59 +121,23 @@
      * Returns id attribute for svg output
      * @return {String}
      */
-    getSvgId: function() {
-      return this.id ? 'id="' + this.id + '" ' : '';
+    getSvgCommons: function() {
+      return [
+        this.id ? 'id="' + this.id + '" ' : '',
+        this.clipPath ? 'clip-path="url(#' + this.clipPath.clipPathId + ')" ' : '',
+      ].join('');
     },
 
     /**
      * Returns transform-string for svg-export
+     * @param {Boolean} use the full transform or the single object one.
      * @return {String}
      */
-    getSvgTransform: function() {
-      if (this.group && this.group.type === 'path-group') {
-        return '';
-      }
-      var toFixed = fabric.util.toFixed,
-          angle = this.getAngle(),
-          skewX = (this.getSkewX() % 360),
-          skewY = (this.getSkewY() % 360),
-          center = this.getCenterPoint(),
-
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-
-          translatePart = this.type === 'path-group' ? '' : 'translate(' +
-                            toFixed(center.x, NUM_FRACTION_DIGITS) +
-                            ' ' +
-                            toFixed(center.y, NUM_FRACTION_DIGITS) +
-                          ')',
-
-          anglePart = angle !== 0
-            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
-            : '',
-
-          scalePart = (this.scaleX === 1 && this.scaleY === 1)
-            ? '' :
-            (' scale(' +
-              toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-              ' ' +
-              toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
-            ')'),
-
-          skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
-
-          skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
-
-          addTranslateX = this.type === 'path-group' ? this.width : 0,
-
-          flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
-
-          addTranslateY = this.type === 'path-group' ? this.height : 0,
-
-          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
-
-      return [
-        translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
-      ].join('');
+    getSvgTransform: function(full, additionalTransform) {
+      var transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
+          svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
+      return svgTransform +
+        (additionalTransform || '') + this.getSvgTransformMatrix() + '" ';
     },
 
     /**
@@ -127,25 +145,123 @@
      * @return {String}
      */
     getSvgTransformMatrix: function() {
-      return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ') ' : '';
+      return this.transformMatrix ? ' ' + fabric.util.matrixToSVG(this.transformMatrix) : '';
+    },
+
+    _setSVGBg: function(textBgRects) {
+      if (this.backgroundColor) {
+        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+        textBgRects.push(
+          '\t\t<rect ',
+          this._getFillAttributes(this.backgroundColor),
+          ' x="',
+          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+          '" y="',
+          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+          '" width="',
+          toFixed(this.width, NUM_FRACTION_DIGITS),
+          '" height="',
+          toFixed(this.height, NUM_FRACTION_DIGITS),
+          '"></rect>\n');
+      }
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toSVG: function(reviver) {
+      return this._createBaseSVGMarkup(this._toSVG(reviver), { reviver: reviver });
+    },
+
+    /**
+     * Returns svg clipPath representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    toClipPathSVG: function(reviver) {
+      return '\t' + this._createBaseClipPathSVGMarkup(this._toSVG(reviver), { reviver: reviver });
     },
 
     /**
      * @private
      */
-    _createBaseSVGMarkup: function() {
-      var markup = [];
+    _createBaseClipPathSVGMarkup: function(objectMarkup, options) {
+      options = options || {};
+      var reviver = options.reviver,
+          additionalTransform = options.additionalTransform || '',
+          commonPieces = [
+            this.getSvgTransform(true, additionalTransform),
+            this.getSvgCommons(),
+          ].join(''),
+          // insert commons in the markup, style and svgCommons
+          index = objectMarkup.indexOf('COMMON_PARTS');
+      objectMarkup[index] = commonPieces;
+      return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
+    },
 
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
+    /**
+     * @private
+     */
+    _createBaseSVGMarkup: function(objectMarkup, options) {
+      options = options || {};
+      var noStyle = options.noStyle,
+          reviver = options.reviver,
+          styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
+          shadowInfo = options.withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
+          clipPath = this.clipPath,
+          vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
+          absoluteClipPath = clipPath && clipPath.absolutePositioned,
+          stroke = this.stroke, fill = this.fill, shadow = this.shadow,
+          commonPieces, markup = [], clipPathMarkup,
+          // insert commons in the markup, style and svgCommons
+          index = objectMarkup.indexOf('COMMON_PARTS'),
+          additionalTransform = options.additionalTransform;
+      if (clipPath) {
+        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
+          clipPath.toClipPathSVG(reviver) +
+          '</clipPath>\n';
       }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
+      if (absoluteClipPath) {
+        markup.push(
+          '<g ', shadowInfo, this.getSvgCommons(), ' >\n'
+        );
       }
-      if (this.shadow) {
-        markup.push(this.shadow.toSVG(this));
+      markup.push(
+        '<g ',
+        this.getSvgTransform(false),
+        !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
+        ' >\n'
+      );
+      commonPieces = [
+        styleInfo,
+        vectorEffect,
+        noStyle ? '' : this.addPaintOrder(), ' ',
+        additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
+      ].join('');
+      objectMarkup[index] = commonPieces;
+      if (fill && fill.toLive) {
+        markup.push(fill.toSVG(this));
       }
-      return markup;
+      if (stroke && stroke.toLive) {
+        markup.push(stroke.toSVG(this));
+      }
+      if (shadow) {
+        markup.push(shadow.toSVG(this));
+      }
+      if (clipPath) {
+        markup.push(clipPathMarkup);
+      }
+      markup.push(objectMarkup.join(''));
+      markup.push('</g>\n');
+      absoluteClipPath && markup.push('</g>\n');
+      return reviver ? reviver(markup.join('')) : markup.join('');
+    },
+
+    addPaintOrder: function() {
+      return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
 })();

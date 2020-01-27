@@ -10,6 +10,9 @@ fabric.Collection = {
    * (if `renderOnAddRemove` is not `false`).
    * in case of Group no changes to bounding box are made.
    * Objects should be instances of (or inherit from) fabric.Object
+   * Use of this function is highly discouraged for groups.
+   * you can add a bunch of objects with the add method but then you NEED
+   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
    * @chainable
@@ -21,13 +24,16 @@ fabric.Collection = {
         this._onObjectAdded(arguments[i]);
       }
     }
-    this.renderOnAddRemove && this.renderAll();
+    this.renderOnAddRemove && this.requestRenderAll();
     return this;
   },
 
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
+   * Use of this function is highly discouraged for groups.
+   * you can add a bunch of objects with the insertAt method but then you NEED
+   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {Object} object Object to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
@@ -35,7 +41,7 @@ fabric.Collection = {
    * @chainable
    */
   insertAt: function (object, index, nonSplicing) {
-    var objects = this.getObjects();
+    var objects = this._objects;
     if (nonSplicing) {
       objects[index] = object;
     }
@@ -43,7 +49,7 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.renderAll();
+    this.renderOnAddRemove && this.requestRenderAll();
     return this;
   },
 
@@ -54,7 +60,7 @@ fabric.Collection = {
    * @chainable
    */
   remove: function() {
-    var objects = this.getObjects(),
+    var objects = this._objects,
         index, somethingRemoved = false;
 
     for (var i = 0, length = arguments.length; i < length; i++) {
@@ -68,7 +74,7 @@ fabric.Collection = {
       }
     }
 
-    this.renderOnAddRemove && somethingRemoved && this.renderAll();
+    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
     return this;
   },
 
@@ -95,12 +101,13 @@ fabric.Collection = {
   /**
    * Returns an array of children objects of this instance
    * Type parameter introduced in 1.3.10
+   * since 2.3.5 this method return always a COPY of the array;
    * @param {String} [type] When specified, only objects of this type are returned
    * @return {Array}
    */
   getObjects: function(type) {
     if (typeof type === 'undefined') {
-      return this._objects;
+      return this._objects.concat();
     }
     return this._objects.filter(function(o) {
       return o.type === type;
@@ -113,7 +120,7 @@ fabric.Collection = {
    * @return {Self} thisArg
    */
   item: function (index) {
-    return this.getObjects()[index];
+    return this._objects[index];
   },
 
   /**
@@ -121,7 +128,7 @@ fabric.Collection = {
    * @return {Boolean} true if collection is empty
    */
   isEmpty: function () {
-    return this.getObjects().length === 0;
+    return this._objects.length === 0;
   },
 
   /**
@@ -129,7 +136,7 @@ fabric.Collection = {
    * @return {Number} Collection size
    */
   size: function() {
-    return this.getObjects().length;
+    return this._objects.length;
   },
 
   /**
@@ -138,7 +145,7 @@ fabric.Collection = {
    * @return {Boolean} `true` if collection contains an object
    */
   contains: function(object) {
-    return this.getObjects().indexOf(object) > -1;
+    return this._objects.indexOf(object) > -1;
   },
 
   /**
@@ -146,7 +153,7 @@ fabric.Collection = {
    * @return {Number} complexity
    */
   complexity: function () {
-    return this.getObjects().reduce(function (memo, current) {
+    return this._objects.reduce(function (memo, current) {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);

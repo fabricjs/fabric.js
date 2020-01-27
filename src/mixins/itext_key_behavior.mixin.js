@@ -6,16 +6,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initHiddenTextarea: function() {
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
+    this.hiddenTextarea.setAttribute('autocorrect', 'off');
+    this.hiddenTextarea.setAttribute('autocomplete', 'off');
+    this.hiddenTextarea.setAttribute('spellcheck', 'false');
+    this.hiddenTextarea.setAttribute('data-fabric-hiddentextarea', '');
+    this.hiddenTextarea.setAttribute('wrap', 'off');
     var style = this._calcTextareaPosition();
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top + '; left: ' + style.left + ';'
-                                        + ' opacity: 0; width: 0px; height: 0px; z-index: -999;';
+    // line-height: 1px; was removed from the style to fix this:
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top +
+    '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
+    ' paddingｰtop: ' + style.fontSize + ';';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'cut', this.cut.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
@@ -28,13 +36,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * @private
+   * For functionalities on keyDown
+   * Map a special key to a function of the instance/prototype
+   * If you need different behaviour for ESC or TAB or arrows, you have to change
+   * this map setting the name of a function that you build on the fabric.Itext or
+   * your prototype.
+   * the map change will affect all Instances unless you need for only some text Instances
+   * in that case you have to clone this object and assign your Instance.
+   * this.keysMap = fabric.util.object.clone(this.keysMap);
+   * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
    */
-  _keysMap: {
-    8:  'removeChars',
+  keysMap: {
     9:  'exitEditing',
     27: 'exitEditing',
-    13: 'insertNewline',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
     35: 'moveCursorRight',
@@ -43,21 +57,20 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     38: 'moveCursorUp',
     39: 'moveCursorRight',
     40: 'moveCursorDown',
-    46: 'forwardDelete'
   },
 
   /**
-   * @private
+   * For functionalities on keyUp + ctrl || cmd
    */
-  _ctrlKeysMapUp: {
+  ctrlKeysMapUp: {
     67: 'copy',
     88: 'cut'
   },
 
   /**
-   * @private
+   * For functionalities on keyDown + ctrl || cmd
    */
-  _ctrlKeysMapDown: {
+  ctrlKeysMapDown: {
     65: 'selectAll'
   },
 
@@ -71,21 +84,28 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyDown: function(e) {
-    if (!this.isEditing) {
+    if (!this.isEditing || this.inCompositionMode) {
       return;
     }
-    if (e.keyCode in this._keysMap) {
-      this[this._keysMap[e.keyCode]](e);
+    if (e.keyCode in this.keysMap) {
+      this[this.keysMap[e.keyCode]](e);
     }
-    else if ((e.keyCode in this._ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      this[this._ctrlKeysMapDown[e.keyCode]](e);
+    else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      this[this.ctrlKeysMapDown[e.keyCode]](e);
     }
     else {
       return;
     }
     e.stopImmediatePropagation();
     e.preventDefault();
-    this.canvas && this.canvas.renderAll();
+    if (e.keyCode >= 33 && e.keyCode <= 40) {
+      // if i press an arrow key just update selection
+      this.clearContextTop();
+      this.renderCursorOrSelection();
+    }
+    else {
+      this.canvas && this.canvas.requestRenderAll();
+    }
   },
 
   /**
@@ -95,19 +115,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyUp: function(e) {
-    if (!this.isEditing || this._copyDone) {
+    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
       this._copyDone = false;
       return;
     }
-    if ((e.keyCode in this._ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      this[this._ctrlKeysMapUp[e.keyCode]](e);
+    if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      this[this.ctrlKeysMapUp[e.keyCode]](e);
     }
     else {
       return;
     }
     e.stopImmediatePropagation();
     e.preventDefault();
-    this.canvas && this.canvas.renderAll();
+    this.canvas && this.canvas.requestRenderAll();
   },
 
   /**
@@ -115,37 +135,81 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    if (!this.isEditing || this.inCompositionMode) {
+    var fromPaste = this.fromPaste;
+    this.fromPaste = false;
+    e && e.stopPropagation();
+    if (!this.isEditing) {
       return;
     }
-    var offset = this.selectionStart || 0,
-        offsetEnd = this.selectionEnd || 0,
-        textLength = this.text.length,
-        newTextLength = this.hiddenTextarea.value.length,
-        diff, charsToInsert, start;
-    if (newTextLength > textLength) {
-      //we added some character
-      start = this._selectionDirection === 'left' ? offsetEnd : offset;
-      diff = newTextLength - textLength;
-      charsToInsert = this.hiddenTextarea.value.slice(start, start + diff);
+    // decisions about style changes.
+    var nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText,
+        charCount = this._text.length,
+        nextCharCount = nextText.length,
+        removedText, insertedText,
+        charDiff = nextCharCount - charCount;
+    if (this.hiddenTextarea.value === '') {
+      this.styles = { };
+      this.updateFromTextArea();
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
+      }
+      return;
     }
-    else {
-      //we selected a portion of text and then input something else.
-      //Internet explorer does not trigger this else
-      diff = newTextLength - textLength + offsetEnd - offset;
-      charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
-    }
-    this.insertChars(charsToInsert);
-    e.stopPropagation();
-  },
 
+    var textareaSelection = this.fromStringToGraphemeSelection(
+      this.hiddenTextarea.selectionStart,
+      this.hiddenTextarea.selectionEnd,
+      this.hiddenTextarea.value
+    );
+    var backDelete = this.selectionStart > textareaSelection.selectionStart;
+
+    if (this.selectionStart !== this.selectionEnd) {
+      removedText = this._text.slice(this.selectionStart, this.selectionEnd);
+      charDiff += this.selectionEnd - this.selectionStart;
+    }
+    else if (nextCharCount < charCount) {
+      if (backDelete) {
+        removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
+      }
+      else {
+        removedText = this._text.slice(this.selectionStart, this.selectionStart - charDiff);
+      }
+    }
+    insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
+    if (removedText && removedText.length) {
+      if (this.selectionStart !== this.selectionEnd) {
+        this.removeStyleFromTo(this.selectionStart, this.selectionEnd);
+      }
+      else if (backDelete) {
+        // detect differencies between forwardDelete and backDelete
+        this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
+      }
+      else {
+        this.removeStyleFromTo(this.selectionEnd, this.selectionEnd + removedText.length);
+      }
+    }
+    if (insertedText.length) {
+      if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
+        this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
+      }
+      else {
+        this.insertNewStyleBlock(insertedText, this.selectionStart);
+      }
+    }
+    this.updateFromTextArea();
+    this.fire('changed');
+    if (this.canvas) {
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
+  },
   /**
    * Composition start
    */
   onCompositionStart: function() {
     this.inCompositionMode = true;
-    this.prevCompositionLength = 0;
-    this.compositionStart = this.selectionStart;
   },
 
   /**
@@ -155,57 +219,32 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.inCompositionMode = false;
   },
 
-  /**
-   * Composition update
-   */
+  // /**
+  //  * Composition update
+  //  */
   onCompositionUpdate: function(e) {
-    var data = e.data;
-    this.selectionStart = this.compositionStart;
-    this.selectionEnd = this.selectionEnd === this.selectionStart ?
-      this.compositionStart + this.prevCompositionLength : this.selectionEnd;
-    this.insertChars(data, false);
-    this.prevCompositionLength = data.length;
-  },
-
-  /**
-   * Forward delete
-   */
-  forwardDelete: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      if (this.selectionStart === this.text.length) {
-        return;
-      }
-      this.moveCursorRight(e);
-    }
-    this.removeChars(e);
+    this.compositionStart = e.target.selectionStart;
+    this.compositionEnd = e.target.selectionEnd;
+    this.updateTextareaPosition();
   },
 
   /**
    * Copies selected text
    * @param {Event} e Event object
    */
-  copy: function(e) {
+  copy: function() {
     if (this.selectionStart === this.selectionEnd) {
       //do not cut-copy if no selection
       return;
     }
-    var selectedText = this.getSelectedText(),
-        clipboardData = this._getClipboardData(e);
 
-    // Check for backward compatibility with old browsers
-    if (clipboardData) {
-      clipboardData.setData('text', selectedText);
+    fabric.copiedText = this.getSelectedText();
+    if (!fabric.disableStyleCopyPaste) {
+      fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
     }
-
-    fabric.copiedText = selectedText;
-    fabric.copiedTextStyle = fabric.util.object.clone(
-      this.getSelectionStyles(
-        this.selectionStart,
-        this.selectionEnd
-      )
-    );
-    e.stopImmediatePropagation();
-    e.preventDefault();
+    else {
+      fabric.copiedTextStyle = null;
+    }
     this._copyDone = true;
   },
 
@@ -213,40 +252,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Pastes text
    * @param {Event} e Event object
    */
-  paste: function(e) {
-    var copiedText = null,
-        clipboardData = this._getClipboardData(e),
-        useCopiedStyle = true;
-
-    // Check for backward compatibility with old browsers
-    if (clipboardData) {
-      copiedText = clipboardData.getData('text').replace(/\r/g, '');
-      if (!fabric.copiedTextStyle || fabric.copiedText !== copiedText) {
-        useCopiedStyle = false;
-      }
-    }
-    else {
-      copiedText = fabric.copiedText;
-    }
-
-    if (copiedText) {
-      this.insertChars(copiedText, useCopiedStyle);
-    }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-  },
-
-  /**
-   * Cuts text
-   * @param {Event} e Event object
-   */
-  cut: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      return;
-    }
-
-    this.copy(e);
-    this.removeChars(e);
+  paste: function() {
+    this.fromPaste = true;
   },
 
   /**
@@ -266,13 +273,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @return {Number} widthBeforeCursor width before cursor
    */
   _getWidthBeforeCursor: function(lineIndex, charIndex) {
-    var textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
-        widthOfLine = this._getLineWidth(this.ctx, lineIndex),
-        widthBeforeCursor = this._getLineLeftOffset(widthOfLine), _char;
+    var widthBeforeCursor = this._getLineLeftOffset(lineIndex), bound;
 
-    for (var i = 0, len = textBeforeCursor.length; i < len; i++) {
-      _char = textBeforeCursor[i];
-      widthBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
+    if (charIndex > 0) {
+      bound = this.__charBounds[lineIndex][charIndex - 1];
+      widthBeforeCursor += bound.left + bound.width;
     }
     return widthBeforeCursor;
   },
@@ -290,14 +295,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // if on last line, down cursor goes to end of line
     if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
       // move to the end of a text
-      return this.text.length - selectionProp;
+      return this._text.length - selectionProp;
     }
     var charIndex = cursorLocation.charIndex,
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
         indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
         textAfterCursor = this._textLines[lineIndex].slice(charIndex);
-
-    return textAfterCursor.length + indexOnOtherLine + 2;
+    return textAfterCursor.length + indexOnOtherLine + 1 + this.missingNewlineOffset(lineIndex);
   },
 
   /**
@@ -332,49 +336,42 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var charIndex = cursorLocation.charIndex,
         widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
         indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
-        textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex);
+        textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
+        missingNewlineOffset = this.missingNewlineOffset(lineIndex - 1);
     // return a negative offset
-    return -this._textLines[lineIndex - 1].length + indexOnOtherLine - textBeforeCursor.length;
+    return -this._textLines[lineIndex - 1].length
+     + indexOnOtherLine - textBeforeCursor.length + (1 - missingNewlineOffset);
   },
 
   /**
-   * find for a given width it founds the matching character.
+   * for a given width it founds the matching character.
    * @private
    */
   _getIndexOnLine: function(lineIndex, width) {
 
-    var widthOfLine = this._getLineWidth(this.ctx, lineIndex),
-        textOnLine = this._textLines[lineIndex],
-        lineLeftOffset = this._getLineLeftOffset(widthOfLine),
+    var line = this._textLines[lineIndex],
+        lineLeftOffset = this._getLineLeftOffset(lineIndex),
         widthOfCharsOnLine = lineLeftOffset,
-        indexOnLine = 0,
-        foundMatch;
+        indexOnLine = 0, charWidth, foundMatch;
 
-    for (var j = 0, jlen = textOnLine.length; j < jlen; j++) {
-
-      var _char = textOnLine[j],
-          widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
-
-      widthOfCharsOnLine += widthOfChar;
-
+    for (var j = 0, jlen = line.length; j < jlen; j++) {
+      charWidth = this.__charBounds[lineIndex][j].width;
+      widthOfCharsOnLine += charWidth;
       if (widthOfCharsOnLine > width) {
-
         foundMatch = true;
-
-        var leftEdge = widthOfCharsOnLine - widthOfChar,
+        var leftEdge = widthOfCharsOnLine - charWidth,
             rightEdge = widthOfCharsOnLine,
             offsetFromLeftEdge = Math.abs(leftEdge - width),
             offsetFromRightEdge = Math.abs(rightEdge - width);
 
         indexOnLine = offsetFromRightEdge < offsetFromLeftEdge ? j : (j - 1);
-
         break;
       }
     }
 
     // reached end
     if (!foundMatch) {
-      indexOnLine = textOnLine.length - 1;
+      indexOnLine = line.length - 1;
     }
 
     return indexOnLine;
@@ -386,7 +383,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorDown: function(e) {
-    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+    if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
     this._moveCursorUpOrDown('Down', e);
@@ -435,8 +432,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorWithShift: function(offset) {
     var newSelection = this._selectionDirection === 'left'
-    ? this.selectionStart + offset
-    : this.selectionEnd + offset;
+      ? this.selectionStart + offset
+      : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
     return offset !== 0;
   },
@@ -541,7 +538,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorRight: function(e) {
-    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+    if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
     this._moveCursorLeftOrRight('Right', e);
@@ -578,7 +575,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
       return this._moveRight(e, 'selectionStart');
     }
-    else if (this.selectionEnd !== this.text.length) {
+    else if (this.selectionEnd !== this._text.length) {
       this._selectionDirection = 'right';
       return this._moveRight(e, 'selectionEnd');
     }
@@ -603,53 +600,56 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Removes characters selected by selection
-   * @param {Event} e Event object
+   * Removes characters from start/end
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {Number} start
+   * @param {Number} end default to start + 1
    */
-  removeChars: function(e) {
-    if (this.selectionStart === this.selectionEnd) {
-      this._removeCharsNearCursor(e);
+  removeChars: function(start, end) {
+    if (typeof end === 'undefined') {
+      end = start + 1;
     }
-    else {
-      this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
+    this.removeStyleFromTo(start, end);
+    this._text.splice(start, end - start);
+    this.text = this._text.join('');
+    this.set('dirty', true);
+    if (this._shouldClearDimensionCache()) {
+      this.initDimensions();
+      this.setCoords();
     }
-
-    this.setSelectionEnd(this.selectionStart);
-
     this._removeExtraneousStyles();
-
-    this.canvas && this.canvas.renderAll();
-
-    this.setCoords();
-    this.fire('changed');
-    this.canvas && this.canvas.fire('text:changed', { target: this });
   },
 
   /**
-   * @private
-   * @param {Event} e Event object
+   * insert characters at start position, before start position.
+   * start  equal 1 it means the text get inserted between actual grapheme 0 and 1
+   * if style array is provided, it must be as the same length of text in graphemes
+   * if end is provided and is bigger than start, old text is replaced.
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {String} text text to insert
+   * @param {Array} style array of style objects
+   * @param {Number} start
+   * @param {Number} end default to start + 1
    */
-  _removeCharsNearCursor: function(e) {
-    if (this.selectionStart === 0) {
-      return;
+  insertChars: function(text, style, start, end) {
+    if (typeof end === 'undefined') {
+      end = start;
     }
-    if (e.metaKey) {
-      // remove all till the start of current line
-      var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
+    if (end > start) {
+      this.removeStyleFromTo(start, end);
+    }
+    var graphemes = fabric.util.string.graphemeSplit(text);
+    this.insertNewStyleBlock(graphemes, start, style);
+    this._text = [].concat(this._text.slice(0, start), graphemes, this._text.slice(end));
+    this.text = this._text.join('');
+    this.set('dirty', true);
+    if (this._shouldClearDimensionCache()) {
+      this.initDimensions();
+      this.setCoords();
+    }
+    this._removeExtraneousStyles();
+  },
 
-      this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-      this.setSelectionStart(leftLineBoundary);
-    }
-    else if (e.altKey) {
-      // remove all till the start of current word
-      var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
-
-      this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-      this.setSelectionStart(leftWordBoundary);
-    }
-    else {
-      this._removeSingleCharAndStyle(this.selectionStart);
-      this.setSelectionStart(this.selectionStart - 1);
-    }
-  }
 });

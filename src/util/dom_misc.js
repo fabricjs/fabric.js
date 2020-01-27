@@ -125,8 +125,7 @@
         top += element.scrollTop || 0;
       }
 
-      if (element.nodeType === 1 &&
-          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+      if (element.nodeType === 1 && element.style.position === 'fixed') {
         break;
       }
     }
@@ -288,6 +287,26 @@
     fabric.util.getScript = getScript;
   })();
 
+  function getNodeCanvas(element) {
+    var impl = fabric.jsdomImplForWrapper(element);
+    return impl._canvas || impl._image;
+  };
+
+  function cleanUpJsdomNode(element) {
+    if (!fabric.isLikelyNode) {
+      return;
+    }
+    var impl = fabric.jsdomImplForWrapper(element);
+    if (impl) {
+      impl._image = null;
+      impl._canvas = null;
+      // unsure if necessary
+      impl._currentSrc = null;
+      impl._attributes = null;
+      impl._classList = null;
+    }
+  }
+
   fabric.util.getById = getById;
   fabric.util.toArray = toArray;
   fabric.util.makeElement = makeElement;
@@ -296,5 +315,7 @@
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getElementStyle = getElementStyle;
+  fabric.util.getNodeCanvas = getNodeCanvas;
+  fabric.util.cleanUpJsdomNode = cleanUpJsdomNode;
 
 })();

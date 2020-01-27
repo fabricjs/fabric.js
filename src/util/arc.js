@@ -1,9 +1,6 @@
 (function() {
 
-  var arcToSegmentsCache = { },
-      segmentToBezierCache = { },
-      boundsOfCurveCache = { },
-      _join = Array.prototype.join;
+  var _join = Array.prototype.join;
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
    * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
@@ -11,13 +8,13 @@
    */
   function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
     var argsString = _join.call(arguments);
-    if (arcToSegmentsCache[argsString]) {
-      return arcToSegmentsCache[argsString];
+    if (fabric.arcToSegmentsCache[argsString]) {
+      return fabric.arcToSegmentsCache[argsString];
     }
 
     var PI = Math.PI, th = rotateX * PI / 180,
-        sinTh = Math.sin(th),
-        cosTh = Math.cos(th),
+        sinTh = fabric.util.sin(th),
+        cosTh = fabric.util.cos(th),
         fromX = 0, fromY = 0;
 
     rx = Math.abs(rx);
@@ -66,20 +63,15 @@
       mTheta = th3;
       th3 += mDelta;
     }
-    arcToSegmentsCache[argsString] = result;
+    fabric.arcToSegmentsCache[argsString] = result;
     return result;
   }
 
   function segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) {
-    var argsString2 = _join.call(arguments);
-    if (segmentToBezierCache[argsString2]) {
-      return segmentToBezierCache[argsString2];
-    }
-
-    var costh2 = Math.cos(th2),
-        sinth2 = Math.sin(th2),
-        costh3 = Math.cos(th3),
-        sinth3 = Math.sin(th3),
+    var costh2 = fabric.util.cos(th2),
+        sinth2 = fabric.util.sin(th2),
+        costh3 = fabric.util.cos(th3),
+        sinth3 = fabric.util.sin(th3),
         toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
         toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
         cp1X = fromX + mT * ( -cosTh * rx * sinth2 - sinTh * ry * costh2),
@@ -87,12 +79,11 @@
         cp2X = toX + mT * ( cosTh * rx * sinth3 + sinTh * ry * costh3),
         cp2Y = toY + mT * ( sinTh * rx * sinth3 - cosTh * ry * costh3);
 
-    segmentToBezierCache[argsString2] = [
+    return [
       cp1X, cp1Y,
       cp2X, cp2Y,
       toX, toY
     ];
-    return segmentToBezierCache[argsString2];
   }
 
   /*
@@ -178,9 +169,12 @@
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-    var argsString = _join.call(arguments);
-    if (boundsOfCurveCache[argsString]) {
-      return boundsOfCurveCache[argsString];
+    var argsString;
+    if (fabric.cachesBoundsOfCurve) {
+      argsString = _join.call(arguments);
+      if (fabric.boundsOfCurveCache[argsString]) {
+        return fabric.boundsOfCurveCache[argsString];
+      }
     }
 
     var sqrt = Math.sqrt,
@@ -250,7 +244,9 @@
         y: max.apply(null, bounds[1])
       }
     ];
-    boundsOfCurveCache[argsString] = result;
+    if (fabric.cachesBoundsOfCurve) {
+      fabric.boundsOfCurveCache[argsString] = result;
+    }
     return result;
   }
 

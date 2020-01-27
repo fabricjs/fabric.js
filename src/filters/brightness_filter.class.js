@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -16,10 +15,10 @@
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Brightness({
-   *   brightness: 200
+   *   brightness: 0.05
    * });
    * object.filters.push(filter);
-   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * object.applyFilters();
    */
   filters.Brightness = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
 
@@ -31,54 +30,84 @@
     type: 'Brightness',
 
     /**
-     * Constructor
-     * @memberOf fabric.Image.filters.Brightness.prototype
-     * @param {Object} [options] Options object
-     * @param {Number} [options.brightness=0] Value to brighten the image up (-255..255)
+     * Fragment source for the brightness program
      */
-    initialize: function(options) {
-      options = options || { };
-      this.brightness = options.brightness || 0;
-    },
+    fragmentSource: 'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'uniform float uBrightness;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'void main() {\n' +
+        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+        'color.rgb += uBrightness;\n' +
+        'gl_FragColor = color;\n' +
+      '}',
 
     /**
-     * Applies filter to canvas element
-     * @param {Object} canvasEl Canvas element to apply filter to
+     * Brightness value, from -1 to 1.
+     * translated to -255 to 255 for 2d
+     * 0.0039215686 is the part of 1 that get translated to 1 in 2d
+     * @param {Number} brightness
+     * @default
      */
-    applyTo: function(canvasEl) {
-      var context = canvasEl.getContext('2d'),
-          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-          data = imageData.data,
-          brightness = this.brightness;
+    brightness: 0,
 
-      for (var i = 0, len = data.length; i < len; i += 4) {
-        data[i] += brightness;
-        data[i + 1] += brightness;
-        data[i + 2] += brightness;
+    /**
+     * Describe the property that is the filter parameter
+     * @param {String} m
+     * @default
+     */
+    mainParameter: 'brightness',
+
+    /**
+    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
+    *
+    * @param {Object} options
+    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
+    */
+    applyTo2d: function(options) {
+      if (this.brightness === 0) {
+        return;
       }
-
-      context.putImageData(imageData, 0, 0);
+      var imageData = options.imageData,
+          data = imageData.data, i, len = data.length,
+          brightness = Math.round(this.brightness * 255);
+      for (i = 0; i < len; i += 4) {
+        data[i] = data[i] + brightness;
+        data[i + 1] = data[i + 1] + brightness;
+        data[i + 2] = data[i + 2] + brightness;
+      }
     },
 
     /**
-     * Returns object representation of an instance
-     * @return {Object} Object representation of an instance
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        brightness: this.brightness
-      });
-    }
+    getUniformLocations: function(gl, program) {
+      return {
+        uBrightness: gl.getUniformLocation(program, 'uBrightness'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      gl.uniform1f(uniformLocations.uBrightness, this.brightness);
+    },
   });
 
   /**
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {function} [callback] to be invoked after filter creation
    * @return {fabric.Image.filters.Brightness} Instance of fabric.Image.filters.Brightness
    */
-  fabric.Image.filters.Brightness.fromObject = function(object) {
-    return new fabric.Image.filters.Brightness(object);
-  };
+  fabric.Image.filters.Brightness.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

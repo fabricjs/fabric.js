@@ -10,9 +10,6 @@
     return;
   }
 
-  var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push('rx', 'ry', 'x', 'y');
-
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -27,7 +24,7 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: stateProperties,
+    stateProperties: fabric.Object.prototype.stateProperties.concat('rx', 'ry'),
 
     /**
      * Type of an object
@@ -50,11 +47,7 @@
      */
     ry:   0,
 
-    /**
-     * Used to specify dash pattern for stroke on this object
-     * @type Array
-     */
-    strokeDashArray: null,
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
 
     /**
      * Constructor
@@ -64,7 +57,6 @@
     initialize: function(options) {
       this.callSuper('initialize', options);
       this._initRxRy();
-
     },
 
     /**
@@ -83,22 +75,18 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
 
-      // optimize 1x1 case (used in spray brush)
-      if (this.width === 1 && this.height === 1) {
-        ctx.fillRect(-0.5, -0.5, 1, 1);
-        return;
-      }
+      // 1x1 case (used in spray brush) optimization was removed because
+      // with caching and higher zoom level this makes more damage than help
 
       var rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
-          x = noTransform ? this.left : -this.width / 2,
-          y = noTransform ? this.top : -this.height / 2,
+          x = -this.width / 2,
+          y = -this.height / 2,
           isRounded = rx !== 0 || ry !== 0,
           /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
           k = 1 - 0.5522847498;
@@ -120,8 +108,7 @@
 
       ctx.closePath();
 
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -154,36 +141,20 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = this.left, y = this.top;
-      if (!(this.group && this.group.type === 'path-group')) {
-        x = -this.width / 2;
-        y = -this.height / 2;
-      }
-      markup.push(
-        '<rect ', this.getSvgId(),
-          'x="', x, '" y="', y,
-          '" rx="', this.get('rx'), '" ry="', this.get('ry'),
-          '" width="', this.width, '" height="', this.height,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          this.getSvgTransformMatrix(),
-        '"/>\n');
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+    _toSVG: function() {
+      var x = -this.width / 2, y = -this.height / 2;
+      return [
+        '<rect ', 'COMMON_PARTS',
+        'x="', x, '" y="', y,
+        '" rx="', this.rx, '" ry="', this.ry,
+        '" width="', this.width, '" height="', this.height,
+        '" />\n'
+      ];
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return 1;
-    }
   });
 
   /* _FROM_SVG_START_ */
@@ -200,12 +171,12 @@
    * @static
    * @memberOf fabric.Rect
    * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Rect} Instance of fabric.Rect
    */
-  fabric.Rect.fromElement = function(element, options) {
+  fabric.Rect.fromElement = function(element, callback, options) {
     if (!element) {
-      return null;
+      return callback(null);
     }
     options = options || { };
 
@@ -213,9 +184,11 @@
 
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top  = parsedAttributes.top  || 0;
+    parsedAttributes.height  = parsedAttributes.height || 0;
+    parsedAttributes.width  = parsedAttributes.width || 0;
     var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
-    return rect;
+    callback(rect);
   };
   /* _FROM_SVG_END_ */
 
@@ -225,12 +198,9 @@
    * @memberOf fabric.Rect
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Rect instance is created
-   * @return {Object} instance of fabric.Rect
    */
   fabric.Rect.fromObject = function(object, callback) {
-    var rect = new fabric.Rect(object);
-    callback && callback(rect);
-    return rect;
+    return fabric.Object._fromObject('Rect', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

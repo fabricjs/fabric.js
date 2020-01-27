@@ -15,33 +15,41 @@
   }
 
   function _isEqual(origValue, currentValue, firstPass) {
-    if (!fabric.isLikelyNode && origValue instanceof Element) {
-      // avoid checking deep html elements
-      return origValue === currentValue;
+    if (origValue === currentValue) {
+      // if the objects are identical, return
+      return true;
     }
-    else if (origValue instanceof Array) {
-      if (origValue.length !== currentValue.length) {
-        return false
-      }
-      var _currentValue = currentValue.concat().sort(),
-          _origValue = origValue.concat().sort();
-      return !_origValue.some(function(v, i) {
-        return !_isEqual(_currentValue[i], v);
-      });
-    }
-    else if (origValue instanceof Object) {
-      if (!firstPass && Object.keys(origValue).length !== Object.keys(currentValue).length) {
+    else if (Array.isArray(origValue)) {
+      if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
         return false;
       }
-      for (var key in origValue) {
-        if (!_isEqual(origValue[key], currentValue[key])) {
+      for (var i = 0, len = origValue.length; i < len; i++) {
+        if (!_isEqual(origValue[i], currentValue[i])) {
           return false;
         }
       }
       return true;
     }
-    else {
-      return origValue === currentValue;
+    else if (origValue && typeof origValue === 'object') {
+      var keys = Object.keys(origValue), key;
+      if (!currentValue ||
+          typeof currentValue !== 'object' ||
+          (!firstPass && keys.length !== Object.keys(currentValue).length)
+      ) {
+        return false;
+      }
+      for (var i = 0, len = keys.length; i < len; i++) {
+        key = keys[i];
+        // since clipPath is in the statefull cache list and the clipPath objects
+        // would be iterated as an object, this would lead to possible infinite recursion
+        if (key === 'canvas') {
+          continue;
+        }
+        if (!_isEqual(origValue[key], currentValue[key])) {
+          return false;
+        }
+      }
+      return true;
     }
   }
 
@@ -55,8 +63,11 @@
      */
     hasStateChanged: function(propertySet) {
       propertySet = propertySet || originalSet;
-      propertySet = '_' + propertySet;
-      return !_isEqual(this[propertySet], this, true);
+      var dashedPropertySet = '_' + propertySet;
+      if (Object.keys(this[dashedPropertySet]).length < this[propertySet].length) {
+        return true;
+      }
+      return !_isEqual(this[dashedPropertySet], this, true);
     },
 
     /**
@@ -67,6 +78,9 @@
     saveState: function(options) {
       var propertySet = options && options.propertySet || originalSet,
           destination = '_' + propertySet;
+      if (!this[destination]) {
+        return this.setupState(options);
+      }
       saveProps(this, destination, this[propertySet]);
       if (options && options.stateProperties) {
         saveProps(this, destination, options.stateProperties);

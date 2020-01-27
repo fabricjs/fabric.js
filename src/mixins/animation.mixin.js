@@ -25,12 +25,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('left'),
+      startValue: object.left,
       endValue: this.getCenter().left,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('left', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function() {
@@ -60,12 +60,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('top'),
+      startValue: object.top,
       endValue: this.getCenter().top,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('top', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function() {
@@ -95,15 +95,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('opacity'),
+      startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
-      onStart: function() {
-        object.set('active', false);
-      },
       onChange: function(value) {
         object.set('opacity', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function () {
@@ -201,7 +198,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       abort: options.abort && function() {
         return options.abort.call(_this);
       },
-      onChange: function(value) {
+      onChange: function(value, valueProgress, timeProgress) {
         if (propPair) {
           _this[propPair[0]][propPair[1]] = value;
         }
@@ -211,15 +208,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (skipCallbacks) {
           return;
         }
-        options.onChange && options.onChange();
+        options.onChange && options.onChange(value, valueProgress, timeProgress);
       },
-      onComplete: function() {
+      onComplete: function(value, valueProgress, timeProgress) {
         if (skipCallbacks) {
           return;
         }
 
         _this.setCoords();
-        options.onComplete && options.onComplete();
+        options.onComplete && options.onComplete(value, valueProgress, timeProgress);
       }
     });
   }

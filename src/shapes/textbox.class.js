@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
-      clone  = fabric.util.object.clone;
+  var fabric = global.fabric || (global.fabric = {});
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -50,60 +49,63 @@
     /**
      * Override standard Object class values
      */
-    lockScalingY: true,
-
-    /**
-     * Override standard Object class values
-     */
     lockScalingFlip: true,
 
     /**
-     * Constructor. Some scaling related property values are forced. Visibility
-     * of controls is also fixed; only the rotation and width controls are
-     * made available.
-     * @param {String} text Text string
-     * @param {Object} [options] Options object
-     * @return {fabric.Textbox} thisArg
+     * Override standard Object class values
+     * Textbox needs this on false
      */
-    initialize: function(text, options) {
+    noScaleCache: false,
 
-      this.callSuper('initialize', text, options);
-      this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
-      this.ctx = this.objectCaching ? this._cacheContext : fabric.util.createCanvasElement().getContext('2d');
-      // add width to this list of props that effect line wrapping.
-      this._dimensionAffectingProps.push('width');
-    },
+    /**
+     * Properties which when set cause object to change dimensions
+     * @type Object
+     * @private
+     */
+    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
+
+    /**
+     * Use this regular expression to split strings in breakable lines
+     * @private
+     */
+    _wordJoiners: /[ \t\r]/,
+
+    /**
+     * Use this boolean property in order to split strings that have no white space concept.
+     * this is a cheap way to help with chinese/japaense
+     * @type Boolean
+     * @since 2.6.0
+     */
+    splitByGrapheme: false,
 
     /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
      * @private
      * @override
      */
-    _initDimensions: function(ctx) {
+    initDimensions: function() {
       if (this.__skipDimension) {
         return;
       }
-
-      if (!ctx) {
-        ctx = fabric.util.createCanvasElement().getContext('2d');
-        this._setTextStyles(ctx);
-      }
-
+      this.isEditing && this.initDelayedCursor();
+      this.clearContextTop();
+      this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
-
       // wrap lines
-      this._textLines = this._splitTextIntoLines();
+      this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
       if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
-
+      if (this.textAlign.indexOf('justify') !== -1) {
+        // once text is measured we need to make space fatter to make justified text.
+        this.enlargeSpaces();
+      }
       // clear cache and re-calculate height
-      this._clearCache();
-      this.height = this._getTextHeight(ctx);
+      this.height = this.calcTextHeight();
+      this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**
@@ -113,19 +115,19 @@
      * which is only sufficient for Text / IText
      * @private
      */
-    _generateStyleMap: function() {
+    _generateStyleMap: function(textInfo) {
       var realLineCount     = 0,
           realLineCharCount = 0,
           charCount         = 0,
           map               = {};
 
-      for (var i = 0; i < this._textLines.length; i++) {
-        if (this.text[charCount] === '\n' && i > 0) {
+      for (var i = 0; i < textInfo.graphemeLines.length; i++) {
+        if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
-        else if (this.text[charCount] === ' ' && i > 0) {
+        else if (!this.splitByGrapheme && this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) && i > 0) {
           // this case deals with space's that are removed from end of lines when wrapping
           realLineCharCount++;
           charCount++;
@@ -133,29 +135,77 @@
 
         map[i] = { line: realLineCount, offset: realLineCharCount };
 
-        charCount += this._textLines[i].length;
-        realLineCharCount += this._textLines[i].length;
+        charCount += textInfo.graphemeLines[i].length;
+        realLineCharCount += textInfo.graphemeLines[i].length;
       }
 
       return map;
     },
 
     /**
+     * Returns true if object has a style property or has it on a specified line
+     * @param {Number} lineIndex
+     * @return {Boolean}
+     */
+    styleHas: function(property, lineIndex) {
+      if (this._styleMap && !this.isWrapping) {
+        var map = this._styleMap[lineIndex];
+        if (map) {
+          lineIndex = map.line;
+        }
+      }
+      return fabric.Text.prototype.styleHas.call(this, property, lineIndex);
+    },
+
+    /**
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
+     * @return {Boolean}
+     */
+    isEmptyStyles: function(lineIndex) {
+      if (!this.styles) {
+        return true;
+      }
+      var offset = 0, nextLineIndex = lineIndex + 1, nextOffset, obj, shouldLimit = false,
+          map = this._styleMap[lineIndex], mapNextLine = this._styleMap[lineIndex + 1];
+      if (map) {
+        lineIndex = map.line;
+        offset = map.offset;
+      }
+      if (mapNextLine) {
+        nextLineIndex = mapNextLine.line;
+        shouldLimit = nextLineIndex === lineIndex;
+        nextOffset = mapNextLine.offset;
+      }
+      obj = typeof lineIndex === 'undefined' ? this.styles : { line: this.styles[lineIndex] };
+      for (var p1 in obj) {
+        for (var p2 in obj[p1]) {
+          if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+            // eslint-disable-next-line no-unused-vars
+            for (var p3 in obj[p1][p2]) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    },
+
+    /**
      * @param {Number} lineIndex
      * @param {Number} charIndex
-     * @param {Boolean} [returnCloneOrEmpty=false]
      * @private
      */
-    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
-      if (this._styleMap) {
+    _getStyleDeclaration: function(lineIndex, charIndex) {
+      if (this._styleMap && !this.isWrapping) {
         var map = this._styleMap[lineIndex];
         if (!map) {
-          return returnCloneOrEmpty ? { } : null;
+          return null;
         }
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
-      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex, returnCloneOrEmpty);
+      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex);
     },
 
     /**
@@ -181,36 +231,31 @@
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
-
       delete this.styles[lineIndex][charIndex];
     },
 
     /**
+     * probably broken need a fix
+     * Returns the real style line that correspond to the wrapped lineIndex line
+     * Used just to verify if the line does exist or not.
      * @param {Number} lineIndex
+     * @returns {Boolean} if the line exists or not
      * @private
      */
     _getLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
-      return this.styles[map.line];
+      return !!this.styles[map.line];
     },
 
     /**
+     * Set the line style to an empty object so that is initialized
      * @param {Number} lineIndex
      * @param {Object} style
      * @private
      */
-    _setLineStyle: function(lineIndex, style) {
+    _setLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
-      this.styles[map.line] = style;
-    },
-
-    /**
-     * @param {Number} lineIndex
-     * @private
-     */
-    _deleteLineStyle: function(lineIndex) {
-      var map = this._styleMap[lineIndex];
-      delete this.styles[map.line];
+      this.styles[map.line] = {};
     },
 
     /**
@@ -218,23 +263,23 @@
      * splits text on newlines, so we preserve newlines entered by the user.
      * Then it wraps each line using the width of the Textbox by calling
      * _wrapLine().
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
-     * @param {String} text The string of text that is split into lines
+     * @param {Array} lines The string array of text that is split into lines
+     * @param {Number} desiredWidth width you want to wrap to
      * @returns {Array} Array of lines
      */
-    _wrapText: function(ctx, text) {
-      var lines = text.split(this._reNewline), wrapped = [], i;
-
+    _wrapText: function(lines, desiredWidth) {
+      var wrapped = [], i;
+      this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
+        wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
       }
-
+      this.isWrapping = false;
       return wrapped;
     },
 
     /**
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
-     *
+     * it gets called when charBounds are not available yet.
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
@@ -242,48 +287,58 @@
      * @returns {number}
      * @private
      */
-    _measureText: function(ctx, text, lineIndex, charOffset) {
-      var width = 0;
+    _measureWord: function(word, lineIndex, charOffset) {
+      var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
-      for (var i = 0, len = text.length; i < len; i++) {
-        width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
+      for (var i = 0, len = word.length; i < len; i++) {
+        var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+        width += box.kernedWidth;
+        prevGrapheme = word[i];
       }
       return width;
     },
 
     /**
      * Wraps a line of text using the width of the Textbox and a context.
-     * @param {CanvasRenderingContext2D} ctx Context to use for measurements
-     * @param {String} text The string of text to split into lines
+     * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
+     * @param {Number} desiredWidth width you want to wrap the line to
+     * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(ctx, text, lineIndex) {
-      var lineWidth        = 0,
-          lines            = [],
-          line             = '',
-          words            = text.split(' '),
-          word             = '',
-          offset           = 0,
-          infix            = ' ',
-          wordWidth        = 0,
-          infixWidth       = 0,
+    _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
+      var lineWidth = 0,
+          splitByGrapheme = this.splitByGrapheme,
+          graphemeLines = [],
+          line = [],
+          // spaces in different languges?
+          words = splitByGrapheme ? fabric.util.string.graphemeSplit(_line) : _line.split(this._wordJoiners),
+          word = '',
+          offset = 0,
+          infix = splitByGrapheme ? '' : ' ',
+          wordWidth = 0,
+          infixWidth = 0,
           largestWordWidth = 0,
           lineJustStarted = true,
-          additionalSpace = this._getWidthOfCharSpacing();
-
+          additionalSpace = splitByGrapheme ? 0 : this._getWidthOfCharSpacing(),
+          reservedSpace = reservedSpace || 0;
+      // fix a difference between split and graphemeSplit
+      if (words.length === 0) {
+        words.push([]);
+      }
+      desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {
-        word = words[i];
-        wordWidth = this._measureText(ctx, word, lineIndex, offset);
-
+        // if using splitByGrapheme words are already in graphemes.
+        word = splitByGrapheme ? words[i] : fabric.util.string.graphemeSplit(words[i]);
+        wordWidth = this._measureWord(word, lineIndex, offset);
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
 
-        if (lineWidth >= this.width && !lineJustStarted) {
-          lines.push(line);
-          line = '';
+        if (lineWidth >= desiredWidth && !lineJustStarted) {
+          graphemeLines.push(line);
+          line = [];
           lineWidth = wordWidth;
           lineJustStarted = true;
         }
@@ -291,12 +346,12 @@
           lineWidth += additionalSpace;
         }
 
-        if (!lineJustStarted) {
-          line += infix;
+        if (!lineJustStarted && !splitByGrapheme) {
+          line.push(infix);
         }
-        line += word;
+        line = line.concat(word);
 
-        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+        infixWidth = this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
         // keep track of largest word
@@ -305,127 +360,80 @@
         }
       }
 
-      i && lines.push(line);
+      i && graphemeLines.push(line);
 
-      if (largestWordWidth > this.dynamicMinWidth) {
-        this.dynamicMinWidth = largestWordWidth - additionalSpace;
+      if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+        this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
       }
 
-      return lines;
-    },
-    /**
-     * Gets lines of text to render in the Textbox. This function calculates
-     * text wrapping on the fly everytime it is called.
-     * @returns {Array} Array of lines in the Textbox.
-     * @override
-     */
-    _splitTextIntoLines: function() {
-      var originalAlign = this.textAlign;
-      this.ctx.save();
-      this._setTextStyles(this.ctx);
-      this.textAlign = 'left';
-      var lines = this._wrapText(this.ctx, this.text);
-      this.textAlign = originalAlign;
-      this.ctx.restore();
-      this._textLines = lines;
-      this._styleMap = this._generateStyleMap();
-      return lines;
+      return graphemeLines;
     },
 
     /**
-     * When part of a group, we don't want the Textbox's scale to increase if
-     * the group's increases. That's why we reduce the scale of the Textbox by
-     * the amount that the group's increases. This is to maintain the effective
-     * scale of the Textbox at 1, so that font-size values make sense. Otherwise
-     * the same font-size value would result in different actual size depending
-     * on the value of the scale.
-     * @param {String} key
-     * @param {*} value
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @param {Number} lineIndex text to split
+     * @return {Boolean}
      */
-    setOnGroup: function(key, value) {
-      if (key === 'scaleX') {
-        this.set('scaleX', Math.abs(1 / value));
-        this.set('width', (this.get('width') * value) /
-          (typeof this.__oldScaleX === 'undefined' ? 1 : this.__oldScaleX));
-        this.__oldScaleX = value;
+    isEndOfWrapping: function(lineIndex) {
+      if (!this._styleMap[lineIndex + 1]) {
+        // is last line, return true;
+        return true;
       }
+      if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
+        // this is last line before a line break, return true;
+        return true;
+      }
+      return false;
     },
 
     /**
-     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
-     * Overrides the superclass function to take into account text wrapping.
-     *
-     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+     * Detect if a line has a linebreak and so we need to account for it when moving
+     * and counting style.
+     * @return Number
      */
-    get2DCursorLocation: function(selectionStart) {
-      if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
+    missingNewlineOffset: function(lineIndex) {
+      if (this.splitByGrapheme) {
+        return this.isEndOfWrapping(lineIndex) ? 1 : 0;
       }
-
-      var numLines = this._textLines.length,
-          removed  = 0;
-
-      for (var i = 0; i < numLines; i++) {
-        var line    = this._textLines[i],
-            lineLen = line.length;
-
-        if (selectionStart <= removed + lineLen) {
-          return {
-            lineIndex: i,
-            charIndex: selectionStart - removed
-          };
-        }
-
-        removed += lineLen;
-
-        if (this.text[removed] === '\n' || this.text[removed] === ' ') {
-          removed++;
-        }
-      }
-
-      return {
-        lineIndex: numLines - 1,
-        charIndex: this._textLines[numLines - 1].length
-      };
+      return 1;
     },
 
     /**
-     * Overrides superclass function and uses text wrapping data to get cursor
-     * boundary offsets instead of the array of chars.
-     * @param {Array} chars Unused
-     * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
-     * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
-     */
-    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-      var topOffset      = 0,
-          leftOffset     = 0,
-          cursorLocation = this.get2DCursorLocation(),
-          lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
-          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, cursorLocation.lineIndex));
-
-      for (var i = 0; i < cursorLocation.charIndex; i++) {
-        leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
+    * Gets lines of text to render in the Textbox. This function calculates
+    * text wrapping on the fly every time it is called.
+    * @param {String} text text to split
+    * @returns {Array} Array of lines in the Textbox.
+    * @override
+    */
+    _splitTextIntoLines: function(text) {
+      var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
+          graphemeLines = this._wrapText(newText.lines, this.width),
+          lines = new Array(graphemeLines.length);
+      for (var i = 0; i < graphemeLines.length; i++) {
+        lines[i] = graphemeLines[i].join('');
       }
-
-      for (i = 0; i < cursorLocation.lineIndex; i++) {
-        topOffset += this._getHeightOfLine(this.ctx, i);
-      }
-
-      if (typeOfBoundaries === 'cursor') {
-        topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, cursorLocation.lineIndex)
-          / this.lineHeight - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex)
-          * (1 - this._fontSizeFraction);
-      }
-
-      return {
-        top: topOffset,
-        left: leftOffset,
-        lineLeft: lineLeftOffset
-      };
+      newText.lines = lines;
+      newText.graphemeLines = graphemeLines;
+      return newText;
     },
 
     getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
+    },
+
+    _removeExtraneousStyles: function() {
+      var linesToKeep = {};
+      for (var prop in this._styleMap) {
+        if (this._textLines[prop]) {
+          linesToKeep[this._styleMap[prop].line] = 1;
+        }
+      }
+      for (var prop in this.styles) {
+        if (!linesToKeep[prop]) {
+          delete this.styles[prop];
+        }
+      }
     },
 
     /**
@@ -435,38 +443,18 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
     }
   });
+
   /**
    * Returns fabric.Textbox instance from an object representation
    * @static
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Textbox instance is created
-   * @return {fabric.Textbox} instance of fabric.Textbox
    */
   fabric.Textbox.fromObject = function(object, callback) {
-    var textbox = new fabric.Textbox(object.text, clone(object));
-    callback && callback(textbox);
-    return textbox;
+    return fabric.Object._fromObject('Textbox', object, callback, 'text');
   };
-  /**
-   * Returns the default controls visibility required for Textboxes.
-   * @returns {Object}
-   */
-  fabric.Textbox.getTextboxControlVisibility = function() {
-    return {
-      tl: false,
-      tr: false,
-      br: false,
-      bl: false,
-      ml: true,
-      mt: false,
-      mr: true,
-      mb: false,
-      mtr: true
-    };
-  };
-
 })(typeof exports !== 'undefined' ? exports : this);

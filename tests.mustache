@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
 <head>
-<title>Test'em</title>
-<script src="/bower_components/qunit/qunit/qunit.js"></script>
+<title>Unit Tests</title>
+<script src="/node_modules/qunit/qunit/qunit.js"></script>
 <script src="/testem.js"></script>
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
-<link rel="stylesheet" href="/bower_components/qunit/qunit/qunit.css"/>
+<link rel="stylesheet" href="/node_modules/qunit/qunit/qunit.css"/>
 {{#styles}}<link rel="stylesheet" href="{{.}}">{{/styles}}
 </head>
 <body>

@@ -26,15 +26,18 @@
     type: 'triangle',
 
     /**
-     * Constructor
-     * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * Width is set to 100 to compensate the old initialize code that was setting it to 100
+     * @type Number
+     * @default
      */
-    initialize: function(options) {
-      this.callSuper('initialize', options);
-      this.set('width', options && options.width || 100)
-          .set('height', options && options.height || 100);
-    },
+    width: 100,
+
+    /**
+     * Height is set to 100 to compensate the old initialize code that was setting it to 100
+     * @type Number
+     * @default
+     */
+    height: 100,
 
     /**
      * @private
@@ -50,8 +53,7 @@
       ctx.lineTo(widthBy2, heightBy2);
       ctx.closePath();
 
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -71,54 +73,36 @@
 
     /* _TO_SVG_START_ */
     /**
-     * Returns SVG representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
+     * Returns svg representation of an instance
+     * @return {Array} an array of strings with the specific svg representation
+     * of the instance
      */
-    toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
-          widthBy2 = this.width / 2,
+    _toSVG: function() {
+      var widthBy2 = this.width / 2,
           heightBy2 = this.height / 2,
           points = [
             -widthBy2 + ' ' + heightBy2,
             '0 ' + -heightBy2,
             widthBy2 + ' ' + heightBy2
-          ]
-          .join(',');
-
-      markup.push(
-        '<polygon ', this.getSvgId(),
-          'points="', points,
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-        '"/>'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+          ].join(',');
+      return [
+        '<polygon ', 'COMMON_PARTS',
+        'points="', points,
+        '" />'
+      ];
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return 1;
-    }
   });
 
   /**
-   * Returns fabric.Triangle instance from an object representation
+   * Returns {@link fabric.Triangle} instance from an object representation
    * @static
    * @memberOf fabric.Triangle
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Triangle instance is created
-   * @return {Object} instance of Canvas.Triangle
+   * @param {function} [callback] invoked with new instance as first argument
    */
   fabric.Triangle.fromObject = function(object, callback) {
-    var triangle = new fabric.Triangle(object);
-    callback && callback(triangle);
-    return triangle;
+    return fabric.Object._fromObject('Triangle', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

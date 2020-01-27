@@ -60,8 +60,17 @@
     includeDefaultValues: true,
 
     /**
+     * When `false`, the shadow will scale with the object.
+     * When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
+     * default to false
+     * @type Boolean
+     * @default
+     */
+    nonScaling: false,
+
+    /**
      * Constructor
-     * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetX properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px, "2px 2px 10px rgba(0,0,0,0.2)")
+     * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
      * @return {fabric.Shadow} thisArg
      */
     initialize: function(options) {
@@ -115,7 +124,7 @@
           offset = fabric.util.rotateVector(
             { x: this.offsetX, y: this.offsetY },
             fabric.util.degreesToRadians(-object.angle)),
-          BLUR_BOX = 20;
+          BLUR_BOX = 20, color = new fabric.Color(this.color);
 
       if (object.width && object.height) {
         //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
@@ -129,6 +138,7 @@
       if (object.flipY) {
         offset.y *= -1;
       }
+
       return (
         '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' +
           'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
@@ -136,7 +146,7 @@
             toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGITS) + '"></feGaussianBlur>\n' +
           '\t<feOffset dx="' + toFixed(offset.x, NUM_FRACTION_DIGITS) +
           '" dy="' + toFixed(offset.y, NUM_FRACTION_DIGITS) + '" result="oBlur" ></feOffset>\n' +
-          '\t<feFlood flood-color="' + this.color + '"/>\n' +
+          '\t<feFlood flood-color="' + color.toRgb() + '" flood-opacity="' + color.getAlpha() + '"/>\n' +
           '\t<feComposite in2="oBlur" operator="in" />\n' +
           '\t<feMerge>\n' +
             '\t\t<feMergeNode></feMergeNode>\n' +
@@ -157,12 +167,13 @@
           blur: this.blur,
           offsetX: this.offsetX,
           offsetY: this.offsetY,
-          affectStroke: this.affectStroke
+          affectStroke: this.affectStroke,
+          nonScaling: this.nonScaling
         };
       }
       var obj = { }, proto = fabric.Shadow.prototype;
 
-      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke'].forEach(function(prop) {
+      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'].forEach(function(prop) {
         if (this[prop] !== proto[prop]) {
           obj[prop] = this[prop];
         }
