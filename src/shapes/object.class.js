@@ -1737,7 +1737,7 @@
       // if the current width/height is not an integer
       // we need to make it so.
       el.width = Math.ceil(width);
-      el.height += Math.ceil(height);
+      el.height = Math.ceil(height);
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: false,
         renderOnAddRemove: false,
