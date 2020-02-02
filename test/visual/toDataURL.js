@@ -74,7 +74,7 @@
     test: 'Text to DataURL with shadow no offset',
     code: toDataURL2,
     golden: 'dataurl2.png',
-    percentage: 0.09,
+    percentage: 0.10,
   });
 
   function toDataURL3(canvas, callback) {
