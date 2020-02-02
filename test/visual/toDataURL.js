@@ -386,6 +386,48 @@
     height: 100,
   });
 
+  function toDataURLWithOddPixelsStrokeWidth(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
+    var imageEl = new fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl, { strokeWidth: 1, stroke: 'orange' });
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with odd strokeWidth will not render crisp',
+    code: toDataURLWithOddPixelsStrokeWidth,
+    // use the same golden on purpose
+    golden: 'dataurl15.png',
+    percentage: 0.09,
+    width: 100,
+    height: 100,
+  });
+
+  function toDataURLWithOddPixelsStrokeWidthEven(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
+    var imageEl = new fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl, { strokeWidth: 2, stroke: 'orange' });
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with even strokeWidth will render crisp',
+    code: toDataURLWithOddPixelsStrokeWidthEven,
+    // use the same golden on purpose
+    golden: 'dataurl16.png',
+    percentage: 0.09,
+    width: 100,
+    height: 100,
+  });
+
   function testWrapper(test) {
     var actualTest = test.code;
     test.code = function(fabricCanvas, callback) {
