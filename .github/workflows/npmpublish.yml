@@ -2,6 +2,9 @@ name: Node.js Package
 
 on:
   release:
+    branches:
+      - master
+      - v3.x
     types: [created]
 
 jobs:
