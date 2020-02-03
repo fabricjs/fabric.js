@@ -50,7 +50,7 @@
     code: toDataURL1,
     golden: 'dataurl1.png',
     newModule: 'DataURL exports',
-    percentage: 0.09,
+    percentage: 0.10,
     beforeEachHandler: function() {
       fabric.Object.prototype.objectCaching = false;
     }
