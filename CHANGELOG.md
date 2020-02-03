@@ -24,6 +24,8 @@ breaking: LockScalingFlip with the scaling flip behaviour are missing now, maybe
 breaking: Object.lockUniScaling is removed. Alternatives to get the same identical functionality with less code are being evaluated.
 breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to the event `before:transform’
 
+## [3.6.2]
+- fix fabric.Object.toDataURL blurriness on images with odd pixel number [#6131](https://github.com/fabricjs/fabric.js/pull/6131)
 
 ## [3.6.1]
 - fix(gradient, text): ISSUE-6014 ISSUE-6077 support percentage gradient in text [#6090](https://github.com/fabricjs/fabric.js/pull/6090)
