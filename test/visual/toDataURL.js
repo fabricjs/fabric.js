@@ -403,6 +403,7 @@
     // use the same golden on purpose
     golden: 'dataurl15.png',
     percentage: 0.09,
+    disabled: true,
     width: 100,
     height: 100,
   });
