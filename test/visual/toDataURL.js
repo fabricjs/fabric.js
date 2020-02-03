@@ -50,7 +50,7 @@
     code: toDataURL1,
     golden: 'dataurl1.png',
     newModule: 'DataURL exports',
-    percentage: 0.09,
+    percentage: 0.10,
     beforeEachHandler: function() {
       fabric.Object.prototype.objectCaching = false;
     }
@@ -74,7 +74,7 @@
     test: 'Text to DataURL with shadow no offset',
     code: toDataURL2,
     golden: 'dataurl2.png',
-    percentage: 0.09,
+    percentage: 0.10,
   });
 
   function toDataURL3(canvas, callback) {
@@ -344,6 +344,90 @@
     height: 300,
   });
 
+  function toDataURLWithOddPixels(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
+    var imageEl = fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl);
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with odd pixels will render crisp',
+    code: toDataURLWithOddPixels,
+    // use the same golden on purpose
+    golden: 'dataurl13.png',
+    percentage: 0.09,
+    width: 99,
+    height: 99,
+  });
+
+  function toDataURLWithEvenPixels(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAQMAAABKLAcXAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwAfqy43KjcqNyo3KjcoBAEFzhKc6XssoAAAAAElFTkSuQmCC';
+    var imageEl = fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl);
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with even pixels will render crisp',
+    code: toDataURLWithEvenPixels,
+    // use the same golden on purpose
+    golden: 'dataurl14.png',
+    percentage: 0.09,
+    width: 100,
+    height: 100,
+  });
+
+  function toDataURLWithOddPixelsStrokeWidth(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
+    var imageEl = fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl, { strokeWidth: 1, stroke: 'orange' });
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with odd strokeWidth will not render crisp',
+    code: toDataURLWithOddPixelsStrokeWidth,
+    // use the same golden on purpose
+    golden: 'dataurl15.png',
+    percentage: 0.09,
+    disabled: true,
+    width: 100,
+    height: 100,
+  });
+
+  function toDataURLWithOddPixelsStrokeWidthEven(fabricCanvas, callback) {
+    var imgsrc =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
+    var imageEl = fabric.util.createImage();
+    imageEl.onload = function() {
+      var fimg = new fabric.Image(imageEl, { strokeWidth: 2, stroke: 'orange' });
+      callback(fimg.toDataURL());
+    };
+    imageEl.src = imgsrc;
+  }
+
+  tests.push({
+    test: 'images with even strokeWidth will render crisp',
+    code: toDataURLWithOddPixelsStrokeWidthEven,
+    // use the same golden on purpose
+    golden: 'dataurl16.png',
+    percentage: 0.09,
+    width: 100,
+    height: 100,
+  });
 
   function testWrapper(test) {
     var actualTest = test.code;
