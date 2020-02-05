@@ -601,17 +601,17 @@
      */
     exitEditing: function() {
       var isTextChanged = (this._textBeforeEdit !== this.text);
+      var hiddenTextarea = this.hiddenTextarea;
       this.selected = false;
       this.isEditing = false;
 
       this.selectionEnd = this.selectionStart;
 
-      if (this.hiddenTextarea) {
-        this.hiddenTextarea.blur && this.hiddenTextarea.blur();
-        this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
-        this.hiddenTextarea = null;
+      if (hiddenTextarea) {
+        hiddenTextarea.blur && hiddenTextarea.blur();
+        hiddenTextarea.parentNode && hiddenTextarea.parentNode.removeChild(hiddenTextarea);
       }
-
+      this.hiddenTextarea = null;
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
