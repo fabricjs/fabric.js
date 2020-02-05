@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.0.0-beta.6]
+
+fix(fabric.IText): exitEditing won't error on missing hiddenTextarea. [#6138](https://github.com/fabricjs/fabric.js/pull/6138)
+
 ## [4.0.0-beta.5]
 
 fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. [#6118](https://github.com/fabricjs/fabric.js/pull/6118)
