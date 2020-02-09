@@ -2,34 +2,6 @@
 
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) {
-      return path;
-    }
-    var imgEl = _createImageElement();
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
-  }
-
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_WIDTH = 276,
-      IMG_HEIGHT  = 110;
-
-  function _createImageElement() {
-    return fabric.document.createElement('img');
-  }
-
-  function createImageObject(callback) {
-    var elImage = _createImageElement();
-    elImage.width = IMG_WIDTH;
-    elImage.height = IMG_HEIGHT;
-    elImage.onload = callback;
-    elImage.src = IMG_SRC;
-  }
-
   QUnit.module('fabric.Object', {
     afterEach: function() {
       fabric.perfLimitSizeTotal = 2097152;
@@ -299,7 +271,7 @@
       .set('strokeDashArray', [5, 2])
       .set('strokeLineCap', 'round')
       .set('strokeLineJoin', 'bevil')
-      .set('strokeMiterLimit', 5)
+      .set('strokeMiterLimit', 5);
     toObjectObj = cObj.toObject();
     assert.deepEqual(augmentedObjectRepr, toObjectObj);
     assert.notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
