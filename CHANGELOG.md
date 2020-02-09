@@ -3,7 +3,7 @@
 ## [4.0.0-beta.7]
 
 Removal of deprecated methods / patterns. [#6111](https://github.com/fabricjs/fabric.js/pull/6111)
-- removed Object.setShadow, and BaseBrush.setShadow. change `rect.setShadow(options)` to `rect.shadow = new fabric.Shadow(options)`
+- removed Object.setShadow, and BaseBrush.setShadow. change `rect.setShadow(options)` to `rect.set('shadow', new fabric.Shadow(options))`
 - removed Object.transformMatrix.
 - removed `object:selected` event. use `selection:created`. In the callback you will still find  `target` in the options, but also you will find `selected` with all the objects selected during that single event.
 - removed Gradient.forObject. No alternative available.
