@@ -29,14 +29,12 @@
     'y2':                       1,
     'shadow':                   null,
     'visible':                  true,
-    'clipTo':                   null,
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
     'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
     'skewY':                    0,
-    'transformMatrix':          null
   };
 
   QUnit.module('fabric.Line');

@@ -70,9 +70,9 @@
     obj.set({
       width: 10, height: 10, scaleX: 12, scaleY: 3, top: 10, left: 5, fill: '#f55',
     });
-    obj.setShadow({
+    obj.set('shadow', new fabric.Shadow({
       color: 'rgba(0,100,0,0.9)', blur: 5, offsetX: 8, offsetY: 8, nonScaling: true
-    });
+    }));
     canvas.add(obj);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);

@@ -762,12 +762,6 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
   });
 
-  QUnit.test('customTransformMatrix', function(assert) {
-    assert.ok(typeof fabric.util.customTransformMatrix === 'function');
-    var m1 = fabric.util.customTransformMatrix(5, 4, 45);
-    assert.deepEqual(m1, [5, 0, 4.999999999999999, 4, 0, 0]);
-  });
-
   QUnit.test('resetObjectTransform', function(assert) {
     assert.ok(typeof fabric.util.resetObjectTransform === 'function');
     var rect = new fabric.Rect({

@@ -111,7 +111,6 @@
       'shadow':                   null,
       'visible':                  true,
       'backgroundColor':          '',
-      'clipTo':                   null,
       'fillRule':                 'nonzero',
       'paintFirst':               'fill',
       'globalCompositeOperation': 'source-over',
@@ -120,7 +119,6 @@
       'endAngle':                 2 * Math.PI,
       'skewX':                    0,
       'skewY':                    0,
-      'transformMatrix':          null
     };
     assert.ok(typeof circle.toObject === 'function');
     assert.deepEqual(circle.toObject(), defaultProperties);

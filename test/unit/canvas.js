@@ -57,12 +57,12 @@
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
+                           '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
-                  '"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+                  '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
     return fabric.document.createElement('img');
@@ -463,9 +463,9 @@
     canvas._collectObjects = function() {
       return [rect1];
     };
-    canvas.on('object:selected', function() { isFired = true; });
+    canvas.on('selection:created', function() { isFired = true; });
     canvas._groupSelectedObjects({});
-    assert.equal(isFired, true, 'object:selected fired for _groupSelectedObjects');
+    assert.equal(isFired, true, 'selection:created fired for _groupSelectedObjects');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
@@ -1389,12 +1389,10 @@
         opacity: 1,
         shadow: null,
         visible: true,
-        clipTo: null,
         backgroundColor: '',
         fillRule: 'nonzero',
         paintFirst: 'fill',
         globalCompositeOperation: 'source-over',
-        transformMatrix: null,
         skewX: 0,
         skewY: 0,
         rx: 0,
@@ -1642,32 +1640,6 @@
     });
   });
 
-  QUnit.test('loadFromDatalessJSON with async content', function(assert) {
-    var done = assert.async();
-
-    var circ1 = new fabric.Circle({ radius: 30, fill: '#55f', top: 0, left: 0 });
-    var circ2 = new fabric.Circle({ radius: 30, fill: '#f55', top: 50, left: 50 });
-    var circ3 = new fabric.Circle({ radius: 30, fill: '#5f5', top: 50, left: 50 });
-
-    var arr = [circ1, circ2];
-    var group = new fabric.Group(arr, { top: 150, left: 150 });
-
-    canvas.add(circ3);
-    canvas.add(group);
-    canvas.renderAll();
-
-    canvas._discardActiveObject();
-    var json = JSON.stringify( canvas.toDatalessJSON() );
-    canvas.clear();
-    canvas.loadFromDatalessJSON(json, function() {
-
-      assert.equal(2, canvas.getObjects().length);
-      assert.equal('group', canvas.getObjects()[1].type);
-
-      done();
-    });
-  });
-
   QUnit.test('loadFromJSON with custom properties on Canvas with no async object', function(assert) {
     var done = assert.async();
     var serialized = JSON.parse(PATH_JSON);
@@ -1685,7 +1657,7 @@
 
   QUnit.test('loadFromJSON with custom properties on Canvas with image', function(assert) {
     var done = assert.async();
-    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
+    var JSON_STRING = '{"objects":[{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}],'
 + '"background":"green"}';
     var serialized = JSON.parse(JSON_STRING);
     serialized.controlsAboveOverlay = true;
@@ -2438,23 +2410,6 @@
   //     done();
   //   }, 1000);
   // });
-
-  QUnit.test('clipTo', function(assert) {
-    canvas.clipTo = function(ctx) {
-      ctx.arc(0, 0, 10, 0, Math.PI * 2, false);
-    };
-
-    var error;
-    try {
-      canvas.renderAll();
-    }
-    catch (err) {
-      error = err;
-    }
-    delete canvas.clipTo;
-
-    assert.ok(typeof error === 'undefined', 'renderAll with clipTo does not throw');
-  });
 
   QUnit.test('isTargetTransparent', function(assert) {
     var rect = new fabric.Rect({

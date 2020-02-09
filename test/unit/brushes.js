@@ -13,7 +13,6 @@
       assert.ok(brush instanceof fabric.BaseBrush, 'should inherit from fabric.BaseBrush');
       assert.equal(brush.color, 'rgb(0, 0, 0)', 'default color is black');
       assert.equal(brush.width, 1, 'default width is 1');
-      assert.ok(typeof brush.setShadow === 'function', 'setShadow is a method');
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);
