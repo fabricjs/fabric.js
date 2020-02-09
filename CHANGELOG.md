@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.0.0-beta.7]
+
+- removed Object.setShadow, and BaseBrush.setShadow. change `rect.setShadow(options)` to `rect.shadow = new fabric.Shadow(options)`
+- removed Object.transformMatrix.
+- removed `object:selected` event. use `selection:created`. In the callback you will still find  `target` in the options, but also you will find `selected` with all the objects selected during that single event.
+- removed Gradient.forObject. No alternative available.
+- removed Object and canvas `clipTo`. Use Object.clipPath;
+- removed Canvas.loadFromDatalessJSON, it was just an alias for `loadFromJSON`
+- removed `observe`, `stopObserving`, `trigger` from observable. Keep using `on`, `off`, `fire`.
+- removed the Object.set ability to take a function as a value. Was rather strange to use.
+- removed Object.setGradient. Change `rect.setGradient(options)` with `rect.set('fill', new fabric.Gradient(otherOptions))`. The options format is slightly different, but keeping 2 formats does not really make sense.
+- removed Object.setPatternFill. Change `rect.setPatternFill(options)` to `rect.set('fill', new fabric.Pattern(options))`;
+- removed Object.setColor. Change `rect.setColor(color)` to `rect.set('fill', color)`
+- removed fabric.util.customTransformMatrix. Use the replacement fabric.util.composeMatrix
+
 ## [4.0.0-beta.6]
 
 fix(fabric.IText): exitEditing won't error on missing hiddenTextarea. [#6138](https://github.com/fabricjs/fabric.js/pull/6138)
