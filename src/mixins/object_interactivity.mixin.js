@@ -170,7 +170,7 @@
     drawBorders: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       var wh = this._calculateCurrentDimensions(),
-          strokeWidth = 1 / this.borderScaleFactor,
+          strokeWidth = this.borderScaleFactor,
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
@@ -189,10 +189,10 @@
       );
 
       if (hasControls) {
+        ctx.beginPath();
         this.forEachControl(function(control, key, fabricObject) {
           // in this moment, the ctx is centered on the object.
           // width and height of the above function are the size of the bbox.
-          ctx.beginPath();
           if (control.withConnection && control.getVisibility(fabricObject)) {
             // reset movement for each control
             shouldStroke = true;
@@ -223,17 +223,19 @@
      */
     drawBordersInGroup: function(ctx, options, styleOverride) {
       styleOverride = styleOverride || {};
-      var p = this._getNonTransformedDimensions(),
+      var p = { x: this.width, y: this.height },
           matrix = fabric.util.composeMatrix({
             scaleX: options.scaleX,
             scaleY: options.scaleY,
             skewX: options.skewX
           }),
           wh = fabric.util.transformPoint(p, matrix),
-          strokeWidth = 1 / this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth;
-
+          strokeWidth = this.strokeWidth,
+          borderScaleFactor = this.borderScaleFactor,
+          width =
+            wh.x + strokeWidth * (this.strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
+          height =
+            wh.y + strokeWidth * (this.strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;

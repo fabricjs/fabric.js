@@ -372,6 +372,9 @@
 
     /**
      * Scale factor of object's controlling borders
+     * bigger number will make a thicker border
+     * border is 1, so this is basically a border tickness
+     * since there is no way to change the border itself.
      * @type Number
      * @default
      */
@@ -832,6 +835,8 @@
             strokeLineCap:            this.strokeLineCap,
             strokeDashOffset:         this.strokeDashOffset,
             strokeLineJoin:           this.strokeLineJoin,
+            // TODO: add this before release
+            // strokeUniform:            this.strokeUniform,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
             scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
@@ -912,13 +917,8 @@
      * @return {Object} object with scaleX and scaleY properties
      */
     getObjectScaling: function() {
-      var scaleX = this.scaleX, scaleY = this.scaleY;
-      if (this.group) {
-        var scaling = this.group.getObjectScaling();
-        scaleX *= scaling.scaleX;
-        scaleY *= scaling.scaleY;
-      }
-      return { scaleX: scaleX, scaleY: scaleY };
+      var options = fabric.util.qrDecompose(this.calcTransformMatrix());
+      return { scaleX: Math.abs(options.scaleX), scaleY: Math.abs(options.scaleY) };
     },
 
     /**
@@ -1500,7 +1500,11 @@
       }
 
       ctx.save();
-      if (this.strokeUniform) {
+      if (this.strokeUniform && this.group) {
+        var scaling = this.getObjectScaling();
+        ctx.scale(1 / scaling.scaleX, 1 / scaling.scaleY);
+      }
+      else if (this.strokeUniform) {
         ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
@@ -1683,7 +1687,8 @@
           // skip canvas zoom and calculate with setCoords now.
           boundingRect = this.getBoundingRect(true, true),
           shadow = this.shadow, scaling,
-          shadowOffset = { x: 0, y: 0 }, shadowBlur;
+          shadowOffset = { x: 0, y: 0 }, shadowBlur,
+          width, height;
 
       if (shadow) {
         shadowBlur = shadow.blur;
@@ -1697,10 +1702,12 @@
         shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.scaleX));
         shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.scaleY));
       }
-      el.width = boundingRect.width + shadowOffset.x;
-      el.height = boundingRect.height + shadowOffset.y;
-      el.width += el.width % 2 ? 2 - el.width % 2 : 0;
-      el.height += el.height % 2 ? 2 - el.height % 2 : 0;
+      width = boundingRect.width + shadowOffset.x;
+      height = boundingRect.height + shadowOffset.y;
+      // if the current width/height is not an integer
+      // we need to make it so.
+      el.width = Math.ceil(width);
+      el.height = Math.ceil(height);
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: false,
         renderOnAddRemove: false,
