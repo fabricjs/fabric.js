@@ -41,13 +41,11 @@
       shadow:                   null,
       visible:                  true,
       backgroundColor:          '',
-      clipTo:                   null,
       fillRule:                 'nonzero',
       paintFirst:               'fill',
       globalCompositeOperation: 'source-over',
       skewX:                      0,
       skewY:                      0,
-      transformMatrix:          null,
     };
 
     var cObj = new fabric.Object();

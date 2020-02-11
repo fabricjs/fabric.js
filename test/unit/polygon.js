@@ -34,13 +34,11 @@
     'shadow':                   null,
     'visible':                  true,
     'backgroundColor':          '',
-    'clipTo':                   null,
     'fillRule':                 'nonzero',
     'paintFirst':               'fill',
     'globalCompositeOperation': 'source-over',
     'skewX':                    0,
     'skewY':                    0,
-    'transformMatrix':          null
   };
 
   var REFERENCE_EMPTY_OBJECT = {
@@ -172,9 +170,7 @@
         'points':           expectedPoints,
         'top':              10,
         'left':             10,
-        'transformMatrix':  [2, 0, 0, 2, -10, -20]
       }));
-      assert.deepEqual(polygonWithAttrs.get('transformMatrix'), [2, 0, 0, 2, -10, -20]);
     });
   });
   QUnit.test('fromElement with null', function(assert) {
