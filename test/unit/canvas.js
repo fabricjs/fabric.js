@@ -2248,6 +2248,9 @@
       target: rect
     };
     canvas.setActiveObject(rect);
+    rect.__corner = rect._findTargetCorner(
+      canvas.getPointer(eventStub, true)
+    );
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2261,7 +2264,9 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: rect
     };
-
+    rect.__corner = rect._findTargetCorner(
+      canvas.getPointer(eventStub, true)
+    );
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2270,6 +2275,9 @@
     assert.equal(t.shiftKey, undefined, 'shift was not pressed');
 
     var alreadySelected = true;
+    rect.__corner = rect._findTargetCorner(
+      canvas.getPointer(eventStub, true)
+    );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2285,6 +2293,9 @@
       target: rect,
       shiftKey: true
     };
+    rect.__corner = rect._findTargetCorner(
+      canvas.getPointer(eventStub, true)
+    );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
