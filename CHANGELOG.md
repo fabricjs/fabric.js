@@ -2,6 +2,8 @@
 
 ## [4.0.0-beta.7]
 
+Added controls mouseUpHandler and mouseDownHandler 
+
 Removal of deprecated methods / patterns. [#6111](https://github.com/fabricjs/fabric.js/pull/6111)
 - removed Object.setShadow, and BaseBrush.setShadow. change `rect.setShadow(options)` to `rect.set('shadow', new fabric.Shadow(options))`
 - removed Object.transformMatrix.

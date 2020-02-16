@@ -657,8 +657,7 @@
         return;
       }
 
-      var pointer = this.getPointer(e), isTouch = isTouchEvent(e),
-          corner = target._findTargetCorner(this.getPointer(e, true), isTouch),
+      var pointer = this.getPointer(e), corner = target.__corner,
           actionHandler = !!corner && target.controls[corner].getActionHandler(),
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),

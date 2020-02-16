@@ -440,12 +440,20 @@
         this._finalizeCurrentTransform(e);
         shouldRender = transform.actionPerformed;
       }
-
       if (!isClick) {
         this._maybeGroupObjects(e);
         shouldRender || (shouldRender = this._shouldRender(target));
       }
       if (target) {
+        var corner = target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)
+        );
+        var control = target.controls[corner],
+            mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
+        if (mouseUpHandler) {
+          mouseUpHandler(e, target, control);
+        }
         target.isMoving = false;
       }
       this._setCursorFromEvent(e, target);
@@ -695,7 +703,17 @@
         if (target.selectable) {
           this.setActiveObject(target, e);
         }
-        if (target === this._activeObject && (target.__corner || !shouldGroup)) {
+        var corner = target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)
+        );
+        target.__corner = corner;
+        if (target === this._activeObject && (corner || !shouldGroup)) {
+          var control = target.controls[corner],
+              mouseDownHandler = control && control.getMouseDownHandler(e, target, control);
+          if (mouseDownHandler) {
+            mouseDownHandler(e, target, control);
+          }
           this._setupCurrentTransform(e, target, alreadySelected);
         }
       }
