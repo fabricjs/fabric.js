@@ -431,10 +431,11 @@
      */
     _setImageSmoothing: function() {
       var ctx = this.getContext();
-
-      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
+      if (ctx) {
+        ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
         || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+        ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+      }
     },
 
     /**
