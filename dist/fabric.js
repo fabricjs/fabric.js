@@ -38,6 +38,13 @@ else {
 }
 
 /**
+ * Attribute measure character enable or disable kerned
+ * @Author: Hoai Ly(lyhoai2006tc@gmail.com)
+ * @type boolean
+ */
+fabric.enableKerned = true;
+
+/**
  * True when in environment that supports touch events
  * @type boolean
  */
@@ -25492,7 +25499,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         fontCache[couple] = coupleWidth;
         kernedWidth = coupleWidth - previousWidth;
       }
-      return { width: width * fontMultiplier, kernedWidth: kernedWidth * fontMultiplier };
+	  if (fabric.enableKerned) {
+          return { width: width * fontMultiplier, kernedWidth: kernedWidth * fontMultiplier };
+      } else {
+          return { width: width * fontMultiplier, kernedWidth: width * fontMultiplier };
+      }    
     },
 
     /**
