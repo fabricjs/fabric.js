@@ -470,11 +470,13 @@
       })
     };
 
-    var cObj = new Custom.Object();
+    var cObj = new window.Custom.Object();
 
     assert.ok(typeof cObj.clone === 'function');
     cObj.clone(function(clone) {
-      assert.ok(clone instanceof Custom.Object);
+      assert.ok(clone instanceof window.Custom.Object);
+
+      delete window.Custom;
     });
   });
 
