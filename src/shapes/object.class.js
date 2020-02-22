@@ -831,7 +831,6 @@
           object = {
             type:                     this.type,
             version:                  fabric.version,
-            namespace:                this.namespace,
             originX:                  this.originX,
             originY:                  this.originY,
             left:                     toFixed(this.left, NUM_FRACTION_DIGITS),
@@ -868,6 +867,10 @@
         object.clipPath = this.clipPath.toObject(propertiesToInclude);
         object.clipPath.inverted = this.clipPath.inverted;
         object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
+      }
+
+      if (this.namespace) {
+        object.namespace = this.namespace;
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
