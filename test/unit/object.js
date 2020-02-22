@@ -464,7 +464,7 @@
   });
 
   QUnit.test('clone with namespace', function(assert) {
-    var Custom = {
+    window.Custom = {
       Object: fabric.util.createClass(fabric.Object, {
         'namespace': 'Custom',
       })
