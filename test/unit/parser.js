@@ -760,4 +760,17 @@
     });
   });
 
+  QUnit.test('parseSVGFromString with empty <style/>', function(assert) {
+    var done = assert.async();
+    var string = '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+                 '  <style/>' +
+                 '  <rect width="10" height="10" />' +
+                 '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].type, 'rect');
+      done();
+    });
+  });
+
 })();
