@@ -464,19 +464,21 @@
   });
 
   QUnit.test('clone with namespace', function(assert) {
-    document.defaultView.Custom = {
+    var glob = fabric.isLikelyNode ? global : window;
+
+    glob.Custom = {
       Object: fabric.util.createClass(fabric.Object, {
         'namespace': 'Custom',
       })
     };
 
-    var cObj = new document.defaultView.Custom.Object();
+    var cObj = new glob.Custom.Object();
 
     assert.ok(typeof cObj.clone === 'function');
     cObj.clone(function(clone) {
-      assert.ok(clone instanceof document.defaultView.Custom.Object);
+      assert.ok(clone instanceof glob.Custom.Object);
 
-      delete document.defaultView.Custom;
+      delete glob.Custom;
     });
   });
 
