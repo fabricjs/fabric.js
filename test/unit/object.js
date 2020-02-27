@@ -464,19 +464,19 @@
   });
 
   QUnit.test('clone with namespace', function(assert) {
-    window.Custom = {
+    document.defaultView.Custom = {
       Object: fabric.util.createClass(fabric.Object, {
         'namespace': 'Custom',
       })
     };
 
-    var cObj = new window.Custom.Object();
+    var cObj = new document.defaultView.Custom.Object();
 
     assert.ok(typeof cObj.clone === 'function');
     cObj.clone(function(clone) {
-      assert.ok(clone instanceof window.Custom.Object);
+      assert.ok(clone instanceof document.defaultView.Custom.Object);
 
-      delete window.Custom;
+      delete document.defaultView.Custom;
     });
   });
 
