@@ -1399,7 +1399,7 @@
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = this._objects;
+          fontPaths = fabric.fontPaths, objects = this._objects.map(o => [].concat(o, o._objects || [])).flat(Infinity);
 
       for (i = 0, len = objects.length; i < len; i++) {
         obj = objects[i];
