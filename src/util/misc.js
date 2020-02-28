@@ -1,4 +1,4 @@
-(function(global) {
+(function() {
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -318,7 +318,7 @@
 
       var parts = namespace.split('.'),
           len = parts.length, i,
-          obj = global || fabric.window;
+          obj = typeof global === 'undefined' ? fabric.window : global;
 
       for (i = 0; i < len; ++i) {
         obj = obj[parts[i]];
@@ -975,4 +975,4 @@
       }).join(' ') + ')';
     }
   };
-})(typeof exports !== 'undefined' ? exports : this);
+})();

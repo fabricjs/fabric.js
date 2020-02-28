@@ -1,4 +1,4 @@
-(function(){
+(function(global){
 
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
@@ -464,21 +464,21 @@
   });
 
   QUnit.test('clone with namespace', function(assert) {
-    var glob = fabric.isLikelyNode ? global : window;
-
-    glob.Custom = {
-      Object: fabric.util.createClass(fabric.Object, {
-        'namespace': 'Custom',
-      })
+    var MyClass = fabric.util.createClass(fabric.Object, {
+      namespace: 'MyNameSpace',
+      type: 'myClass'
+    });
+    MyClass.fromObject = function(object, callback) {
+      return fabric.Object._fromObject('MyClass', object, callback);
     };
-
-    var cObj = new glob.Custom.Object();
-
+    global.MyNameSpace = {
+      MyClass: MyClass
+    };
+    var cObj = new MyClass();
     assert.ok(typeof cObj.clone === 'function');
     cObj.clone(function(clone) {
-      assert.ok(clone instanceof glob.Custom.Object);
-
-      delete glob.Custom;
+      assert.ok(clone instanceof MyClass);
+      delete global.MyNameSpace;
     });
   });
 
@@ -1289,4 +1289,4 @@
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
   });
-})();
+})(typeof global !== 'undefined' ? global : this);
