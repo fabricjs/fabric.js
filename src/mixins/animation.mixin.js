@@ -135,14 +135,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   animate: function() {
     if (arguments[0] && typeof arguments[0] === 'object') {
-      var propsToAnimate = [], prop, skipCallbacks;
-      for (prop in arguments[0]) {
-        propsToAnimate.push(prop);
+      if ('name' in arguments[0] && arguments[0].name in fabric.animations) {
+        var options = fabric.animations[arguments[0].name];
+        if ('from' in options) {
+          this.set(options.from);
+          this.canvas && this.canvas.requestRenderAll();
+        }
+        this.animate(options.to, arguments[1]);
       }
-      for (var i = 0, len = propsToAnimate.length; i < len; i++) {
-        prop = propsToAnimate[i];
-        skipCallbacks = i !== len - 1;
-        this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+      else {
+        var propsToAnimate = [], prop, skipCallbacks;
+        for (prop in arguments[0]) {
+          propsToAnimate.push(prop);
+        }
+        for (var i = 0, len = propsToAnimate.length; i < len; i++) {
+          prop = propsToAnimate[i];
+          skipCallbacks = i !== len - 1;
+          this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+        }
       }
     }
     else {

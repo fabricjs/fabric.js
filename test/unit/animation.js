@@ -79,6 +79,22 @@
     }, 1000);
   });
 
+  QUnit.test('animate with registered animation', function(assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ opacity: 1, left: 20, top: 30, width: 40, height: 50, angle: 43 });
+    var customAnimation = { from: { opacity: 0 }, to: { opacity: 1 } };
+    fabric.util.registerAnimation('fadeIn', customAnimation);
+    assert.equal(fabric.animations.fadeIn, customAnimation);
+    object.animate({ name: 'fadeIn' });
+
+    assert.equal(object.opacity, 0, 'opacity is now 0');
+
+    setTimeout(function() {
+      assert.equal(object.opacity, 1, 'opacity is now 1');
+      done();
+    }, 1000);
+  });
+
   QUnit.test('animate with object', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
