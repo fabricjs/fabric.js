@@ -601,7 +601,7 @@
      * @type Array
      */
     colorProperties: (
-      'fill stroke backgroundColor borderColor'
+      'fill stroke backgroundColor'
     ).split(' '),
 
     /**
