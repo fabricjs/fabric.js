@@ -53,7 +53,7 @@
           );
         }
       },
-      onChange: function(current, valuePerc, timePerc) {
+      onChange: function (current, valuePerc, timePerc) {
         if (originalOnChange) {
           if (Array.isArray(current)) {
             return originalOnChange(
