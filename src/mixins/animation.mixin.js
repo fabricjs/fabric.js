@@ -174,7 +174,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       propPair = property.split('.');
     }
 
-    var propIsText = _this.colorProperties.includes(property) || (propPair && _this.colorProperties.includes(propPair[propPair.length - 1]));
+    var propIsColor = _this.colorProperties.indexOf(property) > -1 || (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
 
     var currentValue = propPair
       ? this.get(propPair[0])[propPair[1]]
@@ -184,7 +184,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options.from = currentValue;
     }
 
-    if (!propIsText) {
+    if (!propIsColor) {
       if (~to.indexOf('=')) {
         to = currentValue + parseFloat(to.replace('=', ''));
       }
@@ -224,7 +224,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
     };
 
-    if (_this.colorProperties.includes(property) || propPair && _this.colorProperties.includes(propPair[propPair.length - 1])) {
+    if (propIsColor) {
       fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
     }
     else {
