@@ -664,7 +664,7 @@
         if (_this.canvas) {
           _this.canvas.requestRenderAll();
         }
-        originalOnChange && originalOnChange();
+        originalOnChange && originalOnChange.apply(this, arguments);
       };
 
       _this.on(trigger, function () {
