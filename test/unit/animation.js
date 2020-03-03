@@ -95,6 +95,35 @@
     }, 1000);
   });
 
+  QUnit.test('animate with addAnimation', function(assert) {
+    var done = assert.async();
+    var canvas = new fabric.Canvas();
+    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
+    object.addAnimation({ top: 0 });
+    assert.equal(object.top, 30, 'top is 30');
+    canvas.add(object);
+    setTimeout(function() {
+      assert.equal(object.top, 0, 'top is now 0');
+      done();
+    }, 1000);
+  });
+
+  QUnit.test('animate with stored animation', function(assert) {
+    var done = assert.async();
+    var canvas = new fabric.Canvas();
+    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
+    object.addAnimation({ top: 0 }, { duration: 5000 });
+    assert.equal(object.top, 30, 'top is 30');
+    fabric.Object._fromObject('Object', object.toJSON(), function (newObject) {
+      assert.equal(newObject.top, 30, 'top is still 30');
+      canvas.add(newObject);
+      setTimeout(function() {
+        assert.equal(newObject.top, 0, 'top is now 0');
+        done();
+      }, 5000);
+    });
+  });
+
   QUnit.test('animate with object', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });

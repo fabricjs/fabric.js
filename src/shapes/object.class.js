@@ -581,7 +581,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
-      'skewX skewY fillRule paintFirst clipPath strokeUniform'
+      'skewX skewY fillRule paintFirst clipPath strokeUniform animations'
     ).split(' '),
 
     /**
@@ -627,6 +627,12 @@
     absolutePositioned: false,
 
     /**
+     * List of stored animations.
+     * @type array
+     */
+    animations: [],
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -634,6 +640,54 @@
       if (options) {
         this.setOptions(options);
       }
+      this._startAnimations();
+    },
+
+    /**
+     * Start the animations stored on the object.
+     * @private
+     */
+    _startAnimations: function () {
+      this.animations.forEach(this._startAnimation.bind(this));
+    },
+
+    /**
+     * Start the given animation stored on the object.
+     * @private
+     */
+    _startAnimation: function (animation) {
+      var _this = this;
+      var props = animation[0], options = fabric.util.object.clone(animation[1] || {}), trigger = animation[2] || 'added';
+
+      options.onChange = function () {
+        if (_this.canvas) {
+          _this.canvas.requestRenderAll();
+        }
+      };
+
+      _this.on(trigger, function () {
+        _this.animate.call(_this, props, options);
+      });
+    },
+
+    /**
+     * Add an animation to the object.
+     */
+    addAnimation: function (props, options, trigger) {
+      var animation = [
+        props,
+        options,
+        trigger
+      ];
+      this.animations.push(animation);
+      this._startAnimation(animation);
+    },
+
+    /**
+     * Remove an animation from the object.
+     */
+    removeAnimation: function (animation) {
+      this.animations.splice(this.animations.indexOf(animation), 1);
     },
 
     /**
@@ -852,6 +906,7 @@
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            animations:               this.animations
           };
 
       if (this.clipPath) {
