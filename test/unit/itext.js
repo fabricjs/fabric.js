@@ -706,14 +706,7 @@
       canvas.add(group);
       assert.equal(typeof iText1.toSVG, 'function');
       assert.equal(typeof iText2.toSVG, 'function');
-      var parser;
-      if (fabric.isLikelyNode) {
-        var XmlDomParser = require('xmldom').DOMParser;
-        parser = new XmlDomParser();
-      }
-      else {
-        parser = new DOMParser();
-      }
+      var parser = new DOMParser();
       var svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
