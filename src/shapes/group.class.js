@@ -58,6 +58,14 @@
     useSetOnGroup: false,
 
     /**
+     * List of events to be triggered
+     * on objects contained in this group.
+     * @type array
+     * @default
+     */
+    triggerObjectsEvents: [],
+
+    /**
      * Constructor
      * @param {Object} objects Group objects
      * @param {Object} [options] Options object
@@ -100,6 +108,22 @@
       }
 
       this.setCoords();
+      this._triggerObjectsEvents();
+    },
+
+    /**
+     * Trigger events on objects.
+     * @private
+     */
+    _triggerObjectsEvents: function () {
+      var _this = this;
+      _this.triggerObjectsEvents.forEach(function (eventName) {
+        _this.on(eventName, function (event) {
+          _this.forEachObject(function (object) {
+            object.fire(eventName, event);
+          });
+        });
+      });
     },
 
     /**
@@ -240,6 +264,11 @@
       });
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
       obj.objects = objsToObject;
+
+      if (this.triggerObjectsEvents.length > 0) {
+        obj.triggerObjectsEvents = this.triggerObjectsEvents;
+      }
+
       return obj;
     },
 
