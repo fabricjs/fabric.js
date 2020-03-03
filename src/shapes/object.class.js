@@ -907,9 +907,12 @@
             paintFirst:               this.paintFirst,
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
-            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
-            animations:               JSON.parse(JSON.stringify(this.animations))
+            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
           };
+
+      if (this.animations.length > 0) {
+        object.animations = JSON.parse(JSON.stringify(this.animations));
+      }
 
       if (this.clipPath) {
         object.clipPath = this.clipPath.toObject(propertiesToInclude);
