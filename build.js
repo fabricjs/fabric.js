@@ -32,7 +32,7 @@ var amdUglifyFlags = '';
 if (amdLib === 'requirejs' && minifier !== 'uglifyjs') {
   console.log('[notice]: require.js support requires uglifyjs as minifier; changed minifier to uglifyjs.');
   minifier = 'uglifyjs';
-  amdUglifyFlags = ' -r \'require,exports,window,fabric\' -e window:window,undefined ';
+  amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
 }
 
 // if we want sourceMap support, uglify or google closure compiler are supported
@@ -87,7 +87,7 @@ function appendFileContents(fileNames, callback) {
     }
 
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
-      if (err) {throw err;}
+      if (err) throw err;
       var strData = String(data);
       if (fileName === 'src/HEADER.js' && amdLib === false) {
         strData = strData.replace(/\/\* _AMD_START_ \*\/[\s\S]*?\/\* _AMD_END_ \*\//g, '');
@@ -237,7 +237,7 @@ var filesToInclude = [
 
 if (buildMinified) {
   for (var i = 0; i < filesToInclude.length; i++) {
-    if (!filesToInclude[i]) {continue;}
+    if (!filesToInclude[i]) continue;
     var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
     exec('uglifyjs -nc ' + amdUglifyFlags + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
   }
@@ -258,8 +258,7 @@ else {
 
       if (amdLib !== false) {
         console.log('Built distribution to ' + distributionPath + 'fabric.js (' + amdLib + '-compatible)');
-      }
-      else {
+      } else {
         console.log('Built distribution to ' + distributionPath + 'fabric.js');
       }
 
