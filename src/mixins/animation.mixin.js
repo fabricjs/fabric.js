@@ -137,11 +137,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (arguments[0] && typeof arguments[0] === 'object') {
       if ('name' in arguments[0] && arguments[0].name in fabric.animations) {
         var options = fabric.animations[arguments[0].name];
+
         if ('from' in options) {
+          options.to = options.to || Object.keys(options.from).reduce(function (options, key) {
+            options[key] = this[key];
+            return options;
+          }, {});
+
           this.set(options.from);
           this.canvas && this.canvas.requestRenderAll();
         }
-        this.animate(options.to, arguments[1]);
+
+        if (options.to) {
+          this.animate(options.to, arguments[1]);
+        }
       }
       else {
         var propsToAnimate = [], prop, skipCallbacks;
