@@ -220,7 +220,7 @@
       this.dirty = true;
       object.group = this;
       if (!object.canvas && this.triggerObjectsEvents.indexOf('added') > -1) {
-        object.trigger('added');
+        object.fire('added');
       }
       object._set('canvas', this.canvas);
     },
