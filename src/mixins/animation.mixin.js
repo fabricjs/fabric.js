@@ -139,8 +139,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         var options = fabric.animations[arguments[0].name];
 
         if ('from' in options) {
+          var _this = this;
           options.to = options.to || Object.keys(options.from).reduce(function (options, key) {
-            options[key] = this[key];
+            options[key] = _this[key];
             return options;
           }, {});
 
