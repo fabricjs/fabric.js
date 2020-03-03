@@ -627,6 +627,12 @@
     absolutePositioned: false,
 
     /**
+     * List of stored events.
+     * @type array
+     */
+    events: [],
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -634,6 +640,52 @@
       if (options) {
         this.setOptions(options);
       }
+      this._startEvents();
+    },
+
+    /**
+     * Start the events stored on the object.
+     * @private
+     */
+    _startEvents: function () {
+      this.events.forEach(this._startEvent.bind(this));
+    },
+
+    /**
+     * Start the given event stored on the object.
+     * @private
+     */
+    _startEvent: function (event) {
+      var _this = this;
+      var name = event.name, trigger = event.trigger;
+
+      if (fabric.events[name]) {
+        _this.on(trigger, function (event) {
+          fabric.events[name](event, _this);
+        });
+      }
+      else {
+        throw new Error('This event [' + name + '] does not exist.');
+      }
+    },
+
+    /**
+     * Add an event to the object.
+     */
+    addEvent: function (name, trigger) {
+      var event = {
+        name: name,
+        trigger: trigger || 'added'
+      };
+      this.set({ events: this.events.concat(event) });
+      this._startEvent(event);
+    },
+
+    /**
+     * Remove an event from the object.
+     */
+    removeEvent: function (event) {
+      this.events.splice(this.events.indexOf(event), 1);
     },
 
     /**
@@ -853,6 +905,10 @@
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
           };
+
+      if (this.events.length > 0) {
+        object.events = JSON.parse(JSON.stringify(this.events));
+      }
 
       if (this.clipPath) {
         object.clipPath = this.clipPath.toObject(propertiesToInclude);

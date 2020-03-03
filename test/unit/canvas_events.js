@@ -956,4 +956,29 @@
     assert.equal(canvas._addEventOptions(opt, { action: 'drag' }), 'moved', 'drag => moved');
     assert.equal(opt.by, undefined, 'by => undefined');
   });
+
+
+  QUnit.test('event with registered event', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({});
+    fabric.util.registerEvent('method', function (event, object) {
+      assert.ok(true, 'method calls operation function');
+      done();
+    });
+    object.addEvent('method', 'mousedown');
+    object.fire('mousedown');
+  });
+
+  QUnit.test('event with stored event', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({});
+    fabric.util.registerEvent('method', function (event, object) {
+      assert.ok(true, 'method calls operation function');
+      done();
+    });
+    object.addEvent('method', 'mousedown');
+    fabric.Object._fromObject('Object', object.toJSON(), function (newObject) {
+      newObject.fire('mousedown');
+    });
+  });
 })();
