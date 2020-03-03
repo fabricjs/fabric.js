@@ -99,28 +99,45 @@
     var done = assert.async();
     var canvas = new fabric.Canvas();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
-    object.addAnimation({ top: 0 });
     assert.equal(object.top, 30, 'top is 30');
+    object.addAnimation({ top: 0 }, {
+      onComplete: function () {
+        assert.equal(object.top, 0, 'top is now 0');
+        done();
+      }
+    });
     canvas.add(object);
-    setTimeout(function() {
-      assert.equal(object.top, 0, 'top is now 0');
-      done();
-    }, 1000);
   });
 
   QUnit.test('animate with stored animation', function(assert) {
     var done = assert.async();
     var canvas = new fabric.Canvas();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
-    object.addAnimation({ top: 0 }, { duration: 5000 });
+    object.addAnimation({ top: 0 });
     assert.equal(object.top, 30, 'top is 30');
     fabric.Object._fromObject('Object', object.toJSON(), function (newObject) {
       assert.equal(newObject.top, 30, 'top is still 30');
-      canvas.add(newObject);
-      setTimeout(function() {
+      newObject.animations[0].options.onComplete = function () {
         assert.equal(newObject.top, 0, 'top is now 0');
         done();
-      }, 5000);
+      };
+      canvas.add(newObject);
+    });
+  });
+
+  QUnit.test('animate with stored+registered animation', function(assert) {
+    var done = assert.async();
+    var canvas = new fabric.Canvas();
+    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
+    fabric.util.registerAnimation('fadeIn', { from: { opacity: 0 }, to: { opacity: 1 }});
+    object.addAnimation({ name: 'fadeIn' });
+    fabric.Object._fromObject('Object', object.toJSON(), function (newObject) {
+      newObject.animations[0].options.onComplete = function () {
+        assert.equal(newObject.opacity, 1, 'opacity is now 1');
+        done();
+      };
+      canvas.add(newObject);
+      assert.equal(newObject.opacity, 0, 'opacity is 0');
     });
   });
 

@@ -581,7 +581,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
-      'skewX skewY fillRule paintFirst clipPath strokeUniform animations'
+      'skewX skewY fillRule paintFirst clipPath strokeUniform'
     ).split(' '),
 
     /**
@@ -636,7 +636,7 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function (options) {
       if (options) {
         this.setOptions(options);
       }
@@ -657,12 +657,14 @@
      */
     _startAnimation: function (animation) {
       var _this = this;
-      var props = animation[0], options = fabric.util.object.clone(animation[1] || {}), trigger = animation[2] || 'added';
+      var props = animation.props, options = animation.options, trigger = animation.trigger;
+      var originalOnChange = options.onChange;
 
       options.onChange = function () {
         if (_this.canvas) {
           _this.canvas.requestRenderAll();
         }
+        originalOnChange && originalOnChange();
       };
 
       _this.on(trigger, function () {
@@ -674,12 +676,12 @@
      * Add an animation to the object.
      */
     addAnimation: function (props, options, trigger) {
-      var animation = [
-        props,
-        options,
-        trigger
-      ];
-      this.animations.push(animation);
+      var animation = {
+        props: props || {},
+        options: options || {},
+        trigger: trigger || 'added'
+      };
+      this.set({ animations: this.animations.concat(animation) });
       this._startAnimation(animation);
     },
 
@@ -906,7 +908,7 @@
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
-            animations:               this.animations
+            animations:               JSON.parse(JSON.stringify(this.animations))
           };
 
       if (this.clipPath) {
