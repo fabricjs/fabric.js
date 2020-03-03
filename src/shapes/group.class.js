@@ -219,6 +219,9 @@
     _onObjectAdded: function(object) {
       this.dirty = true;
       object.group = this;
+      if (!object.canvas && this.triggerObjectsEvents.indexOf('added') > -1) {
+        object.trigger('added');
+      }
       object._set('canvas', this.canvas);
     },
 

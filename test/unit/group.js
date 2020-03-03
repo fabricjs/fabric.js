@@ -38,10 +38,10 @@
     var canvas = new fabric.Canvas();
     var object = new fabric.Object({});
     object.on('added', function () {
-      addedWasCalled = true;
+      addedWasCalled = !addedWasCalled;
     });
     object.on('removed', function () {
-      removedWasCalled = true;
+      removedWasCalled = !removedWasCalled;
     });
     var group = new fabric.Group([object], {
       triggerObjectsEvents: ['added', 'removed']
