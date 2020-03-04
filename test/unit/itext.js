@@ -676,6 +676,48 @@
       assert.equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
     });
 
+    QUnit.test('toSVGWithFontsInGroups', function(assert) {
+      var iText1 = new fabric.IText('test foo bar-baz\nqux', {
+        styles: {
+          0: {
+            0: { fill: '#112233' },
+            2: { stroke: '#223344', fontFamily: 'Lacquer' },
+            3: { backgroundColor: '#00FF00' }
+          }
+        },
+        fontFamily: 'Plaster'
+      });
+      var iText2 = new fabric.IText('test foo bar-baz\nqux\n2', {
+        styles: {
+          0: {
+            0: { fill: '#112233', fontFamily: 'Engagement' },
+            2: { stroke: '#223344' },
+            3: { backgroundColor: '#00FF00' }
+          }
+        },
+        fontFamily: 'Poppins'
+      });
+      fabric.fontPaths = {
+        Engagement: 'path-to-engagement-font-file',
+        Plaster: 'path-to-plaster-font-file',
+        Poppins: 'path-to-poppins-font-file',
+        Lacquer: 'path-to-lacquer-font-file'
+      };
+      var subGroup = new fabric.Group([iText1]);
+      var group = new fabric.Group([subGroup, iText2]);
+      canvas.add(group);
+      assert.equal(typeof iText1.toSVG, 'function');
+      assert.equal(typeof iText2.toSVG, 'function');
+      var parser = new DOMParser();
+      var svgString = canvas.toSVG(),
+          doc = parser.parseFromString(svgString, 'image/svg+xml'),
+          style = doc.getElementsByTagName('style')[0].firstChild.data;
+      assert.equal(
+        style,
+        '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Lacquer\';\n\t\t\tsrc: url(\'path-to-lacquer-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Poppins\';\n\t\t\tsrc: url(\'path-to-poppins-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n'
+      );
+    });
+
     QUnit.test('space wrap attribute', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux');
       iText.enterEditing();
