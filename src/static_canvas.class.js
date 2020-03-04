@@ -1434,7 +1434,14 @@
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = this._objects;
+          fontPaths = fabric.fontPaths, objects = [];
+      
+      this._objects.forEach(function add(object) {
+        objects.push(object);
+        if (object._objects) {
+          object._objects.forEach(add);
+        }
+      });
 
       for (i = 0, len = objects.length; i < len; i++) {
         obj = objects[i];
