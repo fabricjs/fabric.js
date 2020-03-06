@@ -9,7 +9,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group) {
       fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
     }
-    else {
+    else (this.canvas) {
       this.canvas.sendToBack(this);
     }
     return this;
@@ -24,7 +24,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group) {
       fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
     }
-    else {
+    else (this.canvas) {
       this.canvas.bringToFront(this);
     }
     return this;
@@ -40,7 +40,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group) {
       fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
     }
-    else {
+    else (this.canvas) {
       this.canvas.sendBackwards(this, intersecting);
     }
     return this;
@@ -56,7 +56,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group) {
       fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
     }
-    else {
+    else (this.canvas) {
       this.canvas.bringForward(this, intersecting);
     }
     return this;
@@ -72,7 +72,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group && this.group.type !== 'activeSelection') {
       fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
     }
-    else {
+    else (this.canvas) {
       this.canvas.moveTo(this, index);
     }
     return this;
