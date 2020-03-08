@@ -645,7 +645,7 @@
       overline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline ';
+    var expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -655,7 +655,7 @@
       underline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline ';
+    var expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -666,7 +666,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -678,7 +678,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
