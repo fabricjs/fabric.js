@@ -134,6 +134,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       clipPath.setPositionByOrigin({ x: options.translateX, y: options.translateY }, 'center', 'center');
       obj.clipPath = clipPath;
     }
+    else {
+      // if clip-path does not resolve to any element, delete the property.
+      delete obj.clipPath;
+    }
   };
 
   proto.checkIfDone = function() {
