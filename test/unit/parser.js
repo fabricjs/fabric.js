@@ -760,6 +760,20 @@
     });
   });
 
+  QUnit.test('parseSVGFromString with missing clippath', function(assert) {
+    var done = assert.async();
+    var string = '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+                   '<g clip-path="url(#i)">' +
+                     '<path d="m59.09 7.55c-5.22 1.85-5.74-1.42-5.74-1.42-2.83 1.41-0.97 4.45-0.97 4.45s-2.87-0.21-4.1 2.27c-1.29 2.6-0.15 4.59-0.15 4.59s-2.76 1.75-1.68 4.95c0.72 2.12 2.87 2.97 2.87 2.97-0.26 4.57 1.18 6.79 1.18 6.79s1.79-7.85 1.62-9.05c0 0 3.3-0.66 7.05-2.8 2.53-1.45 4.26-3.15 7.11-3.79 4.33-0.98 5.3 2.16 5.3 2.16s4.01-0.77 5.22 4.8c0.5 2.29 0.71 6.12 0.98 8.45-0.02-0.2 1.49-2.72 1.75-5.28 0.1-0.95 1.54-3.26 1.97-4.99 0.94-3.75-0.29-6.7-0.88-7.58-1.07-1.61-3.61-3.83-5.52-3.51 0.1-2.04-1.51-3.94-3.45-4.59-5.29-1.8-11 1.02-12.56 1.58z" fill="none" stroke="#402720" stroke-miterlimit="10" stroke-width="2"/>' +
+                   '</g>' +
+                 '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].clipPath, undefined);
+      done();
+    });
+  });
+
   QUnit.test('parseSVGFromString with empty <style/>', function(assert) {
     var done = assert.async();
     var string = '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
