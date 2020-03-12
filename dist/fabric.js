@@ -13430,14 +13430,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     ).split(' '),
 
     /**
-     * List of properties to consider for animating colors.
-     * @type Array
-     */
-    colorProperties: (
-      'fill stroke backgroundColor'
-    ).split(' '),
-
-    /**
      * a fabricObject that, without stroke define a clipping area with their shape. filled in black
      * the clipPath object gets used when the object has rendered, and the context is placed in the center
      * of the object cacheCanvas.
@@ -16911,8 +16903,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       propPair = property.split('.');
     }
 
-    var propIsColor = _this.colorProperties.indexOf(property) > -1 || (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
-
     var currentValue = propPair
       ? this.get(propPair[0])[propPair[1]]
       : this.get(property);
@@ -16921,25 +16911,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options.from = currentValue;
     }
 
-    if (!propIsColor) {
-      if (~to.indexOf('=')) {
-        to = currentValue + parseFloat(to.replace('=', ''));
-      }
-      else {
-        to = parseFloat(to);
-      }
+    if (~to.indexOf('=')) {
+      to = currentValue + parseFloat(to.replace('=', ''));
+    }
+    else {
+      to = parseFloat(to);
     }
 
-    var _options = {
+    fabric.util.animate({
       startValue: options.from,
       endValue: to,
       byValue: options.by,
       easing: options.easing,
       duration: options.duration,
-      abort: options.abort && function () {
+      abort: options.abort && function() {
         return options.abort.call(_this);
       },
-      onChange: function (value, valueProgress, timeProgress) {
+      onChange: function(value, valueProgress, timeProgress) {
         if (propPair) {
           _this[propPair[0]][propPair[1]] = value;
         }
@@ -16951,7 +16939,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
         options.onChange && options.onChange(value, valueProgress, timeProgress);
       },
-      onComplete: function (value, valueProgress, timeProgress) {
+      onComplete: function(value, valueProgress, timeProgress) {
         if (skipCallbacks) {
           return;
         }
@@ -16959,14 +16947,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         _this.setCoords();
         options.onComplete && options.onComplete(value, valueProgress, timeProgress);
       }
-    };
-
-    if (propIsColor) {
-      fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
-    }
-    else {
-      fabric.util.animate(_options);
-    }
+    });
   }
 });
 
