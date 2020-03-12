@@ -2,33 +2,14 @@
 
 ## [3.6.3]
 
-backport: fix(fabric.Group): will draw shadow will call parent method. [#6116](https://github.com/fabricjs/fabric.js/pull/6116)
-backport: fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. [#6118](https://github.com/fabricjs/fabric.js/pull/6118)
-backport: fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. [#6118](https://github.com/fabricjs/fabric.js/pull/6118)
-
-## [4.0.0-beta.5]
-
-fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. [#6118](https://github.com/fabricjs/fabric.js/pull/6118)
-
-## [4.0.0-beta.4]
-
-fix(fabric.Group): will draw shadow will call parent method. [#6116](https://github.com/fabricjs/fabric.js/pull/6116)
-
-## [4.0.0-beta.3]
-
-fix(controls): control offset rendering code had extras `beginPath` that would clear all but not the last of them [#6114](https://github.com/fabricjs/fabric.js/pull/6114)
-
-## [4.0.0-beta.2]
-
-fix(controls): Control.getVisibility will always receive the fabric.Object argument.
-
-## [4.0.0-beta.1]
-
-breaking: All your old control code override will not work
-breaking: `uniScaleTransform` has been renamed in `uniformScaling`, meaning changed and  the default  value swapped. The behaviour is unchanged, but now the description and the name match.
-breaking: LockScalingFlip with the scaling flip behaviour are missing now, maybe reimplemented later.
-breaking: Object.lockUniScaling is removed. Alternatives to get the same identical functionality with less code are being evaluated.
-breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to the event `before:transform’
+- fix(fabric.IText): exitEditing won't error on missing hiddenTextarea. #6138
+- fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. #6118
+- fix(fabric.Group): will draw shadow will call parent method. #6116
+- fix(svg_parsers): Add support for empty <style/> tags (#6169)
+- fix(SVG_export, text): Check font faces markup for objects within groups (#6195)
+- fix(svg_export): remove extra space from svg export (#6209)
+- fix(svg_import): ISSUE-6170 do not try to create missing clippath (#6210)
+- fix(fabric.Object) Adding existence check for this.canvas on object stacking mixins (#6207)
 
 ## [3.6.2]
 - fix fabric.Object.toDataURL blurriness on images with odd pixel number [#6131](https://github.com/fabricjs/fabric.js/pull/6131)
