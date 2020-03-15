@@ -21,3 +21,4 @@ jobs:
       - run: node publish.js
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          PRE_RELEASE: ${{github.event.release.prerelease}}
