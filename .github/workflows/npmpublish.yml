@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - v3.x
-    types: [created]
+    types: [published]
 
 jobs:
   publish-npm:
