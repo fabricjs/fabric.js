@@ -174,7 +174,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       propPair = property.split('.');
     }
 
-    var propIsColor = _this.colorProperties.indexOf(property) > -1 || (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
+    var propIsColor =
+      _this.colorProperties.indexOf(property) > -1 ||
+      (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
 
     var currentValue = propPair
       ? this.get(propPair[0])[propPair[1]]
