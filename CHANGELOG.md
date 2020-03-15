@@ -2,6 +2,7 @@
 
 ## [3.6.3]
 
+- fix(Object): ISSUE 6196 use set('canvas') to restore canvas #6216
 - fix(fabric.IText): exitEditing won't error on missing hiddenTextarea. #6138
 - fix(fabric.Object): getObjectScaling takes in account rotation of objects inside groups. #6118
 - fix(fabric.Group): will draw shadow will call parent method. #6116

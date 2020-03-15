@@ -8077,7 +8077,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
           fontPaths = fabric.fontPaths, objects = [];
-      
+
       this._objects.forEach(function add(object) {
         objects.push(object);
         if (object._objects) {
@@ -14563,7 +14563,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       canvas.add(this);
       var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.shadow = originalShadow;
-      this.canvas = originalCanvas;
+      this.set('canvas', originalCanvas);
       if (originalGroup) {
         this.group = originalGroup;
       }
