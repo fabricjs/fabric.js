@@ -423,7 +423,7 @@
 
     assert.equal(cObj.canvas, canvas, 'canvas is the main one step 1');
 
-    var canvasEl = activeSel.toCanvasElement();
+    activeSel.toCanvasElement();
 
     assert.equal(cObj.canvas, canvas, 'canvas is the main one step 2');
 
