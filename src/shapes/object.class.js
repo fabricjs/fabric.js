@@ -633,14 +633,6 @@
     ).split(' '),
 
     /**
-     * List of properties to consider for animating colors.
-     * @type Array
-     */
-    colorProperties: (
-      'fill stroke backgroundColor'
-    ).split(' '),
-
-    /**
      * a fabricObject that, without stroke define a clipping area with their shape. filled in black
      * the clipPath object gets used when the object has rendered, and the context is placed in the center
      * of the object cacheCanvas.
@@ -1774,7 +1766,7 @@
       canvas.add(this);
       var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.shadow = originalShadow;
-      this.canvas = originalCanvas;
+      this.set('canvas', originalCanvas);
       if (originalGroup) {
         this.group = originalGroup;
       }
