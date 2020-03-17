@@ -443,8 +443,10 @@
 
   // currently unusued, needed for the textbox.
   function changeWidth(eventData, transform, x, y) {
-    var target = transform.target, localPoint = getLocalPoint(target, transform.originX, transform.originY, x, y);
-    transform.target.set('width', Math.abs(localPoint.x));
+    var target = transform.target, localPoint = getLocalPoint(target, transform.originX, transform.originY, x, y),
+        strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+        newWidth = Math.abs(localPoint.x / target.scaleX) - strokePadding;
+    target.set('width', Math.max(newWidth, 0));
     return true;
   }
 

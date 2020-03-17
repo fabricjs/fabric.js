@@ -1,7 +1,8 @@
 # Changelog
 
 ## [4.0.0-beta.8]
-
+- fix(controls): Handle textbox width change properly [#6219](https://github.com/fabricjs/fabric.js/pull/6219)
+- fix(controls): correctly handling the uniform scaling option [#6218](https://github.com/fabricjs/fabric.js/pull/6218)
 - fix(fabric.Object): fix activeSelection toDataURL canvas restore [#6216](https://github.com/fabricjs/fabric.js/pull/6216)
 - fix(svg_parsers): Add support for empty <style/> tags [#6169](https://github.com/fabricjs/fabric.js/pull/6169)
 - fix(SVG_export, text): Check font faces markup for objects within groups [#6195](https://github.com/fabricjs/fabric.js/pull/6195)
