@@ -21,19 +21,41 @@
     target.fire(eventName, options);
   }
 
-  function scaleCursorStyleHandler(eventData, corner, fabricObject) {
-    var canvas = fabricObject.canvas, uniScaleKey = canvas.uniScaleKey, notAllowed = 'not-allowed',
-        uniformIsToggled = eventData[uniScaleKey],
-        scaleIsProportional = (canvas.uniformScaling && !uniformIsToggled) ||
-        (!canvas.uniformScaling && uniformIsToggled);
+  function scaleIsProportional(eventData, fabricObject) {
+    var canvas = fabricObject.canvas, uniScaleKey = canvas.uniScaleKey,
+        uniformIsToggled = eventData[uniScaleKey];
+    return (canvas.uniformScaling && !uniformIsToggled) ||
+    (!canvas.uniformScaling && uniformIsToggled);
+  }
 
-    if (fabricObject.lockScalingX && fabricObject.lockScalingY) {
-      return notAllowed;
+  function scalingIsForbidden(fabricObject, by, scaleProportionally) {
+    var lockX = fabricObject.lockScalingX, lockY = fabricObject.lockScalingY;
+    if (lockX && lockY) {
+      return true;
     }
-    if (corner.x !== 0 && fabricObject.lockScalingX && scaleIsProportional) {
-      return notAllowed;
+    if (!by && (lockX || lockY) && scaleProportionally) {
+      return true;
     }
-    if (corner.y !== 0 && fabricObject.lockScalingY && scaleIsProportional) {
+    if (lockX && by === 'x') {
+      return true;
+    }
+    if (lockY && by === 'y') {
+      return true;
+    }
+    return false;
+  }
+
+  function scaleCursorStyleHandler(eventData, corner, fabricObject) {
+    var notAllowed = 'not-allowed',
+        scaleProportionally = scaleIsProportional(eventData, fabricObject),
+        by = '';
+    if (corner.x !== 0 && corner.y === 0) {
+      by = 'x';
+    }
+    else if (corner.x === 0 && corner.y !== 0) {
+      by = 'y';
+    }
+    if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
       return notAllowed;
     }
     var n = findCornerQuadrant(fabricObject, corner);
@@ -341,15 +363,12 @@
   function scaleObject(eventData, transform, x, y, options) {
     options = options || {};
     var target = transform.target,
-        uniScaleKey = target.canvas.uniScaleKey, isUniScalePressed = eventData[uniScaleKey],
         lockScalingX = target.lockScalingX, lockScalingY = target.lockScalingY,
-        by = options.by, newPoint, scaleX, scaleY, dim;
+        by = options.by, newPoint, scaleX, scaleY, dim,
+        scaleProportionally = scaleIsProportional(eventData, target),
+        forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
 
-    if (!isUniScalePressed && (lockScalingX || lockScalingY)) {
-      return false;
-    }
-
-    if (isUniScalePressed && lockScalingX && lockScalingY) {
+    if (forbidScaling) {
       return false;
     }
 
@@ -357,7 +376,7 @@
     newPoint = getLocalPoint(target, transform.originX, transform.originY, x, y);
 
     // missing detection of flip and logic to switch the origin
-    if (!isUniScalePressed && !by) {
+    if (scaleProportionally && !by) {
       // uniform scaling
       var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
           original = transform.original,
@@ -379,10 +398,11 @@
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
     if (!by) {
-      target.set('scaleX', scaleX);
-      target.set('scaleY', scaleY);
+      !lockScalingX && target.set('scaleX', scaleX);
+      !lockScalingY && target.set('scaleY', scaleY);
     }
     else {
+      // forbidden cases already handled on top here.
       by === 'x' && target.set('scaleX', scaleX);
       by === 'y' && target.set('scaleY', scaleY);
     }
