@@ -1,6 +1,7 @@
 # Changelog
 
 ## [4.0.0-beta.8]
+- fix(IText) Stop composition events on mousedown to enable cursor position on android keyboards [#6224](https://github.com/fabricjs/fabric.js/pull/6224)
 - fix(controls): Handle textbox width change properly [#6219](https://github.com/fabricjs/fabric.js/pull/6219)
 - fix(controls): correctly handling the uniform scaling option [#6218](https://github.com/fabricjs/fabric.js/pull/6218)
 - fix(fabric.Object): fix activeSelection toDataURL canvas restore [#6216](https://github.com/fabricjs/fabric.js/pull/6216)
