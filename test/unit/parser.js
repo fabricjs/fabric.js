@@ -106,6 +106,21 @@
       { left: 100, top: 200, width: 600, height: 600 });
   });
 
+  QUnit.test('parseAttributeFontValueStartWithFontSize', function(assert) {
+    var element = fabric.document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
+    element.setAttribute('style', 'font: 15px arial, sans-serif;');
+    var styleObj = fabric.parseAttributes(element, ['font']);
+    var expectedObject = {
+      font: '15px arial, sans-serif',
+      fontSize: 15,
+      fontFamily: 'arial, sans-serif'
+    };
+    assert.deepEqual(styleObj, expectedObject);
+  });
+
   QUnit.test('parseElements', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.parseElements === 'function');
