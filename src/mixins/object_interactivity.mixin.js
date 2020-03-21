@@ -3,7 +3,6 @@
   var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
-
     /**
      * Determines which corner has been clicked
      * @private
@@ -287,6 +286,10 @@
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
+      var objectVisibility = this._controlsVisibility;
+      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+        return objectVisibility[controlKey];
+      }
       return this.controls[controlKey] && this.controls[controlKey].getVisibility(this);
     },
 
@@ -298,7 +301,10 @@
      * @chainable
      */
     setControlVisible: function(controlKey, visible) {
-      this.controls[controlKey].setVisibility(visible, this, controlKey);
+      if (!this._controlsVisibility) {
+        this._controlsVisibility = {};
+      }
+      this._controlsVisibility[controlKey] = visible;
       return this;
     },
 
