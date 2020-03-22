@@ -176,9 +176,14 @@
     /**
      * Returns controls visibility
      * @param {fabric.Object} object on which the control is displayed
+     * @param {String} controlKey key where the control is memorized on the
      * @return {Boolean}
      */
-    getVisibility: function(/*fabricObject */) {
+    getVisibility: function(fabricObject, controlKey) {
+      var objectVisibility = fabricObject._controlsVisibility;
+      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+        return objectVisibility[controlKey];
+      }
       return this.visible;
     },
 
@@ -235,9 +240,6 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!this.getVisibility(fabricObject)) {
-        return;
-      }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
           renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);

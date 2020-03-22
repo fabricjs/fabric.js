@@ -32,6 +32,23 @@
     assert.equal(cObj.isControlVisible('tl'), true);
   });
 
+  QUnit.test('setControlVisible is per object', function(assert) {
+    assert.ok(fabric.Object);
+
+    var cObj = new fabric.Object({ });
+    var cObj2 = new fabric.Object({ });
+
+    cObj.setControlVisible('tl', false);
+    assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
+    assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
+    cObj.controls.tl.setVisibility(false);
+    assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
+    cObj.setControlVisible('tl', true);
+    assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precendence');
+    // restore original visibility
+    cObj.controls.tl.setVisibility(true);
+  });
+
   QUnit.test('setControlsVisibility', function(assert) {
     assert.ok(fabric.Object);
 

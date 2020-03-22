@@ -3,7 +3,6 @@
   var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
-
     /**
      * Determines which corner has been clicked
      * @private
@@ -193,7 +192,7 @@
         this.forEachControl(function(control, key, fabricObject) {
           // in this moment, the ctx is centered on the object.
           // width and height of the above function are the size of the bbox.
-          if (control.withConnection && control.getVisibility(fabricObject)) {
+          if (control.withConnection && control.getVisibility(fabricObject, key)) {
             // reset movement for each control
             shouldStroke = true;
             ctx.moveTo(control.x * width, control.y * height);
@@ -270,12 +269,13 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
       this.setCoords(false);
-      for (var c in this.controls) {
-        this.controls[c].render(ctx,
-          this.oCoords[c].x,
-          this.oCoords[c].y, styleOverride, this);
-      }
-
+      this.forEachControl(function(control, key, fabricObject) {
+        if (control.getVisibility(fabricObject, key)) {
+          control.render(ctx,
+            fabricObject.oCoords[key].x,
+            fabricObject.oCoords[key].y, styleOverride, fabricObject);
+        }
+      });
       ctx.restore();
 
       return this;
@@ -287,7 +287,7 @@
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
-      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this);
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
     },
 
     /**
@@ -298,7 +298,10 @@
      * @chainable
      */
     setControlVisible: function(controlKey, visible) {
-      this.controls[controlKey].setVisibility(visible, this, controlKey);
+      if (!this._controlsVisibility) {
+        this._controlsVisibility = {};
+      }
+      this._controlsVisibility[controlKey] = visible;
       return this;
     },
 
@@ -326,18 +329,6 @@
       return this;
     },
 
-    /**
-     * Returns the instance of the control visibility set for this object.
-     * @private
-     * @returns {Object}
-     */
-    _getControlsVisibility: function() {
-      var visibility = {};
-      this.forEachControl(function(control, key, fabricObject) {
-        visibility[key] = control.getVisibility(fabricObject);
-      });
-      return visibility;
-    },
 
     /**
      * This callback function is called every time _discardActiveObject or _setActiveObject
