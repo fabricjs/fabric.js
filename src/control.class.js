@@ -3,7 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      degreesToRadians = fabric.util.degreesToRadians,
+      util = fabric.util,
       renderCircleControl = fabric.controlRenderers.renderCircleControl,
       renderSquareControl = fabric.controlRenderers.renderSquareControl;
 
@@ -198,29 +198,28 @@
 
 
     positionHandler: function(dim, finalMatrix, fabricObject /* currentControl */ ) {
-      var padding = fabricObject.padding, angle = degreesToRadians(fabricObject.angle),
-          cos = fabric.util.cos(angle), sin = fabric.util.sin(angle), offsetX = this.offsetX,
+      var padding = fabricObject.padding, angle = util.degreesToRadians(fabricObject.angle),
+          cos = util.cos(angle), sin = util.sin(angle), offsetX = this.offsetX,
           offsetY = this.offsetY, cosP = cos * padding, sinP = sin * padding, cosY = cos * offsetY,
           cosX = cos * offsetX, sinY = sin * offsetY, sinX = sin * offsetX,
-          point = fabric.util.transformPoint({
-            x: (this.x * dim.x),
-            y: (this.y * dim.y) }, finalMatrix);
+          point = util.transformPoint({
+            x: this.x * dim.x,
+            y: this.y * dim.y }, finalMatrix);
       if (this.x > 0) {
-        point.y += sinP + sinX + cosY;
         point.x += cosP + cosX - sinY;
+        point.y += sinP + sinX + cosY;
+      }
+      if (this.x < 0) {
+        point.x += -cosP + cosX - sinY;
+        point.y += -sinP + sinX + cosY;
       }
       if (this.y > 0) {
-        point.y += cosP + sinX + cosY;
         point.x += -sinP + cosX - sinY;
-      }
-      // to be verified
-      if (this.x < 0) {
-        point.y += -sinP - sinX - cosY;
-        point.x += -cosP - cosX + sinY;
+        point.y += cosP + sinX + cosY;
       }
       if (this.y < 0) {
-        point.y += -cosP - sinX + cosY;
         point.x += sinP + cosX - sinY;
+        point.y += -cosP - sinX + cosY;
       }
       return point;
     },

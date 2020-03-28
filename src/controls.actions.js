@@ -122,8 +122,10 @@
     };
   }
 
-  function getLocalPoint(target, originX, originY, x, y) {
-    var zoom = target.canvas.getZoom(),
+  function getLocalPoint(transform, originX, originY, x, y) {
+    var target = transform.target,
+        control = target.controls[transform.corner],
+        zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
         localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
@@ -138,6 +140,8 @@
     if (localPoint.y <= padding) {
       localPoint.y += padding;
     }
+    localPoint.x -= control.offsetX;
+    localPoint.y -= control.offsetY;
     return localPoint;
   }
 
@@ -157,7 +161,7 @@
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
         dimNoSkew = target._getTransformedDimensions(0, target.skewY),
-        localPoint = getLocalPoint(target, transform.originX, transform.originY, x, y),
+        localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
         // this makes the skew growth to localPoint * 2 - dimNoSkew.
@@ -168,7 +172,7 @@
       newSkew = 0;
     }
     else {
-      newSkew = fabric.util.radiansToDegrees(
+      newSkew = radiansToDegrees(
         Math.atan2((totalSkewSize / target.scaleX), (dimNoSkew.y / target.scaleY))
       );
       // now we have to find the sign of the skew.
@@ -197,7 +201,7 @@
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
         dimNoSkew = target._getTransformedDimensions(target.skewX, 0),
-        localPoint = getLocalPoint(target, transform.originX, transform.originY, x, y),
+        localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
         // this makes the skew growth to localPoint * 2 - dimNoSkew.
@@ -208,7 +212,7 @@
       newSkew = 0;
     }
     else {
-      newSkew = fabric.util.radiansToDegrees(
+      newSkew = radiansToDegrees(
         Math.atan2((totalSkewSize / target.scaleY), (dimNoSkew.x / target.scaleX))
       );
       // now we have to find the sign of the skew.
@@ -246,7 +250,7 @@
       return false;
     }
     if (currentSkew === 0) {
-      var localPointFromCenter = getLocalPoint(target, CENTER, CENTER, x, y);
+      var localPointFromCenter = getLocalPoint(transform, CENTER, CENTER, x, y);
       if (localPointFromCenter.x > 0) {
         // we are pulling right, anchor left;
         originX = LEFT;
@@ -288,7 +292,7 @@
       return false;
     }
     if (currentSkew === 0) {
-      var localPointFromCenter = getLocalPoint(target, CENTER, CENTER, x, y);
+      var localPointFromCenter = getLocalPoint(transform, CENTER, CENTER, x, y);
       if (localPointFromCenter.y > 0) {
         // we are pulling down, anchor up;
         originY = TOP;
@@ -373,7 +377,7 @@
     }
 
     dim = target._getTransformedDimensions();
-    newPoint = getLocalPoint(target, transform.originX, transform.originY, x, y);
+    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
 
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
@@ -443,7 +447,7 @@
 
   // currently unusued, needed for the textbox.
   function changeWidth(eventData, transform, x, y) {
-    var target = transform.target, localPoint = getLocalPoint(target, transform.originX, transform.originY, x, y),
+    var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         newWidth = Math.abs(localPoint.x / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
