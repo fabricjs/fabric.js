@@ -11,6 +11,7 @@
         originX: 'left',
         orginY: 'top',
         target: target,
+        corner: 'mr',
       };
     });
     hooks.afterEach(function() {
