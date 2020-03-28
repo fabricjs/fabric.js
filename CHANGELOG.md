@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.0.0-beta.9]
+- fix(controls) show offsetX/offsetY correctly. [#6236](https://github.com/fabricjs/fabric.js/pull/6236)
+- fix(controls) ISSUE-6201 Restore per object setting of controls visibility [#6226](https://github.com/fabricjs/fabric.js/pull/6226)
+- fix(svg_parser): ISSUE-6220 Allow to parse font declaration that start with a number [#6222](https://github.com/fabricjs/fabric.js/pull/6222)
+
 ## [4.0.0-beta.8]
 - fix(IText) Stop composition events on mousedown to enable cursor position on android keyboards [#6224](https://github.com/fabricjs/fabric.js/pull/6224)
 - fix(controls): Handle textbox width change properly [#6219](https://github.com/fabricjs/fabric.js/pull/6219)
