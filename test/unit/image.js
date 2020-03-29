@@ -29,6 +29,8 @@
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
+  var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
+
   var REFERENCE_IMG_OBJECT = {
     version:                  fabric.version,
     type:                     'image',
@@ -474,6 +476,16 @@
     fabric.Image.fromURL(IMG_SRC, function(instance) {
       assert.ok(instance instanceof fabric.Image);
       assert.deepEqual(REFERENCE_IMG_OBJECT, instance.toObject());
+      done();
+    });
+  });
+
+  QUnit.test('fromURL error', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Image.fromURL === 'function');
+    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance, isError) {
+      assert.ok(instance instanceof fabric.Image);
+      assert.equal(isError, true);
       done();
     });
   });

@@ -345,7 +345,7 @@
 
       /** @ignore */
       var onLoadCallback = function () {
-        callback && callback.call(context, img);
+        callback && callback.call(context, img, false);
         img = img.onload = img.onerror = null;
       };
 

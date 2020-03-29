@@ -380,10 +380,10 @@
      * @chainable
      */
     setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img) {
+      fabric.util.loadImage(src, function(img, isError) {
         this.setElement(img, options);
         this._setWidthHeight();
-        callback && callback(this);
+        callback && callback(this, isError);
       }, this, options && options.crossOrigin);
       return this;
     },
@@ -687,9 +687,9 @@
    */
   fabric.Image.fromObject = function(_object, callback) {
     var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, error) {
-      if (error) {
-        callback && callback(null, error);
+    fabric.util.loadImage(object.src, function(img, isError) {
+      if (isError) {
+        callback && callback(null, true);
         return;
       }
       fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
@@ -699,7 +699,7 @@
           fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
             object.clipPath = enlivedProps[0];
             var image = new fabric.Image(img, object);
-            callback(image);
+            callback(image, false);
           });
         });
       });
@@ -710,12 +710,12 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
+   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occured or not.
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
-    fabric.util.loadImage(url, function(img) {
-      callback && callback(new fabric.Image(img, imgOptions));
+    fabric.util.loadImage(url, function(img, isError) {
+      callback && callback(new fabric.Image(img, imgOptions), isError);
     }, null, imgOptions && imgOptions.crossOrigin);
   };
 
