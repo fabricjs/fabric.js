@@ -75,9 +75,9 @@
         // img src string
         var _this = this;
         this.source = fabric.util.createImage();
-        fabric.util.loadImage(options.source, function(img) {
+        fabric.util.loadImage(options.source, function(img, isError) {
           _this.source = img;
-          callback && callback(_this);
+          callback && callback(_this, isError);
         }, null, this.crossOrigin);
       }
     },

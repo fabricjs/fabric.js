@@ -296,7 +296,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -347,7 +347,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -442,25 +442,25 @@
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
+     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay. The first argument is the created image, the second argument is a flag indicating whether an error occured or not.
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
     __setBgOverlayImage: function(property, image, callback, options) {
       if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img) {
+        fabric.util.loadImage(image, function(img, isError) {
           if (img) {
             var instance = new fabric.Image(img, options);
             this[property] = instance;
             instance.canvas = this;
           }
-          callback && callback(img);
+          callback && callback(img, isError);
         }, this, options && options.crossOrigin);
       }
       else {
         options && image.setOptions(options);
         this[property] = image;
         image && (image.canvas = this);
-        callback && callback(image);
+        callback && callback(image, false);
       }
 
       return this;

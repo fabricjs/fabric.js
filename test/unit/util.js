@@ -440,10 +440,11 @@
       return;
     }
 
-    fabric.util.loadImage(IMG_URL, function(obj) {
+    fabric.util.loadImage(IMG_URL, function(obj, isError) {
       if (obj) {
         var oImg = new fabric.Image(obj);
         assert.ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
+        assert.ok(!isError);
       }
       done();
     });
@@ -473,9 +474,10 @@
       return;
     }
     try {
-      fabric.util.loadImage(IMG_URL, function(img) {
+      fabric.util.loadImage(IMG_URL, function(img, isError) {
         assert.equal(img.src, IMG_URL, 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
+        assert.ok(!isError);
         done();
       }, null, 'anonymous');
     }
