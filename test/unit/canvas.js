@@ -674,6 +674,25 @@
     assert.equal(returned, false, 'if onSelect returns true, shouldGroup return false');
   });
 
+  QUnit.test('_shouldGroup if canvas.selection is true or false', function(assert) {
+    var rect = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect.onSelect = function() {
+      return true;
+    };
+    canvas._activeObject = rect2;
+    canvas.selectable = false;
+
+    var event = {};
+    var returned = canvas._shouldGroup(event, rect);
+    assert.equal(returned, null, '_shouldGroup return null if canvas.selectable is false');
+    canvas.selectable = true;
+
+    var event2 = {};
+    var returned2 = canvas._shouldGroup(event2, rect);
+    assert.equal(returned2, true, '_shouldGroup return true if canvas.selectable is true');
+  });
+
   QUnit.test('_shouldGroup return true if onSelect return false and selectionKey is true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
