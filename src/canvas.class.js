@@ -131,6 +131,13 @@
      * @default
      */
     interactive:            true,
+    
+    /**
+     * Indicates if canvas objects can be selected
+     * @type Boolean
+     * @default
+     */
+    selectable:             true,
 
     /**
      * Indicates whether group selection should be enabled
