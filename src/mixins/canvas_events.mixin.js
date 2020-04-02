@@ -702,7 +702,7 @@
         target = this._activeObject;
       }
 
-      if (this.selection && (!target ||
+      if (this.selection && this.selectable && (!target ||
         (!target.selectable && !target.isEditing && target !== this._activeObject))) {
         this._groupSelector = {
           ex: pointer.x,
@@ -712,7 +712,7 @@
         };
       }
 
-      if (target) {
+      if (this.selectable && target) {
         var alreadySelected = target === this._activeObject;
         if (target.selectable) {
           this.setActiveObject(target, e);
