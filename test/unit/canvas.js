@@ -674,7 +674,6 @@
     assert.equal(returned, false, 'if onSelect returns true, shouldGroup return false');
   });
 
-
   QUnit.test('_shouldGroup return true if onSelect return false and selectionKey is true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
@@ -689,7 +688,7 @@
     assert.equal(returned, true, 'if onSelect returns false, shouldGroup return true');
   });
 
-  QUnit.test('_shouldGroup return null if selectionKey is false', function(assert) {
+  QUnit.test('_shouldGroup return false if selectionKey is false', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
