@@ -726,7 +726,7 @@
     var event = {};
     event[canvas.selectionKey] = true;
     var returned = canvas._shouldGroup(event, rect);
-    assert.equal(returned, false, '_shouldGroup return null if canvas.selectable is false');
+    assert.equal(returned, false, '_shouldGroup return false if canvas.selectable is false');
     canvas.selectable = true;
   });
 
