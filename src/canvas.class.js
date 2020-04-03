@@ -131,7 +131,7 @@
      * @default
      */
     interactive:            true,
-    
+
     /**
      * Indicates if canvas objects can be selected
      * @type Boolean
