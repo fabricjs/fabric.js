@@ -170,10 +170,16 @@
     canvas.__onMouseDown(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'a new groupSelector is created');
     canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
     canvas.selectable = false;
     canvas.__onMouseDown(e);
     assert.deepEqual(canvas._groupSelector, null, 'while canvas is not selectable');
+    canvas.__onMouseUp(e);
     canvas.selectable = true;
+    canvas.__onMouseDown(e);
+    assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'while canvas is selectable');
+    canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
   });
 
   QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
