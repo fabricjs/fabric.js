@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.0.0-beta.10]
+- fix(controls): fix missing target in canvas event options [#6251](https://github.com/fabricjs/fabric.js/pull/6251)
+- fix(controls): correct position for offsets [#6250](https://github.com/fabricjs/fabric.js/pull/6250)
+- feat(utils): Added more error flag passing throughout functions [#6238](https://github.com/fabricjs/fabric.js/pull/6238)
+
 ## [4.0.0-beta.9]
 - fix(controls) show offsetX/offsetY correctly. [#6236](https://github.com/fabricjs/fabric.js/pull/6236)
 - fix(controls) ISSUE-6201 Restore per object setting of controls visibility [#6226](https://github.com/fabricjs/fabric.js/pull/6226)
