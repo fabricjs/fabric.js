@@ -197,30 +197,10 @@
     },
 
 
-    positionHandler: function(dim, finalMatrix, fabricObject /* currentControl */ ) {
-      var padding = fabricObject.padding, angle = util.degreesToRadians(fabricObject.angle),
-          cos = util.cos(angle), sin = util.sin(angle), offsetX = this.offsetX,
-          offsetY = this.offsetY, cosP = cos * padding, sinP = sin * padding, cosY = cos * offsetY,
-          cosX = cos * offsetX, sinY = sin * offsetY, sinX = sin * offsetX,
-          point = util.transformPoint({
-            x: this.x * dim.x,
-            y: this.y * dim.y }, finalMatrix);
-      if (this.x > 0) {
-        point.x += cosP + cosX - sinY;
-        point.y += sinP + sinX + cosY;
-      }
-      if (this.x < 0) {
-        point.x += -cosP + cosX - sinY;
-        point.y += -sinP + sinX + cosY;
-      }
-      if (this.y > 0) {
-        point.x += -sinP + cosX - sinY;
-        point.y += cosP + sinX + cosY;
-      }
-      if (this.y < 0) {
-        point.x += sinP + cosX - sinY;
-        point.y += -cosP - sinX + cosY;
-      }
+    positionHandler: function(dim, finalMatrix, /* fabricObject, currentControl */) {
+      var point = util.transformPoint({
+        x: this.x * dim.x + this.offsetX,
+        y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
     },
 
