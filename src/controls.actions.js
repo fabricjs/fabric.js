@@ -16,8 +16,9 @@
 
   function fireEvent(eventName, options) {
     var target = options.transform.target,
-        canvas = target.canvas;
-    canvas && canvas.fire('object:' + eventName, options);
+        canvas = target.canvas,
+        canasOptions = Object.assign({}, options, { target: target });
+    canvas && canvas.fire('object:' + eventName, canasOptions);
     target.fire(eventName, options);
   }
 
