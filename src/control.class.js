@@ -197,7 +197,7 @@
     },
 
 
-    positionHandler: function(dim, finalMatrix, /* fabricObject, currentControl */) {
+    positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
       var point = util.transformPoint({
         x: this.x * dim.x + this.offsetX,
         y: this.y * dim.y + this.offsetY }, finalMatrix);
