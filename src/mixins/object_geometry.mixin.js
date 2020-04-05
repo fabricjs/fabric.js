@@ -9,11 +9,12 @@
     ];
   }
 
-  var degreesToRadians = fabric.util.degreesToRadians,
-      multiplyMatrices = fabric.util.multiplyTransformMatrices,
-      transformPoint = fabric.util.transformPoint;
+  var util = fabric.util,
+      degreesToRadians = util.degreesToRadians,
+      multiplyMatrices = util.multiplyTransformMatrices,
+      transformPoint = util.transformPoint;
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+  util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Describe object's corner position in canvas element coordinates.
@@ -322,7 +323,7 @@
      */
     getBoundingRect: function(absolute, calculate) {
       var coords = this.getCoords(absolute, calculate);
-      return fabric.util.makeBoundingBoxFromPoints(coords);
+      return util.makeBoundingBoxFromPoints(coords);
     },
 
     /**
@@ -419,7 +420,7 @@
       if (!this.aCoords) { this.aCoords = this.calcACoords(); }
       var vpt = this.getViewportTransform();
       var padding = this.padding, angle = degreesToRadians(this.angle),
-          cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
+          cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
           cosPMinusSinP = cosP - sinP, aCoords = this.aCoords;
 
@@ -452,15 +453,16 @@
     },
 
     calcOCoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
-          startMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
+      var matrix = this.calcTransformMatrix(),
           vpt = this.getViewportTransform(),
-          finalMatrix = multiplyMatrices(vpt, startMatrix),
-          dim = this._getTransformedDimensions(),
+          options = util.qrDecompose(multiplyMatrices(vpt, matrix));
+      options.scaleX = 1;
+      options.scaleY = 1;
+      var finalMatrix = util.composeMatrix(options),
+          dim = this._calculateCurrentDimensions(),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
-        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
+        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject, control);
       });
 
       // debug code
@@ -517,7 +519,7 @@
      * @return {Array} rotation matrix for the object
      */
     _calcRotateMatrix: function() {
-      return fabric.util.calcRotateMatrix(this);
+      return util.calcRotateMatrix(this);
     },
 
     /**
@@ -576,7 +578,7 @@
       this.translateX = tMatrix[4];
       this.translateY = tMatrix[5];
       cache.key = key;
-      cache.value = fabric.util.composeMatrix(this);
+      cache.value = util.composeMatrix(this);
       return cache.value;
     },
 
@@ -589,7 +591,7 @@
      * @return {Object} .y height dimension
      */
     _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
-      return fabric.util.calcDimensionsMatrix({
+      return util.calcDimensionsMatrix({
         skewX: skewX,
         skewY: skewY,
         scaleX: this.scaleX * (flipping && this.flipX ? -1 : 1),
@@ -660,13 +662,13 @@
               x: dimX,
               y: dimY
             }],
-          transformMatrix = fabric.util.calcDimensionsMatrix({
+          transformMatrix = util.calcDimensionsMatrix({
             scaleX: this.scaleX,
             scaleY: this.scaleY,
             skewX: skewX,
             skewY: skewY,
           }),
-          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+          bbox = util.makeBoundingBoxFromPoints(points, transformMatrix);
       return this._finalizeDimensions(bbox.width, bbox.height);
     },
 
@@ -692,7 +694,6 @@
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
           p = transformPoint(dim, vpt, true);
-
       return p.scalarAdd(2 * this.padding);
     },
   });
