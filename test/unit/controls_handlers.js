@@ -46,5 +46,39 @@
       fabric.controlHandlers.changeWidth(eventData, transform, 200, 300);
       assert.equal(Math.floor(transform.target.width), 51);
     });
+    QUnit.test('scalingXOrSkewingY changes scaleX', function(assert) {
+      transform.target.scaleX = 1;
+      transform.target.strokeWidth = 0;
+      fabric.controlHandlers.scalingXOrSkewingY(eventData, transform, 200, 300);
+      assert.equal(Math.round(transform.target.scaleX), 2);
+    });
+    QUnit.test('scalingXOrSkewingY changes skewY if shift pressed', function(assert) {
+      transform.target.scaleX = 1;
+      transform.target.skewY = 0;
+      transform.target.strokeWidth = 0;
+      eventData.shiftKey = true;
+      fabric.controlHandlers.scalingXOrSkewingY(eventData, transform, 200, 300);
+      assert.equal(Math.round(transform.target.skewY), 79);
+      assert.equal(Math.round(transform.target.scaleX), 1);
+    });
+    QUnit.test('scalingXOrSkewingY will fire events on canvas and target', function(assert) {
+      var done = assert.async();
+      transform.target.scaleX = 1;
+      transform.target.canvas.on('object:scaling', function(options) {
+        assert.equal(options.target, transform.target);
+      });
+      transform.target.on('scaling', function(options) {
+        assert.deepEqual(options, {
+          e: eventData,
+          transform: transform,
+          pointer: {
+            x: 200,
+            y: 300,
+          },
+        });
+        done();
+      });
+      fabric.controlHandlers.scalingXOrSkewingY(eventData, transform, 200, 300);
+    });
   });
 })();
