@@ -271,7 +271,19 @@
       this._clearTextArea(ctx);
       skipRestore || ctx.restore();
     },
-
+    transform: function(ctx) {
+      var m;
+      // the contextTop layer will not be transform in group render function. so we need
+      // manual apply the group transform for render cursor or selection which used the contextTop
+      if ((this.group && !this.group._transformDone) ||
+          (this.group && this.canvas && ctx === this.canvas.contextTop)) {
+        m = this.calcTransformMatrix();
+      }
+      else {
+        m = this.calcOwnMatrix();
+      }
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    },
     /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
