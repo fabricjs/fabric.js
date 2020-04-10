@@ -680,7 +680,7 @@
             ey: pointer.y,
             lastX: pointer.x,
             lastY: pointer.y,
-            // unsure they are usefull anymore.
+            // unsure they are useful anymore.
             // left: target.left,
             // top: target.top,
             theta: degreesToRadians(target.angle),
