@@ -10069,7 +10069,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        // unsure they are usefull anymore.
+        // unsure they are useful anymore.
         // left: target.left,
         // top: target.top,
         theta: degreesToRadians(target.angle),
@@ -26447,7 +26447,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
      * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. usefull to manage styles.
+     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
      */
     get2DCursorLocation: function(selectionStart, skipWrapping) {
       if (typeof selectionStart === 'undefined') {
