@@ -1,6 +1,6 @@
 (function() {
 
-  function getCoords(coords) {
+  function arrayFromCoords(coords) {
     return [
       new fabric.Point(coords.tl.x, coords.tl.y),
       new fabric.Point(coords.tr.x, coords.tr.y),
@@ -69,9 +69,10 @@
     /**
      * return correct set of coordinates for intersection
      * this will return either aCoords or lineCoords.
-     * lineCoords is the 4 corner version of Occords.
+     * @param {Boolean} absolute will return aCoords if true or lineCoords
+     * @return {Object} {tl, tr, br, bl} points
      */
-    getCoords: function(absolute, calculate) {
+    _getCoords: function(absolute, calculate) {
       if (calculate) {
         return (absolute ? this.calcACoords() : this.calcLineCoords());
       }
@@ -79,6 +80,16 @@
         this.setCoords(true);
       }
       return (absolute ? this.aCoords : this.lineCoords);
+    },
+
+    /**
+     * return correct set of coordinates for intersection
+     * this will return either aCoords or lineCoords.
+     * The coords are returned in an array.
+     * @return {Array} [tl, tr, br, bl] of points
+     */
+    getCoords: function(absolute, calculate) {
+      return arrayFromCoords(this._getCoords(absolute, calculate));
     },
 
     /**
@@ -164,7 +175,7 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point, lines, absolute, calculate) {
-      var coords = calculate ? this.calcLineCoords(absolute) : absolute ? this.aCoords : this.lineCoords,
+      var coords = this._getCoords(absolute, calculate),
           lines = lines || this._getImageLines(coords),
           xPoints = this._findCrossPoints(point, lines);
       // if xPoints is odd then point is inside the object
@@ -415,8 +426,10 @@
 
     /**
      * Calculates and returns the .coords of an object.
+     * unused by the library, only for the end dev.
      * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
+     * @deprecated
      */
     calcCoords: function(absolute) {
       // this is a compatibility function to avoid removing calcCoords now.
@@ -427,24 +440,18 @@
     },
 
     calcLineCoords: function() {
-      if (!this.aCoords) { this.aCoords = this.calcACoords(); }
-      var vpt = this.getViewportTransform();
-      var padding = this.padding, angle = degreesToRadians(this.angle),
+      var vpt = this.getViewportTransform(),
+          padding = this.padding, angle = degreesToRadians(this.angle),
           cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
-          cosPMinusSinP = cosP - sinP, aCoords = this.aCoords;
+          cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
 
       var lineCoords = {
-        tl: { x: aCoords.tl.x, y: aCoords.tl.y },
-        tr: { x: aCoords.tr.x, y: aCoords.tr.y },
-        bl: { x: aCoords.bl.x, y: aCoords.bl.y },
-        br: { x: aCoords.br.x, y: aCoords.br.y },
+        tl: transformPoint(aCoords.tl, vpt),
+        tr: transformPoint(aCoords.tr, vpt),
+        bl: transformPoint(aCoords.bl, vpt),
+        br: transformPoint(aCoords.br, vpt),
       };
-
-      lineCoords.tl = transformPoint(aCoords.tl, vpt);
-      lineCoords.tr = transformPoint(aCoords.tr, vpt);
-      lineCoords.bl = transformPoint(aCoords.bl, vpt);
-      lineCoords.br = transformPoint(aCoords.br, vpt);
 
       if (padding) {
         lineCoords.tl.x -= cosPMinusSinP;
@@ -519,7 +526,7 @@
         return this;
       }
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this.oCoords = this.calcOCoords()
+      this.oCoords = this.calcOCoords();
       this._setCornerCoords && this._setCornerCoords();
       return this;
     },
