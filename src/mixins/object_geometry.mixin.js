@@ -465,7 +465,7 @@
           options = util.qrDecompose(multiplyMatrices(vpt, matrix));
       options.scaleX = 1;
       options.scaleY = 1;
-      // options.skewX = 0;
+      options.skewX = 0;
       var finalMatrix = util.composeMatrix(options),
           dim = this._calculateCurrentDimensions(),
           coords = {};
