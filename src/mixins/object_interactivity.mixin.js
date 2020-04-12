@@ -268,7 +268,7 @@
         ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
-      this.setCoords(false);
+      this.setCoords();
       this.forEachControl(function(control, key, fabricObject) {
         if (control.getVisibility(fabricObject, key)) {
           control.render(ctx,

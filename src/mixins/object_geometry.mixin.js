@@ -18,14 +18,12 @@
 
     /**
      * Describe object's corner position in canvas element coordinates.
-     * properties are tl,mt,tr,ml,mr,bl,mb,br,mtr for the main controls.
+     * properties are depending on control keys and padding the main controls.
      * each property is an object with x, y and corner.
      * The `corner` property contains in a similar manner the 4 points of the
      * interactive area of the corner.
-     * The coordinates depends from this properties: width, height, scaleX, scaleY
-     * skewX, skewY, angle, strokeWidth, viewportTransform, top, left, padding.
-     * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords;
+     * The coordinates depends from the controls positionHandler and are used
+     * to draw and locate controls
      * @memberOf fabric.Object.prototype
      */
     oCoords: null,
@@ -45,6 +43,14 @@
     aCoords: null,
 
     /**
+     * Describe object's corner position in canvas element coordinates.
+     * includes padding. Used of object detection.
+     * set and refreshed with setCoords and calcCoords.
+     * @memberOf fabric.Object.prototype
+     */
+    lineCoords: null,
+
+    /**
      * storage for object transform matrix
      */
     ownMatrixCache: null,
@@ -62,20 +68,17 @@
 
     /**
      * return correct set of coordinates for intersection
-     * this will return either aCoords or lineCoors.
+     * this will return either aCoords or lineCoords.
      * lineCoords is the 4 corner version of Occords.
      */
     getCoords: function(absolute, calculate) {
-      if (!this.oCoords) {
-        this.setCoords();
+      if (calculate) {
+        return (absolute ? this.calcACoords() : this.calcLineCoords());
       }
-      var coords = absolute ? this.aCoords : this.lineCoords;
-      return getCoords(
-        calculate ?
-          (absolute ? this.calcACoords() : this.calcLineCoords())
-          :
-          coords
-      );
+      if (!this.aCoords || !this.lineCoords) {
+        this.setCoords(true);
+      }
+      return (absolute ? this.aCoords : this.lineCoords);
     },
 
     /**
@@ -423,7 +426,7 @@
       return this.calcOCoords();
     },
 
-    calcLineCoords: function(ignoreZoom) {
+    calcLineCoords: function() {
       if (!this.aCoords) { this.aCoords = this.calcACoords(); }
       var vpt = this.getViewportTransform();
       var padding = this.padding, angle = degreesToRadians(this.angle),
@@ -438,12 +441,10 @@
         br: { x: aCoords.br.x, y: aCoords.br.y },
       };
 
-      if (!ignoreZoom) {
-        lineCoords.tl = transformPoint(aCoords.tl, vpt);
-        lineCoords.tr = transformPoint(aCoords.tr, vpt);
-        lineCoords.bl = transformPoint(aCoords.bl, vpt);
-        lineCoords.br = transformPoint(aCoords.br, vpt);
-      }
+      lineCoords.tl = transformPoint(aCoords.tl, vpt);
+      lineCoords.tr = transformPoint(aCoords.tr, vpt);
+      lineCoords.bl = transformPoint(aCoords.bl, vpt);
+      lineCoords.br = transformPoint(aCoords.br, vpt);
 
       if (padding) {
         lineCoords.tl.x -= cosPMinusSinP;
@@ -503,21 +504,23 @@
 
     /**
      * Sets corner position coordinates based on current angle, width and height.
+     * oCoords are used to find the corners
+     * aCoords are used to quickly find an object on the canvas
+     * lineCoords are used to quickly find object during pointer events.
      * See {@link https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords|When-to-call-setCoords}
-     * @param {Boolean} [ignoreZoom] set oCoords with or without the viewport transform.
-     * @param {Boolean} [skipAbsolute] skip calculation of aCoords, useful in setViewportTransform
+     * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setCoords: function(ignoreZoom, skipAbsolute) {
-      if (!skipAbsolute) {
-        this.aCoords = this.calcACoords();
+    setCoords: function(skipCorners) {
+      this.aCoords = this.calcACoords();
+      this.lineCoords = this.calcLineCoords();
+      if (skipCorners) {
+        return this;
       }
-      this.oCoords = this.calcOCoords();
-      this.lineCoords = this.calcLineCoords(ignoreZoom);
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      ignoreZoom || (this._setCornerCoords && this._setCornerCoords());
-
+      this.oCoords = this.calcOCoords()
+      this._setCornerCoords && this._setCornerCoords();
       return this;
     },
 
