@@ -179,8 +179,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         removedText = this._text.slice(this.selectionStart, this.selectionStart - charDiff);
       }
     }
+    var copiedStyle;
     insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
+      if (insertedText.length) {
+        copiedStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+      }
       if (this.selectionStart !== this.selectionEnd) {
         this.removeStyleFromTo(this.selectionStart, this.selectionEnd);
       }
@@ -197,7 +201,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
       }
       else {
-        this.insertNewStyleBlock(insertedText, this.selectionStart);
+        this.insertNewStyleBlock(insertedText, this.selectionStart, copiedStyle);
       }
     }
     this.updateFromTextArea();
