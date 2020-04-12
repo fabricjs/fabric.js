@@ -39,7 +39,7 @@
      * Those coordinates are useful to understand where an object is. They get updated
      * with oCoords but they do not need to be updated when zoom or panning change.
      * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords(true);
+     * You can calculate them without updating with @method calcACoords();
      * @memberOf fabric.Object.prototype
      */
     aCoords: null,
@@ -62,13 +62,20 @@
 
     /**
      * return correct set of coordinates for intersection
+     * this will return either aCoords or lineCoors.
+     * lineCoords is the 4 corner version of Occords.
      */
     getCoords: function(absolute, calculate) {
       if (!this.oCoords) {
         this.setCoords();
       }
       var coords = absolute ? this.aCoords : this.lineCoords;
-      return getCoords(calculate ? this.calcCoords(absolute) : coords);
+      return getCoords(
+        calculate ?
+          (absolute ? this.calcACoords() : this.calcLineCoords())
+          :
+          coords
+      );
     },
 
     /**
@@ -458,6 +465,7 @@
           options = util.qrDecompose(multiplyMatrices(vpt, matrix));
       options.scaleX = 1;
       options.scaleY = 1;
+      // options.skewX = 0;
       var finalMatrix = util.composeMatrix(options),
           dim = this._calculateCurrentDimensions(),
           coords = {};
@@ -502,7 +510,6 @@
      * @chainable
      */
     setCoords: function(ignoreZoom, skipAbsolute) {
-      // this.oCoords = this.calcCoords(ignoreZoom);
       if (!skipAbsolute) {
         this.aCoords = this.calcACoords();
       }
