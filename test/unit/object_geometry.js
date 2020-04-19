@@ -287,6 +287,20 @@
     assert.equal(cObj.oCoords.br.y, 350);
     assert.equal(cObj.oCoords.mtr.x, 300);
     assert.equal(cObj.oCoords.mtr.y, 210);
+
+    cObj.set('padding', 25);
+    cObj.setCoords();
+    // coords should still correspond to initial one, even after invoking `set`
+    assert.equal(cObj.oCoords.tl.x, 225, 'setCoords tl.x padding');
+    assert.equal(cObj.oCoords.tl.y, 225, 'setCoords tl.y padding');
+    assert.equal(cObj.oCoords.tr.x, 375, 'setCoords tr.x padding');
+    assert.equal(cObj.oCoords.tr.y, 225, 'setCoords tr.y padding');
+    assert.equal(cObj.oCoords.bl.x, 225, 'setCoords bl.x padding');
+    assert.equal(cObj.oCoords.bl.y, 375, 'setCoords bl.y padding');
+    assert.equal(cObj.oCoords.br.x, 375, 'setCoords br.x padding');
+    assert.equal(cObj.oCoords.br.y, 375, 'setCoords br.y padding');
+    assert.equal(cObj.oCoords.mtr.x, 300, 'setCoords mtr.x padding');
+    assert.equal(cObj.oCoords.mtr.y, 185, 'setCoords mtr.y padding');
   });
 
   QUnit.test('setCoords and aCoords', function(assert) {
@@ -296,16 +310,16 @@
     };
     cObj.setCoords();
 
-    assert.equal(cObj.oCoords.tl.x, 300, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.tl.y, 300, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.tr.x, 500, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.tr.y, 300, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.bl.x, 300, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.bl.y, 500, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.br.x, 500, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.br.y, 500, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.mtr.x, 400, 'oCoords are modified by viewportTransform');
-    assert.equal(cObj.oCoords.mtr.y, 260, 'oCoords are modified by viewportTransform');
+    assert.equal(cObj.oCoords.tl.x, 300, 'oCoords are modified by viewportTransform tl.x');
+    assert.equal(cObj.oCoords.tl.y, 300, 'oCoords are modified by viewportTransform tl.y');
+    assert.equal(cObj.oCoords.tr.x, 500, 'oCoords are modified by viewportTransform tr.x');
+    assert.equal(cObj.oCoords.tr.y, 300, 'oCoords are modified by viewportTransform tr.y');
+    assert.equal(cObj.oCoords.bl.x, 300, 'oCoords are modified by viewportTransform bl.x');
+    assert.equal(cObj.oCoords.bl.y, 500, 'oCoords are modified by viewportTransform bl.y');
+    assert.equal(cObj.oCoords.br.x, 500, 'oCoords are modified by viewportTransform br.x');
+    assert.equal(cObj.oCoords.br.y, 500, 'oCoords are modified by viewportTransform br.y');
+    assert.equal(cObj.oCoords.mtr.x, 400, 'oCoords are modified by viewportTransform mtr.x');
+    assert.equal(cObj.oCoords.mtr.y, 260, 'oCoords are modified by viewportTransform mtr.y');
 
     assert.equal(cObj.aCoords.tl.x, 150, 'aCoords do not interfere with viewportTransform');
     assert.equal(cObj.aCoords.tl.y, 150, 'aCoords do not interfere with viewportTransform');
