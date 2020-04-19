@@ -468,17 +468,16 @@
     },
 
     calcOCoords: function() {
-      var matrix = this.calcTransformMatrix(),
+      var rotateMatrix = this._calcRotateMatrix(),
+          translateMatrix = this._calcTranslateMatrix(),
           vpt = this.getViewportTransform(),
-          options = util.qrDecompose(multiplyMatrices(vpt, matrix));
-      options.scaleX = 1;
-      options.scaleY = 1;
-      options.skewX = 0;
-      var finalMatrix = util.composeMatrix(options),
+          startMatrix = multiplyMatrices(vpt, translateMatrix),
+          finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
+          finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
-        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject, control);
+        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
       });
 
       // debug code
@@ -548,33 +547,36 @@
       return [1, 0, 0, 1, center.x, center.y];
     },
 
-    transformMatrixKey: function(skipGroup) {
+    transformMatrixKey: function(skipGroup, skipFlip) {
       var sep = '_', prefix = '';
       if (!skipGroup && this.group) {
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
         sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.originX + sep + this.originY +
-        sep + this.width + sep + this.height + sep + this.strokeWidth + this.flipX + this.flipY;
+        sep + this.width + sep + this.height + sep + this.strokeWidth +
+        (skipFlip ? 'falsefalse' : this.flipX + this.flipY);
     },
 
     /**
      * calculate transform matrix that represents the current transformations from the
      * object's properties.
      * @param {Boolean} [skipGroup] return transform matrix for object not counting parent transformations
+     * @param {Boolean} [skipFlip] return transform matrix for object not the flipping.
+     * There are some situation in which this is useful to avoid the fake rotation.
      * @return {Array} transform matrix for the object
      */
-    calcTransformMatrix: function(skipGroup) {
-      if (skipGroup) {
-        return this.calcOwnMatrix();
+    calcTransformMatrix: function(skipGroup, skipFlip) {
+      var matrix = this.calcOwnMatrix(skipFlip);
+      if (skipGroup || !this.group) {
+        return matrix;
       }
-      var key = this.transformMatrixKey(), cache = this.matrixCache || (this.matrixCache = {});
+      var key = this.transformMatrixKey(skipGroup, skipFlip), cache = this.matrixCache || (this.matrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
-      var matrix = this.calcOwnMatrix();
       if (this.group) {
-        matrix = multiplyMatrices(this.group.calcTransformMatrix(), matrix);
+        matrix = multiplyMatrices(this.group.calcTransformMatrix(false, skipFlip), matrix);
       }
       cache.key = key;
       cache.value = matrix;
@@ -584,18 +586,30 @@
     /**
      * calculate transform matrix that represents the current transformations from the
      * object's properties, this matrix does not include the group transformation
+     * @param {Boolean} [skipFlip] return transform matrix for object not the flipping.
      * @return {Array} transform matrix for the object
      */
-    calcOwnMatrix: function() {
-      var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {});
+    calcOwnMatrix: function(skipFlip) {
+      var key = this.transformMatrixKey(true, skipFlip), cache = this.ownMatrixCache || (this.ownMatrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
-      var tMatrix = this._calcTranslateMatrix();
-      this.translateX = tMatrix[4];
-      this.translateY = tMatrix[5];
+      var tMatrix = this._calcTranslateMatrix(),
+          options = {
+            angle: this.angle,
+            translateX: tMatrix[4],
+            translateY: tMatrix[5],
+            scaleX: this.scaleX,
+            scaleY: this.scaleY,
+            skewX: this.skewX,
+            skewY: this.skewY,
+          };
+      if (!skipFlip) {
+        options.flipX = this.flipX;
+        options.flipY = this.flipY;
+      }
       cache.key = key;
-      cache.value = util.composeMatrix(this);
+      cache.value = util.composeMatrix(options);
       return cache.value;
     },
 
@@ -658,35 +672,13 @@
       if (noSkew) {
         return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
       }
-      else {
-        dimX /= 2;
-        dimY /= 2;
-      }
-      var points = [
-            {
-              x: -dimX,
-              y: -dimY
-            },
-            {
-              x: dimX,
-              y: -dimY
-            },
-            {
-              x: -dimX,
-              y: dimY
-            },
-            {
-              x: dimX,
-              y: dimY
-            }],
-          transformMatrix = util.calcDimensionsMatrix({
-            scaleX: this.scaleX,
-            scaleY: this.scaleY,
-            skewX: skewX,
-            skewY: skewY,
-          }),
-          bbox = util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return this._finalizeDimensions(bbox.width, bbox.height);
+      var bbox = util.sizeAfterTransform(dimX, dimY, {
+        scaleX: this.scaleX,
+        scaleY: this.scaleY,
+        skewX: skewX,
+        skewY: skewY,
+      });
+      return this._finalizeDimensions(bbox.x, bbox.y);
     },
 
     /*
@@ -703,8 +695,10 @@
         :
         { x: width, y: height };
     },
+
     /*
-     * Calculate object dimensions for controls, including padding and canvas zoom.
+     * Calculate object dimensions for controls box, including padding and canvas zoom.
+     * and active selection
      * private
      */
     _calculateCurrentDimensions: function()  {
