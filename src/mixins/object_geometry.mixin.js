@@ -671,13 +671,13 @@
       if (noSkew) {
         return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
       }
-      var bbox = util.bboxFromSize(dimX, dimY, {
+      var bbox = util.sizeAfterTransform(dimX, dimY, {
         scaleX: this.scaleX,
         scaleY: this.scaleY,
         skewX: skewX,
         skewY: skewY,
       });
-      return this._finalizeDimensions(bbox.width, bbox.height);
+      return this._finalizeDimensions(bbox.x, bbox.y);
     },
 
     /*

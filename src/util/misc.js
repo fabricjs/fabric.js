@@ -975,7 +975,23 @@
       }).join(' ') + ')';
     },
 
-    bboxFromSize: function(width, height, options) {
+    /**
+     * given a width and height, return the size of the bounding box
+     * that can contains the box with width/height with applied transform
+     * described in options.
+     * Use to calculate the boxes around objects for controls.
+     * @memberOf fabric.util
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Object} options
+     * @param {Number} options.scaleX
+     * @param {Number} options.scaleY
+     * @param {Number} options.skewX
+     * @param {Number} options.skewY
+     * @return {Object.x} width of containing
+     * @return {Object.y} height of containing
+     */
+    sizeAfterTransform: function(width, height, options) {
       var dimX = width / 2, dimY = height / 2,
           points = [
             {
@@ -996,7 +1012,10 @@
             }],
           transformMatrix = fabric.util.calcDimensionsMatrix(options),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return bbox;
+      return {
+        x: bbox.width,
+        y: bbox.height,
+      };
     }
   };
 })(typeof exports !== 'undefined' ? exports : this);
