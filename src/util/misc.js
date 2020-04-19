@@ -659,10 +659,10 @@
       var angle = atan2(a[1], a[0]),
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
+          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
           skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
-        angle: angle  / PiBy180,
+        angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
@@ -973,6 +973,30 @@
       return 'matrix(' + transform.map(function(value) {
         return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
       }).join(' ') + ')';
+    },
+
+    bboxFromSize: function(width, height, options) {
+      var dimX = width / 2, dimY = height / 2,
+          points = [
+            {
+              x: -dimX,
+              y: -dimY
+            },
+            {
+              x: dimX,
+              y: -dimY
+            },
+            {
+              x: -dimX,
+              y: dimY
+            },
+            {
+              x: dimX,
+              y: dimY
+            }],
+          transformMatrix = fabric.util.calcDimensionsMatrix(options),
+          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+      return bbox;
     }
   };
 })(typeof exports !== 'undefined' ? exports : this);

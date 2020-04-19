@@ -222,23 +222,17 @@
      */
     drawBordersInGroup: function(ctx, options, styleOverride) {
       styleOverride = styleOverride || {};
-      var p = { x: this.width, y: this.height },
-          matrix = fabric.util.composeMatrix({
-            scaleX: options.scaleX,
-            scaleY: options.scaleY,
-            skewX: options.skewX
-          }),
-          wh = fabric.util.transformPoint(p, matrix),
+      var bbox = fabric.util.bboxFromSize(this.width, this.height, options),
           strokeWidth = this.strokeWidth,
+          strokeUniform = this.strokeUniform,
           borderScaleFactor = this.borderScaleFactor,
           width =
-            wh.x + strokeWidth * (this.strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
+            bbox.width + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
-            wh.y + strokeWidth * (this.strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
+            bbox.height + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-
       ctx.strokeRect(
         -width / 2,
         -height / 2,
