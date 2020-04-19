@@ -204,22 +204,22 @@
           point = util.transformPoint({
             x: this.x * dim.x + this.offsetX,
             y: this.y * dim.y + this.offsetY }, finalMatrix);
-      if (this.x > 0) {
-        point.x += cosP;
-        point.y += sinP;
-      }
-      if (this.x < 0) {
-        point.x += -cosP;
-        point.y += -sinP;
-      }
-      if (this.y > 0) {
-        point.x += -sinP;
-        point.y += cosP;
-      }
-      if (this.y < 0) {
-        point.x += sinP;
-        point.y += -cosP;
-      }
+      // if (this.x > 0) {
+      //   point.x += cosP;
+      //   point.y += sinP;
+      // }
+      // if (this.x < 0) {
+      //   point.x += -cosP;
+      //   point.y += -sinP;
+      // }
+      // if (this.y > 0) {
+      //   point.x += -sinP;
+      //   point.y += cosP;
+      // }
+      // if (this.y < 0) {
+      //   point.x += sinP;
+      //   point.y += -cosP;
+      // }
       return point;
     },
 

@@ -470,10 +470,11 @@
     calcOCoords: function() {
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
-          startMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           vpt = this.getViewportTransform(),
-          finalMatrix = multiplyMatrices(vpt, startMatrix),
-          dim = this._getTransformedDimensions(),
+          startMatrix = multiplyMatrices(vpt, translateMatrix),
+          finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
+          finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
+          dim = this._calculateCurrentDimensions(),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
