@@ -72,9 +72,7 @@
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
           canvasEl = fabric.util.createCanvasElement(),
-          originalContextTop = this.contextTop,
-          newContext = canvasEl.getContext('2d');
-      fabric.util.setImageSmoothing(newContext, this.imageSmoothingEnabled);
+          originalContextTop = this.contextTop;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
@@ -84,7 +82,7 @@
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.renderCanvas(newContext, this._objects);
+      this.renderCanvas(canvasEl.getContext('2d'), this._objects);
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;
