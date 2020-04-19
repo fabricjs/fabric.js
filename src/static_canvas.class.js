@@ -204,7 +204,6 @@
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
-      this._setImageSmoothing();
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
@@ -615,7 +614,6 @@
         this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
       }
       this._initRetinaScaling();
-      this._setImageSmoothing();
       this.calcOffset();
 
       if (!options.cssOnly) {
@@ -904,6 +902,7 @@
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
+      this._setImageSmoothing(ctx);
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
 

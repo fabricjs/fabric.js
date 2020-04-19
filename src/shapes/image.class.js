@@ -125,6 +125,15 @@
     cropY: 0,
 
     /**
+     * Indicates whether this canvas will use image smoothing when painting this image.
+     * Also influence if the cacheCanvas for this image uses imageSmoothing
+     * @since 4.0.0-beta.11
+     * @type Boolean
+     * @default
+     */
+    imageSmoothing: true,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -495,11 +504,22 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
       this._stroke(ctx);
       this._renderPaintInOrder(ctx);
+    },
+
+    /**
+     * Paint the cached copy of the object on the target context.
+     * it will set the imageSmoothing for the draw operation
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawCacheOnCanvas: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
+      fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
     },
 
     /**
