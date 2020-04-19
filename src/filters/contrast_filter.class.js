@@ -15,7 +15,7 @@
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Contrast({
-   *   contrast: 40
+   *   contrast: 0.25
    * });
    * object.filters.push(filter);
    * object.applyFilters();
@@ -40,6 +40,11 @@
         'gl_FragColor = color;\n' +
       '}',
 
+    /**
+     * contrast value, range from -1 to 1.
+     * @param {Number} contrast
+     * @default 0
+     */
     contrast: 0,
 
     mainParameter: 'contrast',
