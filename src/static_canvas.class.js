@@ -430,11 +430,7 @@
      * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
      */
     _setImageSmoothing: function() {
-      var ctx = this.getContext();
-
-      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
-        || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+      fabric.util.setImageSmoothing(this.getContext(), this.imageSmoothingEnabled);
     },
 
     /**
