@@ -82,7 +82,8 @@
     // 'clippath-8',
     'emoji-b',
     'gold-logo',
-    'svg_missing_clippath'
+    'svg_missing_clippath',
+    'image-rendering-attr',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
