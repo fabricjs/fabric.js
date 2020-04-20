@@ -8,9 +8,10 @@
 - added: Image.imageSmoothing for fabric.Image objects
 - added: added fabric.util.setImageSmoothing(ctx, value);
 - added svg import/export for image image-rendering attribute
+
 BREAKING:
-removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
-remove private member _setImageSmoothing in the canvas: use fabric.util.setImageSmoothing(ctx, value);
+- removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
+- remove private member _setImageSmoothing in the canvas: use fabric.util.setImageSmoothing(ctx, value);
 
 
 ## [4.0.0-beta.10]
