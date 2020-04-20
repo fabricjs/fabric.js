@@ -252,41 +252,6 @@
     fabric.util.makeElementSelectable = makeElementSelectable;
   })();
 
-  (function() {
-
-    /**
-     * Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
-     * @memberOf fabric.util
-     * @param {String} url URL of a script to load
-     * @param {Function} callback Callback to execute when script is finished loading
-     */
-    function getScript(url, callback) {
-      var headEl = fabric.document.getElementsByTagName('head')[0],
-          scriptEl = fabric.document.createElement('script'),
-          loading = true;
-
-      /** @ignore */
-      scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
-        if (loading) {
-          if (typeof this.readyState === 'string' &&
-              this.readyState !== 'loaded' &&
-              this.readyState !== 'complete') {
-            return;
-          }
-          loading = false;
-          callback(e || fabric.window.event);
-          scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
-        }
-      };
-      scriptEl.src = url;
-      headEl.appendChild(scriptEl);
-      // causes issue in Opera
-      // headEl.removeChild(scriptEl);
-    }
-
-    fabric.util.getScript = getScript;
-  })();
-
   function getNodeCanvas(element) {
     var impl = fabric.jsdomImplForWrapper(element);
     return impl._canvas || impl._image;
@@ -307,14 +272,28 @@
     }
   }
 
+  function setImageSmoothing(ctx, value) {
+    ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
+      || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = value;
+  }
+
+  /**
+   * setImageSmoothing sets the context imageSmoothingEnabled property.
+   * Used by canvas and by ImageObject.
+   * @memberOf fabric.util
+   * @since 4.0.0
+   * @param {HTMLRenderingContext2D} ctx to set on
+   * @param {Boolean} value true or false
+   */
+  fabric.util.setImageSmoothing = setImageSmoothing;
   fabric.util.getById = getById;
   fabric.util.toArray = toArray;
-  fabric.util.makeElement = makeElement;
   fabric.util.addClass = addClass;
+  fabric.util.makeElement = makeElement;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
-  fabric.util.getElementStyle = getElementStyle;
   fabric.util.getNodeCanvas = getNodeCanvas;
   fabric.util.cleanUpJsdomNode = cleanUpJsdomNode;
 

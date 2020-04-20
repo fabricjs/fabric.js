@@ -49,7 +49,8 @@
         opacity:              'opacity',
         'clip-path':          'clipPath',
         'clip-rule':          'clipRule',
-        'vector-effect':      'strokeUniform'
+        'vector-effect':      'strokeUniform',
+        'image-rendering':    'imageSmoothing',
       },
 
       colorAttributes = {
@@ -83,8 +84,8 @@
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
     }
-    else if (attr === 'vector-effect') {
-      value = value === 'non-scaling-stroke';
+    else if (attr === 'strokeUniform') {
+      return (value === 'non-scaling-stroke');
     }
     else if (attr === 'strokeDashArray') {
       if (value === 'none') {
@@ -136,6 +137,9 @@
     }
     else if (attr === 'href' || attr === 'xlink:href' || attr === 'font') {
       return value;
+    }
+    else if (attr === 'imageSmoothing') {
+      return (value === 'optimizeQuality' ? true : false);
     }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);

@@ -125,6 +125,15 @@
     cropY: 0,
 
     /**
+     * Indicates whether this canvas will use image smoothing when painting this image.
+     * Also influence if the cacheCanvas for this image uses imageSmoothing
+     * @since 4.0.0-beta.11
+     * @type Boolean
+     * @default
+     */
+    imageSmoothing: true,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -304,8 +313,11 @@
      * of the instance
      */
     _toSVG: function() {
-      var svgString = [], imageMarkup = [], strokeSvg,
-          x = -this.width / 2, y = -this.height / 2, clipPath = '';
+      var svgString = [], imageMarkup = [], strokeSvg, element = this._element,
+          x = -this.width / 2, y = -this.height / 2, clipPath = '', imageRendering = '';
+      if (!element) {
+        return [];
+      }
       if (this.hasCrop()) {
         var clipPathId = fabric.Object.__uid++;
         svgString.push(
@@ -315,13 +327,17 @@
         );
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
+      if (!this.imageSmoothing) {
+        imageRendering = '" image-rendering="optimizeSpeed';
+      }
       imageMarkup.push('\t<image ', 'COMMON_PARTS', 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
         // so that object's center aligns with container's left/top
-        '" width="', this._element.width || this._element.naturalWidth,
-        '" height="', this._element.height || this._element.height,
+        '" width="', element.width || element.naturalWidth,
+        '" height="', element.height || element.height,
+        imageRendering,
         '"', clipPath,
         '></image>\n');
 
@@ -495,11 +511,22 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
       this._stroke(ctx);
       this._renderPaintInOrder(ctx);
+    },
+
+    /**
+     * Paint the cached copy of the object on the target context.
+     * it will set the imageSmoothing for the draw operation
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawCacheOnCanvas: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
+      fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
     },
 
     /**
@@ -726,7 +753,9 @@
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
   fabric.Image.ATTRIBUTE_NAMES =
-    fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href crossOrigin'.split(' '));
+    fabric.SHARED_ATTRIBUTES.concat(
+      'x y width height preserveAspectRatio xlink:href crossOrigin image-rendering'.split(' ')
+    );
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element

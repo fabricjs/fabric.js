@@ -291,6 +291,28 @@
     });
   });
 
+  QUnit.test('toSVG with imageSmoothing false', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.imageSmoothing = false;
+      assert.ok(typeof image.toSVG === 'function');
+      var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" image-rendering=\"optimizeSpeed\"></image>\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
+  QUnit.test('toSVG with missing element', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      delete image._element;
+      assert.ok(typeof image.toSVG === 'function');
+      var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
   QUnit.test('getSrc', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
@@ -508,6 +530,27 @@
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      done();
+    });
+  });
+
+  QUnit.test('fromElement imageSmoothing', function(assert) {
+    var done = assert.async();
+
+    var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
+
+    assert.ok(typeof fabric.Image.fromElement === 'function', 'fromElement should exist');
+
+    var imageEl = makeImageElement({
+      width: '14',
+      height: '17',
+      'image-rendering': 'optimizeSpeed',
+      'xlink:href': IMAGE_DATA_URL
+    });
+
+    fabric.Image.fromElement(imageEl, function(imgObject) {
+      assert.ok(imgObject instanceof fabric.Image);
+      assert.deepEqual(imgObject.get('imageSmoothing'), false, 'imageSmoothing set to false');
       done();
     });
   });

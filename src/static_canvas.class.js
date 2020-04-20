@@ -204,7 +204,6 @@
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
-      this._setImageSmoothing();
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
@@ -427,18 +426,6 @@
 
     /**
      * @private
-     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
-     */
-    _setImageSmoothing: function() {
-      var ctx = this.getContext();
-
-      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
-        || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    },
-
-    /**
-     * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
@@ -619,7 +606,6 @@
         this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
       }
       this._initRetinaScaling();
-      this._setImageSmoothing();
       this.calcOffset();
 
       if (!options.cssOnly) {
@@ -908,6 +894,7 @@
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
 
