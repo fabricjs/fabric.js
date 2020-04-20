@@ -84,8 +84,8 @@
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
     }
-    else if (attr === 'vector-effect') {
-      value = value === 'non-scaling-stroke';
+    else if (attr === 'strokeUniform') {
+      return (value === 'non-scaling-stroke');
     }
     else if (attr === 'strokeDashArray') {
       if (value === 'none') {
@@ -138,7 +138,7 @@
     else if (attr === 'href' || attr === 'xlink:href' || attr === 'font') {
       return value;
     }
-    else if (attr === 'image-rendering') {
+    else if (attr === 'imageSmoothing') {
       return (value === 'optimizeQuality' ? true : false);
     }
     else {
