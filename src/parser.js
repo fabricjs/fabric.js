@@ -49,7 +49,8 @@
         opacity:              'opacity',
         'clip-path':          'clipPath',
         'clip-rule':          'clipRule',
-        'vector-effect':      'strokeUniform'
+        'vector-effect':      'strokeUniform',
+        'image-rendering':    'imageSmoothing',
       },
 
       colorAttributes = {
@@ -136,6 +137,9 @@
     }
     else if (attr === 'href' || attr === 'xlink:href' || attr === 'font') {
       return value;
+    }
+    else if (attr === 'image-rendering') {
+      return (value === 'optimizeQuality' ? true : false);
     }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);

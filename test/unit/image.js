@@ -291,6 +291,28 @@
     });
   });
 
+  QUnit.test('toSVG with imageSmoothing false', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.imageSmoothing = false;
+      assert.ok(typeof image.toSVG === 'function');
+      var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" image-rendering=\"optimizeSpeed\"></image>\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
+  QUnit.test('toSVG with missing element', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      delete image._element;
+      assert.ok(typeof image.toSVG === 'function');
+      var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
+      assert.equal(image.toSVG(), expectedSVG);
+      done();
+    });
+  });
+
   QUnit.test('getSrc', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
