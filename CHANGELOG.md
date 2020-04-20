@@ -5,6 +5,13 @@
 - fix(controls): Fix flip and controls and skewY and controls. [#6278](https://github.com/fabricjs/fabric.js/pull/6278)
 - fix(controls): Current position with handlers is wrong if using skew [#6267](https://github.com/fabricjs/fabric.js/pull/6267)
 - breaking: setCoords has only one argument now `skipCorners` boolean. setCoords will always update aCoords, lineCoords. If skipCorners is not specified, it will alos update oCoords();
+- added: Image.imageSmoothing for fabric.Image objects
+- added: added fabric.util.setImageSmoothing(ctx, value);
+- added svg import/export for image image-rendering attribute
+BREAKING:
+removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
+remove private member _setImageSmoothing in the canvas: use fabric.util.setImageSmoothing(ctx, value);
+
 
 ## [4.0.0-beta.10]
 - fix(controls): fix missing target in canvas event options [#6251](https://github.com/fabricjs/fabric.js/pull/6251)
