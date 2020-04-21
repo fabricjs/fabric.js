@@ -81,7 +81,9 @@
     'gold-logo',
     'svg_missing_clippath',
     'image-rendering-attr',
-    'svg-missing-images'
+    'svg-missing-images',
+    // this svg below here is not correct. but we do not want additional regressions
+    'nested-svgs'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
