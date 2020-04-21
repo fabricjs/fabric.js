@@ -39,7 +39,7 @@ var jsdom = require('jsdom');
 class CustomResourceLoader extends jsdom.ResourceLoader {
   fetch(url, options) {
     return super.fetch(url, options).catch(e => {
-      throw new Error('JSDOM FETCH CATCHED');
+      console.log('JSDOM FETCH CATCHED', e.message);
     });
   }
 }

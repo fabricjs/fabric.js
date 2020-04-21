@@ -18,9 +18,6 @@
       getAsset(svgName, function(err, string) {
         fabric.loadSVGFromString(string, function(objects, options) {
           // something is disabling objectCaching and i cannot find where it is.
-          objects.forEach(function(o) {
-            o.objectCaching = true;
-          });
           var group = fabric.util.groupSVGElements(objects, options);
           group.includeDefaultValues = false;
           canvas.includeDefaultValues = false;
@@ -84,6 +81,7 @@
     'gold-logo',
     'svg_missing_clippath',
     'image-rendering-attr',
+    'svg-missing-images'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
