@@ -10,6 +10,8 @@
 - fix(fabric.Image): toSVG export with missing element won't crash [#6280](https://github.com/fabricjs/fabric.js/pull/6280)
 - added: added fabric.util.setImageSmoothing(ctx, value);
 - added svg import/export for image image-rendering attribute
+- fix(svg_import): Fix some parsing logic for nested SVGs. [#6284](https://github.com/fabricjs/fabric.js/pull/6284)
+- fix(fabric.Image): do not crash if image has no element [#6285](https://github.com/fabricjs/fabric.js/pull/6285)
 
 BREAKING:
 - removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
