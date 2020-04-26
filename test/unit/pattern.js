@@ -55,14 +55,6 @@
     assert.equal(object.offsetX, 0);
     assert.equal(object.offsetY, 0);
     assert.equal(object.patternTransform, null);
-
-    var patternWithGetSource = new fabric.Pattern({
-      source: function () {return fabric.document.createElement('canvas');}
-    });
-
-    var object2 = patternWithGetSource.toObject();
-    assert.equal(object2.source, 'function () {return fabric.document.createElement(\'canvas\');}');
-    assert.equal(object2.repeat, 'repeat');
   });
 
   QUnit.test('toObject with custom props', function(assert) {
@@ -109,27 +101,6 @@
     assert.ok(typeof pattern.toLive === 'function');
     var created = pattern.toLive(canvas.contextContainer);
     assert.equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');
-  });
-
-  QUnit.test('pattern serialization / deserialization (function)', function(assert) {
-    var patternSourceCanvas, padding;
-
-    var pattern = new fabric.Pattern({
-      source: function() {
-        patternSourceCanvas.setDimensions({
-          width: img.width + padding,
-          height: img.height + padding
-        });
-        return patternSourceCanvas.getElement();
-      },
-      repeat: 'repeat'
-    });
-
-    var obj = pattern.toObject();
-    var patternDeserialized = new fabric.Pattern(obj);
-
-    assert.equal(typeof patternDeserialized.source, 'function');
-    assert.equal(patternDeserialized.repeat, 'repeat');
   });
 
   QUnit.test('pattern serialization / deserialization (image source)', function(assert) {

@@ -805,15 +805,6 @@
     },
 
     /**
-     * Returns string representation of function body
-     * @param {Function} fn Function to get body of
-     * @return {String} Function body
-     */
-    getFunctionBody: function(fn) {
-      return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
-    },
-
-    /**
      * Returns true if context has transparent pixel
      * at specified location (taking tolerance into account)
      * @param {CanvasRenderingContext2D} ctx context
