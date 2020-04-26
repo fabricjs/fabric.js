@@ -547,36 +547,34 @@
       return [1, 0, 0, 1, center.x, center.y];
     },
 
-    transformMatrixKey: function(skipGroup, skipFlip) {
+    transformMatrixKey: function(skipGroup) {
       var sep = '_', prefix = '';
       if (!skipGroup && this.group) {
         prefix = this.group.transformMatrixKey(skipGroup) + sep;
       };
       return prefix + this.top + sep + this.left + sep + this.scaleX + sep + this.scaleY +
         sep + this.skewX + sep + this.skewY + sep + this.angle + sep + this.originX + sep + this.originY +
-        sep + this.width + sep + this.height + sep + this.strokeWidth +
-        (skipFlip ? 'falsefalse' : this.flipX + this.flipY);
+        sep + this.width + sep + this.height + sep + this.strokeWidth + this.flipX + this.flipY;
     },
 
     /**
      * calculate transform matrix that represents the current transformations from the
      * object's properties.
      * @param {Boolean} [skipGroup] return transform matrix for object not counting parent transformations
-     * @param {Boolean} [skipFlip] return transform matrix for object not the flipping.
      * There are some situation in which this is useful to avoid the fake rotation.
      * @return {Array} transform matrix for the object
      */
-    calcTransformMatrix: function(skipGroup, skipFlip) {
-      var matrix = this.calcOwnMatrix(skipFlip);
+    calcTransformMatrix: function(skipGroup) {
+      var matrix = this.calcOwnMatrix();
       if (skipGroup || !this.group) {
         return matrix;
       }
-      var key = this.transformMatrixKey(skipGroup, skipFlip), cache = this.matrixCache || (this.matrixCache = {});
+      var key = this.transformMatrixKey(skipGroup), cache = this.matrixCache || (this.matrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
       if (this.group) {
-        matrix = multiplyMatrices(this.group.calcTransformMatrix(false, skipFlip), matrix);
+        matrix = multiplyMatrices(this.group.calcTransformMatrix(false), matrix);
       }
       cache.key = key;
       cache.value = matrix;
@@ -586,11 +584,10 @@
     /**
      * calculate transform matrix that represents the current transformations from the
      * object's properties, this matrix does not include the group transformation
-     * @param {Boolean} [skipFlip] return transform matrix for object not the flipping.
      * @return {Array} transform matrix for the object
      */
-    calcOwnMatrix: function(skipFlip) {
-      var key = this.transformMatrixKey(true, skipFlip), cache = this.ownMatrixCache || (this.ownMatrixCache = {});
+    calcOwnMatrix: function() {
+      var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
@@ -603,11 +600,9 @@
             scaleY: this.scaleY,
             skewX: this.skewX,
             skewY: this.skewY,
+            flipX: this.flipX,
+            flipY: this.flipY,
           };
-      if (!skipFlip) {
-        options.flipX = this.flipX;
-        options.flipY = this.flipY;
-      }
       cache.key = key;
       cache.value = util.composeMatrix(options);
       return cache.value;
