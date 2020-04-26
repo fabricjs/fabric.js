@@ -1,6 +1,7 @@
 # Changelog
 
 ## [4.0.0-beta.12]
+- fix(fabric.IText): respect value of `cursorColor` [#6300](https://github.com/fabricjs/fabric.js/pull/6300);
 - fix(fabric.Textbox): Improve splitByGrapheme and charSpacing [#6298](https://github.com/fabricjs/fabric.js/pull/6298);
 
 ## [4.0.0-beta.11]
