@@ -40,6 +40,12 @@ starting point.
 
 We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
 
+### Online one-click setup for making PRs
+
+Contribute to fabricjs using a fully featured online development environment that will automatically with a single click: clone the repo and install the dependencies.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
+
 ### Pull request guidelines
 
 Here are a few notes you should take into account:
