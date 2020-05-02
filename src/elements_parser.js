@@ -81,7 +81,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
   };
 
-  proto.createClipPathCallback = function(obj, container) {
+  proto.createClipPathCallback = function(obj, element, container) {
     return function(_newObj) {
       _newObj._removeTransformMatrix();
       _newObj.fillRule = _newObj.clipRule;
@@ -89,9 +89,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     };
   };
 
-  proto.createMaskCallbak = function(obj, container) {
+  proto.createMaskCallbak = function(obj, element, container) {
+    var _this = this;
     return function(_newObj) {
       _newObj._removeTransformMatrix();
+      _this.resolveGradient(_newObj, element, 'fill');
+      _this.resolveGradient(_newObj, element, 'stroke');
       container.push(_newObj);
     };
   };
@@ -114,7 +117,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         klass = this.findTag(element);
         klass.fromElement(
           element,
-          this.createClipPathCallback(obj, container),
+          this.createClipPathCallback(obj, element, container),
           this.options
         );
       }
@@ -171,7 +174,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       klass = this.findTag(element);
       klass.fromElement(
         element,
-        this.createMaskCallbak(obj, container),
+        this.createMaskCallbak(obj, element, container),
         this.options
       );
     }
