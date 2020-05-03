@@ -7,7 +7,13 @@
       skewMap = ['ns', 'nesw', 'ew', 'nwse'],
       controls = {},
       LEFT = 'left', TOP = 'top', RIGHT = 'right', BOTTOM = 'bottom', CENTER = 'center',
-      radiansToDegrees = fabric.util.radiansToDegrees;
+      opposite = {
+        top: BOTTOM,
+        bottom: TOP,
+        left: RIGHT,
+        right: LEFT,
+      }, radiansToDegrees = fabric.util.radiansToDegrees,
+      sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
   function findCornerQuadrant(fabricObject, corner) {
     var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
@@ -115,10 +121,9 @@
   function wrapWithFixedAnchor(actionHandler) {
     return function(eventData, transform, x, y) {
       var target = transform.target, centerPoint = target.getCenterPoint(),
-          anchorY = transform.originY, anchorX = transform.originX,
-          constraint = target.translateToOriginPoint(centerPoint, anchorX, anchorY),
+          constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, anchorX, anchorY);
+      target.setPositionByOrigin(constraint, transform.originX, transform.originY);
       return actionPerformed;
     };
   }
@@ -371,15 +376,29 @@
         lockScalingX = target.lockScalingX, lockScalingY = target.lockScalingY,
         by = options.by, newPoint, scaleX, scaleY, dim,
         scaleProportionally = scaleIsProportional(eventData, target),
-        forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
+        forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
+        signX, signY;
 
     if (forbidScaling) {
       return false;
     }
+    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    signX = sign(newPoint.x);
+    signY = sign(newPoint.y);
+    if (!transform.signX) {
+      transform.signX = signX;
+    }
+    if (!transform.signY) {
+      transform.signY = signY;
+    }
+
+    if (target.lockScalingFlip &&
+      (transform.signX !== signX || transform.signY !== signY)
+    ) {
+      return false;
+    }
 
     dim = target._getTransformedDimensions();
-    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
@@ -399,6 +418,16 @@
     if (transform.originX === CENTER && transform.originY === CENTER) {
       scaleX *= 2;
       scaleY *= 2;
+    }
+    if (transform.signX !== signX) {
+      transform.originX = opposite[transform.originX];
+      scaleX *= -1;
+      transform.signX = signX;
+    }
+    if (transform.signY !== signY) {
+      transform.originY = opposite[transform.originY];
+      scaleY *= -1;
+      transform.signY = signY;
     }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;

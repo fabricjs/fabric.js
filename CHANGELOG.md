@@ -3,6 +3,7 @@
 ## [4.0.0-beta.12]
 - fix(fabric.IText): respect value of `cursorColor` [#6300](https://github.com/fabricjs/fabric.js/pull/6300);
 - fix(fabric.Textbox): Improve splitByGrapheme and charSpacing [#6298](https://github.com/fabricjs/fabric.js/pull/6298);
+- feat(controls): Reintroduce flip by scaling and lockScalingFlip [#6313](https://github.com/fabricjs/fabric.js/pull/6313);
 
 ## [4.0.0-beta.11]
 - fix(itext): improved style handling for new lines [#6268](https://github.com/fabricjs/fabric.js/pull/6268)
@@ -85,7 +86,6 @@ fix(controls): Control.getVisibility will always receive the fabric.Object argum
 
 breaking: All your old control code override will not work
 breaking: `uniScaleTransform` has been renamed in `uniformScaling`, meaning changed and  the default  value swapped. The behaviour is unchanged, but now the description and the name match.
-breaking: LockScalingFlip with the scaling flip behaviour are missing now, maybe reimplemented later.
 breaking: Object.lockUniScaling is removed. Alternatives to get the same identical functionality with less code are being evaluated.
 breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to the event `before:transform’
 
