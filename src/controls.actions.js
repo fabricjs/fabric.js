@@ -12,7 +12,8 @@
         bottom: TOP,
         left: RIGHT,
         right: LEFT,
-      }, radiansToDegrees = fabric.util.radiansToDegrees;
+      }, radiansToDegrees = fabric.util.radiansToDegrees,
+      sign = Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; };
 
   function findCornerQuadrant(fabricObject, corner) {
     var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
@@ -375,20 +376,31 @@
         lockScalingX = target.lockScalingX, lockScalingY = target.lockScalingY,
         by = options.by, newPoint, scaleX, scaleY, dim,
         scaleProportionally = scaleIsProportional(eventData, target),
-        forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
+        forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
+        signX, signY;
 
     if (forbidScaling) {
       return false;
     }
+    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    signX = sign(newPoint.x);
+    signY = sign(newPoint.y);
+
+    if (!transform.signX) {
+      transform.signX = signX;
+    }
+    if (!transform.signY) {
+      transform.signY = signY;
+    }
+
+    if (target.lockScalingFlip &&
+      (transform.signX !== signX || transform.signY !== signY)
+    ) {
+      return false;
+    }
 
     dim = target._getTransformedDimensions();
-    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-    if (transform.flippedX) {
-      newPoint.x *= -1;
-    }
-    if (transform.flippedY) {
-      newPoint.y *= -1;
-    }
+
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
@@ -401,21 +413,23 @@
       scaleY = original.scaleY * scale;
     }
     else {
-      scaleX = newPoint.x * target.scaleX / dim.x;
-      scaleY = newPoint.y * target.scaleY / dim.y;
+      scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
+      scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
     }
     // if we are scaling by center, we need to double the scale
     if (transform.originX === CENTER && transform.originY === CENTER) {
       scaleX *= 2;
       scaleY *= 2;
     }
-    if (scaleX < 0) {
-      transform.hasFlippedX = !transform.hasFlippedX;
+    if (transform.signX !== signX) {
       transform.originX = opposite[transform.originX];
+      scaleX *= -1;
+      transform.signX = signX;
     }
-    if (scaleY < 0) {
-      transform.hasFlippedY = !transform.hasFlippedY;
+    if (transform.signY !== signY) {
       transform.originY = opposite[transform.originY];
+      scaleY *= -1;
+      transform.signY = signY;
     }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
