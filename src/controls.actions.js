@@ -7,7 +7,12 @@
       skewMap = ['ns', 'nesw', 'ew', 'nwse'],
       controls = {},
       LEFT = 'left', TOP = 'top', RIGHT = 'right', BOTTOM = 'bottom', CENTER = 'center',
-      radiansToDegrees = fabric.util.radiansToDegrees;
+      opposite = {
+        TOP: BOTTOM,
+        BOTTOM: TOP,
+        LEFT: RIGHT,
+        RIGHT: LEFT,
+      }, radiansToDegrees = fabric.util.radiansToDegrees;
 
   function findCornerQuadrant(fabricObject, corner) {
     var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
@@ -115,10 +120,9 @@
   function wrapWithFixedAnchor(actionHandler) {
     return function(eventData, transform, x, y) {
       var target = transform.target, centerPoint = target.getCenterPoint(),
-          anchorY = transform.originY, anchorX = transform.originX,
-          constraint = target.translateToOriginPoint(centerPoint, anchorX, anchorY),
+          constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, anchorX, anchorY);
+      target.setPositionByOrigin(constraint, transform.originX, transform.originY);
       return actionPerformed;
     };
   }
@@ -392,24 +396,33 @@
       scaleY = original.scaleY * scale;
     }
     else {
-      scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
-      scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
+      scaleX = newPoint.x * target.scaleX / dim.x;
+      scaleY = newPoint.y * target.scaleY / dim.y;
     }
     // if we are scaling by center, we need to double the scale
     if (transform.originX === CENTER && transform.originY === CENTER) {
       scaleX *= 2;
       scaleY *= 2;
     }
+    else {
+      if (scaleX < 0) {
+        transform.originX = opposite[transform.originX];
+      }
+      if (scaleY < 0) {
+        transform.originY = opposite[transform.originY];
+      }
+      console.log(scaleX, scaleY, transform.originX, transform.originY)
+    }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
     if (!by) {
-      !lockScalingX && target.set('scaleX', scaleX);
-      !lockScalingY && target.set('scaleY', scaleY);
+      !lockScalingX && scaleX && target.set('scaleX', scaleX);
+      !lockScalingY && scaleY && target.set('scaleY', scaleY);
     }
     else {
       // forbidden cases already handled on top here.
-      by === 'x' && target.set('scaleX', scaleX);
-      by === 'y' && target.set('scaleY', scaleY);
+      by === 'x' && scaleX && target.set('scaleX', scaleX);
+      by === 'y' && scaleY && target.set('scaleY', scaleY);
     }
     hasScaled = oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
     if (hasScaled) {
