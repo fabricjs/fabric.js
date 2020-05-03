@@ -8,10 +8,10 @@
       controls = {},
       LEFT = 'left', TOP = 'top', RIGHT = 'right', BOTTOM = 'bottom', CENTER = 'center',
       opposite = {
-        TOP: BOTTOM,
-        BOTTOM: TOP,
-        LEFT: RIGHT,
-        RIGHT: LEFT,
+        top: BOTTOM,
+        bottom: TOP,
+        left: RIGHT,
+        right: LEFT,
       }, radiansToDegrees = fabric.util.radiansToDegrees;
 
   function findCornerQuadrant(fabricObject, corner) {
@@ -383,7 +383,12 @@
 
     dim = target._getTransformedDimensions();
     newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-
+    if (transform.flippedX) {
+      newPoint.x *= -1;
+    }
+    if (transform.flippedY) {
+      newPoint.y *= -1;
+    }
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
@@ -404,25 +409,24 @@
       scaleX *= 2;
       scaleY *= 2;
     }
-    else {
-      if (scaleX < 0) {
-        transform.originX = opposite[transform.originX];
-      }
-      if (scaleY < 0) {
-        transform.originY = opposite[transform.originY];
-      }
-      console.log(scaleX, scaleY, transform.originX, transform.originY)
+    if (scaleX < 0) {
+      transform.hasFlippedX = !transform.hasFlippedX;
+      transform.originX = opposite[transform.originX];
+    }
+    if (scaleY < 0) {
+      transform.hasFlippedY = !transform.hasFlippedY;
+      transform.originY = opposite[transform.originY];
     }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
     if (!by) {
-      !lockScalingX && scaleX && target.set('scaleX', scaleX);
-      !lockScalingY && scaleY && target.set('scaleY', scaleY);
+      !lockScalingX && target.set('scaleX', scaleX);
+      !lockScalingY && target.set('scaleY', scaleY);
     }
     else {
       // forbidden cases already handled on top here.
-      by === 'x' && scaleX && target.set('scaleX', scaleX);
-      by === 'y' && scaleY && target.set('scaleY', scaleY);
+      by === 'x' && target.set('scaleX', scaleX);
+      by === 'y' && target.set('scaleY', scaleY);
     }
     hasScaled = oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
     if (hasScaled) {
