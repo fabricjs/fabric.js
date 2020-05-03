@@ -13,7 +13,7 @@
         left: RIGHT,
         right: LEFT,
       }, radiansToDegrees = fabric.util.radiansToDegrees,
-      sign = Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; };
+      sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
   function findCornerQuadrant(fabricObject, corner) {
     var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
@@ -385,7 +385,6 @@
     newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
     signX = sign(newPoint.x);
     signY = sign(newPoint.y);
-
     if (!transform.signX) {
       transform.signX = signX;
     }
@@ -400,7 +399,6 @@
     }
 
     dim = target._getTransformedDimensions();
-
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
