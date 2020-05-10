@@ -550,13 +550,17 @@
         return;
       }
       var w = this.width, h = this.height,
-          sW = Math.min(elementToDraw.naturalWidth || elementToDraw.width, w * this._filterScalingX),
-          sH = Math.min(elementToDraw.naturalHeight || elementToDraw.height, h * this._filterScalingY),
+          elWidth = elementToDraw.naturalWidth || elementToDraw.width,
+          elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+          maxW = Math.min(this.width, elWidth - this.cropX),
+          maxH = Math.min(this.height, elHeight - this.cropY),
+          sW = Math.min(elWidth, maxW * this._filterScalingX),
+          sH = Math.min(elHeight, maxH * this._filterScalingY),
           x = -w / 2, y = -h / 2,
           sX = Math.max(0, this.cropX * this._filterScalingX),
           sY = Math.max(0, this.cropY * this._filterScalingY);
 
-      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, w, h);
+      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxW, maxH);
     },
 
     /**
