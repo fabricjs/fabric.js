@@ -549,18 +549,22 @@
       if (!elementToDraw) {
         return;
       }
-      var w = this.width, h = this.height,
+      var scaleX = this._filterScalingX, scaleY = this._filterScalingY,
+          w = this.width, h = this.height, min = Math.min,
+          cropX = this.cropX, cropY = this.cropY,
           elWidth = elementToDraw.naturalWidth || elementToDraw.width,
           elHeight = elementToDraw.naturalHeight || elementToDraw.height,
-          maxW = Math.min(this.width, elWidth - this.cropX),
-          maxH = Math.min(this.height, elHeight - this.cropY),
-          sW = Math.min(elWidth, maxW * this._filterScalingX),
-          sH = Math.min(elHeight, maxH * this._filterScalingY),
+          maxSW = min(w * scaleX, elWidth - cropX * scaleX),
+          maxSH = min(h * scaleY, elHeight - cropY * scaleY),
+          sW = min(elWidth, maxSW),
+          sH = min(elHeight, maxSH),
           x = -w / 2, y = -h / 2,
-          sX = Math.max(0, this.cropX * this._filterScalingX),
-          sY = Math.max(0, this.cropY * this._filterScalingY);
+          sX = min(0, cropX),
+          sY = min(0, cropY),
+          maxDestW = min(w, elWidth / scaleX - cropX),
+          maxDestH = min(h, elHeight / scaleX - cropY);
 
-      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxW, maxH);
+      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
     },
 
     /**
