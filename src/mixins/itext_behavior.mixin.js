@@ -28,6 +28,8 @@
       this.on('added', function() {
         var canvas = _this.canvas;
         if (canvas) {
+          _this._restoreClickHandlerProps();
+
           if (!canvas._hasITextHandlers) {
             canvas._hasITextHandlers = true;
             _this._initCanvasHandlers(canvas);
@@ -926,6 +928,14 @@
       else if (this.selectionEnd < 0) {
         this.selectionEnd = 0;
       }
-    }
+    },
+
+    /**
+     * Restores click handler props to default values
+     * @private
+     */
+    _restoreClickHandlerProps: function() {
+      this._clickHandlerInitialized = false;
+    },
   });
 })();

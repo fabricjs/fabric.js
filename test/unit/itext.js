@@ -830,5 +830,18 @@
         fabric.devicePixelRatio = 1;
       });
     });
+
+    QUnit.test('_restoreClickHandlerProps', function(assert) {
+      var iText = new fabric.IText('test');
+  
+      iText._clickHandlerInitialized = true;
+  
+      iText._restoreClickHandlerProps();
+  
+      assert.notOk(
+        iText._clickHandlerInitialized,
+        "set to false by _restoreClickHandlerProps"
+      );
+    });
   });
 })();
