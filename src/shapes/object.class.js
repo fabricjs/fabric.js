@@ -601,7 +601,7 @@
      * @type Array
      */
     animatableProperties: (
-      'fill stroke strokeWidth top left angle scaleX'
+      'top left angle scaleX'
     ).split(' '),
 
     /**
