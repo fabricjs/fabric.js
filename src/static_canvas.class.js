@@ -829,6 +829,18 @@
     },
 
     /**
+     * Renders the canvas
+     * @param {Number} time offset for animations
+     * @return {fabric.Canvas} instance
+     * @chainable
+     */
+    renderAtTime: function (time) {
+      var canvasToDrawOn = this.contextContainer;
+      this.renderCanvas(canvasToDrawOn, this._objects, time);
+      return this;
+    },
+
+    /**
      * Function created to be instance bound at initialization
      * used in requestAnimationFrame rendering
      * Let the fabricJS call it. If you call it manually you could have more
@@ -886,10 +898,11 @@
      * Renders background, objects, overlay and controls.
      * @param {CanvasRenderingContext2D} ctx
      * @param {Array} objects to render
+     * @param {Number} time offset for eventual animations
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function(ctx, objects, time) {
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
@@ -901,7 +914,7 @@
       ctx.save();
       //apply viewport transform once for all rendering process
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      this._renderObjects(ctx, objects);
+      this._renderObjects(ctx, objects, time);
       ctx.restore();
       if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
@@ -943,10 +956,17 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} objects to render
      */
-    _renderObjects: function(ctx, objects) {
+    _renderObjects: function(ctx, objects, time) {
       var i, len;
       for (i = 0, len = objects.length; i < len; ++i) {
-        objects[i] && objects[i].render(ctx);
+        if (objects[i]) {
+          if (time) {
+            objects[i].renderAtTime(ctx, time);
+          }
+          else {
+            objects[i].render(ctx);
+          }
+        }
       }
     },
 

@@ -597,6 +597,14 @@
     ).split(' '),
 
     /**
+     * List of properties for which there is animation support
+     * @type Array
+     */
+    animatableProperties: (
+      'fill stroke strokeWidth top left angle scaleX'
+    ).split(' '),
+
+    /**
      * List of properties to consider for animating colors.
      * @type Array
      */
@@ -1033,6 +1041,17 @@
         (!this.width && !this.height && this.strokeWidth === 0) ||
         !this.visible;
     },
+
+    /**
+     * Renders an object on a specified context
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} time millisecond after the first frame
+     */
+    renderAtTime: function(ctx, time) {
+      fabric.util.applyAnimationState(this, time);
+      this.render(ctx);
+    },
+
 
     /**
      * Renders an object on a specified context
