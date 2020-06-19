@@ -896,4 +896,16 @@
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
   });
 
+  QUnit.test('isPartiallyOnScreen with object inside and outside of canvas', function(assert) {
+    var cObj = new fabric.Object({ left: 5, top: 5, width: 100, height: 100, strokeWidth: 0});
+    cObj.canvas = new fabric.StaticCanvas(null, { width: 120, height: 120, enableRetinaScaling: false});
+    cObj.canvas.calcViewportBoundaries();
+    assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely onScreen');
+    cObj.left = -20;
+    cObj.top = -20;
+    cObj.scaleX = 2;
+    cObj.scaleY = 2;
+    cObj.setCoords();
+    assert.equal(cObj.isPartiallyOnScreen(true), true, 'object has all corners outside screen but contains canvas');
+  });
 })();
