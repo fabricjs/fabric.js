@@ -193,12 +193,13 @@
         return false;
       }
       var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      var points = this.getCoords(true, calculate), point;
-      for (var i = 0; i < 4; i++) {
-        point = points[i];
-        if (point.x <= pointBR.x && point.x >= pointTL.x && point.y <= pointBR.y && point.y >= pointTL.y) {
-          return true;
-        }
+      var points = this.getCoords(true, calculate);
+      // if some point is on screen, the object is on screen.
+      if (points.some(function(point) {
+        return point.x <= pointBR.x && point.x >= pointTL.x &&
+        point.y <= pointBR.y && point.y >= pointTL.y;
+      })) {
+        return true;
       }
       // no points on screen, check intersection with absolute coordinates
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
@@ -238,7 +239,11 @@
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
-      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      var allPointsAreOutside = this.getCoords(true, calculate).every(function(point) {
+        return (point.x >= pointBR.x || point.x <= pointTL.x) &&
+        (point.y >= pointBR.y || point.y <= pointTL.y);
+      });
+      return allPointsAreOutside && this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
