@@ -248,5 +248,29 @@
     percentage: 0.05,
   });
 
+  function text8(canvas, callback) {
+    var text = new fabric.Text('Scaling down', {
+      left: 10,
+      top: 10,
+      fill: 'red',
+      fontSize: 300,
+      scaleX: 0.2,
+      scaleY: 0.2,
+      fontFamily: 'Ubuntu'
+    });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text with negative scaling',
+    code: text8,
+    width: 400,
+    height: 150,
+    golden: 'text8.png',
+    percentage: 0.06,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
