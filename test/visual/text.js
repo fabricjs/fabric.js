@@ -269,6 +269,7 @@
     width: 400,
     height: 150,
     golden: 'text8.png',
+    disabled: !fabric.isLikelyNode,
     percentage: 0.06,
   });
 
