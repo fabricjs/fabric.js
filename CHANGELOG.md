@@ -2,7 +2,7 @@
 
 ## [latest]
 - fix(fabric.Object): geometry mixin fix partiallyOnscreen [#6402](https://github.com/fabricjs/fabric.js/pull/6402);
-- fix(fabric.Image): ISSUE-6397 modify crossOrigin behaviour for setSerc [#6414](https://github.com/fabricjs/fabric.js/pull/6414);
+- fix(fabric.Image): ISSUE-6397 modify crossOrigin behaviour for setSrc [#6414](https://github.com/fabricjs/fabric.js/pull/6414);
 - Breaking: fabric.Image.setCrossOrigin is gone. Having the property on the fabric.Image is misleading and brings to errors. crossOrigin is for loading/reloading only, and is mandatory to specify it each load.
 
 ## [4.0.0-beta.12]
