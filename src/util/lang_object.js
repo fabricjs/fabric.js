@@ -28,10 +28,7 @@
       }
       else if (source && typeof source === 'object') {
         for (var property in source) {
-          if (property === 'canvas') {
-            destination[property] = extend({ }, source[property]);
-          }
-          else if (source.hasOwnProperty(property)) {
+          if (property !== 'canvas' && property !== 'group' && source.hasOwnProperty(property)) {
             destination[property] = extend({ }, source[property], deep);
           }
         }
