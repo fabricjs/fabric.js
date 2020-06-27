@@ -102,7 +102,7 @@
     fillRule: 'nonzero',
     paintFirst: 'fill',
     globalCompositeOperation: 'source-over',
-    crossOrigin: '',
+    crossOrigin: null,
     skewX: 0,
     skewY: 0,
     cropX: 0,
