@@ -64,7 +64,7 @@
     globalCompositeOperation: 'source-over',
     skewX:                    0,
     skewY:                    0,
-    crossOrigin:              '',
+    crossOrigin:              null,
     cropX:                    0,
     cropY:                    0
   };
@@ -397,7 +397,7 @@
   QUnit.test('crossOrigin', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
-      assert.equal(image.getCrossOrigin(), '', 'initial crossOrigin value should be set');
+      assert.equal(image.getCrossOrigin(), null, 'initial crossOrigin value should be set');
 
       var elImage = _createImageElement();
       elImage.crossOrigin = 'anonymous';
@@ -419,9 +419,9 @@
         done();
         return;
       }
-
+      console.log(objRepr);
       fabric.Image.fromObject(objRepr, function(img) {
-        assert.equal(img.getCrossOrigin(), 'anonymous');
+        assert.equal(img.getCrossOrigin(), null, 'image without src return no element');
         done();
       });
     });

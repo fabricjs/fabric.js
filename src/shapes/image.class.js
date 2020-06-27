@@ -203,7 +203,7 @@
      * Get the crossOrigin value (of the corresponding image element)
      */
     getCrossOrigin: function() {
-      return this._originalElement && this._originalElement.crossOrigin;
+      return this._originalElement && (this._originalElement.crossOrigin || null);
     },
 
     /**
