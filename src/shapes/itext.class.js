@@ -458,6 +458,7 @@
      * High level function to know the height of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns fontSize of char at the current cursor
+     * Unused from the library, is for the end user
      * @return {Number} Character font size
      */
     getCurrentCharFontSize: function() {
@@ -469,6 +470,7 @@
      * High level function to know the color of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns color (fill) of char at the current cursor
+     * Unused from the library, is for the end user
      * @return {String} Character color (fill)
      */
     getCurrentCharColor: function() {
