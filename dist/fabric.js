@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '3.6.3' };
+var fabric = fabric || { version: '3.6.4' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -24118,7 +24118,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Contrast({
-   *   contrast: 40
+   *   contrast: 0.25
    * });
    * object.filters.push(filter);
    * object.applyFilters();
@@ -24143,6 +24143,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         'gl_FragColor = color;\n' +
       '}',
 
+    /**
+     * contrast value, range from -1 to 1.
+     * @param {Number} contrast
+     * @default 0
+     */
     contrast: 0,
 
     mainParameter: 'contrast',
@@ -27115,6 +27120,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * High level function to know the height of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns fontSize of char at the current cursor
+     * Unused from the library, is for the end user
      * @return {Number} Character font size
      */
     getCurrentCharFontSize: function() {
@@ -27126,6 +27132,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * High level function to know the color of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns color (fill) of char at the current cursor
+     * Unused from the library, is for the end user
      * @return {String} Character color (fill)
      */
     getCurrentCharColor: function() {
@@ -27892,7 +27899,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     },
 
     /**
-     * Inserts new style object
+     * Handle insertion of more consecutive style lines for when one or more
+     * newlines gets added to the text. Since current style needs to be shifted
+     * first we shift the current style of the number lines needed, then we add
+     * new lines from the last to the first.
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
      * @param {Number} qty number of lines to add
@@ -27901,14 +27911,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
           newLineStyles = {},
-          somethingAdded = false;
+          somethingAdded = false,
+          isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
       if (this.styles[lineIndex]) {
         currentCharStyle = this.styles[lineIndex][charIndex === 0 ? charIndex : charIndex - 1];
       }
-
       // we clone styles of all chars
       // after cursor onto the current line
       for (var index in this.styles[lineIndex]) {
@@ -27917,21 +27927,27 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           somethingAdded = true;
           newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
           // remove lines from the previous line since they're on a new line now
-          delete this.styles[lineIndex][index];
+          if (!(isEndOfLine && charIndex === 0)) {
+            delete this.styles[lineIndex][index];
+          }
         }
       }
-      if (somethingAdded) {
+      var styleCarriedOver = false;
+      if (somethingAdded && !isEndOfLine) {
+        // if is end of line, the extra style we copied
+        // is probably not something we want
         this.styles[lineIndex + qty] = newLineStyles;
+        styleCarriedOver = true;
       }
-      else {
-        delete this.styles[lineIndex + qty];
-      }
-      // for the other lines
-      // we clone current char style onto the next (otherwise empty) line
-      while (qty > 1) {
+      if (styleCarriedOver) {
+        // skip the last line of since we already prepared it.
         qty--;
-        if (copiedStyle && copiedStyle[qty]) {
-          this.styles[lineIndex + qty] = { 0: clone(copiedStyle[qty]) };
+      }
+      // for the all the lines or all the other lines
+      // we clone current char style onto the next (otherwise empty) line
+      while (qty > 0) {
+        if (copiedStyle && copiedStyle[qty - 1]) {
+          this.styles[lineIndex + qty] = { 0: clone(copiedStyle[qty - 1]) };
         }
         else if (currentCharStyle) {
           this.styles[lineIndex + qty] = { 0: clone(currentCharStyle) };
@@ -27939,6 +27955,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         else {
           delete this.styles[lineIndex + qty];
         }
+        qty--;
       }
       this._forceClearCache = true;
     },
@@ -28001,6 +28018,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     insertNewStyleBlock: function(insertedText, start, copiedStyle) {
       var cursorLoc = this.get2DCursorLocation(start, true),
           addedLines = [0], linesLength = 0;
+      // get an array of how many char per lines are being added.
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
           linesLength++;
@@ -28010,6 +28028,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           addedLines[linesLength]++;
         }
       }
+      // for the first line copy the style from the current char position.
       if (addedLines[0] > 0) {
         this.insertCharStyleObject(cursorLoc.lineIndex, cursorLoc.charIndex, addedLines[0], copiedStyle);
         copiedStyle = copiedStyle && copiedStyle.slice(addedLines[0] + 1);
@@ -28505,7 +28524,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         charCount = this._text.length,
         nextCharCount = nextText.length,
         removedText, insertedText,
-        charDiff = nextCharCount - charCount;
+        charDiff = nextCharCount - charCount,
+        selectionStart = this.selectionStart, selectionEnd = this.selectionEnd,
+        selection = selectionStart !== selectionEnd,
+        copiedStyle, removeFrom, removeTo;
     if (this.hiddenTextarea.value === '') {
       this.styles = { };
       this.updateFromTextArea();
@@ -28522,40 +28544,55 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.hiddenTextarea.selectionEnd,
       this.hiddenTextarea.value
     );
-    var backDelete = this.selectionStart > textareaSelection.selectionStart;
+    var backDelete = selectionStart > textareaSelection.selectionStart;
 
-    if (this.selectionStart !== this.selectionEnd) {
-      removedText = this._text.slice(this.selectionStart, this.selectionEnd);
-      charDiff += this.selectionEnd - this.selectionStart;
+    if (selection) {
+      removedText = this._text.slice(selectionStart, selectionEnd);
+      charDiff += selectionEnd - selectionStart;
     }
     else if (nextCharCount < charCount) {
       if (backDelete) {
-        removedText = this._text.slice(this.selectionEnd + charDiff, this.selectionEnd);
+        removedText = this._text.slice(selectionEnd + charDiff, selectionEnd);
       }
       else {
-        removedText = this._text.slice(this.selectionStart, this.selectionStart - charDiff);
+        removedText = this._text.slice(selectionStart, selectionStart - charDiff);
       }
     }
+    var copiedStyle;
     insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
     if (removedText && removedText.length) {
-      if (this.selectionStart !== this.selectionEnd) {
-        this.removeStyleFromTo(this.selectionStart, this.selectionEnd);
+      if (insertedText.length) {
+        // let's copy some style before deleting.
+        // we want to copy the style before the cursor OR the style at the cursor if selection
+        // is bigger than 0.
+        copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, true);
+        // now duplicate the style one for each inserted text.
+        copiedStyle = insertedText.map(function() {
+          // this return an array of references, but that is fine since we are
+          // copying the style later.
+          return copiedStyle[0];
+        });
+      }
+      if (selection) {
+        removeFrom = selectionStart;
+        removeTo = selectionEnd;
       }
       else if (backDelete) {
         // detect differencies between forwardDelete and backDelete
-        this.removeStyleFromTo(this.selectionEnd - removedText.length, this.selectionEnd);
+        removeFrom = selectionEnd - removedText.length;
+        removeTo = selectionEnd;
       }
       else {
-        this.removeStyleFromTo(this.selectionEnd, this.selectionEnd + removedText.length);
+        removeFrom = selectionEnd;
+        removeTo = selectionEnd + removedText.length;
       }
+      this.removeStyleFromTo(removeFrom, removeTo);
     }
     if (insertedText.length) {
       if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
-        this.insertNewStyleBlock(insertedText, this.selectionStart, fabric.copiedTextStyle);
+        copiedStyle = fabric.copiedTextStyle;
       }
-      else {
-        this.insertNewStyleBlock(insertedText, this.selectionStart);
-      }
+      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
     this.updateFromTextArea();
     this.fire('changed');

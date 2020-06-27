@@ -357,11 +357,22 @@
 
       assert.equal(typeof iText.insertNewlineStyleObject, 'function');
 
-      iText.insertNewlineStyleObject(0, 4, true);
+      iText.insertNewlineStyleObject(0, 4, 1);
       assert.deepEqual(iText.styles, { }, 'does not insert empty styles');
       iText.styles = { 1: { 0: { fill: 'blue' } } };
-      iText.insertNewlineStyleObject(0, 4, true);
+      iText.insertNewlineStyleObject(0, 4, 1);
       assert.deepEqual(iText.styles, { 2: { 0: { fill: 'blue' } } }, 'correctly shift styles');
+    });
+
+    QUnit.test('insertNewlineStyleObject with existing style', function(assert) {
+      var iText = new fabric.IText('test\n2');
+
+      iText.styles = { 0: { 3: { fill: 'red' } }, 1: { 0: { fill: 'blue' } } };
+      iText.insertNewlineStyleObject(0, 4, 3);
+      assert.deepEqual(iText.styles[4], { 0: { fill: 'blue' } }, 'correctly shift styles 3 lines');
+      assert.deepEqual(iText.styles[3], { 0: { fill: 'red' } }, 'correctly copied previous style line 3');
+      assert.deepEqual(iText.styles[2], { 0: { fill: 'red' } }, 'correctly copied previous style line 2');
+      assert.deepEqual(iText.styles[1], { 0: { fill: 'red' } }, 'correctly copied previous style line 1');
     });
 
     QUnit.test('shiftLineStyles', function(assert) {
