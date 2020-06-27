@@ -2,17 +2,9 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      util = fabric.util,
-      renderCircleControl = fabric.controlRenderers.renderCircleControl,
-      renderSquareControl = fabric.controlRenderers.renderSquareControl;
+  var fabric = global.fabric || (global.fabric = { });
 
   function Control(options) {
-    if (options.position) {
-      this.x = options.position.x;
-      this.y = options.position.y;
-    }
-    delete options.position;
     for (var i in options) {
       this[i] = options[i];
     }
@@ -198,7 +190,7 @@
 
 
     positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
-      var point = util.transformPoint({
+      var point = fabric.util.transformPoint({
         x: this.x * dim.x + this.offsetX,
         y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
@@ -221,10 +213,10 @@
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlRenderers.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlRenderers.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };
