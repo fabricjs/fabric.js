@@ -248,16 +248,15 @@
       left: 50,
       top: 0,
       fill: 'green',
-      selectable: false
     });
     canvas.add(greenRect);
-    canvas.__onMouseDown({ clientX: 25, clientY: 25, which: 1, target: canvas.upperCanvasEl });
-    canvas.__onMouseMove({ clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ clientX: 25, clientY: 25, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
     canvas.requestRenderAll = function() {
-      console.log(arguments);
       renderRequested = true;
     };
-    canvas.__onMouseUp({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseUp({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
     assert.equal(renderRequested, true, 'a render has been requested');
   });
 
