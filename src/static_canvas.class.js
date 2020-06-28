@@ -943,17 +943,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} objects to render
      */
-    _renderObjects: function(ctx, objects, time) {
+    _renderObjects: function(ctx, objects) {
       var i, len;
       for (i = 0, len = objects.length; i < len; ++i) {
-        if (objects[i]) {
-          if (time) {
-            objects[i].renderAtTime(ctx, time);
-          }
-          else {
-            objects[i].render(ctx);
-          }
-        }
+        objects[i] && objects[i].render(ctx);
       }
     },
 
