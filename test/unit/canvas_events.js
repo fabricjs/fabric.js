@@ -239,6 +239,29 @@
     canvas.__onMouseUp(e4);
   });
 
+  QUnit.test('specific bug #6314 for partial intersection with drag', function(assert) {
+    var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+    var renderRequested = false;
+    var greenRect = new fabric.Rect({
+      width: 300,
+      height: 300,
+      left: 50,
+      top: 0,
+      fill: 'green',
+      selectable: false
+    });
+    canvas.add(greenRect);
+    canvas.__onMouseDown({ clientX: 25, clientY: 25, which: 1, target: canvas.upperCanvasEl });
+    canvas.__onMouseMove({ clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl });
+    canvas.requestRenderAll = function() {
+      console.log(arguments);
+      renderRequested = true;
+    };
+    canvas.__onMouseUp({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    assert.equal(renderRequested, true, 'a render has been requested');
+  });
+
+
   QUnit.test('mouse:up isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
