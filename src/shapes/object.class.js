@@ -1045,17 +1045,6 @@
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Number} time millisecond after the first frame
-     */
-    renderAtTime: function(ctx, time) {
-      fabric.util.applyAnimationState(this, time);
-      this.render(ctx);
-    },
-
-
-    /**
-     * Renders an object on a specified context
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function(ctx) {
       // do not render if width/height are zeros or object is not visible
