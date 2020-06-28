@@ -809,13 +809,9 @@
      * @param {CanvasRenderingContext2D} ctx Context
      */
     transform: function(ctx) {
-      var m;
-      if (this.group && !this.group._transformDone) {
-        m = this.calcTransformMatrix();
-      }
-      else {
-        m = this.calcOwnMatrix();
-      }
+      var needFullTransform = (this.group && !this.group._transformDone) ||
+         (this.group && this.canvas && ctx === this.canvas.contextTop);
+      var m = this.calcTransformMatrix(!needFullTransform);
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     },
 
