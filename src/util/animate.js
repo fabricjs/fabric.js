@@ -94,6 +94,10 @@
     return _cancelAnimFrame.apply(fabric.window, arguments);
   }
 
+  function identityEase(currentTime, startValue) {
+    return startValue;
+  }
+
   function calculateCurrentAnimationValue(startingValue, animation, time) {
     var easing = fabric.util.ease[animation.easing] || identityEase;
     // valid for numbers only written like this.
@@ -119,7 +123,7 @@
       if (!accumulator[property]) {
         accumulator[property] = {
           previouslyEndedAt: 0,
-          previousState: object[property]
+          previousState: object._animatableProperties[property],
         };
       }
       var validAnimation = accumulator[property],
@@ -136,21 +140,27 @@
       // at this point the animation is the valid one.
       validAnimation.animationEndTime = endTime;
       validAnimation.animation = current;
+      return accumulator;
     }, {});
     /**
-     * at this point currentAnimation should look like this:
-     * {
-     *  fill: {
-     *    animationEndTime: 4242 // not more useful at this point
-     *    animation: { ... } // animation data, referencerenced do not mutate
-     *    previousState: 'blue', define the starting value
-     *  }
-     * }
-     */
+       * at this point currentAnimation should look like this:
+       * {
+       *  fill: {
+       *    animationEndTime: 4242 // not more useful at this point
+       *    animation: { ... } // animation data, referencerenced do not mutate
+       *    previousState: 'blue', define the starting value
+       *  }
+       * }
+       */
     Object.keys(validAnimations).forEach(function(key) {
       var data = validAnimations[key];
       // this is over simplified and needs probably to handle edge cases.
-      object[key] = fabric.util.calculateCurrentAnimationValue(data.previousState, data.animation, time);
+      if (!data.animation) {
+        return;
+      }
+      var finalValue = fabric.util.calculateCurrentAnimationValue(data.previousState, data.animation, time);
+      console.log(finalValue);
+      object[key] = finalValue;
     });
   }
 

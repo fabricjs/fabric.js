@@ -601,7 +601,7 @@
      * @type Array
      */
     animatableProperties: (
-      'top left angle scaleX'
+      'top left angle scaleX opacity strokeWidth'
     ).split(' '),
 
     /**
