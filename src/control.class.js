@@ -46,13 +46,6 @@
     angle: 0,
 
     /**
-     * Maybe useless, maybe will get removed before releaseing
-     * @type {String}
-     * @default ''
-     */
-    name: '',
-
-    /**
      * Relative position of the control. X
      * 0,0 is the center of the Object, while -0.5 (left) or 0.5 (right) are the extremities
      * of the bounding box.
