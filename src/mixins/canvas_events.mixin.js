@@ -930,6 +930,7 @@
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
+          actionHandler = transform.actionHandler,
           // this object could be created from the function in the control handlers
           options = {
             target: transform.target,
@@ -945,8 +946,8 @@
           this.setCursor(options.target.moveCursor || this.moveCursor);
         }
       }
-      else {
-        (actionPerformed = transform.actionHandler(e, transform, x, y)) && this._fire(action, options);
+      else if (actionHandler) {
+        (actionPerformed = actionHandler(e, transform, x, y)) && this._fire(action, options);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },

@@ -10,7 +10,6 @@
       objectControls = fabric.Object.prototype.controls;
 
   objectControls.ml = new fabric.Control({
-    name: 'ml',
     x: -0.5,
     y: 0,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -19,7 +18,6 @@
   });
 
   objectControls.mr = new fabric.Control({
-    name: 'mr',
     x: 0.5,
     y: 0,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -28,7 +26,6 @@
   });
 
   objectControls.mb = new fabric.Control({
-    name: 'mb',
     x: 0,
     y: 0.5,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -37,7 +34,6 @@
   });
 
   objectControls.mt = new fabric.Control({
-    name: 'mt',
     x: 0,
     y: -0.5,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -46,7 +42,6 @@
   });
 
   objectControls.tl = new fabric.Control({
-    name: 'tl',
     x: -0.5,
     y: -0.5,
     cursorStyleHandler: scaleStyleHandler,
@@ -54,7 +49,6 @@
   });
 
   objectControls.tr = new fabric.Control({
-    name: 'tr',
     x: 0.5,
     y: -0.5,
     cursorStyleHandler: scaleStyleHandler,
@@ -62,7 +56,6 @@
   });
 
   objectControls.bl = new fabric.Control({
-    name: 'bl',
     x: -0.5,
     y: 0.5,
     cursorStyleHandler: scaleStyleHandler,
@@ -70,7 +63,6 @@
   });
 
   objectControls.br = new fabric.Control({
-    name: 'br',
     x: 0.5,
     y: 0.5,
     cursorStyleHandler: scaleStyleHandler,
@@ -78,7 +70,6 @@
   });
 
   objectControls.mtr = new fabric.Control({
-    name: 'mtr',
     x: 0,
     y: -0.5,
     actionHandler: controlHandlers.rotationWithSnapping,
@@ -105,7 +96,6 @@
     textBoxControls.mb = objectControls.mb;
 
     textBoxControls.mr = new fabric.Control({
-      name: 'mr',
       x: 0.5,
       y: 0,
       actionHandler: controlHandlers.changeWidth,
@@ -114,7 +104,6 @@
     });
 
     textBoxControls.ml = new fabric.Control({
-      name: 'ml',
       x: -0.5,
       y: 0,
       actionHandler: controlHandlers.changeWidth,
