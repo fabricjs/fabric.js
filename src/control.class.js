@@ -39,7 +39,8 @@
 
     /**
      * Drawing angle of the control.
-     * Used to reuse the same drawing function for different rotated controls
+     * NOT used for now, but name marked as needed for internal logic
+     * example: to reuse the same drawing function for different rotated controls
      * @type {Number}
      * @default 0
      */
@@ -100,6 +101,33 @@
      * @default false
      */
     withConnection: false,
+
+    /**
+     * The control actionHandler, provide one to handle action ( control being moved )
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    actionHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control handler for mouse down, provide one to handle mouse down on control
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseDownHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control mouseUpHandler, provide one to handle an effect on mouse up.
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
 
     /**
      * Returns control actionHandler
