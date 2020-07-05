@@ -499,6 +499,8 @@
   controls.scaleOrSkewActionName = scaleOrSkewActionName;
   controls.rotationStyleHandler = rotationStyleHandler;
   controls.fireEvent = fireEvent;
+  controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
+  controls.getLocalPoint = getLocalPoint;
   fabric.controlHandlers = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);
