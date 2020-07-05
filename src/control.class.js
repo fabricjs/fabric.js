@@ -219,12 +219,11 @@
 
     /**
     * Render function for the control.
-    * When this function runs the context is already centered on the object and rotated with
-    * object angle. So when thinking of your rendering function think of the object align with the
-    * axis and your origin 0,0 is the center point of the control. Dimensions are in pixels, object
-    * scale or skew does not count.
+    * When this function runs the context is unscaled. unrotate. Just retina scaled.
+    * all the functions will have to translate to the point left,top before starting Drawing
+    * if they want to draw a control where the position is detected.
+    * left and top are the result of the positionHandler function
     * @param {RenderingContext2D} ctx the context where the control will be drawn
-    * @param {String} methodName fill or stroke, This is probably removed
     * @param {Number} left position of the canvas where we are about to render the control.
     * @param {Number} top position of the canvas where we are about to render the control.
     * @param {Object} styleOverride
@@ -234,10 +233,10 @@
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          fabric.controlRenderers.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          fabric.controlRenderers.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };

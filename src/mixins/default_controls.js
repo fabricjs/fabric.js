@@ -1,12 +1,12 @@
 (function() {
 
-  var controlHandlers = fabric.controlHandlers,
-      scaleSkewStyleHandler = controlHandlers.scaleSkewCursorStyleHandler,
-      scaleStyleHandler = controlHandlers.scaleCursorStyleHandler,
-      scalingEqually = controlHandlers.scalingEqually,
-      scalingYOrSkewingX = controlHandlers.scalingYOrSkewingX,
-      scalingXOrSkewingY = controlHandlers.scalingXOrSkewingY,
-      scaleOrSkewActionName = controlHandlers.scaleOrSkewActionName,
+  var controlsUtils = fabric.controlsUtils,
+      scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
+      scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
+      scalingEqually = controlsUtils.scalingEqually,
+      scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
+      scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
+      scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
       objectControls = fabric.Object.prototype.controls;
 
   objectControls.ml = new fabric.Control({
@@ -72,8 +72,8 @@
   objectControls.mtr = new fabric.Control({
     x: 0,
     y: -0.5,
-    actionHandler: controlHandlers.rotationWithSnapping,
-    cursorStyleHandler: controlHandlers.rotationStyleHandler,
+    actionHandler: controlsUtils.rotationWithSnapping,
+    cursorStyleHandler: controlsUtils.rotationStyleHandler,
     offsetY: -40,
     withConnection: true,
     actionName: 'rotate',
@@ -98,7 +98,7 @@
     textBoxControls.mr = new fabric.Control({
       x: 0.5,
       y: 0,
-      actionHandler: controlHandlers.changeWidth,
+      actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
     });
@@ -106,7 +106,7 @@
     textBoxControls.ml = new fabric.Control({
       x: -0.5,
       y: 0,
-      actionHandler: controlHandlers.changeWidth,
+      actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
     });
