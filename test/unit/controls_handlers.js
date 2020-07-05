@@ -9,7 +9,7 @@
       };
       transform = {
         originX: 'left',
-        orginY: 'top',
+        originY: 'top',
         target: target,
         corner: 'mr',
         signX: 1,
@@ -130,6 +130,37 @@
         done();
       });
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
+    });
+    QUnit.test('wrapWithFixedAnchor', function(assert) {
+      var target = transform.target;
+      transform.originX = 'center';
+      transform.originY = 'center';
+      target.strokeWidth = 0;
+      var actionHandler = function (eventData, transform) {
+        var target = transform.target;
+        target.scaleX = 5;
+        target.scaleY = 5;
+      };
+      var center = target.getCenterPoint();
+      assert.deepEqual(center.x, 50, 'initial center is x 50');
+      assert.deepEqual(center.y, 50, 'initial center is y 50');
+      actionHandler({}, transform);
+      var center2 = target.getCenterPoint();
+      assert.deepEqual(center2.x, 250, 'after action center is x 250');
+      assert.deepEqual(center2.y, 250, 'after action center is y 250');
+      target.top = 0;
+      target.left = 0;
+      target.scaleX = 1;
+      target.scaleY = 1;
+      var center3 = target.getCenterPoint();
+      assert.deepEqual(center3.x, 50, 'after reset center is x 50');
+      assert.deepEqual(center3.y, 50, 'after reset center is y 50');
+      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)({}, transform);
+      var center4 = target.getCenterPoint();
+      assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+      assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+      assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
+      assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
     });
   });
 })();
