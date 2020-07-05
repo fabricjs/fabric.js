@@ -4,7 +4,7 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       degreesToRadians = fabric.util.degreesToRadians,
-      controls = {};
+      controls = fabric.controlsUtils;
 
   function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
@@ -55,6 +55,5 @@
 
   controls.renderCircleControl = renderCircleControl;
   controls.renderSquareControl = renderSquareControl;
-  fabric.controlRenderers = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);

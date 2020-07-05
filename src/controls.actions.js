@@ -501,6 +501,6 @@
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.getLocalPoint = getLocalPoint;
-  fabric.controlHandlers = controls;
+  fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);

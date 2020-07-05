@@ -234,10 +234,10 @@
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          fabric.controlRenderers.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          fabric.controlRenderers.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };

@@ -955,7 +955,7 @@
     /**
      * @private
      */
-    _fire: fabric.controlHandlers.fireEvent,
+    _fire: fabric.controlsUtils.fireEvent,
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.
