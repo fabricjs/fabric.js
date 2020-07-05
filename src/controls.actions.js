@@ -15,8 +15,15 @@
       }, radiansToDegrees = fabric.util.radiansToDegrees,
       sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
-  function findCornerQuadrant(fabricObject, corner) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
+  /**
+   * Combine control position and object angle to find the control direction compared
+   * to the object center.
+   * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+   * @param {fabric.Control} control the control class
+   * @return {Number} 0 - 7 a quadrant number
+   */
+  function findCornerQuadrant(fabricObject, control) {
+    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -28,6 +35,12 @@
     target.fire(eventName, options);
   }
 
+  /**
+   * Inspect event and fabricObject properties to understand if the scaling action
+   * @param {Event} eventData from the user action
+   * @param {fabric.Object} fabricObject the fabric object about to scale
+   * @return {Boolean} true if scale is proportional
+   */
   function scaleIsProportional(eventData, fabricObject) {
     var canvas = fabricObject.canvas, uniScaleKey = canvas.uniScaleKey,
         uniformIsToggled = eventData[uniScaleKey];
@@ -35,6 +48,13 @@
     (!canvas.uniformScaling && uniformIsToggled);
   }
 
+  /**
+   * Inspect fabricObject to understand if the current scaling action is allowed
+   * @param {fabric.Object} fabricObject the fabric object about to scale
+   * @param {String} by 'x' or 'y' or ''
+   * @param {Boolean} scaleProportionally true if we are trying to scale proportionally
+   * @return {Boolean} true if scaling is not allowed at current conditions
+   */
   function scalingIsForbidden(fabricObject, by, scaleProportionally) {
     var lockX = fabricObject.lockScalingX, lockY = fabricObject.lockScalingY;
     if (lockX && lockY) {
@@ -52,59 +72,95 @@
     return false;
   }
 
-  function scaleCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * return the correct cursor style for the scale action
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function scaleCursorStyleHandler(eventData, control, fabricObject) {
     var notAllowed = 'not-allowed',
         scaleProportionally = scaleIsProportional(eventData, fabricObject),
         by = '';
-    if (corner.x !== 0 && corner.y === 0) {
+    if (control.x !== 0 && control.y === 0) {
       by = 'x';
     }
-    else if (corner.x === 0 && corner.y !== 0) {
+    else if (control.x === 0 && control.y !== 0) {
       by = 'y';
     }
     if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
       return notAllowed;
     }
-    var n = findCornerQuadrant(fabricObject, corner);
+    var n = findCornerQuadrant(fabricObject, control);
     return scaleMap[n] + '-resize';
   }
 
-  function skewCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * return the correct cursor style for the skew action
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function skewCursorStyleHandler(eventData, control, fabricObject) {
     var notAllowed = 'not-allowed';
-    if (corner.x !== 0 && fabricObject.lockSkewingY) {
+    if (control.x !== 0 && fabricObject.lockSkewingY) {
       return notAllowed;
     }
-    if (corner.y !== 0 && fabricObject.lockSkewingX) {
+    if (control.y !== 0 && fabricObject.lockSkewingX) {
       return notAllowed;
     }
-    var n = findCornerQuadrant(fabricObject, corner) % 4;
+    var n = findCornerQuadrant(fabricObject, control) % 4;
     return skewMap[n] + '-resize';
   }
 
-  function scaleSkewCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * Combine skew and scale style handlers to cover fabric standard use case
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function scaleSkewCursorStyleHandler(eventData, control, fabricObject) {
     if (eventData[fabricObject.canvas.altActionKey]) {
-      return controls.skewCursorStyleHandler(eventData, corner, fabricObject);
+      return controls.skewCursorStyleHandler(eventData, control, fabricObject);
     }
-    return controls.scaleCursorStyleHandler(eventData, corner, fabricObject);
+    return controls.scaleCursorStyleHandler(eventData, control, fabricObject);
   }
 
-  function scaleOrSkewActionName(eventData, corner, fabricObject) {
+  /**
+   * Inspect event , control and fabricObject to return the correct action name
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} an action name
+   */
+  function scaleOrSkewActionName(eventData, control, fabricObject) {
     var isAlternative = eventData[fabricObject.canvas.altActionKey];
-    if (corner.x === 0) {
+    if (control.x === 0) {
       // then is scaleY or skewX
       return isAlternative ? 'skewX' : 'scaleY';
     }
-    if (corner.y === 0) {
+    if (control.y === 0) {
       // then is scaleY or skewX
       return isAlternative ? 'skewY' : 'scaleX';
     }
   }
 
-  function rotationStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * Find the correct style for the control that is used for rotation.
+   * this function is very simple and it just take care of not-allowed or standard cursor
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function rotationStyleHandler(eventData, control, fabricObject) {
     if (fabricObject.lockRotation) {
       return 'not-allowed';
     }
-    return corner.cursorStyle;
+    return control.cursorStyle;
   }
 
   function commonEventInfo(eventData, transform, x, y) {
