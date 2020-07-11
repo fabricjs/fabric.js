@@ -1,5 +1,9 @@
 # Changelog
 
+- fix(fabric.IText): copy style in non full mode when typing text [#6454](https://github.com/fabricjs/fabric.js/pull/6454);
+- feat(fabric.Controls) expose the extra utils for control handling.
+Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.controlsUtils.
+
 ## [4.0.0-rc.1]
 - fix(fabric.Canvas): ISSUE-6314 rerender in case of drag selection that select a single oobject. [#6421](https://github.com/fabricjs/fabric.js/pull/6421);
 - feat(text): allow correct cursor/selection position if text is edited inside a group. [#6256](https://github.com/fabricjs/fabric.js/pull/6256);
