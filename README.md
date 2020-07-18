@@ -68,9 +68,23 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 <h3 id="npm-install">Install with npm</h3>
 
-To install Fabric.js using npm, you must first manually [install Cairo](http://cairographics.org/download/) on your system. Cairo is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+Note: If you are using Fabric.js in a Node.js script, you must first manually [install Cairo](http://cairographics.org/download/) on your system. Cairo is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+
 
     $ npm install fabric --save
+    
+
+After this, you can import fabric like so:
+
+```
+const fabric = require("fabric").fabric;
+```
+
+Or you can use this instead if your environment supports ES6 imports:
+
+```
+import { fabric } from "fabric";
+```
 
 <h3 id="fabric-building">Building</h3>
 
@@ -194,27 +208,6 @@ For example:
     node build.js modules=ALL exclude=json no-strict no-svg-export
 
 ### Examples of use
-
-#### Using NPM
-
-To use fabric with npm, run
-
-```bash
-npm i fabric
-```
-
-After this, you can import fabric like so:
-
-```
-const fabric = require("fabric").fabric;
-```
-
-If you are using ES6 imports (such as in React), you can use this instead:
-
-```
-import { fabric } from "fabric";
-```
-
 
 #### Adding red rectangle to canvas
 
