@@ -1,4 +1,5 @@
-### Fabric
+## Fabric.js
+
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
@@ -87,6 +88,8 @@ Or you can use this instead if your environment supports ES6 imports:
 ```
 import { fabric } from "fabric";
 ```
+
+See [the example section](#examples-of-use) for usage examples.
 
 <h3 id="fabric-building">Building</h3>
 
