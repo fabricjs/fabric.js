@@ -195,6 +195,27 @@ For example:
 
 ### Examples of use
 
+#### Using NPM
+
+To use fabric with npm, run
+
+```bash
+npm i fabric
+```
+
+After this, you can import fabric like so:
+
+```
+const fabric = require("fabric").fabric;
+```
+
+If you are using ES6 imports (such as in React), you can use this instead:
+
+```
+import { fabric } from "fabric";
+```
+
+
 #### Adding red rectangle to canvas
 
 ```html
