@@ -71,7 +71,8 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 <h3 id="npm-install">Install with npm</h3>
 
-Note: If you are using Fabric.js in a Node.js script, you must first manually [install Cairo](http://cairographics.org/download/) on your system. Cairo is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+Note: If you are using Fabric.js in a Node.js script, you will depend from [node-canvas](https://github.com/Automattic/node-canvas).`node-canvas` is an html canvas replacement that works on top of native libraries.
+Please follow the instructions located [here](https://github.com/Automattic/node-canvas#compiling) in order to get it up and running.
 
 
     $ npm install fabric --save
