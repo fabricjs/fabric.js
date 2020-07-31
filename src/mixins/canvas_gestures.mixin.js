@@ -130,19 +130,11 @@
 
       target._scaling = true;
 
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          dim = target._getTransformedDimensions();
+      var dim = target._getTransformedDimensions(),
+          x = t.scaleX * dim.x * s / target.scaleX,
+          y = t.scaleY * dim.y * s / target.scaleY;
 
-      this._setObjectScale(new fabric.Point(t.scaleX * dim.x * s / target.scaleX, t.scaleY * dim.y * s / target.scaleY),
-        t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'), dim);
-
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-
-      this._fire('scaling', {
-        target: target,
-        e: e,
-        transform: t,
-      });
+      fabric.controlUtils.scalingEqually(e, t, x, y);
     },
 
     /**
