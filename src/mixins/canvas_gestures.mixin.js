@@ -54,14 +54,17 @@
       t.action = 'scale';
       t.originX = t.originY = 'center';
 
-      this._scaleObjectBy(self.scale, e);
+      var hasScaled = this._scaleObjectBy(self.scale, e);
+      var hasRotated = false;
 
       if (self.rotation !== 0) {
         t.action = 'rotate';
-        this._rotateObjectByAngle(self.rotation, e);
+        hasRotated = this._rotateObjectByAngle(self.rotation, e);
+      }
+      if (hasScaled || hasRotated) {
+        this.requestRenderAll();
       }
 
-      this.requestRenderAll();
       t.action = 'drag';
     },
 
@@ -120,21 +123,10 @@
      */
     _scaleObjectBy: function(s, e) {
       var t = this._currentTransform,
-          target = t.target,
-          lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
-
-      if (lockScalingX && lockScalingY) {
-        return;
-      }
-
+          target = t.target;
+      t.gestureScale = s;
       target._scaling = true;
-
-      var dim = target._getTransformedDimensions(),
-          x = t.scaleX * dim.x * s / target.scaleX,
-          y = t.scaleY * dim.y * s / target.scaleY;
-
-      fabric.controlUtils.scalingEqually(e, t, x, y);
+      return fabric.controlsUtils.scalingEqually(e, t, 0, 0);
     },
 
     /**
