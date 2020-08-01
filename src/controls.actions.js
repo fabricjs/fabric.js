@@ -218,11 +218,8 @@
     if (localPoint.y <= padding) {
       localPoint.y += padding;
     }
-    // we check if control exist, to handle usage of those functions with gestures.
-    if (control) {
-      localPoint.x -= control.offsetX;
-      localPoint.y -= control.offsetY;
-    }
+    localPoint.x -= control.offsetX;
+    localPoint.y -= control.offsetY;
     return localPoint;
   }
 
@@ -591,8 +588,8 @@
    * @param {number} y current mouse y position, canvas normalized
    * @return {Boolean} true if some change happened
    */
-  function scaleObjectFromCorner(eventData, transform, x, y, options) {
-    return scaleObject(eventData, transform, x, y, options);
+  function scaleObjectFromCorner(eventData, transform, x, y) {
+    return scaleObject(eventData, transform, x, y);
   }
 
   /**
