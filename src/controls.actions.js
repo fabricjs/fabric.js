@@ -686,7 +686,6 @@
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.getLocalPoint = getLocalPoint;
-  controls.scalingIsForbidden = scalingIsForbidden;
   fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);
