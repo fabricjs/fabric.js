@@ -98,7 +98,7 @@
   QUnit.test('toLive', function(assert) {
     var pattern = createPattern();
     var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
-    var patternHTML = canvas.contextContainer.createPattern(img);
+    var patternHTML = canvas.contextContainer.createPattern(img, 'repeat');
     assert.ok(typeof pattern.toLive === 'function');
 
     var created = pattern.toLive(canvas.contextContainer);
