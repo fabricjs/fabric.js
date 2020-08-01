@@ -503,57 +503,63 @@
         by = options.by, newPoint, scaleX, scaleY, dim,
         scaleProportionally = scaleIsProportional(eventData, target),
         forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
-        signX, signY;
+        signX, signY, gestureScale = transform.gestureScale;
 
     if (forbidScaling) {
       return false;
     }
-    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-    signX = sign(newPoint.x);
-    signY = sign(newPoint.y);
-    if (!transform.signX) {
-      transform.signX = signX;
-    }
-    if (!transform.signY) {
-      transform.signY = signY;
-    }
-
-    if (target.lockScalingFlip &&
-      (transform.signX !== signX || transform.signY !== signY)
-    ) {
-      return false;
-    }
-
-    dim = target._getTransformedDimensions();
-    // missing detection of flip and logic to switch the origin
-    if (scaleProportionally && !by) {
-      // uniform scaling
-      var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-          original = transform.original,
-          originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
-            Math.abs(dim.y * original.scaleY / target.scaleY),
-          scale = distance / originalDistance, hasScaled;
-      scaleX = original.scaleX * scale;
-      scaleY = original.scaleY * scale;
+    if (gestureScale) {
+      scaleX = transform.scaleX * gestureScale;
+      scaleY = transform.scaleY * gestureScale;
     }
     else {
-      scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
-      scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
-    }
-    // if we are scaling by center, we need to double the scale
-    if (transform.originX === CENTER && transform.originY === CENTER) {
-      scaleX *= 2;
-      scaleY *= 2;
-    }
-    if (transform.signX !== signX) {
-      transform.originX = opposite[transform.originX];
-      scaleX *= -1;
-      transform.signX = signX;
-    }
-    if (transform.signY !== signY) {
-      transform.originY = opposite[transform.originY];
-      scaleY *= -1;
-      transform.signY = signY;
+      newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+      signX = sign(newPoint.x);
+      signY = sign(newPoint.y);
+      if (!transform.signX) {
+        transform.signX = signX;
+      }
+      if (!transform.signY) {
+        transform.signY = signY;
+      }
+
+      if (target.lockScalingFlip &&
+        (transform.signX !== signX || transform.signY !== signY)
+      ) {
+        return false;
+      }
+
+      dim = target._getTransformedDimensions();
+      // missing detection of flip and logic to switch the origin
+      if (scaleProportionally && !by) {
+        // uniform scaling
+        var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
+            original = transform.original,
+            originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
+              Math.abs(dim.y * original.scaleY / target.scaleY),
+            scale = distance / originalDistance, hasScaled;
+        scaleX = original.scaleX * scale;
+        scaleY = original.scaleY * scale;
+      }
+      else {
+        scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
+        scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
+      }
+      // if we are scaling by center, we need to double the scale
+      if (transform.originX === CENTER && transform.originY === CENTER) {
+        scaleX *= 2;
+        scaleY *= 2;
+      }
+      if (transform.signX !== signX) {
+        transform.originX = opposite[transform.originX];
+        scaleX *= -1;
+        transform.signX = signX;
+      }
+      if (transform.signY !== signY) {
+        transform.originY = opposite[transform.originY];
+        scaleY *= -1;
+        transform.signY = signY;
+      }
     }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;

@@ -62,6 +62,7 @@
       }
 
       this.requestRenderAll();
+
       t.action = 'drag';
     },
 
@@ -120,29 +121,10 @@
      */
     _scaleObjectBy: function(s, e) {
       var t = this._currentTransform,
-          target = t.target,
-          lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
-
-      if (lockScalingX && lockScalingY) {
-        return;
-      }
-
+          target = t.target;
+      t.gestureScale = s;
       target._scaling = true;
-
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          dim = target._getTransformedDimensions();
-
-      this._setObjectScale(new fabric.Point(t.scaleX * dim.x * s / target.scaleX, t.scaleY * dim.y * s / target.scaleY),
-        t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'), dim);
-
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-
-      this._fire('scaling', {
-        target: target,
-        e: e,
-        transform: t,
-      });
+      return fabric.controlsUtils.scalingEqually(e, t, 0, 0);
     },
 
     /**
