@@ -98,9 +98,11 @@
   QUnit.test('toLive', function(assert) {
     var pattern = createPattern();
     var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+    var patternHTML = canvas.contextContainer.createPattern(img);
     assert.ok(typeof pattern.toLive === 'function');
+
     var created = pattern.toLive(canvas.contextContainer);
-    assert.equal(created.toString(), '[object CanvasPattern]', 'is a gradient for canvas radial');
+    assert.equal(created.toString(), patternHTML.toString(), 'is a pattern');
   });
 
   QUnit.test('pattern serialization / deserialization (image source)', function(assert) {
