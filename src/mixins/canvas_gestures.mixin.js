@@ -54,16 +54,14 @@
       t.action = 'scale';
       t.originX = t.originY = 'center';
 
-      var hasScaled = this._scaleObjectBy(self.scale, e);
-      var hasRotated = false;
+      this._scaleObjectBy(self.scale, e);
 
       if (self.rotation !== 0) {
         t.action = 'rotate';
-        hasRotated = this._rotateObjectByAngle(self.rotation, e);
+        this._rotateObjectByAngle(self.rotation, e);
       }
-      if (hasScaled || hasRotated) {
-        this.requestRenderAll();
-      }
+
+      this.requestRenderAll();
 
       t.action = 'drag';
     },
