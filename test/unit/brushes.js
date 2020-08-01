@@ -64,7 +64,7 @@
           var added = null;
           canvas.on('before:path:created', function() {
             fireCount++;
-          })
+          });
           canvas.on('path:created', function(opt) {
             fireCount++;
             added = opt.path;
