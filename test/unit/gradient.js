@@ -181,17 +181,19 @@
   QUnit.test('toLive linearGradient', function(assert) {
     var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
     var gradient = createLinearGradient();
+    var gradientHTML = canvas.contextContainer.createLinearGradient(0, 0, 1, 1);
     assert.ok(typeof gradient.toLive === 'function');
     var gradientCtx = gradient.toLive(canvas.contextContainer);
-    assert.equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
+    assert.equal(gradientCtx.toString(), gradientHTML.toString(), 'is a gradient for canvas radial');
   });
 
   QUnit.test('toLive radialGradient', function(assert) {
     var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false });
     var gradient = createRadialGradient();
+    var gradientHTML = canvas.contextContainer.createRadialGradient(0, 0, 1, 1, 2, 2);
     assert.ok(typeof gradient.toLive === 'function');
     var gradientCtx = gradient.toLive(canvas.contextContainer);
-    assert.equal(gradientCtx.toString(), '[object CanvasGradient]', 'is a gradient for canvas radial');
+    assert.equal(gradientCtx.toString(), gradientHTML.toString(), 'is a gradient for canvas radial');
   });
 
   QUnit.test('fromElement linearGradient', function(assert) {
