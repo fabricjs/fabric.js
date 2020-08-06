@@ -274,7 +274,6 @@
       this._clearTextArea(ctx);
       skipRestore || ctx.restore();
     },
-
     /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
