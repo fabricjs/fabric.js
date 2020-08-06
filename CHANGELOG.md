@@ -1,5 +1,7 @@
 # Changelog
 
+## [4.0.0]
+- fixed the gesture module to not break with 4.0 [#6491](https://github.com/fabricjs/fabric.js/pull/6491);
 - fix(fabric.IText): copy style in non full mode when typing text [#6454](https://github.com/fabricjs/fabric.js/pull/6454);
 - feat(fabric.Controls) expose the extra utils for control handling.
 Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.controlsUtils.
