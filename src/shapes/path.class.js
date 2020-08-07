@@ -7,7 +7,6 @@
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc,
       toFixed = fabric.util.toFixed,
       commandLengths = {
         m: 2,
@@ -115,44 +114,10 @@
 
         switch (current[0]) { // first letter
 
-          case 'l': // lineto, relative
-            x += current[1];
-            y += current[2];
-            ctx.lineTo(x + l, y + t);
-            break;
-
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
             ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'h': // horizontal lineto, relative
-            x += current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'H': // horizontal lineto, absolute
-            x = current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'v': // vertical lineto, relative
-            y += current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'V': // verical lineto, absolute
-            y = current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'm': // moveTo, relative
-            x += current[1];
-            y += current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            ctx.moveTo(x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
@@ -161,23 +126,6 @@
             subpathStartX = x;
             subpathStartY = y;
             ctx.moveTo(x + l, y + t);
-            break;
-
-          case 'c': // bezierCurveTo, relative
-            tempX = x + current[5];
-            tempY = y + current[6];
-            controlX = x + current[3];
-            controlY = y + current[4];
-            ctx.bezierCurveTo(
-              x + current[1] + l, // x1
-              y + current[2] + t, // y1
-              controlX + l, // x2
-              controlY + t, // y2
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
             break;
 
           case 'C': // bezierCurveTo, absolute
@@ -193,43 +141,6 @@
               x + l,
               y + t
             );
-            break;
-
-          case 's': // shorthand cubic bezierCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              x + current[1] + l,
-              y + current[2] + t,
-              tempX + l,
-              tempY + t
-            );
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = x + current[1];
-            controlY = y + current[2];
-
-            x = tempX;
-            y = tempY;
             break;
 
           case 'S': // shorthand cubic bezierCurveTo, absolute
@@ -266,24 +177,6 @@
 
             break;
 
-          case 'q': // quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            controlX = x + current[1];
-            controlY = y + current[2];
-
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
           case 'Q': // quadraticCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
@@ -298,35 +191,6 @@
             y = tempY;
             controlX = current[1];
             controlY = current[2];
-            break;
-
-          case 't': // shorthand quadraticCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[1];
-            tempY = y + current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-
             break;
 
           case 'T':
@@ -352,36 +216,6 @@
             );
             x = tempX;
             y = tempY;
-            break;
-
-          case 'a':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x + l,
-              current[7] + y + t
-            ]);
-            x += current[6];
-            y += current[7];
-            break;
-
-          case 'A':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + l,
-              current[7] + t
-            ]);
-            x = current[6];
-            y = current[7];
             break;
 
           case 'z':
@@ -566,43 +400,9 @@
 
         switch (current[0]) { // first letter
 
-          case 'l': // lineto, relative
-            x += current[1];
-            y += current[2];
-            bounds = [];
-            break;
-
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
-            bounds = [];
-            break;
-
-          case 'h': // horizontal lineto, relative
-            x += current[1];
-            bounds = [];
-            break;
-
-          case 'H': // horizontal lineto, absolute
-            x = current[1];
-            bounds = [];
-            break;
-
-          case 'v': // vertical lineto, relative
-            y += current[1];
-            bounds = [];
-            break;
-
-          case 'V': // verical lineto, absolute
-            y = current[1];
-            bounds = [];
-            break;
-
-          case 'm': // moveTo, relative
-            x += current[1];
-            y += current[2];
-            subpathStartX = x;
-            subpathStartY = y;
             bounds = [];
             break;
 
@@ -612,23 +412,6 @@
             subpathStartX = x;
             subpathStartY = y;
             bounds = [];
-            break;
-
-          case 'c': // bezierCurveTo, relative
-            tempX = x + current[5];
-            tempY = y + current[6];
-            controlX = x + current[3];
-            controlY = y + current[4];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              x + current[1], // x1
-              y + current[2], // y1
-              controlX, // x2
-              controlY, // y2
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
             break;
 
           case 'C': // bezierCurveTo, absolute
@@ -644,42 +427,6 @@
             );
             x = current[5];
             y = current[6];
-            break;
-
-          case 's': // shorthand cubic bezierCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              x + current[1],
-              y + current[2],
-              tempX,
-              tempY
-            );
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = x + current[1];
-            controlY = y + current[2];
-            x = tempX;
-            y = tempY;
             break;
 
           case 'S': // shorthand cubic bezierCurveTo, absolute
@@ -714,24 +461,6 @@
             controlY = current[2];
             break;
 
-          case 'q': // quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-            controlX = x + current[1];
-            controlY = y + current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
           case 'Q': // quadraticCurveTo, absolute
             controlX = current[1];
             controlY = current[2];
@@ -745,35 +474,6 @@
             );
             x = current[3];
             y = current[4];
-            break;
-
-          case 't': // shorthand quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[1];
-            tempY = y + current[2];
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-
             break;
 
           case 'T':
@@ -801,36 +501,6 @@
             );
             x = tempX;
             y = tempY;
-            break;
-
-          case 'a':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x,
-              current[7] + y
-            );
-            x += current[6];
-            y += current[7];
-            break;
-
-          case 'A':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6],
-              current[7]
-            );
-            x = current[6];
-            y = current[7];
             break;
 
           case 'z':
