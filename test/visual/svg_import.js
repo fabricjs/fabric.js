@@ -85,7 +85,8 @@
     // this svg below here is not correct. but we do not want additional regressions
     'nested-svgs',
     'arc1',
-    'arc2'
+    'arc2',
+    'arc3'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
