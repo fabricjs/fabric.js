@@ -7,22 +7,7 @@
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
-      toFixed = fabric.util.toFixed,
-      commandLengths = {
-        m: 2,
-        l: 2,
-        h: 1,
-        v: 1,
-        c: 6,
-        s: 4,
-        q: 4,
-        t: 2,
-        a: 7
-      },
-      repeatedCommands = {
-        m: 'l',
-        M: 'L'
-      };
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -82,7 +67,9 @@
       }
 
       if (!fromArray) {
-        this.path = this._parsePath();
+        this.path = fabric.util.makePathSimpler(
+          fabric.util.parsePath(this.path)
+        );
       }
 
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
@@ -324,55 +311,6 @@
      */
     complexity: function() {
       return this.path.length;
-    },
-
-    /**
-     * @private
-     */
-    _parsePath: function() {
-      var result = [],
-          coords = [],
-          currentPath,
-          parsed,
-          re = fabric.rePathCommand,
-          match,
-          coordsStr;
-
-      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
-        currentPath = this.path[i];
-
-        coordsStr = currentPath.slice(1).trim();
-        coords.length = 0;
-
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
-        }
-
-        coordsParsed = [currentPath.charAt(0)];
-
-        for (var j = 0, jlen = coords.length; j < jlen; j++) {
-          parsed = parseFloat(coords[j]);
-          if (!isNaN(parsed)) {
-            coordsParsed.push(parsed);
-          }
-        }
-
-        var command = coordsParsed[0],
-            commandLength = commandLengths[command.toLowerCase()],
-            repeatedCommand = repeatedCommands[command] || command;
-
-        if (coordsParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
-            command = repeatedCommand;
-          }
-        }
-        else {
-          result.push(coordsParsed);
-        }
-      }
-
-      return result;
     },
 
     /**

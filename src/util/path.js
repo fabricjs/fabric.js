@@ -1,6 +1,20 @@
 (function() {
-  var _join = Array.prototype.join;
-
+  var _join = Array.prototype.join,
+      commandLengths = {
+        m: 2,
+        l: 2,
+        h: 1,
+        v: 1,
+        c: 6,
+        s: 4,
+        q: 4,
+        t: 2,
+        a: 7
+      },
+      repeatedCommands = {
+        m: 'l',
+        M: 'L'
+      };
   function segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) {
     var costh2 = fabric.util.cos(th2),
         sinth2 = fabric.util.sin(th2),
@@ -105,6 +119,7 @@
    * @param {Number} y3
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
+  // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
     var argsString;
     if (fabric.cachesBoundsOfCurve) {
@@ -211,10 +226,11 @@
       segsNorm[i][5] += fx;
       segsNorm[i][6] += fy;
     }
+    return segsNorm;
   };
 
 
-  fabric.util.makePathAbsolute = function(path) {
+  function makePathSimpler(path) {
     // x and y represent the last point of the path. the previous command point.
     // we add them to each relative command to make it an absolute comment.
     // we also swap the v V h H with L, because are easier to transform.
@@ -334,7 +350,54 @@
     return destinationPath;
   };
 
+  function parsePath(pathString) {
+    var result = [],
+        coords = [],
+        currentPath,
+        parsed,
+        re = fabric.rePathCommand,
+        match,
+        coordsStr;
+
+    for (var i = 0, coordsParsed, len = pathString.length; i < len; i++) {
+      currentPath = pathString[i];
+
+      coordsStr = currentPath.slice(1).trim();
+      coords.length = 0;
+
+      while ((match = re.exec(coordsStr))) {
+        coords.push(match[0]);
+      }
+
+      coordsParsed = [currentPath.charAt(0)];
+
+      for (var j = 0, jlen = coords.length; j < jlen; j++) {
+        parsed = parseFloat(coords[j]);
+        if (!isNaN(parsed)) {
+          coordsParsed.push(parsed);
+        }
+      }
+
+      var command = coordsParsed[0],
+          commandLength = commandLengths[command.toLowerCase()],
+          repeatedCommand = repeatedCommands[command] || command;
+
+      if (coordsParsed.length - 1 > commandLength) {
+        for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+          result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
+          command = repeatedCommand;
+        }
+      }
+      else {
+        result.push(coordsParsed);
+      }
+    }
+
+    return result;
+  };
+
+  fabric.util.parsePath = parsePath;
+  fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.fromArcToBeizers = fromArcToBeizers;
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
-
 })();
