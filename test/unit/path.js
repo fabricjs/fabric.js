@@ -303,21 +303,20 @@
     fabric.Path.fromElement(el, function(obj) {
 
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
-      assert.deepEqual(obj.path[1], ['l', 200, 200]);
-      assert.deepEqual(obj.path[2], ['l', 300, 300]);
-      assert.deepEqual(obj.path[3], ['l', 400, -50]);
+      assert.deepEqual(obj.path[1], ['L', 300, 300]);
+      assert.deepEqual(obj.path[2], ['L', 600, 600]);
+      assert.deepEqual(obj.path[3], ['L', 1000, 550]);
 
       el = getPathElement('c 0,-53.25604 43.17254,-96.42858 96.42857,-96.42857 53.25603,0 96.42857,43.17254 96.42857,96.42857');
       fabric.Path.fromElement(el, function(obj) {
-
-        assert.deepEqual(obj.path[0], ['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857]);
-        assert.deepEqual(obj.path[1], ['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857]);
+        assert.deepEqual(obj.path[0], ['C', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857]);
+        assert.deepEqual(obj.path[1], ['C', 149.6846, -96.42857, 192.85714, -53.256029999999996, 192.85714, 0]);
         done();
       });
     });
   });
 
-  QUnit.test('multiple M/m coordinates converted to L/l', function(assert) {
+  QUnit.test('multiple M/m coordinates converted all L', function(assert) {
     var done = assert.async();
     var el = getPathElement('M100 100 200 200 150 50 m 300 300 400 -50 50 100');
     fabric.Path.fromElement(el, function(obj) {
@@ -325,14 +324,14 @@
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
       assert.deepEqual(obj.path[1], ['L', 200, 200]);
       assert.deepEqual(obj.path[2], ['L', 150, 50]);
-      assert.deepEqual(obj.path[3], ['m', 300, 300]);
-      assert.deepEqual(obj.path[4], ['l', 400, -50]);
-      assert.deepEqual(obj.path[5], ['l', 50, 100]);
+      assert.deepEqual(obj.path[3], ['M', 450, 350]);
+      assert.deepEqual(obj.path[4], ['L', 850, 300]);
+      assert.deepEqual(obj.path[5], ['L', 900, 400]);
       done();
     });
   });
 
-  QUnit.test('multiple M/m commands preserved as M/m commands', function(assert) {
+  QUnit.test('multiple M/m commands converted all as M commands', function(assert) {
     var done = assert.async();
     var el = getPathElement('M100 100 M 200 200 M150 50 m 300 300 m 400 -50 m 50 100');
     fabric.Path.fromElement(el, function(obj) {
@@ -340,21 +339,21 @@
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
       assert.deepEqual(obj.path[1], ['M', 200, 200]);
       assert.deepEqual(obj.path[2], ['M', 150, 50]);
-      assert.deepEqual(obj.path[3], ['m', 300, 300]);
-      assert.deepEqual(obj.path[4], ['m', 400, -50]);
-      assert.deepEqual(obj.path[5], ['m', 50, 100]);
+      assert.deepEqual(obj.path[3], ['M', 450, 350]);
+      assert.deepEqual(obj.path[4], ['M', 850, 300]);
+      assert.deepEqual(obj.path[5], ['M', 900, 400]);
       done();
     });
   });
 
   QUnit.test('compressed path commands', function(assert) {
     var done = assert.async();
-    var el = getPathElement('M56.224 84.12c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
+    var el = getPathElement('M56.224 84.12C-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
     fabric.Path.fromElement(el, function(obj) {
 
       assert.deepEqual(obj.path[0], ['M', 56.224, 84.12]);
-      assert.deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
-      assert.deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
+      assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
+      assert.deepEqual(obj.path[2], ['C', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
       assert.deepEqual(obj.path[3], ['z']);
       done();
     });
@@ -362,13 +361,13 @@
 
   QUnit.test('compressed path commands with e^x', function(assert) {
     var done = assert.async();
-    var el = getPathElement('M56.224e2 84.12E-2c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215m-.050 -20.100z');
+    var el = getPathElement('M56.224e2 84.12E-2C-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215m-.050 -20.100z');
     fabric.Path.fromElement(el, function(obj) {
 
       assert.deepEqual(obj.path[0], ['M', 5622.4, 0.8412]);
-      assert.deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
-      assert.deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
-      assert.deepEqual(obj.path[3], ['m', -0.05, -20.100]);
+      assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
+      assert.deepEqual(obj.path[2], ['C', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
+      assert.deepEqual(obj.path[3], ['M', 0.272, -20.315]);
       assert.deepEqual(obj.path[4], ['z']);
       done();
     });

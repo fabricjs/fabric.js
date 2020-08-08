@@ -58,7 +58,7 @@
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
-        ? path
+        ? fabric.util.makePathSimpler(path)
         // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
         : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
