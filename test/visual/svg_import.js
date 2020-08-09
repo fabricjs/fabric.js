@@ -94,7 +94,9 @@
     'arc1',
     'arc2',
     'arc3',
-    fabric.isLikelyNode ? '' : 'generic-path',
+    'cs',
+    'qt',
+    fabric.isLikelyNode ? '' : 'generic-path'
   ].map(createTestFromSVG).filter(identity);
 
   tests.forEach(visualTestLoop(QUnit));
