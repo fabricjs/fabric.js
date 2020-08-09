@@ -351,7 +351,6 @@
           current[2] += y;
           // falls through
         case 'T':
-          converted = true;
           if (previous === 'Q') {
             // calculate reflection of previous control point
             controlX = 2 * x - controlX;

@@ -92,7 +92,8 @@
     'arc3',
     'cs',
     'qt',
-    'generic-path'
+    'generic-path',
+    '177'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
