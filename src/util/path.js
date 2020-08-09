@@ -241,7 +241,7 @@
         x1 = 0, y1 = 0, current, i, converted,
         // previous will host the letter of the previous command, to handle S and T.
         // controlX and controlY will host the previous reflected control point
-        destinationPath = [], previous, controlX, controlY, tempX, tempY;
+        destinationPath = [], previous, controlX, controlY;
     for (i = 0; i < len; ++i) {
       converted = false;
       current = path[i].slice(0);
@@ -351,6 +351,7 @@
           current[2] += y;
           // falls through
         case 'T':
+          converted = true;
           if (previous === 'Q') {
             // calculate reflection of previous control point
             controlX = 2 * x - controlX;
@@ -403,10 +404,12 @@
         parsed,
         re = fabric.rePathCommand,
         match,
-        coordsStr;
+        coordsStr,
+        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+        path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
-    for (var i = 0, coordsParsed, len = pathString.length; i < len; i++) {
-      currentPath = pathString[i];
+    for (var i = 0, coordsParsed, len = path.length; i < len; i++) {
+      currentPath = path[i];
 
       coordsStr = currentPath.slice(1).trim();
       coords.length = 0;

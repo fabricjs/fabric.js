@@ -59,17 +59,13 @@
 
       this.path = fromArray
         ? fabric.util.makePathSimpler(path)
-        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+
+        : path.match && fabric.util.makePathSimpler(
+          fabric.util.parsePath(this.path)
+        );
 
       if (!this.path) {
         return;
-      }
-
-      if (!fromArray) {
-        this.path = fabric.util.makePathSimpler(
-          fabric.util.parsePath(this.path)
-        );
       }
 
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
