@@ -86,7 +86,9 @@
     'nested-svgs',
     'arc1',
     'arc2',
-    'arc3'
+    'arc3',
+    'cs',
+    'qt'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
