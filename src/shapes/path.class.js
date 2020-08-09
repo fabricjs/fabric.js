@@ -50,7 +50,6 @@
     initialize: function(path, options) {
       options = options || { };
       this.callSuper('initialize', options);
-
       if (!path) {
         path = [];
       }
@@ -60,14 +59,13 @@
       this.path = fromArray
         ? fabric.util.makePathSimpler(path)
 
-        : path.match && fabric.util.makePathSimpler(
-          fabric.util.parsePath(this.path)
+        : fabric.util.makePathSimpler(
+          fabric.util.parsePath(path)
         );
 
       if (!this.path) {
         return;
       }
-
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
     },
 

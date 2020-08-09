@@ -41,10 +41,6 @@
 
   QUnit.module('Simple svg import test');
 
-  function identity (a) {
-    return a;
-  }
-
   var tests = [
     'svg_stroke_1',
     'svg_stroke_2',
@@ -96,8 +92,8 @@
     'arc3',
     'cs',
     'qt',
-    fabric.isLikelyNode ? '' : 'generic-path'
-  ].map(createTestFromSVG).filter(identity);
+    'generic-path'
+  ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
 })();
