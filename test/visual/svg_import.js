@@ -14,6 +14,9 @@
   }
 
   function createTestFromSVG(svgName) {
+    if (!svgName) {
+      return null;
+    }
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
         fabric.loadSVGFromString(string, function(objects, options) {
@@ -37,6 +40,10 @@
   }
 
   QUnit.module('Simple svg import test');
+
+  function identity (a) {
+    return a;
+  }
 
   var tests = [
     'svg_stroke_1',
@@ -86,8 +93,9 @@
     'nested-svgs',
     'arc1',
     'arc2',
-    'arc3'
-  ].map(createTestFromSVG);
+    'arc3',
+    fabric.isLikelyNode ? '' : 'generic-path',
+  ].map(createTestFromSVG).filter(identity);
 
   tests.forEach(visualTestLoop(QUnit));
 })();
