@@ -406,7 +406,11 @@
         match,
         coordsStr,
         // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+        path;
+    if (!pathString || !pathString.match) {
+      return result;
+    }
+    path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
     for (var i = 0, coordsParsed, len = path.length; i < len; i++) {
       currentPath = path[i];
