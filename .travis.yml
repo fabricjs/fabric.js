@@ -86,17 +86,17 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
-      os: osx
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      os: windows
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
+    #   os: osx
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   os: windows
 script: npm run build:fast && npm run test
 
 dist: bionic
