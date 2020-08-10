@@ -239,7 +239,9 @@
         // m or M command. When a z or Z command is drawn, x and y need to be resetted to
         // the last x1 and y1.
         x1 = 0, y1 = 0, current, i, converted,
-        destinationPath = [];
+        // previous will host the letter of the previous command, to handle S and T.
+        // controlX and controlY will host the previous reflected control point
+        destinationPath = [], previous, controlX, controlY;
     for (i = 0; i < len; ++i) {
       converted = false;
       current = path[i].slice(0);
@@ -291,6 +293,8 @@
           current[6] += y;
           // falls through
         case 'C':
+          controlX = current[3];
+          controlY = current[4];
           x = current[5];
           y = current[6];
           break;
@@ -302,8 +306,31 @@
           current[4] += y;
           // falls through
         case 'S':
+          // would be sScC but since we are swapping sSc for C, we check just that.
+          if (previous === 'C') {
+            // calculate reflection of previous control points
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
+          }
+          else {
+            // If there is no previous command or if the previous command was not a C, c, S, or s,
+            // the control point is coincident with the current point
+            controlX = x;
+            controlY = y;
+          }
           x = current[3];
           y = current[4];
+          current[0] = 'C';
+          current[5] = current[3];
+          current[6] = current[4];
+          current[3] = current[1];
+          current[4] = current[2];
+          current[1] = controlX;
+          current[2] = controlY;
+          // current[3] and current[4] are NOW the second control point.
+          // we keep it for the next reflection.
+          controlX = current[3];
+          controlY = current[4];
           break;
         case 'q': // quadraticCurveTo, relative
           current[0] = 'Q';
@@ -313,6 +340,8 @@
           current[4] += y;
           // falls through
         case 'Q':
+          controlX = current[1];
+          controlY = current[2];
           x = current[3];
           y = current[4];
           break;
@@ -322,8 +351,24 @@
           current[2] += y;
           // falls through
         case 'T':
+          if (previous === 'Q') {
+            // calculate reflection of previous control point
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
+          }
+          else {
+            // If there is no previous command or if the previous command was not a Q, q, T or t,
+            // assume the control point is coincident with the current point
+            controlX = x;
+            controlY = y;
+          }
+          current[0] = 'Q';
           x = current[1];
           y = current[2];
+          current[1] = controlX;
+          current[2] = controlY;
+          current[3] = x;
+          current[4] = y;
           break;
         case 'a':
           current[0] = 'A';
@@ -346,6 +391,7 @@
       if (!converted) {
         destinationPath.push(current);
       }
+      previous = current[0];
     }
     return destinationPath;
   };
@@ -357,10 +403,16 @@
         parsed,
         re = fabric.rePathCommand,
         match,
-        coordsStr;
+        coordsStr,
+        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+        path;
+    if (!pathString || !pathString.match) {
+      return result;
+    }
+    path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
-    for (var i = 0, coordsParsed, len = pathString.length; i < len; i++) {
-      currentPath = pathString[i];
+    for (var i = 0, coordsParsed, len = path.length; i < len; i++) {
+      currentPath = path[i];
 
       coordsStr = currentPath.slice(1).trim();
       coords.length = 0;

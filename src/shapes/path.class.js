@@ -50,7 +50,6 @@
     initialize: function(path, options) {
       options = options || { };
       this.callSuper('initialize', options);
-
       if (!path) {
         path = [];
       }
@@ -59,19 +58,14 @@
 
       this.path = fromArray
         ? fabric.util.makePathSimpler(path)
-        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+
+        : fabric.util.makePathSimpler(
+          fabric.util.parsePath(path)
+        );
 
       if (!this.path) {
         return;
       }
-
-      if (!fromArray) {
-        this.path = fabric.util.makePathSimpler(
-          fabric.util.parsePath(this.path)
-        );
-      }
-
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
     },
 
@@ -81,15 +75,12 @@
      */
     _renderPathCommands: function(ctx) {
       var current, // current instruction
-          previous = null,
           subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
           controlY = 0, // current control point y
-          tempX,
-          tempY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
 
@@ -130,79 +121,17 @@
             );
             break;
 
-          case 'S': // shorthand cubic bezierCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              current[1] + l,
-              current[2] + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = current[1];
-            controlY = current[2];
-
-            break;
-
           case 'Q': // quadraticCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-
             ctx.quadraticCurveTo(
               current[1] + l,
               current[2] + t,
-              tempX + l,
-              tempY + t
+              current[3] + l,
+              current[4] + t
             );
-            x = tempX;
-            y = tempY;
+            x = current[3];
+            y = current[4];
             controlX = current[1];
             controlY = current[2];
-            break;
-
-          case 'T':
-            tempX = current[1];
-            tempY = current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
             break;
 
           case 'z':
@@ -212,7 +141,6 @@
             ctx.closePath();
             break;
         }
-        previous = current;
       }
     },
 
@@ -321,15 +249,10 @@
       var aX = [],
           aY = [],
           current, // current instruction
-          previous = null,
           subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
           y = 0, // current y
-          controlX = 0, // current control point x
-          controlY = 0, // current control point y
-          tempX,
-          tempY,
           bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -353,13 +276,11 @@
             break;
 
           case 'C': // bezierCurveTo, absolute
-            controlX = current[3];
-            controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
               current[1],
               current[2],
-              controlX,
-              controlY,
+              current[3],
+              current[4],
               current[5],
               current[6]
             );
@@ -367,78 +288,17 @@
             y = current[6];
             break;
 
-          case 'S': // shorthand cubic bezierCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
+          case 'Q': // quadraticCurveTo, absolute
             bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
               current[1],
               current[2],
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = current[1];
-            controlY = current[2];
-            break;
-
-          case 'Q': // quadraticCurveTo, absolute
-            controlX = current[1];
-            controlY = current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
+              current[1],
+              current[2],
               current[3],
               current[4]
             );
             x = current[3];
             y = current[4];
-            break;
-
-          case 'T':
-            tempX = current[1];
-            tempY = current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
             break;
 
           case 'z':
@@ -447,7 +307,6 @@
             y = subpathStartY;
             break;
         }
-        previous = current;
         bounds.forEach(function (point) {
           aX.push(point.x);
           aY.push(point.y);

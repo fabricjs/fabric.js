@@ -14,6 +14,9 @@
   }
 
   function createTestFromSVG(svgName) {
+    if (!svgName) {
+      return null;
+    }
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
         fabric.loadSVGFromString(string, function(objects, options) {
@@ -88,7 +91,9 @@
     'arc2',
     'arc3',
     'cs',
-    'qt'
+    'qt',
+    'generic-path',
+    '177'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
