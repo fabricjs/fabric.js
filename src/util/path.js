@@ -402,31 +402,31 @@
 
   //measures the length of a pre-simplified path
   function measurePath(path) {
-    var totalLength = 0, len = path.length, current, 
+    var totalLength = 0, len = path.length, current,
         x1 = 0, y1 = 0, x2 = 0, y2 = 0;
         //x1 and y1 are the coords of the previous point on the path
         //x2 and y2 are the coords of the current point
     for (var i = 0; i < len; i++) {
-        current = path[i];
-        switch (current[0]) { //first letter
-            case 'L':
-              x2 = current[1];
-              y2 = current[2];
-              totalLength += calcLineLength(x1, y1, x2, y2);
-              x1 = current[1];
-              y1 = current[2];
-            break;
-            case 'M':
-              x1 = current[1];
-              y1 = current[2];
-            break;
-            case 'C':
-              //todo
-            break;
-            case 'Q':
-              //todo
-            break;
-        }
+      current = path[i];
+      switch (current[0]) { //first letter
+        case 'L':
+          x2 = current[1];
+          y2 = current[2];
+          totalLength += calcLineLength(x1, y1, x2, y2);
+          x1 = current[1];
+          y1 = current[2];
+        break;
+        case 'M':
+          x1 = current[1];
+          y1 = current[2];
+        break;
+        case 'C':
+          //todo
+        break;
+        case 'Q':
+          //todo
+        break;
+      }
     }
     return totalLength;
   }
