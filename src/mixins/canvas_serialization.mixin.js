@@ -1,22 +1,4 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
-
-  /**
-   * Populates canvas with data from the specified dataless JSON.
-   * JSON format must conform to the one of {@link fabric.Canvas#toDatalessJSON}
-   * @deprecated since 1.2.2
-   * @param {String|Object} json JSON string or object
-   * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: {@link fabric.Image})
-   *                            are initialized
-   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
-   * @return {fabric.Canvas} instance
-   * @chainable
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
-   */
-  loadFromDatalessJSON: function (json, callback, reviver) {
-    return this.loadFromJSON(json, callback, reviver);
-  },
-
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
@@ -49,34 +31,58 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
+        clipPath = serialized.clipPath,
         renderOnAddRemove = this.renderOnAddRemove;
+
     this.renderOnAddRemove = false;
+
+    delete serialized.clipPath;
 
     this._enlivenObjects(serialized.objects, function (enlivenedObjects) {
       _this.clear();
       _this._setBgOverlay(serialized, function () {
-        enlivenedObjects.forEach(function(obj, index) {
-          // we splice the array just in case some custom classes restored from JSON
-          // will add more object to canvas at canvas init.
-          _this.insertAt(obj, index);
-        });
-        _this.renderOnAddRemove = renderOnAddRemove;
-        // remove parts i cannot set as options
-        delete serialized.objects;
-        delete serialized.backgroundImage;
-        delete serialized.overlayImage;
-        delete serialized.background;
-        delete serialized.overlay;
-        // this._initOptions does too many things to just
-        // call it. Normally loading an Object from JSON
-        // create the Object instance. Here the Canvas is
-        // already an instance and we are just loading things over it
-        _this._setOptions(serialized);
-        _this.renderAll();
-        callback && callback();
+        if (clipPath) {
+          _this._enlivenObjects([clipPath], function (enlivenedCanvasClip) {
+            _this.clipPath = enlivenedCanvasClip[0];
+            _this.__setupCanvas.call(_this, serialized, enlivenedObjects, renderOnAddRemove, callback);
+          });
+        }
+        else {
+          _this.__setupCanvas.call(_this, serialized, enlivenedObjects, renderOnAddRemove, callback);
+        }
       });
     }, reviver);
     return this;
+  },
+
+  /**
+   * @private
+   * @param {Object} serialized Object with background and overlay information
+   * @param {Array} restored canvas objects
+   * @param {Function} cached renderOnAddRemove callback
+   * @param {Function} callback Invoked after all background and overlay images/patterns loaded
+   */
+  __setupCanvas: function(serialized, enlivenedObjects, renderOnAddRemove, callback) {
+    var _this = this;
+    enlivenedObjects.forEach(function(obj, index) {
+      // we splice the array just in case some custom classes restored from JSON
+      // will add more object to canvas at canvas init.
+      _this.insertAt(obj, index);
+    });
+    this.renderOnAddRemove = renderOnAddRemove;
+    // remove parts i cannot set as options
+    delete serialized.objects;
+    delete serialized.backgroundImage;
+    delete serialized.overlayImage;
+    delete serialized.background;
+    delete serialized.overlay;
+    // this._initOptions does too many things to just
+    // call it. Normally loading an Object from JSON
+    // create the Object instance. Here the Canvas is
+    // already an instance and we are just loading things over it
+    this._setOptions(serialized);
+    this.renderAll();
+    callback && callback();
   },
 
   /**
@@ -207,7 +213,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     el.height = this.height;
 
     var clone = new fabric.Canvas(el);
-    clone.clipTo = this.clipTo;
     if (this.backgroundImage) {
       clone.setBackgroundImage(this.backgroundImage.src, function() {
         clone.renderAll();

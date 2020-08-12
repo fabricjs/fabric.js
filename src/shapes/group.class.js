@@ -35,7 +35,7 @@
     strokeWidth: 0,
 
     /**
-     * Indicates if click events should also check for subtargets
+     * Indicates if click, mouseover, mouseout events & hoverCursor should also check for subtargets
      * @type Boolean
      * @default
      */
@@ -107,9 +107,9 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsACoords: function() {
-      var ignoreZoom = true, skipAbsolute = true;
+      var skipControls = true;
       for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(ignoreZoom, skipAbsolute);
+        this._objects[i].setCoords(skipControls);
       }
     },
 
@@ -132,14 +132,14 @@
     _updateObjectCoords: function(object, center) {
       var objectLeft = object.left,
           objectTop = object.top,
-          ignoreZoom = true, skipAbsolute = true;
+          skipControls = true;
 
       object.set({
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
       object.group = this;
-      object.setCoords(ignoreZoom, skipAbsolute);
+      object.setCoords(skipControls);
     },
 
     /**
@@ -303,8 +303,8 @@
      * @return {Boolean}
      */
     willDrawShadow: function() {
-      if (this.shadow) {
-        return fabric.Object.prototype.willDrawShadow.call(this);
+      if (fabric.Object.prototype.willDrawShadow.call(this)) {
+        return true;
       }
       for (var i = 0, len = this._objects.length; i < len; i++) {
         if (this._objects[i].willDrawShadow()) {
@@ -462,9 +462,9 @@
      * @chainable
      */
     setObjectsCoords: function() {
-      var ignoreZoom = true, skipAbsolute = true;
+      var skipControls = true;
       this.forEachObject(function(object) {
-        object.setCoords(ignoreZoom, skipAbsolute);
+        object.setCoords(skipControls);
       });
       return this;
     },
@@ -478,16 +478,15 @@
           o, prop,
           props = ['tr', 'br', 'bl', 'tl'],
           i = 0, iLen = this._objects.length,
-          j, jLen = props.length,
-          ignoreZoom = true;
+          j, jLen = props.length;
 
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
-        o.setCoords(ignoreZoom);
+        o.aCoords = o.calcACoords();
         for (j = 0; j < jLen; j++) {
           prop = props[j];
-          aX.push(o.oCoords[prop].x);
-          aY.push(o.oCoords[prop].y);
+          aX.push(o.aCoords[prop].x);
+          aY.push(o.aCoords[prop].y);
         }
       }
 
@@ -518,16 +517,29 @@
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      var svgString = [];
+    _toSVG: function(reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t', this._objects[i].toSVG(reviver));
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
+      svgString.push('</g>\n');
+      return svgString;
+    },
 
-      return this._createBaseSVGMarkup(
-        svgString,
-        { reviver: reviver, noStyle: true, withShadow: true });
+    /**
+     * Returns styles-string for svg-export, specific version for group
+     * @return {String}
+     */
+    getSvgStyles: function() {
+      var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
+      return [
+        opacity,
+        this.getSvgFilter(),
+        visibility
+      ].join('');
     },
 
     /**
@@ -555,7 +567,19 @@
    * @param {Function} [callback] Callback to invoke when an group instance is created
    */
   fabric.Group.fromObject = function(object, callback) {
-    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
+    var objects = object.objects,
+        options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    if (typeof objects === 'string') {
+      // it has to be an url or something went wrong.
+      fabric.loadSVGFromURL(objects, function (elements) {
+        var group = fabric.util.groupSVGElements(elements, object, objects);
+        group.set(options);
+        callback && callback(group);
+      });
+      return;
+    }
+    fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
         var options = fabric.util.object.clone(object, true);
         options.clipPath = enlivedClipPath[0];

@@ -53,6 +53,7 @@
       if (activeSelection.contains(target)) {
         activeSelection.removeWithUpdate(target);
         this._hoveredTarget = target;
+        this._hoveredTargets = this.targets.concat();
         if (activeSelection.size() === 1) {
           // activate last remaining object
           this._setActiveObject(activeSelection.item(0), e);
@@ -61,6 +62,7 @@
       else {
         activeSelection.addWithUpdate(target);
         this._hoveredTarget = activeSelection;
+        this._hoveredTargets = this.targets.concat();
       }
       this._fireSelectionEvents(currentActiveObjects, e);
     },
@@ -71,6 +73,9 @@
     _createActiveSelection: function(target, e) {
       var currentActives = this.getActiveObjects(), group = this._createGroup(target);
       this._hoveredTarget = group;
+      // ISSUE 4115: should we consider subTargets here?
+      // this._hoveredTargets = [];
+      // this._hoveredTargets = this.targets.concat();
       this._setActiveObject(group, e);
       this._fireSelectionEvents(currentActives, e);
     },
@@ -130,7 +135,7 @@
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject || !currentObject.selectable || !currentObject.visible || currentObject.onSelect({ e: e })) {
+        if (!currentObject || !currentObject.selectable || !currentObject.visible) {
           continue;
         }
 
@@ -140,12 +145,17 @@
             (allowIntersect && currentObject.containsPoint(selectionX2Y2))
         ) {
           group.push(currentObject);
-
           // only add one object if it's a click
           if (isClick) {
             break;
           }
         }
+      }
+
+      if (group.length > 1) {
+        group = group.filter(function(object) {
+          return !object.onSelect({ e: e });
+        });
       }
 
       return group;

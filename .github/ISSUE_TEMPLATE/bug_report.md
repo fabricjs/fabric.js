@@ -6,7 +6,7 @@ about: Create a report with a reproducible test case in a JSFIDDLE
 
 <!-- BUG TEMPLATE -->
 ## Version
-2.4.0
+3.6.0
 
 ## Test Case
 http://jsfiddle.net/fabricjs/Da7SP/

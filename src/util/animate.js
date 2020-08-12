@@ -4,6 +4,10 @@
     return false;
   }
 
+  function defaultEasing(t, b, c, d) {
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+  }
+
   /**
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
@@ -15,6 +19,7 @@
    * @param {Number} [options.byValue=100] Value to modify the property by
    * @param {Function} [options.easing] Easing function
    * @param {Number} [options.duration=500] Duration of change (in ms)
+   * @param {Function} [options.abort] Additional function with logic. If returns true, onComplete is called.
    */
   function animate(options) {
 
@@ -27,7 +32,7 @@
           onChange = options.onChange || noop,
           abort = options.abort || noop,
           onComplete = options.onComplete || noop,
-          easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;},
+          easing = options.easing || defaultEasing,
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
           byValue = options.byValue || endValue - startValue;
@@ -35,24 +40,28 @@
       options.onStart && options.onStart();
 
       (function tick(ticktime) {
-        if (abort()) {
-          onComplete(endValue, 1, 1);
-          return;
-        }
+        // TODO: move abort call after calculation
+        // and pass (current,valuePerc, timePerc) as arguments
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
             valuePerc = Math.abs((current - startValue) / byValue);
-        onChange(current, valuePerc, timePerc);
-        if (time > finish) {
-          options.onComplete && options.onComplete();
+        if (abort()) {
+          onComplete(endValue, 1, 1);
           return;
         }
-        requestAnimFrame(tick);
+        if (time > finish) {
+          onChange(endValue, 1, 1);
+          onComplete(endValue, 1, 1);
+          return;
+        }
+        else {
+          onChange(current, valuePerc, timePerc);
+          requestAnimFrame(tick);
+        }
       })(start);
     });
-
   }
 
   var _requestAnimFrame = fabric.window.requestAnimationFrame       ||

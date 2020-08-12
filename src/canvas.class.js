@@ -2,11 +2,9 @@
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      radiansToDegrees = fabric.util.radiansToDegrees,
-      atan2 = Math.atan2,
       abs = Math.abs,
       supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
-
+      isTouchEvent = fabric.util.isTouchEvent,
       STROKE_OFFSET = 0.5;
 
   /**
@@ -16,38 +14,39 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
-   * @fires object:modified
-   * @fires object:rotated
-   * @fires object:scaled
-   * @fires object:moved
-   * @fires object:skewed
-   * @fires object:rotating
-   * @fires object:scaling
-   * @fires object:moving
-   * @fires object:skewing
-   * @fires object:selected this event is deprecated. use selection:created
+   * @fires object:modified at the end of a transform or any change when statefull is true
+   * @fires object:rotated at the end of a rotation transform
+   * @fires object:scaled at the end of a scale transform
+   * @fires object:moved at the end of translation transform
+   * @fires object:skewed at the end of a skew transform
+   * @fires object:rotating while an object is being rotated from the control
+   * @fires object:scaling while an object is being scaled by controls
+   * @fires object:moving while an object is being dragged
+   * @fires object:skewing while an object is being skewed from the controls
    *
-   * @fires before:transform
+   * @fires before:transform before a transform is is started
    * @fires before:selection:cleared
    * @fires selection:cleared
    * @fires selection:updated
    * @fires selection:created
    *
-   * @fires path:created
+   * @fires path:created after a drawing operation ends and the path is added
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
-   * @fires mouse:down:before
-   * @fires mouse:move:before
-   * @fires mouse:up:before
+   * @fires mouse:down:before  on mouse down, before the inner fabric logic runs
+   * @fires mouse:move:before on mouse move, before the inner fabric logic runs
+   * @fires mouse:up:before on mouse up, before the inner fabric logic runs
    * @fires mouse:over
    * @fires mouse:out
-   * @fires mouse:dblclick
+   * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
    *
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
    * @fires drop
+   * @fires after:render at the end of the render process, receives the context in the callback
+   * @fires before:render at start the render process, receives the context in the callback
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
@@ -69,16 +68,21 @@
 
     /**
      * When true, objects can be transformed by one side (unproportionally)
+     * when dragged on the corners that normally would not do that.
      * @type Boolean
      * @default
+     * @since fabric 4.0 // changed name and default value
      */
-    uniScaleTransform:      false,
+    uniformScaling:      true,
 
     /**
-     * Indicates which key enable unproportional scaling
+     * Indicates which key switches uniform scaling.
      * values: 'altKey', 'shiftKey', 'ctrlKey'.
      * If `null` or 'none' or any other string that is not a modifier key
-     * feature is disabled feature disabled.
+     * feature is disabled.
+     * totally wrong named. this sounds like `uniform scaling`
+     * if Canvas.uniformScaling is true, pressing this will set it to false
+     * and viceversa.
      * @since 1.6.2
      * @type String
      * @default
@@ -331,6 +335,26 @@
     fireMiddleClick: false,
 
     /**
+     * Keep track of the subTargets for Mouse Events
+     * @type fabric.Object[]
+     */
+    targets: [],
+
+    /**
+     * Keep track of the hovered target
+     * @type fabric.Object
+     * @private
+     */
+    _hoveredTarget: null,
+
+    /**
+     * hold the list of nested targets hovered
+     * @type fabric.Object[]
+     * @private
+     */
+    _hoveredTargets: [],
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -426,49 +450,6 @@
     },
 
     /**
-     * Resets the current transform to its original values and chooses the type of resizing based on the event
-     * @private
-     */
-    _resetCurrentTransform: function() {
-      var t = this._currentTransform;
-
-      t.target.set({
-        scaleX: t.original.scaleX,
-        scaleY: t.original.scaleY,
-        skewX: t.original.skewX,
-        skewY: t.original.skewY,
-        left: t.original.left,
-        top: t.original.top
-      });
-
-      if (this._shouldCenterTransform(t.target)) {
-        if (t.originX !== 'center') {
-          if (t.originX === 'right') {
-            t.mouseXSign = -1;
-          }
-          else {
-            t.mouseXSign = 1;
-          }
-        }
-        if (t.originY !== 'center') {
-          if (t.originY === 'bottom') {
-            t.mouseYSign = -1;
-          }
-          else {
-            t.mouseYSign = 1;
-          }
-        }
-
-        t.originX = 'center';
-        t.originY = 'center';
-      }
-      else {
-        t.originX = t.original.originX;
-        t.originY = t.original.originY;
-      }
-    },
-
-    /**
      * Checks if point is contained within an area of given object
      * @param {Event} e Event object
      * @param {fabric.Object} target Object to test against
@@ -478,7 +459,7 @@
     containsPoint: function (e, target, point) {
       var ignoreZoom = true,
           pointer = point || this.getPointer(e, ignoreZoom),
-          xy;
+          xy, isTouch = e ? isTouchEvent(e) : false;
 
       if (target.group && target.group === this._activeObject && target.group.type === 'activeSelection') {
         xy = this._normalizePointer(target.group, pointer);
@@ -488,7 +469,7 @@
       }
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || target._findTargetCorner(pointer));
+      return (target.containsPoint(xy) || !!target._findTargetCorner(pointer, isTouch));
     },
 
     /**
@@ -598,28 +579,31 @@
     /**
      * centeredScaling from object can't override centeredScaling from canvas.
      * this should be fixed, since object setting should take precedence over canvas.
+     * also this should be something that will be migrated in the control properties.
+     * as ability to define the origin of the transformation that the control provide.
      * @private
      * @param {fabric.Object} target
+     * @param {String} action
      */
-    _shouldCenterTransform: function (target) {
+    _shouldCenterTransform: function (target, action, altKey) {
       if (!target) {
         return;
       }
 
-      var t = this._currentTransform,
-          centerTransform;
+      var centerTransform;
 
-      if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
+      if (action === 'scale' || action === 'scaleX' || action === 'scaleY') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
-      else if (t.action === 'rotate') {
+      else if (action === 'rotate') {
         centerTransform = this.centeredRotation || target.centeredRotation;
       }
 
-      return centerTransform ? !t.altKey : t.altKey;
+      return centerTransform ? !altKey : altKey;
     },
 
     /**
+     * should disappear before release 4.0
      * @private
      */
     _getOriginFromCorner: function(target, corner) {
@@ -641,7 +625,10 @@
       else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
         origin.y = 'top';
       }
-
+      else if (corner === 'mtr') {
+        origin.x = 'center';
+        origin.y = 'center';
+      }
       return origin;
     },
 
@@ -652,23 +639,12 @@
      * @param {Event} e Event object
      * @param {fabric.Object} [target] inserted back to help overriding. Unused
      */
-    _getActionFromCorner: function(alreadySelected, corner, e /* target */) {
+    _getActionFromCorner: function(alreadySelected, corner, e, target) {
       if (!corner || !alreadySelected) {
         return 'drag';
       }
-
-      switch (corner) {
-        case 'mtr':
-          return 'rotate';
-        case 'ml':
-        case 'mr':
-          return e[this.altActionKey] ? 'skewY' : 'scaleX';
-        case 'mt':
-        case 'mb':
-          return e[this.altActionKey] ? 'skewX' : 'scaleY';
-        default:
-          return 'scale';
-      }
+      var control = target.controls[corner];
+      return control.getActionName(e, control, target);
     },
 
     /**
@@ -681,45 +657,47 @@
         return;
       }
 
-      var pointer = this.getPointer(e),
-          corner = target._findTargetCorner(this.getPointer(e, true)),
+      var pointer = this.getPointer(e), corner = target.__corner,
+          actionHandler = !!corner && target.controls[corner].getActionHandler(),
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
-          origin = this._getOriginFromCorner(target, corner);
+          origin = this._getOriginFromCorner(target, corner),
+          altKey = e[this.centeredKey],
+          transform = {
+            target: target,
+            action: action,
+            actionHandler: actionHandler,
+            corner: corner,
+            scaleX: target.scaleX,
+            scaleY: target.scaleY,
+            skewX: target.skewX,
+            skewY: target.skewY,
+            // used by transation
+            offsetX: pointer.x - target.left,
+            offsetY: pointer.y - target.top,
+            originX: origin.x,
+            originY: origin.y,
+            ex: pointer.x,
+            ey: pointer.y,
+            lastX: pointer.x,
+            lastY: pointer.y,
+            // unsure they are useful anymore.
+            // left: target.left,
+            // top: target.top,
+            theta: degreesToRadians(target.angle),
+            // end of unsure
+            width: target.width * target.scaleX,
+            shiftKey: e.shiftKey,
+            altKey: altKey,
+            original: fabric.util.saveObjectTransform(target),
+          };
 
-      this._currentTransform = {
-        target: target,
-        action: action,
-        corner: corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        // used by transation
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
-        originX: origin.x,
-        originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        // unsure they are usefull anymore.
-        // left: target.left,
-        // top: target.top,
-        theta: degreesToRadians(target.angle),
-        // end of unsure
-        width: target.width * target.scaleX,
-        mouseXSign: 1,
-        mouseYSign: 1,
-        shiftKey: e.shiftKey,
-        altKey: e[this.centeredKey],
-        original: fabric.util.saveObjectTransform(target),
-      };
-
-      this._currentTransform.original.originX = origin.x;
-      this._currentTransform.original.originY = origin.y;
-
-      this._resetCurrentTransform();
+      if (this._shouldCenterTransform(target, action, altKey)) {
+        transform.originX = 'center';
+        transform.originY = 'center';
+      }
+      transform.original.originX = origin.x;
+      transform.original.originY = origin.y;
+      this._currentTransform = transform;
       this._beforeTransform(e);
     },
 
@@ -741,360 +719,6 @@
       moveX && target.set('left', newLeft);
       moveY && target.set('top', newTop);
       return moveX || moveY;
-    },
-
-    /**
-     * Check if we are increasing a positive skew or lower it,
-     * checking mouse direction and pressed corner.
-     * @private
-     */
-    _changeSkewTransformOrigin: function(mouseMove, t, by) {
-      var property = 'originX', origins = { 0: 'center' },
-          skew = t.target.skewX, originA = 'left', originB = 'right',
-          corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1,
-          flipSign = 1;
-
-      mouseMove = mouseMove > 0 ? 1 : -1;
-      if (by === 'y') {
-        skew = t.target.skewY;
-        originA = 'top';
-        originB = 'bottom';
-        property = 'originY';
-      }
-      origins[-1] = originA;
-      origins[1] = originB;
-
-      t.target.flipX && (flipSign *= -1);
-      t.target.flipY && (flipSign *= -1);
-
-      if (skew === 0) {
-        t.skewSign = -corner * mouseMove * flipSign;
-        t[property] = origins[-mouseMove];
-      }
-      else {
-        skew = skew > 0 ? 1 : -1;
-        t.skewSign = skew;
-        t[property] = origins[skew * corner * flipSign];
-      }
-    },
-
-    /**
-     * Skew object by mouse events
-     * @private
-     * @param {Number} x pointer's x coordinate
-     * @param {Number} y pointer's y coordinate
-     * @param {String} by Either 'x' or 'y'
-     * @return {Boolean} true if the skewing occurred
-     */
-    _skewObject: function (x, y, by) {
-      var t = this._currentTransform,
-          target = t.target, skewed = false,
-          lockSkewingX = target.get('lockSkewingX'),
-          lockSkewingY = target.get('lockSkewingY');
-
-      if ((lockSkewingX && by === 'x') || (lockSkewingY && by === 'y')) {
-        return false;
-      }
-
-      // Get the constraint point
-      var center = target.getCenterPoint(),
-          actualMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center')[by],
-          lastMouseByCenter = target.toLocalPoint(new fabric.Point(t.lastX, t.lastY), 'center', 'center')[by],
-          actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
-
-      this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
-      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by];
-      constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
-      // Actually skew the object
-      skewed = this._setObjectSkew(actualMouseByOrigin, t, by, dim);
-      t.lastX = x;
-      t.lastY = y;
-      // Make sure the constraints apply
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-      return skewed;
-    },
-
-    /**
-     * Set object skew
-     * @private
-     * @return {Boolean} true if the skewing occurred
-     */
-    _setObjectSkew: function(localMouse, transform, by, _dim) {
-      var target = transform.target, newValue, skewed = false,
-          skewSign = transform.skewSign, newDim, dimNoSkew,
-          otherBy, _otherBy, _by, newDimMouse, skewX, skewY;
-
-      if (by === 'x') {
-        otherBy = 'y';
-        _otherBy = 'Y';
-        _by = 'X';
-        skewX = 0;
-        skewY = target.skewY;
-      }
-      else {
-        otherBy = 'x';
-        _otherBy = 'X';
-        _by = 'Y';
-        skewX = target.skewX;
-        skewY = 0;
-      }
-
-      dimNoSkew = target._getTransformedDimensions(skewX, skewY);
-      newDimMouse = 2 * Math.abs(localMouse) - dimNoSkew[by];
-      if (newDimMouse <= 2) {
-        newValue = 0;
-      }
-      else {
-        newValue = skewSign * Math.atan((newDimMouse / target['scale' + _by]) /
-                                        (dimNoSkew[otherBy] / target['scale' + _otherBy]));
-        newValue = fabric.util.radiansToDegrees(newValue);
-      }
-      skewed = target['skew' + _by] !== newValue;
-      target.set('skew' + _by, newValue);
-      if (target['skew' + _otherBy] !== 0) {
-        newDim = target._getTransformedDimensions();
-        newValue = (_dim[otherBy] / newDim[otherBy]) * target['scale' + _otherBy];
-        target.set('scale' + _otherBy, newValue);
-      }
-      return skewed;
-    },
-
-    /**
-     * Scales object by invoking its scaleX/scaleY methods
-     * @private
-     * @param {Number} x pointer's x coordinate
-     * @param {Number} y pointer's y coordinate
-     * @param {String} by Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
-     *                    When not provided, an object is scaled by both dimensions equally
-     * @return {Boolean} true if the scaling occurred
-     */
-    _scaleObject: function (x, y, by) {
-      var t = this._currentTransform,
-          target = t.target,
-          lockScalingX = target.lockScalingX,
-          lockScalingY = target.lockScalingY,
-          lockScalingFlip = target.lockScalingFlip;
-
-      if (lockScalingX && lockScalingY) {
-        return false;
-      }
-
-      // Get the constraint point
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY),
-          dim = target._getTransformedDimensions(), scaled = false;
-
-      this._setLocalMouse(localMouse, t);
-
-      // Actually scale the object
-      scaled = this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
-
-      // Make sure the constraints apply
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-      return scaled;
-    },
-
-    /**
-     * @private
-     * @return {Boolean} true if the scaling occurred
-     */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, _dim) {
-      var target = transform.target, forbidScalingX = false, forbidScalingY = false, scaled = false,
-          scaleX = localMouse.x * target.scaleX / _dim.x,
-          scaleY = localMouse.y * target.scaleY / _dim.y,
-          changeX = target.scaleX !== scaleX,
-          changeY = target.scaleY !== scaleY;
-
-      transform.newScaleX = scaleX;
-      transform.newScaleY = scaleY;
-      if (by === 'x' && target instanceof fabric.Textbox) {
-        var w = target.width * (localMouse.x / _dim.x);
-        if (w >= target.getMinWidth()) {
-          scaled = w !== target.width;
-          target.set('width', w);
-          return scaled;
-        }
-        return false;
-      }
-
-      if (lockScalingFlip && scaleX <= 0 && scaleX < target.scaleX) {
-        forbidScalingX = true;
-        localMouse.x = 0;
-      }
-
-      if (lockScalingFlip && scaleY <= 0 && scaleY < target.scaleY) {
-        forbidScalingY = true;
-        localMouse.y = 0;
-      }
-
-      if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        scaled = this._scaleObjectEqually(localMouse, target, transform, _dim);
-      }
-      else if (!by) {
-        forbidScalingX || lockScalingX || (target.set('scaleX', scaleX) && (scaled = scaled || changeX));
-        forbidScalingY || lockScalingY || (target.set('scaleY', scaleY) && (scaled = scaled || changeY));
-      }
-      else if (by === 'x' && !target.get('lockUniScaling')) {
-        forbidScalingX || lockScalingX || (target.set('scaleX', scaleX) && (scaled = changeX));
-      }
-      else if (by === 'y' && !target.get('lockUniScaling')) {
-        forbidScalingY || lockScalingY || (target.set('scaleY', scaleY) && (scaled = changeY));
-      }
-      forbidScalingX || forbidScalingY || this._flipObject(transform, by);
-      return scaled;
-    },
-
-    /**
-     * @private
-     * @return {Boolean} true if the scaling occurred
-     */
-    _scaleObjectEqually: function(localMouse, target, transform, _dim) {
-
-      var dist = localMouse.y + localMouse.x,
-          lastDist = _dim.y * transform.original.scaleY / target.scaleY +
-                     _dim.x * transform.original.scaleX / target.scaleX,
-          scaled, signX = localMouse.x < 0 ? -1 : 1,
-          signY = localMouse.y < 0 ? -1 : 1, newScaleX, newScaleY;
-
-      // We use transform.scaleX/Y instead of target.scaleX/Y
-      // because the object may have a min scale and we'll loose the proportions
-      newScaleX = signX * Math.abs(transform.original.scaleX * dist / lastDist);
-      newScaleY = signY * Math.abs(transform.original.scaleY * dist / lastDist);
-      scaled = newScaleX !== target.scaleX || newScaleY !== target.scaleY;
-      target.set('scaleX', newScaleX);
-      target.set('scaleY', newScaleY);
-      return scaled;
-    },
-
-    /**
-     * @private
-     */
-    _flipObject: function(transform, by) {
-      if (transform.newScaleX < 0 && by !== 'y') {
-        if (transform.originX === 'left') {
-          transform.originX = 'right';
-        }
-        else if (transform.originX === 'right') {
-          transform.originX = 'left';
-        }
-      }
-
-      if (transform.newScaleY < 0 && by !== 'x') {
-        if (transform.originY === 'top') {
-          transform.originY = 'bottom';
-        }
-        else if (transform.originY === 'bottom') {
-          transform.originY = 'top';
-        }
-      }
-    },
-
-    /**
-     * @private
-     */
-    _setLocalMouse: function(localMouse, t) {
-      var target = t.target, zoom = this.getZoom(),
-          padding = target.padding / zoom;
-
-      if (t.originX === 'right') {
-        localMouse.x *= -1;
-      }
-      else if (t.originX === 'center') {
-        localMouse.x *= t.mouseXSign * 2;
-        if (localMouse.x < 0) {
-          t.mouseXSign = -t.mouseXSign;
-        }
-      }
-
-      if (t.originY === 'bottom') {
-        localMouse.y *= -1;
-      }
-      else if (t.originY === 'center') {
-        localMouse.y *= t.mouseYSign * 2;
-        if (localMouse.y < 0) {
-          t.mouseYSign = -t.mouseYSign;
-        }
-      }
-
-      // adjust the mouse coordinates when dealing with padding
-      if (abs(localMouse.x) > padding) {
-        if (localMouse.x < 0) {
-          localMouse.x += padding;
-        }
-        else {
-          localMouse.x -= padding;
-        }
-      }
-      else { // mouse is within the padding, set to 0
-        localMouse.x = 0;
-      }
-
-      if (abs(localMouse.y) > padding) {
-        if (localMouse.y < 0) {
-          localMouse.y += padding;
-        }
-        else {
-          localMouse.y -= padding;
-        }
-      }
-      else {
-        localMouse.y = 0;
-      }
-    },
-
-    /**
-     * Rotates object by invoking its rotate method
-     * @private
-     * @param {Number} x pointer's x coordinate
-     * @param {Number} y pointer's y coordinate
-     * @return {Boolean} true if the rotation occurred
-     */
-    _rotateObject: function (x, y) {
-
-      var t = this._currentTransform,
-          target = t.target, constraintPosition,
-          constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
-
-      if (target.lockRotation) {
-        return false;
-      }
-
-      var lastAngle = atan2(t.ey - constraintPosition.y, t.ex - constraintPosition.x),
-          curAngle = atan2(y - constraintPosition.y, x - constraintPosition.x),
-          angle = radiansToDegrees(curAngle - lastAngle + t.theta),
-          hasRotated = true;
-
-      if (target.snapAngle > 0) {
-        var snapAngle  = target.snapAngle,
-            snapThreshold  = target.snapThreshold || snapAngle,
-            rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
-            leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
-
-        if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
-          angle = leftAngleLocked;
-        }
-        else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
-          angle = rightAngleLocked;
-        }
-      }
-
-      // normalize angle to positive value
-      if (angle < 0) {
-        angle = 360 + angle;
-      }
-      angle %= 360;
-
-      if (target.angle === angle) {
-        hasRotated = false;
-      }
-      else {
-        // rotation only happen here
-        target.angle = angle;
-        // Make sure the constraints apply
-        target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-      }
-
-      return hasRotated;
     },
 
     /**
@@ -1179,7 +803,8 @@
           pointer = this.getPointer(e, ignoreZoom),
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
-          activeTarget, activeTargetSubs;
+          activeTarget, activeTargetSubs,
+          isTouch = isTouchEvent(e);
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
@@ -1190,7 +815,7 @@
         return activeObject;
       }
       // if we hit the corner of an activeObject, let's return that.
-      if (aObjects.length === 1 && activeObject._findTargetCorner(pointer)) {
+      if (aObjects.length === 1 && activeObject._findTargetCorner(pointer, isTouch)) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
@@ -1224,7 +849,7 @@
       if (obj &&
           obj.visible &&
           obj.evented &&
-          this.containsPoint(null, obj, pointer)){
+          this.containsPoint(null, obj, pointer)) {
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
@@ -1327,6 +952,12 @@
         pointer = this.restorePointerVpt(pointer);
       }
 
+      var retinaScaling = this.getRetinaScaling();
+      if (retinaScaling !== 1) {
+        pointer.x /= retinaScaling;
+        pointer.y /= retinaScaling;
+      }
+
       if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };
@@ -1349,22 +980,24 @@
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
+      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
+          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
       // there is no need to create a new upperCanvas element if we have already one.
-      if (this.upperCanvasEl) {
-        this.upperCanvasEl.className = '';
+      if (upperCanvasEl) {
+        upperCanvasEl.className = '';
       }
       else {
-        this.upperCanvasEl = this._createCanvasElement();
+        upperCanvasEl = this._createCanvasElement();
+        this.upperCanvasEl = upperCanvasEl;
       }
-      fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
+      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
-      this.wrapperEl.appendChild(this.upperCanvasEl);
+      this.wrapperEl.appendChild(upperCanvasEl);
 
-      this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
-      this._applyCanvasStyle(this.upperCanvasEl);
-      this.contextTop = this.upperCanvasEl.getContext('2d');
+      this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
+      this._applyCanvasStyle(upperCanvasEl);
+      this.contextTop = upperCanvasEl.getContext('2d');
     },
 
     /**
@@ -1406,7 +1039,8 @@
         height: height + 'px',
         left: 0,
         top: 0,
-        'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none'
+        'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
+        '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : 'none'
       });
       element.width = width;
       element.height = height;
@@ -1476,8 +1110,9 @@
         this.fire('selection:cleared', { target: obj });
         obj.fire('deselected');
       }
-      if (this._hoveredTarget === obj) {
+      if (obj === this._hoveredTarget){
         this._hoveredTarget = null;
+        this._hoveredTargets = [];
       }
       this.callSuper('_onObjectRemoved', obj);
     },
@@ -1513,11 +1148,6 @@
         somethingChanged && this.fire('selection:updated', opt);
       }
       else if (objects.length > 0) {
-        // deprecated event
-        if (objects.length === 1) {
-          opt.target = added[0];
-          this.fire('object:selected', opt);
-        }
         opt.selected = added;
         // added for backward compatibility
         opt.target = this._activeObject;
@@ -1588,9 +1218,9 @@
      * @chainable
      */
     discardActiveObject: function (e) {
-      var currentActives = this.getActiveObjects();
+      var currentActives = this.getActiveObjects(), activeObject = this.getActiveObject();
       if (currentActives.length) {
-        this.fire('before:selection:cleared', { target: currentActives[0], e: e });
+        this.fire('before:selection:cleared', { target: activeObject, e: e });
       }
       this._discardActiveObject(e);
       this._fireSelectionEvents(currentActives, e);
@@ -1719,10 +1349,5 @@
     if (prop !== 'prototype') {
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
-  }
-
-  if (fabric.isTouchSupported) {
-    /** @ignore */
-    fabric.Canvas.prototype._setCursorFromEvent = function() { };
   }
 })();

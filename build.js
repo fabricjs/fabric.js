@@ -126,7 +126,7 @@ var filesToInclude = [
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
   ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
-  'src/util/arc.js',
+  'src/util/path.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
@@ -149,6 +149,9 @@ var filesToInclude = [
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
+  ifSpecifiedInclude('interaction', 'src/controls.actions.js'),
+  ifSpecifiedInclude('interaction', 'src/controls.render.js'),
+  ifSpecifiedInclude('interaction', 'src/control.class.js'),
 
   ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
   ifSpecifiedInclude('pattern', 'src/pattern.class.js'),
@@ -228,7 +231,7 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
-
+  ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
 ];
 
 if (buildMinified) {

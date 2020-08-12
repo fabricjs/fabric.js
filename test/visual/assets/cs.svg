@@ -1,0 +1,39 @@
+<?xml version="1.0" standalone="yes"?>
+<svg width="400px" height="200px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <!-- Cubic Bézier curve with absolute coordinates -->
+  <path fill="none" stroke="red"
+        d="M 10,90
+           C 30,90 25,10 50,10
+           S 70,90 90,90" />
+
+  <!-- Cubic Bézier curve with relative coordinates -->
+  <path fill="none" stroke="red"
+        d="M 110,90
+           c 20,0 15,-80 40,-80
+           s 20,80 40,80" />
+
+  <!-- Highlight the curve vertex and control points -->
+  <g id="ControlPoints">
+
+    <!-- First cubic command control points -->
+    <line x1="10" y1="90" x2="30" y2="90" stroke="lightgrey" />
+    <circle cx="30" cy="90" r="1.5"/>
+
+    <line x1="50" y1="10" x2="25" y2="10" stroke="lightgrey" />
+    <circle cx="25" cy="10" r="1.5"/>
+
+    <!-- Second smooth command control points (the first one is implicit) -->
+    <line x1="50" y1="10" x2="75" y2="10" stroke="lightgrey" stroke-dasharray="2" />
+    <circle cx="75" cy="10" r="1.5" fill="lightgrey"/>
+
+    <line x1="90" y1="90" x2="70" y2="90" stroke="lightgrey" />
+    <circle cx="70" cy="90" r="1.5" />
+
+    <!-- curve vertex points -->
+    <circle cx="10" cy="90" r="1.5"/>
+    <circle cx="50" cy="10" r="1.5"/>
+    <circle cx="90" cy="90" r="1.5"/>
+  </g>
+  <use xlink:href="#ControlPoints" x="100" />
+</svg>

@@ -30,14 +30,6 @@
     type: 'image',
 
     /**
-     * crossOrigin value (one of "", "anonymous", "use-credentials")
-     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
-     * @type String
-     * @default
-     */
-    crossOrigin: '',
-
-    /**
      * Width of a stroke.
      * For image quality a stroke multiple of 2 gives better results.
      * @type Number
@@ -125,6 +117,15 @@
     cropY: 0,
 
     /**
+     * Indicates whether this canvas will use image smoothing when painting this image.
+     * Also influence if the cacheCanvas for this image uses imageSmoothing
+     * @since 4.0.0-beta.11
+     * @type Boolean
+     * @default
+     */
+    imageSmoothing: true,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -199,15 +200,10 @@
     },
 
     /**
-     * Sets crossOrigin value (on an instance and corresponding image element)
-     * @return {fabric.Image} thisArg
-     * @chainable
+     * Get the crossOrigin value (of the corresponding image element)
      */
-    setCrossOrigin: function(value) {
-      this.crossOrigin = value;
-      this._element.crossOrigin = value;
-
-      return this;
+    getCrossOrigin: function() {
+      return this._originalElement && (this._originalElement.crossOrigin || null);
     },
 
     /**
@@ -278,9 +274,10 @@
       var object = extend(
         this.callSuper(
           'toObject',
-          ['crossOrigin', 'cropX', 'cropY'].concat(propertiesToInclude)
+          ['cropX', 'cropY'].concat(propertiesToInclude)
         ), {
           src: this.getSrc(),
+          crossOrigin: this.getCrossOrigin(),
           filters: filters,
         });
       if (this.resizeFilter) {
@@ -304,8 +301,11 @@
      * of the instance
      */
     _toSVG: function() {
-      var svgString = [], imageMarkup = [], strokeSvg,
-          x = -this.width / 2, y = -this.height / 2, clipPath = '';
+      var svgString = [], imageMarkup = [], strokeSvg, element = this._element,
+          x = -this.width / 2, y = -this.height / 2, clipPath = '', imageRendering = '';
+      if (!element) {
+        return [];
+      }
       if (this.hasCrop()) {
         var clipPathId = fabric.Object.__uid++;
         svgString.push(
@@ -315,13 +315,17 @@
         );
         clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
       }
+      if (!this.imageSmoothing) {
+        imageRendering = '" image-rendering="optimizeSpeed';
+      }
       imageMarkup.push('\t<image ', 'COMMON_PARTS', 'xlink:href="', this.getSvgSrc(true),
         '" x="', x - this.cropX, '" y="', y - this.cropY,
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
         // so that object's center aligns with container's left/top
-        '" width="', this._element.width || this._element.naturalWidth,
-        '" height="', this._element.height || this._element.height,
+        '" width="', element.width || element.naturalWidth,
+        '" height="', element.height || element.height,
+        imageRendering,
         '"', clipPath,
         '></image>\n');
 
@@ -376,14 +380,16 @@
      * @param {String} src Source string (URL)
      * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
      * @param {Object} [options] Options object
+     * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
      * @return {fabric.Image} thisArg
      * @chainable
      */
     setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img) {
+      fabric.util.loadImage(src, function(img, isError) {
         this.setElement(img, options);
         this._setWidthHeight();
-        callback && callback(this);
+        callback && callback(this, isError);
       }, this, options && options.crossOrigin);
       return this;
     },
@@ -495,11 +501,22 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
       this._stroke(ctx);
       this._renderPaintInOrder(ctx);
+    },
+
+    /**
+     * Paint the cached copy of the object on the target context.
+     * it will set the imageSmoothing for the draw operation
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawCacheOnCanvas: function(ctx) {
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
+      fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
     },
 
     /**
@@ -518,8 +535,11 @@
     },
 
     _renderFill: function(ctx) {
-      var elementToDraw = this._element,
-          w = this.width, h = this.height,
+      var elementToDraw = this._element;
+      if (!elementToDraw) {
+        return;
+      }
+      var w = this.width, h = this.height,
           sW = Math.min(elementToDraw.naturalWidth || elementToDraw.width, w * this._filterScalingX),
           sH = Math.min(elementToDraw.naturalHeight || elementToDraw.height, h * this._filterScalingY),
           x = -w / 2, y = -h / 2,
@@ -530,7 +550,8 @@
     },
 
     /**
-     * @private, needed to check if image needs resize
+     * needed to check if image needs resize
+     * @private
      */
     _needsResize: function() {
       var scale = this.getTotalObjectScaling();
@@ -564,9 +585,6 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      if (this._element && this.crossOrigin) {
-        this._element.crossOrigin = this.crossOrigin;
-      }
     },
 
     /**
@@ -686,9 +704,9 @@
    */
   fabric.Image.fromObject = function(_object, callback) {
     var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, error) {
-      if (error) {
-        callback && callback(null, error);
+    fabric.util.loadImage(object.src, function(img, isError) {
+      if (isError) {
+        callback && callback(null, true);
         return;
       }
       fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
@@ -698,7 +716,7 @@
           fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
             object.clipPath = enlivedProps[0];
             var image = new fabric.Image(img, object);
-            callback(image);
+            callback(image, false);
           });
         });
       });
@@ -709,12 +727,12 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
+   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occured or not.
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
-    fabric.util.loadImage(url, function(img) {
-      callback && callback(new fabric.Image(img, imgOptions));
+    fabric.util.loadImage(url, function(img, isError) {
+      callback && callback(new fabric.Image(img, imgOptions), isError);
     }, null, imgOptions && imgOptions.crossOrigin);
   };
 
@@ -725,7 +743,9 @@
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
   fabric.Image.ATTRIBUTE_NAMES =
-    fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href crossOrigin'.split(' '));
+    fabric.SHARED_ATTRIBUTES.concat(
+      'x y width height preserveAspectRatio xlink:href crossOrigin image-rendering'.split(' ')
+    );
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element

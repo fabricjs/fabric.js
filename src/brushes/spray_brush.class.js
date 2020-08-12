@@ -110,7 +110,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     var group = new fabric.Group(rects);
-    this.shadow && group.setShadow(this.shadow);
+    this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
+    this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 

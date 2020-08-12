@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '2.7.0' };
+var fabric = fabric || { version: '4.0.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -10,7 +10,7 @@ else if (typeof define === 'function' && define.amd) {
 }
 /* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  if (document instanceof HTMLDocument) {
+  if (document instanceof (typeof HTMLDocument !== 'undefined' ? HTMLDocument : Document)) {
     fabric.document = document;
   }
   else {
@@ -64,7 +64,7 @@ fabric.SHARED_ATTRIBUTES = [
   'stroke-linejoin', 'stroke-miterlimit',
   'stroke-opacity', 'stroke-width',
   'id', 'paint-order', 'vector-effect',
-  'instantiated_by_use', 'clip-path'
+  'instantiated_by_use', 'clip-path',
 ];
 /* _FROM_SVG_END_ */
 
@@ -72,9 +72,12 @@ fabric.SHARED_ATTRIBUTES = [
  * Pixel per Inch as a default value set to 96. Can be changed for more realistic conversion.
  */
 fabric.DPI = 96;
-fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)';
+fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
+fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };
 fabric.iMatrix = [1, 0, 0, 1, 0, 0];
+fabric.svgNS = 'http://www.w3.org/2000/svg';
 
 /**
  * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
@@ -113,6 +116,15 @@ fabric.charWidthsCache = { };
  * @default
  */
 fabric.textureSize = 2048;
+
+/**
+ * When 'true', style information is not retained when copy/pasting text, making
+ * pasted text use destination style.
+ * Defaults to 'false'.
+ * @type Boolean
+ * @default
+ */
+fabric.disableStyleCopyPaste = false;
 
 /**
  * Enable webgl for filtering picture is available
@@ -169,6 +181,15 @@ fabric.boundsOfCurveCache = { };
  * @default true
  */
 fabric.cachesBoundsOfCurve = true;
+
+/**
+ * Skip performance testing of setupGLContext and force the use of putImageData that seems to be the one that works best on
+ * Chrome + old hardware. if your users are experiencing empty images after filtering you may try to force this to true
+ * this has to be set before instantiating the filtering backend ( before filtering the first image )
+ * @type Boolean
+ * @default false
+ */
+fabric.forceGLPutImageData = false;
 
 fabric.initFilterBackend = function() {
   if (fabric.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(fabric.textureSize)) {

@@ -1,4 +1,13 @@
 (function() {
+  var simulateEvent;
+  if (fabric.isLikelyNode) {
+    simulateEvent = global.simulateEvent;
+  }
+  else {
+    simulateEvent = window.simulateEvent;
+  }
+
+  var SUB_TARGETS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"activeSelection","left":-152,"top":656.25,"width":356.5,"height":356.5,"scaleX":0.45,"scaleY":0.45,"objects":[]},{"type":"group","left":11,"top":6,"width":511.5,"height":511.5,"objects":[{"type":"rect","left":-255.75,"top":-255.75,"width":50,"height":50,"fill":"#6ce798","scaleX":10.03,"scaleY":10.03,"opacity":0.8},{"type":"group","left":-179.75,"top":22,"width":356.5,"height":356.5,"scaleX":0.54,"scaleY":0.54,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":-202.75,"top":-228.5,"width":356.5,"height":356.5,"scaleX":0.61,"scaleY":0.61,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":138.3,"top":-90.22,"width":356.5,"height":356.5,"scaleX":0.42,"scaleY":0.42,"angle":62.73,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]}]}]}';
 
   var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
   var upperCanvasEl = canvas.upperCanvasEl;
@@ -34,11 +43,10 @@
     canvas.setActiveObject(rect);
 
     var t, counter = 0;
-    var _onBeforeScaleRotate = canvas.onBeforeScaleRotate;
-    canvas.onBeforeScaleRotate = function (target) {
-      t = target;
+    canvas.on('before:transform', function (options) {
+      t = options.transform.target;
       counter++;
-    };
+    });
 
     var corners = ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr'];
     for (var i = 0; i < corners.length; i++) {
@@ -50,8 +58,8 @@
       };
       canvas._setupCurrentTransform(e, rect);
     }
-    assert.equal(counter, corners.length, '_beforeTransform should trigger onBeforeScaleRotate for all corners');
-    assert.equal(t, rect, 'onBeforeScaleRotate should receive correct target');
+    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate for all corners');
+    assert.equal(t, rect, 'before:transform should receive correct target');
 
     canvas.zoomToPoint({ x: 25, y: 25 }, 2);
 
@@ -67,11 +75,10 @@
       };
       canvas._beforeTransform(e, rect);
     }
-    assert.equal(counter, corners.length, '_beforeTransform should trigger onBeforeScaleRotate when canvas is zoomed');
-    assert.equal(t, rect, 'onBeforeScaleRotate should receive correct target when canvas is zoomed');
+    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
+    assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');
 
     canvas.zoomToPoint({ x: 0, y: 0 }, 1);
-    canvas.onBeforeScaleRotate = _onBeforeScaleRotate;
   });
 
   QUnit.test('cache and reset event properties', function(assert) {
@@ -103,19 +110,19 @@
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
     canvas.isDrawingMode = false;
-    canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 0, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse down fired');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'rightclick did not fire a mouse:down event');
     canvas.fireRightClick = true;
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'rightclick did fire a mouse:down event');
     clickCount = 0;
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 0, 'middleClick did not fire a mouse:down event');
     canvas.fireMiddleClick = true;
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl  });
+    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'middleClick did fire a mouse:down event');
   });
 
@@ -232,6 +239,28 @@
     canvas.__onMouseUp(e4);
   });
 
+  QUnit.test('specific bug #6314 for partial intersection with drag', function(assert) {
+    var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+    var renderRequested = false;
+    var greenRect = new fabric.Rect({
+      width: 300,
+      height: 300,
+      left: 50,
+      top: 0,
+      fill: 'green',
+    });
+    canvas.add(greenRect);
+    canvas._onMouseDown({ clientX: 25, clientY: 25, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    canvas.requestRenderAll = function() {
+      renderRequested = true;
+    };
+    canvas._onMouseUp({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    assert.equal(renderRequested, true, 'a render has been requested');
+  });
+
+
   QUnit.test('mouse:up isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
@@ -315,9 +344,9 @@
   });
 
   QUnit.test('scale small object when mousemove + drag, active', function(assert) {
-    var e = { clientX: 2, clientY: 2, which: 1 };
-    var e1 = { clientX: -4, clientY: -4, which: 1 };
-    var e2 = { clientX: -6, clientY: -6, which: 1 };
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     assert.equal(rect.scaleX, 1, 'rect not scaled X');
     assert.equal(rect.scaleY, 1, 'rect not scaled Y');
@@ -481,6 +510,117 @@
     });
   });
 
+  QUnit.test('mouseover and mouseout with subtarget check', function(assert) {
+    var rect1 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 0, strokeWidth: 0, name: 'rect1' });
+    var rect2 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 5, strokeWidth: 0, name: 'rect2' });
+    var rect3 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 5, strokeWidth: 0, name: 'rect3' });
+    var rect4 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 0, strokeWidth: 0, name: 'rect4' });
+    var rect5 = new fabric.Rect({ width: 5, height: 5, left: 2.5, top: 2.5, strokeWidth: 0, name: 'rect5' });
+    var group1 = new fabric.Group([rect1, rect2], { subTargetCheck: true, name: 'group1' });
+    var group2 = new fabric.Group([rect3, rect4], { subTargetCheck: true, name: 'group2' });
+    // a group with 2 groups, with 2 rects each, one group left one group right
+    // each with 2 rects vertically aligned
+    var group = new fabric.Group([group1, group2], { subTargetCheck: true, name: 'group' });
+    var c = new fabric.Canvas();
+    var targetArray = [];
+    var targetOutArray = [];
+    [rect1, rect2, rect3, rect4, rect5, group1, group2, group].forEach(function(t) {
+      t.on('mouseover', function(opt) {
+        targetArray.push(opt.target);
+      });
+      t.on('mouseout', function(opt) {
+        targetOutArray.push(opt.target);
+      });
+    });
+    c.add(group, rect5);
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 1, pointerY: 1
+    });
+    assert.equal(targetArray[0], group, 'first hit is group');
+    assert.equal(targetArray[2], group2, 'then hit group2');
+    assert.equal(targetArray[1], rect4, 'then hit rect4');
+    assert.equal(targetOutArray.length, 0, 'no target out');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 5, pointerY: 5
+    });
+    assert.equal(targetArray[0], rect5, 'first hit is target5');
+    assert.equal(targetArray.length, 1, 'only one target');
+    assert.equal(targetOutArray[0], group, 'first targetOutArray is group');
+    assert.equal(targetOutArray[2], group2, 'then targetOutArray group2');
+    assert.equal(targetOutArray[1], rect4, 'then targetOutArray rect4');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 9, pointerY: 9
+    });
+    assert.equal(targetArray[0], group, 'first hit is group');
+    assert.equal(targetArray[2], group1, 'then hit group1');
+    assert.equal(targetArray[1], rect2, 'then hit rect2');
+    assert.equal(targetOutArray.length, 1, 'only one target out when moving away from rect 5');
+    assert.equal(targetOutArray[0], rect5, 'rect5 fires out');
+
+    targetArray = [];
+    targetOutArray = [];
+    simulateEvent(c.upperCanvasEl, 'mousemove', {
+      pointerX: 9, pointerY: 1
+    });
+    assert.equal(targetArray[0], rect1, 'the only target changing is rect1');
+    assert.equal(targetArray.length, 1, 'only one target entering ');
+    assert.equal(targetOutArray.length, 1, 'one target out');
+    assert.equal(targetOutArray[0], rect2, 'the only target out is rect2');
+  });
+
+  QUnit.test('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
+    var counterOver = 0, counterOut = 0, canvas = new fabric.Canvas();
+    function setSubTargetCheckRecursive(obj) {
+      if (obj._objects) {
+        obj._objects.forEach(setSubTargetCheckRecursive);
+      }
+      obj.subTargetCheck = true;
+      obj.on('mouseover', function() {
+        counterOver++;
+      });
+      obj.on('mouseout', function() {
+        counterOut++;
+      });
+    }
+    canvas.loadFromJSON(SUB_TARGETS_JSON, function() {
+      var activeSelection = new fabric.ActiveSelection(canvas.getObjects(), {
+        canvas: canvas
+      });
+      canvas.setActiveObject(activeSelection);
+      setSubTargetCheckRecursive(activeSelection);
+
+      // perform MouseOver event on a deeply nested subTarget
+      var moveEvent = fabric.document.createEvent('HTMLEvents');
+      moveEvent.initEvent('mousemove', true, true);
+      var target = canvas.item(1);
+      canvas.targets = [
+        target.item(1),
+        target.item(1).item(1),
+        target.item(1).item(1).item(1)
+      ];
+      canvas._fireOverOutEvents(target, moveEvent);
+      assert.equal(counterOver, 4, 'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets');
+      assert.equal(canvas._hoveredTarget, target, 'activeSelection is _hoveredTarget');
+      assert.equal(canvas._hoveredTargets.length, 3, '3 additional subTargets are captured as _hoveredTargets');
+
+      // perform MouseOut even on all hoveredTargets
+      canvas.targets = [];
+      canvas._fireOverOutEvents(null, moveEvent);
+      assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
+      assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
+      assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');
+    });
+  });
+
+  // TODO: QUnit.test('mousemove: subTargetCheck: setCursorFromEvent considers subTargets')
+  // TODO: QUnit.test('mousemove: subTargetCheck: setCursorFromEvent considers subTargets in reverse order, so the top-most subTarget's .hoverCursor takes precedence')
+
   ['MouseDown', 'MouseMove', 'MouseOut', 'MouseEnter', 'MouseWheel', 'DoubleClick'].forEach(function(eventType) {
     QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
       var funcName = '_on' + eventType;
@@ -533,6 +673,50 @@
     }, 200);
   });
 
+  QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
+    var event = fabric.document.createEvent('MouseEvent');
+    event.initEvent('mouseenter', true, true);
+    var c = new fabric.Canvas();
+    c._hoveredTarget = new fabric.Object();
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(c._hoveredTarget, null, '_hoveredTarget has been removed');
+  });
+
+  QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
+    var event = fabric.document.createEvent('MouseEvent');
+    event.initEvent('mouseenter', true, true);
+    var c = new fabric.Canvas();
+    var obj = new fabric.Object();
+    c._hoveredTarget = obj;
+    c.currentTransform = {};
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
+  });
+
+  QUnit.test('mouseEnter removes __corner', function(assert) {
+    var event = fabric.document.createEvent('MouseEvent');
+    event.initEvent('mouseenter', true, true);
+    var c = new fabric.Canvas();
+    var obj = new fabric.Object({ top: 100, left: 100 });
+    c.add(obj);
+    c.setActiveObject(obj);
+    obj.__corner = 'test';
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
+  });
+
+  QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
+    var event = fabric.document.createEvent('MouseEvent');
+    event.initEvent('mouseenter', true, true);
+    var c = new fabric.Canvas();
+    var obj = new fabric.Object();
+    c.currentTransform = {};
+    c.setActiveObject(obj);
+    obj.__corner = 'test';
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(obj.__corner, 'test', '__corner has not been reset');
+  });
+
   QUnit.test('avoid multiple events on window', function(assert) {
     var originalResize = fabric.Canvas.prototype._onResize;
     var counter = 0;
@@ -550,130 +734,128 @@
     fabric.Canvas.prototype._onResize = originalResize;
   });
 
-  QUnit.test('actionIsDisabled ', function(assert) {
-    assert.ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
-    var key = canvas.altActionKey;
-    var target = new fabric.Object();
-    var e = { };
-    e[key] = false;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'action is not disabled');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'action is not disabled');
-    target = new fabric.Object();
-    target.lockScalingX = true;
-
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled lockScalingX');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockScalingX');
-    target = new fabric.Object();
-    target.lockScalingY = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is not disabled lockScalingY');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabledlockScalingY');
-    target = new fabric.Object();
-    target.lockScalingY = true;
-    target.lockScalingX = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled scaling locked');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled scaling locked');
-    target = new fabric.Object();
-    target.lockRotation = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockRotation');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), true, 'mtr action is disabled lockRotation');
-    target = new fabric.Object();
-    target.lockSkewingX = true;
-    target.lockSkewingY = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewing');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewing');
-    e[key] = true;
-    target = new fabric.Object();
-    target.lockSkewingY = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingY');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingY');
-
-    e[key] = true;
-    target = new fabric.Object();
-    target.lockSkewingX = true;
-    assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingX');
-    assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingX');
-  });
+  // this test is important. As today we do not havenymore a unique function that give us the
+  // status of the action. that logic is replicated in style handler and action handler.
+  // this is a cleanup of the current work that we need to do.
+  // this wasn't a user facing feature, although the method was public and documented in JSDOCS
+  // QUnit.test('actionIsDisabled ', function(assert) {
+  //   assert.ok(typeof fabric.Canvas.prototype.actionIsDisabled === 'function', 'actionIsDisabled is a function');
+  //   var key = canvas.altActionKey;
+  //   var target = new fabric.Object();
+  //   var e = { };
+  //   e[key] = false;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'action is not disabled');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'action is not disabled');
+  //   target = new fabric.Object();
+  //   target.lockScalingX = true;
+  //
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled lockScalingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockScalingX');
+  //   target = new fabric.Object();
+  //   target.lockScalingY = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is not disabled lockScalingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabledlockScalingY');
+  //   target = new fabric.Object();
+  //   target.lockScalingY = true;
+  //   target.lockScalingX = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), true, 'tl action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), true, 'tr action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), true, 'bl action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), true, 'br action is disabled scaling locked');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled scaling locked');
+  //   target = new fabric.Object();
+  //   target.lockRotation = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockRotation');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), true, 'mtr action is disabled lockRotation');
+  //   target = new fabric.Object();
+  //   target.lockSkewingX = true;
+  //   target.lockSkewingY = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewing');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewing');
+  //   e[key] = true;
+  //   target = new fabric.Object();
+  //   target.lockSkewingY = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), false, 'mt action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), false, 'mb action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), true, 'ml action is disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), true, 'mr action is disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingY');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingY');
+  //
+  //   e[key] = true;
+  //   target = new fabric.Object();
+  //   target.lockSkewingX = true;
+  //   assert.equal(!!canvas.actionIsDisabled('mt', target, e), true, 'mt action is disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mb', target, e), true, 'mb action is disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('ml', target, e), false, 'ml action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mr', target, e), false, 'mr action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('tl', target, e), false, 'tl action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('tr', target, e), false, 'tr action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('bl', target, e), false, 'bl action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('br', target, e), false, 'br action is not disabled lockSkewingX');
+  //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingX');
+  // });
 
   QUnit.test('getCornerCursor ', function(assert) {
-    assert.ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'actionIsDisabled is a function');
+    assert.ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'getCornerCursor is a function');
     var key = canvas.altActionKey;
     var key2 = canvas.uniScaleKey;
-    var target = new fabric.Object();
+    var target = new fabric.Object({ canvas: canvas });
     var e = { };
     e[key] = false;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled');
+    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'crosshair action is not disabled');
 
-    target = new fabric.Object();
-    target.hasRotatingPoint = false;
-    var e = { };
-    e[key] = false;
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'default', 'action is not disabled');
-
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockScalingX = true;
     assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockScalingX');
     assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockScalingX');
@@ -691,7 +873,7 @@
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingX key2');
 
     var e = { };
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockScalingY = true;
     assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScalingY');
     assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScalingY');
@@ -709,7 +891,7 @@
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingY key2');
 
     var e = { };
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockScalingY = true;
     target.lockScalingX = true;
     assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScaling');
@@ -728,19 +910,19 @@
     assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling key2');
 
     var e = { };
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockRotation = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'action is disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled lockRotation');
+    assert.equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'mtr action is disabled lockRotation');
 
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockSkewingX = true;
     target.lockSkewingY = true;
     assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
@@ -754,30 +936,30 @@
     assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
 
     e[key] = true;
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockSkewingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'e-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'w-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    assert.equal(canvas.getCornerCursor('mt', target, e), 'ew-resize', 'lockSkewingY mt action is not disabled');
+    assert.equal(canvas.getCornerCursor('mb', target, e), 'ew-resize', 'lockSkewingY mb action is not disabled');
+    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'lockSkewingY ml action is disabled');
+    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'lockSkewingY mr action is disabled');
+    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingY tl action is not disabled');
+    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingY tr action is not disabled');
+    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingY bl action is not disabled');
+    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingY br action is not disabled');
+    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingY mtr action is not disabled');
 
     e[key] = true;
-    target = new fabric.Object();
+    target = new fabric.Object({ canvas: canvas });
     target.lockSkewingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'n-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 's-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'lockSkewingX mt action is disabled');
+    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'lockSkewingX mb action is disabled');
+    assert.equal(canvas.getCornerCursor('ml', target, e), 'ns-resize', 'lockSkewingX ml action is not disabled');
+    assert.equal(canvas.getCornerCursor('mr', target, e), 'ns-resize', 'lockSkewingX mr action is not disabled');
+    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingX tl action is not disabled');
+    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingX tr action is not disabled');
+    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingX bl action is not disabled');
+    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
+    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
   });
   QUnit.test('_addEventOptions return the correct event name', function(assert) {
     var opt = {};

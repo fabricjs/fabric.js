@@ -57,17 +57,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeDashArray: null,
 
   /**
-   * Sets shadow of an object
-   * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
-   * @return {fabric.Object} thisArg
-   * @chainable
-   */
-  setShadow: function(options) {
-    this.shadow = new fabric.Shadow(options);
-    return this;
-  },
-
-  /**
    * Sets brush styles
    * @private
    */
@@ -103,13 +92,23 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       return;
     }
 
-    var ctx = this.canvas.contextTop,
-        zoom = this.canvas.getZoom();
+    var canvas = this.canvas,
+        shadow = this.shadow,
+        ctx = canvas.contextTop,
+        zoom = canvas.getZoom();
+    if (canvas && canvas._isRetinaScaling()) {
+      zoom *= fabric.devicePixelRatio;
+    }
 
-    ctx.shadowColor = this.shadow.color;
-    ctx.shadowBlur = this.shadow.blur * zoom;
-    ctx.shadowOffsetX = this.shadow.offsetX * zoom;
-    ctx.shadowOffsetY = this.shadow.offsetY * zoom;
+    ctx.shadowColor = shadow.color;
+    ctx.shadowBlur = shadow.blur * zoom;
+    ctx.shadowOffsetX = shadow.offsetX * zoom;
+    ctx.shadowOffsetY = shadow.offsetY * zoom;
+  },
+
+  needsFullRender: function() {
+    var color = new fabric.Color(this.color);
+    return color.getAlpha() < 1 || !!this.shadow;
   },
 
   /**

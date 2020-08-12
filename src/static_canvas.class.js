@@ -57,10 +57,6 @@
 
     /**
      * Background image of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}.
-     * <b>Backwards incompatibility note:</b> The "backgroundImageOpacity"
-     * and "backgroundImageStretch" properties are deprecated since 1.3.9.
-     * Use {@link fabric.Image#opacity}, {@link fabric.Image#width} and {@link fabric.Image#height}.
      * since 2.4.0 image caching is active, please when putting an image as background, add to the
      * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
      * vale. As an alternative you can disable image objectCaching
@@ -80,10 +76,6 @@
 
     /**
      * Overlay image of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setOverlayImage}.
-     * <b>Backwards incompatibility note:</b> The "overlayImageLeft"
-     * and "overlayImageTop" properties are deprecated since 1.3.9.
-     * Use {@link fabric.Image#left} and {@link fabric.Image#top}.
      * since 2.4.0 image caching is active, please when putting an image as overlay, add to the
      * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
      * vale. As an alternative you can disable image objectCaching
@@ -118,18 +110,6 @@
      * @default
      */
     renderOnAddRemove: true,
-
-    /**
-     * Function that determines clipping of entire canvas area
-     * Being passed context as first argument.
-     * If you are using code minification, ctx argument can be minified/manglied you should use
-     * as a workaround `var ctx = arguments[0];` in the function;
-     * See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
-     * @deprecated since 2.0.0
-     * @type Function
-     * @default
-     */
-    clipTo: null,
 
     /**
      * Indicates whether object controls (borders/controls) are rendered above overlay image
@@ -174,15 +154,6 @@
      * @default
      */
     overlayVpt: true,
-
-    /**
-     * Callback; invoked right before object is about to be scaled/rotated
-     * @deprecated since 2.3.0
-     * Use before:transform event
-     */
-    onBeforeScaleRotate: function () {
-      /* NOOP */
-    },
 
     /**
      * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
@@ -233,7 +204,6 @@
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
-      this._setImageSmoothing();
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
@@ -276,11 +246,19 @@
       if (!this._isRetinaScaling()) {
         return;
       }
-      this.lowerCanvasEl.setAttribute('width', this.width * fabric.devicePixelRatio);
-      this.lowerCanvasEl.setAttribute('height', this.height * fabric.devicePixelRatio);
-
-      this.contextContainer.scale(fabric.devicePixelRatio, fabric.devicePixelRatio);
+      var scaleRatio = fabric.devicePixelRatio;
+      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
+      if (this.upperCanvasEl) {
+        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
+      }
     },
+
+    __initRetinaScaling: function(scaleRatio, canvas, context) {
+      canvas.setAttribute('width', this.width * scaleRatio);
+      canvas.setAttribute('height', this.height * scaleRatio);
+      context.scale(scaleRatio, scaleRatio);
+    },
+
 
     /**
      * Calculates canvas element offset relative to the document
@@ -317,7 +295,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -368,7 +346,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -448,40 +426,28 @@
 
     /**
      * @private
-     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
-     */
-    _setImageSmoothing: function() {
-      var ctx = this.getContext();
-
-      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
-        || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    },
-
-    /**
-     * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
+     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay. The first argument is the created image, the second argument is a flag indicating whether an error occured or not.
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
     __setBgOverlayImage: function(property, image, callback, options) {
       if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img) {
+        fabric.util.loadImage(image, function(img, isError) {
           if (img) {
             var instance = new fabric.Image(img, options);
             this[property] = instance;
             instance.canvas = this;
           }
-          callback && callback(img);
+          callback && callback(img, isError);
         }, this, options && options.crossOrigin);
       }
       else {
         options && image.setOptions(options);
         this[property] = image;
         image && (image.canvas = this);
-        callback && callback(image);
+        callback && callback(image, false);
       }
 
       return this;
@@ -640,7 +606,6 @@
         this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
       }
       this._initRetinaScaling();
-      this._setImageSmoothing();
       this.calcOffset();
 
       if (!options.cssOnly) {
@@ -711,14 +676,14 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject, object, ignoreVpt = false, skipAbsolute = true, i, len;
+      var activeObject = this._activeObject, object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords(ignoreVpt, skipAbsolute);
+        object.group || object.setCoords(true);
       }
-      if (activeObject && activeObject.type === 'activeSelection') {
-        activeObject.setCoords(ignoreVpt, skipAbsolute);
+      if (activeObject) {
+        activeObject.setCoords();
       }
       this.calcViewportBoundaries();
       this.renderOnAddRemove && this.requestRenderAll();
@@ -929,10 +894,8 @@
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
       this.fire('before:render', { ctx: ctx, });
-      if (this.clipTo) {
-        fabric.util.clipContext(this, ctx);
-      }
       this._renderBackground(ctx);
 
       ctx.save();
@@ -942,9 +905,6 @@
       ctx.restore();
       if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
-      }
-      if (this.clipTo) {
-        ctx.restore();
       }
       if (path) {
         path.canvas = this;
@@ -996,27 +956,38 @@
      * @param {string} property 'background' or 'overlay'
      */
     _renderBackgroundOrOverlay: function(ctx, property) {
-      var object = this[property + 'Color'], v;
-      if (object) {
-        ctx.fillStyle = object.toLive
-          ? object.toLive(ctx, this)
-          : object;
-
-        ctx.fillRect(
-          object.offsetX || 0,
-          object.offsetY || 0,
-          this.width,
-          this.height);
+      var fill = this[property + 'Color'], object = this[property + 'Image'],
+          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+      if (!fill && !object) {
+        return;
       }
-      object = this[property + 'Image'];
+      if (fill) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(this.width, 0);
+        ctx.lineTo(this.width, this.height);
+        ctx.lineTo(0, this.height);
+        ctx.closePath();
+        ctx.fillStyle = fill.toLive
+          ? fill.toLive(ctx, this)
+          : fill;
+        if (needsVpt) {
+          ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        }
+        ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
+        var m = fill.gradientTransform || fill.patternTransform;
+        m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        ctx.fill();
+        ctx.restore();
+      }
       if (object) {
-        if (this[property + 'Vpt']) {
-          v = this.viewportTransform;
-          ctx.save();
+        ctx.save();
+        if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
         object.render(ctx);
-        this[property + 'Vpt'] && ctx.restore();
+        ctx.restore();
       }
     },
 
@@ -1298,13 +1269,13 @@
       if (this.clipPath) {
         markup.push('<g clip-path="url(#' + this.clipPath.clipPathId + ')" >\n');
       }
-      this._setSVGBgOverlayColor(markup, 'backgroundColor');
+      this._setSVGBgOverlayColor(markup, 'background');
       this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
       this._setSVGObjects(markup, reviver);
       if (this.clipPath) {
         markup.push('</g>\n');
       }
-      this._setSVGBgOverlayColor(markup, 'overlayColor');
+      this._setSVGBgOverlayColor(markup, 'overlay');
       this._setSVGBgOverlayImage(markup, 'overlayImage', reviver);
 
       markup.push('</svg>');
@@ -1388,10 +1359,18 @@
      */
     createSVGRefElementsMarkup: function() {
       var _this = this,
-          markup = ['backgroundColor', 'overlayColor'].map(function(prop) {
-            var fill = _this[prop];
+          markup = ['background', 'overlay'].map(function(prop) {
+            var fill = _this[prop + 'Color'];
             if (fill && fill.toLive) {
-              return fill.toSVG(_this, false);
+              var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
+                  object = {
+                    width: _this.width / (shouldTransform ? vpt[0] : 1),
+                    height: _this.height / (shouldTransform ? vpt[3] : 1)
+                  };
+              return fill.toSVG(
+                object,
+                { additionalTransform: shouldTransform ? fabric.util.matrixToSVG(vpt) : '' }
+              );
             }
           });
       return markup.join('');
@@ -1407,7 +1386,14 @@
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = this._objects;
+          fontPaths = fabric.fontPaths, objects = [];
+
+      this._objects.forEach(function add(object) {
+        objects.push(object);
+        if (object._objects) {
+          object._objects.forEach(add);
+        }
+      });
 
       for (i = 0, len = objects.length; i < len; i++) {
         obj = objects[i];
@@ -1488,16 +1474,18 @@
      * @private
      */
     _setSVGBgOverlayColor: function(markup, property) {
-      var filler = this[property], vpt = this.viewportTransform, finalWidth = this.width / vpt[0],
-          finalHeight = this.height / vpt[3];
+      var filler = this[property + 'Color'], vpt = this.viewportTransform, finalWidth = this.width,
+          finalHeight = this.height;
       if (!filler) {
         return;
       }
       if (filler.toLive) {
-        var repeat = filler.repeat;
+        var repeat = filler.repeat, iVpt = fabric.util.invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
+            additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
         markup.push(
-          '<rect transform="translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
-          ' x="', filler.offsetX - finalWidth / 2, '" y="', filler.offsetY - finalHeight / 2, '" ',
+          '<rect transform="' + additionalTransform + ' translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
+          ' x="', filler.offsetX - finalWidth / 2,
+          '" y="', filler.offsetY - finalHeight / 2, '" ',
           'width="',
           (repeat === 'repeat-y' || repeat === 'no-repeat'
             ? filler.source.width
@@ -1513,7 +1501,7 @@
       else {
         markup.push(
           '<rect x="0" y="0" width="100%" height="100%" ',
-          'fill="', this[property], '"',
+          'fill="', filler, '"',
           '></rect>\n'
         );
       }
@@ -1832,7 +1820,7 @@
    * @example <caption>JSON without additional properties</caption>
    * var json = canvas.toJSON();
    * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
    * @example <caption>JSON without default values</caption>
    * canvas.includeDefaultValues = false;
    * var json = canvas.toJSON();

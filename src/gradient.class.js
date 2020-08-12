@@ -1,7 +1,7 @@
 (function() {
 
   /* _FROM_SVG_START_ */
-  function getColorStop(el) {
+  function getColorStop(el, multiplier) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset') || 0,
         color, colorAlpha, opacity, i;
@@ -41,7 +41,7 @@
     color = new fabric.Color(color);
     colorAlpha = color.getAlpha();
     opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
-    opacity *= colorAlpha;
+    opacity *= colorAlpha * multiplier;
 
     return {
       offset: offset,
@@ -96,17 +96,67 @@
     offsetY: 0,
 
     /**
+     * A transform matrix to apply to the gradient before painting.
+     * Imported from svg gradients, is not applied with the current transform in the center.
+     * Before this transform is applied, the origin point is at the top left corner of the object
+     * plus the addition of offsetY and offsetX.
+     * @type Number[]
+     * @default null
+     */
+    gradientTransform: null,
+
+    /**
+     * coordinates units for coords.
+     * If `pixels`, the number of coords are in the same unit of width / height.
+     * If set as `percentage` the coords are still a number, but 1 means 100% of width
+     * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
+     * allowed values pixels or percentage.
+     * @type String
+     * @default 'pixels'
+     */
+    gradientUnits: 'pixels',
+
+    /**
+     * Gradient type linear or radial
+     * @type String
+     * @default 'pixels'
+     */
+    type: 'linear',
+
+    /**
      * Constructor
-     * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
+     * @param {Object} options Options object with type, coords, gradientUnits and colorStops
+     * @param {Object} [options.type] gradient type linear or radial
+     * @param {Object} [options.gradientUnits] gradient units
+     * @param {Object} [options.offsetX] SVG import compatibility
+     * @param {Object} [options.offsetY] SVG import compatibility
+     * @param {Object[]} options.colorStops contains the colorstops.
+     * @param {Object} options.coords contains the coords of the gradient
+     * @param {Number} [options.coords.x1] X coordiante of the first point for linear or of the focal point for radial
+     * @param {Number} [options.coords.y1] Y coordiante of the first point for linear or of the focal point for radial
+     * @param {Number} [options.coords.x2] X coordiante of the second point for linear or of the center point for radial
+     * @param {Number} [options.coords.y2] Y coordiante of the second point for linear or of the center point for radial
+     * @param {Number} [options.coords.r1] only for radial gradient, radius of the inner circle
+     * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
      * @return {fabric.Gradient} thisArg
      */
     initialize: function(options) {
       options || (options = { });
+      options.coords || (options.coords = { });
 
-      var coords = { };
+      var coords, _this = this;
 
-      this.id = fabric.Object.__uid++;
-      this.type = options.type || 'linear';
+      // sets everything, then coords and colorstops get sets again
+      Object.keys(options).forEach(function(option) {
+        _this[option] = options[option];
+      });
+
+      if (this.id) {
+        this.id += '_' + fabric.Object.__uid++;
+      }
+      else {
+        this.id = fabric.Object.__uid++;
+      }
 
       coords = {
         x1: options.coords.x1 || 0,
@@ -119,13 +169,9 @@
         coords.r1 = options.coords.r1 || 0;
         coords.r2 = options.coords.r2 || 0;
       }
+
       this.coords = coords;
       this.colorStops = options.colorStops.slice();
-      if (options.gradientTransform) {
-        this.gradientTransform = options.gradientTransform;
-      }
-      this.offsetX = options.offsetX || this.offsetX;
-      this.offsetY = options.offsetY || this.offsetY;
     },
 
     /**
@@ -157,6 +203,7 @@
         colorStops: this.colorStops,
         offsetX: this.offsetX,
         offsetY: this.offsetY,
+        gradientUnits: this.gradientUnits,
         gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
       };
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
@@ -170,28 +217,40 @@
      * @param {Object} object Object to create a gradient for
      * @return {String} SVG representation of an gradient (linear/radial)
      */
-    toSVG: function(object) {
-      var coords = clone(this.coords, true), i, len,
+    toSVG: function(object, options) {
+      var coords = clone(this.coords, true), i, len, options = options || {},
           markup, commonAttributes, colorStops = clone(this.colorStops, true),
           needsSwap = coords.r1 > coords.r2,
           transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
-          offsetX = object.width / 2 - this.offsetX, offsetY = object.height / 2 - this.offsetY;
+          offsetX = -this.offsetX, offsetY = -this.offsetY,
+          withViewport = !!options.additionalTransform,
+          gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
       // colorStops must be sorted ascending
       colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
 
+      if (gradientUnits === 'objectBoundingBox') {
+        offsetX /= object.width;
+        offsetY /= object.height;
+      }
+      else {
+        offsetX += object.width / 2;
+        offsetY += object.height / 2;
+      }
       if (object.type === 'path') {
         offsetX -= object.pathOffset.x;
         offsetY -= object.pathOffset.y;
       }
 
+
       transform[4] -= offsetX;
       transform[5] -= offsetY;
 
       commonAttributes = 'id="SVGID_' + this.id +
-                     '" gradientUnits="userSpaceOnUse"';
-      commonAttributes += ' gradientTransform="matrix(' + transform.join(' ') + ')" ';
+                     '" gradientUnits="' + gradientUnits + '"';
+      commonAttributes += ' gradientTransform="' + (withViewport ?
+        options.additionalTransform + ' ' : '') + fabric.util.matrixToSVG(transform) + '" ';
 
       if (this.type === 'linear') {
         markup = [
@@ -300,11 +359,18 @@
      * @memberOf fabric.Gradient
      * @param {SVGGradientElement} el SVG gradient element
      * @param {fabric.Object} instance
+     * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
+     * @param {Object} svgOptions an object containing the size of the SVG in order to parse correctly graidents
+     * that uses gradientUnits as 'userSpaceOnUse' and percentages.
+     * @param {Object.number} viewBoxWidth width part of the viewBox attribute on svg
+     * @param {Object.number} viewBoxHeight height part of the viewBox attribute on svg
+     * @param {Object.number} width width part of the svg tag if viewBox is not specified
+     * @param {Object.number} height height part of the svg tag if viewBox is not specified
      * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */
-    fromElement: function(el, instance) {
+    fromElement: function(el, instance, opacityAttr, svgOptions) {
       /**
        *  @example:
        *
@@ -338,106 +404,87 @@
        *
        */
 
+      var multiplier = parseFloat(opacityAttr) / (/%$/.test(opacityAttr) ? 100 : 1);
+      multiplier = multiplier < 0 ? 0 : multiplier > 1 ? 1 : multiplier;
+      if (isNaN(multiplier)) {
+        multiplier = 1;
+      }
+
       var colorStopEls = el.getElementsByTagName('stop'),
           type,
-          gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
-          gradientTransform = el.getAttribute('gradientTransform'),
+          gradientUnits = el.getAttribute('gradientUnits') === 'userSpaceOnUse' ?
+            'pixels' : 'percentage',
+          gradientTransform = el.getAttribute('gradientTransform') || '',
           colorStops = [],
-          coords, ellipseMatrix, i;
-
+          coords, i, offsetX = 0, offsetY = 0,
+          transformMatrix;
       if (el.nodeName === 'linearGradient' || el.nodeName === 'LINEARGRADIENT') {
         type = 'linear';
+        coords = getLinearCoords(el);
       }
       else {
         type = 'radial';
-      }
-
-      if (type === 'linear') {
-        coords = getLinearCoords(el);
-      }
-      else if (type === 'radial') {
         coords = getRadialCoords(el);
       }
 
       for (i = colorStopEls.length; i--; ) {
-        colorStops.push(getColorStop(colorStopEls[i]));
+        colorStops.push(getColorStop(colorStopEls[i], multiplier));
       }
 
-      ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);
+      transformMatrix = fabric.parseTransformAttribute(gradientTransform);
+
+      __convertPercentUnitsToValues(instance, coords, svgOptions, gradientUnits);
+
+      if (gradientUnits === 'pixels') {
+        offsetX = -instance.left;
+        offsetY = -instance.top;
+      }
 
       var gradient = new fabric.Gradient({
+        id: el.getAttribute('id'),
         type: type,
         coords: coords,
         colorStops: colorStops,
-        offsetX: -instance.left,
-        offsetY: -instance.top
+        gradientUnits: gradientUnits,
+        gradientTransform: transformMatrix,
+        offsetX: offsetX,
+        offsetY: offsetY,
       });
 
-      if (gradientTransform || ellipseMatrix !== '') {
-        gradient.gradientTransform = fabric.parseTransformAttribute((gradientTransform || '') + ellipseMatrix);
-      }
-
       return gradient;
-    },
-    /* _FROM_SVG_END_ */
-
-    /**
-     * Returns {@link fabric.Gradient} instance from its object representation
-     * @static
-     * @memberOf fabric.Gradient
-     * @param {Object} obj
-     * @param {Object} [options] Options object
-     */
-    forObject: function(obj, options) {
-      options || (options = { });
-      _convertPercentUnitsToValues(obj, options.coords, 'userSpaceOnUse');
-      return new fabric.Gradient(options);
     }
+    /* _FROM_SVG_END_ */
   });
 
   /**
    * @private
    */
-  function _convertPercentUnitsToValues(object, options, gradientUnits) {
-    var propValue, addFactor = 0, multFactor = 1, ellipseMatrix = '';
-    for (var prop in options) {
-      if (options[prop] === 'Infinity') {
-        options[prop] = 1;
+  function __convertPercentUnitsToValues(instance, options, svgOptions, gradientUnits) {
+    var propValue, finalValue;
+    Object.keys(options).forEach(function(prop) {
+      propValue = options[prop];
+      if (propValue === 'Infinity') {
+        finalValue = 1;
       }
-      else if (options[prop] === '-Infinity') {
-        options[prop] = 0;
-      }
-      propValue = parseFloat(options[prop], 10);
-      if (typeof options[prop] === 'string' && /^(\d+\.\d+)%|(\d+)%$/.test(options[prop])) {
-        multFactor = 0.01;
+      else if (propValue === '-Infinity') {
+        finalValue = 0;
       }
       else {
-        multFactor = 1;
+        finalValue = parseFloat(options[prop], 10);
+        if (typeof propValue === 'string' && /^(\d+\.\d+)%|(\d+)%$/.test(propValue)) {
+          finalValue *= 0.01;
+          if (gradientUnits === 'pixels') {
+            // then we need to fix those percentages here in svg parsing
+            if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+              finalValue *= svgOptions.viewBoxWidth || svgOptions.width;
+            }
+            if (prop === 'y1' || prop === 'y2') {
+              finalValue *= svgOptions.viewBoxHeight || svgOptions.height;
+            }
+          }
+        }
       }
-      if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        multFactor *= gradientUnits === 'objectBoundingBox' ? object.width : 1;
-        addFactor = gradientUnits === 'objectBoundingBox' ? object.left || 0 : 0;
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        multFactor *= gradientUnits === 'objectBoundingBox' ? object.height : 1;
-        addFactor = gradientUnits === 'objectBoundingBox' ? object.top || 0 : 0;
-      }
-      options[prop] = propValue * multFactor + addFactor;
-    }
-    if (object.type === 'ellipse' &&
-        options.r2 !== null &&
-        gradientUnits === 'objectBoundingBox' &&
-        object.rx !== object.ry) {
-
-      var scaleFactor = object.ry / object.rx;
-      ellipseMatrix = ' scale(1, ' + scaleFactor + ')';
-      if (options.y1) {
-        options.y1 /= scaleFactor;
-      }
-      if (options.y2) {
-        options.y2 /= scaleFactor;
-      }
-    }
-    return ellipseMatrix;
+      options[prop] = finalValue;
+    });
   }
 })();

@@ -3,7 +3,6 @@
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
-      abs = Math.abs,
       PiBy180 = Math.PI / 180,
       PiBy2 = Math.PI / 2;
 
@@ -165,9 +164,15 @@
     /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
+     * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
      */
-    makeBoundingBoxFromPoints: function(points) {
+    makeBoundingBoxFromPoints: function(points, transform) {
+      if (transform) {
+        for (var i = 0; i < points.length; i++) {
+          points[i] = fabric.util.transformPoint(points[i], transform);
+        }
+      }
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
           minX = fabric.util.array.min(xPoints),
           maxX = fabric.util.array.max(xPoints),
@@ -340,7 +345,7 @@
 
       /** @ignore */
       var onLoadCallback = function () {
-        callback && callback.call(context, img);
+        callback && callback.call(context, img, false);
         img = img.onload = img.onerror = null;
       };
 
@@ -356,7 +361,10 @@
       // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
       // see https://code.google.com/p/chromium/issues/detail?id=315152
       //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      if (url.indexOf('data') !== 0 && crossOrigin) {
+      // crossOrigin null is the same as not set.
+      if (url.indexOf('data') !== 0 &&
+        crossOrigin !== undefined &&
+        crossOrigin !== null) {
         img.crossOrigin = crossOrigin;
       }
 
@@ -410,15 +418,18 @@
     enlivenObjects: function(objects, callback, namespace, reviver) {
       objects = objects || [];
 
-      function onLoaded() {
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback(enlivenedObjects);
-        }
-      }
-
       var enlivenedObjects = [],
           numLoadedObjects = 0,
           numTotalObjects = objects.length;
+
+      function onLoaded() {
+        if (++numLoadedObjects === numTotalObjects) {
+          callback && callback(enlivenedObjects.filter(function(obj) {
+            // filter out undefined objects (objects that gave error)
+            return obj;
+          }));
+        }
+      }
 
       if (!numTotalObjects) {
         callback && callback(enlivenedObjects);
@@ -620,20 +631,6 @@
     },
 
     /**
-     * @static
-     * @memberOf fabric.util
-     * @deprecated since 2.0.0
-     * @param {fabric.Object} receiver Object implementing `clipTo` method
-     * @param {CanvasRenderingContext2D} ctx Context to clip
-     */
-    clipContext: function(receiver, ctx) {
-      ctx.save();
-      ctx.beginPath();
-      receiver.clipTo(ctx);
-      ctx.clip();
-    },
-
-    /**
      * Multiply matrix A by matrix B to nest transformations
      * @static
      * @memberOf fabric.util
@@ -655,7 +652,7 @@
     },
 
     /**
-     * Decomposes standard 2x2 matrix into transform componentes
+     * Decomposes standard 2x3 matrix into transform components
      * @static
      * @memberOf fabric.util
      * @param  {Array} a transformMatrix
@@ -665,10 +662,10 @@
       var angle = atan2(a[1], a[0]),
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
+          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
           skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
-        angle: angle  / PiBy180,
+        angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
@@ -678,10 +675,99 @@
       };
     },
 
-    customTransformMatrix: function(scaleX, scaleY, skewX) {
-      var skewMatrixX = [1, 0, abs(Math.tan(skewX * PiBy180)), 1],
-          scaleMatrix = [abs(scaleX), 0, 0, abs(scaleY)];
-      return fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle] angle in degrees
+     * @return {Number[]} transform matrix
+     */
+    calcRotateMatrix: function(options) {
+      if (!options.angle) {
+        return fabric.iMatrix.concat();
+      }
+      var theta = fabric.util.degreesToRadians(options.angle),
+          cos = fabric.util.cos(theta),
+          sin = fabric.util.sin(theta);
+      return [cos, sin, -sin, cos, 0, 0];
+    },
+
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet.
+     * is called DimensionsTransformMatrix because those properties are the one that influence
+     * the size of the resulting box of the object.
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @return {Number[]} transform matrix
+     */
+    calcDimensionsMatrix: function(options) {
+      var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
+          scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
+          scaleMatrix = [
+            options.flipX ? -scaleX : scaleX,
+            0,
+            0,
+            options.flipY ? -scaleY : scaleY,
+            0,
+            0],
+          multiply = fabric.util.multiplyTransformMatrices,
+          degreesToRadians = fabric.util.degreesToRadians;
+      if (options.skewX) {
+        scaleMatrix = multiply(
+          scaleMatrix,
+          [1, 0, Math.tan(degreesToRadians(options.skewX)), 1],
+          true);
+      }
+      if (options.skewY) {
+        scaleMatrix = multiply(
+          scaleMatrix,
+          [1, Math.tan(degreesToRadians(options.skewY)), 0, 1],
+          true);
+      }
+      return scaleMatrix;
+    },
+
+    /**
+     * Returns a transform matrix starting from an object of the same kind of
+     * the one returned from qrDecompose, useful also if you want to calculate some
+     * transformations from an object that is not enlived yet
+     * @static
+     * @memberOf fabric.util
+     * @param  {Object} options
+     * @param  {Number} [options.angle]
+     * @param  {Number} [options.scaleX]
+     * @param  {Number} [options.scaleY]
+     * @param  {Boolean} [options.flipX]
+     * @param  {Boolean} [options.flipY]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.translateX]
+     * @param  {Number} [options.translateY]
+     * @return {Number[]} transform matrix
+     */
+    composeMatrix: function(options) {
+      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
+          multiply = fabric.util.multiplyTransformMatrices;
+      if (options.angle) {
+        matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
+      }
+      if (options.scaleX !== 1 || options.scaleY !== 1 ||
+          options.skewX || options.skewY || options.flipX || options.flipY) {
+        matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
+      }
+      return matrix;
     },
 
     /**
@@ -719,15 +805,6 @@
         flipY: target.flipY,
         top: target.top
       };
-    },
-
-    /**
-     * Returns string representation of function body
-     * @param {Function} fn Function to get body of
-     * @return {String} Function body
-     */
-    getFunctionBody: function(fn) {
-      return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
     },
 
     /**
@@ -845,12 +922,94 @@
       return Math.max(min, Math.min(value, max));
     },
 
+    /**
+     * Finds the scale for the object source to fit inside the object destination,
+     * keeping aspect ratio intact.
+     * respect the total allowed area for the cache.
+     * @memberOf fabric.util
+     * @param {Object | fabric.Object} source
+     * @param {Number} source.height natural unscaled height of the object
+     * @param {Number} source.width natural unscaled width of the object
+     * @param {Object | fabric.Object} destination
+     * @param {Number} destination.height natural unscaled height of the object
+     * @param {Number} destination.width natural unscaled width of the object
+     * @return {Number} scale factor to apply to source to fit into destination
+     */
     findScaleToFit: function(source, destination) {
       return Math.min(destination.width / source.width, destination.height / source.height);
     },
 
+    /**
+     * Finds the scale for the object source to cover entirely the object destination,
+     * keeping aspect ratio intact.
+     * respect the total allowed area for the cache.
+     * @memberOf fabric.util
+     * @param {Object | fabric.Object} source
+     * @param {Number} source.height natural unscaled height of the object
+     * @param {Number} source.width natural unscaled width of the object
+     * @param {Object | fabric.Object} destination
+     * @param {Number} destination.height natural unscaled height of the object
+     * @param {Number} destination.width natural unscaled width of the object
+     * @return {Number} scale factor to apply to source to cover destination
+     */
     findScaleToCover: function(source, destination) {
       return Math.max(destination.width / source.width, destination.height / source.height);
+    },
+
+    /**
+     * given an array of 6 number returns something like `"matrix(...numbers)"`
+     * @memberOf fabric.util
+     * @param {Array} trasnform an array with 6 numbers
+     * @return {String} transform matrix for svg
+     * @return {Object.y} Limited dimensions by Y
+     */
+    matrixToSVG: function(transform) {
+      return 'matrix(' + transform.map(function(value) {
+        return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
+      }).join(' ') + ')';
+    },
+
+    /**
+     * given a width and height, return the size of the bounding box
+     * that can contains the box with width/height with applied transform
+     * described in options.
+     * Use to calculate the boxes around objects for controls.
+     * @memberOf fabric.util
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Object} options
+     * @param {Number} options.scaleX
+     * @param {Number} options.scaleY
+     * @param {Number} options.skewX
+     * @param {Number} options.skewY
+     * @return {Object.x} width of containing
+     * @return {Object.y} height of containing
+     */
+    sizeAfterTransform: function(width, height, options) {
+      var dimX = width / 2, dimY = height / 2,
+          points = [
+            {
+              x: -dimX,
+              y: -dimY
+            },
+            {
+              x: dimX,
+              y: -dimY
+            },
+            {
+              x: -dimX,
+              y: dimY
+            },
+            {
+              x: dimX,
+              y: dimY
+            }],
+          transformMatrix = fabric.util.calcDimensionsMatrix(options),
+          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+      return {
+        x: bbox.width,
+        y: bbox.height,
+      };
     }
   };
 })(typeof exports !== 'undefined' ? exports : this);

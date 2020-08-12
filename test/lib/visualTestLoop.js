@@ -19,15 +19,16 @@
     }
   };
 
-  function createCanvasForTest(width, height) {
+  function createCanvasForTest(opts) {
+    var fabricClass = opts.fabricClass || 'StaticCanvas';
     var options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
-    if (width) {
-      options.width = width;
+    if (opts.width) {
+      options.width = opts.width;
     }
-    if (height) {
-      options.height = height;
+    if (opts.height) {
+      options.height = opts.height;
     }
-    return new fabric.StaticCanvas(null, options);
+    return new fabric[fabricClass](null, options);
   };
 
   function getAbsolutePath(path) {
@@ -48,6 +49,7 @@
     var finalName = '/assets/' + filename + '.svg';
     return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
   }
+  exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
@@ -74,11 +76,11 @@
     var img = fabric.document.createElement('img');
     img.onload = function() {
       img.onload = null;
-      callback(img);
+      callback(img, false);
     };
     img.onerror = function(err) {
       img.onerror = null;
-      callback(img);
+      callback(img, true);
       console.log('Image loading errored', err);
     };
     img.src = filename;
@@ -106,10 +108,6 @@
       threshold: 0.095
     };
 
-    function beforeEachHandler() {
-
-    }
-
     return function testCallback(testObj) {
       if (testObj.disabled) {
         return;
@@ -122,12 +120,12 @@
       var newModule = testObj.newModule;
       if (newModule) {
         QUnit.module(newModule, {
-          beforeEach: beforeEachHandler,
+          beforeEach: testObj.beforeEachHandler,
         });
       }
       QUnit.test(testName, function(assert) {
         var done = assert.async();
-        var fabricCanvas = createCanvasForTest(testObj.width, testObj.height);
+        var fabricCanvas = createCanvasForTest(testObj);
         code(fabricCanvas, function(renderedCanvas) {
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;

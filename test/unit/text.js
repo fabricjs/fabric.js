@@ -33,7 +33,6 @@
     'opacity':                   1,
     'shadow':                    null,
     'visible':                   true,
-    'clipTo':                    null,
     'backgroundColor':           '',
     'text':                      'x',
     'fontSize':                  40,
@@ -51,7 +50,6 @@
     'globalCompositeOperation':  'source-over',
     'skewX':                      0,
     'skewY':                      0,
-    'transformMatrix':            null,
     'charSpacing':                0,
     'styles':                     {}
   };
@@ -86,6 +84,13 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+  });
+
+  QUnit.test('_getFontDeclaration with coma', function(assert) {
+    var text = createTextObject();
+    text.fontFamily = 'Arial, sans-serif';
+    var fontDecl = text._getFontDeclaration();
+    assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
   });
 
   fabric.Text.genericFonts.forEach(function(fontName) {
@@ -173,18 +178,6 @@
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
   });
 
-  QUnit.test('setShadow', function(assert) {
-    var text = createTextObject();
-    assert.ok(typeof text.setShadow === 'function');
-    assert.equal(text.setShadow('10px 8px 2px red'), text, 'should be chainable');
-
-    assert.ok(text.shadow instanceof fabric.Shadow, 'should inherit from fabric.Shadow');
-    assert.equal(text.shadow.color, 'red');
-    assert.equal(text.shadow.offsetX, 10);
-    assert.equal(text.shadow.offsetY, 8);
-    assert.equal(text.shadow.blur, 2);
-  });
-
   QUnit.test('fabric.Text.fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
@@ -215,27 +208,27 @@
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
-
-    var elTextWithAttrs = fabric.document.createElement('text');
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elTextWithAttrs = fabric.document.createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
-    elTextWithAttrs.setAttribute('x', 10);
-    elTextWithAttrs.setAttribute('y', 20);
-    elTextWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elTextWithAttrs.setAttribute('opacity', 0.45);
-    elTextWithAttrs.setAttribute('stroke', 'blue');
-    elTextWithAttrs.setAttribute('stroke-width', 3);
-    elTextWithAttrs.setAttribute('stroke-dasharray', '5, 2');
-    elTextWithAttrs.setAttribute('stroke-linecap', 'round');
-    elTextWithAttrs.setAttribute('stroke-linejoin', 'bevil');
-    elTextWithAttrs.setAttribute('stroke-miterlimit', 5);
-    elTextWithAttrs.setAttribute('font-family', 'Monaco');
-    elTextWithAttrs.setAttribute('font-style', 'italic');
-    elTextWithAttrs.setAttribute('font-weight', 'bold');
-    elTextWithAttrs.setAttribute('font-size', '123');
-    elTextWithAttrs.setAttribute('letter-spacing', '1em');
-    elTextWithAttrs.setAttribute('text-decoration', 'underline');
-    elTextWithAttrs.setAttribute('text-anchor', 'middle');
+    elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
+    elTextWithAttrs.setAttributeNS(namespace, 'y', 20);
+    elTextWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
+    elTextWithAttrs.setAttributeNS(namespace, 'opacity', 0.45);
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
+    elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-weight', 'bold');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-size', '123');
+    elTextWithAttrs.setAttributeNS(namespace, 'letter-spacing', '1em');
+    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
+    elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
     fabric.Text.fromElement(elTextWithAttrs, function(textWithAttrs) {
       // temp workaround for text objects not obtaining width under node
@@ -652,7 +645,7 @@
       overline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline ';
+    var expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -662,7 +655,7 @@
       underline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline ';
+    var expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -673,7 +666,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -685,7 +678,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -752,4 +745,89 @@
     assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
+
+  QUnit.test('_deleteStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    text._deleteStyleDeclaration(0, 10);
+    assert.equal(text.styles[0][10], undefined, 'style has been removed');
+  });
+
+  QUnit.test('_setStyleDeclaration', function(assert) {
+    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+          3: { fontSize: 4 },
+          4: { fontSize: 4 },
+          5: { fontSize: 4 },
+          6: { fontSize: 4 },
+          7: { fontSize: 4 },
+          8: { fontSize: 4 },
+          9: { fontSize: 4 },
+          10: { fontSize: 4 },
+          11: { fontSize: 4 },
+          12: { fontSize: 4 },
+          13: { fontSize: 4 },
+          14: { fontSize: 4 },
+          15: { fontSize: 4 },
+          16: { fontSize: 4 },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(typeof text._setStyleDeclaration, 'function', 'function exists');
+    var newStyle = { fontSize: 10 };
+    text._setStyleDeclaration(0, 10, newStyle);
+    assert.equal(text.styles[0][10], newStyle, 'style has been changed');
+  });
+
+  QUnit.test('styleHas', function(assert) {
+    var textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
+      styles: {
+        0: {
+          0: { fontSize: 4 },
+          1: { fontSize: 4 },
+          2: { fontSize: 4 },
+        },
+        1: {
+          0: { fontFamily: 'Arial' },
+          1: { fontFamily: 'Arial' },
+          2: { fontFamily: 'Arial' },
+        },
+      },
+      width: 5,
+    });
+    assert.equal(textbox.styleHas('fontSize'), true, 'style has fontSize');
+    assert.equal(textbox.styleHas('fontSize', 0), true, 'style has fontSize on line 0');
+    assert.equal(textbox.styleHas('fontSize', 1), false, 'style does not have fontSize on line 1');
+    assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
+    assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
+    assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
 })();

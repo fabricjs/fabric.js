@@ -32,6 +32,23 @@
     assert.equal(cObj.isControlVisible('tl'), true);
   });
 
+  QUnit.test('setControlVisible is per object', function(assert) {
+    assert.ok(fabric.Object);
+
+    var cObj = new fabric.Object({ });
+    var cObj2 = new fabric.Object({ });
+
+    cObj.setControlVisible('tl', false);
+    assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
+    assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
+    cObj.controls.tl.setVisibility(false);
+    assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
+    cObj.setControlVisible('tl', true);
+    assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precendence');
+    // restore original visibility
+    cObj.controls.tl.setVisibility(true);
+  });
+
   QUnit.test('setControlsVisibility', function(assert) {
     assert.ok(fabric.Object);
 
@@ -149,7 +166,26 @@
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
     assert.equal(cObj._findTargetCorner({ x: 0, y: 0 }), false);
+  });
 
+  QUnit.test('_findTargetCorner for touches', function(assert) {
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    cObj.setCoords();
+    cObj.canvas = {
+      _activeObject: cObj
+    };
+    var pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.cornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.cornerSize / 3
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr), 'br', 'cornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event cornerSize/3 near br returns br');
+    pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.touchCornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.touchCornerSize / 3,
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
   });
 
   QUnit.test('_calculateCurrentDimensions', function(assert) {

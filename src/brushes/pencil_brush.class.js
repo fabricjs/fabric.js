@@ -1,11 +1,17 @@
 (function() {
-
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
    * @extends fabric.BaseBrush
    */
   fabric.PencilBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.PencilBrush.prototype */ {
+
+    /**
+     * Discard points that are less than `decimate` pixel distant from each other
+     * @type Number
+     * @default 0.4
+     */
+    decimate: 0.4,
 
     /**
      * Constructor
@@ -31,7 +37,10 @@
      * Inovoked on mouse down
      * @param {Object} pointer
      */
-    onMouseDown: function(pointer) {
+    onMouseDown: function(pointer, options) {
+      if (!this.canvas._isMainEvent(options.e)) {
+        return;
+      }
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
@@ -43,9 +52,12 @@
      * Inovoked on mouse move
      * @param {Object} pointer
      */
-    onMouseMove: function(pointer) {
+    onMouseMove: function(pointer, options) {
+      if (!this.canvas._isMainEvent(options.e)) {
+        return;
+      }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
-        if (this.needsFullRender) {
+        if (this.needsFullRender()) {
           // redraw curve
           // clear top canvas
           this.canvas.clearContext(this.canvas.contextTop);
@@ -69,9 +81,13 @@
     /**
      * Invoked on mouse up
      */
-    onMouseUp: function() {
+    onMouseUp: function(options) {
+      if (!this.canvas._isMainEvent(options.e)) {
+        return true;
+      }
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
+      return false;
     },
 
     /**
@@ -104,10 +120,8 @@
      * @private
      */
     _reset: function() {
-      this._points.length = 0;
+      this._points = [];
       this._setBrushStyles();
-      var color = new fabric.Color(this.color);
-      this.needsFullRender = (color.getAlpha() < 1);
       this._setShadow();
     },
 
@@ -168,7 +182,7 @@
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
-          len = points.length, multSignX = 1, multSignY = 1, manyPoints = len > 2;
+          len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
 
       if (manyPoints) {
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
@@ -211,16 +225,35 @@
         strokeLineJoin: this.strokeLineJoin,
         strokeDashArray: this.strokeDashArray,
       });
-      var position = new fabric.Point(path.left + path.width / 2, path.top + path.height / 2);
-      position = path.translateToGivenOrigin(position, 'center', 'center', path.originX, path.originY);
-      path.top = position.y;
-      path.left = position.x;
       if (this.shadow) {
         this.shadow.affectStroke = true;
-        path.setShadow(this.shadow);
+        path.shadow = new fabric.Shadow(this.shadow);
       }
 
       return path;
+    },
+
+    /**
+     * Decimate poins array with the decimate value
+     */
+    decimatePoints: function(points, distance) {
+      if (points.length <= 2) {
+        return points;
+      }
+      var zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
+          i, l = points.length - 1, lastPoint = points[0], newPoints = [lastPoint],
+          cDistance;
+      for (i = 1; i < l; i++) {
+        cDistance = Math.pow(lastPoint.x - points[i].x, 2) + Math.pow(lastPoint.y - points[i].y, 2);
+        if (cDistance >= adjustedDistance) {
+          lastPoint = points[i];
+          newPoints.push(lastPoint);
+        }
+      }
+      if (newPoints.length === 1) {
+        newPoints.push(new fabric.Point(newPoints[0].x, newPoints[0].y));
+      }
+      return newPoints;
     },
 
     /**
@@ -231,7 +264,9 @@
     _finalizeAndAddPath: function() {
       var ctx = this.canvas.contextTop;
       ctx.closePath();
-
+      if (this.decimate) {
+        this._points = this.decimatePoints(this._points, this.decimate);
+      }
       var pathData = this.convertPointsToSVGPath(this._points).join('');
       if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
@@ -244,8 +279,9 @@
 
       var path = this.createPath(pathData);
       this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.fire('before:path:created', { path: path });
       this.canvas.add(path);
-      this.canvas.renderAll();
+      this.canvas.requestRenderAll();
       path.setCoords();
       this._resetShadow();
 
