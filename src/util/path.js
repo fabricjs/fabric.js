@@ -519,6 +519,7 @@
           break;
         case 'Z':
         case 'z':
+          // we add those in order to ease calculations later
           tempInfo.destX = x2;
           tempInfo.destY = y2;
           tempInfo.length = calcLineLength(x1, y1, x2, y2);
@@ -542,14 +543,21 @@
       distance -= infos[i];
       i++;
     }
-    var segInfo = infos[i], segPercent = distance / segInfo.length, command = segInfo.length, segment = path[i];
+    var segInfo = infos[i], segPercent = distance / segInfo.length,
+        command = segInfo.length, segment = path[i];
     switch (command) {
       case 'Z':
       case 'z':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(new fabric.Point(segInfo.destX, segInfo.destY), segPercent);
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segInfo.destX, segInfo.destY),
+          segPercent
+        );
         break;
       case 'L':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(new fabric.Point(segment[1], segment[2]), segPercent);
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segment[1], segment[2]),
+          segPercent
+        );
         break;
       case 'C':
         return getPointOnCubicBezierIterator(
