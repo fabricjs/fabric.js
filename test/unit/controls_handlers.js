@@ -23,6 +23,17 @@
       assert.equal(transform.target.width, 100);
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
       assert.equal(transform.target.width, 199);
+      assert.equal(transform.target.left, 0);
+      assert.equal(transform.target.top, 0);
+    });
+    QUnit.test('changeWidth changes the width with centered transform', function(assert) {
+      transform.originX = 'center';
+      transform.originY = 'center';
+      assert.equal(transform.target.width, 100);
+      fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      assert.equal(transform.target.width, 298);
+      assert.equal(transform.target.left, -99);
+      assert.equal(transform.target.top, 0);
     });
     QUnit.test('changeWidth changes the width with big strokeWidth', function(assert) {
       transform.target.strokeWidth = 15;

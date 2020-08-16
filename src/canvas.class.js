@@ -592,7 +592,7 @@
 
       var centerTransform;
 
-      if (action === 'scale' || action === 'scaleX' || action === 'scaleY') {
+      if (action === 'scale' || action === 'scaleX' || action === 'scaleY' || action === 'resizing') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
       else if (action === 'rotate') {
