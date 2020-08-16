@@ -49,6 +49,15 @@
   }
 
   /**
+   * Checks if transform is centered
+   * @param {Object} transform transform data
+   * @return {Boolean} true if transform is centered
+   */
+  function isTransformCentered(transform) {
+    return transform.originX === CENTER && transform.originY === CENTER;
+  }
+
+  /**
    * Inspect fabricObject to understand if the current scaling action is allowed
    * @param {fabric.Object} fabricObject the fabric object about to scale
    * @param {String} by 'x' or 'y' or ''
@@ -546,7 +555,7 @@
         scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
       }
       // if we are scaling by center, we need to double the scale
-      if (transform.originX === CENTER && transform.originY === CENTER) {
+      if (isTransformCentered(transform)) {
         scaleX *= 2;
         scaleY *= 2;
       }
@@ -664,7 +673,8 @@
   function changeWidth(eventData, transform, x, y) {
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        newWidth = Math.abs(localPoint.x / target.scaleX) - strokePadding;
+        multiplier = isTransformCentered(transform) ? 2 : 1,
+        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
     return true;
   }

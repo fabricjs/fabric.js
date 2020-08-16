@@ -2539,4 +2539,35 @@
 
     assert.ok(typeof InheritedCanvasClass === 'function');
   });
+
+  QUnit.test('_shouldCenterTransform', function(assert) {
+    assert.equal(
+      canvas._shouldCenterTransform({}, 'someAction', false), false, 'a non standard action does not center scale');
+    assert.equal(
+      canvas._shouldCenterTransform({}, 'someAction', true), true,
+      'a non standard action will center scale if altKey is true'
+    );
+    canvas.centeredScaling = true;
+    ['scale', 'scaleX', 'scaleY', 'resizing'].forEach(function(action) {
+      assert.equal(
+        canvas._shouldCenterTransform({}, action, false), true,
+        action + ' standard action will center scale if canvas.centeredScaling is true and no centeredKey pressed'
+      );
+    });
+    ['scale', 'scaleX', 'scaleY', 'resizing'].forEach(function(action) {
+      assert.equal(
+        canvas._shouldCenterTransform({}, action, true), false,
+        action + ' standard action will NOT center scale if canvas.centeredScaling is true and centeredKey is pressed'
+      );
+    });
+    assert.equal(
+      canvas._shouldCenterTransform({}, 'rotate', false), false,
+      'rotate standard action will NOT center scale if canvas.centeredScaling is true'
+    );
+    canvas.centeredRotation = true;
+    assert.equal(
+      canvas._shouldCenterTransform({}, 'rotate', false), true,
+      'rotate standard action will center scale if canvas.centeredRotation is true'
+    );
+  });
 })();
