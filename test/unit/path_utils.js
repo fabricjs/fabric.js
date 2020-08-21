@@ -1,7 +1,7 @@
 (function() {
   QUnit.module('fabric.util - path.js');
   // eslint-disable-next-line max-len
-  var path = 'M 2 5 l 2 -2 L 4 4 h 3 H 9 C 8 3 10 3 10 3 c 1 -1 2 0 1 1 S 8 5 9 7 v 1 s 2 -1 1 2 Q 9 10 10 11 T 12 11 t -1 -1 v 2 T 10 12 S 9 12 7 11 c 0 -1 0 -1 -2 -2 z m 0 2 l 1 0 l 0 1 l -1 0 z M 1 1 a 1 1 1 0 30 2 2 A 2 2 1 0 30 6 6';
+  var path = 'M 2 5 l 2 -2 L 4 4 h 3 H 9 C 8 3 10 3 10 3 c 1 -1 2 0 1 1 S 8 5 9 7 v 1 s 2 -1 1 2 Q 9 10 10 11 T 12 11 t -1 -1 v 2 T 10 12 S 9 12 7 11 c 0 -1 0 -1 -2 -2 z m 0 2 l 1 0 l 0 1 l -1 0 z M 1 1 a 1 1 30 1 0 2 2 A 2 2 30 1 0 6 6';
   // eslint-disable-next-line
   var expectedParse = [['M',2,5],['l',2,-2],['L',4,4],['h',3],['H',9],['C',8,3,10,3,10,3],['c',1,-1,2,0,1,1],['S',8,5,9,7],['v',1],['s',2,-1,1,2],['Q',9,10,10,11],['T',12,11],['t',-1,-1],['v',2],['T',10,12],['S',9,12,7,11],['c',0,-1,0,-1,-2,-2],['z'],['m',0,2],['l',1,0],['l',0,1],['l',-1,0],['z'],['M', 1, 1], ['a', 1, 1, 1, 0, 30, 2, 2],['A', 2,2,1,0,30,6,6]];
   // eslint-disable-next-line
@@ -21,5 +21,15 @@
       }
       assert.deepEqual(command, expectedSimplified[index], 'should contain a subset of equivalent commands ' + index);
     });
+  });
+  QUnit.test('fabric.util.getPathSegmentsInfo', function(assert) {
+    assert.ok(typeof fabric.util.getPathSegmentsInfo === 'function');
+    var parsed = fabric.util.makePathSimpler(fabric.util.parsePath(path));
+    var infos = fabric.util.getPathSegmentsInfo(parsed);
+    assert.deepEqual(infos[0].length, 0, 'the command 0 a M has a length 0');
+    assert.deepEqual(infos[1].length, 0, 'the command 0 a M has a length 0');
+    assert.deepEqual(infos[2].length, 0, 'the command 0 a M has a length 0');
+    assert.deepEqual(infos[3].length, 0, 'the command 0 a M has a length 0');
+    assert.deepEqual(infos[4].length, 0, 'the command 0 a M has a length 0');
   });
 })();
