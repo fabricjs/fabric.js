@@ -397,7 +397,7 @@
   };
 
   /**
-   * Calc lenght from point x1,y1 to x2,y2
+   * Calc length from point x1,y1 to x2,y2
    * @param {Number} x1 starting point x
    * @param {Number} y1 starting point y
    * @param {Number} x2 starting point x
