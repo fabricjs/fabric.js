@@ -9,10 +9,9 @@ var pkgObject = JSON.parse(pkgText); // parsed pkg to override its fields
 var args = process.argv.slice(2).join(' '); // args will be passed to npm publish (like --dry-run)
 var preRelease = process.env.PRE_RELEASE;
 
-console.log(preRelease);
-
 // allow publishing of pre-releases with beta tag
-if (preRelease === 'false') {
+if (preRelease === 'true') {
+  console.log('Adding the tag `beta` to this release');
   args = '--tag beta ' + args;
 }
 
@@ -24,6 +23,8 @@ fs.writeFileSync(
     version: pkgObject.version + '-browser',
   }), null, '\t')
 );
+
+console.log('npm publish ' + args);
 
 // publish -browser version
 cp.execSync('npm publish ' + args);

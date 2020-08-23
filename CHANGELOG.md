@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.6.6]
+- republish 3.6.4 as non beta. no differences
+
 ## [3.6.5]
 - republish 3.6.4 as non beta. no differences
 
