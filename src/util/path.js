@@ -423,12 +423,12 @@
     return (1 - t) * (1 - t) * (1 - t);
   }
 
-  function getPointOnCubicBezierIterator(P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y) {
+  function getPointOnCubicBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
     return function(pct) {
       var c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
       return {
-        x: P4x * c1 + P3x * c2 + P2x * c3 + P1x * c4,
-        y: P4y * c1 + P3y * c2 + P2y * c3 + P1y * c4
+        x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+        y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
       };
     };
   }
@@ -445,12 +445,12 @@
     return (1 - t) * (1 - t);
   }
 
-  function getPointOnQuadraticBezierIterator(P1x, P1y, P2x, P2y, P3x, P3y) {
+  function getPointOnQuadraticBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
     return function(pct) {
       var c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
       return {
-        x: P3x * c1 + P2x * c2 + P1x * c3,
-        y: P3y * c1 + P2y * c2 + P1y * c3
+        x: p3x * c1 + p2x * c2 + p1x * c3,
+        y: p3y * c1 + p2y * c2 + p1y * c3
       };
     };
   }
