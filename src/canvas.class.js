@@ -450,29 +450,6 @@
     },
 
     /**
-     * Checks if point is contained within an area of given object
-     * @param {Event} e Event object
-     * @param {fabric.Object} target Object to test against
-     * @param {Object} [point] x,y object of point coordinates we want to check.
-     * @return {Boolean} true if point is contained within an area of given object
-     */
-    containsPoint: function (e, target, point) {
-      var ignoreZoom = true,
-          pointer = point || this.getPointer(e, ignoreZoom),
-          xy, isTouch = e ? isTouchEvent(e) : false;
-
-      if (target.group && target.group === this._activeObject && target.group.type === 'activeSelection') {
-        xy = this._normalizePointer(target.group, pointer);
-      }
-      else {
-        xy = { x: pointer.x, y: pointer.y };
-      }
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || !!target._findTargetCorner(pointer, isTouch));
-    },
-
-    /**
      * @private
      */
     _normalizePointer: function (object, pointer) {
@@ -850,7 +827,10 @@
       if (obj &&
           obj.visible &&
           obj.evented &&
-          this.containsPoint(null, obj, pointer)) {
+          // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
+          // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+          (obj.containsPoint(pointer) || !!obj._findTargetCorner(pointer))
+      ) {
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
@@ -877,7 +857,7 @@
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
         var objToCheck = objects[i];
-        var pointerToUse = objToCheck.group && objToCheck.group.type !== 'activeSelection' ?
+        var pointerToUse = objToCheck.group ?
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];

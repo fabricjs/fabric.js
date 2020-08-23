@@ -2207,34 +2207,6 @@
     assert.equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
   });
 
-  QUnit.test('containsPoint', function(assert) {
-    assert.ok(typeof canvas.containsPoint === 'function');
-
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-    canvas.add(rect);
-
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-
-    var eventStub = {
-      clientX: canvasOffset.left + 100,
-      clientY: canvasOffset.top + 100,
-      target: rect
-    };
-
-    assert.ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
-
-    eventStub = {
-      clientX: canvasOffset.left + 200,
-      clientY: canvasOffset.top + 200,
-      target: rect
-    };
-    assert.ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
-
-    rect.set('left', 175).set('top', 175).setCoords();
-    assert.ok(canvas.containsPoint(eventStub, rect), 'on rect at (200, 200) should be within area (175, 175, 225, 225)');
-  });
-
   QUnit.test('setupCurrentTransform', function(assert) {
     assert.ok(typeof canvas._setupCurrentTransform === 'function');
 
@@ -2353,24 +2325,6 @@
   //   assert.equal(rect.originX, 'right');
   //   assert.equal(rect.originY, 'bottom');
   // });
-
-  QUnit.test('containsPoint in viewport transform', function(assert) {
-    canvas.viewportTransform = [2, 0, 0, 2, 50, 50];
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-    canvas.add(rect);
-
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-
-    var eventStub = {
-      clientX: canvasOffset.left + 250,
-      clientY: canvasOffset.top + 250,
-      target: rect
-    };
-
-    assert.ok(canvas.containsPoint(eventStub, rect), 'point at (250, 250) should be within area (75, 75, 125, 125)');
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-  });
 
   QUnit.test('fxRemove', function(assert) {
     var done = assert.async();
