@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.6.5]
+- republish 3.6.4 as non beta. no differences
+
 ## [3.6.4]
 - fix(fabric.Image): fix safari drawing bug for using drawImage outside element boundaries #6326
 - fix(fabric.Itext): fix copy paste of text with style #6418

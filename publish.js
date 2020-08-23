@@ -9,8 +9,10 @@ var pkgObject = JSON.parse(pkgText); // parsed pkg to override its fields
 var args = process.argv.slice(2).join(' '); // args will be passed to npm publish (like --dry-run)
 var preRelease = process.env.PRE_RELEASE;
 
+console.log(preRelease);
+
 // allow publishing of pre-releases with beta tag
-if (preRelease) {
+if (preRelease === 'false') {
   args = '--tag beta ' + args;
 }
 
