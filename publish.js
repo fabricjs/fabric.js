@@ -10,7 +10,8 @@ var args = process.argv.slice(2).join(' '); // args will be passed to npm publis
 var preRelease = process.env.PRE_RELEASE;
 
 // allow publishing of pre-releases with beta tag
-if (preRelease) {
+if (preRelease === 'true') {
+  console.log('Adding beta tag to NPM publish');
   args = '--tag beta ' + args;
 }
 
@@ -22,6 +23,8 @@ fs.writeFileSync(
     version: pkgObject.version + '-browser',
   }), null, '\t')
 );
+
+console.log('npm publish ' + args);
 
 // publish -browser version
 cp.execSync('npm publish ' + args);
