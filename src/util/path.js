@@ -396,39 +396,192 @@
     return destinationPath;
   };
 
+  /**
+   * Calc length from point x1,y1 to x2,y2
+   * @param {Number} x1 starting point x
+   * @param {Number} y1 starting point y
+   * @param {Number} x2 starting point x
+   * @param {Number} y2 starting point y
+   * @return {Number} length of segment
+   */
   function calcLineLength(x1, y1, x2, y2) {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
 
+  // functions for the Cubic beizer
+  // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
+  function CB1(t) {
+    return t * t * t;
+  }
+  function CB2(t) {
+    return 3 * t * t * (1 - t);
+  }
+  function CB3(t) {
+    return 3 * t * (1 - t) * (1 - t);
+  }
+  function CB4(t) {
+    return (1 - t) * (1 - t) * (1 - t);
+  }
+
+  function getPointOnCubicBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+    return function(pct) {
+      var c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
+      return {
+        x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+        y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+      };
+    };
+  }
+
+  function QB1(t) {
+    return t * t;
+  }
+
+  function QB2(t) {
+    return 2 * t * (1 - t);
+  }
+
+  function QB3(t) {
+    return (1 - t) * (1 - t);
+  }
+
+  function getPointOnQuadraticBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
+    return function(pct) {
+      var c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
+      return {
+        x: p3x * c1 + p2x * c2 + p1x * c3,
+        y: p3y * c1 + p2y * c2 + p1y * c3
+      };
+    };
+  }
+
+  function pathIterator(iterator, x1, y1) {
+    var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
+    for (perc = 0.01; perc <= 1; perc += 0.01) {
+      p = iterator(perc);
+      tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
+      tempP = p;
+    }
+    return tmpLen;
+  }
+
   //measures the length of a pre-simplified path
-  function measurePath(path) {
+  function getPathSegmentsInfo(path) {
     var totalLength = 0, len = path.length, current,
-        x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-        //x1 and y1 are the coords of the previous point on the path
-        //x2 and y2 are the coords of the current point
+        //x2 and y2 are the coords of segment start
+        //x1 and y1 are the coords of the current point
+        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo;
     for (var i = 0; i < len; i++) {
       current = path[i];
+      tempInfo = {
+        x: x1,
+        y: y1,
+        command: current[0],
+      };
       switch (current[0]) { //first letter
-        case 'L':
-          x2 = current[1];
-          y2 = current[2];
-          totalLength += calcLineLength(x1, y1, x2, y2);
-          x1 = current[1];
-          y1 = current[2];
-          break;
         case 'M':
+          tempInfo.length = 0;
+          x2 = x1 = current[1];
+          y2 = y1 = current[2];
+          break;
+        case 'L':
+          tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
           x1 = current[1];
           y1 = current[2];
           break;
         case 'C':
-          //todo
+          iterator = getPointOnCubicBezierIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4],
+            current[5],
+            current[6]
+          );
+          tempInfo.length = pathIterator(iterator, x1, y1);
+          x1 = current[5];
+          y1 = current[6];
           break;
         case 'Q':
-          //todo
+          iterator = getPointOnQuadraticBezierIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4]
+          );
+          tempInfo.length = pathIterator(iterator, x1, y1);
+          x1 = current[3];
+          y1 = current[4];
+          break;
+        case 'Z':
+        case 'z':
+          // we add those in order to ease calculations later
+          tempInfo.destX = x2;
+          tempInfo.destY = y2;
+          tempInfo.length = calcLineLength(x1, y1, x2, y2);
+          x1 = x2;
+          y1 = y2;
           break;
       }
+      totalLength += tempInfo.length;
+      info.push(tempInfo);
     }
-    return totalLength;
+    info.push({ length: totalLength, x: x1, y: y1 });
+    return info;
+  }
+
+  function getPointOnPath(path, perc, infos) {
+    if (!infos) {
+      infos = getPathSegmentsInfo(path);
+    }
+    var distance = infos[infos.length - 1] * perc, i = 0;
+    while ((distance - infos[i] > 0) && i < infos.length) {
+      distance -= infos[i];
+      i++;
+    }
+    var segInfo = infos[i], segPercent = distance / segInfo.length,
+        command = segInfo.length, segment = path[i];
+    switch (command) {
+      case 'Z':
+      case 'z':
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segInfo.destX, segInfo.destY),
+          segPercent
+        );
+        break;
+      case 'L':
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segment[1], segment[2]),
+          segPercent
+        );
+        break;
+      case 'C':
+        return getPointOnCubicBezierIterator(
+          segInfo.x,
+          segInfo.y,
+          segment[1],
+          segment[2],
+          segment[3],
+          segment[4],
+          segment[5],
+          segment[6]
+        )(segPercent);
+        break;
+      case 'Q':
+        return getPointOnQuadraticBezierIterator(
+          segInfo.x,
+          segInfo.y,
+          segment[1],
+          segment[2],
+          segment[3],
+          segment[4]
+        )(segPercent);
+        break;
+    }
   }
 
   function parsePath(pathString) {
@@ -528,9 +681,10 @@
 
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
-  fabric.util.measurePath = measurePath;
+  fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
   fabric.util.fromArcToBeizers = fromArcToBeizers;
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
+  fabric.util.getPointOnPath = getPointOnPath;
   // kept because we do not want to make breaking changes.
   // but useless and deprecated.
   fabric.util.getBoundsOfArc = getBoundsOfArc;
