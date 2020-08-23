@@ -12,6 +12,7 @@
         bottom: TOP,
         left: RIGHT,
         right: LEFT,
+        center: CENTER,
       }, radiansToDegrees = fabric.util.radiansToDegrees,
       sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
@@ -523,8 +524,13 @@
     }
     else {
       newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-      signX = sign(newPoint.x);
-      signY = sign(newPoint.y);
+      // use of sign: We use sign to detect change of direction of an action. sign usually change when
+      // we cross the origin point with the mouse. So a scale flip for example. There is an issue when scaling
+      // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
+      // cross many time the origin point and flip the object. so we need a way to filter out the noise.
+      // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
+      signX = by !== 'y' ? sign(newPoint.x) : 1;
+      signY = by !== 'x' ? sign(newPoint.y) : 1;
       if (!transform.signX) {
         transform.signX = signX;
       }
@@ -559,12 +565,12 @@
         scaleX *= 2;
         scaleY *= 2;
       }
-      if (transform.signX !== signX) {
+      if (transform.signX !== signX && by !== 'y') {
         transform.originX = opposite[transform.originX];
         scaleX *= -1;
         transform.signX = signX;
       }
-      if (transform.signY !== signY) {
+      if (transform.signY !== signY && by !== 'x') {
         transform.originY = opposite[transform.originY];
         scaleY *= -1;
         transform.signY = signY;
