@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.0.0-rc.1' };
+var fabric = fabric || { version: '4.1.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1607,19 +1607,46 @@ fabric.CommonMethods = {
 
 
 (function() {
+  var _join = Array.prototype.join,
+      commandLengths = {
+        m: 2,
+        l: 2,
+        h: 1,
+        v: 1,
+        c: 6,
+        s: 4,
+        q: 4,
+        t: 2,
+        a: 7
+      },
+      repeatedCommands = {
+        m: 'l',
+        M: 'L'
+      };
+  function segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) {
+    var costh2 = fabric.util.cos(th2),
+        sinth2 = fabric.util.sin(th2),
+        costh3 = fabric.util.cos(th3),
+        sinth3 = fabric.util.sin(th3),
+        toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
+        toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
+        cp1X = fromX + mT * ( -cosTh * rx * sinth2 - sinTh * ry * costh2),
+        cp1Y = fromY + mT * ( -sinTh * rx * sinth2 + cosTh * ry * costh2),
+        cp2X = toX + mT * ( cosTh * rx * sinth3 + sinTh * ry * costh3),
+        cp2Y = toY + mT * ( sinTh * rx * sinth3 - cosTh * ry * costh3);
 
-  var _join = Array.prototype.join;
+    return ['C',
+      cp1X, cp1Y,
+      cp2X, cp2Y,
+      toX, toY
+    ];
+  }
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
    * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
    * http://mozilla.org/MPL/2.0/
    */
   function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
-    var argsString = _join.call(arguments);
-    if (fabric.arcToSegmentsCache[argsString]) {
-      return fabric.arcToSegmentsCache[argsString];
-    }
-
     var PI = Math.PI, th = rotateX * PI / 180,
         sinTh = fabric.util.sin(th),
         cosTh = fabric.util.cos(th),
@@ -1666,32 +1693,12 @@ fabric.CommonMethods = {
 
     for (var i = 0; i < segments; i++) {
       result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY);
-      fromX = result[i][4];
-      fromY = result[i][5];
+      fromX = result[i][5];
+      fromY = result[i][6];
       mTheta = th3;
       th3 += mDelta;
     }
-    fabric.arcToSegmentsCache[argsString] = result;
     return result;
-  }
-
-  function segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) {
-    var costh2 = fabric.util.cos(th2),
-        sinth2 = fabric.util.sin(th2),
-        costh3 = fabric.util.cos(th3),
-        sinth3 = fabric.util.sin(th3),
-        toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
-        toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
-        cp1X = fromX + mT * ( -cosTh * rx * sinth2 - sinTh * ry * costh2),
-        cp1Y = fromY + mT * ( -sinTh * rx * sinth2 + cosTh * ry * costh2),
-        cp2X = toX + mT * ( cosTh * rx * sinth3 + sinTh * ry * costh3),
-        cp2Y = toY + mT * ( sinTh * rx * sinth3 - cosTh * ry * costh3);
-
-    return [
-      cp1X, cp1Y,
-      cp2X, cp2Y,
-      toX, toY
-    ];
   }
 
   /*
@@ -1709,62 +1716,6 @@ fabric.CommonMethods = {
   }
 
   /**
-   * Draws arc
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {Number} fx
-   * @param {Number} fy
-   * @param {Array} coords
-   */
-  fabric.util.drawArc = function(ctx, fx, fy, coords) {
-    var rx = coords[0],
-        ry = coords[1],
-        rot = coords[2],
-        large = coords[3],
-        sweep = coords[4],
-        tx = coords[5],
-        ty = coords[6],
-        segs = [[], [], [], []],
-        segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
-
-    for (var i = 0, len = segsNorm.length; i < len; i++) {
-      segs[i][0] = segsNorm[i][0] + fx;
-      segs[i][1] = segsNorm[i][1] + fy;
-      segs[i][2] = segsNorm[i][2] + fx;
-      segs[i][3] = segsNorm[i][3] + fy;
-      segs[i][4] = segsNorm[i][4] + fx;
-      segs[i][5] = segsNorm[i][5] + fy;
-      ctx.bezierCurveTo.apply(ctx, segs[i]);
-    }
-  };
-
-  /**
-   * Calculate bounding box of a elliptic-arc
-   * @param {Number} fx start point of arc
-   * @param {Number} fy
-   * @param {Number} rx horizontal radius
-   * @param {Number} ry vertical radius
-   * @param {Number} rot angle of horizontal axe
-   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points
-   * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
-   * @param {Number} tx end point of arc
-   * @param {Number} ty
-   */
-  fabric.util.getBoundsOfArc = function(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
-
-    var fromX = 0, fromY = 0, bound, bounds = [],
-        segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
-
-    for (var i = 0, len = segs.length; i < len; i++) {
-      bound = getBoundsOfCurve(fromX, fromY, segs[i][0], segs[i][1], segs[i][2], segs[i][3], segs[i][4], segs[i][5]);
-      bounds.push({ x: bound[0].x + fx, y: bound[0].y + fy });
-      bounds.push({ x: bound[1].x + fx, y: bound[1].y + fy });
-      fromX = segs[i][4];
-      fromY = segs[i][5];
-    }
-    return bounds;
-  };
-
-  /**
    * Calculate bounding box of a beziercurve
    * @param {Number} x0 starting point
    * @param {Number} y0
@@ -1776,6 +1727,7 @@ fabric.CommonMethods = {
    * @param {Number} y3
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
+  // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
     var argsString;
     if (fabric.cachesBoundsOfCurve) {
@@ -1858,8 +1810,493 @@ fabric.CommonMethods = {
     return result;
   }
 
-  fabric.util.getBoundsOfCurve = getBoundsOfCurve;
+  /**
+   * Converts arc to a bunch of beizer curves
+   * @param {Number} fx starting point x
+   * @param {Number} fy starting point y
+   * @param {Array} coords Arc command
+   */
+  function fromArcToBeizers(fx, fy, coords) {
+    var rx = coords[1],
+        ry = coords[2],
+        rot = coords[3],
+        large = coords[4],
+        sweep = coords[5],
+        tx = coords[6],
+        ty = coords[7],
+        segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
+    for (var i = 0, len = segsNorm.length; i < len; i++) {
+      segsNorm[i][1] += fx;
+      segsNorm[i][2] += fy;
+      segsNorm[i][3] += fx;
+      segsNorm[i][4] += fy;
+      segsNorm[i][5] += fx;
+      segsNorm[i][6] += fy;
+    }
+    return segsNorm;
+  };
+
+
+  function makePathSimpler(path) {
+    // x and y represent the last point of the path. the previous command point.
+    // we add them to each relative command to make it an absolute comment.
+    // we also swap the v V h H with L, because are easier to transform.
+    var x = 0, y = 0, len = path.length,
+        // x1 and y1 represent the last point of the subpath. the subpath is started with
+        // m or M command. When a z or Z command is drawn, x and y need to be resetted to
+        // the last x1 and y1.
+        x1 = 0, y1 = 0, current, i, converted,
+        // previous will host the letter of the previous command, to handle S and T.
+        // controlX and controlY will host the previous reflected control point
+        destinationPath = [], previous, controlX, controlY;
+    for (i = 0; i < len; ++i) {
+      converted = false;
+      current = path[i].slice(0);
+      switch (current[0]) { // first letter
+        case 'l': // lineto, relative
+          current[0] = 'L';
+          current[1] += x;
+          current[2] += y;
+          // falls through
+        case 'L':
+          x = current[1];
+          y = current[2];
+          break;
+        case 'h': // horizontal lineto, relative
+          current[1] += x;
+          // falls through
+        case 'H':
+          current[0] = 'L';
+          current[2] = y;
+          x = current[1];
+          break;
+        case 'v': // vertical lineto, relative
+          current[1] += y;
+          // falls through
+        case 'V':
+          current[0] = 'L';
+          y = current[1];
+          current[1] = x;
+          current[2] = y;
+          break;
+        case 'm': // moveTo, relative
+          current[0] = 'M';
+          current[1] += x;
+          current[2] += y;
+          // falls through
+        case 'M':
+          x = current[1];
+          y = current[2];
+          x1 = current[1];
+          y1 = current[2];
+          break;
+        case 'c': // bezierCurveTo, relative
+          current[0] = 'C';
+          current[1] += x;
+          current[2] += y;
+          current[3] += x;
+          current[4] += y;
+          current[5] += x;
+          current[6] += y;
+          // falls through
+        case 'C':
+          controlX = current[3];
+          controlY = current[4];
+          x = current[5];
+          y = current[6];
+          break;
+        case 's': // shorthand cubic bezierCurveTo, relative
+          current[0] = 'S';
+          current[1] += x;
+          current[2] += y;
+          current[3] += x;
+          current[4] += y;
+          // falls through
+        case 'S':
+          // would be sScC but since we are swapping sSc for C, we check just that.
+          if (previous === 'C') {
+            // calculate reflection of previous control points
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
+          }
+          else {
+            // If there is no previous command or if the previous command was not a C, c, S, or s,
+            // the control point is coincident with the current point
+            controlX = x;
+            controlY = y;
+          }
+          x = current[3];
+          y = current[4];
+          current[0] = 'C';
+          current[5] = current[3];
+          current[6] = current[4];
+          current[3] = current[1];
+          current[4] = current[2];
+          current[1] = controlX;
+          current[2] = controlY;
+          // current[3] and current[4] are NOW the second control point.
+          // we keep it for the next reflection.
+          controlX = current[3];
+          controlY = current[4];
+          break;
+        case 'q': // quadraticCurveTo, relative
+          current[0] = 'Q';
+          current[1] += x;
+          current[2] += y;
+          current[3] += x;
+          current[4] += y;
+          // falls through
+        case 'Q':
+          controlX = current[1];
+          controlY = current[2];
+          x = current[3];
+          y = current[4];
+          break;
+        case 't': // shorthand quadraticCurveTo, relative
+          current[0] = 'T';
+          current[1] += x;
+          current[2] += y;
+          // falls through
+        case 'T':
+          if (previous === 'Q') {
+            // calculate reflection of previous control point
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
+          }
+          else {
+            // If there is no previous command or if the previous command was not a Q, q, T or t,
+            // assume the control point is coincident with the current point
+            controlX = x;
+            controlY = y;
+          }
+          current[0] = 'Q';
+          x = current[1];
+          y = current[2];
+          current[1] = controlX;
+          current[2] = controlY;
+          current[3] = x;
+          current[4] = y;
+          break;
+        case 'a':
+          current[0] = 'A';
+          current[6] += x;
+          current[7] += y;
+          // falls through
+        case 'A':
+          converted = true;
+          destinationPath = destinationPath.concat(fromArcToBeizers(x, y, current));
+          x = current[6];
+          y = current[7];
+          break;
+        case 'z':
+        case 'Z':
+          x = x1;
+          y = y1;
+          break;
+        default:
+      }
+      if (!converted) {
+        destinationPath.push(current);
+      }
+      previous = current[0];
+    }
+    return destinationPath;
+  };
+
+  /**
+   * Calc length from point x1,y1 to x2,y2
+   * @param {Number} x1 starting point x
+   * @param {Number} y1 starting point y
+   * @param {Number} x2 starting point x
+   * @param {Number} y2 starting point y
+   * @return {Number} length of segment
+   */
+  function calcLineLength(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  }
+
+  // functions for the Cubic beizer
+  // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
+  function CB1(t) {
+    return t * t * t;
+  }
+  function CB2(t) {
+    return 3 * t * t * (1 - t);
+  }
+  function CB3(t) {
+    return 3 * t * (1 - t) * (1 - t);
+  }
+  function CB4(t) {
+    return (1 - t) * (1 - t) * (1 - t);
+  }
+
+  function getPointOnCubicBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+    return function(pct) {
+      var c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
+      return {
+        x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+        y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+      };
+    };
+  }
+
+  function QB1(t) {
+    return t * t;
+  }
+
+  function QB2(t) {
+    return 2 * t * (1 - t);
+  }
+
+  function QB3(t) {
+    return (1 - t) * (1 - t);
+  }
+
+  function getPointOnQuadraticBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
+    return function(pct) {
+      var c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
+      return {
+        x: p3x * c1 + p2x * c2 + p1x * c3,
+        y: p3y * c1 + p2y * c2 + p1y * c3
+      };
+    };
+  }
+
+  function pathIterator(iterator, x1, y1) {
+    var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
+    for (perc = 0.01; perc <= 1; perc += 0.01) {
+      p = iterator(perc);
+      tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
+      tempP = p;
+    }
+    return tmpLen;
+  }
+
+  //measures the length of a pre-simplified path
+  function getPathSegmentsInfo(path) {
+    var totalLength = 0, len = path.length, current,
+        //x2 and y2 are the coords of segment start
+        //x1 and y1 are the coords of the current point
+        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo;
+    for (var i = 0; i < len; i++) {
+      current = path[i];
+      tempInfo = {
+        x: x1,
+        y: y1,
+        command: current[0],
+      };
+      switch (current[0]) { //first letter
+        case 'M':
+          tempInfo.length = 0;
+          x2 = x1 = current[1];
+          y2 = y1 = current[2];
+          break;
+        case 'L':
+          tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
+          x1 = current[1];
+          y1 = current[2];
+          break;
+        case 'C':
+          iterator = getPointOnCubicBezierIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4],
+            current[5],
+            current[6]
+          );
+          tempInfo.length = pathIterator(iterator, x1, y1);
+          x1 = current[5];
+          y1 = current[6];
+          break;
+        case 'Q':
+          iterator = getPointOnQuadraticBezierIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4]
+          );
+          tempInfo.length = pathIterator(iterator, x1, y1);
+          x1 = current[3];
+          y1 = current[4];
+          break;
+        case 'Z':
+        case 'z':
+          // we add those in order to ease calculations later
+          tempInfo.destX = x2;
+          tempInfo.destY = y2;
+          tempInfo.length = calcLineLength(x1, y1, x2, y2);
+          x1 = x2;
+          y1 = y2;
+          break;
+      }
+      totalLength += tempInfo.length;
+      info.push(tempInfo);
+    }
+    info.push({ length: totalLength, x: x1, y: y1 });
+    return info;
+  }
+
+  function getPointOnPath(path, perc, infos) {
+    if (!infos) {
+      infos = getPathSegmentsInfo(path);
+    }
+    var distance = infos[infos.length - 1] * perc, i = 0;
+    while ((distance - infos[i] > 0) && i < infos.length) {
+      distance -= infos[i];
+      i++;
+    }
+    var segInfo = infos[i], segPercent = distance / segInfo.length,
+        command = segInfo.length, segment = path[i];
+    switch (command) {
+      case 'Z':
+      case 'z':
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segInfo.destX, segInfo.destY),
+          segPercent
+        );
+        break;
+      case 'L':
+        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+          new fabric.Point(segment[1], segment[2]),
+          segPercent
+        );
+        break;
+      case 'C':
+        return getPointOnCubicBezierIterator(
+          segInfo.x,
+          segInfo.y,
+          segment[1],
+          segment[2],
+          segment[3],
+          segment[4],
+          segment[5],
+          segment[6]
+        )(segPercent);
+        break;
+      case 'Q':
+        return getPointOnQuadraticBezierIterator(
+          segInfo.x,
+          segInfo.y,
+          segment[1],
+          segment[2],
+          segment[3],
+          segment[4]
+        )(segPercent);
+        break;
+    }
+  }
+
+  function parsePath(pathString) {
+    var result = [],
+        coords = [],
+        currentPath,
+        parsed,
+        re = fabric.rePathCommand,
+        match,
+        coordsStr,
+        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+        path;
+    if (!pathString || !pathString.match) {
+      return result;
+    }
+    path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+
+    for (var i = 0, coordsParsed, len = path.length; i < len; i++) {
+      currentPath = path[i];
+
+      coordsStr = currentPath.slice(1).trim();
+      coords.length = 0;
+
+      while ((match = re.exec(coordsStr))) {
+        coords.push(match[0]);
+      }
+
+      coordsParsed = [currentPath.charAt(0)];
+
+      for (var j = 0, jlen = coords.length; j < jlen; j++) {
+        parsed = parseFloat(coords[j]);
+        if (!isNaN(parsed)) {
+          coordsParsed.push(parsed);
+        }
+      }
+
+      var command = coordsParsed[0],
+          commandLength = commandLengths[command.toLowerCase()],
+          repeatedCommand = repeatedCommands[command] || command;
+
+      if (coordsParsed.length - 1 > commandLength) {
+        for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+          result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
+          command = repeatedCommand;
+        }
+      }
+      else {
+        result.push(coordsParsed);
+      }
+    }
+
+    return result;
+  };
+
+  /**
+   * Calculate bounding box of a elliptic-arc
+   * @deprecated
+   * @param {Number} fx start point of arc
+   * @param {Number} fy
+   * @param {Number} rx horizontal radius
+   * @param {Number} ry vertical radius
+   * @param {Number} rot angle of horizontal axis
+   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points
+   * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
+   * @param {Number} tx end point of arc
+   * @param {Number} ty
+   */
+  function getBoundsOfArc(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
+
+    var fromX = 0, fromY = 0, bound, bounds = [],
+        segs = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
+
+    for (var i = 0, len = segs.length; i < len; i++) {
+      bound = getBoundsOfCurve(fromX, fromY, segs[i][1], segs[i][2], segs[i][3], segs[i][4], segs[i][5], segs[i][6]);
+      bounds.push({ x: bound[0].x + fx, y: bound[0].y + fy });
+      bounds.push({ x: bound[1].x + fx, y: bound[1].y + fy });
+      fromX = segs[i][5];
+      fromY = segs[i][6];
+    }
+    return bounds;
+  };
+
+  /**
+   * Draws arc
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Number} fx
+   * @param {Number} fy
+   * @param {Array} coords coords of the arc, without the front 'A/a'
+   */
+  function drawArc(ctx, fx, fy, coords) {
+    coords = coords.slice(0).unshift('X'); // command A or a does not matter
+    var beizers = fromArcToBeizers(fx, fy, coords);
+    beizers.forEach(function(beizer) {
+      ctx.bezierCurveTo.apply(ctx, beizer.slice(1));
+    });
+  };
+
+  fabric.util.parsePath = parsePath;
+  fabric.util.makePathSimpler = makePathSimpler;
+  fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
+  fabric.util.fromArcToBeizers = fromArcToBeizers;
+  fabric.util.getBoundsOfCurve = getBoundsOfCurve;
+  fabric.util.getPointOnPath = getPointOnPath;
+  // kept because we do not want to make breaking changes.
+  // but useless and deprecated.
+  fabric.util.getBoundsOfArc = getBoundsOfArc;
+  fabric.util.drawArc = drawArc;
 })();
 
 
@@ -5727,6 +6164,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         bottom: TOP,
         left: RIGHT,
         right: LEFT,
+        center: CENTER,
       }, radiansToDegrees = fabric.util.radiansToDegrees,
       sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
@@ -5761,6 +6199,15 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         uniformIsToggled = eventData[uniScaleKey];
     return (canvas.uniformScaling && !uniformIsToggled) ||
     (!canvas.uniformScaling && uniformIsToggled);
+  }
+
+  /**
+   * Checks if transform is centered
+   * @param {Object} transform transform data
+   * @return {Boolean} true if transform is centered
+   */
+  function isTransformCentered(transform) {
+    return transform.originX === CENTER && transform.originY === CENTER;
   }
 
   /**
@@ -6229,8 +6676,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     }
     else {
       newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-      signX = sign(newPoint.x);
-      signY = sign(newPoint.y);
+      // use of sign: We use sign to detect change of direction of an action. sign usually change when
+      // we cross the origin point with the mouse. So a scale flip for example. There is an issue when scaling
+      // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
+      // cross many time the origin point and flip the object. so we need a way to filter out the noise.
+      // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
+      signX = by !== 'y' ? sign(newPoint.x) : 1;
+      signY = by !== 'x' ? sign(newPoint.y) : 1;
       if (!transform.signX) {
         transform.signX = signX;
       }
@@ -6261,16 +6713,16 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
       }
       // if we are scaling by center, we need to double the scale
-      if (transform.originX === CENTER && transform.originY === CENTER) {
+      if (isTransformCentered(transform)) {
         scaleX *= 2;
         scaleY *= 2;
       }
-      if (transform.signX !== signX) {
+      if (transform.signX !== signX && by !== 'y') {
         transform.originX = opposite[transform.originX];
         scaleX *= -1;
         transform.signX = signX;
       }
-      if (transform.signY !== signY) {
+      if (transform.signY !== signY && by !== 'x') {
         transform.originY = opposite[transform.originY];
         scaleY *= -1;
         transform.signY = signY;
@@ -6379,7 +6831,8 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   function changeWidth(eventData, transform, x, y) {
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        newWidth = Math.abs(localPoint.x / target.scaleX) - strokePadding;
+        multiplier = isTransformCentered(transform) ? 2 : 1,
+        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
     return true;
   }
@@ -9864,6 +10317,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
       var path = this.createPath(pathData);
       this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.fire('before:path:created', { path: path });
       this.canvas.add(path);
       this.canvas.requestRenderAll();
       path.setCoords();
@@ -9986,6 +10440,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var group = new fabric.Group(circles);
     group.canvas = this.canvas;
 
+    this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 
@@ -10132,6 +10587,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
 
     var group = new fabric.Group(rects);
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
+    this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 
@@ -10749,29 +11205,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Checks if point is contained within an area of given object
-     * @param {Event} e Event object
-     * @param {fabric.Object} target Object to test against
-     * @param {Object} [point] x,y object of point coordinates we want to check.
-     * @return {Boolean} true if point is contained within an area of given object
-     */
-    containsPoint: function (e, target, point) {
-      var ignoreZoom = true,
-          pointer = point || this.getPointer(e, ignoreZoom),
-          xy, isTouch = e ? isTouchEvent(e) : false;
-
-      if (target.group && target.group === this._activeObject && target.group.type === 'activeSelection') {
-        xy = this._normalizePointer(target.group, pointer);
-      }
-      else {
-        xy = { x: pointer.x, y: pointer.y };
-      }
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || !!target._findTargetCorner(pointer, isTouch));
-    },
-
-    /**
      * @private
      */
     _normalizePointer: function (object, pointer) {
@@ -10883,6 +11316,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {fabric.Object} target
      * @param {String} action
+     * @param {Boolean} altKey
      */
     _shouldCenterTransform: function (target, action, altKey) {
       if (!target) {
@@ -10891,7 +11325,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var centerTransform;
 
-      if (action === 'scale' || action === 'scaleX' || action === 'scaleY') {
+      if (action === 'scale' || action === 'scaleX' || action === 'scaleY' || action === 'resizing') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
       else if (action === 'rotate') {
@@ -11148,7 +11582,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (obj &&
           obj.visible &&
           obj.evented &&
-          this.containsPoint(null, obj, pointer)) {
+          // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
+          // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+          (obj.containsPoint(pointer) || !!obj._findTargetCorner(pointer))
+      ) {
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
@@ -11175,7 +11612,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
         var objToCheck = objects[i];
-        var pointerToUse = objToCheck.group && objToCheck.group.type !== 'activeSelection' ?
+        var pointerToUse = objToCheck.group ?
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
@@ -15901,7 +16338,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     setCoords: function(skipCorners) {
       this.aCoords = this.calcACoords();
-      this.lineCoords = this.calcLineCoords();
+      // in case we are in a group, for how the inner group target check works,
+      // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
+      this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
       if (skipCorners) {
         return this;
       }
@@ -18529,23 +18968,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc,
-      toFixed = fabric.util.toFixed,
-      commandLengths = {
-        m: 2,
-        l: 2,
-        h: 1,
-        v: 1,
-        c: 6,
-        s: 4,
-        q: 4,
-        t: 2,
-        a: 7
-      },
-      repeatedCommands = {
-        m: 'l',
-        M: 'L'
-      };
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -18588,7 +19011,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(path, options) {
       options = options || { };
       this.callSuper('initialize', options);
-
       if (!path) {
         path = [];
       }
@@ -18596,18 +19018,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
-        ? path
-        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+        ? fabric.util.makePathSimpler(path)
+
+        : fabric.util.makePathSimpler(
+          fabric.util.parsePath(path)
+        );
 
       if (!this.path) {
         return;
       }
-
-      if (!fromArray) {
-        this.path = this._parsePath();
-      }
-
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
     },
 
@@ -18617,15 +19036,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _renderPathCommands: function(ctx) {
       var current, // current instruction
-          previous = null,
           subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
           controlY = 0, // current control point y
-          tempX,
-          tempY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
 
@@ -18637,44 +19053,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         switch (current[0]) { // first letter
 
-          case 'l': // lineto, relative
-            x += current[1];
-            y += current[2];
-            ctx.lineTo(x + l, y + t);
-            break;
-
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
             ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'h': // horizontal lineto, relative
-            x += current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'H': // horizontal lineto, absolute
-            x = current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'v': // vertical lineto, relative
-            y += current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'V': // verical lineto, absolute
-            y = current[1];
-            ctx.lineTo(x + l, y + t);
-            break;
-
-          case 'm': // moveTo, relative
-            x += current[1];
-            y += current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            ctx.moveTo(x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
@@ -18683,23 +19065,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             subpathStartX = x;
             subpathStartY = y;
             ctx.moveTo(x + l, y + t);
-            break;
-
-          case 'c': // bezierCurveTo, relative
-            tempX = x + current[5];
-            tempY = y + current[6];
-            controlX = x + current[3];
-            controlY = y + current[4];
-            ctx.bezierCurveTo(
-              x + current[1] + l, // x1
-              y + current[2] + t, // y1
-              controlX + l, // x2
-              controlY + t, // y2
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
             break;
 
           case 'C': // bezierCurveTo, absolute
@@ -18717,193 +19082,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             );
             break;
 
-          case 's': // shorthand cubic bezierCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              x + current[1] + l,
-              y + current[2] + t,
-              tempX + l,
-              tempY + t
-            );
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = x + current[1];
-            controlY = y + current[2];
-
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'S': // shorthand cubic bezierCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            ctx.bezierCurveTo(
-              controlX + l,
-              controlY + t,
-              current[1] + l,
-              current[2] + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = current[1];
-            controlY = current[2];
-
-            break;
-
-          case 'q': // quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            controlX = x + current[1];
-            controlY = y + current[2];
-
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
           case 'Q': // quadraticCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-
             ctx.quadraticCurveTo(
               current[1] + l,
               current[2] + t,
-              tempX + l,
-              tempY + t
+              current[3] + l,
+              current[4] + t
             );
-            x = tempX;
-            y = tempY;
+            x = current[3];
+            y = current[4];
             controlX = current[1];
             controlY = current[2];
-            break;
-
-          case 't': // shorthand quadraticCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[1];
-            tempY = y + current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-
-            break;
-
-          case 'T':
-            tempX = current[1];
-            tempY = current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            ctx.quadraticCurveTo(
-              controlX + l,
-              controlY + t,
-              tempX + l,
-              tempY + t
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'a':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x + l,
-              current[7] + y + t
-            ]);
-            x += current[6];
-            y += current[7];
-            break;
-
-          case 'A':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + l,
-              current[7] + t
-            ]);
-            x = current[6];
-            y = current[7];
             break;
 
           case 'z':
@@ -18913,7 +19102,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             ctx.closePath();
             break;
         }
-        previous = current;
       }
     },
 
@@ -19017,69 +19205,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      */
-    _parsePath: function() {
-      var result = [],
-          coords = [],
-          currentPath,
-          parsed,
-          re = fabric.rePathCommand,
-          match,
-          coordsStr;
-
-      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
-        currentPath = this.path[i];
-
-        coordsStr = currentPath.slice(1).trim();
-        coords.length = 0;
-
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
-        }
-
-        coordsParsed = [currentPath.charAt(0)];
-
-        for (var j = 0, jlen = coords.length; j < jlen; j++) {
-          parsed = parseFloat(coords[j]);
-          if (!isNaN(parsed)) {
-            coordsParsed.push(parsed);
-          }
-        }
-
-        var command = coordsParsed[0],
-            commandLength = commandLengths[command.toLowerCase()],
-            repeatedCommand = repeatedCommands[command] || command;
-
-        if (coordsParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
-            command = repeatedCommand;
-          }
-        }
-        else {
-          result.push(coordsParsed);
-        }
-      }
-
-      return result;
-    },
-
-    /**
-     * @private
-     */
     _calcDimensions: function() {
 
       var aX = [],
           aY = [],
           current, // current instruction
-          previous = null,
           subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
           y = 0, // current y
-          controlX = 0, // current control point x
-          controlY = 0, // current control point y
-          tempX,
-          tempY,
           bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -19088,43 +19222,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         switch (current[0]) { // first letter
 
-          case 'l': // lineto, relative
-            x += current[1];
-            y += current[2];
-            bounds = [];
-            break;
-
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
-            bounds = [];
-            break;
-
-          case 'h': // horizontal lineto, relative
-            x += current[1];
-            bounds = [];
-            break;
-
-          case 'H': // horizontal lineto, absolute
-            x = current[1];
-            bounds = [];
-            break;
-
-          case 'v': // vertical lineto, relative
-            y += current[1];
-            bounds = [];
-            break;
-
-          case 'V': // verical lineto, absolute
-            y = current[1];
-            bounds = [];
-            break;
-
-          case 'm': // moveTo, relative
-            x += current[1];
-            y += current[2];
-            subpathStartX = x;
-            subpathStartY = y;
             bounds = [];
             break;
 
@@ -19136,31 +19236,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             bounds = [];
             break;
 
-          case 'c': // bezierCurveTo, relative
-            tempX = x + current[5];
-            tempY = y + current[6];
-            controlX = x + current[3];
-            controlY = y + current[4];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              x + current[1], // x1
-              y + current[2], // y1
-              controlX, // x2
-              controlY, // y2
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
           case 'C': // bezierCurveTo, absolute
-            controlX = current[3];
-            controlY = current[4];
             bounds = fabric.util.getBoundsOfCurve(x, y,
               current[1],
               current[2],
-              controlX,
-              controlY,
+              current[3],
+              current[4],
               current[5],
               current[6]
             );
@@ -19168,191 +19249,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             y = current[6];
             break;
 
-          case 's': // shorthand cubic bezierCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
+          case 'Q': // quadraticCurveTo, absolute
             bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              x + current[1],
-              y + current[2],
-              tempX,
-              tempY
-            );
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = x + current[1];
-            controlY = y + current[2];
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'S': // shorthand cubic bezierCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-            if (previous[0].match(/[CcSs]/) === null) {
-              // If there is no previous command or if the previous command was not a C, c, S, or s,
-              // the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control points
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
               current[1],
               current[2],
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = current[1];
-            controlY = current[2];
-            break;
-
-          case 'q': // quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-            controlX = x + current[1];
-            controlY = y + current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'Q': // quadraticCurveTo, absolute
-            controlX = current[1];
-            controlY = current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
+              current[1],
+              current[2],
               current[3],
               current[4]
             );
             x = current[3];
             y = current[4];
-            break;
-
-          case 't': // shorthand quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[1];
-            tempY = y + current[2];
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-
-            break;
-
-          case 'T':
-            tempX = current[1];
-            tempY = current[2];
-
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else {
-              // calculate reflection of previous control point
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'a':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x,
-              current[7] + y
-            );
-            x += current[6];
-            y += current[7];
-            break;
-
-          case 'A':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6],
-              current[7]
-            );
-            x = current[6];
-            y = current[7];
             break;
 
           case 'z':
@@ -19361,7 +19268,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             y = subpathStartY;
             break;
         }
-        previous = current;
         bounds.forEach(function (point) {
           aX.push(point.x);
           aY.push(point.y);
@@ -19541,7 +19447,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * @private
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsACoords: function() {
       var skipControls = true;
@@ -19835,8 +19740,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _restoreObjectState: function(object) {
       this.realizeTransform(object);
-      object.setCoords();
       delete object.group;
+      object.setCoords();
       return this;
     },
 
@@ -20727,14 +20632,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!elementToDraw) {
         return;
       }
-      var w = this.width, h = this.height,
-          sW = Math.min(elementToDraw.naturalWidth || elementToDraw.width, w * this._filterScalingX),
-          sH = Math.min(elementToDraw.naturalHeight || elementToDraw.height, h * this._filterScalingY),
+      var scaleX = this._filterScalingX, scaleY = this._filterScalingY,
+          w = this.width, h = this.height, min = Math.min, max = Math.max,
+          // crop values cannot be lesser than 0.
+          cropX = max(this.cropX, 0), cropY = max(this.cropY, 0),
+          elWidth = elementToDraw.naturalWidth || elementToDraw.width,
+          elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+          sX = cropX * scaleX,
+          sY = cropY * scaleY,
+          // the width height cannot exceed element width/height, starting from the crop offset.
+          sW = min(w * scaleX, elWidth - sX),
+          sH = min(h * scaleY, elHeight - sY),
           x = -w / 2, y = -h / 2,
-          sX = Math.max(0, this.cropX * this._filterScalingX),
-          sY = Math.max(0, this.cropY * this._filterScalingY);
+          maxDestW = min(w, elWidth / scaleX - cropX),
+          maxDestH = min(h, elHeight / scaleX - cropY);
 
-      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, w, h);
+      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
     },
 
     /**
@@ -25935,13 +25848,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
 
     /**
      * @private
-     * @param {String} method
+     * @param {String} method fillText or strokeText.
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Content of the line
+     * @param {Array} line Content of the line, splitted in an array by grapheme
      * @param {Number} left
      * @param {Number} top
      * @param {Number} lineIndex
-     * @param {Number} charOffset
      */
     _renderChars: function(method, ctx, line, left, top, lineIndex) {
       // set proper line offset
@@ -25959,7 +25871,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
         // render all the line in one pass without checking
-        this._renderChar(method, ctx, lineIndex, 0, this.textLines[lineIndex], left, top, lineHeight);
+        this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
       }

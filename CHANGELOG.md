@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.1.0]
+- feat(Brushes): add beforePathCreated event [#6492](https://github.com/fabricjs/fabric.js/pull/6492);
+- feat(fabric.Path): Change the way path is parsed and drawn. simplify path at parsing time [#6504](https://github.com/fabricjs/fabric.js/pull/6504);
+- feat(fabric.Path): Simplify S and T command in C and Q. [#6507](https://github.com/fabricjs/fabric.js/pull/6507);
+- fix(fabric.Textbox): ISSUE-6518 Textbox and centering scaling [#6524](https://github.com/fabricjs/fabric.js/pull/6524);
+- fix(fabric.Text): Ensure the shortcut text render the passed argument and not the entire line [#6526](https://github.com/fabricjs/fabric.js/pull/6526);
+- feat(fabric.util): Add a function to work with path measurements [#6525](https://github.com/fabricjs/fabric.js/pull/6525);
+- fix(fabric.Image): rendering pixel outside canvas size [#6326](https://github.com/fabricjs/fabric.js/pull/6326);
+- fix(fabric.controlsUtils): stabilize scaleObject function [#6540](https://github.com/fabricjs/fabric.js/pull/6540);
+- fix(fabric.Object): when in groups or active groups, fix the ability to shift deselect [#6541](https://github.com/fabricjs/fabric.js/pull/6541);
+
 ## [4.0.0]
 - fixed the gesture module to not break with 4.0 [#6491](https://github.com/fabricjs/fabric.js/pull/6491);
 - fix(fabric.IText): copy style in non full mode when typing text [#6454](https://github.com/fabricjs/fabric.js/pull/6454);
