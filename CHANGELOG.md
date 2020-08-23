@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.6.4]
+- fix(fabric.Image): fix safari drawing bug for using drawImage outside element boundaries #6326
+- fix(fabric.Itext): fix copy paste of text with style #6418
+- fix(fabric.Itext): carry over style of selected test when replacing by typing (cherry-pick) #6172
+
 ## [3.6.3]
 
 - fix(Object): ISSUE 6196 use set('canvas') to restore canvas #6216
