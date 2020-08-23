@@ -540,17 +540,17 @@
         return;
       }
       var scaleX = this._filterScalingX, scaleY = this._filterScalingY,
-          w = this.width, h = this.height, min = Math.min,
-          cropX = this.cropX, cropY = this.cropY,
+          w = this.width, h = this.height, min = Math.min, max = Math.max,
+          // crop values cannot be lesser than 0.
+          cropX = max(this.cropX, 0), cropY = max(this.cropY, 0),
           elWidth = elementToDraw.naturalWidth || elementToDraw.width,
           elHeight = elementToDraw.naturalHeight || elementToDraw.height,
-          maxSW = min(w * scaleX, elWidth - cropX * scaleX),
-          maxSH = min(h * scaleY, elHeight - cropY * scaleY),
-          sW = min(elWidth, maxSW),
-          sH = min(elHeight, maxSH),
+          sX = cropX * scaleX,
+          sY = cropY * scaleY,
+          // the width height cannot exceed element width/height, starting from the crop offset.
+          sW = min(w * scaleX, elWidth - sX),
+          sH = min(h * scaleY, elHeight - sY),
           x = -w / 2, y = -h / 2,
-          sX = min(0, cropX),
-          sY = min(0, cropY),
           maxDestW = min(w, elWidth / scaleX - cropX),
           maxDestH = min(h, elHeight / scaleX - cropY);
 
