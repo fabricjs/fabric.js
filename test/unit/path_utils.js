@@ -31,6 +31,12 @@
     assert.deepEqual(infos[2].length, 1, 'the command 2 a L with one step on Y has a length 1');
     assert.deepEqual(infos[3].length, 3, 'the command 3 a L with 3 step on X has a length 3');
     assert.deepEqual(infos[4].length, 2, 'the command 4 a L with 2 step on X has a length 0');
-    assert.deepEqual(infos[5].length, 2.061820497903685, 'the command 5 a C has a approximated lenght of 2');
+    assert.deepEqual(infos[5].length, 2.061820497903685, 'the command 5 a C has a approximated lenght of 2.061');
+    assert.deepEqual(infos[6].length, 2.786311794934689, 'the command 6 a C has a approximated lenght of 2.786');
+    assert.deepEqual(infos[7].length, 4.123555017527272, 'the command 7 a C has a approximated lenght of 4.123');
+    assert.deepEqual(infos[8].length, 1, 'the command 8 a L with 1 step on the Y has an exact lenght of 1');
+    assert.deepEqual(infos[9].length, 3.1338167707969693, 'the command 9 a C has a approximated lenght of 3.183');
+    assert.deepEqual(infos[10].length, 1.512191042774622, 'the command 10 a Q has a approximated lenght of 1.512');
+    assert.deepEqual(infos[11].length, 2.2674203737413428, 'the command 11 a Q has a approximated lenght of 2.267');
   });
 })();
