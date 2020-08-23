@@ -39,4 +39,15 @@
     assert.deepEqual(infos[10].length, 1.512191042774622, 'the command 10 a Q has a approximated lenght of 1.512');
     assert.deepEqual(infos[11].length, 2.2674203737413428, 'the command 11 a Q has a approximated lenght of 2.267');
   });
+
+  QUnit.test('fabric.util.getPathSegmentsInfo test Z command', function(assert) {
+    assert.ok(typeof fabric.util.getPathSegmentsInfo === 'function');
+    var parsed = fabric.util.makePathSimpler(fabric.util.parsePath('M 0 0 h 20, v 20 L 0, 20 Z'));
+    var infos = fabric.util.getPathSegmentsInfo(parsed);
+    assert.deepEqual(infos[0].length, 0, 'the command 0 a M has a length 0');
+    assert.deepEqual(infos[1].length, 20, 'the command 1 a L has length 20');
+    assert.deepEqual(infos[2].length, 20, 'the command 2 a L has length 20');
+    assert.deepEqual(infos[3].length, 20, 'the command 3 a L has length 20');
+    assert.deepEqual(infos[4].length, 20, 'the command 4 a Z has length 20');
+  });
 })();
