@@ -14,6 +14,9 @@
   }
 
   function createTestFromSVG(svgName) {
+    if (!svgName) {
+      return null;
+    }
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
         fabric.loadSVGFromString(string, function(objects, options) {
@@ -83,7 +86,14 @@
     'image-rendering-attr',
     'svg-missing-images',
     // this svg below here is not correct. but we do not want additional regressions
-    'nested-svgs'
+    'nested-svgs',
+    'arc1',
+    'arc2',
+    'arc3',
+    'cs',
+    'qt',
+    'generic-path',
+    '177'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

@@ -15,8 +15,15 @@
       }, radiansToDegrees = fabric.util.radiansToDegrees,
       sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
 
-  function findCornerQuadrant(fabricObject, corner) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(corner.y, corner.x)) + 360;
+  /**
+   * Combine control position and object angle to find the control direction compared
+   * to the object center.
+   * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+   * @param {fabric.Control} control the control class
+   * @return {Number} 0 - 7 a quadrant number
+   */
+  function findCornerQuadrant(fabricObject, control) {
+    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -28,6 +35,12 @@
     target.fire(eventName, options);
   }
 
+  /**
+   * Inspect event and fabricObject properties to understand if the scaling action
+   * @param {Event} eventData from the user action
+   * @param {fabric.Object} fabricObject the fabric object about to scale
+   * @return {Boolean} true if scale is proportional
+   */
   function scaleIsProportional(eventData, fabricObject) {
     var canvas = fabricObject.canvas, uniScaleKey = canvas.uniScaleKey,
         uniformIsToggled = eventData[uniScaleKey];
@@ -35,6 +48,22 @@
     (!canvas.uniformScaling && uniformIsToggled);
   }
 
+  /**
+   * Checks if transform is centered
+   * @param {Object} transform transform data
+   * @return {Boolean} true if transform is centered
+   */
+  function isTransformCentered(transform) {
+    return transform.originX === CENTER && transform.originY === CENTER;
+  }
+
+  /**
+   * Inspect fabricObject to understand if the current scaling action is allowed
+   * @param {fabric.Object} fabricObject the fabric object about to scale
+   * @param {String} by 'x' or 'y' or ''
+   * @param {Boolean} scaleProportionally true if we are trying to scale proportionally
+   * @return {Boolean} true if scaling is not allowed at current conditions
+   */
   function scalingIsForbidden(fabricObject, by, scaleProportionally) {
     var lockX = fabricObject.lockScalingX, lockY = fabricObject.lockScalingY;
     if (lockX && lockY) {
@@ -52,59 +81,95 @@
     return false;
   }
 
-  function scaleCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * return the correct cursor style for the scale action
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function scaleCursorStyleHandler(eventData, control, fabricObject) {
     var notAllowed = 'not-allowed',
         scaleProportionally = scaleIsProportional(eventData, fabricObject),
         by = '';
-    if (corner.x !== 0 && corner.y === 0) {
+    if (control.x !== 0 && control.y === 0) {
       by = 'x';
     }
-    else if (corner.x === 0 && corner.y !== 0) {
+    else if (control.x === 0 && control.y !== 0) {
       by = 'y';
     }
     if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
       return notAllowed;
     }
-    var n = findCornerQuadrant(fabricObject, corner);
+    var n = findCornerQuadrant(fabricObject, control);
     return scaleMap[n] + '-resize';
   }
 
-  function skewCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * return the correct cursor style for the skew action
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function skewCursorStyleHandler(eventData, control, fabricObject) {
     var notAllowed = 'not-allowed';
-    if (corner.x !== 0 && fabricObject.lockSkewingY) {
+    if (control.x !== 0 && fabricObject.lockSkewingY) {
       return notAllowed;
     }
-    if (corner.y !== 0 && fabricObject.lockSkewingX) {
+    if (control.y !== 0 && fabricObject.lockSkewingX) {
       return notAllowed;
     }
-    var n = findCornerQuadrant(fabricObject, corner) % 4;
+    var n = findCornerQuadrant(fabricObject, control) % 4;
     return skewMap[n] + '-resize';
   }
 
-  function scaleSkewCursorStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * Combine skew and scale style handlers to cover fabric standard use case
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function scaleSkewCursorStyleHandler(eventData, control, fabricObject) {
     if (eventData[fabricObject.canvas.altActionKey]) {
-      return controls.skewCursorStyleHandler(eventData, corner, fabricObject);
+      return controls.skewCursorStyleHandler(eventData, control, fabricObject);
     }
-    return controls.scaleCursorStyleHandler(eventData, corner, fabricObject);
+    return controls.scaleCursorStyleHandler(eventData, control, fabricObject);
   }
 
-  function scaleOrSkewActionName(eventData, corner, fabricObject) {
+  /**
+   * Inspect event , control and fabricObject to return the correct action name
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} an action name
+   */
+  function scaleOrSkewActionName(eventData, control, fabricObject) {
     var isAlternative = eventData[fabricObject.canvas.altActionKey];
-    if (corner.x === 0) {
+    if (control.x === 0) {
       // then is scaleY or skewX
       return isAlternative ? 'skewX' : 'scaleY';
     }
-    if (corner.y === 0) {
+    if (control.y === 0) {
       // then is scaleY or skewX
       return isAlternative ? 'skewY' : 'scaleX';
     }
   }
 
-  function rotationStyleHandler(eventData, corner, fabricObject) {
+  /**
+   * Find the correct style for the control that is used for rotation.
+   * this function is very simple and it just take care of not-allowed or standard cursor
+   * @param {Event} eventData the javascript event that is causing the scale
+   * @param {fabric.Control} control the control that is interested in the action
+   * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+   * @return {String} a valid css string for the cursor
+   */
+  function rotationStyleHandler(eventData, control, fabricObject) {
     if (fabricObject.lockRotation) {
       return 'not-allowed';
     }
-    return corner.cursorStyle;
+    return control.cursorStyle;
   }
 
   function commonEventInfo(eventData, transform, x, y) {
@@ -118,6 +183,12 @@
     };
   }
 
+  /**
+   * Wrap an action handler with saving/restoring object position on the transform.
+   * this is the code that permits to obects to keep their position while transforming.
+   * @param {Function} actionHandler the function to wrap
+   * @return {Function} a function with an action handler signature
+   */
   function wrapWithFixedAnchor(actionHandler) {
     return function(eventData, transform, x, y) {
       var target = transform.target, centerPoint = target.getCenterPoint(),
@@ -128,6 +199,16 @@
     };
   }
 
+  /**
+   * Transforms a point described by x and y in a distance from the top left corner of the object
+   * bounding box.
+   * @param {Object} transform
+   * @param {String} originX
+   * @param {String} originY
+   * @param {number} x
+   * @param {number} y
+   * @return {Fabric.Point} the normalized point
+   */
   function getLocalPoint(transform, originX, originY, x, y) {
     var target = transform.target,
         control = target.controls[transform.corner],
@@ -151,10 +232,19 @@
     return localPoint;
   }
 
+  /**
+   * Detect if the fabric object is flipped on one side.
+   * @param {fabric.Object} target
+   * @return {Boolean} true if one flip, but not two.
+   */
   function targetHasOneFlip(target) {
     return (target.flipX && !target.flipY) || (!target.flipX && target.flipY);
   }
 
+  /**
+   * Utility function to componsate the scale factor when skew is applied on both axes
+   * @private
+   */
   function compensateScaleForSkew(target, oppositeSkew, scaleToCompoensate, axis, reference) {
     if (target[oppositeSkew] !== 0) {
       var newDim = target._getTransformedDimensions()[axis];
@@ -163,6 +253,10 @@
     }
   }
 
+  /**
+   * Action handler for skewing on the X axis
+   * @private
+   */
   function skewObjectX(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
@@ -203,6 +297,10 @@
     return hasSkewed;
   }
 
+  /**
+   * Action handler for skewing on the Y axis
+   * @private
+   */
   function skewObjectY(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
@@ -243,7 +341,15 @@
     return hasSkewed;
   }
 
-  // writing a skewX only action, try to generalize later
+  /**
+   * Wrapped Action handler for skewing on the Y axis, takes care of the
+   * skew direction and determine the correct transform origin for the anchor point
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function skewHandlerX(eventData, transform, x, y) {
     // step1 figure out and change transform origin.
     // if skewX > 0 and originY bottom we anchor on right
@@ -285,7 +391,15 @@
     return finalHandler(eventData, transform, x, y);
   }
 
-  // writing a skewY only action, try to generalize later
+  /**
+   * Wrapped Action handler for skewing on the Y axis, takes care of the
+   * skew direction and determine the correct transform origin for the anchor point
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function skewHandlerY(eventData, transform, x, y) {
     // step1 figure out and change transform origin.
     // if skewY > 0 and originX left we anchor on top
@@ -327,6 +441,16 @@
     return finalHandler(eventData, transform, x, y);
   }
 
+  /**
+   * Action handler for rotation and snapping, without anchor point.
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   * @private
+   */
   function rotationWithSnapping(eventData, transform, x, y) {
     var t = transform,
         target = t.target,
@@ -369,7 +493,18 @@
     return hasRotated;
   }
 
-
+  /**
+   * Basic scaling logic, reused with differnt constrain for scaling X,Y, freely or equally.
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @param {Object} options additional information for scaling
+   * @param {String} options.by 'x', 'y', 'equally' or '' to indicate type of scaling
+   * @return {Boolean} true if some change happened
+   * @private
+   */
   function scaleObject(eventData, transform, x, y, options) {
     options = options || {};
     var target = transform.target,
@@ -377,57 +512,63 @@
         by = options.by, newPoint, scaleX, scaleY, dim,
         scaleProportionally = scaleIsProportional(eventData, target),
         forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
-        signX, signY;
+        signX, signY, gestureScale = transform.gestureScale;
 
     if (forbidScaling) {
       return false;
     }
-    newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-    signX = sign(newPoint.x);
-    signY = sign(newPoint.y);
-    if (!transform.signX) {
-      transform.signX = signX;
-    }
-    if (!transform.signY) {
-      transform.signY = signY;
-    }
-
-    if (target.lockScalingFlip &&
-      (transform.signX !== signX || transform.signY !== signY)
-    ) {
-      return false;
-    }
-
-    dim = target._getTransformedDimensions();
-    // missing detection of flip and logic to switch the origin
-    if (scaleProportionally && !by) {
-      // uniform scaling
-      var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-          original = transform.original,
-          originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
-            Math.abs(dim.y * original.scaleY / target.scaleY),
-          scale = distance / originalDistance, hasScaled;
-      scaleX = original.scaleX * scale;
-      scaleY = original.scaleY * scale;
+    if (gestureScale) {
+      scaleX = transform.scaleX * gestureScale;
+      scaleY = transform.scaleY * gestureScale;
     }
     else {
-      scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
-      scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
-    }
-    // if we are scaling by center, we need to double the scale
-    if (transform.originX === CENTER && transform.originY === CENTER) {
-      scaleX *= 2;
-      scaleY *= 2;
-    }
-    if (transform.signX !== signX) {
-      transform.originX = opposite[transform.originX];
-      scaleX *= -1;
-      transform.signX = signX;
-    }
-    if (transform.signY !== signY) {
-      transform.originY = opposite[transform.originY];
-      scaleY *= -1;
-      transform.signY = signY;
+      newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+      signX = sign(newPoint.x);
+      signY = sign(newPoint.y);
+      if (!transform.signX) {
+        transform.signX = signX;
+      }
+      if (!transform.signY) {
+        transform.signY = signY;
+      }
+
+      if (target.lockScalingFlip &&
+        (transform.signX !== signX || transform.signY !== signY)
+      ) {
+        return false;
+      }
+
+      dim = target._getTransformedDimensions();
+      // missing detection of flip and logic to switch the origin
+      if (scaleProportionally && !by) {
+        // uniform scaling
+        var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
+            original = transform.original,
+            originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
+              Math.abs(dim.y * original.scaleY / target.scaleY),
+            scale = distance / originalDistance, hasScaled;
+        scaleX = original.scaleX * scale;
+        scaleY = original.scaleY * scale;
+      }
+      else {
+        scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
+        scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
+      }
+      // if we are scaling by center, we need to double the scale
+      if (isTransformCentered(transform)) {
+        scaleX *= 2;
+        scaleY *= 2;
+      }
+      if (transform.signX !== signX) {
+        transform.originX = opposite[transform.originX];
+        scaleX *= -1;
+        transform.signX = signX;
+      }
+      if (transform.signY !== signY) {
+        transform.originY = opposite[transform.originY];
+        scaleY *= -1;
+        transform.signY = signY;
+      }
     }
     // minScale is taken are in the setter.
     var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
@@ -447,18 +588,54 @@
     return hasScaled;
   }
 
+  /**
+   * Generic scaling logic, to scale from corners either equally or freely.
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function scaleObjectFromCorner(eventData, transform, x, y) {
     return scaleObject(eventData, transform, x, y);
   }
 
+  /**
+   * Scaling logic for the X axis.
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function scaleObjectX(eventData, transform, x, y) {
     return scaleObject(eventData, transform, x, y , { by: 'x' });
   }
 
+  /**
+   * Scaling logic for the Y axis.
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function scaleObjectY(eventData, transform, x, y) {
     return scaleObject(eventData, transform, x, y , { by: 'y' });
   }
 
+  /**
+   * Composed action handler to either scale Y or skew X
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function scalingYOrSkewingX(eventData, transform, x, y) {
     // ok some safety needed here.
     if (eventData[transform.target.canvas.altActionKey]) {
@@ -467,6 +644,15 @@
     return controls.scalingY(eventData, transform, x, y);
   }
 
+  /**
+   * Composed action handler to either scale X or skew Y
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function scalingXOrSkewingY(eventData, transform, x, y) {
     // ok some safety needed here.
     if (eventData[transform.target.canvas.altActionKey]) {
@@ -475,11 +661,20 @@
     return controls.scalingX(eventData, transform, x, y);
   }
 
-  // currently unusued, needed for the textbox.
+  /**
+   * Action handler to change textbox width
+   * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
+   */
   function changeWidth(eventData, transform, x, y) {
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        newWidth = Math.abs(localPoint.x / target.scaleX) - strokePadding;
+        multiplier = isTransformCentered(transform) ? 2 : 1,
+        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
     return true;
   }
@@ -499,6 +694,8 @@
   controls.scaleOrSkewActionName = scaleOrSkewActionName;
   controls.rotationStyleHandler = rotationStyleHandler;
   controls.fireEvent = fireEvent;
-  fabric.controlHandlers = controls;
+  controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
+  controls.getLocalPoint = getLocalPoint;
+  fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);

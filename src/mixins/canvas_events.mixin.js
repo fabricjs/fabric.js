@@ -441,8 +441,14 @@
         shouldRender = transform.actionPerformed;
       }
       if (!isClick) {
+        var targetWasActive = target === this._activeObject;
         this._maybeGroupObjects(e);
-        shouldRender || (shouldRender = this._shouldRender(target));
+        if (!shouldRender) {
+          shouldRender = (
+            this._shouldRender(target) ||
+            (!targetWasActive && target === this._activeObject)
+          );
+        }
       }
       if (target) {
         var corner = target._findTargetCorner(
@@ -924,6 +930,7 @@
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
+          actionHandler = transform.actionHandler,
           // this object could be created from the function in the control handlers
           options = {
             target: transform.target,
@@ -939,8 +946,8 @@
           this.setCursor(options.target.moveCursor || this.moveCursor);
         }
       }
-      else {
-        (actionPerformed = transform.actionHandler(e, transform, x, y)) && this._fire(action, options);
+      else if (actionHandler) {
+        (actionPerformed = actionHandler(e, transform, x, y)) && this._fire(action, options);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
@@ -948,7 +955,7 @@
     /**
      * @private
      */
-    _fire: fabric.controlHandlers.fireEvent,
+    _fire: fabric.controlsUtils.fireEvent,
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.

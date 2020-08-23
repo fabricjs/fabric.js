@@ -584,6 +584,7 @@
      * @private
      * @param {fabric.Object} target
      * @param {String} action
+     * @param {Boolean} altKey
      */
     _shouldCenterTransform: function (target, action, altKey) {
       if (!target) {
@@ -592,7 +593,7 @@
 
       var centerTransform;
 
-      if (action === 'scale' || action === 'scaleX' || action === 'scaleY') {
+      if (action === 'scale' || action === 'scaleX' || action === 'scaleY' || action === 'resizing') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
       else if (action === 'rotate') {

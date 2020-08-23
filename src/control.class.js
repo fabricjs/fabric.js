@@ -2,17 +2,9 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      util = fabric.util,
-      renderCircleControl = fabric.controlRenderers.renderCircleControl,
-      renderSquareControl = fabric.controlRenderers.renderSquareControl;
+  var fabric = global.fabric || (global.fabric = { });
 
   function Control(options) {
-    if (options.position) {
-      this.x = options.position.x;
-      this.y = options.position.y;
-    }
-    delete options.position;
     for (var i in options) {
       this[i] = options[i];
     }
@@ -47,18 +39,12 @@
 
     /**
      * Drawing angle of the control.
-     * Used to reuse the same drawing function for different rotated controls
+     * NOT used for now, but name marked as needed for internal logic
+     * example: to reuse the same drawing function for different rotated controls
      * @type {Number}
      * @default 0
      */
     angle: 0,
-
-    /**
-     * Maybe useless, maybe will get removed before releaseing
-     * @type {String}
-     * @default ''
-     */
-    name: '',
 
     /**
      * Relative position of the control. X
@@ -115,6 +101,33 @@
      * @default false
      */
     withConnection: false,
+
+    /**
+     * The control actionHandler, provide one to handle action ( control being moved )
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    actionHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control handler for mouse down, provide one to handle mouse down on control
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseDownHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control mouseUpHandler, provide one to handle an effect on mouse up.
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
 
     /**
      * Returns control actionHandler
@@ -198,7 +211,7 @@
 
 
     positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
-      var point = util.transformPoint({
+      var point = fabric.util.transformPoint({
         x: this.x * dim.x + this.offsetX,
         y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
@@ -206,12 +219,11 @@
 
     /**
     * Render function for the control.
-    * When this function runs the context is already centered on the object and rotated with
-    * object angle. So when thinking of your rendering function think of the object align with the
-    * axis and your origin 0,0 is the center point of the control. Dimensions are in pixels, object
-    * scale or skew does not count.
+    * When this function runs the context is unscaled. unrotate. Just retina scaled.
+    * all the functions will have to translate to the point left,top before starting Drawing
+    * if they want to draw a control where the position is detected.
+    * left and top are the result of the positionHandler function
     * @param {RenderingContext2D} ctx the context where the control will be drawn
-    * @param {String} methodName fill or stroke, This is probably removed
     * @param {Number} left position of the canvas where we are about to render the control.
     * @param {Number} top position of the canvas where we are about to render the control.
     * @param {Object} styleOverride
@@ -221,10 +233,10 @@
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };

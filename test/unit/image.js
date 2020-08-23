@@ -64,7 +64,7 @@
     globalCompositeOperation: 'source-over',
     skewX:                    0,
     skewY:                    0,
-    crossOrigin:              '',
+    crossOrigin:              null,
     cropX:                    0,
     cropY:                    0
   };
@@ -148,6 +148,25 @@
         assert.equal(image.width, IMG_WIDTH);
         assert.equal(image.height, IMG_HEIGHT);
         done();
+      });
+    });
+  });
+
+  QUnit.test('setSrc with crossOrigin', function(assert) {
+    var done = assert.async();
+    createImageObject(function(image) {
+      image.width = 100;
+      image.height = 100;
+      assert.ok(typeof image.setSrc === 'function');
+      assert.equal(image.width, 100);
+      assert.equal(image.height, 100);
+      image.setSrc(IMG_SRC, function() {
+        assert.equal(image.width, IMG_WIDTH);
+        assert.equal(image.height, IMG_HEIGHT);
+        assert.equal(image.getCrossOrigin(), 'anonymous', 'setSrc will respect crossOrigin');
+        done();
+      }, {
+        crossOrigin: 'anonymous'
       });
     });
   });
@@ -378,29 +397,31 @@
   QUnit.test('crossOrigin', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
-      assert.equal(image.crossOrigin, '', 'initial crossOrigin value should be set');
+      assert.equal(image.getCrossOrigin(), null, 'initial crossOrigin value should be set');
 
       var elImage = _createImageElement();
       elImage.crossOrigin = 'anonymous';
       image = new fabric.Image(elImage);
-      assert.equal(image.crossOrigin, '', 'crossOrigin value on an instance takes precedence');
+      assert.equal(image.getCrossOrigin(), 'anonymous', 'crossOrigin value will respect the image element value');
 
       var objRepr = image.toObject();
-      assert.equal(objRepr.crossOrigin, '', 'toObject should return proper crossOrigin value');
+      assert.equal(objRepr.crossOrigin, 'anonymous', 'toObject should return proper crossOrigin value');
 
       var elImage2 = _createImageElement();
-      elImage2.crossOrigin = 'anonymous';
+      elImage2.crossOrigin = 'use-credentials';
       image.setElement(elImage2);
-      assert.equal(elImage2.crossOrigin, 'anonymous', 'setElement should set proper crossOrigin on an img element');
+      assert.equal(
+        elImage2.crossOrigin, 'use-credentials', 'setElement should not try to change element crossOrigin'
+      );
 
       // fromObject doesn't work on Node :/
       if (fabric.isLikelyNode) {
         done();
         return;
       }
-
+      console.log(objRepr);
       fabric.Image.fromObject(objRepr, function(img) {
-        assert.equal(img.crossOrigin, '');
+        assert.equal(img.getCrossOrigin(), null, 'image without src return no element');
         done();
       });
     });
