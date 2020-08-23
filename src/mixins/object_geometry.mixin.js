@@ -525,7 +525,9 @@
      */
     setCoords: function(skipCorners) {
       this.aCoords = this.calcACoords();
-      this.lineCoords = this.calcLineCoords();
+      // in case we are in a group, for how the inner group target check works,
+      // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
+      this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
       if (skipCorners) {
         return this;
       }

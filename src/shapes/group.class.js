@@ -104,7 +104,6 @@
 
     /**
      * @private
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsACoords: function() {
       var skipControls = true;
@@ -398,8 +397,8 @@
      */
     _restoreObjectState: function(object) {
       this.realizeTransform(object);
-      object.setCoords();
       delete object.group;
+      object.setCoords();
       return this;
     },
 
