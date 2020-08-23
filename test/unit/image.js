@@ -874,7 +874,7 @@
     });
   });
 
-  QUnit.test('_renderFill respects source boundaries ', function (assert) {
+  QUnit.test('_renderFill respects source boundaries crop < 0 and width > elWidth', function (assert) {
     fabric.Image.prototype._renderFill.call({
       cropX: -1,
       cropY: -1,
@@ -892,6 +892,28 @@
         assert.ok(sY >= 0, 'sY should be positive');
         assert.ok(sW <= 200, 'sW should not be larger than image width');
         assert.ok(sH <= 200, 'sH should  not be larger than image height');
+      }
+    });
+  });
+
+  QUnit.test('_renderFill respects source boundaries crop < 0 and width > elWidth', function (assert) {
+    fabric.Image.prototype._renderFill.call({
+      cropX: 30,
+      cropY: 30,
+      _filterScalingX: 0.5,
+      _filterScalingY: 0.5,
+      width: 210,
+      height: 210,
+      _element: {
+        naturalWidth: 200,
+        height: 200,
+      },
+    }, {
+      drawImage: function(src, sX, sY, sW, sH) {
+        assert.ok(sX === 15, 'sX should be cropX * filterScalingX');
+        assert.ok(sY === 15, 'sY should be cropY * filterScalingY');
+        assert.ok(sW === 105, 'sW will be width * filterScalingX if is < of element width');
+        assert.ok(sH === 105, 'sH will be height * filterScalingY if is < of element height');
       }
     });
   });
