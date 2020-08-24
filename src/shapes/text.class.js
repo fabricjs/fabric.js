@@ -895,8 +895,13 @@
           charBox,
           boxWidth = 0,
           timeToRender,
-          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
-
+          path = this.path,
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
+          startingPoint, originalLeft = left, movingPoint, renderLeft, renderTop;
+      if (path) {
+        // find the first point of the path, to consider the other as difference
+        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+      }
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
@@ -906,7 +911,7 @@
         return;
       }
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing;
+        timeToRender = i === len || this.charSpacing || this.path;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
@@ -928,7 +933,19 @@
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
         if (timeToRender) {
-          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          if (path) {
+            // we are at left - originalLeft. we want to know what point on the path is.
+            movingPoint = fabric.util.getPointOnPath(path.path, left - originalLeft, path.segmentsInfo);
+            console.log(movingPoint.x, movingPoint.y)
+
+            renderLeft = movingPoint.x - startingPoint.x;
+            renderTop = movingPoint.y - startingPoint.y;
+          }
+          else {
+            renderLeft = left;
+            renderTop = top;
+          }
+          this._renderChar(method, ctx, lineIndex, i, charsToRender, renderLeft, renderTop, lineHeight);
           charsToRender = '';
           actualStyle = nextStyle;
           left += boxWidth;
