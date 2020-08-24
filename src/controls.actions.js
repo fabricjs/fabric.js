@@ -680,9 +680,14 @@
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
+        oldWidth = target.width, hasScaled,
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
-    return true;
+    hasScaled = oldWidth !== newWidth;
+    if (hasScaled) {
+      fireEvent('scaling', commonEventInfo(eventData, transform, x, y));
+    }
+    return hasScaled;
   }
 
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
