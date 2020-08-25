@@ -540,7 +540,7 @@
     }
     // var distance = infos[infos.length - 1] * perc;
     var i = 0;
-    while ((distance - infos[i].length > 0) && i < infos.length) {
+    while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
       distance -= infos[i].length;
       i++;
     }

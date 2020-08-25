@@ -897,10 +897,12 @@
           timeToRender,
           path = this.path,
           shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
-          startingPoint, originalLeft = left, p1, p2, renderLeft, renderTop, angle;
+          startingPoint, originalLeft = left, p1, p2, renderLeft, renderTop, angle, currentPositionOnPath,
+          totalPathLength = 0;
       if (path) {
         // find the first point of the path, to consider the other as difference
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
       }
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
@@ -911,7 +913,7 @@
         return;
       }
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing || this.path;
+        timeToRender = i === len || this.charSpacing || path;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
@@ -935,18 +937,24 @@
         if (timeToRender) {
           if (path) {
             ctx.save();
-            // we are at left - originalLeft. we want to know what point on the path is.
-            p1 = fabric.util.getPointOnPath(path.path, left - originalLeft, path.segmentsInfo);
-            renderLeft = p1.x - startingPoint.x + boxWidth / 2;
-            renderTop = p1.y - startingPoint.y + boxWidth / 2;
-            p2 = fabric.util.getPointOnPath(path.path, left - originalLeft + boxWidth, path.segmentsInfo);
+            currentPositionOnPath = left - originalLeft + boxWidth / 2;
+            if ((currentPositionOnPath + boxWidth / 2) > totalPathLength) {
+              currentPositionOnPath %= totalPathLength;
+            }
+            // we are at currentPositionOnPath. we want to know what point on the path is.
+            p1 = fabric.util.getPointOnPath(path.path, currentPositionOnPath, path.segmentsInfo);
+            p2 = fabric.util.getPointOnPath(path.path, currentPositionOnPath + 1, path.segmentsInfo);
+            renderLeft = p1.x - startingPoint.x;
+            renderTop = p1.y - startingPoint.y;
             angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
             ctx.translate(renderLeft, renderTop);
             ctx.rotate(angle);
             this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
             ctx.restore();
           }
-          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          else {
+            this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          }
           charsToRender = '';
           actualStyle = nextStyle;
           left += boxWidth;
