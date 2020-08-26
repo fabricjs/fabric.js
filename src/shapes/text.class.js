@@ -35,6 +35,7 @@
       'charSpacing',
       'textAlign',
       'styles',
+      'path'
     ],
 
     /**
@@ -367,12 +368,18 @@
       }
       this._splitText();
       this._clearCache();
-      this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
+      if (this.path) {
+        this.width = this.path.width;
+        this.height = this.path.height;
+      }
+      else {
+        this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
+        this.height = this.calcTextHeight();
+      }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
-      this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
@@ -944,8 +951,8 @@
             // we are at currentPositionOnPath. we want to know what point on the path is.
             p1 = fabric.util.getPointOnPath(path.path, currentPositionOnPath, path.segmentsInfo);
             p2 = fabric.util.getPointOnPath(path.path, currentPositionOnPath + 1, path.segmentsInfo);
-            renderLeft = p1.x - startingPoint.x;
-            renderTop = p1.y - startingPoint.y;
+            renderLeft = p1.x - startingPoint.x - path.pathOffset.x;
+            renderTop = p1.y - startingPoint.y - path.pathOffset.y;
             angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
             ctx.translate(renderLeft, renderTop);
             ctx.rotate(angle);
