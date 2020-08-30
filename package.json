@@ -66,14 +66,14 @@
     "jsdom": "^15.2.1"
   },
   "devDependencies": {
+    "chalk": "^2.4.1",
     "eslint": "4.18.x",
-    "nyc": "13.3.x",
+    "nyc": "^15.1.0",
     "onchange": "^3.x.x",
-    "qunit": "2.9.2",
-    "testem": "^1.18.4",
-    "uglify-js": "3.3.x",
     "pixelmatch": "^4.0.2",
-    "chalk": "^2.4.1"
+    "qunit": "2.9.2",
+    "testem": "^3.2.0",
+    "uglify-js": "3.3.x"
   },
   "engines": {
     "node": ">=8.0.0"
