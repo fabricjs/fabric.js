@@ -1388,7 +1388,7 @@
                   object = {
                     width: _this.width / (shouldTransform ? vpt[0] : 1),
                     height: _this.height / (shouldTransform ? vpt[3] : 1)
-                };
+                  };
               return fill.toSVG(
                 object,
                 { additionalTransform: shouldTransform ? fabric.util.matrixToSVG(vpt) : '' }
