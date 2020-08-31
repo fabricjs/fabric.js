@@ -637,11 +637,11 @@
      * @param {fabric.Object} receiver Object implementing `clipTo` method	
      * @param {CanvasRenderingContext2D} ctx Context to clip	
      */	
-    clipContext: function(receiver, ctx) {	
-      ctx.save();	
-      ctx.beginPath();	
-      receiver.clipTo(ctx);	
-      ctx.clip();	
+    clipContext: function(receiver, ctx) {
+      ctx.save();
+      ctx.beginPath();
+      receiver.clipTo(ctx);
+      ctx.clip();
     },
 
     /**

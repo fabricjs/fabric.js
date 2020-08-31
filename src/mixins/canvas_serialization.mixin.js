@@ -31,8 +31,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
-      clipPath = serialized.clipPath,
-      renderOnAddRemove = this.renderOnAddRemove;
+        clipPath = serialized.clipPath,
+        renderOnAddRemove = this.renderOnAddRemove;
 
     this.renderOnAddRemove = false;
 

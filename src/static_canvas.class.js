@@ -9,15 +9,15 @@
 
   // aliases for faster resolution
   var extend = fabric.util.object.extend,
-    getElementOffset = fabric.util.getElementOffset,
-    removeFromArray = fabric.util.removeFromArray,
-    toFixed = fabric.util.toFixed,
-    transformPoint = fabric.util.transformPoint,
-    invertTransform = fabric.util.invertTransform,
-    getNodeCanvas = fabric.util.getNodeCanvas,
-    createCanvasElement = fabric.util.createCanvasElement,
+      getElementOffset = fabric.util.getElementOffset,
+      removeFromArray = fabric.util.removeFromArray,
+      toFixed = fabric.util.toFixed,
+      transformPoint = fabric.util.transformPoint,
+      invertTransform = fabric.util.invertTransform,
+      getNodeCanvas = fabric.util.getNodeCanvas,
+      createCanvasElement = fabric.util.createCanvasElement,
 
-    CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
+      CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
   /**
    * Static canvas class
@@ -879,7 +879,7 @@
      */
     calcViewportBoundaries: function() {
       var points = { }, width = this.width, height = this.height,
-        iVpt = invertTransform(this.viewportTransform);
+          iVpt = invertTransform(this.viewportTransform);
       points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
       points.br = transformPoint({ x: width, y: height }, iVpt);
       points.tr = new fabric.Point(points.br.x, points.tl.y);
@@ -976,7 +976,7 @@
      */
     _renderBackgroundOrOverlay: function(ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
@@ -1112,7 +1112,7 @@
      */
     getVpCenter: function() {
       var center = this.getCenter(),
-        iVpt = invertTransform(this.viewportTransform);
+          iVpt = invertTransform(this.viewportTransform);
       return transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
@@ -1324,9 +1324,9 @@
      */
     _setSVGHeader: function(markup, options) {
       var width = options.width || this.width,
-        height = options.height || this.height,
-        vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ',
-        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          height = options.height || this.height,
+          vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ',
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       if (options.viewBox) {
         viewBox = 'viewBox="' +
@@ -1381,20 +1381,20 @@
      */
     createSVGRefElementsMarkup: function() {
       var _this = this,
-        markup = ['background', 'overlay'].map(function(prop) {
-          var fill = _this[prop + 'Color'];
-          if (fill && fill.toLive) {
-            var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
-              object = {
-                width: _this.width / (shouldTransform ? vpt[0] : 1),
-                height: _this.height / (shouldTransform ? vpt[3] : 1)
-              };
-            return fill.toSVG(
-              object,
-              { additionalTransform: shouldTransform ? fabric.util.matrixToSVG(vpt) : '' }
-            );
-          }
-        });
+          markup = ['background', 'overlay'].map(function(prop) {
+            var fill = _this[prop + 'Color'];
+            if (fill && fill.toLive) {
+              var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
+                object = {
+                  width: _this.width / (shouldTransform ? vpt[0] : 1),
+                  height: _this.height / (shouldTransform ? vpt[3] : 1)
+                };
+              return fill.toSVG(
+                object,
+                { additionalTransform: shouldTransform ? fabric.util.matrixToSVG(vpt) : '' }
+              );
+            }
+          });
       return markup.join('');
     },
 
@@ -1407,8 +1407,8 @@
      */
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
-        style, row, rowIndex, _char, charIndex, i, len,
-        fontPaths = fabric.fontPaths, objects = [];
+          style, row, rowIndex, _char, charIndex, i, len,
+          fontPaths = fabric.fontPaths, objects = [];
 
       this._objects.forEach(function add(object) {
         objects.push(object);
@@ -1497,13 +1497,13 @@
      */
     _setSVGBgOverlayColor: function(markup, property) {
       var filler = this[property + 'Color'], vpt = this.viewportTransform, finalWidth = this.width,
-        finalHeight = this.height;
+          finalHeight = this.height;
       if (!filler) {
         return;
       }
       if (filler.toLive) {
         var repeat = filler.repeat, iVpt = fabric.util.invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
-          additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
+            additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
         markup.push(
           '<rect transform="' + additionalTransform + ' translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
           ' x="', filler.offsetX - finalWidth / 2,
@@ -1542,7 +1542,7 @@
         return this;
       }
       var activeSelection = this._activeObject,
-        i, obj, objs;
+          i, obj, objs;
       if (object === activeSelection && object.type === 'activeSelection') {
         objs = activeSelection._objects;
         for (i = objs.length; i--;) {
@@ -1571,7 +1571,7 @@
         return this;
       }
       var activeSelection = this._activeObject,
-        i, obj, objs;
+          i, obj, objs;
       if (object === activeSelection && object.type === 'activeSelection') {
         objs = activeSelection._objects;
         for (i = 0; i < objs.length; i++) {
@@ -1604,7 +1604,7 @@
         return this;
       }
       var activeSelection = this._activeObject,
-        i, obj, idx, newIdx, objs, objsMoved = 0;
+          i, obj, idx, newIdx, objs, objsMoved = 0;
 
       if (object === activeSelection && object.type === 'activeSelection') {
         objs = activeSelection._objects;
@@ -1677,7 +1677,7 @@
         return this;
       }
       var activeSelection = this._activeObject,
-        i, obj, idx, newIdx, objs, objsMoved = 0;
+          i, obj, idx, newIdx, objs, objsMoved = 0;
 
       if (object === activeSelection && object.type === 'activeSelection') {
         objs = activeSelection._objects;
