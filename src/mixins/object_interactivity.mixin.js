@@ -88,24 +88,32 @@
           x, y;
 
       for (var control in coords) {
+        // handle custom control corner sizes
+        var controlObject = fabric.Object.prototype.controls[control];
+        var cornerHyp = controlObject.cornerSize
+            ? controlObject.cornerSize * 0.707106
+            : cornerHypotenuse;
+        var cornerCosHalfOffset = controlObject.cornerSize ? cornerHyp * cosTheta : cosHalfOffset;
+        var cornerSinHalfOffset = controlObject.cornerSize ? cornerHyp * sinTheta : sinHalfOffset;
+		// set corner coords
         x = coords[control].x;
         y = coords[control].y;
         coords[control].corner = {
           tl: {
-            x: x - sinHalfOffset,
-            y: y - cosHalfOffset
+            x: x - cornerSinHalfOffset,
+            y: y - cornerCosHalfOffset
           },
           tr: {
-            x: x + cosHalfOffset,
-            y: y - sinHalfOffset
+            x: x + cornerCosHalfOffset,
+            y: y - cornerSinHalfOffset
           },
           bl: {
-            x: x - cosHalfOffset,
-            y: y + sinHalfOffset
+            x: x - cornerCosHalfOffset,
+            y: y + cornerSinHalfOffset
           },
           br: {
-            x: x + sinHalfOffset,
-            y: y + cosHalfOffset
+            x: x + cornerSinHalfOffset,
+            y: y + cornerCosHalfOffset
           }
         };
         coords[control].touchCorner = {
