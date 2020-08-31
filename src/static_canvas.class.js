@@ -1385,9 +1385,9 @@
             var fill = _this[prop + 'Color'];
             if (fill && fill.toLive) {
               var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
-                object = {
-                  width: _this.width / (shouldTransform ? vpt[0] : 1),
-                  height: _this.height / (shouldTransform ? vpt[3] : 1)
+                  object = {
+                    width: _this.width / (shouldTransform ? vpt[0] : 1),
+                    height: _this.height / (shouldTransform ? vpt[3] : 1)
                 };
               return fill.toSVG(
                 object,
