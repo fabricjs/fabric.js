@@ -630,6 +630,20 @@
       return fabric.document.createElement('img');
     },
 
+    /**	
+     * @static	
+     * @memberOf fabric.util	
+     * @deprecated since 2.0.0	
+     * @param {fabric.Object} receiver Object implementing `clipTo` method	
+     * @param {CanvasRenderingContext2D} ctx Context to clip	
+     */	
+    clipContext: function(receiver, ctx) {	
+      ctx.save();	
+      ctx.beginPath();	
+      receiver.clipTo(ctx);	
+      ctx.clip();	
+    },
+
     /**
      * Multiply matrix A by matrix B to nest transformations
      * @static

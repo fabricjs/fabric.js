@@ -60,7 +60,12 @@ fabric.CommonMethods = {
       this._setObject(key);
     }
     else {
-      this._set(key, value);
+      if (typeof value === 'function' && key !== 'clipTo') {
+        this._set(key, value(this.get(key)));
+      }
+      else {
+        this._set(key, value);
+      }
     }
     return this;
   },

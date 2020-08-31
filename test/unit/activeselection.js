@@ -75,6 +75,7 @@
       'visible':                  true,
       'backgroundColor':          '',
       'angle':                    0,
+      'clipTo':                   null,
       'flipX':                    false,
       'flipY':                    false,
       'opacity':                  1,

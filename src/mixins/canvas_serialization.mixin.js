@@ -31,8 +31,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
-        clipPath = serialized.clipPath,
-        renderOnAddRemove = this.renderOnAddRemove;
+      clipPath = serialized.clipPath,
+      renderOnAddRemove = this.renderOnAddRemove;
 
     this.renderOnAddRemove = false;
 
@@ -213,6 +213,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     el.height = this.height;
 
     var clone = new fabric.Canvas(el);
+    clone.clipTo = this.clipTo;
     if (this.backgroundImage) {
       clone.setBackgroundImage(this.backgroundImage.src, function() {
         clone.renderAll();

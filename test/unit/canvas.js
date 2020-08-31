@@ -2376,6 +2376,23 @@
   //   }, 1000);
   // });
 
+  QUnit.test('clipTo', function(assert) {	
+    canvas.clipTo = function(ctx) {	
+      ctx.arc(0, 0, 10, 0, Math.PI * 2, false);	
+    };	
+
+    var error;	
+    try {	
+      canvas.renderAll();	
+    }	
+    catch (err) {	
+      error = err;	
+    }	
+    delete canvas.clipTo;	
+
+    assert.ok(typeof error === 'undefined', 'renderAll with clipTo does not throw');	
+  });
+
   QUnit.test('isTargetTransparent', function(assert) {
     var rect = new fabric.Rect({
       width: 10,
