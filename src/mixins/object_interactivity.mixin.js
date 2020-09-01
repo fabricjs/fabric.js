@@ -91,11 +91,11 @@
         // handle custom control corner sizes
         var controlObject = fabric.Object.prototype.controls[control];
         var cornerHyp = controlObject.cornerSize
-            ? controlObject.cornerSize * 0.707106
-            : cornerHypotenuse;
+          ? controlObject.cornerSize * 0.707106
+          : cornerHypotenuse;
         var cornerCosHalfOffset = controlObject.cornerSize ? cornerHyp * cosTheta : cosHalfOffset;
         var cornerSinHalfOffset = controlObject.cornerSize ? cornerHyp * sinTheta : sinHalfOffset;
-		// set corner coords
+        // set corner coords
         x = coords[control].x;
         y = coords[control].y;
         coords[control].corner = {
