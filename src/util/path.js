@@ -595,7 +595,8 @@
         rNumberCommaWsp = '(' + rNumber + ')' + rCommaWsp,
         rFlagCommaWsp = '([01])' + rCommaWsp + '?',
         rCoordinatePair = '(' + rNumber + ')' + rCommaWsp + '?(' + rNumber + ')',
-        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp + rCoordinatePair,
+        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
+          rCoordinatePair,
         regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
         match,
         coordsStr,
@@ -612,17 +613,18 @@
       coordsStr = currentPath.slice(1).trim();
       coords.length = 0;
 
-      var command = currentPath.charAt(0)
+      var command = currentPath.charAt(0);
       coordsParsed = [command];
 
-      if (command.toLowerCase() == 'a') {
+      if (command.toLowerCase() === 'a') {
         // arcs have special flags that apparently don't require spaces so handle special
         for (var args; (args = regArcArgumentSequence.exec(coordsStr));) {
           for (var j = 1; j < args.length; j++) {
             coords.push(args[j]);
           }
         }
-      } else {
+      }
+      else {
         while ((match = re.exec(coordsStr))) {
           coords.push(match[0]);
         }
