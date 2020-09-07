@@ -590,6 +590,12 @@
         currentPath,
         parsed,
         re = fabric.rePathCommand,
+        rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
+        rNumberCommaWsp = '(' + rNumber + ')' + fabric.commaWsp,
+        rFlagCommaWsp = '([01])' + fabric.commaWsp + '?',
+        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
+          rNumberCommaWsp + '?(' + rNumber + ')',
+        regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
         match,
         coordsStr,
         // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
@@ -605,11 +611,22 @@
       coordsStr = currentPath.slice(1).trim();
       coords.length = 0;
 
-      while ((match = re.exec(coordsStr))) {
-        coords.push(match[0]);
-      }
+      var command = currentPath.charAt(0);
+      coordsParsed = [command];
 
-      coordsParsed = [currentPath.charAt(0)];
+      if (command.toLowerCase() === 'a') {
+        // arcs have special flags that apparently don't require spaces so handle special
+        for (var args; (args = regArcArgumentSequence.exec(coordsStr));) {
+          for (var j = 1; j < args.length; j++) {
+            coords.push(args[j]);
+          }
+        }
+      }
+      else {
+        while ((match = re.exec(coordsStr))) {
+          coords.push(match[0]);
+        }
+      }
 
       for (var j = 0, jlen = coords.length; j < jlen; j++) {
         parsed = parseFloat(coords[j]);
@@ -618,8 +635,7 @@
         }
       }
 
-      var command = coordsParsed[0],
-          commandLength = commandLengths[command.toLowerCase()],
+      var commandLength = commandLengths[command.toLowerCase()],
           repeatedCommand = repeatedCommands[command] || command;
 
       if (coordsParsed.length - 1 > commandLength) {
