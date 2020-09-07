@@ -187,6 +187,16 @@
     },
 
     /**
+     *  
+     * @private
+     * @param {String} controlKey key where the control is memorized on the
+     * @return {Boolean}
+     */
+    _isHiddenWhileUniscalingLocked: function(controlKey) {
+      return controlKey === 'mr' || controlKey === 'mt' || controlKey === 'mb' || controlKey === 'ml';
+    },
+
+    /**
      * Returns controls visibility
      * @param {fabric.Object} object on which the control is displayed
      * @param {String} controlKey key where the control is memorized on the
@@ -194,8 +204,16 @@
      */
     getVisibility: function(fabricObject, controlKey) {
       var objectVisibility = fabricObject._controlsVisibility;
+      var hideWhileUniscalingLocked = fabricObject.lockUniScaling && this._isHiddenWhileUniscalingLocked(controlKey);
+
       if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+        if(hideWhileUniscalingLocked) {
+          return false;
+        }
         return objectVisibility[controlKey];
+      }
+      if(this.visible) {
+        return !hideWhileUniscalingLocked;
       }
       return this.visible;
     },
