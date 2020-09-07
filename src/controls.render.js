@@ -23,14 +23,31 @@
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : this.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
-        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+        myLeft = left,
+        myTop = top;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    if (styleOverride.cornerSizeX && styleOverride.cornerSizeY) {
+      // use scale to make ellipse
+      var xSize = styleOverride.cornerSizeX,
+          ySize = styleOverride.cornerSizeY;
+      if (xSize > ySize) {
+        size = xSize;
+        ctx.scale(1.0, ySize / xSize);
+        myTop = top * xSize / ySize;
+      }
+      else {
+        size = ySize;
+        ctx.scale(xSize / ySize, 1.0);
+        myLeft = left * ySize / xSize;
+      }
+    }
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(left, top, size / 2, 0, 2 * Math.PI, false);
+    ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
     ctx[methodName]();
     if (stroke) {
       ctx.stroke();
