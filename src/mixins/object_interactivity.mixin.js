@@ -76,11 +76,11 @@
       var coords = this.oCoords;
 
       for (var control in coords) {
-				var controlObject = fabric.Object.prototype.controls[control];
-				coords[control].corner = controlObject.calcCornerCoords(
-					this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
-				coords[control].touchCorner = controlObject.calcCornerCoords(
-					this.angle, this.touchCornerSize, coords[control].x, coords[control].y, true);
+        var controlObject = fabric.Object.prototype.controls[control];
+        coords[control].corner = controlObject.calcCornerCoords(
+          this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
+        coords[control].touchCorner = controlObject.calcCornerCoords(
+          this.angle, this.touchCornerSize, coords[control].x, coords[control].y, true);
       }
     },
 

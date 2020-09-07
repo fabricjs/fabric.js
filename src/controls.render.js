@@ -51,8 +51,8 @@
    */
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-		var xSize = styleOverride.cornerSizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-		    ySize = styleOverride.cornerSizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var xSize = styleOverride.cornerSizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = styleOverride.cornerSizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',

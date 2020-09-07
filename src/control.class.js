@@ -260,47 +260,49 @@
      */
     calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
       var controlTriangleAngle,
-        cornerHypotenuse;
+          cornerHypotenuse;
       if (!isTouch && this.cornerSizeX && this.cornerSizeY) {
         // handle custom control corner sizes
         var xSize = this.cornerSizeX,
-          ySize = this.cornerSizeY;
+            ySize = this.cornerSizeY;
         controlTriangleAngle = Math.atan2(ySize, xSize);
         cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      } else if (isTouch && this.touchCornerSizeX && this.touchCornerSizeY) {
+      }
+      else if (isTouch && this.touchCornerSizeX && this.touchCornerSizeY) {
         // handle custom touch control corner sizes
         var xSize = this.touchCornerSizeX,
-          ySize = this.touchCornerSizeY;
+            ySize = this.touchCornerSizeY;
         controlTriangleAngle = Math.atan2(ySize, xSize);
         cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      } else {
+      }
+      else {
         // use default object corner sizes
         controlTriangleAngle = Math.PI / 4;
         /* 0.7071067812 stands for sqrt(2)/2 */
         cornerHypotenuse = objectCornerSize * 0.7071067812;
       }
       var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle),
-      cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
-      sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+          cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
+          sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
 
       return {
-				tl: {
-					x: centerX - cosHalfOffset,
-					y: centerY - sinHalfOffset,
-				},
-				tr: {
-					x: centerX + cosHalfOffset,
-					y: centerY - sinHalfOffset,
-				},
-				bl: {
-					x: centerX - cosHalfOffset,
-					y: centerY + sinHalfOffset,
-				},
-				br: {
-					x: centerX + cosHalfOffset,
-					y: centerY + sinHalfOffset,
-				},
-			};
+        tl: {
+          x: centerX - cosHalfOffset,
+          y: centerY - sinHalfOffset,
+        },
+        tr: {
+          x: centerX + cosHalfOffset,
+          y: centerY - sinHalfOffset,
+        },
+        bl: {
+          x: centerX - cosHalfOffset,
+          y: centerY + sinHalfOffset,
+        },
+        br: {
+          x: centerX + cosHalfOffset,
+          y: centerY + sinHalfOffset,
+        },
+      };
     },
 
     /**
