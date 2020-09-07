@@ -590,10 +590,11 @@
         currentPath,
         parsed,
         re = fabric.rePathCommand,
-        rNumberCommaWsp = '(' + fabric.reNum + ')' + fabric.commaWsp,
+        rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
+        rNumberCommaWsp = '(' + rNumber + ')' + fabric.commaWsp,
         rFlagCommaWsp = '([01])' + fabric.commaWsp + '?',
         rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
-          rNumberCommaWsp + '?(' + fabric.reNum + ')',
+          rNumberCommaWsp + '?(' + rNumber + ')',
         regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
         match,
         coordsStr,
