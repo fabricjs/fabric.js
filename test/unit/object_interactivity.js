@@ -151,7 +151,10 @@
 
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   QUnit.test('_setCornerCoords_customControlSize', function(assert) {
-    fabric.Object.prototype.controls.bl.cornerSize = 30;
+    //set custom corner size
+    fabric.Object.prototype.controls.bl.cornerSizeX = 30;
+    fabric.Object.prototype.controls.bl.cornerSizeY = 30;
+
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
     assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
     cObj.setCoords();
@@ -197,6 +200,9 @@
     assert.equal(cObj.oCoords.mtr.corner.br.x.toFixed(2), 21.5);
     assert.equal(cObj.oCoords.mtr.corner.br.y.toFixed(2), -23.5);
 
+    // reset
+    fabric.Object.prototype.controls.bl.cornerSizeX = null;
+    fabric.Object.prototype.controls.bl.cornerSizeY = null;
   });
 
   QUnit.test('_findTargetCorner', function(assert) {

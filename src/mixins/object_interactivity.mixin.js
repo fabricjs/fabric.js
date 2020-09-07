@@ -73,67 +73,14 @@
      * @private
      */
     _setCornerCoords: function() {
-      var coords = this.oCoords,
-          newTheta = degreesToRadians(45 - this.angle),
-          cosTheta = fabric.util.cos(newTheta),
-          sinTheta = fabric.util.sin(newTheta),
-          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
-          /* 0.707106 stands for sqrt(2)/2 */
-          cornerHypotenuse = this.cornerSize * 0.707106,
-          touchHypotenuse = this.touchCornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * cosTheta,
-          sinHalfOffset = cornerHypotenuse * sinTheta,
-          touchCosHalfOffset = touchHypotenuse * cosTheta,
-          touchSinHalfOffset = touchHypotenuse * sinTheta,
-          x, y;
+      var coords = this.oCoords;
 
       for (var control in coords) {
-        // handle custom control corner sizes
-        var controlObject = fabric.Object.prototype.controls[control];
-        var cornerHyp = controlObject.cornerSize
-          ? controlObject.cornerSize * 0.707106
-          : cornerHypotenuse;
-        var cornerCosHalfOffset = controlObject.cornerSize ? cornerHyp * cosTheta : cosHalfOffset;
-        var cornerSinHalfOffset = controlObject.cornerSize ? cornerHyp * sinTheta : sinHalfOffset;
-        // set corner coords
-        x = coords[control].x;
-        y = coords[control].y;
-        coords[control].corner = {
-          tl: {
-            x: x - cornerSinHalfOffset,
-            y: y - cornerCosHalfOffset
-          },
-          tr: {
-            x: x + cornerCosHalfOffset,
-            y: y - cornerSinHalfOffset
-          },
-          bl: {
-            x: x - cornerCosHalfOffset,
-            y: y + cornerSinHalfOffset
-          },
-          br: {
-            x: x + cornerSinHalfOffset,
-            y: y + cornerCosHalfOffset
-          }
-        };
-        coords[control].touchCorner = {
-          tl: {
-            x: x - touchSinHalfOffset,
-            y: y - touchCosHalfOffset
-          },
-          tr: {
-            x: x + touchCosHalfOffset,
-            y: y - touchSinHalfOffset
-          },
-          bl: {
-            x: x - touchCosHalfOffset,
-            y: y + touchSinHalfOffset
-          },
-          br: {
-            x: x + touchSinHalfOffset,
-            y: y + touchCosHalfOffset
-          }
-        };
+				var controlObject = fabric.Object.prototype.controls[control];
+				coords[control].corner = controlObject.calcCornerCoords(
+					this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
+				coords[control].touchCorner = controlObject.calcCornerCoords(
+					this.angle, this.touchCornerSize, coords[control].x, coords[control].y, true);
       }
     },
 

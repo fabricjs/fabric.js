@@ -87,6 +87,38 @@
     offsetY: 0,
 
     /**
+     * Sets the length of the control. If null, defaults to object's cornerSize.
+     * Expects both cornerSizeX and cornerSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    cornerSizeX: null,
+
+    /**
+     * Sets the height of the control. If null, defaults to object's cornerSize.
+     * Expects both cornerSizeX and cornerSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    cornerSizeY: null,
+
+    /**
+     * Sets the length of the touch area of the control. If null, defaults to object's touchCornerSize.
+     * Expects both touchCornerSizeX and touchCornerSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    touchCornerSizeX: null,
+
+    /**
+     * Sets the height of the touch area of the control. If null, defaults to object's touchCornerSize.
+     * Expects both touchCornerSizeX and touchCornerSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    touchCornerSizeY: null,
+
+    /**
      * Css cursor style to display when the control is hovered.
      * if the method `cursorStyleHandler` is provided, this property is ignored.
      * @type {String}
@@ -218,6 +250,60 @@
     },
 
     /**
+     * Returns the coords for this control based on object values.
+     * @param {Number} objectAngle angle from the fabric object holding the control
+     * @param {Number} objectCornerSize cornerSize from the fabric object holding the control (or touchCornerSize if
+     *   isTouch is true)
+     * @param {Number} centerX x coordinate where the control center should be
+     * @param {Number} centerY y coordinate where the control center should be
+     * @param {boolean} isTouch true if touch corner, false if normal corner
+     */
+    calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
+      var controlTriangleAngle,
+        cornerHypotenuse;
+      if (!isTouch && this.cornerSizeX && this.cornerSizeY) {
+        // handle custom control corner sizes
+        var xSize = this.cornerSizeX,
+          ySize = this.cornerSizeY;
+        controlTriangleAngle = Math.atan2(ySize, xSize);
+        cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+      } else if (isTouch && this.touchCornerSizeX && this.touchCornerSizeY) {
+        // handle custom touch control corner sizes
+        var xSize = this.touchCornerSizeX,
+          ySize = this.touchCornerSizeY;
+        controlTriangleAngle = Math.atan2(ySize, xSize);
+        cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+      } else {
+        // use default object corner sizes
+        controlTriangleAngle = Math.PI / 4;
+        /* 0.7071067812 stands for sqrt(2)/2 */
+        cornerHypotenuse = objectCornerSize * 0.7071067812;
+      }
+      var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle),
+      cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
+      sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+
+      return {
+				tl: {
+					x: centerX - cosHalfOffset,
+					y: centerY - sinHalfOffset,
+				},
+				tr: {
+					x: centerX + cosHalfOffset,
+					y: centerY - sinHalfOffset,
+				},
+				bl: {
+					x: centerX - cosHalfOffset,
+					y: centerY + sinHalfOffset,
+				},
+				br: {
+					x: centerX + cosHalfOffset,
+					y: centerY + sinHalfOffset,
+				},
+			};
+    },
+
+    /**
     * Render function for the control.
     * When this function runs the context is unscaled. unrotate. Just retina scaled.
     * all the functions will have to translate to the point left,top before starting Drawing
@@ -231,6 +317,12 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
+      if (!styleOverride.cornerSizeX && this.cornerSizeX) {
+        styleOverride.cornerSizeX = this.cornerSizeX;
+      }
+      if (!styleOverride.cornerSizeY && this.cornerSizeY) {
+        styleOverride.cornerSizeY = this.cornerSizeY;
+      }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
           fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);

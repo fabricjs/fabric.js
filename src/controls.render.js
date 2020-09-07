@@ -51,13 +51,14 @@
    */
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var size = styleOverride.cornerSize || fabricObject.cornerSize,
+		var xSize = styleOverride.cornerSizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+		    ySize = styleOverride.cornerSizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
-        ), sizeBy2 = size / 2;
+        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.strokeCornerColor || fabricObject.strokeCornerColor;
@@ -67,10 +68,10 @@
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.
     // to have real transparent corners we need the controls on upperCanvas
-    // transparentCorners || ctx.clearRect(-sizeBy2, -sizeBy2, size, size);
-    ctx[methodName + 'Rect'](-sizeBy2, -sizeBy2, size, size);
+    // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+    ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
     if (stroke) {
-      ctx.strokeRect(-sizeBy2, -sizeBy2, size, size);
+      ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
     }
     ctx.restore();
   }
