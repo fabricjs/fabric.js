@@ -207,12 +207,12 @@
       var hideWhileUniscalingLocked = fabricObject.lockUniScaling && this._isHiddenWhileUniscalingLocked(controlKey);
 
       if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
-        if(hideWhileUniscalingLocked) {
+        if (hideWhileUniscalingLocked) {
           return false;
         }
         return objectVisibility[controlKey];
       }
-      if(this.visible) {
+      if (this.visible) {
         return !hideWhileUniscalingLocked;
       }
       return this.visible;
