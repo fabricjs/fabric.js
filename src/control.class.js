@@ -260,18 +260,11 @@
      */
     calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
       var controlTriangleAngle,
-          cornerHypotenuse;
-      if (!isTouch && this.cornerSizeX && this.cornerSizeY) {
-        // handle custom control corner sizes
-        var xSize = this.cornerSizeX,
-            ySize = this.cornerSizeY;
-        controlTriangleAngle = Math.atan2(ySize, xSize);
-        cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      }
-      else if (isTouch && this.touchCornerSizeX && this.touchCornerSizeY) {
-        // handle custom touch control corner sizes
-        var xSize = this.touchCornerSizeX,
-            ySize = this.touchCornerSizeY;
+          cornerHypotenuse,
+          xSize = (isTouch) ? this.touchCornerSizeX : this.cornerSizeX,
+          ySize = (isTouch) ? this.touchCornerSizeY : this.cornerSizeY;
+      if (xSize && ySize) {
+        // handle custom corner sizes
         controlTriangleAngle = Math.atan2(ySize, xSize);
         cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
       }
