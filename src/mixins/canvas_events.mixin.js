@@ -524,6 +524,10 @@
             absolutePointer: this._absolutePointer,
             transform: this._currentTransform
           };
+      if (eventType === 'up') {
+        options.currentTarget = this.findTarget(e);
+        options.currentSubTargets = this.targets;
+      }
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {

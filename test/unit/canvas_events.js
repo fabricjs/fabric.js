@@ -301,6 +301,21 @@
     assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
+  QUnit.test('mouse:up should return currentTarget', function(assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
+    canvas.add(rect);
+    var opt;
+    canvas.on('mouse:up', function(_opt) {
+      opt = _opt;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(opt.currentTarget, rect, 'options match model - currentTarget');
+  });
+
   QUnit.test('fires object:modified and object:moved', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
