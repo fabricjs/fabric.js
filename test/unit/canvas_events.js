@@ -352,7 +352,6 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     canvas.add(rect);
     canvas.__onMouseDown(e);
-    console.log(canvas._currentTransform)
     canvas.__onMouseMove(e1);
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
