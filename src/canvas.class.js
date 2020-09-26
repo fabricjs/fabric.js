@@ -269,7 +269,11 @@
     targetFindTolerance:    0,
 
     /**
-     * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
+     * When true, target detection is skipped. Target detection will return always undefined.
+     * click selection won't work anymore, events will fire with no targets.
+     * if something is selected before setting it to true, it will be deselected at the first click.
+     * area selection will still work. check the `selection` property too.
+     * if you deactivate both, you should look into staticCanvas.
      * @type Boolean
      * @default
      */
