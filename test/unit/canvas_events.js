@@ -352,6 +352,7 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     canvas.add(rect);
     canvas.__onMouseDown(e);
+    console.log(canvas._currentTransform)
     canvas.__onMouseMove(e1);
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
@@ -706,7 +707,7 @@
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
     c._hoveredTarget = obj;
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
   });
@@ -728,7 +729,7 @@
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
