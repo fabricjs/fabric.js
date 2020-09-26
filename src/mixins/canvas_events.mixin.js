@@ -558,6 +558,7 @@
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         if (transform.actionPerformed) {
+          // this is not friendly to the new control api.
           eventName = this._addEventOptions(options, transform);
           this._fire(eventName, options);
         }
@@ -934,24 +935,15 @@
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
-          actionHandler = transform.actionHandler,
+          actionHandler = transform.actionHandler;
           // this object could be created from the function in the control handlers
-          options = {
-            target: transform.target,
-            e: e,
-            transform: transform,
-            pointer: pointer
-          };
 
-      if (action === 'drag') {
-        actionPerformed = this._translateObject(x, y);
-        if (actionPerformed) {
-          this._fire('moving', options);
-          this.setCursor(options.target.moveCursor || this.moveCursor);
-        }
-      }
-      else if (actionHandler) {
+
+      if (actionHandler) {
         (actionPerformed = actionHandler(e, transform, x, y)) && this._fire(action, options);
+      }
+      if (action === 'drag' && actionPerformed) {
+        this.setCursor(options.target.moveCursor || this.moveCursor);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
