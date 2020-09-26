@@ -706,7 +706,7 @@
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
     c._hoveredTarget = obj;
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
   });
@@ -728,7 +728,7 @@
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);

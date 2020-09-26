@@ -59,6 +59,24 @@
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
       assert.equal(Math.floor(transform.target.width), 51);
     });
+    QUnit.test('changeWidth will fire events on canvas and target resizing', function(assert) {
+      var done = assert.async();
+      transform.target.canvas.on('object:resizing', function(options) {
+        assert.equal(options.target, transform.target);
+      });
+      transform.target.on('resizing', function(options) {
+        assert.deepEqual(options, {
+          e: eventData,
+          transform: transform,
+          pointer: {
+            x: 200,
+            y: 300,
+          },
+        });
+        done();
+      });
+      fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+    });
     QUnit.test('scalingXOrSkewingY changes scaleX', function(assert) {
       transform.target.scaleX = 1;
       transform.target.strokeWidth = 0;
