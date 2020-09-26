@@ -940,10 +940,10 @@
 
 
       if (actionHandler) {
-        (actionPerformed = actionHandler(e, transform, x, y)) && this._fire(action, options);
+        actionPerformed = actionHandler(e, transform, x, y);
       }
       if (action === 'drag' && actionPerformed) {
-        this.setCursor(options.target.moveCursor || this.moveCursor);
+        this.setCursor(transform.target.moveCursor || this.moveCursor);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
