@@ -31,8 +31,8 @@
   function fireEvent(eventName, options) {
     var target = options.transform.target,
         canvas = target.canvas,
-        canasOptions = Object.assign({}, options, { target: target });
-    canvas && canvas.fire('object:' + eventName, canasOptions);
+        canvasOptions = Object.assign({}, options, { target: target });
+    canvas && canvas.fire('object:' + eventName, canvasOptions);
     target.fire(eventName, options);
   }
 
@@ -140,7 +140,7 @@
   }
 
   /**
-   * Inspect event , control and fabricObject to return the correct action name
+   * Inspect event, control and fabricObject to return the correct action name
    * @param {Event} eventData the javascript event that is causing the scale
    * @param {fabric.Control} control the control that is interested in the action
    * @param {fabric.Object} fabricObject the fabric object that is interested in the action
@@ -186,7 +186,7 @@
 
   /**
    * Wrap an action handler with saving/restoring object position on the transform.
-   * this is the code that permits to obects to keep their position while transforming.
+   * this is the code that permits to objects to keep their position while transforming.
    * @param {Function} actionHandler the function to wrap
    * @return {Function} a function with an action handler signature
    */
@@ -243,14 +243,14 @@
   }
 
   /**
-   * Utility function to componsate the scale factor when skew is applied on both axes
+   * Utility function to compensate the scale factor when skew is applied on both axes
    * @private
    */
-  function compensateScaleForSkew(target, oppositeSkew, scaleToCompoensate, axis, reference) {
+  function compensateScaleForSkew(target, oppositeSkew, scaleToCompensate, axis, reference) {
     if (target[oppositeSkew] !== 0) {
       var newDim = target._getTransformedDimensions()[axis];
-      var newValue = reference / newDim * target[scaleToCompoensate];
-      target.set(scaleToCompoensate, newValue);
+      var newValue = reference / newDim * target[scaleToCompensate];
+      target.set(scaleToCompensate, newValue);
     }
   }
 
@@ -495,7 +495,7 @@
   }
 
   /**
-   * Basic scaling logic, reused with differnt constrain for scaling X,Y, freely or equally.
+   * Basic scaling logic, reused with different constrain for scaling X,Y, freely or equally.
    * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
@@ -680,9 +680,14 @@
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
+        oldWidth = target.width, hasResized,
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
-    return true;
+    hasResized = oldWidth !== newWidth;
+    if (hasResized) {
+      fireEvent('resizing', commonEventInfo(eventData, transform, x, y));
+    }
+    return hasResized;
   }
 
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
