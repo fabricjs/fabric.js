@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.1.0' };
+var fabric = fabric || { version: '4.2.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -74,6 +74,7 @@ fabric.SHARED_ATTRIBUTES = [
  */
 fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+fabric.commaWsp = '(?:\\s+,?\\s*|,\\s*)'
 fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };
@@ -2198,6 +2199,12 @@ fabric.CommonMethods = {
         currentPath,
         parsed,
         re = fabric.rePathCommand,
+        rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
+        rNumberCommaWsp = '(' + rNumber + ')' + fabric.commaWsp,
+        rFlagCommaWsp = '([01])' + fabric.commaWsp + '?',
+        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
+          rNumberCommaWsp + '?(' + rNumber + ')',
+        regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
         match,
         coordsStr,
         // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
@@ -2213,11 +2220,22 @@ fabric.CommonMethods = {
       coordsStr = currentPath.slice(1).trim();
       coords.length = 0;
 
-      while ((match = re.exec(coordsStr))) {
-        coords.push(match[0]);
-      }
+      var command = currentPath.charAt(0);
+      coordsParsed = [command];
 
-      coordsParsed = [currentPath.charAt(0)];
+      if (command.toLowerCase() === 'a') {
+        // arcs have special flags that apparently don't require spaces so handle special
+        for (var args; (args = regArcArgumentSequence.exec(coordsStr));) {
+          for (var j = 1; j < args.length; j++) {
+            coords.push(args[j]);
+          }
+        }
+      }
+      else {
+        while ((match = re.exec(coordsStr))) {
+          coords.push(match[0]);
+        }
+      }
 
       for (var j = 0, jlen = coords.length; j < jlen; j++) {
         parsed = parseFloat(coords[j]);
@@ -2226,8 +2244,7 @@ fabric.CommonMethods = {
         }
       }
 
-      var command = coordsParsed[0],
-          commandLength = commandLengths[command.toLowerCase()],
+      var commandLength = commandLengths[command.toLowerCase()],
           repeatedCommand = repeatedCommands[command] || command;
 
       if (coordsParsed.length - 1 > commandLength) {
@@ -4014,7 +4031,7 @@ fabric.warn = console.warn;
         // == begin transform regexp
         number = fabric.reNum,
 
-        commaWsp = '(?:\\s+,?\\s*|,\\s*)',
+        commaWsp = fabric.commaWsp,
 
         skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))',
 
@@ -6183,8 +6200,8 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   function fireEvent(eventName, options) {
     var target = options.transform.target,
         canvas = target.canvas,
-        canasOptions = Object.assign({}, options, { target: target });
-    canvas && canvas.fire('object:' + eventName, canasOptions);
+        canvasOptions = Object.assign({}, options, { target: target });
+    canvas && canvas.fire('object:' + eventName, canvasOptions);
     target.fire(eventName, options);
   }
 
@@ -6292,7 +6309,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   }
 
   /**
-   * Inspect event , control and fabricObject to return the correct action name
+   * Inspect event, control and fabricObject to return the correct action name
    * @param {Event} eventData the javascript event that is causing the scale
    * @param {fabric.Control} control the control that is interested in the action
    * @param {fabric.Object} fabricObject the fabric object that is interested in the action
@@ -6338,7 +6355,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
   /**
    * Wrap an action handler with saving/restoring object position on the transform.
-   * this is the code that permits to obects to keep their position while transforming.
+   * this is the code that permits to objects to keep their position while transforming.
    * @param {Function} actionHandler the function to wrap
    * @return {Function} a function with an action handler signature
    */
@@ -6395,14 +6412,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   }
 
   /**
-   * Utility function to componsate the scale factor when skew is applied on both axes
+   * Utility function to compensate the scale factor when skew is applied on both axes
    * @private
    */
-  function compensateScaleForSkew(target, oppositeSkew, scaleToCompoensate, axis, reference) {
+  function compensateScaleForSkew(target, oppositeSkew, scaleToCompensate, axis, reference) {
     if (target[oppositeSkew] !== 0) {
       var newDim = target._getTransformedDimensions()[axis];
-      var newValue = reference / newDim * target[scaleToCompoensate];
-      target.set(scaleToCompoensate, newValue);
+      var newValue = reference / newDim * target[scaleToCompensate];
+      target.set(scaleToCompensate, newValue);
     }
   }
 
@@ -6647,7 +6664,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   }
 
   /**
-   * Basic scaling logic, reused with differnt constrain for scaling X,Y, freely or equally.
+   * Basic scaling logic, reused with different constrain for scaling X,Y, freely or equally.
    * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
@@ -6832,9 +6849,14 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
+        oldWidth = target.width, hasResized,
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
-    return true;
+    hasResized = oldWidth !== newWidth;
+    if (hasResized) {
+      fireEvent('resizing', commonEventInfo(eventData, transform, x, y));
+    }
+    return hasResized;
   }
 
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
@@ -11024,7 +11046,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     targetFindTolerance:    0,
 
     /**
-     * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
+     * When true, target detection is skipped. Target detection will return always undefined.
+     * click selection won't work anymore, events will fire with no targets.
+     * if something is selected before setting it to true, it will be deselected at the first click.
+     * area selection will still work. check the `selection` property too.
+     * if you deactivate both, you should look into staticCanvas.
      * @type Boolean
      * @default
      */
@@ -12615,6 +12641,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             absolutePointer: this._absolutePointer,
             transform: this._currentTransform
           };
+      if (eventType === 'up') {
+        options.currentTarget = this.findTarget(e);
+        options.currentSubTargets = this.targets;
+      }
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
