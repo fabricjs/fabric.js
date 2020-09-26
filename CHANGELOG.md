@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0]
+
+- fix(fabric.utils): ISSUE-6566 Fix SVGs for special Arc lines [#6571](https://github.com/fabricjs/fabric.js/pull/6571)
+- fix(fabric.Canvas): Fix mouse up target when different from action start [#6591](https://github.com/fabricjs/fabric.js/pull/6591)
+- added: feat(fabric.controlsUtils): Fire resizing event for textbox width [#6545](https://github.com/fabricjs/fabric.js/pull/6545)
+- added: feat(fabric.controlsUtils) Move drag to actions to control handlers [#6617](https://github.com/fabricjs/fabric.js/pull/6617)
+
 ## [4.1.0]
 - feat(Brushes): add beforePathCreated event [#6492](https://github.com/fabricjs/fabric.js/pull/6492);
 - feat(fabric.Path): Change the way path is parsed and drawn. simplify path at parsing time [#6504](https://github.com/fabricjs/fabric.js/pull/6504);
