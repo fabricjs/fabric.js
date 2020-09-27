@@ -76,7 +76,7 @@
       var coords = this.oCoords;
 
       for (var control in coords) {
-        var controlObject = fabric.Object.prototype.controls[control];
+        var controlObject = this.controls[control];
         coords[control].corner = controlObject.calcCornerCoords(
           this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
         coords[control].touchCorner = controlObject.calcCornerCoords(
