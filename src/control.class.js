@@ -274,7 +274,7 @@
         /* 0.7071067812 stands for sqrt(2)/2 */
         cornerHypotenuse = objectCornerSize * 0.7071067812;
       }
-      var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle),
+      var newTheta = fabric.util.degreesToRadians(controlTriangleAngle - objectAngle),
           cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
       // use complement angle for some calculations
