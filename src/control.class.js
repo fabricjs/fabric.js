@@ -277,11 +277,15 @@
       var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle),
           cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+      // use complement angle for some calculations
+      var newThetaComp = fabric.util.degreesToRadians(90 - controlTriangleAngle - objectAngle),
+          cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp),
+          sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
 
       return {
         tl: {
-          x: centerX - cosHalfOffset,
-          y: centerY - sinHalfOffset,
+          x: centerX - sinHalfOffsetComp,
+          y: centerY - cosHalfOffsetComp,
         },
         tr: {
           x: centerX + cosHalfOffset,
@@ -292,8 +296,8 @@
           y: centerY + sinHalfOffset,
         },
         br: {
-          x: centerX + cosHalfOffset,
-          y: centerY + sinHalfOffset,
+          x: centerX + sinHalfOffsetComp,
+          y: centerY + cosHalfOffsetComp,
         },
       };
     },
