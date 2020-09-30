@@ -518,14 +518,14 @@
 
   QUnit.test('The same text does not need to be wrapped.', function(assert) {
     var str = '0123456789';
-  	var measureTextbox = new fabric.Textbox(str, {
-  		fontSize: 20,
-  		splitByGrapheme: false,
+    var measureTextbox = new fabric.Textbox(str, {
+      fontSize: 20,
+      splitByGrapheme: false,
     });
     var newTextbox = new fabric.Textbox(str, {
       width: measureTextbox.width,
-    	fontSize: 20,
-    	splitByGrapheme: true,
+      fontSize: 20,
+      splitByGrapheme: true,
     });
     assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
