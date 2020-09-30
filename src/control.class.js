@@ -265,12 +265,12 @@
           ySize = (isTouch) ? this.touchCornerSizeY : this.cornerSizeY;
       if (xSize && ySize) {
         // handle custom corner sizes
-        controlTriangleAngle = Math.atan2(ySize, xSize);
+        controlTriangleAngle = fabric.util.radiansToDegrees(Math.atan2(ySize, xSize));
         cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
       }
       else {
         // use default object corner sizes
-        controlTriangleAngle = Math.PI / 4;
+        controlTriangleAngle = 45;
         /* 0.7071067812 stands for sqrt(2)/2 */
         cornerHypotenuse = objectCornerSize * 0.7071067812;
       }
