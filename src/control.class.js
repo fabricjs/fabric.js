@@ -259,28 +259,35 @@
      * @param {boolean} isTouch true if touch corner, false if normal corner
      */
     calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
-      var controlTriangleAngle,
-          cornerHypotenuse,
+      var cosHalfOffset,
+          sinHalfOffset,
+          cosHalfOffsetComp,
+          sinHalfOffsetComp,
           xSize = (isTouch) ? this.touchCornerSizeX : this.cornerSizeX,
           ySize = (isTouch) ? this.touchCornerSizeY : this.cornerSizeY;
-      if (xSize && ySize) {
-        // handle custom corner sizes
-        controlTriangleAngle = fabric.util.radiansToDegrees(Math.atan2(ySize, xSize));
-        cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+      if (xSize && ySize && xSize !== ySize) {
+        // handle rectangular corners
+        var controlTriangleAngle = Math.atan2(ySize, xSize);
+        var cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+        var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        var newThetaComp = Math.PI / 2 - controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta);
+        sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+        // use complementary angle for two corners
+        cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp);
+        sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
       }
       else {
-        // use default object corner sizes
-        controlTriangleAngle = 45;
+        // handle square corners
+        // use default object corner size unless size is defined
+        var cornerSize = (xSize && ySize) ? xSize : objectCornerSize;
         /* 0.7071067812 stands for sqrt(2)/2 */
-        cornerHypotenuse = objectCornerSize * 0.7071067812;
+        cornerHypotenuse = cornerSize * 0.7071067812;
+        // complementary angles are equal since they're both 45 degrees
+        var newTheta = fabric.util.degreesToRadians(45 - objectAngle);
+        cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newTheta);
+        sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newTheta);
       }
-      var newTheta = fabric.util.degreesToRadians(controlTriangleAngle - objectAngle),
-          cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta),
-          sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
-      // use complement angle for some calculations
-      var newThetaComp = fabric.util.degreesToRadians(90 - controlTriangleAngle - objectAngle),
-          cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp),
-          sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
 
       return {
         tl: {
