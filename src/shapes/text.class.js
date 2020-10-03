@@ -725,6 +725,8 @@
       if (path) {
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+        startingPoint.x += path.pathOffset.x;
+        startingPoint.y += path.pathOffset.y;
       }
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
@@ -752,23 +754,22 @@
     },
 
     /**
-     * Measure and return the info of a single grapheme.
-     * needs the the info of previous graphemes already filled
+     * Calculate the angle  and the left,top position of the char that follow a path.
+     * It appends it to graphemeInfo to be reused later at rendering
      * @private
-     * @param {String} grapheme to be measured
-     * @param {Number} lineIndex index of the line where the char is
-     * @param {Number} charIndex position in the line
-     * @param {String} [prevGrapheme] character preceding the one to be measured
+     * @param {Number} positionInPath to be measured
+     * @param {Object} graphemeInfo current grapheme box information
+     * @param {Object} startingPoint position of the point
      */
     _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
       var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
           path = this.path;
 
       // we are at currentPositionOnPath. we want to know what point on the path is.
-      var p1 = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo),
-          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 1, path.segmentsInfo);
-      graphemeInfo.renderLeft = p1.x - startingPoint.x - path.pathOffset.x;
-      graphemeInfo.renderTop = p1.y - startingPoint.y - path.pathOffset.y;
+      var p1 = fabric.util.getPointOnPath(path.path, centerPosition - 0.1, path.segmentsInfo),
+          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 0.1, path.segmentsInfo);
+      graphemeInfo.renderLeft = p1.x - startingPoint.x;
+      graphemeInfo.renderTop = p1.y - startingPoint.y;
       graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
     },
 
@@ -1197,7 +1198,7 @@
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill,
+          maxHeight, currentFill, lastFill, path = this.path,
           charSpacing = this._getWidthOfCharSpacing();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -1222,15 +1223,30 @@
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
           _size = this.getHeightOfChar(i, j);
           _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
-          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) &&
-              boxWidth > 0) {
+          if (path && currentDecoration && currentFill) {
+            ctx.save();
             ctx.fillStyle = lastFill;
-            lastDecoration && lastFill && ctx.fillRect(
-              leftOffset + lineLeftOffset + boxStart,
-              top + this.offsets[type] * size + dy,
-              boxWidth,
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
+            ctx.fillRect(
+              -charBox.kernedWidth / 2,
+              this.offsets[type] * _size + _dy,
+              charBox.kernedWidth,
               this.fontSize / 15
             );
+            ctx.restore();
+          }
+          else if (
+            (currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy)
+            && boxWidth > 0
+          ) {
+            lastDecoration && lastFill &&
+              ctx.fillRect(
+                leftOffset + lineLeftOffset + boxStart,
+                top + this.offsets[type] * size + dy,
+                boxWidth,
+                this.fontSize / 15
+              );
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
