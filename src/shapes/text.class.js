@@ -718,14 +718,26 @@
      */
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
-          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length);
+          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
+          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
 
       this.__charBounds[lineIndex] = lineBounds;
+      if (path) {
+        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+      }
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        if (path) {
+          if (positionInPath > totalPathLength) {
+            positionInPath %= totalPathLength;
+          }
+          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+        }
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
+        positionInPath += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
@@ -737,6 +749,27 @@
         height: this.fontSize
       };
       return { width: width, numOfSpaces: numOfSpaces };
+    },
+
+    /**
+     * Measure and return the info of a single grapheme.
+     * needs the the info of previous graphemes already filled
+     * @private
+     * @param {String} grapheme to be measured
+     * @param {Number} lineIndex index of the line where the char is
+     * @param {Number} charIndex position in the line
+     * @param {String} [prevGrapheme] character preceding the one to be measured
+     */
+    _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
+      var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
+          path = this.path;
+
+      // we are at currentPositionOnPath. we want to know what point on the path is.
+      var p1 = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo),
+          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 1, path.segmentsInfo);
+      graphemeInfo.renderLeft = p1.x - startingPoint.x - path.pathOffset.x;
+      graphemeInfo.renderTop = p1.y - startingPoint.y - path.pathOffset.y;
+      graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
     },
 
     /**
@@ -903,14 +936,8 @@
           boxWidth = 0,
           timeToRender,
           path = this.path,
-          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
-          startingPoint, originalLeft = left, p1, p2, renderLeft, renderTop, angle, currentPositionOnPath,
-          totalPathLength = 0;
-      if (path) {
-        // find the first point of the path, to consider the other as difference
-        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
-        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      }
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path;
+
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
@@ -944,18 +971,8 @@
         if (timeToRender) {
           if (path) {
             ctx.save();
-            currentPositionOnPath = left - originalLeft + boxWidth / 2;
-            if ((currentPositionOnPath + boxWidth / 2) > totalPathLength) {
-              currentPositionOnPath %= totalPathLength;
-            }
-            // we are at currentPositionOnPath. we want to know what point on the path is.
-            p1 = fabric.util.getPointOnPath(path.path, currentPositionOnPath, path.segmentsInfo);
-            p2 = fabric.util.getPointOnPath(path.path, currentPositionOnPath + 1, path.segmentsInfo);
-            renderLeft = p1.x - startingPoint.x - path.pathOffset.x;
-            renderTop = p1.y - startingPoint.y - path.pathOffset.y;
-            angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-            ctx.translate(renderLeft, renderTop);
-            ctx.rotate(angle);
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
             this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
             ctx.restore();
           }
