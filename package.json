@@ -1,5 +1,5 @@
 {
-  "name": "fabric",
+  "name": "@amplify/fabricjs",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
   "version": "4.2.0",
@@ -79,5 +79,7 @@
     "node": ">=8.0.0"
   },
   "main": "./dist/fabric.js",
-  "dependencies": {}
+  "dependencies": {
+    "uglifyjs": "^2.4.11"
+  }
 }

@@ -96,9 +96,9 @@ See [the example section](#examples-of-use) for usage examples.
 
 <h3 id="fabric-building">Building</h3>
 
-1. [Install Node.js](https://github.com/joyent/node/wiki/Installation)
+1. [Install Node.js](https://github.com/joyent/node/wiki/Installation) and run ```npm install -g uglify-js```
 
-2. Build distribution file  **[~77K minified, ~20K gzipped]**
+2. Build distribution file  **[~77K minified, ~20K gzipped]**s
 
         $ node build.js
 
