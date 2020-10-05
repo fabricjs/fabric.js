@@ -1,3 +1,5 @@
+# Amplify Science's Fork of Scratch Blocks
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
@@ -5,7 +7,7 @@
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/fabricjs/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
@@ -76,7 +78,7 @@ Please follow the instructions located [here](https://github.com/Automattic/node
 
 
     $ npm install fabric --save
-    
+
 
 After this, you can import fabric like so:
 
