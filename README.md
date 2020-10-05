@@ -1,4 +1,4 @@
-# Amplify Science's Fork of Scratch Blocks
+# Amplify Science's Fork of Fabric.js
 
 ## Fabric.js
 
