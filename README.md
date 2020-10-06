@@ -1,5 +1,13 @@
 # Amplify Science's Fork of Fabric.js
 
+### Jenkins job
+
+Jenkins job that builds and deploys this forked version to our NPM registry is located [here](https://jenkins-alpha.dev.learning.amplify.com/job/fabricjs/)
+
+### Installing
+
+```npm install @amplify/fabricjs@[version number]```
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
