@@ -8,6 +8,10 @@ Jenkins job that builds and deploys this forked version to our NPM registry is l
 
 ```npm install @amplify/fabricjs@[version number]```
 
+### Support
+If you have any questions, contact NewXP:<br>
+> Slack: #new-xp
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
