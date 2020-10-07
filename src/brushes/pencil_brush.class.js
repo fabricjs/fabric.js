@@ -29,7 +29,12 @@
      */
     _drawSegment: function (ctx, p1, p2) {
       var midPoint = p1.midPointFrom(p2);
-      ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      // MMZ: No reason to use more complex render operation
+      // TODO: confirm no reason it needs to be this way
+      // TODO: see what other optimizations we can have around this, like killing the midPoint here...
+      //ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
       return midPoint;
     },
 
@@ -74,6 +79,10 @@
           this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
           ctx.stroke();
           ctx.restore();
+
+          // MMZ: Needed for highlight drawing
+          // TODO: check perf on iPads
+          this.canvas.requestRenderAll();
         }
       }
     },
@@ -280,7 +289,11 @@
       var path = this.createPath(pathData);
       this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
-      this.canvas.add(path);
+      
+      // Add to highlight layer
+      //this.canvas.add(path);
+      this.canvas.addHighlight(path);
+
       this.canvas.requestRenderAll();
       path.setCoords();
       this._resetShadow();
