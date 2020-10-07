@@ -64,56 +64,7 @@
       this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
       this._initInteractive();
-      this._createCacheCanvas(); 
-
-      this._initHighlightDrawing();
-    },
-
-    // In-memory canvas element to support highlight drawing
-    highlightDrawingCanvasEl: null,
-
-    _initHighlightDrawing: function() {
-      console.log('fabric.Canvas::_initHighlightDrawing');
-      
-      //(1) Init off-screen buffer
-      if (!this.highlightDrawingCanvasEl) {
-        var canvasBuffer = document.createElement('canvas');
-        canvasBuffer.width  = this.width;
-        canvasBuffer.height = this.height;
-        this.highlightDrawingCanvasEl = canvasBuffer;
-      }
-
-      //(2) Insert Image representing buffer onto the stage
-      if (this.getHighlightLayerIndex() < 0) {
-        var fabricImageBuffer = new fabric.Image(this.highlightDrawingCanvasEl);
-        fabricImageBuffer.selectable = false;
-        fabricImageBuffer.isHighlightLayer = true;
-        //fabricImageBuffer.imageSmoothing = false;
-        this.add(fabricImageBuffer);
-      }
-
-      // (3) Hijack contextTop
-      // TODO: save original top so we can revert to using that for drawing if needed
-      // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
-      this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
-    },
-
-    getHighlightLayerIndex: function() {
-      var highlightLayerIndex = -1;
-      this.forEachObject(function(object, index){
-        if (object.type === 'image' && object.isHighlightLayer === true) {
-          if (highlightLayerIndex !== -1) {
-            console.log('fabric.PencilBrush::_finalizeAndAddPath -> on trying to add path finding more than 1 drawingHighlightLayer!');
-          }
-          highlightLayerIndex = index;
-        }
-      });
-      return highlightLayerIndex;
-    },
-
-    addHighlight: function(path) {
-      var highlightLayerIndex = this.getHighlightLayerIndex();
-      this.insertAt(path, highlightLayerIndex);
+      this._createCacheCanvas();
     },
 
     /**
