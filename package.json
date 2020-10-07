@@ -59,7 +59,8 @@
     "all": "npm run build && npm run test && npm run test:visual && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
     "testem": "testem .",
     "testem:visual": "testem --file testem-visual.json",
-    "testem:ci": "testem ci"
+    "testem:ci": "testem ci",
+    "prepublishOnly": "npm run build"
   },
   "optionalDependencies": {
     "canvas": "^2.6.1",
