@@ -12,6 +12,10 @@ Jenkins job that builds and deploys this forked version to our NPM registry is l
 If you have any questions, contact NewXP:<br>
 > Slack: #new-xp
 
+### Customization
+
+Information on how this fork has been customized for usage @ Amplify please see [here](https://docs.google.com/document/d/1kBNWIeKwgj1_GATsXrWccClUhRgWDwyIrNJpDj30V_Y)
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
