@@ -635,6 +635,13 @@
     absolutePositioned: false,
 
     /**
+     * Indicates that this is the highlight layer image buffer
+     * @type boolean
+     * @default false
+     */
+    isHighlightLayer: false,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -855,6 +862,7 @@
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            isHighlightLayer:         this.isHighlightLayer,
           };
 
       if (this.clipPath) {

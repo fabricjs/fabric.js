@@ -415,7 +415,7 @@
      * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
-    enlivenObjects: function(objects, callback, namespace, reviver) {
+    enlivenObjects: function(objects, callback, namespace, reviver, canvas) {
       objects = objects || [];
 
       var enlivenedObjects = [],
@@ -447,7 +447,7 @@
           error || (enlivenedObjects[index] = obj);
           reviver && reviver(o, obj, error);
           onLoaded();
-        });
+        }, canvas);
       });
     },
 
