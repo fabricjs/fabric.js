@@ -1007,7 +1007,7 @@ fabric.CommonMethods = {
      * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
-    enlivenObjects: function(objects, callback, namespace, reviver) {
+    enlivenObjects: function(objects, callback, namespace, reviver, canvas) {
       objects = objects || [];
 
       var enlivenedObjects = [],
@@ -1039,7 +1039,7 @@ fabric.CommonMethods = {
           error || (enlivenedObjects[index] = obj);
           reviver && reviver(o, obj, error);
           onLoaded();
-        });
+        }, canvas);
       });
     },
 
@@ -13669,7 +13669,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       callback && callback(enlivenedObjects);
-    }, null, reviver);
+    }, null, reviver, this);
   },
 
   /**
@@ -14374,6 +14374,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     absolutePositioned: false,
 
     /**
+     * Indicates that this is the highlight layer image buffer
+     * @type boolean
+     * @default false
+     */
+    isHighlightLayer: false,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
@@ -14594,6 +14601,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            isHighlightLayer:         this.isHighlightLayer,
           };
 
       if (this.clipPath) {
@@ -20937,25 +20945,30 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an image instance is created
    */
-  fabric.Image.fromObject = function(_object, callback) {
+  fabric.Image.fromObject = function(_object, callback, canvas) {
     var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, isError) {
-      if (isError) {
-        callback && callback(null, true);
-        return;
-      }
-      fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [];
-        fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-          object.resizeFilter = resizeFilters[0];
-          fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
-            object.clipPath = enlivedProps[0];
-            var image = new fabric.Image(img, object);
-            callback(image, false);
-          });
+    if(_object.isHighlightLayer) {
+        var image = new fabric.Image(canvas.highlightDrawingCanvasEl, object);
+        callback(image, false);
+    } else {
+        fabric.util.loadImage(object.src, function(img, isError) {
+        if (isError) {
+            callback && callback(null, true);
+            return;
+        }
+        fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
+            object.filters = filters || [];
+            fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
+            object.resizeFilter = resizeFilters[0];
+            fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+                object.clipPath = enlivedProps[0];
+                var image = new fabric.Image(img, object);
+                callback(image, false);
+            });
+            });
         });
-      });
-    }, null, object.crossOrigin);
+        }, null, object.crossOrigin);
+    }
   };
 
   /**

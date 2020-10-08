@@ -160,7 +160,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       callback && callback(enlivenedObjects);
-    }, null, reviver);
+    }, null, reviver, this);
   },
 
   /**

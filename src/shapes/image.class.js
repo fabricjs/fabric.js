@@ -710,25 +710,30 @@
    * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an image instance is created
    */
-  fabric.Image.fromObject = function(_object, callback) {
+  fabric.Image.fromObject = function(_object, callback, canvas) {
     var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, isError) {
-      if (isError) {
-        callback && callback(null, true);
-        return;
-      }
-      fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [];
-        fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-          object.resizeFilter = resizeFilters[0];
-          fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
-            object.clipPath = enlivedProps[0];
-            var image = new fabric.Image(img, object);
-            callback(image, false);
-          });
-        });
-      });
-    }, null, object.crossOrigin);
+    if(_object.isHighlightLayer) {
+        var image = new fabric.Image(canvas.highlightDrawingCanvasEl, object);
+        callback(image, false);
+    } else {
+        fabric.util.loadImage(object.src, function(img, isError) {
+            if (isError) {
+                callback && callback(null, true);
+                return;
+            }
+            fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
+                object.filters = filters || [];
+                fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
+                    object.resizeFilter = resizeFilters[0];
+                    fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+                        object.clipPath = enlivedProps[0];
+                        var image = new fabric.Image(img, object);
+                        callback(image, false);
+                    });
+                });
+            });
+        }, null, object.crossOrigin);
+    }
   };
 
   /**
