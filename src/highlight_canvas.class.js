@@ -82,6 +82,20 @@
     addHighlight: function(path) {
       var highlightLayerIndex = this.getHighlightLayerIndex();
       return this.insertAt(path, highlightLayerIndex);
-    }
+    },
+
+    /**
+     * Clears all contexts (background, main, top) of an instance
+     * @param {Boolean} shouldReInitHighlight determines if this action should also reinitialize the highlightLayer
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function (shouldReInitHighlight) {
+        this.callSuper('clear');
+        if(shouldReInitHighlight) {
+            this._initHighlightDrawing();
+        }
+        return this;
+    },
   });
 })();
