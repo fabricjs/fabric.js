@@ -12169,11 +12169,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _initHighlightDrawing: function() {
+      var scale = this.getRetinaScaling();
+
       //(1) Init off-screen buffer
       if (!this.highlightDrawingCanvasEl) {
         var canvasBuffer = document.createElement('canvas');
-        canvasBuffer.width  = this.width;
-        canvasBuffer.height = this.height;
+        canvasBuffer.width  = this.width * scale;
+        canvasBuffer.height = this.height * scale;
         this.highlightDrawingCanvasEl = canvasBuffer;
       }
 
@@ -12183,6 +12185,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         fabricImageBuffer.selectable = false;
         fabricImageBuffer.isHighlightLayer = true;
         fabricImageBuffer.imageSmoothing = false;
+        fabricImageBuffer.scale(1.0 / scale);
         this.add(fabricImageBuffer);
       }
 
@@ -12190,6 +12193,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // TODO: save original top so we can revert to using that for drawing if needed
       // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
       this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
+      this.contextTop.scale(scale, scale);
     },
 
     /**
@@ -12210,12 +12214,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       return highlightLayerIndex;
     },
 
-  /**
-   * Adds object to the stage right under the drawing highlight layer
-   * @param {Object} object Object to insert
-   * @return {Self} thisArg
-   * @chainable
-   */
+    /**
+     * Adds object to the stage right under the drawing highlight layer
+     * @param {Object} object Object to insert
+     * @return {Self} thisArg
+     * @chainable
+     */
     addHighlight: function(path) {
       var highlightLayerIndex = this.getHighlightLayerIndex();
       return this.insertAt(path, highlightLayerIndex);
@@ -12234,6 +12238,32 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
         return this;
     },
+
+
+    /**
+     * Override this method in order to properly size the highlight buffer
+     * @private
+     * @param {String} prop property (width|height)
+     * @param {Number} value value to set property to
+     * @return {fabric.HighlightCanvas} instance
+     * @chainable true
+     */
+    _setBackstoreDimension: function (prop, value) {
+      this.callSuper('_setBackstoreDimension', prop, value);
+
+      if (this.highlightDrawingCanvasEl) {
+        var scale = this.getRetinaScaling();
+
+        this.highlightDrawingCanvasEl[prop] = value * scale;
+
+        var highlightLayerIndex = this.getHighlightLayerIndex();
+        var highlightImageBuffer = this.item(highlightLayerIndex)
+        if (highlightImageBuffer) {
+          highlightImageBuffer[prop] = value * scale;
+        }
+      }
+      return this;
+    }
   });
 })();
 
