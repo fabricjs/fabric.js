@@ -12219,7 +12219,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     addHighlight: function(path) {
       var highlightLayerIndex = this.getHighlightLayerIndex();
       return this.insertAt(path, highlightLayerIndex);
-    }
+    },
+
+    /**
+     * Clears all contexts (background, main, top) of an instance
+     * @param {Boolean} shouldReInitHighlight determines if this action should also reinitialize the highlightLayer
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    clear: function (shouldReInitHighlight) {
+        this.callSuper('clear');
+        if(shouldReInitHighlight) {
+            this._initHighlightDrawing();
+        }
+        return this;
+    },
   });
 })();
 
@@ -20952,21 +20966,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         callback(image, false);
     } else {
         fabric.util.loadImage(object.src, function(img, isError) {
-        if (isError) {
-            callback && callback(null, true);
-            return;
-        }
-        fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-            object.filters = filters || [];
-            fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-            object.resizeFilter = resizeFilters[0];
-            fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
-                object.clipPath = enlivedProps[0];
-                var image = new fabric.Image(img, object);
-                callback(image, false);
+            if (isError) {
+                callback && callback(null, true);
+                return;
+            }
+            fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
+                object.filters = filters || [];
+                fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
+                    object.resizeFilter = resizeFilters[0];
+                    fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
+                        object.clipPath = enlivedProps[0];
+                        var image = new fabric.Image(img, object);
+                        callback(image, false);
+                    });
+                });
             });
-            });
-        });
         }, null, object.crossOrigin);
     }
   };
