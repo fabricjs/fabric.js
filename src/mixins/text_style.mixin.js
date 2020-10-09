@@ -43,7 +43,7 @@
       for (var p1 in obj) {
         // eslint-disable-next-line
         for (var p2 in obj[p1]) {
-          if (typeof obj[p1][p2][property] !== 'undefined') {
+          if (obj[p1][p2] && typeof obj[p1][p2][property] !== 'undefined') {
             return true;
           }
         }
