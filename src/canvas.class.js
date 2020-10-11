@@ -15,10 +15,6 @@
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:modified at the end of a transform or any change when statefull is true
-   * @fires object:rotated at the end of a rotation transform
-   * @fires object:scaled at the end of a scale transform
-   * @fires object:moved at the end of translation transform
-   * @fires object:skewed at the end of a skew transform
    * @fires object:rotating while an object is being rotated from the control
    * @fires object:scaling while an object is being scaled by controls
    * @fires object:moving while an object is being dragged
@@ -48,6 +44,11 @@
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
+   * the following events are deprecated:
+   * @fires object:rotated at the end of a rotation transform
+   * @fires object:scaled at the end of a scale transform
+   * @fires object:moved at the end of translation transform
+   * @fires object:skewed at the end of a skew transform
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -269,7 +270,11 @@
     targetFindTolerance:    0,
 
     /**
-     * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
+     * When true, target detection is skipped. Target detection will return always undefined.
+     * click selection won't work anymore, events will fire with no targets.
+     * if something is selected before setting it to true, it will be deselected at the first click.
+     * area selection will still work. check the `selection` property too.
+     * if you deactivate both, you should look into staticCanvas.
      * @type Boolean
      * @default
      */
@@ -636,7 +641,8 @@
       }
 
       var pointer = this.getPointer(e), corner = target.__corner,
-          actionHandler = !!corner && target.controls[corner].getActionHandler(),
+          actionHandler = (alreadySelected && corner) ?
+            target.controls[corner].getActionHandler() : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
@@ -677,26 +683,6 @@
       transform.original.originY = origin.y;
       this._currentTransform = transform;
       this._beforeTransform(e);
-    },
-
-    /**
-     * Translates object by "setting" its left/top
-     * @private
-     * @param {Number} x pointer's x coordinate
-     * @param {Number} y pointer's y coordinate
-     * @return {Boolean} true if the translation occurred
-     */
-    _translateObject: function (x, y) {
-      var transform = this._currentTransform,
-          target = transform.target,
-          newLeft = x - transform.offsetX,
-          newTop = y - transform.offsetY,
-          moveX = !target.get('lockMovementX') && target.left !== newLeft,
-          moveY = !target.get('lockMovementY') && target.top !== newTop;
-
-      moveX && target.set('left', newLeft);
-      moveY && target.set('top', newTop);
-      return moveX || moveY;
     },
 
     /**

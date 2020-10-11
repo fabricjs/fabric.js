@@ -22,6 +22,14 @@
       assert.deepEqual(command, expectedSimplified[index], 'should contain a subset of equivalent commands ' + index);
     });
   });
+  QUnit.test('fabric.util.parsePath can parse arcs correctly when no spaces between flags', function(assert) {
+    // eslint-disable-next-line max-len
+    var pathWithWeirdArc = 'a10.56 10.56 0 00-1.484-.133';
+    var expected = ['a', 10.56, 10.56, 0, 0, 0, -1.484, -0.133];
+    var parsed = fabric.util.parsePath(pathWithWeirdArc);
+    var command = parsed[0];
+    assert.deepEqual(command, expected, 'Arc should be parsed correctly.');
+  });
   QUnit.test('fabric.util.getPathSegmentsInfo', function(assert) {
     assert.ok(typeof fabric.util.getPathSegmentsInfo === 'function');
     var parsed = fabric.util.makePathSimpler(fabric.util.parsePath(path));
