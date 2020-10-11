@@ -152,8 +152,8 @@
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   QUnit.test('_setCornerCoords_customControlSize', function(assert) {
     //set custom corner size
-    fabric.Object.prototype.controls.bl.cornerSizeX = 30;
-    fabric.Object.prototype.controls.bl.cornerSizeY = 30;
+    fabric.Object.prototype.controls.bl.sizeX = 30;
+    fabric.Object.prototype.controls.bl.sizeY = 10;
 
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
     assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
@@ -168,13 +168,13 @@
     assert.equal(cObj.oCoords.tl.corner.br.x.toFixed(2), 16.5);
     assert.equal(cObj.oCoords.tl.corner.br.y.toFixed(2), 16.5);
     assert.equal(cObj.oCoords.bl.corner.tl.x.toFixed(2), -5.0);
-    assert.equal(cObj.oCoords.bl.corner.tl.y.toFixed(2), 5.0);
+    assert.equal(cObj.oCoords.bl.corner.tl.y.toFixed(2), 15.0);
     assert.equal(cObj.oCoords.bl.corner.tr.x.toFixed(2), 25.0);
-    assert.equal(cObj.oCoords.bl.corner.tr.y.toFixed(2), 5.0);
+    assert.equal(cObj.oCoords.bl.corner.tr.y.toFixed(2), 15.0);
     assert.equal(cObj.oCoords.bl.corner.bl.x.toFixed(2), -5.0);
-    assert.equal(cObj.oCoords.bl.corner.bl.y.toFixed(2), 35.0);
+    assert.equal(cObj.oCoords.bl.corner.bl.y.toFixed(2), 25.0);
     assert.equal(cObj.oCoords.bl.corner.br.x.toFixed(2), 25.0);
-    assert.equal(cObj.oCoords.bl.corner.br.y.toFixed(2), 35.0);
+    assert.equal(cObj.oCoords.bl.corner.br.y.toFixed(2), 25.0);
     assert.equal(cObj.oCoords.tr.corner.tl.x.toFixed(2), 13.5);
     assert.equal(cObj.oCoords.tr.corner.tl.y.toFixed(2), 3.5);
     assert.equal(cObj.oCoords.tr.corner.tr.x.toFixed(2), 26.5);
@@ -201,8 +201,8 @@
     assert.equal(cObj.oCoords.mtr.corner.br.y.toFixed(2), -23.5);
 
     // reset
-    fabric.Object.prototype.controls.bl.cornerSizeX = null;
-    fabric.Object.prototype.controls.bl.cornerSizeY = null;
+    fabric.Object.prototype.controls.bl.sizeX = null;
+    fabric.Object.prototype.controls.bl.sizeY = null;
   });
 
   QUnit.test('_findTargetCorner', function(assert) {
