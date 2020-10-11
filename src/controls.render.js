@@ -19,8 +19,8 @@
    */
   function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var xSize = styleOverride.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = styleOverride.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : this.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
@@ -68,8 +68,8 @@
    */
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var xSize = styleOverride.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = styleOverride.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',

@@ -323,12 +323,6 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!styleOverride.sizeX && this.sizeX) {
-        styleOverride.sizeX = this.sizeX;
-      }
-      if (!styleOverride.sizeY && this.sizeY) {
-        styleOverride.sizeY = this.sizeY;
-      }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
           fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
