@@ -19,30 +19,30 @@
    */
   function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var size = styleOverride.cornerSize || fabricObject.cornerSize,
+    var xSize = styleOverride.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = styleOverride.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : this.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
         stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
         myLeft = left,
-        myTop = top;
+        myTop = top, size;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-    if (styleOverride.cornerSizeX && styleOverride.cornerSizeY) {
-      // use scale to make ellipse
-      var xSize = styleOverride.cornerSizeX,
-          ySize = styleOverride.cornerSizeY;
-      if (xSize > ySize) {
-        size = xSize;
-        ctx.scale(1.0, ySize / xSize);
-        myTop = top * xSize / ySize;
-      }
-      else {
-        size = ySize;
-        ctx.scale(xSize / ySize, 1.0);
-        myLeft = left * ySize / xSize;
-      }
+    // as soon as fabric react v5, remove ie11, use proper ellipse code.
+    if (xSize > ySize) {
+      size = xSize;
+      ctx.scale(1.0, ySize / xSize);
+      myTop = top * xSize / ySize;
+    }
+    else if (ySize > xSize) {
+      size = ySize;
+      ctx.scale(xSize / ySize, 1.0);
+      myLeft = left * ySize / xSize;
+    }
+    else {
+      size = xSize;
     }
     // this is still wrong
     ctx.lineWidth = 1;
@@ -68,8 +68,8 @@
    */
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var xSize = styleOverride.cornerSizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = styleOverride.cornerSizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var xSize = styleOverride.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = styleOverride.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',

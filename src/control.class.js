@@ -88,35 +88,35 @@
 
     /**
      * Sets the length of the control. If null, defaults to object's cornerSize.
-     * Expects both cornerSizeX and cornerSizeY to be set when set.
+     * Expects both sizeX and sizeY to be set when set.
      * @type {?Number}
      * @default null
      */
-    cornerSizeX: null,
+    sizeX: null,
 
     /**
      * Sets the height of the control. If null, defaults to object's cornerSize.
-     * Expects both cornerSizeX and cornerSizeY to be set when set.
+     * Expects both sizeX and sizeY to be set when set.
      * @type {?Number}
      * @default null
      */
-    cornerSizeY: null,
+    sizeY: null,
 
     /**
      * Sets the length of the touch area of the control. If null, defaults to object's touchCornerSize.
-     * Expects both touchCornerSizeX and touchCornerSizeY to be set when set.
+     * Expects both touchSizeX and touchSizeY to be set when set.
      * @type {?Number}
      * @default null
      */
-    touchCornerSizeX: null,
+    touchSizeX: null,
 
     /**
      * Sets the height of the touch area of the control. If null, defaults to object's touchCornerSize.
-     * Expects both touchCornerSizeX and touchCornerSizeY to be set when set.
+     * Expects both touchSizeX and touchSizeY to be set when set.
      * @type {?Number}
      * @default null
      */
-    touchCornerSizeY: null,
+    touchSizeY: null,
 
     /**
      * Css cursor style to display when the control is hovered.
@@ -263,8 +263,8 @@
           sinHalfOffset,
           cosHalfOffsetComp,
           sinHalfOffsetComp,
-          xSize = (isTouch) ? this.touchCornerSizeX : this.cornerSizeX,
-          ySize = (isTouch) ? this.touchCornerSizeY : this.cornerSizeY;
+          xSize = (isTouch) ? this.touchSizeX : this.sizeX,
+          ySize = (isTouch) ? this.touchSizeY : this.sizeY;
       if (xSize && ySize && xSize !== ySize) {
         // handle rectangular corners
         var controlTriangleAngle = Math.atan2(ySize, xSize);
@@ -323,11 +323,11 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!styleOverride.cornerSizeX && this.cornerSizeX) {
-        styleOverride.cornerSizeX = this.cornerSizeX;
+      if (!styleOverride.sizeX && this.sizeX) {
+        styleOverride.sizeX = this.sizeX;
       }
-      if (!styleOverride.cornerSizeY && this.cornerSizeY) {
-        styleOverride.cornerSizeY = this.cornerSizeY;
+      if (!styleOverride.sizeY && this.sizeY) {
+        styleOverride.sizeY = this.sizeY;
       }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
