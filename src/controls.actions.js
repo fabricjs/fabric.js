@@ -188,15 +188,19 @@
   /**
    * Wrap an action handler with saving/restoring object position on the transform.
    * this is the code that permits to objects to keep their position while transforming.
+   * @param {string} eventName
    * @param {Function} actionHandler the function to wrap
    * @return {Function} a function with an action handler signature
    */
-  function wrapWithFixedAnchor(actionHandler) {
+  function wrapWithFixedAnchor(eventName, actionHandler) {
     return function(eventData, transform, x, y) {
       var target = transform.target, centerPoint = target.getCenterPoint(),
           constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
       target.setPositionByOrigin(constraint, transform.originX, transform.originY);
+      if (actionPerformed) {
+        fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
+      }
       return actionPerformed;
     };
   }
@@ -294,7 +298,6 @@
       var dimBeforeSkewing = target._getTransformedDimensions().y;
       target.set('skewX', newSkew);
       compensateScaleForSkew(target, 'skewY', 'scaleY', 'y', dimBeforeSkewing);
-      fireEvent('skewing', commonEventInfo(eventData, transform, x, y));
     }
     return hasSkewed;
   }
@@ -338,7 +341,6 @@
       var dimBeforeSkewing = target._getTransformedDimensions().x;
       target.set('skewY', newSkew);
       compensateScaleForSkew(target, 'skewX', 'scaleX', 'x', dimBeforeSkewing);
-      fireEvent('skewing', commonEventInfo(eventData, transform, x, y));
     }
     return hasSkewed;
   }
@@ -389,7 +391,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originX = originX;
-    var finalHandler = wrapWithFixedAnchor(skewObjectX);
+    var finalHandler = wrapWithFixedAnchor('skewing', skewObjectX);
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -439,7 +441,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originY = originY;
-    var finalHandler = wrapWithFixedAnchor(skewObjectY);
+    var finalHandler = wrapWithFixedAnchor('skewing', skewObjectY);
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -465,7 +467,7 @@
     var lastAngle = Math.atan2(t.ey - pivotPoint.y, t.ex - pivotPoint.x),
         curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x),
         angle = radiansToDegrees(curAngle - lastAngle + t.theta),
-        hasRotated = true;
+        hasRotated;
 
     if (target.snapAngle > 0) {
       var snapAngle  = target.snapAngle,
@@ -489,9 +491,6 @@
 
     hasRotated = target.angle !== angle;
     target.angle = angle;
-    if (hasRotated) {
-      fireEvent('rotating', commonEventInfo(eventData, transform, x, y));
-    }
     return hasRotated;
   }
 
@@ -552,8 +551,8 @@
         var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
             original = transform.original,
             originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
-              Math.abs(dim.y * original.scaleY / target.scaleY),
-            scale = distance / originalDistance, hasScaled;
+            Math.abs(dim.y * original.scaleY / target.scaleY),
+            scale = distance / originalDistance;
         scaleX = original.scaleX * scale;
         scaleY = original.scaleY * scale;
       }
@@ -588,11 +587,7 @@
       by === 'x' && target.set('scaleX', scaleX);
       by === 'y' && target.set('scaleY', scaleY);
     }
-    hasScaled = oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
-    if (hasScaled) {
-      fireEvent('scaling', commonEventInfo(eventData, transform, x, y));
-    }
-    return hasScaled;
+    return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
   }
 
   /**
@@ -685,9 +680,6 @@
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
     hasResized = oldWidth !== newWidth;
-    if (hasResized) {
-      fireEvent('resizing', commonEventInfo(eventData, transform, x, y));
-    }
     return hasResized;
   }
 
@@ -717,13 +709,13 @@
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
-  controls.rotationWithSnapping = wrapWithFixedAnchor(rotationWithSnapping);
-  controls.scalingEqually = wrapWithFixedAnchor(scaleObjectFromCorner);
-  controls.scalingX = wrapWithFixedAnchor(scaleObjectX);
-  controls.scalingY = wrapWithFixedAnchor(scaleObjectY);
+  controls.rotationWithSnapping = wrapWithFixedAnchor('rotating', rotationWithSnapping);
+  controls.scalingEqually = wrapWithFixedAnchor('scaling', scaleObjectFromCorner);
+  controls.scalingX = wrapWithFixedAnchor('scaling', scaleObjectX);
+  controls.scalingY = wrapWithFixedAnchor('scaling', scaleObjectY);
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFixedAnchor(changeWidth);
+  controls.changeWidth = wrapWithFixedAnchor('resizing', changeWidth);
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;

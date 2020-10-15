@@ -184,12 +184,28 @@
       var center3 = target.getCenterPoint();
       assert.deepEqual(center3.x, 50, 'after reset center is x 50');
       assert.deepEqual(center3.y, 50, 'after reset center is y 50');
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)({}, transform);
+      fabric.controlsUtils.wrapWithFixedAnchor('scaling', actionHandler)({}, transform);
       var center4 = target.getCenterPoint();
       assert.equal(target.scaleX, 5, 'action made scaleX bigger');
       assert.equal(target.scaleY, 5, 'action made scaleY bigger');
       assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
       assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
+    });
+    QUnit.test('wrapWithFixedAnchor only triggers event when action handler changes something', function(assert) {
+      var eventSeen = false;
+      transform.target.canvas.on('object:scaling', function() {
+        eventSeen = true;
+      });
+      var actionHandlerNotChanged = function () {
+        return false;
+      };
+      fabric.controlsUtils.wrapWithFixedAnchor('scaling', actionHandlerNotChanged)({}, transform);
+      assert.equal(eventSeen, false);
+      var actionHandlerChanged = function () {
+        return true;
+      };
+      fabric.controlsUtils.wrapWithFixedAnchor('scaling', actionHandlerChanged)({}, transform);
+      assert.equal(eventSeen, true);
     });
   });
 })();
