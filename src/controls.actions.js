@@ -551,7 +551,7 @@
         var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
             original = transform.original,
             originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
-            Math.abs(dim.y * original.scaleY / target.scaleY),
+              Math.abs(dim.y * original.scaleY / target.scaleY),
             scale = distance / originalDistance;
         scaleX = original.scaleX * scale;
         scaleY = original.scaleY * scale;
