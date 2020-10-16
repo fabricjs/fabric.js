@@ -216,17 +216,17 @@
       }
       if (absoluteClipPath) {
         markup.push(
-          '<g ', shadowInfo, this.getSvgCommons(), ' >\n'
+          '<g ', shadowInfo, styleInfo, ' >\n'
         );
       }
       markup.push(
         '<g ',
         this.getSvgTransform(false),
-        !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
+        !absoluteClipPath ? shadowInfo + styleInfo : '',
         ' >\n'
       );
       commonPieces = [
-        styleInfo,
+        this.getSvgCommons() ,
         vectorEffect,
         noStyle ? '' : this.addPaintOrder(), ' ',
         additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
