@@ -416,5 +416,33 @@
     width: 760,
     height: 760,
   });
+
+  function pathWithGradientSvg(canvas, callback) {
+    var pathWithGradient = new fabric.Path('M 0 0 L 0 100 L 100 100 L 100 0 Z', {
+      fill: new fabric.Gradient({
+        gradientUnits: 'percentage',
+        coords: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        colorStops: [
+          { offset: 0, color: 'red' },
+          { offset: 1, color: 'black' }
+        ]
+      }),
+      height: 100,
+      width: 100,
+      top: 0,
+      left: 0
+    });
+    canvas.add(pathWithGradient);
+    toSVGCanvas(canvas, callback);
+  }
+
+  tests.push({
+    test: 'gradient should be applied to path in svg',
+    code: pathWithGradientSvg,
+    golden: 'pathWithGradientSvg.png',
+    percentage: 0.06,
+    width: 100,
+    height: 100,
+  });
   tests.forEach(visualTestLoop(QUnit));
 })();
