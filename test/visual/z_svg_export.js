@@ -416,5 +416,37 @@
     width: 760,
     height: 760,
   });
+
+  function clipPathAndShadow(canvas, callback) {
+    var rect = new fabric.Rect({
+      fill: '#BADA55',
+      height: 100,
+      width: 100,
+      top: 50,
+      left: 50,
+      shadow: new fabric.Shadow({
+        offsetX: 10,
+        offsetY: 10,
+        color: 'black',
+        blur: 5
+      }),
+      clipPath: new fabric.Circle({
+        radius: 50,
+        top: 0,
+        left: 0
+      })
+    });
+    canvas.add(rect);
+    toSVGCanvas(canvas, callback);
+  }
+
+  tests.push({
+    test: 'clipPath on an element with a shadow',
+    code: clipPathAndShadow,
+    golden: 'clipPathAndShadow.png',
+    percentage: 0.06,
+    width: 200,
+    height: 200,
+  });
   tests.forEach(visualTestLoop(QUnit));
 })();
