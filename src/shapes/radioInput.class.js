@@ -1,5 +1,5 @@
 (function (global) {
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
@@ -8,7 +8,7 @@
     toFixed = fabric.util.toFixed;
 
   if (fabric.RadioInput) {
-    fabric.warn("fabric.RadioInput is already defined");
+    fabric.warn('fabric.RadioInput is already defined');
     return;
   }
 
@@ -24,68 +24,70 @@
       /**
        * Type of an object
        * @type String
-       * @default
        */
-      type: "RadioInput",
+      type: 'RadioInput',
 
       /**
-       * Points array
-       * @type Array
-       * @default
+       * The checked status
+       * @type boolean
        */
       checked: undefined,
       /**
-       * Points array
-       * @type Array
-       * @default
+       * The callback when the the checked status change
+       * @type function
        */
       onChange: undefined,
       /**
-       * Points array
-       * @type Array
-       * @default
+       * The callback when the the input is checked
+       * @type function
        */
       onCheckCallback: undefined,
       /**
-       * Points array
-       * @type Array
-       * @default
+       * The callback when the the input is unchecked
+       * @type function
        */
       onUnCheckCallback: undefined,
 
       /**
        * Constructor
-       * @param {Array} points Array of points (where each point is an object with x and y)
        * @param {Object} [options] Options object
        * @return {fabric.RadioInput} thisArg
        * @example
-       * var poly = new fabric.RadioInput([
-       *     { x: 10, y: 10 },
-       *     { x: 50, y: 30 },
-       *     { x: 40, y: 70 },
-       *     { x: 60, y: 50 },
-       *     { x: 100, y: 150 },
-       *     { x: 40, y: 100 }
-       *   ], {
-       *   stroke: 'red',
-       *   left: 100,
-       *   top: 100
-       * });
+            const input = new fabric.RadioInput({
+              left: 0,
+              top: 0,
+              width: 50,
+              height: 50,
+              stroke: 'blue',
+              strokeWidth: 3,
+              fillColorOnCheck: 'black',
+              checked: false,
+              radius: 12,
+              onCheckCallback: function (e) {
+                console.log('I HAVE BEEN CHECKED');
+              },
+              onUnCheckCallback: function (e) {
+                console.log('I HAVE BEEN UNCHECKED');
+              },
+              onChange: function (e, check) {
+                console.log('I HAVE BEEN CHANGED');
+              },
+            });
        */
 
       onCheckChange: function () {
         if (this.isChecked() === true) {
-          this.set("fill", "transparent");
-          if (typeof this.onUnCheckCallback === "function") {
+          this.set('fill', 'transparent');
+          if (typeof this.onUnCheckCallback === 'function') {
             this.onUnCheckCallback(this);
           }
         } else {
-          this.set("fill", this.onCheckFillColor);
-          if (typeof this.onCheckCallback === "function") {
+          this.set('fill', this.fillColorOnCheck);
+          if (typeof this.onCheckCallback === 'function') {
             this.onCheckCallback(this);
           }
         }
-        if (typeof this.onChange === "function") {
+        if (typeof this.onChange === 'function') {
           this.onChange(this, this.checked);
         }
         this.canvas.renderAll();
@@ -105,15 +107,15 @@
         options = options || {};
         var _this = this;
         if (element.checked === true) {
-          element.fill = element.onCheckFillColor;
+          element.fill = element.fillColorOnCheck;
         } else {
-          element.fill = "transparent";
+          element.fill = 'transparent';
           element.checked = false;
         }
-        this.callSuper("initialize", element, options);
+        this.callSuper('initialize', element, options);
 
-        this.on("added", function () {
-          this.canvas.on("mouse:down", function (e) {
+        this.on('added', function () {
+          this.canvas.on('mouse:down', function (e) {
             _this.onMouseDown(e);
           });
         });
@@ -127,24 +129,10 @@
       toObject: function (propertiesToInclude) {
         return fabric.util.object.extend(
           this.callSuper(
-            "toObject",
-            [
-              "checked",
-              "onCheckFillColor",
-              "onChange",
-              "onCheckCallback",
-              "onUnCheckCallback",
-            ].concat(propertiesToInclude)
+            'toObject',
+            ['checked', 'fillColorOnCheck'].concat(propertiesToInclude)
           )
         );
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        this.callSuper("_render", ctx);
       },
     }
   );
@@ -158,5 +146,4 @@
   fabric.RadioInput.fromObject = function (object, callback) {
     callback && callback(new fabric.RadioInput(object));
   };
-  fabric.RadioInput.async = true;
-})(typeof exports !== "undefined" ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);
