@@ -234,6 +234,7 @@
       top: 0,
       fontSize: 16,
       fill: gradient,
+      stroke: 'black',
     });
     canvas.add(text);
     canvas.renderAll();
@@ -244,7 +245,6 @@
     test: 'Text percentage gradient',
     code: text7,
     golden: 'text7.png',
-    disabled: !fabric.isLikelyNode,
     percentage: 0.05,
   });
 
