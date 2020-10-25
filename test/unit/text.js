@@ -830,4 +830,15 @@
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
   });
 
+  QUnit.test('text with a path', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    assert.ok(text.path, 'text has a path');
+    assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
+    assert.equal(text.width, 100, 'text is big as the path width');
+    assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
+
 })();
