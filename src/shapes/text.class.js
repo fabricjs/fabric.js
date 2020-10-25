@@ -959,7 +959,7 @@
           offsetX = -this.width / 2;
           offsetY = -this.height / 2;
           ctx.translate(offsetX, offsetY);
-          ctx[property] = this._applyPatternGradientTransformText(ctx, filler);
+          ctx[property] = this._applyPatternGradientTransformText(filler);
           return { offsetX: offsetX, offsetY: offsetY };
         }
         else {
