@@ -808,8 +808,7 @@
      */
     _renderTextCommon: function(ctx, method) {
       ctx.save();
-      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset(),
-          filler = method === 'fillText' ? this.fill : this.stroke;
+      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
@@ -930,11 +929,12 @@
      * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
      * is limited.
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {fabric.Gradient} filler a fabric gradient instance
+     * @return {CanvasPattern} a pattern to use as fill/stroke style
      */
-    _applyPatternGradientTransformText: function(ctx, filler) {
+    _applyPatternGradientTransformText: function(filler) {
       var pCanvas = fabric.util.createCanvasElement(), pCtx,
+          // TODO: verify compatibility with strokeUniform
           width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
       pCanvas.width = width;
       pCanvas.height = height;
