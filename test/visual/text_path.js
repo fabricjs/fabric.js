@@ -24,8 +24,8 @@
     golden: 'textpath1.png',
     newModule: 'Text on paths',
     percentage: 0.09,
-    width: 150,
-    height: 60,
+    width: 200,
+    height: 200,
   });
 
   tests.forEach(visualTestLoop(QUnit));
