@@ -2143,21 +2143,18 @@ fabric.CommonMethods = {
     return info;
   }
 
-  function getPointOnPath(path, distance, infos) {
+  function getPointOnPath(path, perc, infos) {
     if (!infos) {
       infos = getPathSegmentsInfo(path);
     }
-    // var distance = infos[infos.length - 1] * perc;
-    var i = 0;
-    while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
-      distance -= infos[i].length;
+    var distance = infos[infos.length - 1] * perc, i = 0;
+    while ((distance - infos[i] > 0) && i < infos.length) {
+      distance -= infos[i];
       i++;
     }
     var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.command, segment = path[i];
+        command = segInfo.length, segment = path[i];
     switch (command) {
-      case 'M':
-        return { x: segInfo.x, y: segInfo.y };
       case 'Z':
       case 'z':
         return new fabric.Point(segInfo.x, segInfo.y).lerp(
@@ -4771,7 +4768,8 @@ fabric.warn = console.warn;
 
       // very crude parsing of style contents
       for (i = 0, len = styles.length; i < len; i++) {
-        var styleContents = styles[i].textContent;
+        // <style/> could produce `undefined`, covering this case with ''
+        var styleContents = styles[i].textContent || '';
 
         // remove comments
         styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -6202,8 +6200,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   function fireEvent(eventName, options) {
     var target = options.transform.target,
         canvas = target.canvas,
-        canvasOptions = fabric.util.object.clone(options);
-    canvasOptions.target = target;
+        canvasOptions = Object.assign({}, options, { target: target });
     canvas && canvas.fire('object:' + eventName, canvasOptions);
     target.fire(eventName, options);
   }
@@ -6862,29 +6859,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     return hasResized;
   }
 
-  /**
-   * Action handler
-   * @private
-   * @param {Event} eventData javascript event that is doing the transform
-   * @param {Object} transform javascript object containing a series of information around the current transform
-   * @param {number} x current mouse x position, canvas normalized
-   * @param {number} y current mouse y position, canvas normalized
-   * @return {Boolean} true if the translation occurred
-   */
-  function dragHandler(eventData, transform, x, y) {
-    var target = transform.target,
-        newLeft = x - transform.offsetX,
-        newTop = y - transform.offsetY,
-        moveX = !target.get('lockMovementX') && target.left !== newLeft,
-        moveY = !target.get('lockMovementY') && target.top !== newTop;
-    moveX && target.set('left', newLeft);
-    moveY && target.set('top', newTop);
-    if (moveX || moveY) {
-      fireEvent('moving', commonEventInfo(eventData, transform, x, y));
-    }
-    return moveX || moveY;
-  }
-
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
@@ -6897,7 +6871,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   controls.changeWidth = wrapWithFixedAnchor(changeWidth);
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
-  controls.dragHandler = dragHandler;
   controls.scaleOrSkewActionName = scaleOrSkewActionName;
   controls.rotationStyleHandler = rotationStyleHandler;
   controls.fireEvent = fireEvent;
@@ -6929,35 +6902,18 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    */
   function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var size = styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : this.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
-        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
-        myLeft = left,
-        myTop = top, size;
+        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-    // as soon as fabric react v5, remove ie11, use proper ellipse code.
-    if (xSize > ySize) {
-      size = xSize;
-      ctx.scale(1.0, ySize / xSize);
-      myTop = top * xSize / ySize;
-    }
-    else if (ySize > xSize) {
-      size = ySize;
-      ctx.scale(xSize / ySize, 1.0);
-      myLeft = left * ySize / xSize;
-    }
-    else {
-      size = xSize;
-    }
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
+    ctx.arc(left, top, size / 2, 0, 2 * Math.PI, false);
     ctx[methodName]();
     if (stroke) {
       ctx.stroke();
@@ -6978,14 +6934,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    */
   function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
-    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    var size = styleOverride.cornerSize || fabricObject.cornerSize,
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
-        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
+        ), sizeBy2 = size / 2;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.strokeCornerColor || fabricObject.strokeCornerColor;
@@ -6995,10 +6950,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.
     // to have real transparent corners we need the controls on upperCanvas
-    // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-    ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
+    // transparentCorners || ctx.clearRect(-sizeBy2, -sizeBy2, size, size);
+    ctx[methodName + 'Rect'](-sizeBy2, -sizeBy2, size, size);
     if (stroke) {
-      ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+      ctx.strokeRect(-sizeBy2, -sizeBy2, size, size);
     }
     ctx.restore();
   }
@@ -7096,38 +7051,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @default 0
      */
     offsetY: 0,
-
-    /**
-     * Sets the length of the control. If null, defaults to object's cornerSize.
-     * Expects both sizeX and sizeY to be set when set.
-     * @type {?Number}
-     * @default null
-     */
-    sizeX: null,
-
-    /**
-     * Sets the height of the control. If null, defaults to object's cornerSize.
-     * Expects both sizeX and sizeY to be set when set.
-     * @type {?Number}
-     * @default null
-     */
-    sizeY: null,
-
-    /**
-     * Sets the length of the touch area of the control. If null, defaults to object's touchCornerSize.
-     * Expects both touchSizeX and touchSizeY to be set when set.
-     * @type {?Number}
-     * @default null
-     */
-    touchSizeX: null,
-
-    /**
-     * Sets the height of the touch area of the control. If null, defaults to object's touchCornerSize.
-     * Expects both touchSizeX and touchSizeY to be set when set.
-     * @type {?Number}
-     * @default null
-     */
-    touchSizeY: null,
 
     /**
      * Css cursor style to display when the control is hovered.
@@ -7258,66 +7181,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         x: this.x * dim.x + this.offsetX,
         y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
-    },
-
-    /**
-     * Returns the coords for this control based on object values.
-     * @param {Number} objectAngle angle from the fabric object holding the control
-     * @param {Number} objectCornerSize cornerSize from the fabric object holding the control (or touchCornerSize if
-     *   isTouch is true)
-     * @param {Number} centerX x coordinate where the control center should be
-     * @param {Number} centerY y coordinate where the control center should be
-     * @param {boolean} isTouch true if touch corner, false if normal corner
-     */
-    calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
-      var cosHalfOffset,
-          sinHalfOffset,
-          cosHalfOffsetComp,
-          sinHalfOffsetComp,
-          xSize = (isTouch) ? this.touchSizeX : this.sizeX,
-          ySize = (isTouch) ? this.touchSizeY : this.sizeY;
-      if (xSize && ySize && xSize !== ySize) {
-        // handle rectangular corners
-        var controlTriangleAngle = Math.atan2(ySize, xSize);
-        var cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-        var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
-        var newThetaComp = Math.PI / 2 - controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
-        cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta);
-        sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
-        // use complementary angle for two corners
-        cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp);
-        sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
-      }
-      else {
-        // handle square corners
-        // use default object corner size unless size is defined
-        var cornerSize = (xSize && ySize) ? xSize : objectCornerSize;
-        /* 0.7071067812 stands for sqrt(2)/2 */
-        cornerHypotenuse = cornerSize * 0.7071067812;
-        // complementary angles are equal since they're both 45 degrees
-        var newTheta = fabric.util.degreesToRadians(45 - objectAngle);
-        cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newTheta);
-        sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newTheta);
-      }
-
-      return {
-        tl: {
-          x: centerX - sinHalfOffsetComp,
-          y: centerY - cosHalfOffsetComp,
-        },
-        tr: {
-          x: centerX + cosHalfOffset,
-          y: centerY - sinHalfOffset,
-        },
-        bl: {
-          x: centerX - cosHalfOffset,
-          y: centerY + sinHalfOffset,
-        },
-        br: {
-          x: centerX + sinHalfOffsetComp,
-          y: centerY + cosHalfOffsetComp,
-        },
-      };
     },
 
     /**
@@ -7587,7 +7450,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         offsetX += object.width / 2;
         offsetY += object.height / 2;
       }
-      if (object.type === 'path' && this.gradientUnits !== 'percentage') {
+      if (object.type === 'path') {
         offsetX -= object.pathOffset.x;
         offsetY -= object.pathOffset.y;
       }
@@ -8920,10 +8783,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     },
 
     /**
-     * Sets zoom level of this canvas instance, the zoom centered around point
-     * meaning that following zoom to point with the same point will have the visual
-     * effect of the zoom originating from that point. The point won't move.
-     * It has nothing to do with canvas center or visual center of the viewport.
+     * Sets zoom level of this canvas instance, zoom centered around point
      * @param {fabric.Point} point to zoom with respect to
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
@@ -10932,6 +10792,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:modified at the end of a transform or any change when statefull is true
+   * @fires object:rotated at the end of a rotation transform
+   * @fires object:scaled at the end of a scale transform
+   * @fires object:moved at the end of translation transform
+   * @fires object:skewed at the end of a skew transform
    * @fires object:rotating while an object is being rotated from the control
    * @fires object:scaling while an object is being scaled by controls
    * @fires object:moving while an object is being dragged
@@ -10961,11 +10825,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
-   * the following events are deprecated:
-   * @fires object:rotated at the end of a rotation transform
-   * @fires object:scaled at the end of a scale transform
-   * @fires object:moved at the end of translation transform
-   * @fires object:skewed at the end of a skew transform
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -11558,8 +11417,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       var pointer = this.getPointer(e), corner = target.__corner,
-          actionHandler = (alreadySelected && corner) ?
-            target.controls[corner].getActionHandler() : fabric.controlsUtils.dragHandler,
+          actionHandler = !!corner && target.controls[corner].getActionHandler(),
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
@@ -11600,6 +11458,26 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       transform.original.originY = origin.y;
       this._currentTransform = transform;
       this._beforeTransform(e);
+    },
+
+    /**
+     * Translates object by "setting" its left/top
+     * @private
+     * @param {Number} x pointer's x coordinate
+     * @param {Number} y pointer's y coordinate
+     * @return {Boolean} true if the translation occurred
+     */
+    _translateObject: function (x, y) {
+      var transform = this._currentTransform,
+          target = transform.target,
+          newLeft = x - transform.offsetX,
+          newTop = y - transform.offsetY,
+          moveX = !target.get('lockMovementX') && target.left !== newLeft,
+          moveY = !target.get('lockMovementY') && target.top !== newTop;
+
+      moveX && target.set('left', newLeft);
+      moveY && target.set('top', newTop);
+      return moveX || moveY;
     },
 
     /**
@@ -12412,7 +12290,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // as a short term fix we are not firing this if we are currently transforming.
       // as a long term fix we need to separate the action of finding a target with the
       // side effects we added to it.
-      if (!this._currentTransform && !this.findTarget(e)) {
+      if (!this.currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
         this._hoveredTarget = null;
         this._hoveredTargets = [];
@@ -12787,7 +12665,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             e: e,
             target: target,
             transform: transform,
-            action: transform.action,
           };
 
       if (target._scaling) {
@@ -12798,8 +12675,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         if (transform.actionPerformed) {
-          // this is not friendly to the new control api.
-          // is deprecated.
           eventName = this._addEventOptions(options, transform);
           this._fire(eventName, options);
         }
@@ -12810,7 +12685,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Mutate option object in order to add by property and give back the event name.
      * @private
-     * @deprecated since 4.2.0
      * @param {Object} options to mutate
      * @param {Object} transform to inspect action from
      */
@@ -13177,15 +13051,24 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
-          actionHandler = transform.actionHandler;
+          actionHandler = transform.actionHandler,
           // this object could be created from the function in the control handlers
+          options = {
+            target: transform.target,
+            e: e,
+            transform: transform,
+            pointer: pointer
+          };
 
-
-      if (actionHandler) {
-        actionPerformed = actionHandler(e, transform, x, y);
+      if (action === 'drag') {
+        actionPerformed = this._translateObject(x, y);
+        if (actionPerformed) {
+          this._fire('moving', options);
+          this.setCursor(options.target.moveCursor || this.moveCursor);
+        }
       }
-      if (action === 'drag' && actionPerformed) {
-        this.setCursor(transform.target.moveCursor || this.moveCursor);
+      else if (actionHandler) {
+        (actionPerformed = actionHandler(e, transform, x, y)) && this._fire(action, options);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
@@ -14948,6 +14831,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       else {
         this._renderBackground(ctx);
+        this._setStrokeStyles(ctx, this);
+        this._setFillStyles(ctx, this);
       }
       this._render(ctx);
       this._drawClipPath(ctx);
@@ -15043,44 +14928,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     _setStrokeStyles: function(ctx, decl) {
-      var stroke = decl.stroke;
-      if (stroke) {
+      if (decl.stroke) {
         ctx.lineWidth = decl.strokeWidth;
         ctx.lineCap = decl.strokeLineCap;
         ctx.lineDashOffset = decl.strokeDashOffset;
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
-        if (stroke.toLive) {
-          if (stroke.gradientUnits === 'percentage' || stroke.gradientTrasnform || stroke.patternTransform) {
-            // need to transform gradient in a pattern.
-            // this is a slow process. If you are hitting this codepath, and the object
-            // is not using caching, you should consider switching it on.
-            // we need a canvas as big as the current object caching canvas.
-            this._applyPatternForTransformedGradient(ctx, stroke);
-          }
-          else {
-            // is a simple gradient or pattern
-            ctx.strokeStyle = stroke.toLive(ctx, this);
-            this._applyPatternGradientTransform(ctx, stroke);
-          }
-        }
-        else {
-          // is a color
-          ctx.strokeStyle = decl.stroke;
-        }
+        ctx.strokeStyle = decl.stroke.toLive
+          ? decl.stroke.toLive(ctx, this)
+          : decl.stroke;
       }
     },
 
     _setFillStyles: function(ctx, decl) {
-      var fill = decl.fill;
-      if (fill) {
-        if (fill.toLive) {
-          ctx.fillStyle = fill.toLive(ctx, this);
-          this._applyPatternGradientTransform(ctx, decl.fill);
-        }
-        else {
-          ctx.fillStyle = fill;
-        }
+      if (decl.fill) {
+        ctx.fillStyle = decl.fill.toLive
+          ? decl.fill.toLive(ctx, this)
+          : decl.fill;
       }
     },
 
@@ -15250,7 +15114,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       ctx.save();
-      this._setFillStyles(ctx, this);
+      this._applyPatternGradientTransform(ctx, this.fill);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -15282,7 +15146,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      this._setStrokeStyles(ctx, this);
+      if (this.stroke.toLive && this.stroke.gradientUnits === 'percentage') {
+        // need to transform gradient in a pattern.
+        // this is a slow process. If you are hitting this codepath, and the object
+        // is not using caching, you should consider switching it on.
+        // we need a canvas as big as the current object caching canvas.
+        this._applyPatternForTransformedGradient(ctx, this.stroke);
+      }
+      else {
+        this._applyPatternGradientTransform(ctx, this.stroke);
+      }
       ctx.stroke();
       ctx.restore();
     },
@@ -17167,8 +17040,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
 
         lines = this._getImageLines(forTouch ? this.oCoords[i].touchCorner : this.oCoords[i].corner);
-        // // debugging
-        //
+        // debugging
+
         // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
         // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
         //
@@ -17209,14 +17082,59 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _setCornerCoords: function() {
-      var coords = this.oCoords;
+      var coords = this.oCoords,
+          newTheta = degreesToRadians(45 - this.angle),
+          cosTheta = fabric.util.cos(newTheta),
+          sinTheta = fabric.util.sin(newTheta),
+          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
+          /* 0.707106 stands for sqrt(2)/2 */
+          cornerHypotenuse = this.cornerSize * 0.707106,
+          touchHypotenuse = this.touchCornerSize * 0.707106,
+          cosHalfOffset = cornerHypotenuse * cosTheta,
+          sinHalfOffset = cornerHypotenuse * sinTheta,
+          touchCosHalfOffset = touchHypotenuse * cosTheta,
+          touchSinHalfOffset = touchHypotenuse * sinTheta,
+          x, y;
 
       for (var control in coords) {
-        var controlObject = this.controls[control];
-        coords[control].corner = controlObject.calcCornerCoords(
-          this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
-        coords[control].touchCorner = controlObject.calcCornerCoords(
-          this.angle, this.touchCornerSize, coords[control].x, coords[control].y, true);
+        x = coords[control].x;
+        y = coords[control].y;
+        coords[control].corner = {
+          tl: {
+            x: x - sinHalfOffset,
+            y: y - cosHalfOffset
+          },
+          tr: {
+            x: x + cosHalfOffset,
+            y: y - sinHalfOffset
+          },
+          bl: {
+            x: x - cosHalfOffset,
+            y: y + sinHalfOffset
+          },
+          br: {
+            x: x + sinHalfOffset,
+            y: y + cosHalfOffset
+          }
+        };
+        coords[control].touchCorner = {
+          tl: {
+            x: x - touchSinHalfOffset,
+            y: y - touchCosHalfOffset
+          },
+          tr: {
+            x: x + touchCosHalfOffset,
+            y: y - touchSinHalfOffset
+          },
+          bl: {
+            x: x - touchCosHalfOffset,
+            y: y + touchSinHalfOffset
+          },
+          br: {
+            x: x + touchSinHalfOffset,
+            y: y + touchCosHalfOffset
+          }
+        };
       }
     },
 
@@ -25092,10 +25010,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     return;
   }
 
-  var styleProps =
-    'fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
-
   /**
    * Text class
    * @class fabric.Text
@@ -25121,7 +25035,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       'charSpacing',
       'textAlign',
       'styles',
-      'path'
     ],
 
     /**
@@ -25254,13 +25167,37 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(styleProps),
+    stateProperties: fabric.Object.prototype.stateProperties.concat('fontFamily',
+      'fontWeight',
+      'fontSize',
+      'text',
+      'underline',
+      'overline',
+      'linethrough',
+      'textAlign',
+      'fontStyle',
+      'lineHeight',
+      'textBackgroundColor',
+      'charSpacing',
+      'styles'),
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(styleProps),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('fontFamily',
+      'fontWeight',
+      'fontSize',
+      'text',
+      'underline',
+      'overline',
+      'linethrough',
+      'textAlign',
+      'fontStyle',
+      'lineHeight',
+      'textBackgroundColor',
+      'charSpacing',
+      'styles'),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -25384,25 +25321,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
-      if (this.path) {
-        this.setPathInfo();
-      }
       this.__skipDimension = false;
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
-    },
-
-    /**
-     * If text has a path, it will add the extra information needed
-     * for path and text calculations
-     * @return {fabric.Text} thisArg
-     */
-    setPathInfo: function() {
-      var path = this.path;
-      if (path) {
-        path.segmentsInfo = fabric.util.getPathSegmentsInfo(path.path);
-      }
     },
 
     /**
@@ -25445,18 +25367,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       this._splitText();
       this._clearCache();
-      if (this.path) {
-        this.width = this.path.width;
-        this.height = this.path.height;
-      }
-      else {
-        this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
-        this.height = this.calcTextHeight();
-      }
+      this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
+      this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
@@ -25621,12 +25537,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
         return;
       }
-      var heightOfLine,
+      var lineTopOffset = 0, heightOfLine,
           lineLeftOffset, originalFill = ctx.fillStyle,
           line, lastColor,
           leftOffset = this._getLeftOffset(),
-          lineTopOffset = this._getTopOffset(),
-          boxStart = 0, boxWidth = 0, charBox, currentColor, path = this.path;
+          topOffset = this._getTopOffset(),
+          boxStart = 0, boxWidth = 0, charBox, currentColor;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -25642,24 +25558,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-          if (path) {
-            ctx.save();
-            ctx.translate(charBox.renderLeft, charBox.renderTop);
-            ctx.rotate(charBox.angle);
-            ctx.fillStyle = currentColor;
-            currentColor && ctx.fillRect(
-              -charBox.width / 2,
-              0,
-              charBox.width,
-              heightOfLine / this.lineHeight
-            );
-            ctx.restore();
-          }
-          else if (currentColor !== lastColor) {
+          if (currentColor !== lastColor) {
             ctx.fillStyle = lastColor;
             lastColor && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              lineTopOffset,
+              topOffset + lineTopOffset,
               boxWidth,
               heightOfLine / this.lineHeight
             );
@@ -25671,11 +25574,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             boxWidth += charBox.kernedWidth;
           }
         }
-        if (currentColor && !path) {
+        if (currentColor) {
           ctx.fillStyle = currentColor;
           ctx.fillRect(
             leftOffset + lineLeftOffset + boxStart,
-            lineTopOffset,
+            topOffset + lineTopOffset,
             boxWidth,
             heightOfLine / this.lineHeight
           );
@@ -25707,6 +25610,22 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         cache[cacheProp] = { };
       }
       return cache[cacheProp];
+    },
+
+    /**
+     * apply all the character style to canvas for rendering
+     * @private
+     * @param {String} _char
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Object} [decl]
+     */
+    _applyCharStyles: function(method, ctx, lineIndex, charIndex, styleDeclaration) {
+
+      this._setFillStyles(ctx, styleDeclaration);
+      this._setStrokeStyles(ctx, styleDeclaration);
+
+      ctx.font = this._getFontDeclaration(styleDeclaration);
     },
 
     /**
@@ -25792,28 +25711,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
-          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
-          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
+          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length);
 
       this.__charBounds[lineIndex] = lineBounds;
-      if (path) {
-        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
-        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-        startingPoint.x += path.pathOffset.x;
-        startingPoint.y += path.pathOffset.y;
-      }
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-        if (path) {
-          if (positionInPath > totalPathLength) {
-            positionInPath %= totalPathLength;
-          }
-          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
-        }
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
-        positionInPath += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
@@ -25825,26 +25730,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         height: this.fontSize
       };
       return { width: width, numOfSpaces: numOfSpaces };
-    },
-
-    /**
-     * Calculate the angle  and the left,top position of the char that follow a path.
-     * It appends it to graphemeInfo to be reused later at rendering
-     * @private
-     * @param {Number} positionInPath to be measured
-     * @param {Object} graphemeInfo current grapheme box information
-     * @param {Object} startingPoint position of the point
-     */
-    _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
-      var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
-          path = this.path;
-
-      // we are at currentPositionOnPath. we want to know what point on the path is.
-      var p1 = fabric.util.getPointOnPath(path.path, centerPosition - 0.1, path.segmentsInfo),
-          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 0.1, path.segmentsInfo);
-      graphemeInfo.renderLeft = p1.x - startingPoint.x;
-      graphemeInfo.renderTop = p1.y - startingPoint.y;
-      graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
     },
 
     /**
@@ -25939,7 +25824,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     _renderTextCommon: function(ctx, method) {
       ctx.save();
-      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
+      var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset(),
+          offsets = this._applyPatternGradientTransform(ctx, method === 'fillText' ? this.fill : this.stroke);
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         var heightOfLine = this.getHeightOfLine(i),
             maxHeight = heightOfLine / this.lineHeight,
@@ -25948,8 +25834,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           method,
           ctx,
           this._textLines[i],
-          left + leftOffset,
-          top + lineHeights + maxHeight,
+          left + leftOffset - offsets.offsetX,
+          top + lineHeights + maxHeight - offsets.offsetY,
           i
         );
         lineHeights += heightOfLine;
@@ -26009,8 +25895,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           charBox,
           boxWidth = 0,
           timeToRender,
-          path = this.path,
-          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path;
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
@@ -26021,7 +25906,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         return;
       }
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing || path;
+        timeToRender = i === len || this.charSpacing;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
@@ -26043,16 +25928,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
         if (timeToRender) {
-          if (path) {
-            ctx.save();
-            ctx.translate(charBox.renderLeft, charBox.renderTop);
-            ctx.rotate(charBox.angle);
-            this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
-            ctx.restore();
-          }
-          else {
-            this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
-          }
+          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
           charsToRender = '';
           actualStyle = nextStyle;
           left += boxWidth;
@@ -26060,73 +25936,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
       ctx.restore();
-    },
-
-    /**
-     * This function try to patch the missing gradientTransform on canvas gradients.
-     * transforming a context to transform the gradient, is going to transform the stroke too.
-     * we want to transform the gradient but not the stroke operation, so we create
-     * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-     * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
-     * is limited.
-     * @private
-     * @param {fabric.Gradient} filler a fabric gradient instance
-     * @return {CanvasPattern} a pattern to use as fill/stroke style
-     */
-    _applyPatternGradientTransformText: function(filler) {
-      var pCanvas = fabric.util.createCanvasElement(), pCtx,
-          // TODO: verify compatibility with strokeUniform
-          width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
-      pCanvas.width = width;
-      pCanvas.height = height;
-      pCtx = pCanvas.getContext('2d');
-      pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
-      pCtx.lineTo(0, height); pCtx.closePath();
-      pCtx.translate(width / 2, height / 2);
-      pCtx.fillStyle = filler.toLive(pCtx);
-      this._applyPatternGradientTransform(pCtx, filler);
-      pCtx.fill();
-      return pCtx.createPattern(pCanvas, 'no-repeat');
-    },
-
-    handleFiller: function(ctx, property, filler) {
-      var offsetX, offsetY;
-      if (filler.toLive) {
-        if (filler.gradientUnits === 'percentage' || filler.gradientTrasnform || filler.patternTransform) {
-          // need to transform gradient in a pattern.
-          // this is a slow process. If you are hitting this codepath, and the object
-          // is not using caching, you should consider switching it on.
-          // we need a canvas as big as the current object caching canvas.
-          offsetX = -this.width / 2;
-          offsetY = -this.height / 2;
-          ctx.translate(offsetX, offsetY);
-          ctx[property] = this._applyPatternGradientTransformText(filler);
-          return { offsetX: offsetX, offsetY: offsetY };
-        }
-        else {
-          // is a simple gradient or pattern
-          ctx[property] = filler.toLive(ctx, this);
-          return this._applyPatternGradientTransform(ctx, filler);
-        }
-      }
-      else {
-        // is a color
-        ctx[property] = filler;
-      }
-      return { offsetX: 0, offsetY: 0 };
-    },
-
-    _setStrokeStyles: function(ctx, decl) {
-      ctx.lineWidth = decl.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineDashOffset = this.strokeDashOffset;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
-    },
-
-    _setFillStyles: function(ctx, decl) {
-      return this.handleFiller(ctx, 'fillStyle', decl.fill);
     },
 
     /**
@@ -26144,19 +25953,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       var decl = this._getStyleDeclaration(lineIndex, charIndex),
           fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           shouldFill = method === 'fillText' && fullDecl.fill,
-          shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth,
-          fillOffsets, strokeOffsets;
+          shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
 
       if (!shouldStroke && !shouldFill) {
         return;
       }
-      ctx.save();
+      decl && ctx.save();
 
-      shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-      shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
-
-      ctx.font = this._getFontDeclaration(fullDecl);
-
+      this._applyCharStyles(method, ctx, lineIndex, charIndex, fullDecl);
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
@@ -26164,9 +25968,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (decl && decl.deltaY) {
         top += decl.deltaY;
       }
-      shouldFill && ctx.fillText(_char, left - fillOffsets.offsetX, top - fillOffsets.offsetY);
-      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.offsetX, top - strokeOffsets.offsetY);
-      ctx.restore();
+
+      shouldFill && ctx.fillText(_char, left, top);
+      shouldStroke && ctx.strokeText(_char, left, top);
+      decl && ctx.restore();
     },
 
     /**
@@ -26342,7 +26147,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill, path = this.path,
+          maxHeight, currentFill, lastFill,
           charSpacing = this._getWidthOfCharSpacing();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -26367,30 +26172,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
           _size = this.getHeightOfChar(i, j);
           _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
-          if (path && currentDecoration && currentFill) {
-            ctx.save();
+          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) &&
+              boxWidth > 0) {
             ctx.fillStyle = lastFill;
-            ctx.translate(charBox.renderLeft, charBox.renderTop);
-            ctx.rotate(charBox.angle);
-            ctx.fillRect(
-              -charBox.kernedWidth / 2,
-              this.offsets[type] * _size + _dy,
-              charBox.kernedWidth,
+            lastDecoration && lastFill && ctx.fillRect(
+              leftOffset + lineLeftOffset + boxStart,
+              top + this.offsets[type] * size + dy,
+              boxWidth,
               this.fontSize / 15
             );
-            ctx.restore();
-          }
-          else if (
-            (currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy)
-            && boxWidth > 0
-          ) {
-            lastDecoration && lastFill &&
-              ctx.fillRect(
-                leftOffset + lineLeftOffset + boxStart,
-                top + this.offsets[type] * size + dy,
-                boxWidth,
-                this.fontSize / 15
-              );
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
@@ -26509,22 +26299,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     set: function(key, value) {
       this.callSuper('set', key, value);
       var needsDims = false;
-      var isAddingPath = false;
       if (typeof key === 'object') {
         for (var _key in key) {
-          if (_key === 'path') {
-            this.setPathInfo();
-          }
           needsDims = needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
-          isAddingPath = isAddingPath || _key === 'path';
         }
       }
       else {
         needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
-        isAddingPath = key === 'path';
-      }
-      if (isAddingPath) {
-        this.setPathInfo();
       }
       if (needsDims) {
         this.initDimensions();
@@ -29967,7 +29748,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
-        if (lineWidth > desiredWidth && !lineJustStarted) {
+        if (lineWidth >= desiredWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
