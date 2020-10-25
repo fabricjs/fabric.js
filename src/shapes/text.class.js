@@ -977,10 +977,10 @@
 
     _setStrokeStyles: function(ctx, decl) {
       ctx.lineWidth = decl.strokeWidth;
-      ctx.lineCap = decl.strokeLineCap;
-      ctx.lineDashOffset = decl.strokeDashOffset;
-      ctx.lineJoin = decl.strokeLineJoin;
-      ctx.miterLimit = decl.strokeMiterLimit;
+      ctx.lineCap = this.strokeLineCap;
+      ctx.lineDashOffset = this.strokeDashOffset;
+      ctx.lineJoin = this.strokeLineJoin;
+      ctx.miterLimit = this.strokeMiterLimit;
       return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
     },
 
