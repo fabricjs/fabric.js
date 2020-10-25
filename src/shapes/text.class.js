@@ -567,7 +567,7 @@
             ctx.fillStyle = currentColor;
             currentColor && ctx.fillRect(
               -charBox.width / 2,
-              0,
+              -heightOfLine / this.lineHeight * (1 - this._fontSizeFraction),
               charBox.width,
               heightOfLine / this.lineHeight
             );
