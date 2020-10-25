@@ -180,7 +180,8 @@
       'lineHeight',
       'textBackgroundColor',
       'charSpacing',
-      'styles'),
+      'styles',
+      'path'),
 
     /**
      * List of properties to consider when checking if cache needs refresh
@@ -198,7 +199,8 @@
       'lineHeight',
       'textBackgroundColor',
       'charSpacing',
-      'styles'),
+      'styles',
+      'path'),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -322,10 +324,25 @@
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
+      if (this.path) {
+        this.setPathInfo();
+      }
       this.__skipDimension = false;
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
+    },
+
+    /**
+     * If text has a path, it will add the extra information needed
+     * for path and text calculations
+     * @return {fabric.Text} thisArg
+     */
+    setPathInfo: function() {
+      var path = this.path;
+      if (path) {
+        path.segmentsInfo = fabric.util.getPathSegmentsInfo(path.path);
+      }
     },
 
     /**
@@ -544,12 +561,12 @@
       if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
         return;
       }
-      var lineTopOffset = 0, heightOfLine,
+      var heightOfLine,
           lineLeftOffset, originalFill = ctx.fillStyle,
           line, lastColor,
           leftOffset = this._getLeftOffset(),
-          topOffset = this._getTopOffset(),
-          boxStart = 0, boxWidth = 0, charBox, currentColor;
+          lineTopOffset = this._getTopOffset(),
+          boxStart = 0, boxWidth = 0, charBox, currentColor, path = this.path;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -565,11 +582,24 @@
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-          if (currentColor !== lastColor) {
+          if (path) {
+            ctx.save();
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
+            ctx.fillStyle = currentColor;
+            currentColor && ctx.fillRect(
+              -charBox.width / 2,
+              0,
+              charBox.width,
+              heightOfLine / this.lineHeight
+            );
+            ctx.restore();
+          }
+          else if (currentColor !== lastColor) {
             ctx.fillStyle = lastColor;
             lastColor && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + lineTopOffset,
+              lineTopOffset,
               boxWidth,
               heightOfLine / this.lineHeight
             );
@@ -581,11 +611,11 @@
             boxWidth += charBox.kernedWidth;
           }
         }
-        if (currentColor) {
+        if (currentColor && !path) {
           ctx.fillStyle = currentColor;
           ctx.fillRect(
             leftOffset + lineLeftOffset + boxStart,
-            topOffset + lineTopOffset,
+            lineTopOffset,
             boxWidth,
             heightOfLine / this.lineHeight
           );
@@ -1367,6 +1397,9 @@
       var needsDims = false;
       if (typeof key === 'object') {
         for (var _key in key) {
+          if (_key === 'path') {
+            this.setPathInfo();
+          }
           needsDims = needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
         }
       }
