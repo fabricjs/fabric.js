@@ -266,6 +266,7 @@
     code: text8,
     width: 400,
     height: 150,
+    disabled: true,
     golden: 'text8.png',
     percentage: 0.06,
   });
