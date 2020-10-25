@@ -10,7 +10,9 @@
     return;
   }
 
-  var styleProps = 'fontFamily fontWeight fontSize text underline overline linethrough textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
+  var styleProps =
+    'fontFamily fontWeight fontSize text underline overline linethrough' +
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
 
   /**
    * Text class
