@@ -243,7 +243,7 @@
     test: 'Text percentage gradient',
     code: text7,
     golden: 'text7.png',
-    percentage: 0.05,
+    percentage: 0.06,
   });
 
   function text8(canvas, callback) {
