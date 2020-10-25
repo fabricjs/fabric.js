@@ -322,6 +322,9 @@
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
+      if (this.path) {
+        this.path.segmentsInfo = fabric.util.getPathSegmentsInfo(this.path.path);
+      }
       this.__skipDimension = false;
       this.initDimensions();
       this.setCoords();
@@ -1419,13 +1422,19 @@
     set: function(key, value) {
       this.callSuper('set', key, value);
       var needsDims = false;
+      var isAddingPath = false;
       if (typeof key === 'object') {
         for (var _key in key) {
           needsDims = needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
+          isAddingPath = isAddingPath || _key === 'path';
         }
       }
       else {
         needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
+        isAddingPath = key === 'path';
+      }
+      if (isAddingPath) {
+        this.path.segmentsInfo = fabric.util.getPathSegmentsInfo(this.path.path);
       }
       if (needsDims) {
         this.initDimensions();

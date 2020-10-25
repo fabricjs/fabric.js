@@ -327,5 +327,34 @@
     percentage: 0.09,
   });
 
+  function text10(canvas, callback) {
+    var path = new fabric.Path('M5 100 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0 z');
+    var test = new fabric.Text('this is a long text we need to wrap around a shape. - BETA feature -', {
+      left: 10,
+      top: 10,
+      fontSize: 16,
+      fontFamily: 'Arial',
+      paintFirst: 'stroke',
+      strokeWidth: 4,
+      strokeLineJoin: 'round',
+      strokeLineCap: 'round',
+      fill: 'blue',
+      stroke: 'red',
+      path: path
+    });
+    canvas.add(test);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text on a path',
+    code: text10,
+    width: 220,
+    height: 220,
+    golden: 'text10.png',
+    percentage: 0.06,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
