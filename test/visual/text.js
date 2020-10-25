@@ -163,6 +163,7 @@
   tests.push({
     test: 'Text with strokeWidths',
     code: text5,
+    disabled: true,
     golden: 'text5.png',
     percentage: 0.15,
   });
@@ -254,7 +255,6 @@
       fontSize: 300,
       scaleX: 0.2,
       scaleY: 0.2,
-      fontFamily: 'Ubuntu'
     });
     canvas.add(text);
     canvas.renderAll();
@@ -267,7 +267,6 @@
     width: 400,
     height: 150,
     golden: 'text8.png',
-    disabled: fabric.isLikelyNode,
     percentage: 0.06,
   });
 
