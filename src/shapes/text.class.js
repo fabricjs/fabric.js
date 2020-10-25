@@ -934,7 +934,7 @@
      * @param {fabric.Gradient} filler a fabric gradient instance
      */
     _applyPatternGradientTransformText: function(ctx, filler) {
-      var pCanvas = fabric.util.createCanvasElement(), pCtx, offset,
+      var pCanvas = fabric.util.createCanvasElement(), pCtx,
           width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
       pCanvas.width = width;
       pCanvas.height = height;
@@ -943,10 +943,9 @@
       pCtx.lineTo(0, height); pCtx.closePath();
       pCtx.translate(width / 2, height / 2);
       pCtx.fillStyle = filler.toLive(pCtx);
-      offset = this._applyPatternGradientTransform(pCtx, filler);
+      this._applyPatternGradientTransform(pCtx, filler);
       pCtx.fill();
-      offset.filler = pCtx.createPattern(pCanvas, 'no-repeat');
-      return offset;
+      return pCtx.createPattern(pCanvas, 'no-repeat');
     },
 
     handleFiller: function(ctx, property, filler) {
@@ -958,11 +957,11 @@
           // is not using caching, you should consider switching it on.
           // we need a canvas as big as the current object caching canvas.
           var offsets = this._applyPatternGradientTransformText(ctx, filler);
-          offsetX = this.width / 2 + this.strokeWidth / 2;
-          offsetY = this.height / 2 + this.strokeWidth / 2;
+          offsetX = -this.width / 2;
+          offsetY = -this.height / 2;
           ctx.translate(offsetX, offsetY);
           ctx[property] = offsets.filler;
-          return { x: offsetX, y: offsetX };
+          return { offsetX: offsetX, offsetY: offsetY };
         }
         else {
           // is a simple gradient or pattern
@@ -974,7 +973,7 @@
         // is a color
         ctx[property] = filler;
       }
-      return { x: 0, y: 0 };
+      return { offsetX: 0, offsetY: 0 };
     },
 
     _setStrokeStyles: function(ctx, decl) {
@@ -1025,8 +1024,8 @@
       if (decl && decl.deltaY) {
         top += decl.deltaY;
       }
-      shouldFill && ctx.fillText(_char, left + fillOffsets.x, top + fillOffsets.y);
-      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.x, top - strokeOffsets.y);
+      shouldFill && ctx.fillText(_char, left - fillOffsets.offsetX, top - fillOffsets.offsetY);
+      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.offsetX, top - strokeOffsets.offsetY);
       ctx.restore();
     },
 
