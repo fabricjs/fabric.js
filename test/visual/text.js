@@ -234,7 +234,6 @@
       top: 0,
       fontSize: 16,
       fill: gradient,
-      stroke: 'black',
     });
     canvas.add(text);
     canvas.renderAll();

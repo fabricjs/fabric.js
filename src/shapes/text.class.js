@@ -956,11 +956,10 @@
           // this is a slow process. If you are hitting this codepath, and the object
           // is not using caching, you should consider switching it on.
           // we need a canvas as big as the current object caching canvas.
-          var offsets = this._applyPatternGradientTransformText(ctx, filler);
           offsetX = -this.width / 2;
           offsetY = -this.height / 2;
           ctx.translate(offsetX, offsetY);
-          ctx[property] = offsets.filler;
+          ctx[property] = this._applyPatternGradientTransformText(ctx, filler);
           return { offsetX: offsetX, offsetY: offsetY };
         }
         else {
