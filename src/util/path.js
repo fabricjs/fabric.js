@@ -534,18 +534,21 @@
     return info;
   }
 
-  function getPointOnPath(path, perc, infos) {
+  function getPointOnPath(path, distance, infos) {
     if (!infos) {
       infos = getPathSegmentsInfo(path);
     }
-    var distance = infos[infos.length - 1] * perc, i = 0;
-    while ((distance - infos[i] > 0) && i < infos.length) {
-      distance -= infos[i];
+    // var distance = infos[infos.length - 1] * perc;
+    var i = 0;
+    while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
+      distance -= infos[i].length;
       i++;
     }
     var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.length, segment = path[i];
+        command = segInfo.command, segment = path[i];
     switch (command) {
+      case 'M':
+        return { x: segInfo.x, y: segInfo.y };
       case 'Z':
       case 'z':
         return new fabric.Point(segInfo.x, segInfo.y).lerp(

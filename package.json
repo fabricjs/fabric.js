@@ -45,7 +45,7 @@
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "link:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm link",
     "build_with_gestures": "node build.js modules=ALL exclude=accessors",
-    "build_export": "npm run build:fast && npm run export_dist_to_site && npm run build_with_gestures && npm run export_gesture_to_site",
+    "build_export": "npm run build:fast && npm run export_dist_to_site",
     "test:single": "qunit test/node_test_setup.js test/lib",
     "test": "nyc qunit test/node_test_setup.js test/lib test/unit",
     "test:visual": "qunit test/node_test_setup.js test/lib test/visual",

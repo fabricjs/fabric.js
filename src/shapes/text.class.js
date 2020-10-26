@@ -10,6 +10,10 @@
     return;
   }
 
+  var styleProps =
+    'fontFamily fontWeight fontSize text underline overline linethrough' +
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
+
   /**
    * Text class
    * @class fabric.Text
@@ -35,6 +39,7 @@
       'charSpacing',
       'textAlign',
       'styles',
+      'path'
     ],
 
     /**
@@ -167,37 +172,13 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('fontFamily',
-      'fontWeight',
-      'fontSize',
-      'text',
-      'underline',
-      'overline',
-      'linethrough',
-      'textAlign',
-      'fontStyle',
-      'lineHeight',
-      'textBackgroundColor',
-      'charSpacing',
-      'styles'),
+    stateProperties: fabric.Object.prototype.stateProperties.concat(styleProps),
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('fontFamily',
-      'fontWeight',
-      'fontSize',
-      'text',
-      'underline',
-      'overline',
-      'linethrough',
-      'textAlign',
-      'fontStyle',
-      'lineHeight',
-      'textBackgroundColor',
-      'charSpacing',
-      'styles'),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat(styleProps),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -321,10 +302,25 @@
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
+      if (this.path) {
+        this.setPathInfo();
+      }
       this.__skipDimension = false;
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
+    },
+
+    /**
+     * If text has a path, it will add the extra information needed
+     * for path and text calculations
+     * @return {fabric.Text} thisArg
+     */
+    setPathInfo: function() {
+      var path = this.path;
+      if (path) {
+        path.segmentsInfo = fabric.util.getPathSegmentsInfo(path.path);
+      }
     },
 
     /**
@@ -367,12 +363,18 @@
       }
       this._splitText();
       this._clearCache();
-      this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
+      if (this.path) {
+        this.width = this.path.width;
+        this.height = this.path.height;
+      }
+      else {
+        this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
+        this.height = this.calcTextHeight();
+      }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
-      this.height = this.calcTextHeight();
       this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
@@ -537,12 +539,12 @@
       if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
         return;
       }
-      var lineTopOffset = 0, heightOfLine,
+      var heightOfLine,
           lineLeftOffset, originalFill = ctx.fillStyle,
           line, lastColor,
           leftOffset = this._getLeftOffset(),
-          topOffset = this._getTopOffset(),
-          boxStart = 0, boxWidth = 0, charBox, currentColor;
+          lineTopOffset = this._getTopOffset(),
+          boxStart = 0, boxWidth = 0, charBox, currentColor, path = this.path;
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -558,11 +560,24 @@
         for (var j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-          if (currentColor !== lastColor) {
+          if (path) {
+            ctx.save();
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
+            ctx.fillStyle = currentColor;
+            currentColor && ctx.fillRect(
+              -charBox.width / 2,
+              -heightOfLine / this.lineHeight * (1 - this._fontSizeFraction),
+              charBox.width,
+              heightOfLine / this.lineHeight
+            );
+            ctx.restore();
+          }
+          else if (currentColor !== lastColor) {
             ctx.fillStyle = lastColor;
             lastColor && ctx.fillRect(
               leftOffset + lineLeftOffset + boxStart,
-              topOffset + lineTopOffset,
+              lineTopOffset,
               boxWidth,
               heightOfLine / this.lineHeight
             );
@@ -574,11 +589,11 @@
             boxWidth += charBox.kernedWidth;
           }
         }
-        if (currentColor) {
+        if (currentColor && !path) {
           ctx.fillStyle = currentColor;
           ctx.fillRect(
             leftOffset + lineLeftOffset + boxStart,
-            topOffset + lineTopOffset,
+            lineTopOffset,
             boxWidth,
             heightOfLine / this.lineHeight
           );
@@ -695,14 +710,28 @@
      */
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
-          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length);
+          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
+          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
 
       this.__charBounds[lineIndex] = lineBounds;
+      if (path) {
+        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+        startingPoint.x += path.pathOffset.x;
+        startingPoint.y += path.pathOffset.y;
+      }
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        if (path) {
+          if (positionInPath > totalPathLength) {
+            positionInPath %= totalPathLength;
+          }
+          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+        }
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
+        positionInPath += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
@@ -714,6 +743,26 @@
         height: this.fontSize
       };
       return { width: width, numOfSpaces: numOfSpaces };
+    },
+
+    /**
+     * Calculate the angle  and the left,top position of the char that follow a path.
+     * It appends it to graphemeInfo to be reused later at rendering
+     * @private
+     * @param {Number} positionInPath to be measured
+     * @param {Object} graphemeInfo current grapheme box information
+     * @param {Object} startingPoint position of the point
+     */
+    _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
+      var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
+          path = this.path;
+
+      // we are at currentPositionOnPath. we want to know what point on the path is.
+      var p1 = fabric.util.getPointOnPath(path.path, centerPosition - 0.1, path.segmentsInfo),
+          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 0.1, path.segmentsInfo);
+      graphemeInfo.renderLeft = p1.x - startingPoint.x;
+      graphemeInfo.renderTop = p1.y - startingPoint.y;
+      graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
     },
 
     /**
@@ -878,7 +927,8 @@
           charBox,
           boxWidth = 0,
           timeToRender,
-          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex);
+          path = this.path,
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path;
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
@@ -889,7 +939,7 @@
         return;
       }
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing;
+        timeToRender = i === len || this.charSpacing || path;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
@@ -911,7 +961,16 @@
           timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
         if (timeToRender) {
-          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          if (path) {
+            ctx.save();
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
+            this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
+            ctx.restore();
+          }
+          else {
+            this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+          }
           charsToRender = '';
           actualStyle = nextStyle;
           left += boxWidth;
@@ -1201,7 +1260,7 @@
           leftOffset = this._getLeftOffset(),
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
-          maxHeight, currentFill, lastFill,
+          maxHeight, currentFill, lastFill, path = this.path,
           charSpacing = this._getWidthOfCharSpacing();
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
@@ -1226,15 +1285,30 @@
           currentFill = this.getValueOfPropertyAt(i, j, 'fill');
           _size = this.getHeightOfChar(i, j);
           _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
-          if ((currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy) &&
-              boxWidth > 0) {
+          if (path && currentDecoration && currentFill) {
+            ctx.save();
             ctx.fillStyle = lastFill;
-            lastDecoration && lastFill && ctx.fillRect(
-              leftOffset + lineLeftOffset + boxStart,
-              top + this.offsets[type] * size + dy,
-              boxWidth,
+            ctx.translate(charBox.renderLeft, charBox.renderTop);
+            ctx.rotate(charBox.angle);
+            ctx.fillRect(
+              -charBox.kernedWidth / 2,
+              this.offsets[type] * _size + _dy,
+              charBox.kernedWidth,
               this.fontSize / 15
             );
+            ctx.restore();
+          }
+          else if (
+            (currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy)
+            && boxWidth > 0
+          ) {
+            lastDecoration && lastFill &&
+              ctx.fillRect(
+                leftOffset + lineLeftOffset + boxStart,
+                top + this.offsets[type] * size + dy,
+                boxWidth,
+                this.fontSize / 15
+              );
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
@@ -1353,13 +1427,22 @@
     set: function(key, value) {
       this.callSuper('set', key, value);
       var needsDims = false;
+      var isAddingPath = false;
       if (typeof key === 'object') {
         for (var _key in key) {
+          if (_key === 'path') {
+            this.setPathInfo();
+          }
           needsDims = needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
+          isAddingPath = isAddingPath || _key === 'path';
         }
       }
       else {
         needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
+        isAddingPath = key === 'path';
+      }
+      if (isAddingPath) {
+        this.setPathInfo();
       }
       if (needsDims) {
         this.initDimensions();
