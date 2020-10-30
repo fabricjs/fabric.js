@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.0.0-beta.6' };
+var fabric = fabric || { version: '4.2.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -64,7 +64,7 @@ fabric.SHARED_ATTRIBUTES = [
   'stroke-linejoin', 'stroke-miterlimit',
   'stroke-opacity', 'stroke-width',
   'id', 'paint-order', 'vector-effect',
-  'instantiated_by_use', 'clip-path'
+  'instantiated_by_use', 'clip-path',
 ];
 /* _FROM_SVG_END_ */
 
@@ -73,6 +73,7 @@ fabric.SHARED_ATTRIBUTES = [
  */
 fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+fabric.commaWsp = '(?:\\s+,?\\s*|,\\s*)'
 fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };

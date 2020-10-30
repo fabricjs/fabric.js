@@ -93,6 +93,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * can be overridden to do something different.
    * Scope of this implementation is: find the click position, set selectionStart
    * find selectionEnd, initialize the drawing of either cursor or selection area
+   * initializing a mousedDown on a text area will cancel fabricjs knowledge of
+   * current compositionMode. It will be set to false.
    */
   _mouseDownHandler: function(options) {
     if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
@@ -102,6 +104,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__isMousedown = true;
 
     if (this.selected) {
+      this.inCompositionMode = false;
       this.setCursorByClick(options.e);
     }
 

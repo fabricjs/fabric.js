@@ -519,6 +519,31 @@
     assert.ok(typeof canvasEl.getContext === 'function', 'the element returned is a canvas');
   });
 
+  QUnit.test('toCanvasElement activeSelection', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+
+    var cObj2 = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+
+    canvas.add(cObj, cObj2);
+
+    var activeSel = new fabric.ActiveSelection([cObj, cObj2], { canvas: canvas });
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 1');
+
+    activeSel.toCanvasElement();
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 2');
+
+    activeSel.destroy();
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 3');
+
+  });
+
   QUnit.test('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
     var cObj = new fabric.Rect({
       width: 100, height: 100, fill: 'red', strokeWidth: 0

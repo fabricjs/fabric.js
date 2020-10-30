@@ -345,7 +345,7 @@
 
       /** @ignore */
       var onLoadCallback = function () {
-        callback && callback.call(context, img);
+        callback && callback.call(context, img, false);
         img = img.onload = img.onerror = null;
       };
 
@@ -361,7 +361,10 @@
       // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
       // see https://code.google.com/p/chromium/issues/detail?id=315152
       //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      if (url.indexOf('data') !== 0 && crossOrigin) {
+      // crossOrigin null is the same as not set.
+      if (url.indexOf('data') !== 0 &&
+        crossOrigin !== undefined &&
+        crossOrigin !== null) {
         img.crossOrigin = crossOrigin;
       }
 
@@ -659,10 +662,10 @@
       var angle = atan2(a[1], a[0]),
           denom = pow(a[0], 2) + pow(a[1], 2),
           scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
+          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
           skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
       return {
-        angle: angle  / PiBy180,
+        angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
         skewX: skewX / PiBy180,
@@ -802,15 +805,6 @@
         flipY: target.flipY,
         top: target.top
       };
-    },
-
-    /**
-     * Returns string representation of function body
-     * @param {Function} fn Function to get body of
-     * @return {String} Function body
-     */
-    getFunctionBody: function(fn) {
-      return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
     },
 
     /**
@@ -973,6 +967,49 @@
       return 'matrix(' + transform.map(function(value) {
         return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
       }).join(' ') + ')';
+    },
+
+    /**
+     * given a width and height, return the size of the bounding box
+     * that can contains the box with width/height with applied transform
+     * described in options.
+     * Use to calculate the boxes around objects for controls.
+     * @memberOf fabric.util
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Object} options
+     * @param {Number} options.scaleX
+     * @param {Number} options.scaleY
+     * @param {Number} options.skewX
+     * @param {Number} options.skewY
+     * @return {Object.x} width of containing
+     * @return {Object.y} height of containing
+     */
+    sizeAfterTransform: function(width, height, options) {
+      var dimX = width / 2, dimY = height / 2,
+          points = [
+            {
+              x: -dimX,
+              y: -dimY
+            },
+            {
+              x: dimX,
+              y: -dimY
+            },
+            {
+              x: -dimX,
+              y: dimY
+            },
+            {
+              x: dimX,
+              y: dimY
+            }],
+          transformMatrix = fabric.util.calcDimensionsMatrix(options),
+          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+      return {
+        x: bbox.width,
+        y: bbox.height,
+      };
     }
   };
 })();

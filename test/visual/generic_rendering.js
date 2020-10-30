@@ -311,5 +311,55 @@
     height: 500,
   });
 
+  function imageSmoothing(fabricCanvas, callback) {
+    getFixture('greyfloral.png', false, function(img2) {
+      var fImg = new fabric.Image(img2, { imageSmoothing: false, scaleX: 10, scaleY: 10 });
+      var fImg2 = new fabric.Image(img2, { left: 400, scaleX: 10, scaleY: 10 });
+      fabricCanvas.add(fImg);
+      fabricCanvas.add(fImg2);
+      fabricCanvas.renderAll();
+      callback(fabricCanvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'fabric.Image with imageSmoothing false',
+    code: imageSmoothing,
+    // use the same golden on purpose
+    golden: 'imageSoothingOnObject.png',
+    percentage: 0.09,
+    width: 800,
+    height: 400,
+  });
+
+  function pathWithGradient(canvas, callback) {
+    var pathWithGradient = new fabric.Path('M 0 0 L 0 100 L 100 100 L 100 0 Z', {
+      fill: new fabric.Gradient({
+        gradientUnits: 'percentage',
+        coords: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        colorStops: [
+          { offset: 0, color: 'red' },
+          { offset: 1, color: 'black' }
+        ]
+      }),
+      height: 100,
+      width: 100,
+      top: 0,
+      left: 0
+    });
+    canvas.add(pathWithGradient);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'gradient should be applied to path',
+    code: pathWithGradient,
+    golden: 'pathWithGradient.png',
+    percentage: 0.06,
+    width: 100,
+    height: 100,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();

@@ -102,11 +102,9 @@
      * @return {String}
      */
     getSvgTextDecoration: function(style) {
-      if ('overline' in style || 'underline' in style || 'linethrough' in style) {
-        return (style.overline ? 'overline ' : '') +
-          (style.underline ? 'underline ' : '') + (style.linethrough ? 'line-through ' : '');
-      }
-      return '';
+      return ['overline', 'underline', 'line-through'].filter(function(decoration) {
+        return style[decoration.replace('-', '')];
+      }).join(' ');
     },
 
     /**

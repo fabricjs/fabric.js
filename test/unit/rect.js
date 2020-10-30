@@ -130,10 +130,11 @@
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
+    elRectWithAttrs.setAttributeNS(namespace, 'vector-effect', 'non-scaling-stroke');
     //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
-
     fabric.Rect.fromElement(elRectWithAttrs, function(rectWithAttrs) {
       assert.ok(rectWithAttrs instanceof fabric.Rect);
+      assert.equal(rectWithAttrs.strokeUniform, true, 'strokeUniform is parsed');
       var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
         left:             10,
         top:              20,
@@ -148,7 +149,8 @@
         strokeLineJoin:   'bevil',
         strokeMiterLimit: 5,
         rx:               11,
-        ry:               12
+        ry:               12,
+        // strokeUniform:    true
       });
       assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
     });

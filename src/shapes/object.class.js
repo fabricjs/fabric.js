@@ -606,6 +606,14 @@
     ).split(' '),
 
     /**
+     * List of properties to consider for animating colors.
+     * @type Array
+     */
+    colorProperties: (
+      'fill stroke backgroundColor'
+    ).split(' '),
+
+    /**
      * a fabricObject that, without stroke define a clipping area with their shape. filled in black
      * the clipPath object gets used when the object has rendered, and the context is placed in the center
      * of the object cacheCanvas.
@@ -810,13 +818,9 @@
      * @param {CanvasRenderingContext2D} ctx Context
      */
     transform: function(ctx) {
-      var m;
-      if (this.group && !this.group._transformDone) {
-        m = this.calcTransformMatrix();
-      }
-      else {
-        m = this.calcOwnMatrix();
-      }
+      var needFullTransform = (this.group && !this.group._transformDone) ||
+         (this.group && this.canvas && ctx === this.canvas.contextTop);
+      var m = this.calcTransformMatrix(!needFullTransform);
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     },
 
@@ -844,7 +848,6 @@
             strokeLineCap:            this.strokeLineCap,
             strokeDashOffset:         this.strokeDashOffset,
             strokeLineJoin:           this.strokeLineJoin,
-            // TODO: add this before release
             // strokeUniform:            this.strokeUniform,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
@@ -1036,7 +1039,7 @@
      */
     isNotVisible: function() {
       return this.opacity === 0 ||
-        (this.width === 0 && this.height === 0 && this.strokeWidth === 0) ||
+        (!this.width && !this.height && this.strokeWidth === 0) ||
         !this.visible;
     },
 
@@ -1206,8 +1209,6 @@
       }
       else {
         this._renderBackground(ctx);
-        this._setStrokeStyles(ctx, this);
-        this._setFillStyles(ctx, this);
       }
       this._render(ctx);
       this._drawClipPath(ctx);
@@ -1303,23 +1304,44 @@
     },
 
     _setStrokeStyles: function(ctx, decl) {
-      if (decl.stroke) {
+      var stroke = decl.stroke;
+      if (stroke) {
         ctx.lineWidth = decl.strokeWidth;
         ctx.lineCap = decl.strokeLineCap;
         ctx.lineDashOffset = decl.strokeDashOffset;
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
-        ctx.strokeStyle = decl.stroke.toLive
-          ? decl.stroke.toLive(ctx, this)
-          : decl.stroke;
+        if (stroke.toLive) {
+          if (stroke.gradientUnits === 'percentage' || stroke.gradientTrasnform || stroke.patternTransform) {
+            // need to transform gradient in a pattern.
+            // this is a slow process. If you are hitting this codepath, and the object
+            // is not using caching, you should consider switching it on.
+            // we need a canvas as big as the current object caching canvas.
+            this._applyPatternForTransformedGradient(ctx, stroke);
+          }
+          else {
+            // is a simple gradient or pattern
+            ctx.strokeStyle = stroke.toLive(ctx, this);
+            this._applyPatternGradientTransform(ctx, stroke);
+          }
+        }
+        else {
+          // is a color
+          ctx.strokeStyle = decl.stroke;
+        }
       }
     },
 
     _setFillStyles: function(ctx, decl) {
-      if (decl.fill) {
-        ctx.fillStyle = decl.fill.toLive
-          ? decl.fill.toLive(ctx, this)
-          : decl.fill;
+      var fill = decl.fill;
+      if (fill) {
+        if (fill.toLive) {
+          ctx.fillStyle = fill.toLive(ctx, this);
+          this._applyPatternGradientTransform(ctx, decl.fill);
+        }
+        else {
+          ctx.fillStyle = fill;
+        }
       }
     },
 
@@ -1489,7 +1511,7 @@
       }
 
       ctx.save();
-      this._applyPatternGradientTransform(ctx, this.fill);
+      this._setFillStyles(ctx, this);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1521,16 +1543,7 @@
         ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      if (this.stroke.toLive && this.stroke.gradientUnits === 'percentage') {
-        // need to transform gradient in a pattern.
-        // this is a slow process. If you are hitting this codepath, and the object
-        // is not using caching, you should consider switching it on.
-        // we need a canvas as big as the current object caching canvas.
-        this._applyPatternForTransformedGradient(ctx, this.stroke);
-      }
-      else {
-        this._applyPatternGradientTransform(ctx, this.stroke);
-      }
+      this._setStrokeStyles(ctx, this);
       ctx.stroke();
       ctx.restore();
     },
@@ -1735,7 +1748,7 @@
       canvas.add(this);
       var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.shadow = originalShadow;
-      this.canvas = originalCanvas;
+      this.set('canvas', originalCanvas);
       if (originalGroup) {
         this.group = originalGroup;
       }

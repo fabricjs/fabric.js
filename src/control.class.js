@@ -2,17 +2,9 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      degreesToRadians = fabric.util.degreesToRadians,
-      renderCircleControl = fabric.controlRenderers.renderCircleControl,
-      renderSquareControl = fabric.controlRenderers.renderSquareControl;
+  var fabric = global.fabric || (global.fabric = { });
 
   function Control(options) {
-    if (options.position) {
-      this.x = options.position.x;
-      this.y = options.position.y;
-    }
-    delete options.position;
     for (var i in options) {
       this[i] = options[i];
     }
@@ -47,18 +39,12 @@
 
     /**
      * Drawing angle of the control.
-     * Used to reuse the same drawing function for different rotated controls
+     * NOT used for now, but name marked as needed for internal logic
+     * example: to reuse the same drawing function for different rotated controls
      * @type {Number}
      * @default 0
      */
     angle: 0,
-
-    /**
-     * Maybe useless, maybe will get removed before releaseing
-     * @type {String}
-     * @default ''
-     */
-    name: '',
 
     /**
      * Relative position of the control. X
@@ -101,6 +87,38 @@
     offsetY: 0,
 
     /**
+     * Sets the length of the control. If null, defaults to object's cornerSize.
+     * Expects both sizeX and sizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    sizeX: null,
+
+    /**
+     * Sets the height of the control. If null, defaults to object's cornerSize.
+     * Expects both sizeX and sizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    sizeY: null,
+
+    /**
+     * Sets the length of the touch area of the control. If null, defaults to object's touchCornerSize.
+     * Expects both touchSizeX and touchSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    touchSizeX: null,
+
+    /**
+     * Sets the height of the touch area of the control. If null, defaults to object's touchCornerSize.
+     * Expects both touchSizeX and touchSizeY to be set when set.
+     * @type {?Number}
+     * @default null
+     */
+    touchSizeY: null,
+
+    /**
      * Css cursor style to display when the control is hovered.
      * if the method `cursorStyleHandler` is provided, this property is ignored.
      * @type {String}
@@ -117,6 +135,33 @@
     withConnection: false,
 
     /**
+     * The control actionHandler, provide one to handle action ( control being moved )
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    actionHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control handler for mouse down, provide one to handle mouse down on control
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseDownHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
+     * The control mouseUpHandler, provide one to handle an effect on mouse up.
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
+
+    /**
      * Returns control actionHandler
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
@@ -125,6 +170,28 @@
      */
     getActionHandler: function(/* eventData, transformData, fabricObject */) {
       return this.actionHandler;
+    },
+
+    /**
+     * Returns control mouseDown handler
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    getMouseDownHandler: function(/* eventData, fabricObject, control */) {
+      return this.mouseDownHandler;
+    },
+
+    /**
+     * Returns control mouseUp handler
+     * @param {Event} eventData the native mouse event
+     * @param {Object} transformData properties of the current transform
+     * @param {fabric.Object} object on which the control is displayed
+     * @return {Function}
+     */
+    getMouseUpHandler: function(/* eventData, fabricObject, control */) {
+      return this.mouseUpHandler;
     },
 
     /**
@@ -154,9 +221,14 @@
     /**
      * Returns controls visibility
      * @param {fabric.Object} object on which the control is displayed
+     * @param {String} controlKey key where the control is memorized on the
      * @return {Boolean}
      */
-    getVisibility: function(/*fabricObject */) {
+    getVisibility: function(fabricObject, controlKey) {
+      var objectVisibility = fabricObject._controlsVisibility;
+      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+        return objectVisibility[controlKey];
+      }
       return this.visible;
     },
 
@@ -170,42 +242,80 @@
     },
 
 
-    positionHandler: function(dim, finalMatrix, fabricObject /* currentControl */ ) {
-      var padding = fabricObject.padding, angle = degreesToRadians(fabricObject.angle),
-          cos = fabric.util.cos(angle), sin = fabric.util.sin(angle), offsetX = this.offsetX,
-          offsetY = this.offsetY, cosP = cos * padding, sinP = sin * padding, cosY = cos * offsetY,
-          cosX = cos * offsetX, sinY = sin * offsetY, sinX = sin * offsetX,
-          point = fabric.util.transformPoint({
-            x: (this.x * dim.x),
-            y: (this.y * dim.y) }, finalMatrix);
-      if (this.x > 0) {
-        point.y += sinP + sinX + cosY;
-        point.x += cosP + cosX - sinY;
-      }
-      if (this.y > 0) {
-        point.y += cosP + sinX + cosY;
-        point.x += -sinP + cosX - sinY;
-      }
-      // to be verified
-      if (this.x < 0) {
-        point.y += -sinP - sinX - cosY;
-        point.x += -cosP - cosX + sinY;
-      }
-      if (this.y < 0) {
-        point.y += -cosP - sinX + cosY;
-        point.x += sinP + cosX - sinY;
-      }
+    positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
+      var point = fabric.util.transformPoint({
+        x: this.x * dim.x + this.offsetX,
+        y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
     },
 
     /**
+     * Returns the coords for this control based on object values.
+     * @param {Number} objectAngle angle from the fabric object holding the control
+     * @param {Number} objectCornerSize cornerSize from the fabric object holding the control (or touchCornerSize if
+     *   isTouch is true)
+     * @param {Number} centerX x coordinate where the control center should be
+     * @param {Number} centerY y coordinate where the control center should be
+     * @param {boolean} isTouch true if touch corner, false if normal corner
+     */
+    calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
+      var cosHalfOffset,
+          sinHalfOffset,
+          cosHalfOffsetComp,
+          sinHalfOffsetComp,
+          xSize = (isTouch) ? this.touchSizeX : this.sizeX,
+          ySize = (isTouch) ? this.touchSizeY : this.sizeY;
+      if (xSize && ySize && xSize !== ySize) {
+        // handle rectangular corners
+        var controlTriangleAngle = Math.atan2(ySize, xSize);
+        var cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+        var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        var newThetaComp = Math.PI / 2 - controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta);
+        sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+        // use complementary angle for two corners
+        cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp);
+        sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
+      }
+      else {
+        // handle square corners
+        // use default object corner size unless size is defined
+        var cornerSize = (xSize && ySize) ? xSize : objectCornerSize;
+        /* 0.7071067812 stands for sqrt(2)/2 */
+        cornerHypotenuse = cornerSize * 0.7071067812;
+        // complementary angles are equal since they're both 45 degrees
+        var newTheta = fabric.util.degreesToRadians(45 - objectAngle);
+        cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newTheta);
+        sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newTheta);
+      }
+
+      return {
+        tl: {
+          x: centerX - sinHalfOffsetComp,
+          y: centerY - cosHalfOffsetComp,
+        },
+        tr: {
+          x: centerX + cosHalfOffset,
+          y: centerY - sinHalfOffset,
+        },
+        bl: {
+          x: centerX - cosHalfOffset,
+          y: centerY + sinHalfOffset,
+        },
+        br: {
+          x: centerX + sinHalfOffsetComp,
+          y: centerY + cosHalfOffsetComp,
+        },
+      };
+    },
+
+    /**
     * Render function for the control.
-    * When this function runs the context is already centered on the object and rotated with
-    * object angle. So when thinking of your rendering function think of the object align with the
-    * axis and your origin 0,0 is the center point of the control. Dimensions are in pixels, object
-    * scale or skew does not count.
+    * When this function runs the context is unscaled. unrotate. Just retina scaled.
+    * all the functions will have to translate to the point left,top before starting Drawing
+    * if they want to draw a control where the position is detected.
+    * left and top are the result of the positionHandler function
     * @param {RenderingContext2D} ctx the context where the control will be drawn
-    * @param {String} methodName fill or stroke, This is probably removed
     * @param {Number} left position of the canvas where we are about to render the control.
     * @param {Number} top position of the canvas where we are about to render the control.
     * @param {Object} styleOverride
@@ -213,15 +323,12 @@
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      if (!this.getVisibility(fabricObject)) {
-        return;
-      }
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };

@@ -1,6 +1,6 @@
 (function() {
 
-  function getCoords(coords) {
+  function arrayFromCoords(coords) {
     return [
       new fabric.Point(coords.tl.x, coords.tl.y),
       new fabric.Point(coords.tr.x, coords.tr.y),
@@ -9,22 +9,21 @@
     ];
   }
 
-  var degreesToRadians = fabric.util.degreesToRadians,
-      multiplyMatrices = fabric.util.multiplyTransformMatrices,
-      transformPoint = fabric.util.transformPoint;
+  var util = fabric.util,
+      degreesToRadians = util.degreesToRadians,
+      multiplyMatrices = util.multiplyTransformMatrices,
+      transformPoint = util.transformPoint;
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+  util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Describe object's corner position in canvas element coordinates.
-     * properties are tl,mt,tr,ml,mr,bl,mb,br,mtr for the main controls.
+     * properties are depending on control keys and padding the main controls.
      * each property is an object with x, y and corner.
      * The `corner` property contains in a similar manner the 4 points of the
      * interactive area of the corner.
-     * The coordinates depends from this properties: width, height, scaleX, scaleY
-     * skewX, skewY, angle, strokeWidth, viewportTransform, top, left, padding.
-     * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords;
+     * The coordinates depends from the controls positionHandler and are used
+     * to draw and locate controls
      * @memberOf fabric.Object.prototype
      */
     oCoords: null,
@@ -38,10 +37,18 @@
      * Those coordinates are useful to understand where an object is. They get updated
      * with oCoords but they do not need to be updated when zoom or panning change.
      * The coordinates get updated with @method setCoords.
-     * You can calculate them without updating with @method calcCoords(true);
+     * You can calculate them without updating with @method calcACoords();
      * @memberOf fabric.Object.prototype
      */
     aCoords: null,
+
+    /**
+     * Describe object's corner position in canvas element coordinates.
+     * includes padding. Used of object detection.
+     * set and refreshed with setCoords and calcCoords.
+     * @memberOf fabric.Object.prototype
+     */
+    lineCoords: null,
 
     /**
      * storage for object transform matrix
@@ -61,13 +68,28 @@
 
     /**
      * return correct set of coordinates for intersection
+     * this will return either aCoords or lineCoords.
+     * @param {Boolean} absolute will return aCoords if true or lineCoords
+     * @return {Object} {tl, tr, br, bl} points
+     */
+    _getCoords: function(absolute, calculate) {
+      if (calculate) {
+        return (absolute ? this.calcACoords() : this.calcLineCoords());
+      }
+      if (!this.aCoords || !this.lineCoords) {
+        this.setCoords(true);
+      }
+      return (absolute ? this.aCoords : this.lineCoords);
+    },
+
+    /**
+     * return correct set of coordinates for intersection
+     * this will return either aCoords or lineCoords.
+     * The coords are returned in an array.
+     * @return {Array} [tl, tr, br, bl] of points
      */
     getCoords: function(absolute, calculate) {
-      if (!this.oCoords) {
-        this.setCoords();
-      }
-      var coords = absolute ? this.aCoords : this.lineCoords;
-      return getCoords(calculate ? this.calcCoords(absolute) : coords);
+      return arrayFromCoords(this._getCoords(absolute, calculate));
     },
 
     /**
@@ -153,7 +175,7 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point, lines, absolute, calculate) {
-      var coords = calculate ? this.calcLineCoords(absolute) : absolute ? this.aCoords : this.lineCoords,
+      var coords = this._getCoords(absolute, calculate),
           lines = lines || this._getImageLines(coords),
           xPoints = this._findCrossPoints(point, lines);
       // if xPoints is odd then point is inside the object
@@ -171,12 +193,13 @@
         return false;
       }
       var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      var points = this.getCoords(true, calculate), point;
-      for (var i = 0; i < 4; i++) {
-        point = points[i];
-        if (point.x <= pointBR.x && point.x >= pointTL.x && point.y <= pointBR.y && point.y >= pointTL.y) {
-          return true;
-        }
+      var points = this.getCoords(true, calculate);
+      // if some point is on screen, the object is on screen.
+      if (points.some(function(point) {
+        return point.x <= pointBR.x && point.x >= pointTL.x &&
+        point.y <= pointBR.y && point.y >= pointTL.y;
+      })) {
+        return true;
       }
       // no points on screen, check intersection with absolute coordinates
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
@@ -216,7 +239,11 @@
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
-      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      var allPointsAreOutside = this.getCoords(true, calculate).every(function(point) {
+        return (point.x >= pointBR.x || point.x <= pointTL.x) &&
+        (point.y >= pointBR.y || point.y <= pointTL.y);
+      });
+      return allPointsAreOutside && this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
@@ -322,7 +349,7 @@
      */
     getBoundingRect: function(absolute, calculate) {
       var coords = this.getCoords(absolute, calculate);
-      return fabric.util.makeBoundingBoxFromPoints(coords);
+      return util.makeBoundingBoxFromPoints(coords);
     },
 
     /**
@@ -404,8 +431,10 @@
 
     /**
      * Calculates and returns the .coords of an object.
+     * unused by the library, only for the end dev.
      * @return {Object} Object with tl, tr, br, bl ....
      * @chainable
+     * @deprecated
      */
     calcCoords: function(absolute) {
       // this is a compatibility function to avoid removing calcCoords now.
@@ -415,27 +444,19 @@
       return this.calcOCoords();
     },
 
-    calcLineCoords: function(ignoreZoom) {
-      if (!this.aCoords) { this.aCoords = this.calcACoords(); }
-      var vpt = this.getViewportTransform();
-      var padding = this.padding, angle = degreesToRadians(this.angle),
-          cos = fabric.util.cos(angle), sin = fabric.util.sin(angle),
+    calcLineCoords: function() {
+      var vpt = this.getViewportTransform(),
+          padding = this.padding, angle = degreesToRadians(this.angle),
+          cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
-          cosPMinusSinP = cosP - sinP, aCoords = this.aCoords;
+          cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
 
       var lineCoords = {
-        tl: { x: aCoords.tl.x, y: aCoords.tl.y },
-        tr: { x: aCoords.tr.x, y: aCoords.tr.y },
-        bl: { x: aCoords.bl.x, y: aCoords.bl.y },
-        br: { x: aCoords.br.x, y: aCoords.br.y },
+        tl: transformPoint(aCoords.tl, vpt),
+        tr: transformPoint(aCoords.tr, vpt),
+        bl: transformPoint(aCoords.bl, vpt),
+        br: transformPoint(aCoords.br, vpt),
       };
-
-      if (!ignoreZoom) {
-        lineCoords.tl = transformPoint(aCoords.tl, vpt);
-        lineCoords.tr = transformPoint(aCoords.tr, vpt);
-        lineCoords.bl = transformPoint(aCoords.bl, vpt);
-        lineCoords.br = transformPoint(aCoords.br, vpt);
-      }
 
       if (padding) {
         lineCoords.tl.x -= cosPMinusSinP;
@@ -454,10 +475,11 @@
     calcOCoords: function() {
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
-          startMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           vpt = this.getViewportTransform(),
-          finalMatrix = multiplyMatrices(vpt, startMatrix),
-          dim = this._getTransformedDimensions(),
+          startMatrix = multiplyMatrices(vpt, translateMatrix),
+          finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
+          finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
+          dim = this._calculateCurrentDimensions(),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
@@ -493,22 +515,25 @@
 
     /**
      * Sets corner position coordinates based on current angle, width and height.
+     * oCoords are used to find the corners
+     * aCoords are used to quickly find an object on the canvas
+     * lineCoords are used to quickly find object during pointer events.
      * See {@link https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords|When-to-call-setCoords}
-     * @param {Boolean} [ignoreZoom] set oCoords with or without the viewport transform.
-     * @param {Boolean} [skipAbsolute] skip calculation of aCoords, useful in setViewportTransform
+     * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setCoords: function(ignoreZoom, skipAbsolute) {
-      // this.oCoords = this.calcCoords(ignoreZoom);
-      if (!skipAbsolute) {
-        this.aCoords = this.calcACoords();
+    setCoords: function(skipCorners) {
+      this.aCoords = this.calcACoords();
+      // in case we are in a group, for how the inner group target check works,
+      // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
+      this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
+      if (skipCorners) {
+        return this;
       }
-      this.oCoords = this.calcOCoords();
-      this.lineCoords = this.calcLineCoords(ignoreZoom);
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      ignoreZoom || (this._setCornerCoords && this._setCornerCoords());
-
+      this.oCoords = this.calcOCoords();
+      this._setCornerCoords && this._setCornerCoords();
       return this;
     },
 
@@ -517,7 +542,7 @@
      * @return {Array} rotation matrix for the object
      */
     _calcRotateMatrix: function() {
-      return fabric.util.calcRotateMatrix(this);
+      return util.calcRotateMatrix(this);
     },
 
     /**
@@ -543,19 +568,20 @@
      * calculate transform matrix that represents the current transformations from the
      * object's properties.
      * @param {Boolean} [skipGroup] return transform matrix for object not counting parent transformations
+     * There are some situation in which this is useful to avoid the fake rotation.
      * @return {Array} transform matrix for the object
      */
     calcTransformMatrix: function(skipGroup) {
-      if (skipGroup) {
-        return this.calcOwnMatrix();
+      var matrix = this.calcOwnMatrix();
+      if (skipGroup || !this.group) {
+        return matrix;
       }
-      var key = this.transformMatrixKey(), cache = this.matrixCache || (this.matrixCache = {});
+      var key = this.transformMatrixKey(skipGroup), cache = this.matrixCache || (this.matrixCache = {});
       if (cache.key === key) {
         return cache.value;
       }
-      var matrix = this.calcOwnMatrix();
       if (this.group) {
-        matrix = multiplyMatrices(this.group.calcTransformMatrix(), matrix);
+        matrix = multiplyMatrices(this.group.calcTransformMatrix(false), matrix);
       }
       cache.key = key;
       cache.value = matrix;
@@ -572,11 +598,20 @@
       if (cache.key === key) {
         return cache.value;
       }
-      var tMatrix = this._calcTranslateMatrix();
-      this.translateX = tMatrix[4];
-      this.translateY = tMatrix[5];
+      var tMatrix = this._calcTranslateMatrix(),
+          options = {
+            angle: this.angle,
+            translateX: tMatrix[4],
+            translateY: tMatrix[5],
+            scaleX: this.scaleX,
+            scaleY: this.scaleY,
+            skewX: this.skewX,
+            skewY: this.skewY,
+            flipX: this.flipX,
+            flipY: this.flipY,
+          };
       cache.key = key;
-      cache.value = fabric.util.composeMatrix(this);
+      cache.value = util.composeMatrix(options);
       return cache.value;
     },
 
@@ -589,7 +624,7 @@
      * @return {Object} .y height dimension
      */
     _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
-      return fabric.util.calcDimensionsMatrix({
+      return util.calcDimensionsMatrix({
         skewX: skewX,
         skewY: skewY,
         scaleX: this.scaleX * (flipping && this.flipX ? -1 : 1),
@@ -639,35 +674,13 @@
       if (noSkew) {
         return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
       }
-      else {
-        dimX /= 2;
-        dimY /= 2;
-      }
-      var points = [
-            {
-              x: -dimX,
-              y: -dimY
-            },
-            {
-              x: dimX,
-              y: -dimY
-            },
-            {
-              x: -dimX,
-              y: dimY
-            },
-            {
-              x: dimX,
-              y: dimY
-            }],
-          transformMatrix = fabric.util.calcDimensionsMatrix({
-            scaleX: this.scaleX,
-            scaleY: this.scaleY,
-            skewX: skewX,
-            skewY: skewY,
-          }),
-          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return this._finalizeDimensions(bbox.width, bbox.height);
+      var bbox = util.sizeAfterTransform(dimX, dimY, {
+        scaleX: this.scaleX,
+        scaleY: this.scaleY,
+        skewX: skewX,
+        skewY: skewY,
+      });
+      return this._finalizeDimensions(bbox.x, bbox.y);
     },
 
     /*
@@ -684,15 +697,16 @@
         :
         { x: width, y: height };
     },
+
     /*
-     * Calculate object dimensions for controls, including padding and canvas zoom.
+     * Calculate object dimensions for controls box, including padding and canvas zoom.
+     * and active selection
      * private
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
           p = transformPoint(dim, vpt, true);
-
       return p.scalarAdd(2 * this.padding);
     },
   });

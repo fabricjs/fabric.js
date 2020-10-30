@@ -645,7 +645,7 @@
       overline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline ';
+    var expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -655,7 +655,7 @@
       underline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline ';
+    var expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -666,7 +666,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -678,7 +678,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -829,5 +829,16 @@
     assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
   });
+
+  QUnit.test('text with a path', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    assert.ok(text.path, 'text has a path');
+    assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
+    assert.equal(text.width, 100, 'text is big as the path width');
+    assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
 
 })();

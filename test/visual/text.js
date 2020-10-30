@@ -163,8 +163,8 @@
   tests.push({
     test: 'Text with strokeWidths',
     code: text5,
-    golden: 'text5.png',
     disabled: true,
+    golden: 'text5.png',
     percentage: 0.15,
   });
 
@@ -244,8 +244,116 @@
     test: 'Text percentage gradient',
     code: text7,
     golden: 'text7.png',
-    disabled: !fabric.isLikelyNode,
-    percentage: 0.05,
+    percentage: 0.06,
+  });
+
+  function text8(canvas, callback) {
+    var text = new fabric.Text('Scaling down', {
+      left: 10,
+      top: 10,
+      fill: 'red',
+      fontSize: 300,
+      scaleX: 0.2,
+      scaleY: 0.2,
+    });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text with negative scaling',
+    code: text8,
+    width: 400,
+    height: 150,
+    disabled: true,
+    golden: 'text8.png',
+    percentage: 0.06,
+  });
+
+  function text9(canvas, callback) {
+    var canvasP = fabric.util.createCanvasElement();
+    canvasP.width = 10;
+    canvasP.height = 10;
+    var ctx = canvasP.getContext('2d');
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(0, 0, 5, 5);
+    ctx.fillStyle = 'red';
+    ctx.fillRect(5, 5, 5, 5);
+    ctx.fillStyle = 'yellow';
+    ctx.fillRect(5, 0, 5, 5);
+    ctx.fillStyle = 'purple';
+    ctx.fillRect(0, 5, 5, 5);
+    var pattern = new fabric.Pattern({ source: canvasP, patternTransform: [1, 0.3, 0.6, 0.8, 0, 0] });
+    var relGradient = new fabric.Gradient({
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 1,
+        y2: 0
+      },
+      gradientUnits: 'percentage',
+      colorStops: [{
+        offset: 0,
+        color: 'red',
+      }, {
+        offset: 1,
+        color: 'blue'
+      }]
+    });
+    var text = new fabric.Text('TEST', {
+      left: 5,
+      top: 5,
+      fontSize: 180,
+      fontFamily: 'Arial',
+      paintFirst: 'stroke',
+      strokeWidth: 12,
+      strokeLineJoin: 'round',
+      strokeLineCap: 'round',
+      stroke: relGradient,
+      fill: pattern,
+    });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text with pattern and gradient',
+    code: text9,
+    width: 480,
+    height: 190,
+    golden: 'text9.png',
+    percentage: 0.09,
+  });
+
+  function text10(canvas, callback) {
+    var path = new fabric.Path('M5 100 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0 z');
+    var test = new fabric.Text('this is a long text we need to wrap around a shape. - BETA feature -', {
+      left: 10,
+      top: 10,
+      fontSize: 16,
+      fontFamily: 'Arial',
+      paintFirst: 'stroke',
+      strokeWidth: 4,
+      strokeLineJoin: 'round',
+      strokeLineCap: 'round',
+      fill: 'blue',
+      stroke: 'red',
+      path: path
+    });
+    canvas.add(test);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text on a path',
+    code: text10,
+    width: 220,
+    height: 220,
+    golden: 'text10.png',
+    percentage: 0.06,
   });
 
   tests.forEach(visualTestLoop(QUnit));

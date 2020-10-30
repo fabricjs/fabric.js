@@ -7,6 +7,13 @@ var pkgPath = path.resolve(__dirname, './package.json');
 var pkgText = fs.readFileSync(pkgPath); // get original pkg text to restore it later
 var pkgObject = JSON.parse(pkgText); // parsed pkg to override its fields
 var args = process.argv.slice(2).join(' '); // args will be passed to npm publish (like --dry-run)
+var preRelease = process.env.PRE_RELEASE;
+
+// allow publishing of pre-releases with beta tag
+if (preRelease === 'true') {
+  console.log('Adding beta tag to NPM publish');
+  args = '--tag beta ' + args;
+}
 
 // override package.json with updated fields
 fs.writeFileSync(
@@ -16,6 +23,8 @@ fs.writeFileSync(
     version: pkgObject.version + '-browser',
   }), null, '\t')
 );
+
+console.log('npm publish ' + args);
 
 // publish -browser version
 cp.execSync('npm publish ' + args);

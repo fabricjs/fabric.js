@@ -204,7 +204,6 @@
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
-      this._setImageSmoothing();
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
@@ -296,7 +295,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -347,7 +346,7 @@
      *   originY: 'top'
      * });
      * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img) {
+     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img, isError) {
      *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
      *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
      * });
@@ -427,40 +426,28 @@
 
     /**
      * @private
-     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
-     */
-    _setImageSmoothing: function() {
-      var ctx = this.getContext();
-
-      ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
-        || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    },
-
-    /**
-     * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
+     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay. The first argument is the created image, the second argument is a flag indicating whether an error occured or not.
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
     __setBgOverlayImage: function(property, image, callback, options) {
       if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img) {
+        fabric.util.loadImage(image, function(img, isError) {
           if (img) {
             var instance = new fabric.Image(img, options);
             this[property] = instance;
             instance.canvas = this;
           }
-          callback && callback(img);
+          callback && callback(img, isError);
         }, this, options && options.crossOrigin);
       }
       else {
         options && image.setOptions(options);
         this[property] = image;
         image && (image.canvas = this);
-        callback && callback(image);
+        callback && callback(image, false);
       }
 
       return this;
@@ -619,7 +606,6 @@
         this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
       }
       this._initRetinaScaling();
-      this._setImageSmoothing();
       this.calcOffset();
 
       if (!options.cssOnly) {
@@ -690,14 +676,14 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject, object, ignoreVpt = false, skipAbsolute = true, i, len;
+      var activeObject = this._activeObject, object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords(ignoreVpt, skipAbsolute);
+        object.group || object.setCoords(true);
       }
-      if (activeObject && activeObject.type === 'activeSelection') {
-        activeObject.setCoords(ignoreVpt, skipAbsolute);
+      if (activeObject) {
+        activeObject.setCoords();
       }
       this.calcViewportBoundaries();
       this.renderOnAddRemove && this.requestRenderAll();
@@ -705,7 +691,10 @@
     },
 
     /**
-     * Sets zoom level of this canvas instance, zoom centered around point
+     * Sets zoom level of this canvas instance, the zoom centered around point
+     * meaning that following zoom to point with the same point will have the visual
+     * effect of the zoom originating from that point. The point won't move.
+     * It has nothing to do with canvas center or visual center of the viewport.
      * @param {fabric.Point} point to zoom with respect to
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
@@ -908,6 +897,7 @@
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
+      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
 
@@ -1399,7 +1389,14 @@
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = this._objects;
+          fontPaths = fabric.fontPaths, objects = [];
+
+      this._objects.forEach(function add(object) {
+        objects.push(object);
+        if (object._objects) {
+          object._objects.forEach(add);
+        }
+      });
 
       for (i = 0, len = objects.length; i < len; i++) {
         obj = objects[i];

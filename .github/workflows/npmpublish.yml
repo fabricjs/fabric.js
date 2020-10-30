@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - v3.x
-    types: [created]
+    types: [published]
 
 jobs:
   publish-npm:
@@ -17,7 +17,8 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: npm install
-      - run: npm build
+      - run: npm run build
       - run: node publish.js
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          PRE_RELEASE: ${{github.event.release.prerelease}}

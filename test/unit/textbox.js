@@ -179,6 +179,30 @@
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
+  QUnit.test('wrapping with charspacing and splitByGrapheme positive', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
+      width: 190,
+      splitByGrapheme: true,
+      charSpacing: 400
+    });
+    assert.deepEqual(
+      textbox.textLines,
+      ['xaxbx', 'cxdey', 'aybid'],
+      'lines match splitByGrapheme charSpacing 400'
+    );
+  });
+  QUnit.test('wrapping with charspacing and splitByGrapheme negative', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
+      width: 190,
+      splitByGrapheme: true,
+      charSpacing: -100
+    });
+    assert.deepEqual(
+      textbox.textLines,
+      ['xaxbxcxdeyay', 'bid'],
+      'lines match splitByGrapheme charSpacing -100'
+    );
+  });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
       width: 16,
@@ -490,6 +514,20 @@
     assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
     // assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
+  QUnit.test('The same text does not need to be wrapped.', function(assert) {
+    var str = '0123456789';
+    var measureTextbox = new fabric.Textbox(str, {
+      fontSize: 20,
+      splitByGrapheme: false,
+    });
+    var newTextbox = new fabric.Textbox(str, {
+      width: measureTextbox.width,
+      fontSize: 20,
+      splitByGrapheme: true,
+    });
+    assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
 
 })();

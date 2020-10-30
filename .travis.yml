@@ -27,9 +27,6 @@ env:
   global:
     - LAUNCHER=Node
 
-matrix:
-  fast_finish: true
-
 jobs:
   fast_finish: true
   allow_failures:
@@ -64,7 +61,7 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Node
-      node_js: "13"
+      node_js: "14"
     - stage: Unit Tests
       env: LAUNCHER=Node
       node_js: "12"
@@ -89,17 +86,17 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
-      os: osx
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      os: windows
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
+    #   os: osx
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   os: windows
 script: npm run build:fast && npm run test
 
 dist: bionic
