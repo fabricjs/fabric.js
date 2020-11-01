@@ -465,6 +465,28 @@
     return tmpLen;
   }
 
+  // add explanation in docs
+  function findPercentageForDistance(segInfo, distance) {
+    var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
+        p, nextLen, nextStep = 0.01;
+    while (tmpLen < distance && perc <= 1 && nextStep > 0.0000001) {
+      p = iterator(perc);
+      nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
+      // compare tmpLen each cycle with distance, decide next perc to test.
+      if ((nextLen + tmpLen) > distance) {
+        // we discard this step and we make smaller steps.
+        nextStep /= 2;
+        perc -= nextStep;
+      }
+      else {
+        tempP = p;
+        perc += nextStep;
+        tmpLen += nextLen;
+      }
+    }
+    return p;
+  }
+
   //measures the length of a pre-simplified path
   function getPathSegmentsInfo(path) {
     var totalLength = 0, len = path.length, current,
@@ -500,6 +522,7 @@
             current[5],
             current[6]
           );
+          tempInfo.iterator = iterator;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[5];
           y1 = current[6];
@@ -513,6 +536,7 @@
             current[3],
             current[4]
           );
+          tempInfo.iterator = iterator;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[3];
           y1 = current[4];
@@ -546,6 +570,7 @@
     }
     var segInfo = infos[i], segPercent = distance / segInfo.length,
         command = segInfo.command, segment = path[i];
+
     switch (command) {
       case 'M':
         return { x: segInfo.x, y: segInfo.y };
@@ -555,35 +580,15 @@
           new fabric.Point(segInfo.destX, segInfo.destY),
           segPercent
         );
-        break;
       case 'L':
         return new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segment[1], segment[2]),
           segPercent
         );
-        break;
       case 'C':
-        return getPointOnCubicBezierIterator(
-          segInfo.x,
-          segInfo.y,
-          segment[1],
-          segment[2],
-          segment[3],
-          segment[4],
-          segment[5],
-          segment[6]
-        )(segPercent);
-        break;
+        return findPercentageForDistance(segInfo, distance);
       case 'Q':
-        return getPointOnQuadraticBezierIterator(
-          segInfo.x,
-          segInfo.y,
-          segment[1],
-          segment[2],
-          segment[3],
-          segment[4]
-        )(segPercent);
-        break;
+        return findPercentageForDistance(segInfo, distance);
     }
   }
 
@@ -685,6 +690,7 @@
 
   /**
    * Draws arc
+   * @deprecated
    * @param {CanvasRenderingContext2D} ctx
    * @param {Number} fx
    * @param {Number} fy
