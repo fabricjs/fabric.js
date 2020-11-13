@@ -60,7 +60,7 @@
     },
 
     /**
-     * Searches the objects on the stage for the highlight layer 
+     * Searches the objects on the stage for the highlight layer
      * @return {Number} index of highlight layer or -1 if not found
      */
     getHighlightLayerIndex: function() {
@@ -86,6 +86,17 @@
     addHighlight: function(path) {
       var highlightLayerIndex = this.getHighlightLayerIndex();
       return this.insertAt(path, highlightLayerIndex);
+    },
+
+    /**
+     * Adds background to the stage right after the drawing highlight layer
+     * @param {Object} object Object to insert
+     * @return {Self} thisArg
+     * @chainable
+     */
+    addBackground: function(background) {
+      var backgroundLayerIndex = this.getHighlightLayerIndex() + 1;
+      return this.insertAt(background, backgroundLayerIndex);
     },
 
     /**
