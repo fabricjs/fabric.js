@@ -276,7 +276,8 @@
           'toObject',
           ['cropX', 'cropY'].concat(propertiesToInclude)
         ), {
-          src: this.getSrc(),
+          // Highlight layer is for in-progress drawing and does not require the src
+          src: this.isHighlightLayer ? null : this.getSrc(),
           crossOrigin: this.getCrossOrigin(),
           filters: filters,
         });

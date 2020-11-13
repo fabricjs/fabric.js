@@ -12176,6 +12176,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         var canvasBuffer = document.createElement('canvas');
         canvasBuffer.width  = this.width * scale;
         canvasBuffer.height = this.height * scale;
+        canvasBuffer.getContext('2d').scale(scale, scale);
         this.highlightDrawingCanvasEl = canvasBuffer;
       }
 
@@ -12193,7 +12194,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // TODO: save original top so we can revert to using that for drawing if needed
       // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
       this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
-      this.contextTop.scale(scale, scale);
     },
 
     /**
@@ -20555,7 +20555,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           'toObject',
           ['cropX', 'cropY'].concat(propertiesToInclude)
         ), {
-          src: this.getSrc(),
+          // Highlight layer is for in-progress drawing and does not require the src
+          src: this.isHighlightLayer ? null : this.getSrc(),
           crossOrigin: this.getCrossOrigin(),
           filters: filters,
         });
