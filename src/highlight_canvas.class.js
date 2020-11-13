@@ -39,6 +39,7 @@
         var canvasBuffer = document.createElement('canvas');
         canvasBuffer.width  = this.width * scale;
         canvasBuffer.height = this.height * scale;
+        canvasBuffer.getContext('2d').scale(scale, scale);
         this.highlightDrawingCanvasEl = canvasBuffer;
       }
 
@@ -56,7 +57,6 @@
       // TODO: save original top so we can revert to using that for drawing if needed
       // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
       this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
-      this.contextTop.scale(scale, scale);
     },
 
     /**
