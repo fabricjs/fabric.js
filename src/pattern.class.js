@@ -168,7 +168,7 @@
      * @return {CanvasPattern}
      */
     toLive: function(ctx) {
-      var source = this.source;
+      var source = typeof this.source === 'function' ? this.source() : this.source;
       // if the image failed to load, return, and allow rest to continue loading
       if (!source) {
         return '';
