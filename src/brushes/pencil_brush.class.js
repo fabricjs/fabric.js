@@ -28,14 +28,9 @@
      * @param {Object} pointer
      */
     _drawSegment: function (ctx, p1, p2) {
-      var midPoint = p1.midPointFrom(p2);
-      // MMZ: No reason to use more complex render operation
-      // TODO: confirm no reason it needs to be this way
-      // TODO: see what other optimizations we can have around this, like killing the midPoint here...
-      //ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
-      return midPoint;
+      return p2;
     },
 
     /**
@@ -200,11 +195,7 @@
       path.push('M ', p1.x - multSignX * width, ' ', p1.y - multSignY * width, ' ');
       for (i = 1; i < len; i++) {
         if (!p1.eq(p2)) {
-          var midPoint = p1.midPointFrom(p2);
-          // p1 is our bezier control point
-          // midpoint is our endpoint
-          // start point is p(i-1) value.
-          path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
+          path.push('L ', p1.x, ' ', p1.y);
         }
         p1 = points[i];
         if ((i + 1) < points.length) {
