@@ -214,7 +214,10 @@
         multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
         multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
       }
-      path.push('L ', p1.x + multSignX * width, ' ', p1.y + multSignY * width);
+      path.push('L ', 
+        fabric.util.toFixed(p1.x + multSignX * width, fabric.Path.NUM_PATH_DIGITS), 
+        ' ', 
+        fabric.util.toFixed(p1.y + multSignY * width, fabric.Path.NUM_PATH_DIGITS));
       return path;
     },
 
