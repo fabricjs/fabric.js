@@ -352,6 +352,8 @@
     }
   };
 
+  fabric.Path.NUM_PATH_DIGITS = 0;
+
   /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)

@@ -183,6 +183,11 @@
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points) {
+      for(i = 0; i < points.length; i++)
+      {
+        points[i].x = fabric.util.toFixed(points[i].x, fabric.Path.NUM_PATH_DIGITS);
+        points[i].y = fabric.util.toFixed(points[i].y, fabric.Path.NUM_PATH_DIGITS);
+      }
       var path = [], i, width = this.width / 1000,
           p1 = new fabric.Point(points[0].x, points[0].y),
           p2 = new fabric.Point(points[1].x, points[1].y),
@@ -192,7 +197,10 @@
         multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
         multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
       }
-      path.push('M ', p1.x - multSignX * width, ' ', p1.y - multSignY * width, ' ');
+      path.push('M ', fabric.util.toFixed(p1.x - multSignX * width, fabric.Path.NUM_PATH_DIGITS)
+                    , ' ' 
+                    , fabric.util.toFixed(p1.y - multSignY * width,fabric.Path.NUM_PATH_DIGITS)
+                    , ' ');
       for (i = 1; i < len; i++) {
         if (!p1.eq(p2)) {
           path.push('L ', p1.x, ' ', p1.y);
@@ -257,6 +265,66 @@
     },
 
     /**
+     * collapse path by removing inner colinear points
+     */
+    simplifyPath: function(fullPath) {
+    // we start with [0], the M of the path
+    var newPath = [fullPath[0]] 
+    // the first point will also always get pushed
+    var baseIndex = 1 
+    // checkIndex is set in the loop
+    var checkIndex
+    // use these to avoid removing extents if the line changes direction 180deg
+    var xInc, xDec, yInc, yDec 
+
+    do
+    {
+        var baseElement = fullPath[baseIndex]
+        newPath.push(baseElement)
+        xInc = yInc = xDec = yDec = false
+        checkIndex = baseIndex+1
+        if(checkIndex === fullPath.length -1) {
+            break;
+        }
+        
+        while(checkIndex < fullPath.length - 1) {
+            var checkElement = fullPath[checkIndex]
+            if(checkElement[1] === baseElement[1] && !xInc && !xDec) {
+                if(checkElement[2] > baseElement[2] && yDec !== true) {
+                    yInc = true
+                }else if(checkElement[2] < baseElement[2] && yInc !== true) {
+                    yDec = true
+                }else {
+                    baseIndex = checkIndex
+                    break
+                }
+            }
+            else if(checkElement[2] === baseElement[2] && !yInc && !yDec) {
+                if(checkElement[1] > baseElement[1] && xDec !== true) {
+                    xInc = true
+                }else if(checkElement[1] < baseElement[1] && xInc !== true) {
+                    xDec = true
+                }else {
+                    baseIndex = checkIndex
+                    break
+                }
+            } else {
+                baseIndex = checkIndex
+                break
+            }
+            checkIndex++
+        }
+    } while(checkIndex < fullPath.length - 1)
+
+    // always push the line ending
+    newPath.push(fullPath[fullPath.length - 1])
+    
+    return newPath
+    },
+
+
+
+    /**
      * On mouseup after drawing the path on contextTop canvas
      * we use the points captured to create an new fabric path object
      * and add it to the fabric canvas.
@@ -278,6 +346,9 @@
       }
 
       var path = this.createPath(pathData);
+      if(this.simplifyPath) {
+          path.path = this.simplifyPath(path.path)
+      }
       this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
       
