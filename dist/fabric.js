@@ -10442,9 +10442,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       }
 
       var path = this.createPath(pathData);
-      if (this.simplifyPath) {
-         path.path = this.simplifyPath(path.path)
-      }
+      path.path = this.simplifyPath(path.path);
+      
       this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
       
