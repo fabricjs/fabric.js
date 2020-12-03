@@ -270,71 +270,70 @@
      * collapse path by removing inner colinear points
      */
     simplifyPath: function(fullPath) {
-    // we start with [0], the M of the path
-    var newPath = [fullPath[0]] 
-    // the first point will also always get pushed
-    var baseIndex = 1 
-    // checkIndex is set in the loop
-    var checkIndex
-    // use these to avoid removing extents if the line changes direction 180deg
-    var xInc, xDec, yInc, yDec 
-    do {
+      // we start with [0], the M of the path
+      var newPath = [fullPath[0]] 
+      // the first point will also always get pushed
+      var baseIndex = 1 
+      // checkIndex is set in the loop
+      var checkIndex
+      // use these to avoid removing extents if the line changes direction 180deg
+      var xInc, xDec, yInc, yDec 
+      do {
         var baseElement = fullPath[baseIndex]
         newPath.push(baseElement)
         xInc = yInc = xDec = yDec = false
         checkIndex = baseIndex+1
-        if (checkIndex === fullPath.length -1) {
-            break
+        if (checkIndex === fullPath.length - 1) {
+          break
         }
         while (checkIndex < fullPath.length - 1) {
-            var checkElement = fullPath[checkIndex]
-            if (checkElement[1] === baseElement[1] && !xInc && !xDec) {
-                if (checkElement[2] > baseElement[2] && yDec !== true) {
-                    yInc = true
-                }
-                else if (checkElement[2] < baseElement[2] && yInc !== true) {
-                    yDec = true
-                    if (yInc || yDec) {
-                        var prevElement = fullPath[checkIndex - 1]
-                        newPath.push(prevElement)
-                    }
-                    baseIndex = checkIndex
-                    break
-                }
+          var checkElement = fullPath[checkIndex]
+          if (checkElement[1] === baseElement[1] && !xInc && !xDec) {
+            if (checkElement[2] > baseElement[2] && yDec !== true) {
+              yInc = true
             }
-            else if (checkElement[2] === baseElement[2] && !yInc && !yDec) {
-                if (checkElement[1] > baseElement[1] && xDec !== true) {
-                    xInc = true
-                }
-                else if (checkElement[1] < baseElement[1] && xInc !== true) {
-                    xDec = true
-                }
-                else {
-                    if(xInc || xDec){
-                        var prevElement = fullPath[checkIndex - 1]
-                        newPath.push(prevElement)
-                    }
-                    baseIndex = checkIndex
-                    break
-                }
-            } 
+            else if (checkElement[2] < baseElement[2] && yInc !== true) {
+              yDec = true
+              if (yInc || yDec) {
+                var prevElement = fullPath[checkIndex - 1]
+                newPath.push(prevElement)
+              }
+              baseIndex = checkIndex
+              break
+            }
+          }
+          else if (checkElement[2] === baseElement[2] && !yInc && !yDec) {
+            if (checkElement[1] > baseElement[1] && xDec !== true) {
+              xInc = true
+            }
+            else if (checkElement[1] < baseElement[1] && xInc !== true) {
+              xDec = true
+            }
             else {
-                if(xInc || xDec || yInc || yDec){
-                    var prevElement = fullPath[checkIndex - 1]
-                    newPath.push(prevElement)
-                }
-                baseIndex = checkIndex
-                break
+              if(xInc || xDec){
+                var prevElement = fullPath[checkIndex - 1]
+                newPath.push(prevElement)
+              }
+              baseIndex = checkIndex
+              break
             }
-            checkIndex++
+          } 
+          else {
+            if(xInc || xDec || yInc || yDec){
+              var prevElement = fullPath[checkIndex - 1]
+              newPath.push(prevElement)
+            }
+            baseIndex = checkIndex
+            break
+          }
+          checkIndex++
         }
-    } while (checkIndex < fullPath.length - 1)
-    // always push the line ending
-    newPath.push(fullPath[fullPath.length - 1])
-    return newPath
+      } while (checkIndex < fullPath.length - 1)
+      // always push the line ending
+      newPath.push(fullPath[fullPath.length - 1])
+      return newPath
     },
-
-
+  
 
     /**
      * On mouseup after drawing the path on contextTop canvas
