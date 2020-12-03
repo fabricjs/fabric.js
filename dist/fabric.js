@@ -10268,8 +10268,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points) {
-      for(i = 0; i < points.length; i++)
-      {
+      for (i = 0; i < points.length; i++) {
         points[i].x = fabric.util.toFixed(points[i].x, fabric.Path.NUM_PATH_DIGITS);
         points[i].y = fabric.util.toFixed(points[i].y, fabric.Path.NUM_PATH_DIGITS);
       }
@@ -10364,27 +10363,23 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     var checkIndex
     // use these to avoid removing extents if the line changes direction 180deg
     var xInc, xDec, yInc, yDec 
-
-    do
-    {
+    do {
         var baseElement = fullPath[baseIndex]
         newPath.push(baseElement)
         xInc = yInc = xDec = yDec = false
         checkIndex = baseIndex+1
-        if(checkIndex === fullPath.length -1) {
-            break;
+        if (checkIndex === fullPath.length -1) {
+            break
         }
-        
-        while(checkIndex < fullPath.length - 1) {
+        while (checkIndex < fullPath.length - 1) {
             var checkElement = fullPath[checkIndex]
-            //x is the same
-            if(checkElement[1] === baseElement[1] && !xInc && !xDec) {
-                if(checkElement[2] > baseElement[2] && yDec !== true) {
+            if (checkElement[1] === baseElement[1] && !xInc && !xDec) {
+                if (checkElement[2] > baseElement[2] && yDec !== true) {
                     yInc = true
-                }else if(checkElement[2] < baseElement[2] && yInc !== true) {
+                }
+                else if (checkElement[2] < baseElement[2] && yInc !== true) {
                     yDec = true
-                }else {
-                    if(yInc || yDec){
+                    if (yInc || yDec) {
                         var prevElement = fullPath[checkIndex - 1]
                         newPath.push(prevElement)
                     }
@@ -10392,12 +10387,14 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
                     break
                 }
             }
-            else if(checkElement[2] === baseElement[2] && !yInc && !yDec) {
-                if(checkElement[1] > baseElement[1] && xDec !== true) {
+            else if (checkElement[2] === baseElement[2] && !yInc && !yDec) {
+                if (checkElement[1] > baseElement[1] && xDec !== true) {
                     xInc = true
-                }else if(checkElement[1] < baseElement[1] && xInc !== true) {
+                }
+                else if (checkElement[1] < baseElement[1] && xInc !== true) {
                     xDec = true
-                }else {
+                }
+                else {
                     if(xInc || xDec){
                         var prevElement = fullPath[checkIndex - 1]
                         newPath.push(prevElement)
@@ -10405,7 +10402,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
                     baseIndex = checkIndex
                     break
                 }
-            } else {
+            } 
+            else {
                 if(xInc || xDec || yInc || yDec){
                     var prevElement = fullPath[checkIndex - 1]
                     newPath.push(prevElement)
@@ -10415,11 +10413,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
             }
             checkIndex++
         }
-    } while(checkIndex < fullPath.length - 1)
-
+    } while (checkIndex < fullPath.length - 1)
     // always push the line ending
     newPath.push(fullPath[fullPath.length - 1])
-    
     return newPath
     },
 
@@ -10447,7 +10443,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       }
 
       var path = this.createPath(pathData);
-      if(this.simplifyPath) {
+      if (this.simplifyPath) {
          path.path = this.simplifyPath(path.path)
       }
       this.canvas.clearContext(this.canvas.contextTop);

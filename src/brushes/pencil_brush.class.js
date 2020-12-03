@@ -284,7 +284,7 @@
         xInc = yInc = xDec = yDec = false
         checkIndex = baseIndex+1
         if (checkIndex === fullPath.length -1) {
-            break;
+            break
         }
         while (checkIndex < fullPath.length - 1) {
             var checkElement = fullPath[checkIndex]
@@ -294,7 +294,7 @@
                 }
                 else if (checkElement[2] < baseElement[2] && yInc !== true) {
                     yDec = true
-                    if(yInc || yDec){
+                    if (yInc || yDec) {
                         var prevElement = fullPath[checkIndex - 1]
                         newPath.push(prevElement)
                     }
