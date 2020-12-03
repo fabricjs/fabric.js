@@ -10377,12 +10377,17 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         
         while(checkIndex < fullPath.length - 1) {
             var checkElement = fullPath[checkIndex]
+            //x is the same
             if(checkElement[1] === baseElement[1] && !xInc && !xDec) {
                 if(checkElement[2] > baseElement[2] && yDec !== true) {
                     yInc = true
                 }else if(checkElement[2] < baseElement[2] && yInc !== true) {
                     yDec = true
                 }else {
+                    if(yInc || yDec){
+                        var prevElement = fullPath[checkIndex - 1]
+                        newPath.push(prevElement)
+                    }
                     baseIndex = checkIndex
                     break
                 }
@@ -10393,10 +10398,18 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
                 }else if(checkElement[1] < baseElement[1] && xInc !== true) {
                     xDec = true
                 }else {
+                    if(xInc || xDec){
+                        var prevElement = fullPath[checkIndex - 1]
+                        newPath.push(prevElement)
+                    }
                     baseIndex = checkIndex
                     break
                 }
             } else {
+                if(xInc || xDec || yInc || yDec){
+                    var prevElement = fullPath[checkIndex - 1]
+                    newPath.push(prevElement)
+                }
                 baseIndex = checkIndex
                 break
             }
@@ -10435,7 +10448,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
       var path = this.createPath(pathData);
       if(this.simplifyPath) {
-          path.path = this.simplifyPath(path.path)
+         path.path = this.simplifyPath(path.path)
       }
       this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
