@@ -162,7 +162,7 @@
       // to clear just itext area we need to transform the context
       // it may not be worth it
       if (shouldClear && canvas) {
-        canvas.clearContext(canvas.contextCursor || canvas.contextContainer);
+        canvas.clearContext(canvas.contextTextbox || canvas.contextContainer);
       }
 
     },

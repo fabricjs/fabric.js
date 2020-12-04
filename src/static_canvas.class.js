@@ -249,16 +249,16 @@
       var scaleRatio = fabric.devicePixelRatio;
       this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
       if (this.upperCanvasEl) {
-        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl,this.contextTop, this.contextCursor);
+        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl,this.contextTop, this.contextTextbox);
       }
     },
 
-    __initRetinaScaling: function(scaleRatio, canvas, context, contextCursor) {
+    __initRetinaScaling: function(scaleRatio, canvas, context, contextTextbox) {
       canvas.setAttribute('width', this.width * scaleRatio);
       canvas.setAttribute('height', this.height * scaleRatio);
       context.scale(scaleRatio, scaleRatio);
-      if (contextCursor) {
-        contextCursor.scale(scaleRatio, scaleRatio);
+      if (contextTextbox) {
+        contextTextbox.scale(scaleRatio, scaleRatio);
       }
     },
 
