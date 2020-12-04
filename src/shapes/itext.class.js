@@ -279,11 +279,11 @@
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextCursor) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
       var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextCursor;
+          ctx = this.canvas.contextTop;
       this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);

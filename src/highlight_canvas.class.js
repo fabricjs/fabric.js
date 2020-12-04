@@ -56,7 +56,6 @@
       // (3) Hijack contextTop
       // TODO: save original top so we can revert to using that for drawing if needed
       // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
-      this.contextCursor = this.contextTop;
       this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
     },
 
