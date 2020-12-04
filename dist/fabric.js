@@ -8366,14 +8366,17 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       var scaleRatio = fabric.devicePixelRatio;
       this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
       if (this.upperCanvasEl) {
-        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
+        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl,this.contextTop, this.contextTextbox);
       }
     },
 
-    __initRetinaScaling: function(scaleRatio, canvas, context) {
+    __initRetinaScaling: function(scaleRatio, canvas, context, contextTextbox) {
       canvas.setAttribute('width', this.width * scaleRatio);
       canvas.setAttribute('height', this.height * scaleRatio);
       context.scale(scaleRatio, scaleRatio);
+      if (contextTextbox) {
+        contextTextbox.scale(scaleRatio, scaleRatio);
+      }
     },
 
 
@@ -11771,6 +11774,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
+      this.contextTextbox = this.contextTop;
     },
 
     /**
@@ -12012,6 +12016,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       wrapper.removeChild(this.lowerCanvasEl);
       this.contextCache = null;
       this.contextTop = null;
+      this.contextTextbox = null;
       ['upperCanvasEl', 'cacheCanvasEl'].forEach((function(element) {
         fabric.util.cleanUpJsdomNode(this[element]);
         this[element] = undefined;
@@ -12184,6 +12189,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // (3) Hijack contextTop
       // TODO: save original top so we can revert to using that for drawing if needed
       // TODO: add a drawingModeType that controls contextTop + PencilBrush behavior
+
+      // save original contentTop to use for rendering textbox cursor
+      this.contextTextbox = this.contextTop;
       this.contextTop = this.highlightDrawingCanvasEl.getContext('2d');
     },
 
@@ -13532,6 +13540,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
+      this.contextTextbox = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
@@ -13546,6 +13555,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
       this.contextTop = originalContextTop;
+      this.contextTextbox = this.contextTop;
       return canvasEl;
     },
   });
@@ -27202,10 +27212,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
-      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      var ctx = this.canvas.contextTextbox, v = this.canvas.viewportTransform;
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this.transform(ctx);
@@ -27217,11 +27227,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
       var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextTop;
+          ctx = this.canvas.contextTextbox;
       this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
@@ -27613,7 +27623,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       // to clear just itext area we need to transform the context
       // it may not be worth it
       if (shouldClear && canvas) {
-        canvas.clearContext(canvas.contextTop || canvas.contextContainer);
+        canvas.clearContext(canvas.contextTextbox || canvas.contextContainer);
       }
 
     },

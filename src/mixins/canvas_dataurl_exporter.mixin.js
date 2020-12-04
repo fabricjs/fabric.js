@@ -76,6 +76,7 @@
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
+      this.contextTextbox = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
@@ -90,6 +91,7 @@
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
       this.contextTop = originalContextTop;
+      this.contextTextbox = this.contextTop;
       return canvasEl;
     },
   });
