@@ -965,6 +965,7 @@
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
+      this.contextTextbox = this.contextTop;
     },
 
     /**
@@ -1206,6 +1207,7 @@
       wrapper.removeChild(this.lowerCanvasEl);
       this.contextCache = null;
       this.contextTop = null;
+      this.contextTextbox = null;
       ['upperCanvasEl', 'cacheCanvasEl'].forEach((function(element) {
         fabric.util.cleanUpJsdomNode(this[element]);
         this[element] = undefined;

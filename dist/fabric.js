@@ -11774,6 +11774,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
+      this.contextTextbox = this.contextTop;
     },
 
     /**
@@ -12015,6 +12016,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       wrapper.removeChild(this.lowerCanvasEl);
       this.contextCache = null;
       this.contextTop = null;
+      this.contextTextbox = null;
       ['upperCanvasEl', 'cacheCanvasEl'].forEach((function(element) {
         fabric.util.cleanUpJsdomNode(this[element]);
         this[element] = undefined;
@@ -13538,6 +13540,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
+      this.contextTextbox = null;
       this.enableRetinaScaling = false;
       this.interactive = false;
       this.viewportTransform = newVp;
@@ -13552,6 +13555,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.interactive = originalInteractive;
       this.enableRetinaScaling = originalRetina;
       this.contextTop = originalContextTop;
+      this.contextTextbox = this.contextTop;
       return canvasEl;
     },
   });
