@@ -65,7 +65,9 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
-      if (this.limitedToCanvasSize === true && (pointer.x < 0 || pointer.x > this.canvas.getWidth() || pointer.y < 0 || pointer.y > this.canvas.getHeight())) {
+      if (this.limitedToCanvasSize === true
+      && (pointer.x < 0 || pointer.x > this.canvas.getWidth()
+      || pointer.y < 0 || pointer.y > this.canvas.getHeight())) {
         return;
       }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
