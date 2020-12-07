@@ -264,10 +264,10 @@
      * Prepare and clean the contextTop
      */
     clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
-      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      var ctx = this.canvas.contextTextbox, v = this.canvas.viewportTransform;
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this.transform(ctx);
@@ -279,11 +279,11 @@
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
       var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextTop;
+          ctx = this.canvas.contextTextbox;
       this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
