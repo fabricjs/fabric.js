@@ -16,6 +16,8 @@ If you have any questions, contact NewXP:<br>
 
 Information on how this fork has been customized for usage @ Amplify please see [here](https://docs.google.com/document/d/1kBNWIeKwgj1_GATsXrWccClUhRgWDwyIrNJpDj30V_Y)
 
+A diff with all changes since the fork can be found [here](https://github.com/amplify-education/fabric.js/compare/v4.2.0...amplify-education:main).
+
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
