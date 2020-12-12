@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case in a JSFIDDLE
+about: Create a report with a reproducible test case in a JSFIDDLE, For anything else that is not a bug with a reproducible test case use the github DISCUSSIONS feature. Anything different than a bug report will be closed withoout a reply.
 
 ---
 
