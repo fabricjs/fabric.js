@@ -1,8 +1,14 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case in a JSFIDDLE, For anything else that is not a bug with a reproducible test case use the github DISCUSSIONS feature. Anything different than a bug report will be closed withoout a reply.
+about: Create a report with a reproducible test case in a JSFIDDLE, For anything else that is not a bug with a reproducible test case use the github DISCUSSIONS feature. Anything different than a bug report will be closed automatically.
 
 ---
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 
 <!-- BUG TEMPLATE -->
 ## Version
