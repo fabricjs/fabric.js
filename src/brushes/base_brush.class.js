@@ -10,7 +10,7 @@ fabric.BaseBrush = fabric.util.createClass(
      * @type String
      * @default
      */
-    color: "rgb(0, 0, 0)",
+    color: 'rgb(0, 0, 0)',
 
     /**
      * Width of a brush, has to be a Number, no string literals
@@ -33,14 +33,14 @@ fabric.BaseBrush = fabric.util.createClass(
      * @type String
      * @default
      */
-    strokeLineCap: "round",
+    strokeLineCap: 'round',
 
     /**
      * Corner style of a brush (one of "bevel", "round", "miter")
      * @type String
      * @default
      */
-    strokeLineJoin: "round",
+    strokeLineJoin: 'round',
 
     /**
      * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
@@ -75,7 +75,7 @@ fabric.BaseBrush = fabric.util.createClass(
       ctx.lineCap = this.strokeLineCap;
       ctx.miterLimit = this.strokeMiterLimit;
       ctx.lineJoin = this.strokeLineJoin;
-      if (fabric.StaticCanvas.supports("setLineDash")) {
+      if (fabric.StaticCanvas.supports('setLineDash')) {
         ctx.setLineDash(this.strokeDashArray || []);
       }
     },
@@ -101,9 +101,9 @@ fabric.BaseBrush = fabric.util.createClass(
       }
 
       var canvas = this.canvas,
-        shadow = this.shadow,
-        ctx = canvas.contextTop,
-        zoom = canvas.getZoom();
+          shadow = this.shadow,
+          ctx = canvas.contextTop,
+          zoom = canvas.getZoom();
       if (canvas && canvas._isRetinaScaling()) {
         zoom *= fabric.devicePixelRatio;
       }
@@ -126,7 +126,7 @@ fabric.BaseBrush = fabric.util.createClass(
     _resetShadow: function () {
       var ctx = this.canvas.contextTop;
 
-      ctx.shadowColor = "";
+      ctx.shadowColor = '';
       ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
     },
 
@@ -136,13 +136,13 @@ fabric.BaseBrush = fabric.util.createClass(
      * @private
      */
 
-     _isOutSideCanvas: function(pointer) {
+    _isOutSideCanvas: function(pointer) {
       if (pointer.x < 0 || pointer.x > this.canvas.getWidth() || pointer.y < 0 || pointer.y > this.canvas.getHeight()) {
         return true;
       }
       else {
-        return false
+        return false;
       }
-     }
+    }
   }
 );
