@@ -14,15 +14,6 @@
     decimate: 0.4,
 
     /**
-     * When `true`, the free drawing is limited to the whiteboard size. Default to false.
-     * @type Boolean
-     * @default false
-     */
-
-    limitedToCanvasSize: false,
-
-
-    /**
      * Constructor
      * @param {fabric.Canvas} canvas
      * @return {fabric.PencilBrush} Instance of a pencil brush
@@ -65,7 +56,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
-      if (this.limitedToCanvasSize === true && (pointer.x < 0 || pointer.x > this.canvas.getHeight() || pointer.x < 0 || pointer.y > this.canvas.getWidth())) {
+      if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
         return;
       }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {

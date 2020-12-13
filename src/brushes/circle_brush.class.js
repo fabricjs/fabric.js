@@ -76,6 +76,9 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
       this._render();
     }
     else {
+      if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+        return;
+      }
       this.drawDot(pointer);
     }
   },
