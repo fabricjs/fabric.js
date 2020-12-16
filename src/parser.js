@@ -139,7 +139,7 @@
       return value;
     }
     else if (attr === 'imageSmoothing') {
-      return (value === 'optimizeQuality' ? true : false);
+      return (value === 'optimizeQuality');
     }
     else {
       parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
