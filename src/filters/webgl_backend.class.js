@@ -68,7 +68,7 @@
     /**
      * Experimental. This object is a sort of repository of help layers used to avoid
      * of recreating them during frequent filtering. If you are previewing a filter with
-     * a slider you problably do not want to create help layers every filter step.
+     * a slider you probably do not want to create help layers every filter step.
      * in this object there will be appended some canvases, created once, resized sometimes
      * cleared never. Clearing is left to the developer.
      **/
@@ -245,7 +245,7 @@
     /**
      * Create a WebGL texture object.
      *
-     * Accepts specific dimensions to initialize the textuer to or a source image.
+     * Accepts specific dimensions to initialize the texture to or a source image.
      *
      * @param {WebGLRenderingContext} gl The GL context to use for creating the texture.
      * @param {Number} width The width to initialize the texture at.

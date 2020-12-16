@@ -356,7 +356,7 @@
     },
 
     /**
-     * Retores original state of each of group objects (original state is that which was before group was created).
+     * Restores original state of each of group objects (original state is that which was before group was created).
      * @private
      * @return {fabric.Group} thisArg
      * @chainable

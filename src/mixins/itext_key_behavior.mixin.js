@@ -201,7 +201,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         removeTo = selectionEnd;
       }
       else if (backDelete) {
-        // detect differencies between forwardDelete and backDelete
+        // detect differences between forwardDelete and backDelete
         removeFrom = selectionEnd - removedText.length;
         removeTo = selectionEnd;
       }

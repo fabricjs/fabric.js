@@ -343,7 +343,7 @@
     strokeLineCap:            'butt',
 
     /**
-     * Corner style of an object's stroke (one of "bevil", "round", "miter")
+     * Corner style of an object's stroke (one of "bevel", "round", "miter")
      * @type String
      * @default
      */
@@ -373,7 +373,7 @@
     /**
      * Scale factor of object's controlling borders
      * bigger number will make a thicker border
-     * border is 1, so this is basically a border tickness
+     * border is 1, so this is basically a border thickness
      * since there is no way to change the border itself.
      * @type Number
      * @default
@@ -1087,7 +1087,7 @@
     /**
      * return true if the object will draw a stroke
      * Does not consider text styles. This is just a shortcut used at rendering time
-     * We want it to be an aproximation and be fast.
+     * We want it to be an approximation and be fast.
      * wrote to avoid extra caching, it has to return true when stroke happens,
      * can guess when it will not happen at 100% chance, does not matter if it misses
      * some use case where the stroke is invisible.
@@ -1101,7 +1101,7 @@
     /**
      * return true if the object will draw a fill
      * Does not consider text styles. This is just a shortcut used at rendering time
-     * We want it to be an aproximation and be fast.
+     * We want it to be an approximation and be fast.
      * wrote to avoid extra caching, it has to return true when fill happens,
      * can guess when it will not happen at 100% chance, does not matter if it misses
      * some use case where the fill is invisible.

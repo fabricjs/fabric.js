@@ -123,7 +123,7 @@
   }
 
   tests.push({
-    test: 'polygon postion independently from strokeWidth and origin',
+    test: 'polygon position independently from strokeWidth and origin',
     code: polygonWithStroke,
     golden: 'polygonWithStroke.png',
     percentage: 0.09,

@@ -147,7 +147,7 @@
     elPolygonWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2)');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
     fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
       var expectedPoints = [
@@ -164,7 +164,7 @@
         'strokeWidth':      3,
         'strokeDashArray':  [5, 2],
         'strokeLineCap':    'round',
-        'strokeLineJoin':   'bevil',
+        'strokeLineJoin':   'bevel',
         'strokeMiterLimit': 5,
         'opacity':          0.34,
         'points':           expectedPoints,

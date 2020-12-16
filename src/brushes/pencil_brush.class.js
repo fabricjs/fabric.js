@@ -34,7 +34,7 @@
     },
 
     /**
-     * Inovoked on mouse down
+     * Invoked on mouse down
      * @param {Object} pointer
      */
     onMouseDown: function(pointer, options) {
@@ -49,7 +49,7 @@
     },
 
     /**
-     * Inovoked on mouse move
+     * Invoked on mouse move
      * @param {Object} pointer
      */
     onMouseMove: function(pointer, options) {
@@ -234,7 +234,7 @@
     },
 
     /**
-     * Decimate poins array with the decimate value
+     * Decimate points array with the decimate value
      */
     decimatePoints: function(points, distance) {
       if (points.length <= 2) {
