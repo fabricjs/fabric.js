@@ -141,7 +141,7 @@
     elPolylineWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2)');
     elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
 
     fabric.Polyline.fromElement(elPolylineWithAttrs, function(polylineWithAttrs) {
@@ -154,7 +154,7 @@
         'strokeWidth': 3,
         'strokeDashArray': [5, 2],
         'strokeLineCap': 'round',
-        'strokeLineJoin': 'bevil',
+        'strokeLineJoin': 'bevel',
         'strokeMiterLimit': 5,
         'opacity': 0.34,
         'points': expectedPoints,

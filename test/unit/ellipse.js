@@ -127,7 +127,7 @@
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
-        strokeLineJoin   = 'bevil',
+        strokeLineJoin   = 'bevel',
         strokeMiterLimit = 5;
 
     elEllipse.setAttributeNS(namespace, 'rx', rx);

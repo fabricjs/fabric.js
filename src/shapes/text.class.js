@@ -227,7 +227,7 @@
 
     /**
      * Object containing character styles - top-level properties -> line numbers,
-     * 2nd-level properties - charater numbers
+     * 2nd-level properties - character numbers
      * @type Object
      * @default
      */
@@ -236,7 +236,7 @@
     /**
      * Reference to a context to measure text char or couple of chars
      * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
-     * once created it will be referenced on fabric._measuringContext to avoide creating a canvas for every
+     * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
      * text object created.
      * @type {CanvasRenderingContext2D}
      * @default
@@ -244,7 +244,7 @@
     _measuringContext: null,
 
     /**
-     * Baseline shift, stlyes only, keep at 0 for the main text object
+     * Baseline shift, styles only, keep at 0 for the main text object
      * @type {Number}
      * @default
      */
@@ -324,7 +324,7 @@
     },
 
     /**
-     * Return a contex for measurement of text string.
+     * Return a context for measurement of text string.
      * if created it gets stored for reuse
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -985,7 +985,7 @@
      * transforming a context to transform the gradient, is going to transform the stroke too.
      * we want to transform the gradient but not the stroke operation, so we create
      * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-     * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
+     * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
      * is limited.
      * @private
      * @param {fabric.Gradient} filler a fabric gradient instance
@@ -1234,7 +1234,7 @@
     /**
      * Retrieves the value of property at given character position
      * @param {Number} lineIndex the line number
-     * @param {Number} charIndex the charater number
+     * @param {Number} charIndex the character number
      * @param {String} property the property name
      * @returns the value of 'property'
      */

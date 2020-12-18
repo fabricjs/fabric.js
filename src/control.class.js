@@ -25,7 +25,7 @@
     visible: true,
 
     /**
-     * Name of the action that the controll will likely execute.
+     * Name of the action that the control will likely execute.
      * This is optional. FabricJS uses to identify what the user is doing for some
      * extra optimizations. If you are writing a custom control and you want to know
      * somewhere else in the code what is going on, you can use this string here.
@@ -69,7 +69,7 @@
      * Positive offset moves the control to the right, negative to the left.
      * It used when you want to have position of control that does not scale with
      * the bounding box. Example: rotation control is placed at x:0, y: 0.5 on
-     * the boundindbox, with an offset of 30 pixels vertivally. Those 30 pixels will
+     * the boundindbox, with an offset of 30 pixels vertically. Those 30 pixels will
      * stay 30 pixels no matter how the object is big. Another example is having 2
      * controls in the corner, that stay in the same position when the object scale.
      * of the bounding box.

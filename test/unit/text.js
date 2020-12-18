@@ -220,7 +220,7 @@
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
     elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
@@ -248,7 +248,7 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         fontFamily:       'Monaco',
         paintFirst:       'fill',

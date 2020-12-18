@@ -128,7 +128,7 @@
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elRectWithAttrs.setAttributeNS(namespace, 'vector-effect', 'non-scaling-stroke');
     //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
@@ -146,7 +146,7 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         rx:               11,
         ry:               12,
