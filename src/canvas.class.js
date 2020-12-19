@@ -637,8 +637,9 @@
       }
 
       var pointer = this.getPointer(e), corner = target.__corner,
+          control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
-            target.controls[corner].getActionHandler() : fabric.controlsUtils.dragHandler,
+            control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
