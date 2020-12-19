@@ -702,6 +702,12 @@
   fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
   fabric.util.fromArcToBeziers = fromArcToBeziers;
+    /**
+   * Typo of `fromArcToBeziers` kept for not breaking the api once corrected.
+   * Will be removed in fabric 5.0
+   * @deprecated
+   */
+  fabric.util. fromArcToBeizers = fromArcToBeziers;
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   // kept because we do not want to make breaking changes.
