@@ -407,7 +407,14 @@
       }
       return objsToRender;
     },
-
+    getBackgroundImage(){
+      return this..backgroundImage.src;
+    },
+    
+    removeBackgroundImage(){
+      this.backgroundImage = null
+    },
+                                          
     /**
      * Renders both the top canvas and the secondary container canvas.
      * @return {fabric.Canvas} instance
