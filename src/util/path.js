@@ -229,7 +229,13 @@
     return segsNorm;
   };
 
-
+  /**
+   * This function take a parsed SVG path and make it simpler for fabricJS logic.
+   * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
+   * S converted in C, T converted in Q, A converted in C.
+   * @param {Array} path the array of commands of a parsed svg path for fabric.Path
+   * @return {Array} the simplified array of commands of a parsed svg path for fabric.Path
+   */
   function makePathSimpler(path) {
     // x and y represent the last point of the path. the previous command point.
     // we add them to each relative command to make it an absolute comment.
@@ -455,6 +461,8 @@
     };
   }
 
+  // this will run over a path segment ( a cubic or quadratic segment) and approximate it
+  // with 100 segemnts. This will good enough to calculate the length of the curve
   function pathIterator(iterator, x1, y1) {
     var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
     for (perc = 0.01; perc <= 1; perc += 0.01) {
@@ -465,11 +473,20 @@
     return tmpLen;
   }
 
-  // add explanation in docs
+  /**
+   * Given a pathInfo, and a distance in pixels, find the percentage from 0 to 1
+   * that correspond to that pixels run over the path.
+   * The percentage will be then used to find the correct point on the canvas for the path.
+   * @param {Array} segInfo fabricJS collection of information on a parsed path
+   * @param {Number} distance from starting point, in pixels.
+   * @return {Number} length of segment
+   */
   function findPercentageForDistance(segInfo, distance) {
     var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
         p, nextLen, nextStep = 0.01;
-    while (tmpLen < distance && perc <= 1 && nextStep > 0.0000001) {
+    // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
+    // the path
+    while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
       p = iterator(perc);
       nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
       // compare tmpLen each cycle with distance, decide next perc to test.
@@ -487,7 +504,12 @@
     return p;
   }
 
-  //measures the length of a pre-simplified path
+  /**
+   * Run over a parsed and simplifed path and extrac some informations.
+   * informations are length of each command and starting point
+   * @param {Array} path fabricJS parsed path commands
+   * @return {Array} path commands informations
+   */
   function getPathSegmentsInfo(path) {
     var totalLength = 0, len = path.length, current,
         //x2 and y2 are the coords of segment start
