@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.2.0' };
+var fabric = fabric || { version: '4.3.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -73,7 +73,7 @@ fabric.SHARED_ATTRIBUTES = [
  */
 fabric.DPI = 96;
 fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
-fabric.commaWsp = '(?:\\s+,?\\s*|,\\s*)'
+fabric.commaWsp = '(?:\\s+,?\\s*|,\\s*)';
 fabric.rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };
