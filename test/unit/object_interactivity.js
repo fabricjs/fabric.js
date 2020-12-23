@@ -44,7 +44,7 @@
     cObj.controls.tl.setVisibility(false);
     assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
     cObj.setControlVisible('tl', true);
-    assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precendence');
+    assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precedence');
     // restore original visibility
     cObj.controls.tl.setVisibility(true);
   });

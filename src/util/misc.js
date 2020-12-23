@@ -959,7 +959,7 @@
     /**
      * given an array of 6 number returns something like `"matrix(...numbers)"`
      * @memberOf fabric.util
-     * @param {Array} trasnform an array with 6 numbers
+     * @param {Array} transform an array with 6 numbers
      * @return {String} transform matrix for svg
      * @return {Object.y} Limited dimensions by Y
      */

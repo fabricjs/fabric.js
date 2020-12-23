@@ -23,8 +23,8 @@
       iText.doubleClickHandler({
         e: eventData
       });
-      assert.equal(iText.selectionStart, 0, 'dblClcik selection start is');
-      assert.equal(iText.selectionEnd, 4, 'dblClcik selection end is');
+      assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
+      assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
       var eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
@@ -34,8 +34,8 @@
       iText.doubleClickHandler({
         e: eventData
       });
-      assert.equal(iText.selectionStart, 20, 'second dblClcik selection start is');
-      assert.equal(iText.selectionEnd, 26, 'second dblClcik selection end is');
+      assert.equal(iText.selectionStart, 20, 'second dblClick selection start is');
+      assert.equal(iText.selectionEnd, 26, 'second dblClick selection end is');
       iText.exitEditing();
     });
     QUnit.test('doubleClickHandler no editing', function(assert) {
@@ -50,8 +50,8 @@
       iText.doubleClickHandler({
         e: eventData
       });
-      assert.equal(iText.selectionStart, 0, 'dblClcik selection start is');
-      assert.equal(iText.selectionEnd, 0, 'dblClcik selection end is');
+      assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
+      assert.equal(iText.selectionEnd, 0, 'dblClick selection end is');
     });
     QUnit.test('tripleClickHandler', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');

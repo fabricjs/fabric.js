@@ -115,7 +115,7 @@
    * @param {Number} y1
    * @param {Number} x2 secondo control point
    * @param {Number} y2
-   * @param {Number} x3 end of beizer
+   * @param {Number} x3 end of bezier
    * @param {Number} y3
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
@@ -203,12 +203,12 @@
   }
 
   /**
-   * Converts arc to a bunch of beizer curves
+   * Converts arc to a bunch of bezier curves
    * @param {Number} fx starting point x
    * @param {Number} fy starting point y
    * @param {Array} coords Arc command
    */
-  function fromArcToBeizers(fx, fy, coords) {
+  function fromArcToBeziers(fx, fy, coords) {
     var rx = coords[1],
         ry = coords[2],
         rot = coords[3],
@@ -377,7 +377,7 @@
           // falls through
         case 'A':
           converted = true;
-          destinationPath = destinationPath.concat(fromArcToBeizers(x, y, current));
+          destinationPath = destinationPath.concat(fromArcToBeziers(x, y, current));
           x = current[6];
           y = current[7];
           break;
@@ -698,16 +698,22 @@
    */
   function drawArc(ctx, fx, fy, coords) {
     coords = coords.slice(0).unshift('X'); // command A or a does not matter
-    var beizers = fromArcToBeizers(fx, fy, coords);
-    beizers.forEach(function(beizer) {
-      ctx.bezierCurveTo.apply(ctx, beizer.slice(1));
+    var beziers = fromArcToBeziers(fx, fy, coords);
+    beziers.forEach(function(bezier) {
+      ctx.bezierCurveTo.apply(ctx, bezier.slice(1));
     });
   };
 
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
-  fabric.util.fromArcToBeizers = fromArcToBeizers;
+  fabric.util.fromArcToBeziers = fromArcToBeziers;
+  /**
+   * Typo of `fromArcToBeziers` kept for not breaking the api once corrected.
+   * Will be removed in fabric 5.0
+   * @deprecated
+   */
+  fabric.util.fromArcToBeizers = fromArcToBeziers;
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   // kept because we do not want to make breaking changes.

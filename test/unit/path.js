@@ -252,7 +252,7 @@
     elPath.setAttributeNS(namespace, 'stroke-width', '1');
     elPath.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elPath.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPath.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elPath.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPath.setAttributeNS(namespace, 'stroke-miterlimit', '5');
 
     // TODO (kangax): to support multiple transformation keywords, we need to do proper matrix multiplication
@@ -265,7 +265,7 @@
       assert.deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5
       }));
 

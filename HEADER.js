@@ -162,7 +162,7 @@ fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
 fabric.browserShadowBlurConstant = 1;
 
 /**
- * This object contains the result of arc to beizer conversion for faster retrieving if the same arc needs to be converted again.
+ * This object contains the result of arc to bezier conversion for faster retrieving if the same arc needs to be converted again.
  * It was an internal variable, is accessible since version 2.3.4
  */
 fabric.arcToSegmentsCache = { };

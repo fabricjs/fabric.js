@@ -482,7 +482,7 @@
     assert.equal(group.toSVG(), expectedSVG);
   });
 
-  QUnit.test('clonining group with 2 objects', function(assert) {
+  QUnit.test('cloning group with 2 objects', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2Objects();
     group.clone(function(clone) {

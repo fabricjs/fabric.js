@@ -168,7 +168,7 @@
       }
       // resizeFilters work on the already filtered copy.
       // we need to apply resizeFilters AFTER normal filters.
-      // applyResizeFilters is run more often than normal fiters
+      // applyResizeFilters is run more often than normal filters
       // and is triggered by user interactions rather than dev code
       if (this.resizeFilter) {
         this.applyResizeFilters();
@@ -287,7 +287,7 @@
     },
 
     /**
-     * Returns true if an image has crop applied, inspecting values of cropX,cropY,width,hight.
+     * Returns true if an image has crop applied, inspecting values of cropX,cropY,width,height.
      * @return {Boolean}
      */
     hasCrop: function() {
@@ -735,7 +735,7 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occured or not.
+   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occurred or not.
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
