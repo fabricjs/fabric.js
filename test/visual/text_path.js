@@ -58,5 +58,22 @@
     height: 200,
   });
 
+  function textpath3(canvas, callback) {
+    var path = new fabric.Path('M -194 -109 C 538 -300 154 50 98 29');
+    var text = new fabric.Text('One Ring to rule them all', { path: path });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Textpath on a particular bezier',
+    code: textpath3,
+    golden: 'textpath3.png',
+    percentage: 0.09,
+    width: 550,
+    height: 210,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
