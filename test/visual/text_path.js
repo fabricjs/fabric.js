@@ -60,7 +60,7 @@
 
   function textpath3(canvas, callback) {
     var path = new fabric.Path('M -194 -109 C 538 -300 154 50 98 29');
-    var text = new fabric.Text('One Ring to rule them all', { path: path });
+    var text = new fabric.Text('Testing constant distance on bezier curve.', { path: path, top: 30, left: 30 });
     canvas.add(text);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
@@ -71,8 +71,8 @@
     code: textpath3,
     golden: 'textpath3.png',
     percentage: 0.09,
-    width: 550,
-    height: 210,
+    width: 610,
+    height: 270,
   });
 
   tests.forEach(visualTestLoop(QUnit));
