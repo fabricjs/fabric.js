@@ -727,6 +727,8 @@
           if (positionInPath > totalPathLength) {
             positionInPath %= totalPathLength;
           }
+          // it would probably much fater to send all the grapheme position for a line
+          // and calculate path position/angle at once.
           this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
         }
         lineBounds[i] = graphemeInfo;
@@ -758,11 +760,10 @@
           path = this.path;
 
       // we are at currentPositionOnPath. we want to know what point on the path is.
-      var p1 = fabric.util.getPointOnPath(path.path, centerPosition - 0.1, path.segmentsInfo),
-          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 0.1, path.segmentsInfo);
-      graphemeInfo.renderLeft = p1.x - startingPoint.x;
-      graphemeInfo.renderTop = p1.y - startingPoint.y;
-      graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+      var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
+      graphemeInfo.renderLeft = info.x - startingPoint.x;
+      graphemeInfo.renderTop = info.y - startingPoint.y;
+      graphemeInfo.angle = info.angle;
     },
 
     /**

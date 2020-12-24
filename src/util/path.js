@@ -446,7 +446,7 @@
           (3 * pct * pct * (p4x - p3x)),
           tangentY = (3 * invT * invT * (p2y - p1y)) + (6 * invT * pct * (p3y - p2y)) +
           (3 * pct * pct * (p4y - p3y));
-      return fabric.util.radiansToDegree(Math.atan2(tangentY, tangentX));
+      return Math.atan2(tangentY, tangentX);
     };
   }
 
@@ -477,7 +477,7 @@
       var invT = 1 - pct,
           tangentX = (2 * invT * (p2x - p1x)) + (2 * pct * (p3x - p2x)),
           tangentY = (2 * invT * (p2y - p1y)) + (2 * pct * (p3y - p2y));
-      return fabric.util.radiansToDegree(Math.atan2(tangentY, tangentX));
+      return Math.atan2(tangentY, tangentX);
     };
   }
 
@@ -650,14 +650,14 @@
           new fabric.Point(segInfo.destX, segInfo.destY),
           segPercent
         );
-        info.angle = fabric.util.radiansToDegree(Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x));
+        info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
         return info;
       case 'L':
         info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segment[1], segment[2]),
           segPercent
         );
-        info.angle = fabric.util.radiansToDegree(Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x));
+        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
         return info;
       case 'C':
         return findPercentageForDistance(segInfo, distance);
