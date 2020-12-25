@@ -439,6 +439,17 @@
     };
   }
 
+  function getTangentCubicIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (3 * invT * invT * (p2x - p1x)) + (6 * invT * pct * (p3x - p2x)) +
+          (3 * pct * pct * (p4x - p3x)),
+          tangentY = (3 * invT * invT * (p2y - p1y)) + (6 * invT * pct * (p3y - p2y)) +
+          (3 * pct * pct * (p4y - p3y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
   function QB1(t) {
     return t * t;
   }
@@ -461,6 +472,16 @@
     };
   }
 
+  function getTangentQuadraticIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (2 * invT * (p2x - p1x)) + (2 * pct * (p3x - p2x)),
+          tangentY = (2 * invT * (p2y - p1y)) + (2 * pct * (p3y - p2y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
+
   // this will run over a path segment ( a cubic or quadratic segment) and approximate it
   // with 100 segemnts. This will good enough to calculate the length of the curve
   function pathIterator(iterator, x1, y1) {
@@ -479,15 +500,16 @@
    * The percentage will be then used to find the correct point on the canvas for the path.
    * @param {Array} segInfo fabricJS collection of information on a parsed path
    * @param {Number} distance from starting point, in pixels.
-   * @return {Number} length of segment
+   * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
    */
   function findPercentageForDistance(segInfo, distance) {
     var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
-        p, nextLen, nextStep = 0.01;
+        p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
     // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
     // the path
     while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
       p = iterator(perc);
+      lastPerc = perc;
       nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
       // compare tmpLen each cycle with distance, decide next perc to test.
       if ((nextLen + tmpLen) > distance) {
@@ -501,6 +523,7 @@
         tmpLen += nextLen;
       }
     }
+    p.angle = angleFinder(lastPerc);
     return p;
   }
 
@@ -514,7 +537,7 @@
     var totalLength = 0, len = path.length, current,
         //x2 and y2 are the coords of segment start
         //x1 and y1 are the coords of the current point
-        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo;
+        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo, angleFinder;
     for (var i = 0; i < len; i++) {
       current = path[i];
       tempInfo = {
@@ -544,7 +567,18 @@
             current[5],
             current[6]
           );
+          angleFinder = getTangentCubicIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4],
+            current[5],
+            current[6]
+          );
           tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[5];
           y1 = current[6];
@@ -558,7 +592,16 @@
             current[3],
             current[4]
           );
+          angleFinder = getTangentQuadraticIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4]
+          );
           tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[3];
           y1 = current[4];
@@ -584,29 +627,33 @@
     if (!infos) {
       infos = getPathSegmentsInfo(path);
     }
-    // var distance = infos[infos.length - 1] * perc;
     var i = 0;
     while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
       distance -= infos[i].length;
       i++;
     }
+    // var distance = infos[infos.length - 1] * perc;
     var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.command, segment = path[i];
+        command = segInfo.command, segment = path[i], info;
 
     switch (command) {
       case 'M':
-        return { x: segInfo.x, y: segInfo.y };
+        return { x: segInfo.x, y: segInfo.y, angle: 0 };
       case 'Z':
       case 'z':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segInfo.destX, segInfo.destY),
           segPercent
         );
+        info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
+        return info;
       case 'L':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segment[1], segment[2]),
           segPercent
         );
+        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
+        return info;
       case 'C':
         return findPercentageForDistance(segInfo, distance);
       case 'Q':
