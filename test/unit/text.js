@@ -220,7 +220,7 @@
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
     elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
@@ -248,7 +248,7 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         fontFamily:       'Monaco',
         paintFirst:       'fill',
@@ -829,5 +829,16 @@
     assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
   });
+
+  QUnit.test('text with a path', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    assert.ok(text.path, 'text has a path');
+    assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
+    assert.equal(text.width, 100, 'text is big as the path width');
+    assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
 
 })();

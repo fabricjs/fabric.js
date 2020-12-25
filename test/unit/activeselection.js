@@ -162,7 +162,7 @@
 
     assert.equal(group.get('lockMovementX'), false);
 
-    // TODO acitveGroup
+    // TODO activeGroup
     // group.getObjects()[0].lockMovementX = true;
     // assert.equal(group.get('lockMovementX'), true);
     //

@@ -101,7 +101,7 @@
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
-        strokeLineJoin   = 'bevil',
+        strokeLineJoin   = 'bevel',
         strokeMiterLimit = 5;
 
     lineEl.setAttributeNS(namespace, 'x1', x1);
@@ -140,7 +140,7 @@
     });
   });
 
-  QUnit.test('straight lines may have 0 width or heigth', function(assert) {
+  QUnit.test('straight lines may have 0 width or height', function(assert) {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 

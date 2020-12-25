@@ -1,5 +1,54 @@
 # Changelog
 
+## [4.3.0]
+
+- fix(fabric.Textbox): Do not let splitbygrapheme split text previously unwrapped [#6621](https://github.com/fabricjs/fabric.js/pull/6621)
+- feat(fabric.controlsUtils) Move drag to actions to control handlers [#6617](https://github.com/fabricjs/fabric.js/pull/6617)
+- feat(fabric.Control): Add custom control size per control. [#6562](https://github.com/fabricjs/fabric.js/pull/6562)
+- fix(svg_export): svg export in path with gradient and added tests [#6654](https://github.com/fabricjs/fabric.js/pull/6654)
+- fix(fabric.Text): improve compatibility with transformed gradients [#6669](https://github.com/fabricjs/fabric.js/pull/6669)
+- feat(fabric.Text): Add ability to put text on paths BETA [#6543](https://github.com/fabricjs/fabric.js/pull/6543)
+- fix(fabric.Canvas): rotation handle should take origin into account [#6686](https://github.com/fabricjs/fabric.js/pull/6686)
+- fix(fabric.Text): Text on path, fix non linear distance of chars over path  [#6671](https://github.com/fabricjs/fabric.js/pull/6671)
+
+## [4.2.0]
+
+- fix(fabric.utils): ISSUE-6566 Fix SVGs for special Arc lines [#6571](https://github.com/fabricjs/fabric.js/pull/6571)
+- fix(fabric.Canvas): Fix mouse up target when different from action start [#6591](https://github.com/fabricjs/fabric.js/pull/6591)
+- added: feat(fabric.controlsUtils): Fire resizing event for textbox width [#6545](https://github.com/fabricjs/fabric.js/pull/6545)
+
+## [4.1.0]
+- feat(Brushes): add beforePathCreated event [#6492](https://github.com/fabricjs/fabric.js/pull/6492);
+- feat(fabric.Path): Change the way path is parsed and drawn. simplify path at parsing time [#6504](https://github.com/fabricjs/fabric.js/pull/6504);
+- feat(fabric.Path): Simplify S and T command in C and Q. [#6507](https://github.com/fabricjs/fabric.js/pull/6507);
+- fix(fabric.Textbox): ISSUE-6518 Textbox and centering scaling [#6524](https://github.com/fabricjs/fabric.js/pull/6524);
+- fix(fabric.Text): Ensure the shortcut text render the passed argument and not the entire line [#6526](https://github.com/fabricjs/fabric.js/pull/6526);
+- feat(fabric.util): Add a function to work with path measurements [#6525](https://github.com/fabricjs/fabric.js/pull/6525);
+- fix(fabric.Image): rendering pixel outside canvas size [#6326](https://github.com/fabricjs/fabric.js/pull/6326);
+- fix(fabric.controlsUtils): stabilize scaleObject function [#6540](https://github.com/fabricjs/fabric.js/pull/6540);
+- fix(fabric.Object): when in groups or active groups, fix the ability to shift deselect [#6541](https://github.com/fabricjs/fabric.js/pull/6541);
+
+## [4.0.0]
+- fixed the gesture module to not break with 4.0 [#6491](https://github.com/fabricjs/fabric.js/pull/6491);
+- fix(fabric.IText): copy style in non full mode when typing text [#6454](https://github.com/fabricjs/fabric.js/pull/6454);
+- feat(fabric.Controls) expose the extra utils for control handling.
+Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.controlsUtils.
+
+## [4.0.0-rc.1]
+- fix(fabric.Canvas): ISSUE-6314 rerender in case of drag selection that select a single oobject. [#6421](https://github.com/fabricjs/fabric.js/pull/6421);
+- feat(text): allow correct cursor/selection position if text is edited inside a group. [#6256](https://github.com/fabricjs/fabric.js/pull/6256);
+- feat(fabric.Control): remove position option in favor of x and y [#6415](https://github.com/fabricjs/fabric.js/pull/6415);
+- fix(fabric.Object) ISSUE-6340 infinite recursion on groups [#6416](https://github.com/fabricjs/fabric.js/pull/6416);
+- fix(fabric.Object): geometry mixin fix partiallyOnscreen [#6402](https://github.com/fabricjs/fabric.js/pull/6402);
+- fix(fabric.Image): ISSUE-6397 modify crossOrigin behaviour for setSrc [#6414](https://github.com/fabricjs/fabric.js/pull/6414);
+- Breaking: fabric.Image.setCrossOrigin is gone. Having the property on the fabric.Image is misleading and brings to errors. crossOrigin is for loading/reloading only, and is mandatory to specify it each load.
+- Breaking: fabric.Control constructor does not accept anymore a position object, but 2 properties, x and y.
+
+## [4.0.0-beta.12]
+- fix(fabric.IText): respect value of `cursorColor` [#6300](https://github.com/fabricjs/fabric.js/pull/6300);
+- fix(fabric.Textbox): Improve splitByGrapheme and charSpacing [#6298](https://github.com/fabricjs/fabric.js/pull/6298);
+- feat(controls): Reintroduce flip by scaling and lockScalingFlip [#6313](https://github.com/fabricjs/fabric.js/pull/6313);
+
 ## [4.0.0-beta.11]
 - fix(itext): improved style handling for new lines [#6268](https://github.com/fabricjs/fabric.js/pull/6268)
 - fix(controls): Fix flip and controls and skewY and controls. [#6278](https://github.com/fabricjs/fabric.js/pull/6278)
@@ -81,7 +130,6 @@ fix(controls): Control.getVisibility will always receive the fabric.Object argum
 
 breaking: All your old control code override will not work
 breaking: `uniScaleTransform` has been renamed in `uniformScaling`, meaning changed and  the default  value swapped. The behaviour is unchanged, but now the description and the name match.
-breaking: LockScalingFlip with the scaling flip behaviour are missing now, maybe reimplemented later.
 breaking: Object.lockUniScaling is removed. Alternatives to get the same identical functionality with less code are being evaluated.
 breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to the event `before:transform’
 

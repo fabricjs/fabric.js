@@ -1,9 +1,11 @@
-### Fabric
+## Fabric.js
+
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/fabricjs/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
@@ -49,11 +51,12 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 
 ### Supported browsers
 
-- Firefox 2+
-- Safari 3+
+- Firefox 4+
+- Safari 5+
 - Opera 9.64+
 - Chrome (all versions)
-- IE10, IE11, Edge
+- Edge (chromium based, all versions)
+- IE11 and Edge legacy, supported but deprecated.
 
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
@@ -61,15 +64,34 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 
 Fabric.js started as a foundation for design editor on [printio.ru](http://printio.ru) — interactive online store with ability to create your own designs. The idea was to create [Javascript-based editor](http://printio.ru/ringer_man_tees/new), which would make it easy to manipulate vector shapes and images on T-Shirts. Since performance was one of the most critical requirements, we chose canvas over SVG. While SVG is excellent with static shapes, it's not as performant as canvas when it comes to dynamic manipulation of objects (movement, scaling, rotation, etc.). Fabric.js was heavily inspired by [Ernest Delgado's canvas experiment](http://www.ernestdelgado.com/public-tests/canvasphoto/demo/canvas.html). In fact, code from Ernest's experiment was the foundation of an entire framework. Later, Fabric.js grew into a collection of distinct object types and got an SVG-to-canvas parser.
 
+### Installation Instructions
+
 <h3 id="bower-install">Install with bower</h3>
 
     $ bower install fabric
 
 <h3 id="npm-install">Install with npm</h3>
 
-To install Fabric.js using npm, you must first manually [install Cairo](http://cairographics.org/download/) on your system. Cairo is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+Note: If you are using Fabric.js in a Node.js script, you will depend from [node-canvas](https://github.com/Automattic/node-canvas).`node-canvas` is an html canvas replacement that works on top of native libraries.
+Please follow the instructions located [here](https://github.com/Automattic/node-canvas#compiling) in order to get it up and running.
+
 
     $ npm install fabric --save
+
+
+After this, you can import fabric like so:
+
+```
+const fabric = require("fabric").fabric;
+```
+
+Or you can use this instead if your environment supports ES6 imports:
+
+```
+import { fabric } from "fabric";
+```
+
+See [the example section](#examples-of-use) for usage examples.
 
 <h3 id="fabric-building">Building</h3>
 

@@ -300,7 +300,7 @@
     assert.ok(typeof point.distanceFrom === 'function');
     var returned = point.distanceFrom(point2, 0.5);
     assert.ok(typeof returned === 'number', 'returns a number');
-    assert.equal(returned, Math.sqrt(Math.pow(point2.x - point.x, 2) + Math.pow(point2.y - point.y, 2)), 'return the geomentric distance between coords');
+    assert.equal(returned, Math.sqrt(Math.pow(point2.x - point.x, 2) + Math.pow(point2.y - point.y, 2)), 'return the geometric distance between coords');
   });
 
   QUnit.test('midPointFrom', function(assert) {

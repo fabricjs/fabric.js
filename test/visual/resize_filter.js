@@ -35,7 +35,7 @@
     newModule: 'Image resize filter test',
     percentage: 0.08,
     width: 200,
-    hieght: 200,
+    height: 200,
     beforeEachHandler: function() {
       fabric.Object.prototype.objectCaching = false;
     }
@@ -59,7 +59,7 @@
     golden: 'parrot.png',
     percentage: 0.08,
     width: 200,
-    hieght: 200,
+    height: 200,
   });
 
   function imageResizeTestGroup(canvas, callback) {
@@ -82,7 +82,7 @@
     golden: 'parrot.png',
     percentage: 0.08,
     width: 200,
-    hieght: 200,
+    height: 200,
   });
 
   function blendImageTest2(canvas, callback) {
@@ -109,7 +109,7 @@
     newModule: 'Image Blend test',
     percentage: 0.06,
     width: 400,
-    hieght: 400,
+    height: 400,
   });
 
   function blendImageTest(canvas, callback) {

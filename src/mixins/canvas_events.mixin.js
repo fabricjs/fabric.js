@@ -173,7 +173,7 @@
       // as a short term fix we are not firing this if we are currently transforming.
       // as a long term fix we need to separate the action of finding a target with the
       // side effects we added to it.
-      if (!this.currentTransform && !this.findTarget(e)) {
+      if (!this._currentTransform && !this.findTarget(e)) {
         this.fire('mouse:over', { target: null, e: e });
         this._hoveredTarget = null;
         this._hoveredTargets = [];
@@ -441,8 +441,14 @@
         shouldRender = transform.actionPerformed;
       }
       if (!isClick) {
+        var targetWasActive = target === this._activeObject;
         this._maybeGroupObjects(e);
-        shouldRender || (shouldRender = this._shouldRender(target));
+        if (!shouldRender) {
+          shouldRender = (
+            this._shouldRender(target) ||
+            (!targetWasActive && target === this._activeObject)
+          );
+        }
       }
       if (target) {
         var corner = target._findTargetCorner(
@@ -452,7 +458,8 @@
         var control = target.controls[corner],
             mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
-          mouseUpHandler(e, target, control);
+          var pointer = this.getPointer(e);
+          mouseUpHandler(e, transform, pointer.x, pointer.y);
         }
         target.isMoving = false;
       }
@@ -518,6 +525,10 @@
             absolutePointer: this._absolutePointer,
             transform: this._currentTransform
           };
+      if (eventType === 'up') {
+        options.currentTarget = this.findTarget(e);
+        options.currentSubTargets = this.targets;
+      }
       this.fire('mouse:' + eventType, options);
       target && target.fire('mouse' + eventType, options);
       for (var i = 0; i < targets.length; i++) {
@@ -538,6 +549,7 @@
             e: e,
             target: target,
             transform: transform,
+            action: transform.action,
           };
 
       if (target._scaling) {
@@ -548,6 +560,8 @@
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
         if (transform.actionPerformed) {
+          // this is not friendly to the new control api.
+          // is deprecated.
           eventName = this._addEventOptions(options, transform);
           this._fire(eventName, options);
         }
@@ -558,6 +572,7 @@
     /**
      * Mutate option object in order to add by property and give back the event name.
      * @private
+     * @deprecated since 4.2.0
      * @param {Object} options to mutate
      * @param {Object} transform to inspect action from
      */
@@ -709,12 +724,13 @@
         );
         target.__corner = corner;
         if (target === this._activeObject && (corner || !shouldGroup)) {
+          this._setupCurrentTransform(e, target, alreadySelected);
           var control = target.controls[corner],
+              pointer = this.getPointer(e),
               mouseDownHandler = control && control.getMouseDownHandler(e, target, control);
           if (mouseDownHandler) {
-            mouseDownHandler(e, target, control);
+            mouseDownHandler(e, this._currentTransform, pointer.x, pointer.y);
           }
-          this._setupCurrentTransform(e, target, alreadySelected);
         }
       }
       this._handleEvent(e, 'down');
@@ -924,23 +940,15 @@
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
+          actionHandler = transform.actionHandler;
           // this object could be created from the function in the control handlers
-          options = {
-            target: transform.target,
-            e: e,
-            transform: transform,
-            pointer: pointer
-          };
 
-      if (action === 'drag') {
-        actionPerformed = this._translateObject(x, y);
-        if (actionPerformed) {
-          this._fire('moving', options);
-          this.setCursor(options.target.moveCursor || this.moveCursor);
-        }
+
+      if (actionHandler) {
+        actionPerformed = actionHandler(e, transform, x, y);
       }
-      else {
-        (actionPerformed = transform.actionHandler(e, transform, x, y)) && this._fire(action, options);
+      if (action === 'drag' && actionPerformed) {
+        this.setCursor(transform.target.moveCursor || this.moveCursor);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
     },
@@ -948,7 +956,7 @@
     /**
      * @private
      */
-    _fire: fabric.controlHandlers.fireEvent,
+    _fire: fabric.controlsUtils.fireEvent,
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.

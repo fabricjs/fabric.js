@@ -695,19 +695,6 @@
     assert.ok(typeof destination.ffffffffff === 'undefined');
   });
 
-  QUnit.test('fabric.util.getFunctionBody', function(assert) {
-    assert.equal(fabric.util.getFunctionBody('function(){}'), '');
-
-    assert.equal(fabric.util.getFunctionBody('function(){return 1 + 2}'),
-      'return 1 + 2');
-
-    assert.equal(fabric.util.getFunctionBody('function () {\n  return "blah" }'),
-      '\n  return "blah" ');
-
-    assert.equal(fabric.util.getFunctionBody('function foo (a , boo_bar, baz123 )\n{\n if (1) { alert(12345) } }'),
-      '\n if (1) { alert(12345) } ');
-  });
-
   QUnit.test('getKlass', function(assert) {
     assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
     assert.equal(fabric.util.getKlass('rect'), fabric.Rect);

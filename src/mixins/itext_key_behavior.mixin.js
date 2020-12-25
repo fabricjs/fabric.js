@@ -188,7 +188,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         // let's copy some style before deleting.
         // we want to copy the style before the cursor OR the style at the cursor if selection
         // is bigger than 0.
-        copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, true);
+        copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, false);
         // now duplicate the style one for each inserted text.
         copiedStyle = insertedText.map(function() {
           // this return an array of references, but that is fine since we are
@@ -201,7 +201,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         removeTo = selectionEnd;
       }
       else if (backDelete) {
-        // detect differencies between forwardDelete and backDelete
+        // detect differences between forwardDelete and backDelete
         removeFrom = selectionEnd - removedText.length;
         removeTo = selectionEnd;
       }
