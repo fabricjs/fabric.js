@@ -623,22 +623,17 @@
     return info;
   }
 
-  function getCurrentSegmentIndex(path, distance, infos) {
+  function getPointOnPath(path, distance, infos) {
+    if (!infos) {
+      infos = getPathSegmentsInfo(path);
+    }
     var i = 0;
     while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
       distance -= infos[i].length;
       i++;
     }
-    return i;
-  }
-
-  function getPointOnPath(path, distance, infos) {
-    if (!infos) {
-      infos = getPathSegmentsInfo(path);
-    }
     // var distance = infos[infos.length - 1] * perc;
-    var i = getCurrentSegmentIndex(path, distance, infos),
-        segInfo = infos[i], segPercent = distance / segInfo.length,
+    var segInfo = infos[i], segPercent = distance / segInfo.length,
         command = segInfo.command, segment = path[i], info;
 
     switch (command) {
