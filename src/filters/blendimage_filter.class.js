@@ -38,6 +38,7 @@
     /**
      * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
      * darken, lighten, overlay, exclusion, tint.
+     * CURRENTLY IMPLEMENTED: multiply, mask, screen.
      **/
     mode: 'multiply',
 
@@ -64,7 +65,6 @@
       multiply: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform sampler2D uImage;\n' +
-        'uniform vec4 uColor;\n' +
         'varying vec2 vTexCoord;\n' +
         'varying vec2 vTexCoord2;\n' +
         'void main() {\n' +
@@ -76,13 +76,23 @@
       mask: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform sampler2D uImage;\n' +
-        'uniform vec4 uColor;\n' +
         'varying vec2 vTexCoord;\n' +
         'varying vec2 vTexCoord2;\n' +
         'void main() {\n' +
           'vec4 color = texture2D(uTexture, vTexCoord);\n' +
           'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
           'color.a = color2.a;\n' +
+          'gl_FragColor = color;\n' +
+        '}',
+      screen: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform sampler2D uImage;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'varying vec2 vTexCoord2;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
+          'color.rgba = color.rgba + color2.rgba - color2.rgba * color.rgba;\n' +
           'gl_FragColor = color;\n' +
         '}',
     },
@@ -181,6 +191,13 @@
             data[i + 1] = g * tg / 255;
             data[i + 2] = b * tb / 255;
             data[i + 3] = a * ta / 255;
+            break;
+          case 'screen':
+            // Cb + Cs -(Cb x Cs)
+            data[i] = r  +  tr - tr * r / 255;
+            data[i + 1] = g  +  tg - tg * g / 255;
+            data[i + 2] = b  +  tb - tb * b / 255;
+            data[i + 3] = a  +  ta - ta * a / 255;
             break;
           case 'mask':
             data[i + 3] = ta;

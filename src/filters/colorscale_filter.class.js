@@ -7,51 +7,34 @@
       createClass = fabric.util.createClass;
 
   /**
-   * Grayscale image filter class
-   * @class fabric.Image.filters.Grayscale
+   * Colorscale image filter class
+   * Takes a greyscale image and swap the scale with another scale of colors
+   * @class fabric.Image.filters.Colorscale
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
-   * var filter = new fabric.Image.filters.Grayscale();
+   * var filter = new fabric.Image.filters.Colorscale({ color1: 'red', color2: 'blue' });
    * object.filters.push(filter);
    * object.applyFilters();
    */
-  filters.Grayscale = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Grayscale.prototype */ {
+  filters.Colorscale = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Grayscale.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Grayscale',
+    type: 'Colorscale',
 
-    fragmentSource: {
-      average: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-          'float average = (color.r + color.b + color.g) / 3.0;\n' +
-          'gl_FragColor = vec4(average, average, average, color.a);\n' +
-        '}',
-      lightness: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'vec4 col = texture2D(uTexture, vTexCoord);\n' +
-          'float average = (max(max(col.r, col.g),col.b) + min(min(col.r, col.g),col.b)) / 2.0;\n' +
-          'gl_FragColor = vec4(average, average, average, col.a);\n' +
-        '}',
-      luminosity: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'vec4 col = texture2D(uTexture, vTexCoord);\n' +
-          'float average = 0.21 * col.r + 0.72 * col.g + 0.07 * col.b;\n' +
-          'gl_FragColor = vec4(average, average, average, col.a);\n' +
-        '}',
-    },
+    fragmentSource:
+      'precision highp float;\n' +
+      'uniform sampler2D uTexture;\n' +
+      'varying vec2 vTexCoord;\n' +
+      'void main() {\n' +
+        'vec4 value = texture2D(uTexture, vTexCoord).r;\n' +
+        'gl_FragColor = vec4(average, average, average, color.a);\n' +
+      '}',
 
 
     /**
@@ -59,9 +42,9 @@
      * @param {String} type
      * @default
      */
-    mode: 'average',
+    color1: 'red',
 
-    mainParameter: 'mode',
+    color2: 'blue',
 
     /**
      * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -92,18 +75,27 @@
     },
 
     /**
-     * Retrieves the cached shader.
-     * @param {Object} options
-     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     * Return WebGL uniform locations for this filter's shader.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    retrieveShader: function(options) {
-      var cacheKey = this.type + '_' + this.mode;
-      if (!options.programCache.hasOwnProperty(cacheKey)) {
-        var shaderSource = this.fragmentSource[this.mode];
-        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
-      }
-      return options.programCache[cacheKey];
+    getUniformLocations: function(gl, program) {
+      return {
+        uColors: gl.getUniformLocation(program, 'uMode'),
+      };
+    },
+
+    /**
+     * Send data from this filter to its shader program's uniforms.
+     *
+     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+     */
+    sendUniformData: function(gl, uniformLocations) {
+      // default average mode.
+      var mode = 1;
+      gl.uniform1i(uniformLocations.uMode, mode);
     },
 
     /**
