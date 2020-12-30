@@ -1412,6 +1412,7 @@
         'textAlign',
         'textBackgroundColor',
         'charSpacing',
+        'path'
       ].concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProperties);
       obj.styles = clone(this.styles, true);
