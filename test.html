@@ -2,68 +2,53 @@
 <header>
   <script src="dist/fabric.js" type="text/javascript" ></script>
   <script src="src/filters/redgreenglitch_filter.class.js" type="text/javascript" ></script>
+  <script src="src/filters/colorscale.class.js" type="text/javascript" ></script>
+
 </header>
 <body>
-  <input type="range" id="offsetX" value="3" />
-  <input type="range" id="offsetY" value="3" />
+  <input type="range" min="-50" max="50" stpe="1" id="offsetX" value="3" />
+  <input type="range" min="-50" max="50" stpe="1" id="offsetY" value="3" />
+  <label>Use WebGl<input type="checkbox" id="webgl" checked></label>
   <canvas id="canvas" width="500" height="620" ></canvas>
   <script>
+    var webglBackend;
+    try {
+      webglBackend = new fabric.WebglFilterBackend();
+    } catch (e) {
+      console.log(e)
+    }
+    var canvas2dBackend = new fabric.Canvas2dFilterBackend();
     // write your test code here
-    var colorHandlerLight = function(evt) {
-      duotoneFilter.subFilters[1].color = evt.target.value;
+    document.getElementById('webgl').addEventListener('click', function(evt) {
+      console.log(evt.target.checked)
+      if (evt.target.checked) {
+        fabric.filterBackend = webglBackend;
+      } else {
+        fabric.filterBackend = canvas2dBackend;
+      }
+    });
+    var glitchFilterX = function(evt) {
+      glitchFilter.offsetX = parseInt(evt.target.value, 10);
       globalImage.applyFilters();
       canvas.requestRenderAll();
     };
-    document.getElementById('offsetX').addEventListener('change', colorHandlerLight);
-    var colorHandlerDark = function(evt) {
-      duotoneFilter.subFilters[2].color = evt.target.value;
+    document.getElementById('offsetX').addEventListener('input', glitchFilterX);
+    var glitchFilterY = function(evt) {
+      glitchFilter.offsetY = parseInt(evt.target.value, 10);
       globalImage.applyFilters();
       canvas.requestRenderAll();
     };
-    document.getElementById('offsetY').addEventListener('change', colorHandlerDark);
+    document.getElementById('offsetY').addEventListener('input', glitchFilterY);
     var globalImage;
+    var glitchFilter = new fabric.Image.filters.RedGreenGlitch({
+      offsetX: 1,
+      offsetY: 1,
+    });
   	var canvas = new fabric.Canvas('canvas');
-    var redFilter = new fabric.Image.filters.ColorMatrix({
-      matrix: '1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'.split(' '),
-    });
-    var greenFilter = new fabric.Image.filters.ColorMatrix({
-      matrix: '0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0'.split(' '),
-    });
-    var blueFilter = new fabric.Image.filters.ColorMatrix({
-      matrix: '0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0'.split(' '),
-    });
-    var glitch1Filter = new fabric.Image.filters.BlendImage({
-      mode: 'screen',
-    });
-    var glitch2Filter = new fabric.Image.filters.BlendImage({
-      mode: 'screen',
-    });
-    var glitchFilter = new fabric.Image.filters.Composed({
-      subFilters: [
-        glitch1Filter,
-        glitch2Filter,
-      ]
-    });
-    fabric.Image.fromURL('https://source.unsplash.com/200x200/?for', function(image) {
-
-      var testImage = new fabric.Image(image.getElement(), { filters: [new fabric.Image.filters.RedGreenGlitch({
-        offsetX: 0.01,
-        offsetY: 0.01,
-      })] });
-      canvas.add(testImage);
-      var rLayer = new fabric.Image(image.getElement(), { filters: [redFilter] });
-      var gLayer = new fabric.Image(image.getElement(), { filters: [greenFilter] });
-      var bLayer = new fabric.Image(image.getElement(), { filters: [blueFilter] });
-
-      var greenImage = new fabric.Image(gLayer._element, { top: 2, left: 2 });
-      var redImage = new fabric.Image(rLayer._element, { top: -2, left: -2 });
-      glitch1Filter.image = greenImage;
-      glitch2Filter.image = redImage;
-      var baseImage = new fabric.Image(bLayer._element, { filters: [glitchFilter] });
-
-      baseImage.scaleToWidth(480);
-      baseImage.applyFilters();
-      canvas.add(baseImage);
+    fabric.Image.fromURL('http://fabricjs.com/assets/mononoke.jpg', function(image) {
+      globalImage = new fabric.Image(image.getElement(), { filters: [glitchFilter] });
+      globalImage.scaleToWidth('450')
+      canvas.add(globalImage);
     }, { crossOrigin: 'anonymous' });
   </script>
 </body>

@@ -27,18 +27,21 @@
     /**
      * Color offsets for red and green, in % of the image.
      **/
-    offsetX: 0.01,
-    offsetY: 0.01,
+    offsetX: 1,
+    offsetY: 1,
 
     vertexSource: 'attribute vec2 aPosition;\n' +
       'varying vec2 vTexCoord;\n' +
       'varying vec2 vTexCoordRed;\n' +
       'varying vec2 vTexCoordGreen;\n' +
       'uniform vec2 uOffset;\n' +
+      'uniform float uStepW;\n' +
+      'uniform float uStepH;\n' +
       'void main() {\n' +
         'vTexCoord = aPosition;\n' +
-        'vTexCoordRed = (aPosition + uOffset);\n' +
-        'vTexCoordGreen = (aPosition - uOffset);\n' +
+        'vec2 offset = vec2(uOffset.x * uStepW, uOffset.y * uStepH);\n' +
+        'vTexCoordRed = (aPosition + offset);\n' +
+        'vTexCoordGreen = (aPosition - offset);\n' +
         'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
       '}',
 
@@ -66,35 +69,36 @@
       var imageData = options.imageData,
           data = imageData.data, iLen = data.length,
           width = imageData.width, r, g,
-          height = imageData.height, redIndex, greenIndex,
-          offsetX = Math.round(this.offsetX * width) * 4,
-          offsetY = Math.round(this.offsetX * height) * 4,
-          displacement = offsetX + offsetY * width,
+          redIndex, greenIndex,
+          displacement = this.offsetX * 4 + this.offsetY * 4 * width,
           imageCopy = new Uint8Array(iLen);
       // we leave the BLUE ( + 2) where it is, and we move green/red.
       for (var i = 0; i < iLen; i += 4) {
         // make a copy of data, while we get over it, since we are going to change it
         // when j and k are higher than i, we read from data, when is lower from imageCopy
         imageCopy[i] = data[i];
+        imageCopy[i + 1] = data[i + 1];
+        imageCopy[i + 2] = data[i + 2];
+        imageCopy[i + 3] = data[i + 3];
         redIndex = i + displacement;
         if (redIndex < 0 || redIndex > iLen) {
           r = 0;
         }
         else if (redIndex < i) {
-          r = imageCopy[i];
+          r = imageCopy[redIndex];
         }
         else {
-          r = data[i];
+          r = data[redIndex];
         }
-        greenIndex = i - displacement;
+        greenIndex = i + 1 - displacement;
         if (greenIndex < 0 || greenIndex > iLen) {
           g = 0;
         }
         else if (greenIndex < i) {
-          g = imageCopy[i + 1];
+          g = imageCopy[greenIndex];
         }
         else {
-          g = data[i + 1];
+          g = data[greenIndex];
         }
         data[i] = r;
         data[i + 1] = g;
