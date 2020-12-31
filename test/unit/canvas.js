@@ -55,12 +55,12 @@
                       '13.99], ["z", null]]}';
 
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
@@ -174,12 +174,12 @@
   });
 
   QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive == 'boolean');
+    assert.ok(typeof canvas.interactive === 'boolean');
     assert.ok(canvas.interactive, 'default is true');
   });
 
   QUnit.test('selection', function(assert) {
-    assert.ok(typeof canvas.selection == 'boolean');
+    assert.ok(typeof canvas.selection === 'boolean');
     assert.ok(canvas.selection, 'default is true');
   });
 
@@ -784,7 +784,7 @@
     var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 15, clientY: 15, 'shiftKey': true },
+        pointer = { clientX: 15, clientY: 15, shiftKey: true },
         pointer2 = { clientX: 4, clientY: 4 };
     canvas.add(rect);
     canvas.add(rectOver);
@@ -1346,7 +1346,7 @@
   QUnit.test('toObject', function(assert) {
     assert.ok(typeof canvas.toObject === 'function');
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvas.getObjects()
     };
     assert.deepEqual(expectedObject, canvas.toObject());
@@ -1362,7 +1362,7 @@
     var clipPath = makeRect();
     var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
       clipPath: {
         type: 'rect',
@@ -1396,7 +1396,8 @@
         skewX: 0,
         skewY: 0,
         rx: 0,
-        ry: 0
+        ry: 0,
+        strokeUniform: false
       }
     };
 
@@ -1412,7 +1413,7 @@
   QUnit.test('toDatalessObject', function(assert) {
     assert.ok(typeof canvas.toDatalessObject === 'function');
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvas.getObjects()
     };
 

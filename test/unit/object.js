@@ -106,13 +106,13 @@
 
   QUnit.test('toJSON', function(assert) {
     var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"skewX":0,"skewY":0}';
 
     var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeMiterLimit":5,' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                         '"skewX":0,"skewY":0}';
@@ -135,69 +135,71 @@
 
   QUnit.test('toObject', function(assert) {
     var emptyObjectRepr = {
-      'version':                  fabric.version,
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     0,
-      'top':                      0,
-      'width':                    0,
-      'height':                   0,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'skewX':                      0,
-      'skewY':                      0,
+      version:                  fabric.version,
+      type:                     'object',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     0,
+      top:                      0,
+      width:                    0,
+      height:                   0,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              1,
+      strokeDashArray:          null,
+      strokeLineCap:            'butt',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'miter',
+      strokeMiterLimit:         4,
+      scaleX:                   1,
+      scaleY:                   1,
+      angle:                    0,
+      flipX:                    false,
+      flipY:                    false,
+      opacity:                  1,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                      0,
+      skewY:                      0,
+      strokeUniform:              false
     };
 
     var augmentedObjectRepr = {
-      'version':                  fabric.version,
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     10,
-      'top':                      20,
-      'width':                    30,
-      'height':                   40,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          [5, 2],
-      'strokeLineCap':            'round',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'bevel',
-      'strokeMiterLimit':         5,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    true,
-      'flipY':                    false,
-      'opacity':                  0.13,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'skewX':                      0,
-      'skewY':                      0
+      version:                  fabric.version,
+      type:                     'object',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     10,
+      top:                      20,
+      width:                    30,
+      height:                   40,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              1,
+      strokeDashArray:          [5, 2],
+      strokeLineCap:            'round',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'bevel',
+      strokeMiterLimit:         5,
+      scaleX:                   1,
+      scaleY:                   1,
+      angle:                    0,
+      flipX:                    true,
+      flipY:                    false,
+      opacity:                  0.13,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                      0,
+      skewY:                      0,
+      strokeUniform:              false
     };
 
     var cObj = new fabric.Object();
