@@ -1576,7 +1576,7 @@
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
    */
   fabric.Text.fromObject = function(object, callback) {
-	  var path = object.path;
+    var path = object.path;
     delete object.path;
     return fabric.Object._fromObject('Text', object, function(textInstance) {
       if (path) {
