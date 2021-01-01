@@ -1416,6 +1416,7 @@
       ].concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProperties);
       obj.styles = clone(this.styles, true);
+      obj.path = this.path && this.path.toObject();
       return obj;
     },
 
@@ -1575,7 +1576,19 @@
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
    */
   fabric.Text.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Text', object, callback, 'text');
+	  var path = object.path;
+    delete object.path;
+    return fabric.Object._fromObject('Text', object, function(textInstance) {
+      if (path) {
+        fabric.Object._fromObject('Path', path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
