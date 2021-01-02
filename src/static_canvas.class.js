@@ -119,7 +119,8 @@
     controlsAboveOverlay: false,
 
     /**
-     * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
+     * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas.
+     * This must a property passed to the canvas when instantiated. Setting this property after, has no effect.
      * @type Boolean
      * @default
      */
