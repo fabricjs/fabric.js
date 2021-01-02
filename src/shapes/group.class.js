@@ -156,9 +156,13 @@
      * @chainable
      */
     addWithUpdate: function(object) {
-      this._restoreObjectsState();
+      var nested = !!this.group;
+      this._restoreObjectsState(nested);
       fabric.util.resetObjectTransform(this);
       if (object) {
+        if (this.group) {
+          fabric.util.makeObjectRelativeToTransform(object, this.group.calcTransformMatrix());
+        }
         this._objects.push(object);
         object.group = this;
         object._set('canvas', this.canvas);
@@ -167,6 +171,9 @@
       this._updateObjectsCoords();
       this.setCoords();
       this.dirty = true;
+      if (this.group) {
+        this.group.addWithUpdate();
+      }
       return this;
     },
 
@@ -357,12 +364,21 @@
 
     /**
      * Restores original state of each of group objects (original state is that which was before group was created).
+     * if the nested boolean is true, the original state will be restored just for the
+     * first group and not for all the group chain
      * @private
+     * @param {Boolean} nested tell the function to restore object state up to the parent group and not more
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    _restoreObjectsState: function() {
-      this._objects.forEach(this._restoreObjectState, this);
+    _restoreObjectsState: function(nested) {
+      var groupMatrix = nested ? this.calcOwnMatrix() : this.calcTransformMatrix();
+      this._objects.forEach(function(object) {
+        // instead of using _this = this;
+        object.group.realizeTransform(object, groupMatrix);
+        delete object.group;
+        object.setCoords();
+      });
       return this;
     },
 
@@ -371,35 +387,18 @@
      * i.e. it tells you what would happen if the supplied object was in
      * the group, and then the group was destroyed. It mutates the supplied
      * object.
+     * Warning: this method is not useful anymore, it has been kept to no break the api.
+     * this method will be reduced to using the utility.
+     * @private
+     * @deprecated
      * @param {fabric.Object} object
+     * @param {Array} parentMatrix parent transformation
      * @return {fabric.Object} transformedObject
      */
-    realizeTransform: function(object) {
-      var matrix = object.calcTransformMatrix(),
-          options = fabric.util.qrDecompose(matrix),
-          center = new fabric.Point(options.translateX, options.translateY);
-      object.flipX = false;
-      object.flipY = false;
-      object.set('scaleX', options.scaleX);
-      object.set('scaleY', options.scaleY);
-      object.skewX = options.skewX;
-      object.skewY = options.skewY;
-      object.angle = options.angle;
-      object.setPositionByOrigin(center, 'center', 'center');
+    realizeTransform: function(object, parentMatrix) {
+      var matrix = fabric.util.multiplyTransformMatrices(object.calcOwnMatrix(), parentMatrix);
+      fabric.util.applyTransformToObject(object, matrix);
       return object;
-    },
-
-    /**
-     * Restores original state of a specified object in group
-     * @private
-     * @param {fabric.Object} object
-     * @return {fabric.Group} thisArg
-     */
-    _restoreObjectState: function(object) {
-      this.realizeTransform(object);
-      delete object.group;
-      object.setCoords();
-      return this;
     },
 
     /**

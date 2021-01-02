@@ -970,6 +970,42 @@
     },
 
     /**
+     * given an object and a transform, apply the inverse transform to the object,
+     * so that when transferred in a space with applied trasform, the object mantain
+     * the same properties it has now.
+     * Can be seen also
+     * described in options.
+     * Use to calculate the boxes around objects for controls.
+     * @memberOf fabric.util
+     * @param {fabric.Object} object the object you want to transform
+     * @param {Array} transform the destination transform
+     */
+    makeObjectRelativeToTransform: function(object, transform) {
+      var inverted = fabric.util.invertTransform(transform),
+          finalTransform = fabric.util.multiplyTransformMatrices(inverted, object.calcOwnMatrix());
+      fabric.util.applyTransformToObject(object, finalTransform);
+    },
+
+    /**
+     * discard an object transform state and apply the one from the matrix.
+     * @memberOf fabric.util
+     * @param {fabric.Object} object the object you want to transform
+     * @param {Array} transform the destination transform
+     */
+    applyTransformToObject: function(object, transform) {
+      var options = fabric.util.qrDecompose(transform),
+          center = new fabric.Point(options.translateX, options.translateY);
+      object.flipX = false;
+      object.flipY = false;
+      object.set('scaleX', options.scaleX);
+      object.set('scaleY', options.scaleY);
+      object.skewX = options.skewX;
+      object.skewY = options.skewY;
+      object.angle = options.angle;
+      object.setPositionByOrigin(center, 'center', 'center');
+    },
+
+    /**
      * given a width and height, return the size of the bounding box
      * that can contains the box with width/height with applied transform
      * described in options.
