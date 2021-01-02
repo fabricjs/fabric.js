@@ -65,11 +65,6 @@ jobs:
     - stage: Unit Tests
       env: LAUNCHER=Node
       node_js: "12"
-    - stage: Unit Tests
-      env: LAUNCHER=Node
-      node_js: "10"
-    - stage: Unit Tests
-      node_js: "8"
     - stage: Visual Tests
       env: LAUNCHER=Node
       node_js: "12"
