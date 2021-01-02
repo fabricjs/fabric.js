@@ -169,10 +169,12 @@
       }
       this._calcBounds();
       this._updateObjectsCoords();
-      this.setCoords();
       this.dirty = true;
       if (this.group) {
         this.group.addWithUpdate();
+      }
+      else {
+        this.setCoords();
       }
       return this;
     },
@@ -396,7 +398,7 @@
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object, parentMatrix) {
-      var matrix = fabric.util.multiplyTransformMatrices(object.calcOwnMatrix(), parentMatrix);
+      var matrix = fabric.util.multiplyTransformMatrices(parentMatrix, object.calcOwnMatrix());
       fabric.util.applyTransformToObject(object, matrix);
       return object;
     },
@@ -473,19 +475,20 @@
     _calcBounds: function(onlyWidthHeight) {
       var aX = [],
           aY = [],
-          o, prop,
+          o, prop, coords,
           props = ['tr', 'br', 'bl', 'tl'],
           i = 0, iLen = this._objects.length,
           j, jLen = props.length;
 
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
-        o.aCoords = o.calcACoords();
+        coords = o.calcACoords();
         for (j = 0; j < jLen; j++) {
           prop = props[j];
-          aX.push(o.aCoords[prop].x);
-          aY.push(o.aCoords[prop].y);
+          aX.push(coords[prop].x);
+          aY.push(coords[prop].y);
         }
+        o.aCoords = coords;
       }
 
       this._getBounds(aX, aY, onlyWidthHeight);
