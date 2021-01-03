@@ -552,7 +552,7 @@
           sH = min(h * scaleY, elHeight - sY),
           x = -w / 2, y = -h / 2,
           maxDestW = min(w, elWidth / scaleX - cropX),
-          maxDestH = min(h, elHeight / scaleX - cropY);
+          maxDestH = min(h, elHeight / scaleY - cropY);
 
       elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
     },
