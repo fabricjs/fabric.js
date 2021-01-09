@@ -71,7 +71,7 @@
     "nyc": "^15.1.0",
     "onchange": "^3.x.x",
     "pixelmatch": "^4.0.2",
-    "qunit": "2.9.2",
+    "qunit": "^2.13.0",
     "testem": "^3.2.0",
     "uglify-js": "3.3.x"
   },
