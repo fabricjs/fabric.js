@@ -2452,9 +2452,9 @@
     assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
     assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
     assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-    assert.equal(canvas.isTargetTransparent(rect, 4, 4), false, 'opaque on 4,4');
-    assert.equal(canvas.isTargetTransparent(rect, 5, 5), false, 'opaque on 5, 5');
-    assert.equal(canvas.isTargetTransparent(rect, 6, 6), false, 'opaque on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
     assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
