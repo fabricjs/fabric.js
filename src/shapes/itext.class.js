@@ -100,6 +100,13 @@
     editable: true,
 
     /**
+     * Indicates whether a text should control cursor
+     * @type Boolean
+     * @default
+     */
+    modifyCursorOnEdit: true,
+
+    /**
      * Border color of text object while it's in editing mode
      * @type String
      * @default

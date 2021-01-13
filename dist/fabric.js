@@ -27134,6 +27134,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     editable: true,
 
     /**
+     * Indicates whether a text should control cursor
+     * @type Boolean
+     * @default
+     */
+    modifyCursorOnEdit: true,
+
+    /**
      * Border color of text object while it's in editing mode
      * @type String
      * @default
@@ -27963,14 +27970,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @private
      */
     _setEditingProps: function() {
-      this.hoverCursor = 'text';
+      if (this.modifyCursorOnEdit) {
+        this.hoverCursor = 'text';
 
-      if (this.canvas) {
-        this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
+        if (this.canvas) {
+          this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
+        }
+        this.hasControls = false;
       }
 
       this.borderColor = this.editingBorderColor;
-      this.hasControls = this.selectable = false;
+      this.selectable = false;
       this.lockMovementX = this.lockMovementY = true;
     },
 
