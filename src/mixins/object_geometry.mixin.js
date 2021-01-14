@@ -514,7 +514,7 @@
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height.
+     * Sets corner and controls position coordinates based on current angle, width and height, left and top.
      * oCoords are used to find the corners
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.

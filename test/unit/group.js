@@ -152,37 +152,38 @@
     var clone = group.toObject();
 
     var expectedObject = {
-      'version': fabric.version,
-      'type':                     'group',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     50,
-      'top':                      100,
-      'width':                    80,
-      'height':                   60,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              0,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'skewX':                    0,
-      'skewY':                    0,
-      'objects':                  clone.objects
+      version: fabric.version,
+      type:                     'group',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     50,
+      top:                      100,
+      width:                    80,
+      height:                   60,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              0,
+      strokeDashArray:          null,
+      strokeLineCap:            'butt',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'miter',
+      strokeMiterLimit:         4,
+      scaleX:                   1,
+      scaleY:                   1,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      angle:                    0,
+      flipX:                    false,
+      flipY:                    false,
+      opacity:                  1,
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                    0,
+      skewY:                    0,
+      objects:                  clone.objects,
+      strokeUniform:            false
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -482,7 +483,7 @@
     assert.equal(group.toSVG(), expectedSVG);
   });
 
-  QUnit.test('clonining group with 2 objects', function(assert) {
+  QUnit.test('cloning group with 2 objects', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2Objects();
     group.clone(function(clone) {

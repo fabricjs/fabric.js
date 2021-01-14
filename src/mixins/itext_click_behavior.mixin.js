@@ -147,7 +147,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * standard hander for mouse up, overridable
+   * standard handler for mouse up, overridable
    * @private
    */
   mouseUpHandler: function(options) {

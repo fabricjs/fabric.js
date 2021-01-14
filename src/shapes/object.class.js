@@ -343,7 +343,7 @@
     strokeLineCap:            'butt',
 
     /**
-     * Corner style of an object's stroke (one of "bevil", "round", "miter")
+     * Corner style of an object's stroke (one of "bevel", "round", "miter")
      * @type String
      * @default
      */
@@ -373,7 +373,7 @@
     /**
      * Scale factor of object's controlling borders
      * bigger number will make a thicker border
-     * border is 1, so this is basically a border tickness
+     * border is 1, so this is basically a border thickness
      * since there is no way to change the border itself.
      * @type Number
      * @default
@@ -839,7 +839,7 @@
             strokeLineCap:            this.strokeLineCap,
             strokeDashOffset:         this.strokeDashOffset,
             strokeLineJoin:           this.strokeLineJoin,
-            // strokeUniform:            this.strokeUniform,
+            strokeUniform:            this.strokeUniform,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
             scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
@@ -991,7 +991,6 @@
           this.group.set('dirty', true);
         }
       }
-
       return this;
     },
 
@@ -1087,7 +1086,7 @@
     /**
      * return true if the object will draw a stroke
      * Does not consider text styles. This is just a shortcut used at rendering time
-     * We want it to be an aproximation and be fast.
+     * We want it to be an approximation and be fast.
      * wrote to avoid extra caching, it has to return true when stroke happens,
      * can guess when it will not happen at 100% chance, does not matter if it misses
      * some use case where the stroke is invisible.
@@ -1101,7 +1100,7 @@
     /**
      * return true if the object will draw a fill
      * Does not consider text styles. This is just a shortcut used at rendering time
-     * We want it to be an aproximation and be fast.
+     * We want it to be an approximation and be fast.
      * wrote to avoid extra caching, it has to return true when fill happens,
      * can guess when it will not happen at 100% chance, does not matter if it misses
      * some use case where the fill is invisible.
@@ -1196,8 +1195,6 @@
       }
       else {
         this._renderBackground(ctx);
-        this._setStrokeStyles(ctx, this);
-        this._setFillStyles(ctx, this);
       }
       this._render(ctx);
       this._drawClipPath(ctx);
@@ -1293,23 +1290,44 @@
     },
 
     _setStrokeStyles: function(ctx, decl) {
-      if (decl.stroke) {
+      var stroke = decl.stroke;
+      if (stroke) {
         ctx.lineWidth = decl.strokeWidth;
         ctx.lineCap = decl.strokeLineCap;
         ctx.lineDashOffset = decl.strokeDashOffset;
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
-        ctx.strokeStyle = decl.stroke.toLive
-          ? decl.stroke.toLive(ctx, this)
-          : decl.stroke;
+        if (stroke.toLive) {
+          if (stroke.gradientUnits === 'percentage' || stroke.gradientTrasnform || stroke.patternTransform) {
+            // need to transform gradient in a pattern.
+            // this is a slow process. If you are hitting this codepath, and the object
+            // is not using caching, you should consider switching it on.
+            // we need a canvas as big as the current object caching canvas.
+            this._applyPatternForTransformedGradient(ctx, stroke);
+          }
+          else {
+            // is a simple gradient or pattern
+            ctx.strokeStyle = stroke.toLive(ctx, this);
+            this._applyPatternGradientTransform(ctx, stroke);
+          }
+        }
+        else {
+          // is a color
+          ctx.strokeStyle = decl.stroke;
+        }
       }
     },
 
     _setFillStyles: function(ctx, decl) {
-      if (decl.fill) {
-        ctx.fillStyle = decl.fill.toLive
-          ? decl.fill.toLive(ctx, this)
-          : decl.fill;
+      var fill = decl.fill;
+      if (fill) {
+        if (fill.toLive) {
+          ctx.fillStyle = fill.toLive(ctx, this);
+          this._applyPatternGradientTransform(ctx, decl.fill);
+        }
+        else {
+          ctx.fillStyle = fill;
+        }
       }
     },
 
@@ -1479,7 +1497,7 @@
       }
 
       ctx.save();
-      this._applyPatternGradientTransform(ctx, this.fill);
+      this._setFillStyles(ctx, this);
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1511,16 +1529,7 @@
         ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
-      if (this.stroke.toLive && this.stroke.gradientUnits === 'percentage') {
-        // need to transform gradient in a pattern.
-        // this is a slow process. If you are hitting this codepath, and the object
-        // is not using caching, you should consider switching it on.
-        // we need a canvas as big as the current object caching canvas.
-        this._applyPatternForTransformedGradient(ctx, this.stroke);
-      }
-      else {
-        this._applyPatternGradientTransform(ctx, this.stroke);
-      }
+      this._setStrokeStyles(ctx, this);
       ctx.stroke();
       ctx.restore();
     },
@@ -1635,11 +1644,15 @@
 
     /**
      * Creates an instance of fabric.Image out of an object
-     * could make use of both toDataUrl or toCanvasElement.
+     * makes use of toCanvasElement.
+     * Once this method was based on toDataUrl and loadImage, so it also had a quality
+     * and format option. toCanvasElement is faster and produce no loss of quality.
+     * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
+     * toCanvasElement and then toBlob from the obtained canvas is also a good option.
+     * This method is sync now, but still support the callback because we did not want to break.
+     * When fabricJS 5.0 will be planned, this will probably be changed to not have a callback.
      * @param {Function} callback callback, invoked with an instance as a first argument
      * @param {Object} [options] for clone as image, passed to toDataURL
-     * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
-     * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
      * @param {Number} [options.multiplier=1] Multiplier to scale by
      * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14

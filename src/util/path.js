@@ -115,7 +115,7 @@
    * @param {Number} y1
    * @param {Number} x2 secondo control point
    * @param {Number} y2
-   * @param {Number} x3 end of beizer
+   * @param {Number} x3 end of bezier
    * @param {Number} y3
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
@@ -203,12 +203,12 @@
   }
 
   /**
-   * Converts arc to a bunch of beizer curves
+   * Converts arc to a bunch of bezier curves
    * @param {Number} fx starting point x
    * @param {Number} fy starting point y
    * @param {Array} coords Arc command
    */
-  function fromArcToBeizers(fx, fy, coords) {
+  function fromArcToBeziers(fx, fy, coords) {
     var rx = coords[1],
         ry = coords[2],
         rot = coords[3],
@@ -229,7 +229,13 @@
     return segsNorm;
   };
 
-
+  /**
+   * This function take a parsed SVG path and make it simpler for fabricJS logic.
+   * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
+   * S converted in C, T converted in Q, A converted in C.
+   * @param {Array} path the array of commands of a parsed svg path for fabric.Path
+   * @return {Array} the simplified array of commands of a parsed svg path for fabric.Path
+   */
   function makePathSimpler(path) {
     // x and y represent the last point of the path. the previous command point.
     // we add them to each relative command to make it an absolute comment.
@@ -377,7 +383,7 @@
           // falls through
         case 'A':
           converted = true;
-          destinationPath = destinationPath.concat(fromArcToBeizers(x, y, current));
+          destinationPath = destinationPath.concat(fromArcToBeziers(x, y, current));
           x = current[6];
           y = current[7];
           break;
@@ -433,6 +439,17 @@
     };
   }
 
+  function getTangentCubicIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (3 * invT * invT * (p2x - p1x)) + (6 * invT * pct * (p3x - p2x)) +
+          (3 * pct * pct * (p4x - p3x)),
+          tangentY = (3 * invT * invT * (p2y - p1y)) + (6 * invT * pct * (p3y - p2y)) +
+          (3 * pct * pct * (p4y - p3y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
   function QB1(t) {
     return t * t;
   }
@@ -455,6 +472,18 @@
     };
   }
 
+  function getTangentQuadraticIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (2 * invT * (p2x - p1x)) + (2 * pct * (p3x - p2x)),
+          tangentY = (2 * invT * (p2y - p1y)) + (2 * pct * (p3y - p2y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
+
+  // this will run over a path segment ( a cubic or quadratic segment) and approximate it
+  // with 100 segemnts. This will good enough to calculate the length of the curve
   function pathIterator(iterator, x1, y1) {
     var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
     for (perc = 0.01; perc <= 1; perc += 0.01) {
@@ -465,12 +494,50 @@
     return tmpLen;
   }
 
-  //measures the length of a pre-simplified path
+  /**
+   * Given a pathInfo, and a distance in pixels, find the percentage from 0 to 1
+   * that correspond to that pixels run over the path.
+   * The percentage will be then used to find the correct point on the canvas for the path.
+   * @param {Array} segInfo fabricJS collection of information on a parsed path
+   * @param {Number} distance from starting point, in pixels.
+   * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
+   */
+  function findPercentageForDistance(segInfo, distance) {
+    var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
+        p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
+    // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
+    // the path
+    while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
+      p = iterator(perc);
+      lastPerc = perc;
+      nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
+      // compare tmpLen each cycle with distance, decide next perc to test.
+      if ((nextLen + tmpLen) > distance) {
+        // we discard this step and we make smaller steps.
+        nextStep /= 2;
+        perc -= nextStep;
+      }
+      else {
+        tempP = p;
+        perc += nextStep;
+        tmpLen += nextLen;
+      }
+    }
+    p.angle = angleFinder(lastPerc);
+    return p;
+  }
+
+  /**
+   * Run over a parsed and simplifed path and extrac some informations.
+   * informations are length of each command and starting point
+   * @param {Array} path fabricJS parsed path commands
+   * @return {Array} path commands informations
+   */
   function getPathSegmentsInfo(path) {
     var totalLength = 0, len = path.length, current,
         //x2 and y2 are the coords of segment start
         //x1 and y1 are the coords of the current point
-        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo;
+        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo, angleFinder;
     for (var i = 0; i < len; i++) {
       current = path[i];
       tempInfo = {
@@ -500,6 +567,18 @@
             current[5],
             current[6]
           );
+          angleFinder = getTangentCubicIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4],
+            current[5],
+            current[6]
+          );
+          tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[5];
           y1 = current[6];
@@ -513,6 +592,16 @@
             current[3],
             current[4]
           );
+          angleFinder = getTangentQuadraticIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4]
+          );
+          tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[3];
           y1 = current[4];
@@ -534,53 +623,41 @@
     return info;
   }
 
-  function getPointOnPath(path, perc, infos) {
+  function getPointOnPath(path, distance, infos) {
     if (!infos) {
       infos = getPathSegmentsInfo(path);
     }
-    var distance = infos[infos.length - 1] * perc, i = 0;
-    while ((distance - infos[i] > 0) && i < infos.length) {
-      distance -= infos[i];
+    var i = 0;
+    while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
+      distance -= infos[i].length;
       i++;
     }
+    // var distance = infos[infos.length - 1] * perc;
     var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.length, segment = path[i];
+        command = segInfo.command, segment = path[i], info;
+
     switch (command) {
+      case 'M':
+        return { x: segInfo.x, y: segInfo.y, angle: 0 };
       case 'Z':
       case 'z':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segInfo.destX, segInfo.destY),
           segPercent
         );
-        break;
+        info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
+        return info;
       case 'L':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segment[1], segment[2]),
           segPercent
         );
-        break;
+        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
+        return info;
       case 'C':
-        return getPointOnCubicBezierIterator(
-          segInfo.x,
-          segInfo.y,
-          segment[1],
-          segment[2],
-          segment[3],
-          segment[4],
-          segment[5],
-          segment[6]
-        )(segPercent);
-        break;
+        return findPercentageForDistance(segInfo, distance);
       case 'Q':
-        return getPointOnQuadraticBezierIterator(
-          segInfo.x,
-          segInfo.y,
-          segment[1],
-          segment[2],
-          segment[3],
-          segment[4]
-        )(segPercent);
-        break;
+        return findPercentageForDistance(segInfo, distance);
     }
   }
 
@@ -682,6 +759,7 @@
 
   /**
    * Draws arc
+   * @deprecated
    * @param {CanvasRenderingContext2D} ctx
    * @param {Number} fx
    * @param {Number} fy
@@ -689,16 +767,22 @@
    */
   function drawArc(ctx, fx, fy, coords) {
     coords = coords.slice(0).unshift('X'); // command A or a does not matter
-    var beizers = fromArcToBeizers(fx, fy, coords);
-    beizers.forEach(function(beizer) {
-      ctx.bezierCurveTo.apply(ctx, beizer.slice(1));
+    var beziers = fromArcToBeziers(fx, fy, coords);
+    beziers.forEach(function(bezier) {
+      ctx.bezierCurveTo.apply(ctx, bezier.slice(1));
     });
   };
 
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
-  fabric.util.fromArcToBeizers = fromArcToBeizers;
+  fabric.util.fromArcToBeziers = fromArcToBeziers;
+  /**
+   * Typo of `fromArcToBeziers` kept for not breaking the api once corrected.
+   * Will be removed in fabric 5.0
+   * @deprecated
+   */
+  fabric.util.fromArcToBeizers = fromArcToBeziers;
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   // kept because we do not want to make breaking changes.

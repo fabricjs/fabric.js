@@ -9,49 +9,50 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
-    'version':                   fabric.version,
-    'type':                      'text',
-    'originX':                   'left',
-    'originY':                   'top',
-    'left':                      0,
-    'top':                       0,
-    'width':                     CHAR_WIDTH,
-    'height':                    45.2,
-    'fill':                      'rgb(0,0,0)',
-    'stroke':                    null,
-    'strokeWidth':               1,
-    'strokeDashArray':           null,
-    'strokeLineCap':             'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':            'miter',
-    'strokeMiterLimit':          4,
-    'scaleX':                    1,
-    'scaleY':                    1,
-    'angle':                     0,
-    'flipX':                     false,
-    'flipY':                     false,
-    'opacity':                   1,
-    'shadow':                    null,
-    'visible':                   true,
-    'backgroundColor':           '',
-    'text':                      'x',
-    'fontSize':                  40,
-    'fontWeight':                'normal',
-    'fontFamily':                'Times New Roman',
-    'fontStyle':                 'normal',
-    'lineHeight':                1.16,
-    'underline':                 false,
-    'overline':                  false,
-    'linethrough':               false,
-    'textAlign':                 'left',
-    'textBackgroundColor':       '',
-    'fillRule':                  'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation':  'source-over',
-    'skewX':                      0,
-    'skewY':                      0,
-    'charSpacing':                0,
-    'styles':                     {}
+    version:                   fabric.version,
+    type:                      'text',
+    originX:                   'left',
+    originY:                   'top',
+    left:                      0,
+    top:                       0,
+    width:                     CHAR_WIDTH,
+    height:                    45.2,
+    fill:                      'rgb(0,0,0)',
+    stroke:                    null,
+    strokeWidth:               1,
+    strokeDashArray:           null,
+    strokeLineCap:             'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:            'miter',
+    strokeMiterLimit:          4,
+    scaleX:                    1,
+    scaleY:                    1,
+    angle:                     0,
+    flipX:                     false,
+    flipY:                     false,
+    opacity:                   1,
+    shadow:                    null,
+    visible:                   true,
+    backgroundColor:           '',
+    text:                      'x',
+    fontSize:                  40,
+    fontWeight:                'normal',
+    fontFamily:                'Times New Roman',
+    fontStyle:                 'normal',
+    lineHeight:                1.16,
+    underline:                 false,
+    overline:                  false,
+    linethrough:               false,
+    textAlign:                 'left',
+    textBackgroundColor:       '',
+    fillRule:                  'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation:  'source-over',
+    skewX:                      0,
+    skewY:                      0,
+    charSpacing:                0,
+    styles:                     {},
+    strokeUniform:              false
   };
 
   QUnit.test('constructor', function(assert) {
@@ -220,7 +221,7 @@
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
     elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
@@ -248,7 +249,7 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         fontFamily:       'Monaco',
         paintFirst:       'fill',
@@ -828,6 +829,21 @@
     assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
     assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
+  QUnit.test('text with a path', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    assert.ok(text.path, 'text has a path');
+    assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
+    assert.equal(text.width, 100, 'text is big as the path width');
+    assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
+  QUnit.test('cacheProperties for text', function(assert) {
+    var text = new fabric.Text('a');
+    assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-path');
   });
 
 })();

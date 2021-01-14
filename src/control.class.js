@@ -25,7 +25,7 @@
     visible: true,
 
     /**
-     * Name of the action that the controll will likely execute.
+     * Name of the action that the control will likely execute.
      * This is optional. FabricJS uses to identify what the user is doing for some
      * extra optimizations. If you are writing a custom control and you want to know
      * somewhere else in the code what is going on, you can use this string here.
@@ -69,7 +69,7 @@
      * Positive offset moves the control to the right, negative to the left.
      * It used when you want to have position of control that does not scale with
      * the bounding box. Example: rotation control is placed at x:0, y: 0.5 on
-     * the boundindbox, with an offset of 30 pixels vertivally. Those 30 pixels will
+     * the boundindbox, with an offset of 30 pixels vertically. Those 30 pixels will
      * stay 30 pixels no matter how the object is big. Another example is having 2
      * controls in the corner, that stay in the same position when the object scale.
      * of the bounding box.
@@ -138,46 +138,49 @@
      * The control actionHandler, provide one to handle action ( control being moved )
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {Number} x x position of the cursor
+     * @param {Number} y y position of the cursor
+     * @return {Boolean} true if the action/event modified the object
      */
-    actionHandler: function(/* eventData, transformData, fabricObject */) { },
+    actionHandler: function(/* eventData, transformData, x, y */) { },
 
     /**
      * The control handler for mouse down, provide one to handle mouse down on control
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {Number} x x position of the cursor
+     * @param {Number} y y position of the cursor
+     * @return {Boolean} true if the action/event modified the object
      */
-    mouseDownHandler: function(/* eventData, transformData, fabricObject */) { },
+    mouseDownHandler: function(/* eventData, transformData, x, y */) { },
 
     /**
      * The control mouseUpHandler, provide one to handle an effect on mouse up.
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {Number} x x position of the cursor
+     * @param {Number} y y position of the cursor
+     * @return {Boolean} true if the action/event modified the object
      */
-    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
+    mouseUpHandler: function(/* eventData, transformData, x, y */) { },
 
     /**
      * Returns control actionHandler
      * @param {Event} eventData the native mouse event
-     * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {fabric.Object} fabricObject on which the control is displayed
+     * @param {fabric.Control} control control for which the action handler is being asked
+     * @return {Function} the action handler
      */
-    getActionHandler: function(/* eventData, transformData, fabricObject */) {
+    getActionHandler: function(/* eventData, fabricObject, control */) {
       return this.actionHandler;
     },
 
     /**
      * Returns control mouseDown handler
      * @param {Event} eventData the native mouse event
-     * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {fabric.Object} fabricObject on which the control is displayed
+     * @param {fabric.Control} control control for which the action handler is being asked
+     * @return {Function} the action handler
      */
     getMouseDownHandler: function(/* eventData, fabricObject, control */) {
       return this.mouseDownHandler;
@@ -186,9 +189,9 @@
     /**
      * Returns control mouseUp handler
      * @param {Event} eventData the native mouse event
-     * @param {Object} transformData properties of the current transform
-     * @param {fabric.Object} object on which the control is displayed
-     * @return {Function}
+     * @param {fabric.Object} fabricObject on which the control is displayed
+     * @param {fabric.Control} control control for which the action handler is being asked
+     * @return {Function} the action handler
      */
     getMouseUpHandler: function(/* eventData, fabricObject, control */) {
       return this.mouseUpHandler;

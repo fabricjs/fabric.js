@@ -5,7 +5,7 @@
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/fabricjs/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
@@ -51,11 +51,12 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 
 ### Supported browsers
 
-- Firefox 2+
-- Safari 3+
+- Firefox 4+
+- Safari 5+
 - Opera 9.64+
 - Chrome (all versions)
-- IE10, IE11, Edge
+- Edge (chromium based, all versions)
+- IE11 and Edge legacy, supported but deprecated.
 
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
@@ -76,7 +77,7 @@ Please follow the instructions located [here](https://github.com/Automattic/node
 
 
     $ npm install fabric --save
-    
+
 
 After this, you can import fabric like so:
 

@@ -90,7 +90,7 @@
 
     /**
      * Calculate the polygon min and max point from points array,
-     * returning an object with left, top, widht, height to measure the
+     * returning an object with left, top, width, height to measure the
      * polygon size
      * @return {Object} object.left X coordinate of the polygon leftmost point
      * @return {Object} object.top Y coordinate of the polygon topmost point

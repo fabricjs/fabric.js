@@ -66,7 +66,8 @@
     skewY:                    0,
     crossOrigin:              null,
     cropX:                    0,
-    cropY:                    0
+    cropY:                    0,
+    strokeUniform:            false
   };
 
   function _createImageElement() {

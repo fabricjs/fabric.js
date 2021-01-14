@@ -513,7 +513,7 @@
     },
 
     /**
-     * takes an event and determins if selection key has been pressed
+     * takes an event and determines if selection key has been pressed
      * @private
      * @param {Event} e Event object
      */
@@ -608,10 +608,6 @@
       else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
         origin.y = 'top';
       }
-      else if (corner === 'mtr') {
-        origin.x = 'center';
-        origin.y = 'center';
-      }
       return origin;
     },
 
@@ -641,8 +637,9 @@
       }
 
       var pointer = this.getPointer(e), corner = target.__corner,
+          control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
-            target.controls[corner].getActionHandler() : fabric.controlsUtils.dragHandler,
+            control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],

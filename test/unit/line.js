@@ -1,40 +1,41 @@
 (function(){
 
   var LINE_OBJECT = {
-    'version':                  fabric.version,
-    'type':                     'line',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     11,
-    'top':                      12,
-    'width':                    2,
-    'height':                   2,
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         4,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'x1':                       -1,
-    'y1':                       -1,
-    'x2':                       1,
-    'y2':                       1,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'skewX':                    0,
-    'skewY':                    0,
+    version:                  fabric.version,
+    type:                     'line',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     11,
+    top:                      12,
+    width:                    2,
+    height:                   2,
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              1,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    x1:                       -1,
+    y1:                       -1,
+    x2:                       1,
+    y2:                       1,
+    shadow:                   null,
+    visible:                  true,
+    backgroundColor:          '',
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    skewX:                    0,
+    skewY:                    0,
+    strokeUniform:            false
   };
 
   QUnit.module('fabric.Line');
@@ -101,7 +102,7 @@
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
-        strokeLineJoin   = 'bevil',
+        strokeLineJoin   = 'bevel',
         strokeMiterLimit = 5;
 
     lineEl.setAttributeNS(namespace, 'x1', x1);
@@ -140,7 +141,7 @@
     });
   });
 
-  QUnit.test('straight lines may have 0 width or heigth', function(assert) {
+  QUnit.test('straight lines may have 0 width or height', function(assert) {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 
