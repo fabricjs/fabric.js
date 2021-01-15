@@ -188,16 +188,27 @@
   /**
    * Wrap an action handler with saving/restoring object position on the transform.
    * this is the code that permits to objects to keep their position while transforming.
-   * @param {string} eventName
    * @param {Function} actionHandler the function to wrap
    * @return {Function} a function with an action handler signature
    */
-  function wrapWithFixedAnchor(eventName, actionHandler) {
+  function wrapWithFixedAnchor(actionHandler) {
     return function(eventData, transform, x, y) {
       var target = transform.target, centerPoint = target.getCenterPoint(),
           constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
       target.setPositionByOrigin(constraint, transform.originX, transform.originY);
+      return actionPerformed;
+    };
+  }
+
+  /**
+   * Wrap an action handler with firing an event if the action is performed
+   * @param {Function} actionHandler the function to wrap
+   * @return {Function} a function with an action handler signature
+   */
+  function wrapWithFireEvent(eventName, actionHandler) {
+    return function(eventData, transform, x, y) {
+      var actionPerformed = actionHandler(eventData, transform, x, y);
       if (actionPerformed) {
         fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
       }
@@ -391,7 +402,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originX = originX;
-    var finalHandler = wrapWithFixedAnchor('skewing', skewObjectX);
+    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectX));
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -441,7 +452,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originY = originY;
-    var finalHandler = wrapWithFixedAnchor('skewing', skewObjectY);
+    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectY));
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -467,7 +478,7 @@
     var lastAngle = Math.atan2(t.ey - pivotPoint.y, t.ex - pivotPoint.x),
         curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x),
         angle = radiansToDegrees(curAngle - lastAngle + t.theta),
-        hasRotated;
+        hasRotated = true;
 
     if (target.snapAngle > 0) {
       var snapAngle  = target.snapAngle,
@@ -676,11 +687,10 @@
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width, hasResized,
+        oldWidth = target.width,
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
-    hasResized = oldWidth !== newWidth;
-    return hasResized;
+    return oldWidth !== newWidth;
   }
 
   /**
@@ -709,13 +719,13 @@
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
-  controls.rotationWithSnapping = wrapWithFixedAnchor('rotating', rotationWithSnapping);
-  controls.scalingEqually = wrapWithFixedAnchor('scaling', scaleObjectFromCorner);
-  controls.scalingX = wrapWithFixedAnchor('scaling', scaleObjectX);
-  controls.scalingY = wrapWithFixedAnchor('scaling', scaleObjectY);
+  controls.rotationWithSnapping = wrapWithFireEvent('rotating', wrapWithFixedAnchor(rotationWithSnapping));
+  controls.scalingEqually = wrapWithFireEvent('scaling', wrapWithFixedAnchor( scaleObjectFromCorner));
+  controls.scalingX = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectX));
+  controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFixedAnchor('resizing', changeWidth);
+  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth));
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
@@ -723,6 +733,7 @@
   controls.rotationStyleHandler = rotationStyleHandler;
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
+  controls.wrapWithFireEvent = wrapWithFireEvent;
   controls.getLocalPoint = getLocalPoint;
   fabric.controlsUtils = controls;
 
