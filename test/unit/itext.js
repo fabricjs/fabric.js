@@ -831,16 +831,15 @@
       });
     });
 
-    QUnit.test('_restoreClickHandlerProps', function (assert) {
+    QUnit.test('restore _clickHandlerInitialized on added', function (assert) {
       var iText = new fabric.IText('test');
-
       iText._clickHandlerInitialized = true;
 
-      iText._restoreClickHandlerProps();
+      canvas.add(iText);
 
       assert.notOk(
         iText._clickHandlerInitialized,
-        'set to false by _restoreClickHandlerProps'
+        'set to false on added'
       );
     });
   });
