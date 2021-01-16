@@ -717,6 +717,10 @@
         var alreadySelected = target === this._activeObject;
         if (target.selectable) {
           this.setActiveObject(target, e);
+          if (fabric.touchSelectBeforeTransform &&
+            !alreadySelected && fabric.util.isTouchEvent(e)) {
+            return;
+          }
         }
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
