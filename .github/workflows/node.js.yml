@@ -20,6 +20,6 @@ jobs:
         node-version: 14.x
     - run: npm ci
     - run: npm run build:fast
-    - run: testem ci --port 8080 -f testem.json -l $LAUNCHER
+    - run: npm run testem ci --port 8080 -f testem.json -l $LAUNCHER
       env:
         LAUNCHER: Firefox
