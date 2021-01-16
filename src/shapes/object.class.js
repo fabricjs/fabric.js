@@ -991,7 +991,6 @@
           this.group.set('dirty', true);
         }
       }
-
       return this;
     },
 
