@@ -1,5 +1,4 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow will do a clean install of node dependencies, build the library, run testem for firefox
 
 name: Unit tests on Firefox
 
@@ -23,7 +22,5 @@ jobs:
     - name: Run headless test
       uses: GabrielBB/xvfb-action@v1
       with:
-        env:
-          LAUNCHER: Firefox
-        run: npm run testem ci --port 8080 -f testem.json -l $LAUNCHER
+        run: LAUNCHER=Firefox npm run testem ci --port 8080 -f testem.json -l $LAUNCHER
 
