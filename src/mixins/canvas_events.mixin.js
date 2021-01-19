@@ -715,12 +715,22 @@
 
       if (target) {
         var alreadySelected = target === this._activeObject;
-        if (target.selectable) {
-          this.setActiveObject(target, e);
-          if (fabric.touchSelectBeforeTransform &&
-            !alreadySelected && fabric.util.isTouchEvent(e)) {
+        if (!alreadySelected) {
+          if(fabric.util.isTouchEvent(e)) {
+            var activeOnDown = (target.setActiveOn === 'mouseuptouchdown' ||
+            target.setActiveOn === 'mousetouchdown');
+          }
+          else {
+            var activeOnDown = (target.setActiveOn === 'mousetouchdown' ||
+            target.setActiveOn === 'mousedowntouchup');
+          }
+          if(!activeOnDown) {
+            this._handleEvent(e, 'down');
             return;
           }
+        }
+        if (target.selectable) {
+          this.setActiveObject(target, e);
         }
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
