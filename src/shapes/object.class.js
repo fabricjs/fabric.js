@@ -570,6 +570,17 @@
      * @default
      */
     paintFirst:           'fill',
+    
+    /**
+     * When 'mousetouchdown', object is set to active on mousedown/touchdown
+     * When 'mousedowntouchup', object is set to active on mousedown/touchup
+     * When 'mouseuptouchdown', object is set to active on mouseup/touchdown
+     * When 'mousetouchup', object is set to active on mouseup/touchup
+     * since 4.4.0
+     * @type String
+     * @default
+     */
+    setActiveOn:           'mousetouchdown',
 
     /**
      * List of properties to consider when checking if state
