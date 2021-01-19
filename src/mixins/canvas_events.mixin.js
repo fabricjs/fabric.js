@@ -451,6 +451,22 @@
         }
       }
       if (target) {
+        if (target.selectable && target !== this._activeObject) {
+          if (fabric.util.isTouchEvent(e)) {
+            var activeOnDown = (target.setActiveOn === 'mouseuptouchdown' ||
+            target.setActiveOn === 'mousetouchdown');
+          }
+          else {
+            var activeOnDown = (target.setActiveOn === 'mousetouchdown' ||
+            target.setActiveOn === 'mousedowntouchup');
+          }
+          if (!activeOnDown) {
+            this.setActiveObject(target, e);
+            this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+            this.requestRenderAll();
+            return;
+          }
+        }
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
           fabric.util.isTouchEvent(e)
