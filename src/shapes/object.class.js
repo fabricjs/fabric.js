@@ -578,7 +578,7 @@
      * When 'mousetouchup', object is set to active on mouseup/touchup
      * since 4.4.0
      * @type String
-     * @default
+     * @default 'mousetouchdown'
      */
     setActiveOn:           'mousetouchdown',
 
