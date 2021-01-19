@@ -716,7 +716,7 @@
       if (target) {
         var alreadySelected = target === this._activeObject;
         if (!alreadySelected) {
-          if(fabric.util.isTouchEvent(e)) {
+          if (fabric.util.isTouchEvent(e)) {
             var activeOnDown = (target.setActiveOn === 'mouseuptouchdown' ||
             target.setActiveOn === 'mousetouchdown');
           }
@@ -724,7 +724,7 @@
             var activeOnDown = (target.setActiveOn === 'mousetouchdown' ||
             target.setActiveOn === 'mousedowntouchup');
           }
-          if(!activeOnDown) {
+          if (!activeOnDown) {
             this._handleEvent(e, 'down');
             return;
           }
