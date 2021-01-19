@@ -570,7 +570,7 @@
      * @default
      */
     paintFirst:           'fill',
-    
+
     /**
      * When 'mousetouchdown', object is set to active on mousedown/touchdown
      * When 'mousedowntouchup', object is set to active on mousedown/touchup
