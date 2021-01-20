@@ -240,7 +240,7 @@
    * @return {Boolean} true if one flip, but not two.
    */
   function targetHasOneFlip(target) {
-    return target.flipX ^ target.flipY;
+    return target.flipX != target.flipY;
   }
 
   /**
