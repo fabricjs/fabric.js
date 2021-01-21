@@ -3,7 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],
+      scaleMap = ['ew', 'nwse', 'ns', 'nesw', 'ew', 'nwse', 'ns', 'nesw', 'ew'],
       skewMap = ['ns', 'nesw', 'ew', 'nwse'],
       controls = {},
       LEFT = 'left', TOP = 'top', RIGHT = 'right', BOTTOM = 'bottom', CENTER = 'center',
