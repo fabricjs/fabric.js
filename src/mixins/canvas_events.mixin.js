@@ -721,7 +721,7 @@
 
       if (target) {
         var alreadySelected = target === this._activeObject;
-        if (target.selectable && target.activeOn !== 'up') {
+        if (target.selectable && target.activeOn === 'down') {
           this.setActiveObject(target, e);
         }
         var corner = target._findTargetCorner(
