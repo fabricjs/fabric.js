@@ -572,15 +572,15 @@
     paintFirst:           'fill',
 
     /**
-     * When 'mousetouchdown', object is set to active on mousedown/touchdown
-     * When 'mousedowntouchup', object is set to active on mousedown/touchup
-     * When 'mouseuptouchdown', object is set to active on mouseup/touchdown
-     * When 'mousetouchup', object is set to active on mouseup/touchup
+     * When 'down', object is set to active on mousedown/touchstart
+     * When 'up', object is set to active on mouseup/touchend
+     * Experimental. Let's see if this breaks anything before supporting officially
+     * @private
      * since 4.4.0
      * @type String
-     * @default 'mousetouchdown'
+     * @default 'down'
      */
-    setActiveOn:           'mousetouchdown',
+    activeOn:           'down',
 
     /**
      * List of properties to consider when checking if state

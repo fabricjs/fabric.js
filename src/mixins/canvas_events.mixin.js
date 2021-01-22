@@ -451,31 +451,21 @@
         }
       }
       if (target) {
-        if (target.selectable && target !== this._activeObject) {
-          if (fabric.util.isTouchEvent(e)) {
-            var activeOnDown = (target.setActiveOn === 'mouseuptouchdown' ||
-            target.setActiveOn === 'mousetouchdown');
-          }
-          else {
-            var activeOnDown = (target.setActiveOn === 'mousetouchdown' ||
-            target.setActiveOn === 'mousedowntouchup');
-          }
-          if (!activeOnDown) {
-            this.setActiveObject(target, e);
-            this._handleEvent(e, 'up', LEFT_CLICK, isClick);
-            this.requestRenderAll();
-            return;
-          }
+        if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
+          this.setActiveObject(target, e);
+          shouldRender = true;
         }
-        var corner = target._findTargetCorner(
-          this.getPointer(e, true),
-          fabric.util.isTouchEvent(e)
-        );
-        var control = target.controls[corner],
-            mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
-        if (mouseUpHandler) {
-          var pointer = this.getPointer(e);
-          mouseUpHandler(e, transform, pointer.x, pointer.y);
+        else {
+          var corner = target._findTargetCorner(
+            this.getPointer(e, true),
+            fabric.util.isTouchEvent(e)
+          );
+          var control = target.controls[corner],
+              mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
+          if (mouseUpHandler) {
+            var pointer = this.getPointer(e);
+            mouseUpHandler(e, transform, pointer.x, pointer.y);
+          }
         }
         target.isMoving = false;
       }
@@ -731,21 +721,7 @@
 
       if (target) {
         var alreadySelected = target === this._activeObject;
-        if (!alreadySelected) {
-          if (fabric.util.isTouchEvent(e)) {
-            var activeOnDown = (target.setActiveOn === 'mouseuptouchdown' ||
-            target.setActiveOn === 'mousetouchdown');
-          }
-          else {
-            var activeOnDown = (target.setActiveOn === 'mousetouchdown' ||
-            target.setActiveOn === 'mousedowntouchup');
-          }
-          if (!activeOnDown) {
-            this._handleEvent(e, 'down');
-            return;
-          }
-        }
-        if (target.selectable) {
+        if (target.selectable && target.activeOn !== 'up') {
           this.setActiveObject(target, e);
         }
         var corner = target._findTargetCorner(
