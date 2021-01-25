@@ -91,7 +91,7 @@ Or you can use this instead if your build pipeline supports ES6 imports:
 import { fabric } from "fabric";
 ```
 
-NOTE: es6 imports won't work in browser or wth bundlers which expect es6 module like vite. Use commonjs syntax instead.
+NOTE: es6 imports won't work in browser or with bundlers which expect es6 module like vite. Use commonjs syntax instead.
 
 See [the example section](#examples-of-use) for usage examples.
 
