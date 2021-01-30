@@ -38,6 +38,7 @@ jobs:
       with:
         node-version: 12.x
     - run: npm ci
+    - run: npm build:fast
     - run: npm run coverage
     - uses: romeovs/lcov-reporter-action@v0.2.16
       with:
