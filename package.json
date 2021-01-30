@@ -58,7 +58,6 @@
     "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit && cp -r test/visual/* ../fabricjs.com/test/visual && cp -r test/fixtures/* ../fabricjs.com/test/fixtures && cp -r test/lib/* ../fabricjs.com/test/lib",
     "all": "npm run build && npm run test && npm run test:visual && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
     "testem": "testem .",
-    "testem:visual": "testem --file testem-visual.json",
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
