@@ -39,7 +39,8 @@ jobs:
         node-version: 12.x
     - run: npm ci
     - run: npm run build:fast
+    - run: npm run test:coverage && npm run test:visual:coverage
     - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        test-command: "npm run coverage"
+        test-command: "npm run coverage:report"
