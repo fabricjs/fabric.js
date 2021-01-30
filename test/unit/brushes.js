@@ -59,6 +59,39 @@
           assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 12.5 Q 15 15 17.5 17.5 Q 20 20 17.5 17.5 Q 15 15 17.5 17.5 L 20.001 20.001', 'path data create a complex path');
           assert.equal(brush._points.length, 6, 'concident points are discarded');
         });
+        QUnit.test('fabric pencil brush multiple points outside canvas', function(assert) {
+          var brush = new fabric.PencilBrush(canvas);
+          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
+          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 100});
+          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
+          var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
+          var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
+          brush.onMouseDown(pointer, { e: {} });
+          brush.onMouseMove(pointer2, { e: {} });
+          brush.onMouseMove(pointer3, { e: {} });
+          brush.onMouseMove(pointer4, { e: {} });
+          brush.onMouseMove(pointer5, { e: {} });
+          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
+          assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 17.5 130 Q 20 160 170 130 Q 320 100 210 100 L 99.999 100', 'path data create a path that goes beyond canvas');
+          assert.equal(brush._points.length, 6, 'all points are available');
+        });
+        QUnit.test('fabric pencil brush multiple points outside canvas, limitedToCanvasSize true', function(assert) {
+          var brush = new fabric.PencilBrush(canvas);
+          brush.limitedToCanvasSize = true;
+          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
+          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 100});
+          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
+          var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
+          var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
+          brush.onMouseDown(pointer, { e: {} });
+          brush.onMouseMove(pointer2, { e: {} });
+          brush.onMouseMove(pointer3, { e: {} });
+          brush.onMouseMove(pointer4, { e: {} });
+          brush.onMouseMove(pointer5, { e: {} });
+          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
+          assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 57.5 100 L 100.001 100', 'path data create a path that does not go beyond canvas');
+          assert.equal(brush._points.length, 4, '2 points have been discarded');
+        });
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
           var fireBeforePathCreatedEvent = false;
           var firePathCreatedEvent = false;

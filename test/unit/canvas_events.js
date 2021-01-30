@@ -179,6 +179,21 @@
     canvas.__onMouseUp(e);
   });
 
+  QUnit.test('activeOn object selection', function(assert) {
+    var rect = new fabric.Rect({ width: 200, height: 200, activeOn: 'down' });
+    canvas.add(rect);
+    var e = { clientX: 30, clientY: 15, which: 1, target: canvas.upperCanvasEl };
+    canvas.__onMouseDown(e);
+    assert.equal(canvas._activeObject, rect, 'with activeOn of down object is selected on mouse down');
+    canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
+    rect.activeOn = 'up';
+    canvas.__onMouseDown(e);
+    assert.equal(canvas._activeObject, null, 'with activeOn of up object is not selected on mouse down');
+    canvas.__onMouseUp(e);
+    assert.equal(canvas._activeObject, rect, 'with activeOn of up object is selected on mouse up');
+  });
+
   QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
     var greenRect = new fabric.Rect({
       width: 300,

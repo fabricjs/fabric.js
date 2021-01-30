@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.3.0' };
+var fabric = fabric || { version: '4.3.1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2048,6 +2048,17 @@ fabric.CommonMethods = {
     };
   }
 
+  function getTangentCubicIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (3 * invT * invT * (p2x - p1x)) + (6 * invT * pct * (p3x - p2x)) +
+          (3 * pct * pct * (p4x - p3x)),
+          tangentY = (3 * invT * invT * (p2y - p1y)) + (6 * invT * pct * (p3y - p2y)) +
+          (3 * pct * pct * (p4y - p3y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
   function QB1(t) {
     return t * t;
   }
@@ -2070,6 +2081,16 @@ fabric.CommonMethods = {
     };
   }
 
+  function getTangentQuadraticIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
+    return function (pct) {
+      var invT = 1 - pct,
+          tangentX = (2 * invT * (p2x - p1x)) + (2 * pct * (p3x - p2x)),
+          tangentY = (2 * invT * (p2y - p1y)) + (2 * pct * (p3y - p2y));
+      return Math.atan2(tangentY, tangentX);
+    };
+  }
+
+
   // this will run over a path segment ( a cubic or quadratic segment) and approximate it
   // with 100 segemnts. This will good enough to calculate the length of the curve
   function pathIterator(iterator, x1, y1) {
@@ -2088,15 +2109,16 @@ fabric.CommonMethods = {
    * The percentage will be then used to find the correct point on the canvas for the path.
    * @param {Array} segInfo fabricJS collection of information on a parsed path
    * @param {Number} distance from starting point, in pixels.
-   * @return {Number} length of segment
+   * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
    */
   function findPercentageForDistance(segInfo, distance) {
     var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
-        p, nextLen, nextStep = 0.01;
+        p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
     // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
     // the path
     while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
       p = iterator(perc);
+      lastPerc = perc;
       nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
       // compare tmpLen each cycle with distance, decide next perc to test.
       if ((nextLen + tmpLen) > distance) {
@@ -2110,6 +2132,7 @@ fabric.CommonMethods = {
         tmpLen += nextLen;
       }
     }
+    p.angle = angleFinder(lastPerc);
     return p;
   }
 
@@ -2123,7 +2146,7 @@ fabric.CommonMethods = {
     var totalLength = 0, len = path.length, current,
         //x2 and y2 are the coords of segment start
         //x1 and y1 are the coords of the current point
-        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo;
+        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo, angleFinder;
     for (var i = 0; i < len; i++) {
       current = path[i];
       tempInfo = {
@@ -2153,7 +2176,18 @@ fabric.CommonMethods = {
             current[5],
             current[6]
           );
+          angleFinder = getTangentCubicIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4],
+            current[5],
+            current[6]
+          );
           tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[5];
           y1 = current[6];
@@ -2167,7 +2201,16 @@ fabric.CommonMethods = {
             current[3],
             current[4]
           );
+          angleFinder = getTangentQuadraticIterator(
+            x1,
+            y1,
+            current[1],
+            current[2],
+            current[3],
+            current[4]
+          );
           tempInfo.iterator = iterator;
+          tempInfo.angleFinder = angleFinder;
           tempInfo.length = pathIterator(iterator, x1, y1);
           x1 = current[3];
           y1 = current[4];
@@ -2193,29 +2236,33 @@ fabric.CommonMethods = {
     if (!infos) {
       infos = getPathSegmentsInfo(path);
     }
-    // var distance = infos[infos.length - 1] * perc;
     var i = 0;
     while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
       distance -= infos[i].length;
       i++;
     }
+    // var distance = infos[infos.length - 1] * perc;
     var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.command, segment = path[i];
+        command = segInfo.command, segment = path[i], info;
 
     switch (command) {
       case 'M':
-        return { x: segInfo.x, y: segInfo.y };
+        return { x: segInfo.x, y: segInfo.y, angle: 0 };
       case 'Z':
       case 'z':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segInfo.destX, segInfo.destY),
           segPercent
         );
+        info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
+        return info;
       case 'L':
-        return new fabric.Point(segInfo.x, segInfo.y).lerp(
+        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
           new fabric.Point(segment[1], segment[2]),
           segPercent
         );
+        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
+        return info;
       case 'C':
         return findPercentageForDistance(segInfo, distance);
       case 'Q':
@@ -8942,7 +8989,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject, object, i, len;
+      var activeObject = this._activeObject,
+          backgroundObject = this.backgroundImage,
+          overlayObject = this.overlayImage,
+          object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
@@ -8950,6 +9000,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
       if (activeObject) {
         activeObject.setCoords();
+      }
+      if (backgroundObject) {
+        backgroundObject.setCoords(true);
+      }
+      if (overlayObject) {
+        overlayObject.setCoords(true);
       }
       this.calcViewportBoundaries();
       this.renderOnAddRemove && this.requestRenderAll();
@@ -14630,7 +14686,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             strokeLineCap:            this.strokeLineCap,
             strokeDashOffset:         this.strokeDashOffset,
             strokeLineJoin:           this.strokeLineJoin,
-            // strokeUniform:            this.strokeUniform,
+            strokeUniform:            this.strokeUniform,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
             scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
             scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
@@ -14782,7 +14838,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           this.group.set('dirty', true);
         }
       }
-
       return this;
     },
 
@@ -25135,9 +25190,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     return;
   }
 
-  var styleProps =
-    'fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
+  var additionalProps =
+    ('fontFamily fontWeight fontSize text underline overline linethrough' +
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
 
   /**
    * Text class
@@ -25297,13 +25352,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(styleProps),
+    stateProperties: fabric.Object.prototype.stateProperties.concat(additionalProps),
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(styleProps),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat(additionalProps),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -25852,6 +25907,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           if (positionInPath > totalPathLength) {
             positionInPath %= totalPathLength;
           }
+          // it would probably much fater to send all the grapheme position for a line
+          // and calculate path position/angle at once.
           this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
         }
         lineBounds[i] = graphemeInfo;
@@ -25883,11 +25940,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           path = this.path;
 
       // we are at currentPositionOnPath. we want to know what point on the path is.
-      var p1 = fabric.util.getPointOnPath(path.path, centerPosition - 0.1, path.segmentsInfo),
-          p2 = fabric.util.getPointOnPath(path.path, centerPosition + 0.1, path.segmentsInfo);
-      graphemeInfo.renderLeft = p1.x - startingPoint.x;
-      graphemeInfo.renderTop = p1.y - startingPoint.y;
-      graphemeInfo.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+      var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
+      graphemeInfo.renderLeft = info.x - startingPoint.x;
+      graphemeInfo.renderTop = info.y - startingPoint.y;
+      graphemeInfo.angle = info.angle;
     },
 
     /**
