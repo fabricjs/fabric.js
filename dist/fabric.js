@@ -6492,7 +6492,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    * @return {Boolean} true if one flip, but not two.
    */
   function targetHasOneFlip(target) {
-    return (target.flipX && !target.flipY) || (!target.flipX && target.flipY);
+    return target.flipX !== target.flipY;
   }
 
   /**
@@ -10227,6 +10227,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeDashArray: null,
 
   /**
+   * When `true`, the free drawing is limited to the whiteboard size. Default to false.
+   * @type Boolean
+   * @default false
+  */
+
+  limitedToCanvasSize: false,
+
+
+  /**
    * Sets brush styles
    * @private
    */
@@ -10290,6 +10299,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
     ctx.shadowColor = '';
     ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  },
+
+  /**
+   * Check is pointer is outside canvas boundaries
+   * @param {Object} pointer
+   * @private
+  */
+  _isOutSideCanvas: function(pointer) {
+    return pointer.x < 0 || pointer.x > this.canvas.getWidth() || pointer.y < 0 || pointer.y > this.canvas.getHeight();
   }
 });
 
@@ -10350,6 +10368,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     onMouseMove: function(pointer, options) {
       if (!this.canvas._isMainEvent(options.e)) {
+        return;
+      }
+      if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
         return;
       }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
@@ -10661,6 +10682,9 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   onMouseMove: function(pointer) {
+    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+      return;
+    }
     if (this.needsFullRender()) {
       this.canvas.clearContext(this.canvas.contextTop);
       this.addPoint(pointer);
@@ -10808,6 +10832,9 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   onMouseMove: function(pointer) {
+    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+      return;
+    }
     this.addSprayChunk(pointer);
     this.render(this.sprayChunkPoints);
   },
@@ -11510,13 +11537,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       target.render(ctx);
       ctx.restore();
 
-      target === this._activeObject && target._renderControls(ctx, {
-        hasBorders: false,
-        transparentCorners: false
-      }, {
-        hasBorders: false,
-      });
-
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
@@ -11778,18 +11798,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
           activeTarget, activeTargetSubs,
-          isTouch = isTouchEvent(e);
+          isTouch = isTouchEvent(e),
+          shouldLookForActive = (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       this.targets = [];
 
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      // if we hit the corner of an activeObject, let's return that.
+      if (shouldLookForActive && activeObject._findTargetCorner(pointer, isTouch)) {
         return activeObject;
       }
-      // if we hit the corner of an activeObject, let's return that.
-      if (aObjects.length === 1 && activeObject._findTargetCorner(pointer, isTouch)) {
+      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
@@ -11825,7 +11846,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           obj.evented &&
           // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
           // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-          (obj.containsPoint(pointer) || !!obj._findTargetCorner(pointer))
+          obj.containsPoint(pointer)
       ) {
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
@@ -12783,15 +12804,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
       if (target) {
-        var corner = target._findTargetCorner(
-          this.getPointer(e, true),
-          fabric.util.isTouchEvent(e)
-        );
-        var control = target.controls[corner],
-            mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
-        if (mouseUpHandler) {
-          var pointer = this.getPointer(e);
-          mouseUpHandler(e, transform, pointer.x, pointer.y);
+        if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
+          this.setActiveObject(target, e);
+          shouldRender = true;
+        }
+        else {
+          var corner = target._findTargetCorner(
+            this.getPointer(e, true),
+            fabric.util.isTouchEvent(e)
+          );
+          var control = target.controls[corner],
+              mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
+          if (mouseUpHandler) {
+            var pointer = this.getPointer(e);
+            mouseUpHandler(e, transform, pointer.x, pointer.y);
+          }
         }
         target.isMoving = false;
       }
@@ -13047,7 +13074,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (target) {
         var alreadySelected = target === this._activeObject;
-        if (target.selectable) {
+        if (target.selectable && target.activeOn === 'down') {
           this.setActiveObject(target, e);
         }
         var corner = target._findTargetCorner(
@@ -14417,6 +14444,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @default
      */
     paintFirst:           'fill',
+
+    /**
+     * When 'down', object is set to active on mousedown/touchstart
+     * When 'up', object is set to active on mouseup/touchend
+     * Experimental. Let's see if this breaks anything before supporting officially
+     * @private
+     * since 4.4.0
+     * @type String
+     * @default 'down'
+     */
+    activeOn:           'down',
 
     /**
      * List of properties to consider when checking if state
