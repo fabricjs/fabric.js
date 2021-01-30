@@ -1,6 +1,6 @@
-# This workflow will do a clean install of node dependencies, build the library, run testem for firefox
+# This workflow will do a clean install of node dependencies, build the library, run testem for chrome
 
-name: Unit tests on Firefox
+name: Unit tests on Chrome
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Unit tests on Firefox
+    - name: Unit tests on Chrome
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
