@@ -39,8 +39,7 @@ jobs:
         node-version: 12.x
     - run: npm ci
     - run: npm run build:fast
-    - run: npm run coverage
-    - uses: romeovs/lcov-reporter-action@v0.2.16
+    - uses: ziishaned/jest-reporter-action@v0.0.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+        test-command: "npm run coveragee"
