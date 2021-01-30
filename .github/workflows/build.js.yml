@@ -42,4 +42,4 @@ jobs:
     - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        test-command: "npm run coveragee"
+        test-command: "npm run coverage"
