@@ -676,7 +676,10 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject, object, i, len;
+      var activeObject = this._activeObject,
+          backgroundObject = this.backgroundImage,
+          overlayObject = this.overlayImage,
+          object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
@@ -684,6 +687,12 @@
       }
       if (activeObject) {
         activeObject.setCoords();
+      }
+      if (backgroundObject) {
+        backgroundObject.setCoords(true);
+      }
+      if (overlayObject) {
+        overlayObject.setCoords(true);
       }
       this.calcViewportBoundaries();
       this.renderOnAddRemove && this.requestRenderAll();

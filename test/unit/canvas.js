@@ -55,12 +55,12 @@
                       '13.99], ["z", null]]}';
 
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
@@ -174,12 +174,12 @@
   });
 
   QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive == 'boolean');
+    assert.ok(typeof canvas.interactive === 'boolean');
     assert.ok(canvas.interactive, 'default is true');
   });
 
   QUnit.test('selection', function(assert) {
-    assert.ok(typeof canvas.selection == 'boolean');
+    assert.ok(typeof canvas.selection === 'boolean');
     assert.ok(canvas.selection, 'default is true');
   });
 
@@ -784,7 +784,7 @@
     var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 15, clientY: 15, 'shiftKey': true },
+        pointer = { clientX: 15, clientY: 15, shiftKey: true },
         pointer2 = { clientX: 4, clientY: 4 };
     canvas.add(rect);
     canvas.add(rectOver);
@@ -1346,7 +1346,7 @@
   QUnit.test('toObject', function(assert) {
     assert.ok(typeof canvas.toObject === 'function');
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvas.getObjects()
     };
     assert.deepEqual(expectedObject, canvas.toObject());
@@ -1362,7 +1362,7 @@
     var clipPath = makeRect();
     var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
       clipPath: {
         type: 'rect',
@@ -1396,7 +1396,8 @@
         skewX: 0,
         skewY: 0,
         rx: 0,
-        ry: 0
+        ry: 0,
+        strokeUniform: false
       }
     };
 
@@ -1412,7 +1413,7 @@
   QUnit.test('toDatalessObject', function(assert) {
     assert.ok(typeof canvas.toDatalessObject === 'function');
     var expectedObject = {
-      'version': fabric.version,
+      version: fabric.version,
       objects: canvas.getObjects()
     };
 
@@ -2451,9 +2452,9 @@
     assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
     assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
     assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-    assert.equal(canvas.isTargetTransparent(rect, 4, 4), false, 'opaque on 4,4');
-    assert.equal(canvas.isTargetTransparent(rect, 5, 5), false, 'opaque on 5, 5');
-    assert.equal(canvas.isTargetTransparent(rect, 6, 6), false, 'opaque on 6, 6');
+    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
     assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
@@ -2464,20 +2465,20 @@
     assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent 14, 14');
     assert.equal(canvas.isTargetTransparent(rect, 15, 15), true, 'transparent 15, 15');
     assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
-    assert.equal(canvas.isTargetTransparent(rect, 17, 17), false, 'opaque 17, 17');
-    assert.equal(canvas.isTargetTransparent(rect, 18, 18), false, 'opaque 18, 18');
-    assert.equal(canvas.isTargetTransparent(rect, 19, 19), false, 'opaque 19, 19');
+    assert.equal(canvas.isTargetTransparent(rect, 17, 17), true, 'transparent 17, 17');
+    assert.equal(canvas.isTargetTransparent(rect, 18, 18), true, 'transparent 18, 18');
+    assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
     assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
     assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
     assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
     assert.equal(canvas.isTargetTransparent(rect, 23, 23), false, 'opaque 23, 23');
-    assert.equal(canvas.isTargetTransparent(rect, 24, 24), false, 'opaque 24, 24');
-    assert.equal(canvas.isTargetTransparent(rect, 25, 25), false, 'opaque 25, 25');
-    assert.equal(canvas.isTargetTransparent(rect, 26, 26), false, 'opaque 26, 26');
-    assert.equal(canvas.isTargetTransparent(rect, 27, 27), false, 'opaque 27, 27');
-    assert.equal(canvas.isTargetTransparent(rect, 28, 28), false, 'opaque 28, 28');
-    assert.equal(canvas.isTargetTransparent(rect, 29, 29), false, 'opaque 29, 29');
-    assert.equal(canvas.isTargetTransparent(rect, 30, 30), false, 'opaque 30, 30');
+    assert.equal(canvas.isTargetTransparent(rect, 24, 24), true, 'transparent 24, 24');
+    assert.equal(canvas.isTargetTransparent(rect, 25, 25), true, 'transparent 25, 25');
+    assert.equal(canvas.isTargetTransparent(rect, 26, 26), true, 'transparent 26, 26');
+    assert.equal(canvas.isTargetTransparent(rect, 27, 27), true, 'transparent 27, 27');
+    assert.equal(canvas.isTargetTransparent(rect, 28, 28), true, 'transparent 28, 28');
+    assert.equal(canvas.isTargetTransparent(rect, 29, 29), true, 'transparent 29, 29');
+    assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
     assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
 
   });

@@ -53,6 +53,7 @@
     charSpacing:                0,
     styles:                     {},
     path:                       null,
+    strokeUniform:              false
   };
 
   QUnit.test('constructor', function(assert) {
@@ -841,5 +842,9 @@
     assert.equal(text.height, 100, 'text is big as the path height');
   });
 
+  QUnit.test('cacheProperties for text', function(assert) {
+    var text = new fabric.Text('a');
+    assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-path');
+  });
 
 })();

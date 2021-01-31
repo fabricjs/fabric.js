@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.3.1]
+
+- fix(fabric.Control) implement targetHasOneFlip using shorthand [#6823](https://github.com/fabricjs/fabric.js/pull/6823)
+- fix(fabric.Text) fix typo in cacheProperties preventing cache clear to work [#6775](https://github.com/fabricjs/fabric.js/pull/6775)
+- fix(fabric.Canvas): Update backgroundImage and overlayImage coordinates on zoom change [#6777](https://github.com/fabricjs/fabric.js/pull/6777)
+- fix(fabric.Object): add strokeuniform to object toObject output. [#6772](https://github.com/fabricjs/fabric.js/pull/6772)
+- fix(fabric.Text): Improve path's angle detection for text on a path [#6755](https://github.com/fabricjs/fabric.js/pull/6755)
+
 ## [4.3.0]
 
 - fix(fabric.Textbox): Do not let splitbygrapheme split text previously unwrapped [#6621](https://github.com/fabricjs/fabric.js/pull/6621)

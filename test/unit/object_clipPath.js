@@ -44,8 +44,9 @@
       fillRule:                 'nonzero',
       paintFirst:               'fill',
       globalCompositeOperation: 'source-over',
-      skewX:                      0,
-      skewY:                      0,
+      skewX:                     0,
+      skewY:                     0,
+      strokeUniform:             false
     };
 
     var cObj = new fabric.Object();

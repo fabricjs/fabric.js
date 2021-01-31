@@ -10,9 +10,9 @@
     return;
   }
 
-  var styleProps =
-    'fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
+  var additionalProps =
+    ('fontFamily fontWeight fontSize text underline overline linethrough' +
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
 
   /**
    * Text class
@@ -172,13 +172,13 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(styleProps),
+    stateProperties: fabric.Object.prototype.stateProperties.concat(additionalProps),
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(styleProps),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat(additionalProps),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.

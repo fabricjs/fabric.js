@@ -56,6 +56,9 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+        return;
+      }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
         if (this.needsFullRender()) {
           // redraw curve
