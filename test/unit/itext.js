@@ -46,6 +46,7 @@
     charSpacing:              0,
     styles:                     { },
     strokeUniform:            false,
+    path:                     null,
   };
 
 
