@@ -52,6 +52,7 @@
     skewY:                      0,
     charSpacing:                0,
     styles:                     {},
+    path:                       null,
     strokeUniform:              false
   };
 
@@ -839,6 +840,28 @@
     assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
     assert.equal(text.width, 100, 'text is big as the path width');
     assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
+  QUnit.test('text with a path toObject', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    var toObject = text.toObject();
+    assert.ok(toObject.path, 'export has a path');
+  });
+
+  QUnit.test('text with a path fromObject', function(assert) {
+    var done = assert.async();
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    var toObject = text.toObject();
+    fabric.Text.fromObject(toObject, function(text) {
+      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.ok(text.path instanceof fabric.Path, 'the path is a path');
+      assert.ok(toObject.path, 'the input has still a path property');
+      done();
+    });
   });
 
   QUnit.test('cacheProperties for text', function(assert) {
