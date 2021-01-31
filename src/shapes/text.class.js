@@ -197,6 +197,14 @@
     shadow:               null,
 
     /**
+     * fabric.Path that the text can follow.
+     * This feature is in BETA.
+     * @type fabric.Path
+     * @default
+     */
+    path:               null,
+
+    /**
      * @private
      */
     _fontSizeFraction: 0.222,
@@ -1572,13 +1580,13 @@
    * Returns fabric.Text instance from an object representation
    * @static
    * @memberOf fabric.Text
-   * @param {Object} object Object to create an instance from
+   * @param {Object} object plain js Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
    */
   fabric.Text.fromObject = function(object, callback) {
-    var path = clone(object.path);
-    delete object.path;
-    return fabric.Object._fromObject('Text', object, function(textInstance) {
+    var objectCopy = clone(object), path = object.path;
+    delete objectCopy.path;
+    return fabric.Object._fromObject('Text', objectCopy, function(textInstance) {
       if (path) {
         fabric.Object._fromObject('Path', path, function(pathInstance) {
           textInstance.set('path', pathInstance);
