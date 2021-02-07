@@ -157,11 +157,12 @@
      */
     addWithUpdate: function(object) {
       var nested = !!this.group;
-      this._restoreObjectsState(nested);
+      this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
       if (object) {
-        if (this.group) {
-          fabric.util.makeObjectRelativeToTransform(object, this.group.calcTransformMatrix());
+        if (nested) {
+          // if this group is inside another group, we need to pre transform the object
+          fabric.util.removeTransformFromObject(object, this.group.calcTransformMatrix());
         }
         this._objects.push(object);
         object.group = this;
@@ -170,7 +171,7 @@
       this._calcBounds();
       this._updateObjectsCoords();
       this.dirty = true;
-      if (this.group) {
+      if (nested) {
         this.group.addWithUpdate();
       }
       else {
@@ -373,11 +374,12 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    _restoreObjectsState: function(nested) {
-      var groupMatrix = nested ? this.calcOwnMatrix() : this.calcTransformMatrix();
+    _restoreObjectsState: function() {
+      var groupMatrix = this.calcOwnMatrix(), matrix;
       this._objects.forEach(function(object) {
         // instead of using _this = this;
-        object.group.realizeTransform(object, groupMatrix);
+        matrix = fabric.util.multiplyTransformMatrices(groupMatrix, object.calcOwnMatrix());
+        fabric.util.applyTransformToObject(object, matrix);
         delete object.group;
         object.setCoords();
       });
@@ -390,6 +392,7 @@
      * the group, and then the group was destroyed. It mutates the supplied
      * object.
      * Warning: this method is not useful anymore, it has been kept to no break the api.
+     * is not used in the fabricJS codebase
      * this method will be reduced to using the utility.
      * @private
      * @deprecated
