@@ -375,11 +375,10 @@
      * @chainable
      */
     _restoreObjectsState: function() {
-      var groupMatrix = this.calcOwnMatrix(), matrix;
+      var groupMatrix = this.calcOwnMatrix();
       this._objects.forEach(function(object) {
         // instead of using _this = this;
-        matrix = fabric.util.multiplyTransformMatrices(groupMatrix, object.calcOwnMatrix());
-        fabric.util.applyTransformToObject(object, matrix);
+        fabric.util.addTransformFromObject(object, groupMatrix);
         delete object.group;
         object.setCoords();
       });
