@@ -1262,7 +1262,7 @@
         layoutProps.forEach(function(prop) {
           originalValues[prop] = instance[prop];
         });
-        fabric.util.addTransformFromObject(instance, this._activeObject.calcOwnMatrix());
+        fabric.util.addTransformToObject(instance, this._activeObject.calcOwnMatrix());
         return originalValues;
       }
       else {

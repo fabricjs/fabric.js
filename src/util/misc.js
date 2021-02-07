@@ -996,7 +996,7 @@
      * @param {fabric.Object} object the object you want to transform
      * @param {Array} transform the destination transform
      */
-    addTransformFromObject: function(object, transform) {
+    addTransformToObject: function(object, transform) {
       fabric.util.applyTransformToObject(
         object,
         fabric.util.multiplyTransformMatrices(transform, object.calcOwnMatrix())

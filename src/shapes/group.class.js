@@ -378,7 +378,7 @@
       var groupMatrix = this.calcOwnMatrix();
       this._objects.forEach(function(object) {
         // instead of using _this = this;
-        fabric.util.addTransformFromObject(object, groupMatrix);
+        fabric.util.addTransformToObject(object, groupMatrix);
         delete object.group;
         object.setCoords();
       });
@@ -400,8 +400,7 @@
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object, parentMatrix) {
-      var matrix = fabric.util.multiplyTransformMatrices(parentMatrix, object.calcOwnMatrix());
-      fabric.util.applyTransformToObject(object, matrix);
+      fabric.util.addTransformToObject(object, parentMatrix);
       return object;
     },
 
