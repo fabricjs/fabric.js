@@ -930,7 +930,6 @@
           transform = this._currentTransform;
 
       transform.reset = false;
-      transform.target.isMoving = true;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
 
@@ -954,6 +953,7 @@
         actionPerformed = actionHandler(e, transform, x, y);
       }
       if (action === 'drag' && actionPerformed) {
+        transform.target.isMoving = true;
         this.setCursor(transform.target.moveCursor || this.moveCursor);
       }
       transform.actionPerformed = transform.actionPerformed || actionPerformed;
