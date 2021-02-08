@@ -62,6 +62,28 @@
     height: 200,
   });
 
+  function imageResizeTestAnamorphic(canvas, callback) {
+    getFixture('parrot.png', false, function(img) {
+      var image = new fabric.Image(img);
+      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.scaleY = 0.3;
+      image.scaleX = 1;
+      canvas.add(image);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+      image.dispose();
+    });
+  }
+
+  tests.push({
+    test: 'Image resize with scaleY != scaleX',
+    code: imageResizeTestAnamorphic,
+    golden: 'parrotxy.png',
+    percentage: 0.08,
+    width: 200,
+    height: 200,
+  });
+
   function imageResizeTestGroup(canvas, callback) {
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img, { strokeWidth: 0 });
