@@ -818,6 +818,50 @@
     assert.equal(group._objects[1].canvas, canvas, 'canvas has been set on object 0');
   });
 
+  QUnit.test('addWithUpdate and coordinates', function(assert) {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
+        group = new fabric.Group([]);
+    group.addWithUpdate(rect1);
+    group.addWithUpdate(rect2);
+    group.left = 5;
+    group.top = 5;
+    group.scaleX = 3;
+    group.scaleY = 2;
+    group.destroy();
+    assert.equal(rect1.top, 5, 'top has been moved');
+    assert.equal(rect1.left, 11, 'left has been moved');
+    assert.equal(rect1.scaleX, 3, 'scaleX has been scaled');
+    assert.equal(rect1.scaleY, 2, 'scaleY has been scaled');
+    assert.equal(rect2.top, 13, 'top has been moved');
+    assert.equal(rect2.left, 23, 'left has been moved');
+    assert.equal(rect2.scaleX, 2, 'scaleX has been scaled inverted because of angle 90');
+    assert.equal(rect2.scaleY, 3, 'scaleY has been scaled inverted because of angle 90');
+  });
+
+  QUnit.test('addWithUpdate and coordinates with nested groups', function(assert) {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
+        group0 = new fabric.Group([rect1, rect2]),
+        rect3 = new fabric.Rect({ top: 2, left: 9, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
+        rect4 = new fabric.Rect({ top: 3, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
+        group1 = new fabric.Group([rect3, rect4], { scaleX: 3, scaleY: 4 }),
+        group = new fabric.Group([group0, group1], { angle: 90, scaleX: 2, scaleY: 0.5 }),
+        rect5 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' });
+
+    group1.addWithUpdate(rect5);
+    assert.equal(rect5.top, -5.5, 'top has been moved');
+    assert.equal(rect5.left, -19.5, 'left has been moved');
+    assert.equal(rect5.scaleX, 2, 'scaleX has been scaled');
+    assert.equal(rect5.scaleY, 0.5, 'scaleY has been scaled');
+    group.destroy();
+    group1.destroy();
+    assert.equal(rect5.top, 1, 'top is back to original minus rounding errors');
+    assert.equal(rect5.left, 1, 'left is back to original');
+    assert.equal(rect5.scaleX, 1, 'scaleX is back to original');
+    assert.equal(rect5.scaleY, 1, 'scaleY is back to original');
+  });
+
   // QUnit.test('cloning group with image', function(assert) {
   //   var done = assert.async();
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),

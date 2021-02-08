@@ -10,9 +10,9 @@
     return;
   }
 
-  var styleProps =
-    'fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path'.split(' ');
+  var additionalProps =
+    ('fontFamily fontWeight fontSize text underline overline linethrough' +
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
 
   /**
    * Text class
@@ -172,13 +172,13 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(styleProps),
+    stateProperties: fabric.Object.prototype.stateProperties.concat(additionalProps),
 
     /**
      * List of properties to consider when checking if cache needs refresh
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(styleProps),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat(additionalProps),
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -195,6 +195,14 @@
      * @default
      */
     shadow:               null,
+
+    /**
+     * fabric.Path that the text can follow.
+     * This feature is in BETA.
+     * @type fabric.Path
+     * @default
+     */
+    path:               null,
 
     /**
      * @private
@@ -1412,9 +1420,11 @@
         'textAlign',
         'textBackgroundColor',
         'charSpacing',
+        'path'
       ].concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProperties);
       obj.styles = clone(this.styles, true);
+      obj.path = this.path && this.path.toObject();
       return obj;
     },
 
@@ -1570,11 +1580,23 @@
    * Returns fabric.Text instance from an object representation
    * @static
    * @memberOf fabric.Text
-   * @param {Object} object Object to create an instance from
+   * @param {Object} object plain js Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
    */
   fabric.Text.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Text', object, callback, 'text');
+    var objectCopy = clone(object), path = object.path;
+    delete objectCopy.path;
+    return fabric.Object._fromObject('Text', objectCopy, function(textInstance) {
+      if (path) {
+        fabric.Object._fromObject('Path', path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
