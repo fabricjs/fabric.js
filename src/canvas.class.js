@@ -1172,6 +1172,9 @@
      * This is supposed to be equivalent to discardActiveObject but without firing
      * any events. There is commitment to have this stay this way.
      * This is the functional part of discardActiveObject.
+     * @param {Event} [e] Event (passed along when firing "object:deselected")
+     * @param {Object} object to set as active
+     * @return {Boolean} true if the selection happened
      * @private
      */
     _discardActiveObject: function(e, object) {
