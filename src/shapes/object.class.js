@@ -572,6 +572,17 @@
     paintFirst:           'fill',
 
     /**
+     * When 'down', object is set to active on mousedown/touchstart
+     * When 'up', object is set to active on mouseup/touchend
+     * Experimental. Let's see if this breaks anything before supporting officially
+     * @private
+     * since 4.4.0
+     * @type String
+     * @default 'down'
+     */
+    activeOn:           'down',
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
