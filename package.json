@@ -1,8 +1,8 @@
 {
-  "name": "fabric",
+  "name": "fabric-vectr",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -81,5 +81,6 @@
     "node": ">=8.0.0"
   },
   "main": "./dist/fabric.js",
+  "types": "./types/index.d.ts",
   "dependencies": {}
 }
