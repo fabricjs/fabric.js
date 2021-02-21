@@ -28192,11 +28192,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       return this;
     },
 
-    forceMoveAndUpdate: function(position) {
+    forceMoveAndUpdate: function(position, temporary) {
       this.left = position.left;
       this.right = position.right;
       this.top = position.top;
       this.bottom = position.bottom;
+      this.temporaryPosition = temporary;
       this.initDimensions();
       this.setCoords();
     },
