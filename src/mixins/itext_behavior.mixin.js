@@ -616,7 +616,7 @@
       }
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
-      this._restoreEditingProps();
+      this._restoreEditingProps();//MAXIM
       this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
@@ -630,6 +630,15 @@
         isTextChanged && this.canvas.fire('object:modified', { target: this });
       }
       return this;
+    },
+
+    forceMoveAndUpdate: function(position) {
+      this.left = position.left;
+      this.right = position.right;
+      this.top = position.top;
+      this.bottom = position.bottom;
+      this.initDimensions();
+      this.setCoords();
     },
 
     /**
@@ -929,6 +938,7 @@
       else if (this.selectionEnd < 0) {
         this.selectionEnd = 0;
       }
-    }
+    },
+
   });
 })();

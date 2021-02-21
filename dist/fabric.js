@@ -13961,6 +13961,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     top:                      0,
 
+
+    /**
+     * Indicates if an object is in a temporary position
+     */
+    temporaryPosition:      false,
+
     /**
      * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
      * @type Number
@@ -28170,7 +28176,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
-      this._restoreEditingProps();
+      this._restoreEditingProps();//MAXIM
       this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
@@ -28184,6 +28190,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         isTextChanged && this.canvas.fire('object:modified', { target: this });
       }
       return this;
+    },
+
+    forceMoveAndUpdate: function(position) {
+      this.left = position.left;
+      this.right = position.right;
+      this.top = position.top;
+      this.bottom = position.bottom;
+      this.initDimensions();
+      this.setCoords();
     },
 
     /**
@@ -28483,7 +28498,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       else if (this.selectionEnd < 0) {
         this.selectionEnd = 0;
       }
-    }
+    },
+
   });
 })();
 
