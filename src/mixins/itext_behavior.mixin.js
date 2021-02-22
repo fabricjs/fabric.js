@@ -632,6 +632,34 @@
       return this;
     },
 
+    setPosition: function(position){
+      this.left = position.left;
+      this.top = position.top;
+      this.initDimensions();
+      this.setCoords();
+    },
+
+    setTemporaryPosition: function(position) {
+      this.originalPosition = {
+        left: this.left,
+        top: this.top,
+      };
+      this.usingTemporaryPosition = true;
+      this.setPosition(position);
+    },
+
+    restoreOriginalPosition: function() {
+      this.usingTemporaryPosition = false;
+      if (this.originalPosition) {
+        this.setPosition(this.originalPosition);
+      }
+    },
+
+    clearTemporaryPosition: function() {
+      this.usingTemporaryPosition = false;
+      this.originalPosition = undefined;
+    },
+
     /**
      * @private
      */
@@ -929,6 +957,7 @@
       else if (this.selectionEnd < 0) {
         this.selectionEnd = 0;
       }
-    }
+    },
+
   });
 })();

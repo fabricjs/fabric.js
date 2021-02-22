@@ -85,6 +85,12 @@
      */
     top:                      0,
 
+
+    /**
+     * Indicates if an object is in a temporary position
+     */
+    usingTemporaryPosition:      false,
+
     /**
      * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
      * @type Number

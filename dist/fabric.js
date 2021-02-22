@@ -13961,6 +13961,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     top:                      0,
 
+
+    /**
+     * Indicates if an object is in a temporary position
+     */
+    usingTemporaryPosition:      false,
+
     /**
      * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
      * @type Number
@@ -28186,6 +28192,34 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       return this;
     },
 
+    setPosition: function(position){
+      this.left = position.left;
+      this.top = position.top;
+      this.initDimensions();
+      this.setCoords();
+    },
+
+    setTemporaryPosition: function(position) {
+      this.originalPosition = {
+        left: this.left,
+        top: this.top,
+      };
+      this.usingTemporaryPosition = true;
+      this.setPosition(position);
+    },
+
+    restoreOriginalPosition: function() {
+      this.usingTemporaryPosition = false;
+      if (this.originalPosition) {
+        this.setPosition(this.originalPosition);
+      }
+    },
+
+    clearTemporaryPosition: function() {
+      this.usingTemporaryPosition = false;
+      this.originalPosition = undefined;
+    },
+
     /**
      * @private
      */
@@ -28483,7 +28517,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       else if (this.selectionEnd < 0) {
         this.selectionEnd = 0;
       }
-    }
+    },
+
   });
 })();
 
