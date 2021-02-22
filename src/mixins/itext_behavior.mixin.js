@@ -616,7 +616,7 @@
       }
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
-      this._restoreEditingProps();//MAXIM
+      this._restoreEditingProps();
       this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
