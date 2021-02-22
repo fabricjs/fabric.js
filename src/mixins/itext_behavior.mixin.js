@@ -632,14 +632,32 @@
       return this;
     },
 
-    forceMoveAndUpdate: function(position, temporary) {
+    setPosition: function(position){
       this.left = position.left;
-      this.right = position.right;
       this.top = position.top;
-      this.bottom = position.bottom;
-      this.temporaryPosition = temporary;
       this.initDimensions();
       this.setCoords();
+    },
+
+    setTemporaryPosition: function(position) {
+      this.originalPosition = {
+        left: this.left,
+        top: this.top,
+      };
+      this.usingTemporaryPosition = true;
+      this.setPosition(position);
+    },
+
+    restoreOriginalPosition: function() {
+      this.usingTemporaryPosition = false;
+      if (this.originalPosition) {
+        this.setPosition(this.originalPosition);
+      }
+    },
+
+    clearTemporaryPosition: function() {
+      this.usingTemporaryPosition = false;
+      this.originalPosition = undefined;
     },
 
     /**
