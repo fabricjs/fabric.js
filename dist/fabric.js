@@ -12649,6 +12649,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onTouchStart: function(e) {
       if (e && e.touches && e.touches.length > 1) {
+        if (this._isCurrentlyDrawing) {
+          this.freeDrawingBrush.onMouseUp({ e: e});
+        }
         return;
       }
       e.preventDefault();
