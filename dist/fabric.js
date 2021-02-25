@@ -12437,7 +12437,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
     },
 
     /**
@@ -12451,6 +12451,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onTouchStart = this._onTouchStart.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
+      this._onTouchMove = this._onTouchMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onTouchEnd = this._onTouchEnd.bind(this);
       this._onResize = this._onResize.bind(this);
@@ -12647,6 +12648,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchStart: function(e) {
+      if (e && e.touches && e.touches.length > 1) {
+        return;
+      }
       e.preventDefault();
       if (this.mainTouchId === null) {
         this.mainTouchId = this.getPointerId(e);
@@ -12656,7 +12660,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
       addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      addListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
       // Unbind mousedown to prevent double triggers from touch devices
       removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     },
@@ -12679,8 +12683,20 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object fired on mousedown
      */
+    _onTouchMove: function(e) {
+      if (e.touches.length > 1) {
+        // if there are still touches stop here
+        return;
+      }
+      this._onMouseMove(e);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
     _onTouchEnd: function(e) {
-      if (e.touches.length > 0) {
+      if (e.touches.length > 1) {
         // if there are still touches stop here
         return;
       }
@@ -12689,7 +12705,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.mainTouchId = null;
       var eventTypePrefix = this._getEventPrefix();
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
       var _this = this;
       if (this._willAddMouseDown) {
         clearTimeout(this._willAddMouseDown);
