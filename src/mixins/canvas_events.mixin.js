@@ -290,9 +290,9 @@
      */
     _onTouchStart: function(e) {
       if (e && e.touches && e.touches.length > 1) {
-          console.log("cancel dray for multiple touches 1")
         if (this._isCurrentlyDrawing) {
           this.freeDrawingBrush.onMouseUp({ e: e});
+
           this._isCurrentlyDrawing = false;
         }
         return;
@@ -345,9 +345,6 @@
      */
     _onTouchEnd: function(e) {
       if (e.touches && e.touches.length > 1) {
-        // if there are still touches stop here
-        console.log("cancel END for multiple touches 3")
-
         return;
       }
       this.__onMouseUp(e);
@@ -658,9 +655,10 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
-        if (e && e.touches && e.touches > 1) {
+        if (e && e.touches && e.touches.length > 1) {
           this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
+          this.clearContext(this.contextTop);
           console.log('cancel mouse');
           return;
         }
