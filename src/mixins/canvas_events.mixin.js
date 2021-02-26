@@ -293,6 +293,7 @@
           console.log("cancel dray for multiple touches 1")
         if (this._isCurrentlyDrawing) {
           this.freeDrawingBrush.onMouseUp({ e: e});
+          this._isCurrentlyDrawing = false;
         }
         return;
       }
@@ -657,6 +658,13 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
+        if (e && e.touches && e.touches > 1) {
+          this.freeDrawingBrush.onMouseUp({ e: e});
+          this._isCurrentlyDrawing = false;
+          console.log('cancel mouse');
+          return;
+        }
+
         var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
@@ -807,9 +815,6 @@
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
-      if (e && e.touches && e.touches.length > 1) {
-        return;
-      }
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
       var target, pointer;

@@ -92,9 +92,11 @@
      */
     onMouseUp: function(options) {
       if (!this.canvas._isMainEvent(options.e)) {
+        console.log('not main event');
         return true;
       }
       this.oldEnd = undefined;
+      console.log('finalize');
       this._finalizeAndAddPath();
       return false;
     },

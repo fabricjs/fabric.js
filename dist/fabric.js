@@ -10180,9 +10180,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     onMouseUp: function(options) {
       if (!this.canvas._isMainEvent(options.e)) {
+        console.log('not main event');
         return true;
       }
       this.oldEnd = undefined;
+      console.log('finalize');
       this._finalizeAndAddPath();
       return false;
     },
@@ -12659,6 +12661,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           console.log("cancel dray for multiple touches 1")
         if (this._isCurrentlyDrawing) {
           this.freeDrawingBrush.onMouseUp({ e: e});
+          this._isCurrentlyDrawing = false;
         }
         return;
       }
@@ -13023,6 +13026,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
+        if (e && e.touches && e.touches > 1) {
+          this.freeDrawingBrush.onMouseUp({ e: e});
+          this._isCurrentlyDrawing = false;
+          console.log('cancel mouse');
+          return;
+        }
+
         var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
@@ -13173,9 +13183,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
-      if (e && e.touches && e.touches.length > 1) {
-        return;
-      }
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
       var target, pointer;
