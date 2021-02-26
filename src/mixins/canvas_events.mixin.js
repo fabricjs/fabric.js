@@ -56,8 +56,6 @@
       functor(canvasElement, 'drop', this._onDrop);
       if (!this.enablePointerEvents) {
         functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
-      } else {
-          console.log("pointer junk cancels this!!!!!!!!!!!!!!!!!!!!!!!!")
       }
       if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
         eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
@@ -291,7 +289,7 @@
     _onTouchStart: function(e) {
       if (e && e.touches && e.touches.length > 1) {
         if (this._isCurrentlyDrawing) {
-          this.freeDrawingBrush.onMouseUp({ e: e});
+         // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
         }
@@ -327,15 +325,12 @@
 
     /**
      * @private
-     * @param {Event} e Event object fired on mousedown
+     * @param {Event} e Event object fired on touchMove
      */
     _onTouchMove: function(e) {
-    //   if (e.touches.length > 1) {
-    //     // if there are still touches stop here
-    //     console.log("cancel move for multiple touches 1")
-
-    //     return;
-    //   }
+      // this was previously routed to onMouseMove automatically
+      // touches are handled in the terminals of these events, but I'm leaving this
+      // here to explicitly route the call for future debugging/features.
       this._onMouseMove(e);
     },
 
@@ -344,7 +339,8 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchEnd: function(e) {
-      if (e.touches && e.touches.length > 1) {
+      if (e.touches.length > 0) {
+        // if there are still touches stop here
         return;
       }
       this.__onMouseUp(e);
@@ -656,10 +652,9 @@
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         if (e && e.touches && e.touches.length > 1) {
-          this.freeDrawingBrush.onMouseUp({ e: e});
+          // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
-          console.log('cancel mouse');
           return;
         }
 

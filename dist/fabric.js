@@ -10130,8 +10130,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         return;
       }
       if (options.e && options.e.touches && options.e.touches.length > 1){
-        this.oldEnd = undefined;
-        this._finalizeAndAddPath();
+        //this.oldEnd = undefined;
+        //this._finalizeAndAddPath();
         return;
       }
       this._prepareForDrawing(pointer);
@@ -10180,11 +10180,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     onMouseUp: function(options) {
       if (!this.canvas._isMainEvent(options.e)) {
-        console.log('not main event');
         return true;
       }
       this.oldEnd = undefined;
-      console.log('finalize');
       this._finalizeAndAddPath();
       return false;
     },
@@ -12424,8 +12422,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       functor(canvasElement, 'drop', this._onDrop);
       if (!this.enablePointerEvents) {
         functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
-      } else {
-          console.log("pointer junk cancels this!!!!!!!!!!!!!!!!!!!!!!!!")
       }
       if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
         eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
@@ -12659,7 +12655,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _onTouchStart: function(e) {
       if (e && e.touches && e.touches.length > 1) {
         if (this._isCurrentlyDrawing) {
-          this.freeDrawingBrush.onMouseUp({ e: e});
+         // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
         }
@@ -12695,15 +12691,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
-     * @param {Event} e Event object fired on mousedown
+     * @param {Event} e Event object fired on touchMove
      */
     _onTouchMove: function(e) {
-    //   if (e.touches.length > 1) {
-    //     // if there are still touches stop here
-    //     console.log("cancel move for multiple touches 1")
-
-    //     return;
-    //   }
+      // this was previously routed to onMouseMove automatically
+      // touches are handled in the terminals of these events, but I'm leaving this
+      // here to explicitly route the call for future debugging/features.
       this._onMouseMove(e);
     },
 
@@ -12712,7 +12705,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchEnd: function(e) {
-      if (e.touches && e.touches.length > 1) {
+      if (e.touches.length > 0) {
+        // if there are still touches stop here
         return;
       }
       this.__onMouseUp(e);
@@ -13024,10 +13018,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
         if (e && e.touches && e.touches.length > 1) {
-          this.freeDrawingBrush.onMouseUp({ e: e});
+          // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
-          console.log('cancel mouse');
           return;
         }
 

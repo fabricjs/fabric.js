@@ -42,8 +42,8 @@
         return;
       }
       if (options.e && options.e.touches && options.e.touches.length > 1){
-        this.oldEnd = undefined;
-        this._finalizeAndAddPath();
+        //this.oldEnd = undefined;
+        //this._finalizeAndAddPath();
         return;
       }
       this._prepareForDrawing(pointer);
@@ -92,11 +92,9 @@
      */
     onMouseUp: function(options) {
       if (!this.canvas._isMainEvent(options.e)) {
-        console.log('not main event');
         return true;
       }
       this.oldEnd = undefined;
-      console.log('finalize');
       this._finalizeAndAddPath();
       return false;
     },
