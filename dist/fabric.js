@@ -10129,6 +10129,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      if (options.e && options.e.touches && options.e.touches.length < 1){
+        this.oldEnd = undefined;
+        this._finalizeAndAddPath();
+        return;
+      }
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
@@ -13168,6 +13173,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
+      if (e && e.touches && e.touches.length > 1) {
+        return;
+      }
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
       var target, pointer;

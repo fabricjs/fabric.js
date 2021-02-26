@@ -41,6 +41,11 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      if (options.e && options.e.touches && options.e.touches.length < 1){
+        this.oldEnd = undefined;
+        this._finalizeAndAddPath();
+        return;
+      }
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)

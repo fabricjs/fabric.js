@@ -807,6 +807,9 @@
      * @param {Event} e Event object fired on mousemove
      */
     __onMouseMove: function (e) {
+      if (e && e.touches && e.touches.length > 1) {
+        return;
+      }
       this._handleEvent(e, 'move:before');
       this._cacheTransformEventData(e);
       var target, pointer;
