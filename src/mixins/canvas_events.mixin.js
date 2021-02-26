@@ -292,8 +292,8 @@
       if (e && e.touches && e.touches.length > 1) {
         if (this._isCurrentlyDrawing) {
           this.freeDrawingBrush.onMouseUp({ e: e});
-
           this._isCurrentlyDrawing = false;
+          this.clearContext(this.contextTop);
         }
         return;
       }
