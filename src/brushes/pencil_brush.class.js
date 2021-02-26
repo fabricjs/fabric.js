@@ -41,9 +41,8 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      // ignore extra touches coming in (for iPads, etc)
       if (options.e && options.e.touches && options.e.touches.length > 1){
-        //this.oldEnd = undefined;
-        //this._finalizeAndAddPath();
         return;
       }
       this._prepareForDrawing(pointer);

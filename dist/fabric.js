@@ -10129,9 +10129,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      // ignore extra touches coming in (for iPads, etc)
       if (options.e && options.e.touches && options.e.touches.length > 1){
-        //this.oldEnd = undefined;
-        //this._finalizeAndAddPath();
         return;
       }
       this._prepareForDrawing(pointer);
@@ -12653,9 +12652,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchStart: function(e) {
+      // If a second touch comes in we need to start scrolling,
+      // but if the fingers come in one after another there might be
+      // an unintentional drawing on the screen from the first touch
+      // need to clear that
       if (e && e.touches && e.touches.length > 1) {
         if (this._isCurrentlyDrawing) {
-         // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
         }
@@ -13017,8 +13019,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
+        // sometimes we can get here if the order of the touches comes in slowly
+        // we need to clear the topContext to keep from the canvas "smearing" as
+        // the user scrolls
         if (e && e.touches && e.touches.length > 1) {
-          // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
           return;

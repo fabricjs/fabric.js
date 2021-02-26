@@ -287,9 +287,12 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchStart: function(e) {
+      // If a second touch comes in we need to start scrolling,
+      // but if the fingers come in one after another there might be
+      // an unintentional drawing on the screen from the first touch
+      // need to clear that
       if (e && e.touches && e.touches.length > 1) {
         if (this._isCurrentlyDrawing) {
-         // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
         }
@@ -651,8 +654,10 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
+        // sometimes we can get here if the order of the touches comes in slowly
+        // we need to clear the topContext to keep from the canvas "smearing" as
+        // the user scrolls
         if (e && e.touches && e.touches.length > 1) {
-          // this.freeDrawingBrush.onMouseUp({ e: e});
           this._isCurrentlyDrawing = false;
           this.clearContext(this.contextTop);
           return;
