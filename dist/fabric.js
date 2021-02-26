@@ -12695,12 +12695,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchMove: function(e) {
-      if (e.touches.length > 1) {
-        // if there are still touches stop here
-        console.log("cancel move for multiple touches 1")
+    //   if (e.touches.length > 1) {
+    //     // if there are still touches stop here
+    //     console.log("cancel move for multiple touches 1")
 
-        return;
-      }
+    //     return;
+    //   }
       this._onMouseMove(e);
     },
 
