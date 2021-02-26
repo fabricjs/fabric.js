@@ -41,7 +41,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
-      if (options.e && options.e.touches && options.e.touches.length < 1){
+      if (options.e && options.e.touches && options.e.touches.length > 1){
         this.oldEnd = undefined;
         this._finalizeAndAddPath();
         return;
