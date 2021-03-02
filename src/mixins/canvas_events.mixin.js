@@ -76,7 +76,7 @@
       removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
       removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
     },
 
     /**
@@ -90,6 +90,7 @@
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onTouchStart = this._onTouchStart.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
+      this._onTouchMove = this._onTouchMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onTouchEnd = this._onTouchEnd.bind(this);
       this._onResize = this._onResize.bind(this);
@@ -286,6 +287,17 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchStart: function(e) {
+      // If a second touch comes in we need to start scrolling,
+      // but if the fingers come in one after another there might be
+      // an unintentional drawing on the screen from the first touch
+      // need to clear that
+      if (e && e.touches && e.touches.length > 1) {
+        if (this._isCurrentlyDrawing) {
+          this._isCurrentlyDrawing = false;
+          this.clearContext(this.contextTop);
+        }
+        return;
+      }
       e.preventDefault();
       if (this.mainTouchId === null) {
         this.mainTouchId = this.getPointerId(e);
@@ -295,7 +307,7 @@
       var canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
       addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      addListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
       // Unbind mousedown to prevent double triggers from touch devices
       removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     },
@@ -316,6 +328,17 @@
 
     /**
      * @private
+     * @param {Event} e Event object fired on touchMove
+     */
+    _onTouchMove: function(e) {
+      // this was previously routed to onMouseMove automatically
+      // touches are handled in the terminals of these events, but I'm leaving this
+      // here to explicitly route the call for future debugging/features.
+      this._onMouseMove(e);
+    },
+
+    /**
+     * @private
      * @param {Event} e Event object fired on mousedown
      */
     _onTouchEnd: function(e) {
@@ -328,7 +351,7 @@
       this.mainTouchId = null;
       var eventTypePrefix = this._getEventPrefix();
       removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(fabric.document, 'touchmove', this._onTouchMove, addEventOptions);
       var _this = this;
       if (this._willAddMouseDown) {
         clearTimeout(this._willAddMouseDown);
@@ -631,6 +654,15 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
+        // sometimes we can get here if the order of the touches comes in slowly
+        // we need to clear the topContext to keep from the canvas "smearing" as
+        // the user scrolls
+        if (e && e.touches && e.touches.length > 1) {
+          this._isCurrentlyDrawing = false;
+          this.clearContext(this.contextTop);
+          return;
+        }
+
         var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseMove(pointer, { e: e, pointer: pointer });
       }
