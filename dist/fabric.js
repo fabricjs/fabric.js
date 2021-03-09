@@ -14427,7 +14427,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Boolean
      * @default true
      */
-    objectCaching:            objectCaching,
+    objectCaching:            false,
 
     /**
      * When `true`, object properties are checked for cache invalidation. In some particular
@@ -15005,6 +15005,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Remove cacheCanvas and its dimensions from the objects
      */
     _removeCacheCanvas: function() {
+      if (this._cacheContext) {
+        this._cacheContext.dispose();
+      }
       this._cacheCanvas = null;
       this.cacheWidth = 0;
       this.cacheHeight = 0;
