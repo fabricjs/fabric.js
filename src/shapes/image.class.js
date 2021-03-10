@@ -93,6 +93,15 @@
     stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
+     * List of properties to consider when checking if cache needs refresh
+     * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+     * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+     * and refreshed at the next render
+     * @type Array
+     */
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('cropX', 'cropY'),
+
+    /**
      * key used to retrieve the texture representing this image
      * @since 2.0.0
      * @type String
