@@ -14427,7 +14427,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Boolean
      * @default true
      */
-    objectCaching:            objectCaching,
+    objectCaching:            false,
 
     /**
      * When `true`, object properties are checked for cache invalidation. In some particular
