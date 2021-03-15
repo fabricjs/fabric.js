@@ -1738,10 +1738,12 @@
 
         if (mOffsetY > mBlur) {
           boundingRect.height += offsetY;
-        } else if (mOffsetY < -mBlur) {
+        }
+        else if (mOffsetY < -mBlur) {
           boundingRect.height -= offsetY;
           boundingRect.top += offsetY;
-        } else {
+        }
+        else {
           boundingRect.height += mBlur * 2;
           boundingRect.top -= mBlur - mOffsetY;
         }
