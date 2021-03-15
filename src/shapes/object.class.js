@@ -1700,7 +1700,7 @@
 
       var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
-          originalShadow = this.shadow, abs = Math.abs,
+          originalShadow = this.shadow,
           multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1);
       delete this.group;
       if (options.withoutTransform) {
@@ -1711,25 +1711,27 @@
       }
 
       var el = fabric.util.createCanvasElement(),
-        boundingRect = this.getBoundingRect(true, true),
-        shadow = this.shadow;
+          boundingRect = this.getBoundingRect(true, true),
+          shadow = this.shadow;
 
       if (shadow) {
         var blur = shadow.blur,
-          mBlur = blur * Math.abs(this.scaleX + this.scaleY) / 4,
-          signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
-          signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
-          mOffsetX = shadow.offsetX * Math.abs(this.scaleX),
-          mOffsetY = shadow.offsetY * Math.abs(this.scaleY), 
-          offsetX = mOffsetX + (signX * mBlur) + mOffsetX,
-          offsetY = mOffsetY + (signY * mBlur) + mOffsetY;
+            mBlur = blur * Math.abs(this.scaleX + this.scaleY) / 4,
+            signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
+            signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
+            mOffsetX = shadow.offsetX * Math.abs(this.scaleX),
+            mOffsetY = shadow.offsetY * Math.abs(this.scaleY),
+            offsetX = mOffsetX + (signX * mBlur) + mOffsetX,
+            offsetY = mOffsetY + (signY * mBlur) + mOffsetY;
 
         if (mOffsetX > mBlur) {
           boundingRect.width += offsetX;
-        } else if (mOffsetX < -mBlur) {
+        }
+        else if (mOffsetX < -mBlur) {
           boundingRect.width -= offsetX;
           boundingRect.left += offsetX;
-        } else {
+        }
+        else {
           boundingRect.width += mBlur * 2;
           boundingRect.left -= mBlur - mOffsetX;
         }
