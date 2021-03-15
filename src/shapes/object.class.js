@@ -1711,30 +1711,45 @@
       }
 
       var el = fabric.util.createCanvasElement(),
-          // skip canvas zoom and calculate with setCoords now.
-          boundingRect = this.getBoundingRect(true, true),
-          shadow = this.shadow, scaling,
-          shadowOffset = { x: 0, y: 0 }, shadowBlur,
-          width, height;
+        boundingRect = this.getBoundingRect(true, true),
+        shadow = this.shadow;
 
       if (shadow) {
-        shadowBlur = shadow.blur;
-        if (shadow.nonScaling) {
-          scaling = { scaleX: 1, scaleY: 1 };
+        var blur = shadow.blur,
+          mBlur = blur * Math.abs(this.scaleX + this.scaleY) / 4,
+          signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
+          signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
+          mOffsetX = shadow.offsetX * Math.abs(this.scaleX),
+          mOffsetY = shadow.offsetY * Math.abs(this.scaleY), 
+          offsetX = mOffsetX + (signX * mBlur) + mOffsetX,
+          offsetY = mOffsetY + (signY * mBlur) + mOffsetY;
+
+        if (mOffsetX > mBlur) {
+          boundingRect.width += offsetX;
+        } else if (mOffsetX < -mBlur) {
+          boundingRect.width -= offsetX;
+          boundingRect.left += offsetX;
+        } else {
+          boundingRect.width += mBlur * 2;
+          boundingRect.left -= mBlur - mOffsetX;
         }
-        else {
-          scaling = this.getObjectScaling();
+
+        if (mOffsetY > mBlur) {
+          boundingRect.height += offsetY;
+        } else if (mOffsetY < -mBlur) {
+          boundingRect.height -= offsetY;
+          boundingRect.top += offsetY;
+        } else {
+          boundingRect.height += mBlur * 2;
+          boundingRect.top -= mBlur - mOffsetY;
         }
-        // consider non scaling shadow.
-        shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.scaleX));
-        shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.scaleY));
       }
-      width = boundingRect.width + shadowOffset.x;
-      height = boundingRect.height + shadowOffset.y;
+
       // if the current width/height is not an integer
       // we need to make it so.
-      el.width = Math.ceil(width);
-      el.height = Math.ceil(height);
+      el.width = Math.ceil(boundingRect.width);
+      el.height = Math.ceil(boundingRect.height);
+
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: false,
         renderOnAddRemove: false,
