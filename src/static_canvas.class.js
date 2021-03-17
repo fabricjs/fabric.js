@@ -813,7 +813,9 @@
      * @chainable
      */
     clear: function () {
-      this._objects.length = 0;
+      this.forEachObject((function (obj) {
+        this.remove(obj);
+      }).bind(this));
       this.backgroundImage = null;
       this.overlayImage = null;
       this.backgroundColor = '';
