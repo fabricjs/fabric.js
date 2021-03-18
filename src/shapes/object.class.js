@@ -1767,7 +1767,7 @@
 
     // This is the old school Javascript way
 
-      let left = rects[0].left,
+      var left = rects[0].left,
         right = rects[0].right,
         top = rects[0].top,
         bottom = rects[0].bottom,
@@ -1782,7 +1782,7 @@
 
       // This is the modern way
 
-      // const
+      // var
       // left = rects.reduce( (min, r) => r.left < min ? r.left : min, rects[0].left),
       // top = rects.reduce( (min, r) => r.top < min ? r.top : min, rects[0].top),
       // right = rects.reduce( (max, r) => r.right > max ? r.right : max, rects[0].right),
