@@ -1698,61 +1698,98 @@
     toCanvasElement: function(options) {
       options || (options = { });
 
-      var utils = fabric.util, origParams = utils.saveObjectTransform(this),
-          originalGroup = this.group,
-          originalShadow = this.shadow,
-          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1);
-      delete this.group;
-      if (options.withoutTransform) {
-        utils.resetObjectTransform(this);
+      var object = this,
+        utils = fabric.util,
+        origParams = utils.saveObjectTransform(this),
+        originalGroup = this.group,
+        originalShadow = this.shadow,
+        multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1),
+        objs = [object],
+        el = fabric.util.createCanvasElement(),
+        rects = [];
+
+      delete object.group;
+      if (options.withoutTransform) utils.resetObjectTransform(object);
+      if (options.withoutShadow) object.shadow = null;
+      if (object.type === "activeSelection" || object.type === "group") objs = object._objects;
+
+      objs.forEach((o) => {
+        var boundingRect = o.getBoundingRect(true, true),
+          shadow = o.shadow,
+          scaling = { scaleX: 1, scaleY: 1 },
+          min,
+          max;
+
+        if (object.type === "activeSelection" || object.type === "group") {
+          var matrix = o.calcTransformMatrix();
+          boundingRect.left = matrix[4] - boundingRect.width / 2;
+          boundingRect.top = matrix[5] - boundingRect.height / 2;
+        }
+        if (shadow) {
+          if (!shadow.nonScaling) {
+            scaling = o.getObjectScaling();
+          }
+          var blur = shadow.blur,
+              mBlur = (blur * Math.abs(scaling.scaleX + scaling.scaleY)) / 4,
+              signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
+              signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
+              mOffsetX = shadow.offsetX * Math.abs(scaling.scaleX) + (shadow.offsetX / 2),
+              mOffsetY = shadow.offsetY * Math.abs(scaling.scaleY) + (shadow.offsetY / 2),
+              offsetX = mOffsetX + signX * mBlur + mOffsetX,
+              offsetY = mOffsetY + signY * mBlur + mOffsetY;
+
+          if (mOffsetX > mBlur) {
+            boundingRect.width += offsetX;
+          } else if (mOffsetX < -mBlur) {
+            boundingRect.width -= offsetX;
+            boundingRect.left += offsetX;
+          } else {
+            boundingRect.width += mBlur * 2;
+            boundingRect.left -= mBlur - mOffsetX;
+          }
+
+          if (mOffsetY > mBlur) {
+            boundingRect.height += offsetY;
+          } else if (mOffsetY < -mBlur) {
+            boundingRect.height -= offsetY;
+            boundingRect.top += offsetY;
+          } else {
+            boundingRect.height += mBlur * 2;
+            boundingRect.top -= mBlur - mOffsetY;
+          }
+        }
+        boundingRect.right = boundingRect.left + boundingRect.width;
+        boundingRect.bottom = boundingRect.top + boundingRect.height;
+        rects.push(boundingRect);
+      });
+
+      // Find overall bounding box
+
+    // This is the old school Javascript way
+
+      let left = rects[0].left,
+        right = rects[0].right,
+        top = rects[0].top,
+        bottom = rects[0].bottom,
+        i,
+        len = rects.length
+      for (i = 1; i < len; i++) {
+        left = (rects[i].left < left) ? rects[i].left : left;
+        right = (rects[i].right > right) ? rects[i].right : right;
+        top = (rects[i].top < top) ? rects[i].top : top;
+        bottom = (rects[i].bottom > bottom) ? rects[i].bottom : bottom;
       }
-      if (options.withoutShadow) {
-        this.shadow = null;
-      }
 
-      var el = fabric.util.createCanvasElement(),
-          boundingRect = this.getBoundingRect(true, true),
-          shadow = this.shadow;
+      // This is the modern way
 
-      if (shadow) {
-        var blur = shadow.blur,
-            mBlur = blur * Math.abs(this.scaleX + this.scaleY) / 4,
-            signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
-            signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
-            mOffsetX = shadow.offsetX * Math.abs(this.scaleX),
-            mOffsetY = shadow.offsetY * Math.abs(this.scaleY),
-            offsetX = mOffsetX + (signX * mBlur) + mOffsetX,
-            offsetY = mOffsetY + (signY * mBlur) + mOffsetY;
+      // const
+      // left = rects.reduce( (min, r) => r.left < min ? r.left : min, rects[0].left),
+      // top = rects.reduce( (min, r) => r.top < min ? r.top : min, rects[0].top),
+      // right = rects.reduce( (max, r) => r.right > max ? r.right : max, rects[0].right),
+      // bottom = rects.reduce( (max, r) => r.bottom > max ? r.bottom : max, rects[0].bottom);
 
-        if (mOffsetX > mBlur) {
-          boundingRect.width += offsetX;
-        }
-        else if (mOffsetX < -mBlur) {
-          boundingRect.width -= offsetX;
-          boundingRect.left += offsetX;
-        }
-        else {
-          boundingRect.width += mBlur * 2;
-          boundingRect.left -= mBlur - mOffsetX;
-        }
-
-        if (mOffsetY > mBlur) {
-          boundingRect.height += offsetY;
-        }
-        else if (mOffsetY < -mBlur) {
-          boundingRect.height -= offsetY;
-          boundingRect.top += offsetY;
-        }
-        else {
-          boundingRect.height += mBlur * 2;
-          boundingRect.top -= mBlur - mOffsetY;
-        }
-      }
-
-      // if the current width/height is not an integer
-      // we need to make it so.
-      el.width = Math.ceil(boundingRect.width);
-      el.height = Math.ceil(boundingRect.height);
+      el.width = Math.ceil(right - left);
+      el.height = Math.ceil(bottom - top);
 
       var canvas = new fabric.StaticCanvas(el, {
         enableRetinaScaling: false,
