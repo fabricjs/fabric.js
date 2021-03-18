@@ -1699,28 +1699,32 @@
       options || (options = { });
 
       var object = this,
-        utils = fabric.util,
-        origParams = utils.saveObjectTransform(this),
-        originalGroup = this.group,
-        originalShadow = this.shadow,
-        multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1),
-        objs = [object],
-        el = fabric.util.createCanvasElement(),
-        rects = [];
+          utils = fabric.util,
+          origParams = utils.saveObjectTransform(this),
+          originalGroup = this.group,
+          originalShadow = this.shadow,
+          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1),
+          objs = [object],
+          el = fabric.util.createCanvasElement(),
+          rects = [];
 
       delete object.group;
-      if (options.withoutTransform) utils.resetObjectTransform(object);
-      if (options.withoutShadow) object.shadow = null;
-      if (object.type === "activeSelection" || object.type === "group") objs = object._objects;
+      if (options.withoutTransform) {
+        utils.resetObjectTransform(object);
+      }
+      if (options.withoutShadow) {
+        object.shadow = null;
+      }
+      if (object.type === 'activeSelection' || object.type === 'group') {
+        objs = object._objects;
+      }
 
       objs.forEach(function(o) {
         var boundingRect = o.getBoundingRect(true, true),
-          shadow = o.shadow,
-          scaling = { scaleX: 1, scaleY: 1 },
-          min,
-          max;
+            shadow = o.shadow,
+            scaling = { scaleX: 1, scaleY: 1 };
 
-        if (object.type === "activeSelection" || object.type === "group") {
+        if (object.type === 'activeSelection' || object.type === 'group') {
           var matrix = o.calcTransformMatrix();
           boundingRect.left = matrix[4] - boundingRect.width / 2;
           boundingRect.top = matrix[5] - boundingRect.height / 2;
@@ -1740,20 +1744,24 @@
 
           if (mOffsetX > mBlur) {
             boundingRect.width += offsetX;
-          } else if (mOffsetX < -mBlur) {
+          }
+          else if (mOffsetX < -mBlur) {
             boundingRect.width -= offsetX;
             boundingRect.left += offsetX;
-          } else {
+          }
+          else {
             boundingRect.width += mBlur * 2;
             boundingRect.left -= mBlur - mOffsetX;
           }
 
           if (mOffsetY > mBlur) {
             boundingRect.height += offsetY;
-          } else if (mOffsetY < -mBlur) {
+          }
+          else if (mOffsetY < -mBlur) {
             boundingRect.height -= offsetY;
             boundingRect.top += offsetY;
-          } else {
+          }
+          else {
             boundingRect.height += mBlur * 2;
             boundingRect.top -= mBlur - mOffsetY;
           }
@@ -1765,14 +1773,15 @@
 
       // Find overall bounding box
 
-    // This is the old school Javascript way
+      // This is the old school Javascript way
 
       var left = rects[0].left,
-        right = rects[0].right,
-        top = rects[0].top,
-        bottom = rects[0].bottom,
-        i,
-        len = rects.length
+          right = rects[0].right,
+          top = rects[0].top,
+          bottom = rects[0].bottom,
+          i,
+          len = rects.length;
+
       for (i = 1; i < len; i++) {
         left = (rects[i].left < left) ? rects[i].left : left;
         right = (rects[i].right > right) ? rects[i].right : right;
