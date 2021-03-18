@@ -1698,25 +1698,25 @@
     toCanvasElement: function(options) {
       options || (options = { });
 
-      var that = this,
+      var _this = this,
           utils = fabric.util,
           origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
           originalShadow = this.shadow,
           multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1),
-          objs = [that],
+          objs = [_this],
           el = fabric.util.createCanvasElement(),
           rects = [];
 
-      delete that.group;
+      delete _this.group;
       if (options.withoutTransform) {
-        utils.resetObjectTransform(that);
+        utils.resetObjectTransform(_this);
       }
       if (options.withoutShadow) {
-        that.shadow = null;
+        _this.shadow = null;
       }
-      if (that.type === 'activeSelection' || that.type === 'group') {
-        objs = that._objects;
+      if (_this.type === 'activeSelection' || _this.type === 'group') {
+        objs = _this._objects;
       }
 
       objs.forEach(function(o) {
@@ -1724,7 +1724,7 @@
             shadow = o.shadow,
             scaling = { scaleX: 1, scaleY: 1 };
 
-        if (that.type === 'activeSelection' || that.type === 'group') {
+        if (_this.type === 'activeSelection' || _this.type === 'group') {
           var matrix = o.calcTransformMatrix();
           boundingRect.left = matrix[4] - boundingRect.width / 2;
           boundingRect.top = matrix[5] - boundingRect.height / 2;
