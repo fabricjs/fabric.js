@@ -1737,8 +1737,8 @@
               mBlur = (blur * Math.abs(scaling.scaleX + scaling.scaleY)) / 4,
               signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0,
               signY = shadow.offsetY >= 0.0 ? 1.0 : -1.0,
-              mOffsetX = shadow.offsetX * Math.abs(scaling.scaleX) + (shadow.offsetX / 2),
-              mOffsetY = shadow.offsetY * Math.abs(scaling.scaleY) + (shadow.offsetY / 2),
+              mOffsetX = shadow.offsetX * Math.abs(scaling.scaleX) + mBlur,
+              mOffsetY = shadow.offsetY * Math.abs(scaling.scaleY) + mBlur,
               offsetX = mOffsetX + signX * mBlur + mOffsetX,
               offsetY = mOffsetY + signY * mBlur + mOffsetY;
 
