@@ -1713,7 +1713,7 @@
       if (options.withoutShadow) object.shadow = null;
       if (object.type === "activeSelection" || object.type === "group") objs = object._objects;
 
-      objs.forEach((o) => {
+      objs.forEach(function(o) {
         var boundingRect = o.getBoundingRect(true, true),
           shadow = o.shadow,
           scaling = { scaleX: 1, scaleY: 1 },
