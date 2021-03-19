@@ -394,6 +394,13 @@
     minScaleLimit:            0,
 
     /**
+     * Indication of extra space taken up on the left (by delete controls for example)
+     * @type Number
+     * @default
+     */
+    leftMargin:            0,
+
+    /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
      * But events still fire on it.
      * @type Boolean

@@ -40,6 +40,14 @@
      */
     dynamicMinWidth: 2,
 
+
+    /**
+     * extra space taken up on the left by delete controls
+     * @type Number
+     * @default
+     */
+    leftMargin:            44,
+
     /**
      * Cached array of text wrapping.
      * @type Array
