@@ -681,8 +681,11 @@
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width, hasResized,
-        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
+        oldWidth = target.width, hasResized;
+    var calcWidth = localPoint.x * multiplier / target.scaleX;
+    var newWidth = (target.lockScalingFlip ?
+      Math.max(calcWidth, target.padding) : Math.abs(calcWidth)) - strokePadding;
+
     target.set('width', Math.max(newWidth, 0));
     hasResized = oldWidth !== newWidth;
     if (hasResized) {
