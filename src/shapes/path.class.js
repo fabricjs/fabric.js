@@ -94,7 +94,7 @@
 
           case 'L': // lineto, absolute
             x = current[1];
-            y = current[2] + (addZeroLenOffset ? .001 : 0);
+            y = current[2];
             ctx.lineTo(x + l, y + t);
             break;
 
