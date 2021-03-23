@@ -86,18 +86,6 @@
 
       ctx.beginPath();
 
-      // SCI-2706 - detect a single point ('m', and all 'l' with the same coords)
-      // Safari doesnt draw zero-length line segments
-      // Safari specs: https://html.spec.whatwg.org/multipage/canvas.html#trace-a-path
-      var addZeroLenOffset = true;
-      for (var i = 0; i < this.path.length - 1; i++) {
-        if (this.path[i][1] !== this.path[i + 1][1] ||
-            this.path[i][2] !== this.path[i + 1][2]) {
-          addZeroLenOffset = false;
-          break;
-        }
-      }
-
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
