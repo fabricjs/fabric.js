@@ -10426,9 +10426,25 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       } while (checkIndex < fullPath.length - 1)
       // always push the line ending
       newPath.push(fullPath[fullPath.length - 1])
-      return newPath
+      return newPath;
     },
-  
+
+    detectAndEnlargeSinglePointPath: function (path){
+      var lastIndex = path.length - 1;
+      for (var i = 0; i < lastIndex; i++){
+        if (path[i][1] !== path[i + 1][1] ||
+            path[i][2] !== path[i + 1][2]) {
+          // path contains at least one divergent point
+          return path;
+        }
+      }
+      // we have detected only a single point. Add a tiny change to it so it will be rendered.
+      // Safari specs: https://html.spec.whatwg.org/multipage/canvas.html#trace-a-path 
+      // Specifically: 'Prune all zero-length line segments from path.'
+      var lastPoint = ['L', path[lastIndex][1], (path[lastIndex][2] + 1)];
+      path.push(lastPoint);
+      return path;
+    },
 
     /**
      * On mouseup after drawing the path on contextTop canvas
@@ -10453,10 +10469,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
       var path = this.createPath(pathData);
       path.path = this.simplifyPath(path.path);
-      
+      path.path = this.detectAndEnlargeSinglePointPath(path.path);
+
       this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
-      
+
       // Add to highlight layer
       //this.canvas.add(path);
       this.canvas.addHighlight(path);
