@@ -10190,6 +10190,14 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     },
 
     /**
+     * Called when we need to interrupt the drawing
+     */
+    interruptDrawing: function() {
+      this.oldEnd = undefined;
+      this._finalizeAndAddPath();
+    },
+
+    /**
      * @private
      * @param {Object} pointer Actual mouse position related to the canvas.
      */
@@ -13325,9 +13333,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
+      this._interruptDrawing();
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'wheel');
       this._resetTransformEventData();
+    },
+
+    /**
+     * Method to call if moving the drawing canvas (e.g. on a scroll event)
+     * @private
+     */
+    _interruptDrawing: function() {
+      if (this.isDrawingMode && this._isCurrentlyDrawing && this.freeDrawingBrush.interruptDrawing) {
+        this.freeDrawingBrush.interruptDrawing();
+        this._isCurrentlyDrawing = false;
+        this.isDrawingMode = false;
+        this.setCursor(this.defaultCursor);
+      }
     },
 
     /**

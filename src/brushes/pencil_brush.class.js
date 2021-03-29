@@ -99,6 +99,14 @@
     },
 
     /**
+     * Called when we need to interrupt the drawing
+     */
+    interruptDrawing: function() {
+      this.oldEnd = undefined;
+      this._finalizeAndAddPath();
+    },
+
+    /**
      * @private
      * @param {Object} pointer Actual mouse position related to the canvas.
      */
