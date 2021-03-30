@@ -10190,7 +10190,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     },
 
     /**
-     * Called when we need to interrupt the drawing
+     * Called when we need to interrupt the current drawing
+     * and apply the current path to the lower canvas
      */
     interruptDrawing: function() {
       this.oldEnd = undefined;
