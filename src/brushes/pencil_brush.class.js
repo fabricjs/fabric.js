@@ -253,9 +253,11 @@
           newPoints.push(lastPoint);
         }
       }
-      if (newPoints.length === 1) {
-        newPoints.push(new fabric.Point(newPoints[0].x, newPoints[0].y));
-      }
+      /**
+       * Add the last point from the original line to the end of the array.
+       * This ensures decimate doesn't delete the last point on the line, and ensures the line is > 1 point.
+       */
+      newPoints.push(points[l]);
       return newPoints;
     },
 
