@@ -358,8 +358,8 @@
 
   function text11(canvas, callback) {
     var itext = new fabric.Text('hello\nworld', {
-      left: 50,
-      top: 50,
+      left: 10,
+      top: 10,
       fontFamily: 'Helvetica',
       fill: 'purple',
       lineHeight: 1.1,
@@ -389,8 +389,8 @@
       }
     });
     var itext2 = new fabric.Text('Version 4.2.0', {
-      left: 150,
-      top: 150,
+      left: 110,
+      top: 110,
       fontFamily: 'Helvetica',
       fill: 'blue',
       lineHeight: 1.1,
@@ -417,8 +417,8 @@
   tests.push({
     test: 'Text and underline color',
     code: text11,
-    width: 500,
-    height: 230,
+    width: 400,
+    height: 200,
     golden: 'text11.png',
     percentage: 0.06,
   });
