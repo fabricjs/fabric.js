@@ -57,6 +57,20 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeDashArray: null,
 
   /**
+   * Function to clean up cancel/apply drawing
+   * add this function to a brush to make it interruptable
+   */
+  interruptDrawing: undefined,
+
+  /**
+   * Checks if brush defines a function for interrupting a
+   * drawing/painting/other action
+   */
+  isInterruptable: function() {
+    return this.interruptDrawing !== undefined;
+  },
+
+  /**
    * Sets brush styles
    * @private
    */

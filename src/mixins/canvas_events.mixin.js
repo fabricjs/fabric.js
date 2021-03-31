@@ -951,7 +951,7 @@
      * @private
      */
     _interruptDrawing: function() {
-      if (this.isDrawingMode && this._isCurrentlyDrawing && this.freeDrawingBrush.interruptDrawing) {
+      if (this.isDrawingMode && this._isCurrentlyDrawing && this.freeDrawingBrush.isInterruptable()) {
         this.freeDrawingBrush.interruptDrawing();
         this._isCurrentlyDrawing = false;
         this.isDrawingMode = false;
