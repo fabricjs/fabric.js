@@ -358,8 +358,8 @@
 
   function text11(canvas, callback) {
     var itext = new fabric.Text('hello\nworld', {
-      left: 10,
-      top: 10,
+      left: 4,
+      top: 4,
       fontFamily: 'Helvetica',
       fill: 'purple',
       lineHeight: 1.1,
@@ -389,8 +389,8 @@
       }
     });
     var itext2 = new fabric.Text('Version 4.2.0', {
-      left: 110,
-      top: 110,
+      left: 105,
+      top: 4,
       fontFamily: 'Helvetica',
       fill: 'blue',
       lineHeight: 1.1,
@@ -400,7 +400,32 @@
             underline: true,
             linethrough: true
           },
+          1: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          2: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
           3: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          4: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          5: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          6: {
             fill: 'red',
             underline: true,
             linethrough: true
@@ -417,10 +442,10 @@
   tests.push({
     test: 'Text and underline color',
     code: text11,
-    width: 400,
-    height: 200,
+    width: 350,
+    height: 100,
     golden: 'text11.png',
-    percentage: 0.06,
+    percentage: 0.00,
   });
 
   tests.forEach(visualTestLoop(QUnit));
