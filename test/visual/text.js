@@ -445,7 +445,7 @@
     width: 350,
     height: 100,
     golden: 'text11.png',
-    percentage: 0.00,
+    percentage: 0.01,
   });
 
   tests.forEach(visualTestLoop(QUnit));
