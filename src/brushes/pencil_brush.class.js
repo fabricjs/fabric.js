@@ -99,6 +99,15 @@
     },
 
     /**
+     * Called when we need to interrupt the current drawing
+     * and apply the current path to the lower canvas
+     */
+    interruptDrawing: function() {
+      this.oldEnd = undefined;
+      this._finalizeAndAddPath();
+    },
+
+    /**
      * @private
      * @param {Object} pointer Actual mouse position related to the canvas.
      */

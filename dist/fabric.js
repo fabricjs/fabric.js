@@ -10022,6 +10022,20 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeDashArray: null,
 
   /**
+   * Function to clean up cancel/apply drawing
+   * add this function to a brush to make it interruptable
+   */
+  interruptDrawing: undefined,
+
+  /**
+   * Checks if brush defines a function for interrupting a
+   * drawing/painting/other action
+   */
+  isInterruptable: function() {
+    return this.interruptDrawing !== undefined;
+  },
+
+  /**
    * Sets brush styles
    * @private
    */
@@ -10187,6 +10201,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
       return false;
+    },
+
+    /**
+     * Called when we need to interrupt the current drawing
+     * and apply the current path to the lower canvas
+     */
+    interruptDrawing: function() {
+      this.oldEnd = undefined;
+      this._finalizeAndAddPath();
     },
 
     /**
@@ -13325,9 +13348,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
+      this._interruptDrawing();
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'wheel');
       this._resetTransformEventData();
+    },
+
+    /**
+     * Method to call if moving the drawing canvas (e.g. on a scroll event)
+     * @private
+     */
+    _interruptDrawing: function() {
+      if (this.isDrawingMode && this._isCurrentlyDrawing && this.freeDrawingBrush.isInterruptable()) {
+        this.freeDrawingBrush.interruptDrawing();
+        this._isCurrentlyDrawing = false;
+        this.isDrawingMode = false;
+        this.setCursor(this.defaultCursor);
+      }
     },
 
     /**
