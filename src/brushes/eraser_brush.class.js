@@ -6,21 +6,14 @@
    */
   fabric.EraserBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabric.EraserBrush.prototype */ {
 
-    /**
-     * Constructor
-     * @param {fabric.Canvas} canvas
-     * @return {fabric.PencilBrush} Instance of a pencil brush
-     */
-    initialize: function (canvas) {
-      this.callSuper('initialize', canvas);
-      this.type = 'eraser';
-    },
+    type: 'eraser',
 
     /**
      * Get the context on which the erasing should occur
      */
     getContext: function () {
-      return this.canvas.getContext();
+      //return this.canvas.getContext();
+      return this.canvas.contextTop;
     },
 
     /**
