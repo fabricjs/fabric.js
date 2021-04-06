@@ -646,6 +646,11 @@
     absolutePositioned: false,
 
     /**
+     * Indicates whether this object can be erased by @class fabric.EraserBrush
+     */
+    erasable: true,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */
