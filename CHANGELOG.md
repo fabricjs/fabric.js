@@ -6,7 +6,7 @@
 - fix(fabric.Text): underline color with text style ( regression from text on a path) [#6974](https://github.com/fabricjs/fabric.js/pull/6974)
 - fix(fabric.Image): Cache CropX and CropY cache properties [#6924](https://github.com/fabricjs/fabric.js/pull/6924)
 - fix(fabric.Canvas): Add target to each selection event [#6858](https://github.com/fabricjs/fabric.js/pull/6858)
-- fix(fabric.Image): fix wrong scaling value for the y axis in renderFi… …
+- fix(fabric.Image): fix wrong scaling value for the y axis in renderFill [#6778](https://github.com/fabricjs/fabric.js/pull/6778)
 - fix(fabric.Canvas): set isMoving on real movement only  [#6856](https://github.com/fabricjs/fabric.js/pull/6856)
 - fix(fabric.Group) make addWithUpdate compatible with nested groups [#6774](https://github.com/fabricjs/fabric.js/pull/6774)
 - fix(Fabric.Text): Add path to text export and import [#6844](https://github.com/fabricjs/fabric.js/pull/6844)
