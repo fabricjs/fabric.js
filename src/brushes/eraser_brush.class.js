@@ -166,7 +166,7 @@
       }
 
       var path = this.createPath(pathData);
-      //this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
 
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
