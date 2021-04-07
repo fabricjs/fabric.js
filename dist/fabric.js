@@ -11233,7 +11233,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         inverted: true,
         dirty: true,
         eraser: mergedEraserPaths
-      })
+      });
+      obj.freezeClipPathTransformMatrix();
     },
 
     /**
@@ -11259,7 +11260,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       var path = this.createPath(pathData);
-      //this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
 
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
@@ -15315,6 +15316,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * Used by @class fabric.EraserBrush to position the erased paths
+     */
+    _clipPathTransformMatrix: null,
+    freezeClipPathTransformMatrix: function () {
+      this._clipPathTransformMatrix = this.calcTransformMatrix();
+    },
+
+    /**
      * Execute the drawing operation for an object clipPath
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -15331,7 +15340,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       //ctx.scale(1 / 2, 1 / 2);
       if (path.absolutePositioned) {
-        var m = fabric.util.invertTransform(this.calcTransformMatrix());
+        var m = fabric.util.invertTransform(this._clipPathTransformMatrix || this.calcTransformMatrix());
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       path.transform(ctx);
