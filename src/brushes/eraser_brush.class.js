@@ -10,6 +10,7 @@
 
     /**
      * Get the context on which the erasing should occur
+     * Uses different drawing context than PencilBrush to erase objects
      */
     getContext() {
       return this.canvas.getContext();
@@ -17,6 +18,7 @@
     },
 
     /**
+     * Use different drawing context to erase objects
      * @override @class fabric.BaseBrush
      */
     _setBrushStyles: function () {
@@ -41,6 +43,7 @@
     },
 
     /**
+     * Use different drawing context to erase objects
      * @override @class fabric.BaseBrush
      */
     _setShadow: function () {
@@ -63,7 +66,8 @@
     },
 
     /**
-     * @override @class fabric.PencelBrush
+     * Use different drawing context to erase objects
+     * @override @class fabric.PencilBrush
      */
     onMouseMove: function (pointer, options) {
       if (!this.canvas._isMainEvent(options.e)) {
@@ -92,6 +96,7 @@
     },
 
     /**
+     * Use different drawing context to erase objects
      * @private
      * @param {Object} pointer Actual mouse position related to the canvas.
      */
