@@ -12,8 +12,8 @@
      * Get the context on which the erasing should occur
      */
     getContext: function () {
-      //return this.canvas.getContext();
-      return this.canvas.contextTop;
+      return this.canvas.getContext();
+      //return this.canvas.contextTop;
     },
 
     /**
@@ -168,10 +168,11 @@
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
         this._addPathToObjectEraser(this.canvas.backgroundImage, path);
       }
+      const _this = this;
       this.canvas.getObjects()
         .forEach(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
-            this._addPathToObjectEraser(obj, path);
+            _this._addPathToObjectEraser(obj, path);
           }
         });
       this.canvas.requestRenderAll();
