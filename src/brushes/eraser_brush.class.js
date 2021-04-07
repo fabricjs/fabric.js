@@ -1,4 +1,3 @@
-
 (function () {
   var ClipPathGroup = fabric.util.createClass(fabric.Group, {
     _transformMatrix: null,
@@ -35,9 +34,10 @@
       },
 
       /**
-       * render all non erasable objects on top of main canvas,
-       * render canvas on top canvas
-       * erasing is done on top canvas so it will reveal main canvas with non erasable objects on it achieving the desired effect
+       * Supports selective erasing - only objects that are erasable will be visibly affected by the gesture.
+       * Erasing occurs on top ctx.
+       * In order to support selective erasing we render all non erasable objects on the main ctx while rendering the entire canvas on the top ctx
+       * This way when erasing occurs it clips the top ctx and reveals the main ctx achieving the desired effect of seeming to erase only erasable objects
        * @param {*} pointer
        * @param {*} options
        * @returns
