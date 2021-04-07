@@ -940,7 +940,6 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseWheel: function(e) {
-      this._interruptDrawing();
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'wheel');
       this._resetTransformEventData();
@@ -948,9 +947,8 @@
 
     /**
      * Method to call if moving the drawing canvas (e.g. on a scroll event)
-     * @private
      */
-    _interruptDrawing: function() {
+    interruptCurrentDrawing: function() {
       if (this.isDrawingMode && this._isCurrentlyDrawing && this.freeDrawingBrush.isInterruptable()) {
         this.freeDrawingBrush.interruptDrawing();
         this._isCurrentlyDrawing = false;
