@@ -11,7 +11,7 @@
     /**
      * Get the context on which the erasing should occur
      */
-    getContext: function () {
+    getContext() {
       return this.canvas.getContext();
       //return this.canvas.contextTop;
     },
@@ -110,7 +110,7 @@
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function (pathData) {
-      var path = this.callSuper('createPath', pathData);
+      const path = this.callSuper('createPath', pathData);
       path.globalCompositeOperation = 'destination-out';
       path.inverted = true;
       path.selectable = false;
@@ -124,12 +124,12 @@
      * @param {fabric.Object} obj
      * @param {fabric.Path} path
      */
-    _addPathToObjectEraser: function (obj, path) {
-      var points = obj.eraser ? obj.eraser.path : [];
-      points.concat(path.path);
-      var mergedEraserPaths = this.createPath(points);
-      var rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
-      var clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
+    _addPathToObjectEraser(obj, path) {
+      const points = obj.eraser?.path || [];
+      points.push(...path.path);
+      const mergedEraserPaths = this.createPath(points);
+      const rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
+      const clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
       clipObject.globalCompositeOperation = "destination-out";
       obj.set({
         clipPath: clipObject,
@@ -161,7 +161,7 @@
         return;
       }
 
-      var path = this.createPath(pathData);
+      const path = this.createPath(pathData);
       //this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
 
@@ -170,7 +170,7 @@
       }
       const _this = this;
       this.canvas.getObjects()
-        .forEach(function (obj) {
+        .forEach((obj) => {
           if (obj.erasable && obj.intersectsWithObject(path)) {
             _this._addPathToObjectEraser(obj, path);
           }
