@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.4.0]
+
+- fix(fabric.Object) wrong variable name `cornerStrokeColor ` [#6981](https://github.com/fabricjs/fabric.js/pull/6981)
+- fix(fabric.Text): underline color with text style ( regression from text on a path) [#6974](https://github.com/fabricjs/fabric.js/pull/6974)
+- fix(fabric.Image): Cache CropX and CropY cache properties [#6924](https://github.com/fabricjs/fabric.js/pull/6924)
+- fix(fabric.Canvas): Add target to each selection event [#6858](https://github.com/fabricjs/fabric.js/pull/6858)
+- fix(fabric.Image): fix wrong scaling value for the y axis in renderFill [#6778](https://github.com/fabricjs/fabric.js/pull/6778)
+- fix(fabric.Canvas): set isMoving on real movement only  [#6856](https://github.com/fabricjs/fabric.js/pull/6856)
+- fix(fabric.Group) make addWithUpdate compatible with nested groups [#6774](https://github.com/fabricjs/fabric.js/pull/6774)
+- fix(Fabric.Text): Add path to text export and import [#6844](https://github.com/fabricjs/fabric.js/pull/6844)
+- fix(fabric.Canvas) Remove controls check in the pixel accuracy target [#6798](https://github.com/fabricjs/fabric.js/pull/6798)
+- feat(fabric.Canvas): Added activeOn 'up/down' property [#6807](https://github.com/fabricjs/fabric.js/pull/6807)
+- feat(fabric.BaseBrush): limitedToCanvasSize property to brush [#6719](https://github.com/fabricjs/fabric.js/pull/6719)
+
 ## [4.3.1]
 
 - fix(fabric.Control) implement targetHasOneFlip using shorthand [#6823](https://github.com/fabricjs/fabric.js/pull/6823)
