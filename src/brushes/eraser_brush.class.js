@@ -129,10 +129,9 @@
      * @param {fabric.Object} obj
      * @param {fabric.Path} path
      */
-    _addPathToObjectEraser(obj, path) {
-      var points = obj.eraser?.path || [];
-      points.push(...path.path);
-      var mergedEraserPaths = this.createPath(points);
+    _addPathToObjectEraser: function(obj, path) {
+      var points = obj.eraser ? obj.eraser.path : [];
+      var mergedEraserPaths = this.createPath(points.concat(path.path));
       var rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
       var clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
       clipObject.globalCompositeOperation = "destination-out";
@@ -175,7 +174,7 @@
       }
       var _this = this;
       this.canvas.getObjects()
-        .forEach((obj) => {
+        .forEach(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
             _this._addPathToObjectEraser(obj, path);
           }

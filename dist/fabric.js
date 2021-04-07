@@ -11103,13 +11103,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * Get the context on which the erasing should occur
+     * Uses different drawing context than PencilBrush to erase objects
      */
     getContext: function () {
-      //return this.canvas.getContext();
-      return this.canvas.contextTop;
+      return this.canvas.getContext();
+      //return this.canvas.contextTop;
     },
 
     /**
+     * Use different drawing context to erase objects
      * @override @class fabric.BaseBrush
      */
     _setBrushStyles: function () {
@@ -11134,6 +11136,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * Use different drawing context to erase objects
      * @override @class fabric.BaseBrush
      */
     _setShadow: function () {
@@ -11156,7 +11159,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * @override @class fabric.PencelBrush
+     * Use different drawing context to erase objects
+     * @override @class fabric.PencilBrush
      */
     onMouseMove: function (pointer, options) {
       if (!this.canvas._isMainEvent(options.e)) {
@@ -11185,6 +11189,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * Use different drawing context to erase objects
      * @private
      * @param {Object} pointer Actual mouse position related to the canvas.
      */
@@ -11217,10 +11222,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {fabric.Object} obj
      * @param {fabric.Path} path
      */
-    _addPathToObjectEraser: function (obj, path) {
+    _addPathToObjectEraser: function(obj, path) {
       var points = obj.eraser ? obj.eraser.path : [];
-      points.concat(path.path);
-      var mergedEraserPaths = this.createPath(points);
+      var mergedEraserPaths = this.createPath(points.concat(path.path));
       var rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
       var clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
       clipObject.globalCompositeOperation = "destination-out";
@@ -11261,10 +11265,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
         this._addPathToObjectEraser(this.canvas.backgroundImage, path);
       }
+      var _this = this;
       this.canvas.getObjects()
         .forEach(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
-            this._addPathToObjectEraser(obj, path);
+            _this._addPathToObjectEraser(obj, path);
           }
         });
       this.canvas.requestRenderAll();
