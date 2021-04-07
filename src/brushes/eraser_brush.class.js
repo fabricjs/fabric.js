@@ -12,7 +12,7 @@
      * Get the context on which the erasing should occur
      * Uses different drawing context than PencilBrush to erase objects
      */
-    getContext() {
+    getContext: function () {
       return this.canvas.getContext();
       //return this.canvas.contextTop;
     },
@@ -115,7 +115,7 @@
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function (pathData) {
-      const path = this.callSuper('createPath', pathData);
+      var path = this.callSuper('createPath', pathData);
       path.globalCompositeOperation = 'destination-out';
       path.inverted = true;
       path.selectable = false;
@@ -130,11 +130,11 @@
      * @param {fabric.Path} path
      */
     _addPathToObjectEraser(obj, path) {
-      const points = obj.eraser?.path || [];
+      var points = obj.eraser?.path || [];
       points.push(...path.path);
-      const mergedEraserPaths = this.createPath(points);
-      const rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
-      const clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
+      var mergedEraserPaths = this.createPath(points);
+      var rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
+      var clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
       clipObject.globalCompositeOperation = "destination-out";
       obj.set({
         clipPath: clipObject,
@@ -166,14 +166,14 @@
         return;
       }
 
-      const path = this.createPath(pathData);
+      var path = this.createPath(pathData);
       //this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.fire('before:path:created', { path: path });
 
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
         this._addPathToObjectEraser(this.canvas.backgroundImage, path);
       }
-      const _this = this;
+      var _this = this;
       this.canvas.getObjects()
         .forEach((obj) => {
           if (obj.erasable && obj.intersectsWithObject(path)) {
