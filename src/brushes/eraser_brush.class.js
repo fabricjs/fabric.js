@@ -1,4 +1,21 @@
 (function () {
+
+  var ClipPathGroup = fabric.util.createClass(fabric.Group, {
+
+    _transformMatrix: null,
+
+    initialize: function (objects, transformMatrix, options) {
+      this.callSuper("initialize", objects, options);
+      this._transformMatrix = transformMatrix;
+    },
+
+    transform: function (ctx) {
+      var m = this._transformMatrix;
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      this.callSuper("transform", ctx);
+    }
+  });
+
   /**
    * EraserBrush class
    * @class fabric.EraserBrush
@@ -133,8 +150,8 @@
       var points = obj.eraser ? obj.eraser.path : [];
       var mergedEraserPaths = this.createPath(points.concat(path.path));
       var rect = new fabric.Rect({ top: 0, left: 0, width: this.canvas.width, height: this.canvas.height });
-      var clipObject = new fabric.Group([rect, mergedEraserPaths], { absolutePositioned: true });
-      clipObject.globalCompositeOperation = "destination-out";
+      var transformMatrix = fabric.util.invertTransform(obj.calcTransformMatrix());
+      var clipObject = new ClipPathGroup([rect, mergedEraserPaths], transformMatrix, { globalCompositeOperation: "destination-out" });
       obj.set({
         clipPath: clipObject,
         inverted: true,
