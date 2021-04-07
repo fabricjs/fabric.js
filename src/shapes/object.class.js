@@ -1173,6 +1173,14 @@
     },
 
     /**
+     * Used by @class fabric.EraserBrush to position the erased paths
+     */
+    _clipPathTransformMatrix: null,
+    freezeClipPathTransformMatrix: function () {
+      this._clipPathTransformMatrix = this.calcTransformMatrix();
+    },
+
+    /**
      * Execute the drawing operation for an object clipPath
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -1189,7 +1197,7 @@
       }
       //ctx.scale(1 / 2, 1 / 2);
       if (path.absolutePositioned) {
-        var m = fabric.util.invertTransform(this.calcTransformMatrix());
+        var m = fabric.util.invertTransform(this._clipPathTransformMatrix || this.calcTransformMatrix());
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       path.transform(ctx);
