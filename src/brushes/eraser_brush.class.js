@@ -140,8 +140,7 @@
         inverted: true,
         dirty: true,
         eraser: mergedEraserPaths
-      });
-      obj.freezeClipPathTransformMatrix();
+      })
     },
 
     /**
