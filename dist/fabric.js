@@ -11105,8 +11105,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Get the context on which the erasing should occur
      */
     getContext: function () {
-      return this.canvas.getContext();
-     // return this.canvas.contextTop;
+      //return this.canvas.getContext();
+      return this.canvas.contextTop;
     },
 
     /**
@@ -11239,8 +11239,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _finalizeAndAddPath: function () {
 
-      //var ctx = this.getContext();
-      //ctx.closePath();
+      var ctx = this.getContext();
+      ctx.closePath();
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
       }
@@ -11256,7 +11256,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var path = this.createPath(pathData);
       //this.canvas.clearContext(this.canvas.contextTop);
-     // this.canvas.fire('before:path:created', { path: path });
+      this.canvas.fire('before:path:created', { path: path });
 
       if (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable) {
         this._addPathToObjectEraser(this.canvas.backgroundImage, path);
@@ -11267,12 +11267,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             this._addPathToObjectEraser(obj, path);
           }
         });
-      this.canvas.renderAll();
-      //path.setCoords();
-      //this._resetShadow();
+      this.canvas.requestRenderAll();
+      path.setCoords();
+      this._resetShadow();
 
       // fire event 'path' created
-     // this.canvas.fire('path:created', { path: path });
+      this.canvas.fire('path:created', { path: path });
     }
   });
 })();
