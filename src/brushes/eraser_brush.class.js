@@ -14,6 +14,26 @@
     }
   });
 
+  fabric.util.object.extend(fabric.Canvas.prototype, {
+    /**
+     * Sets eraable option on background objects
+     * @param {boolean} value 
+     * @returns 
+     */
+    setErasable(value) {
+      let changed = false;
+      if (this.backgroundImage) {
+        changed = true;
+        this.backgroundImage.erasable = value;
+      }
+      if (this.backgroundColor && this.backgroundColor instanceof fabric.Object) {
+        changed = true;
+        this.backgroundColor.erasable = value;
+      }
+      return changed;
+    }
+  });
+
   /**
    * EraserBrush class
    * @class fabric.EraserBrush
