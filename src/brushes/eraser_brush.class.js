@@ -47,7 +47,7 @@
         if (!this.canvas._isMainEvent(options.e)) {
           return;
         }
-        this.canvas.clone((c) => {
+        this.canvas.clone(function (c) {
           if (c.backgroundImage && c.backgroundImage.erasable) {
             c.setBackgroundImage(null);
           }
