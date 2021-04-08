@@ -26,7 +26,7 @@
 
       /**
        * @extends @class fabric.BaseBrush
-       * @param {*} ctx
+       * @param {CanvasRenderingContext2D} ctx
        */
       _saveAndTransform: function (ctx) {
         this.callSuper("_saveAndTransform", ctx);
@@ -34,31 +34,53 @@
       },
 
       /**
-       * Supports selective erasing - only objects that are erasable will be visibly affected by the gesture.
-       * Erasing occurs on top ctx.
-       * In order to support selective erasing we render all non erasable objects on the main ctx while rendering the entire canvas on the top ctx
-       * This way when erasing occurs it clips the top ctx and reveals the main ctx achieving the desired effect of seeming to erase only erasable objects
-       * @param {*} pointer
-       * @param {*} options
+       * Supports selective erasing: Only erasable objects will be visibly affected by the eraser brush.
+       * In order to support selective erasing all non erasable objects are rendered on the main ctx
+       * while the entire canvas is rendered on the top ctx.
+       * When erasing occurs, the path clips the top ctx and reveals the main ctx.
+       * This achieves the desired effect of seeming to erase only erasable objects.
+       * @param {fabric.Point} pointer
+       * @param {fabric.IEvent} options
        * @returns
        */
       onMouseDown: function (pointer, options) {
         if (!this.canvas._isMainEvent(options.e)) {
           return;
         }
-        this.canvas.renderCanvas(
-          this.canvas.getContext(),
-          this.canvas.getObjects().filter(function (obj) {
-            return !obj.erasable;
-          })
-        );
-        this.callSuper("onMouseDown", pointer, options);
+        this.canvas.clone((c) => {
+          if (c.backgroundImage && c.backgroundImage.erasable) {
+            c.setBackgroundImage(null);
+          }
+          if (
+            c.backgroundColor &&
+            c.backgroundColor instanceof fabric.Object &&
+            c.erasable
+          ) {
+            c.setBackgroundColor(null);
+          }
+          c.renderCanvas(
+            this.canvas.getContext(),
+            this.canvas.getObjects().filter(function (obj) {
+              return !obj.erasable;
+            })
+          );
+          c.dispose();
+          this.callSuper("onMouseDown", pointer, options);
+        });
       },
+
+      /**
+       * Restore ctx after _finalizeAndAddPath is invoked
+       * @param {fabric.Point} pointer
+       * @param {fabric.IEvent} options
+       * @returns
+       */
       onMouseUp: function (pointer, options) {
         var retVal = this.callSuper("onMouseUp", pointer, options);
         this.canvas.renderAll();
         return retVal;
       },
+
       _render: function () {
         this.canvas.renderCanvas(
           this.canvas.contextTop,
@@ -74,16 +96,17 @@
        */
       createPath: function (pathData) {
         var path = this.callSuper("createPath", pathData);
-        path.globalCompositeOperation = "destination-out";
-        path.inverted = true;
-        path.selectable = false;
-        path.evented = false;
-        path.absolutePositioned = true;
+        path.set({
+          globalCompositeOperation: "destination-out",
+          selectable: false,
+          evented: false
+        });
         return path;
       },
 
       /**
        * Adds path to existing eraser paths on object
+       * @private
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -115,7 +138,7 @@
       /**
        * On mouseup after drawing the path on contextTop canvas
        * we use the points captured to create an new fabric path object
-       * and add it to the fabric canvas.
+       * and add it to every intersected erasable object.
        */
       _finalizeAndAddPath: function () {
         var ctx = this.canvas.contextTop;
@@ -138,10 +161,18 @@
         this.canvas.fire("before:path:created", { path: path });
 
         if (
-          this.canvas.backgroundImage &&
-          this.canvas.backgroundImage.erasable
+          this.canvas.erasable ||
+          (this.canvas.backgroundImage && this.canvas.backgroundImage.erasable)
         ) {
           this._addPathToObjectEraser(this.canvas.backgroundImage, path);
+        }
+        if (
+          this.canvas.erasable ||
+          (this.canvas.backgroundColor &&
+            this.canvas.backgroundColor instanceof fabric.Object &&
+            this.canvas.backgroundColor.erasable)
+        ) {
+          this._addPathToObjectEraser(this.canvas.backgroundColor, path);
         }
         var _this = this;
         this.canvas.forEachObject(function (obj) {
