@@ -195,11 +195,6 @@
     clipPath: undefined,
 
     /**
-     * Indicates whether the background objects of this canvas can be erased by @class fabric.EraserBrush
-     */
-    erasable: false,
-
-    /**
      * @private
      * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
      * @param {Object} [options] Options object
