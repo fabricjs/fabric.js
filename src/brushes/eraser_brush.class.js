@@ -47,6 +47,7 @@
         if (!this.canvas._isMainEvent(options.e)) {
           return;
         }
+        this._prepareForDrawing(pointer);
         var _this = this;
         this.canvas.clone(function (c) {
           if (c.backgroundImage && c.backgroundImage.erasable) {
@@ -65,8 +66,8 @@
               return !obj.erasable;
             })
           );
+          _this._render();
           c.dispose();
-          _this.callSuper("onMouseDown", pointer, options);
         });
       },
 
