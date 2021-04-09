@@ -1,5 +1,4 @@
 (function () {
-
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
      * Sets erasable option on current background objects
@@ -17,7 +16,7 @@
         this.backgroundColor.erasable = value;
       }
       return changed;
-    }
+    },
   });
 
   /**
@@ -54,28 +53,43 @@
           return;
         }
         this._prepareForDrawing(pointer);
+
         var _this = this;
         this.canvas.clone(function (c) {
-          if (c.backgroundImage && c.backgroundImage.erasable) {
-            c.setBackgroundImage(null);
-          }
-          if (
-            c.backgroundColor &&
-            c.backgroundColor instanceof fabric.Object &&
-            c.backgroundColor.erasable
-          ) {
-            c.setBackgroundColor(null);
-          }
-          c.renderCanvas(
-            _this.canvas.getContext(),
-            _this.canvas.getObjects().filter(function (obj) {
-              return !obj.erasable;
-            })
-          );
-          _this._render();
-          c.dispose();
+          _this.renderInit(c);
         });
       },
+
+      /**
+       * Use a clone of the canvas to render the non-erasable objects on the main context
+       */
+      renderInit(_canvas) {
+        var canvas = this.canvas;
+        if (canvas.backgroundImage && !canvas.backgroundImage.erasable) {
+          canvas.backgroundImage.clone(function (_clone) {
+            _canvas.setBackgroundImage(_clone);
+          });
+        } else {
+          _canvas.setBackgroundImage(null);
+        }
+        if (canvas.backgroundColor && canvas.backgroundColor instanceof fabric.Object &&
+          !canvas.backgroundColor.erasable) {
+          canvas.setBackgroundColor.clone(function (_clone) {
+            _canvas.setBackgroundColor(_clone);
+          });
+        } else {
+          _canvas.setBackgroundColor(canvas.backgroundColor);
+        }
+        _canvas.renderCanvas(
+          canvas.getContext(),
+          canvas.getObjects().filter(function (obj) {
+            return !obj.erasable;
+          })
+        );
+        this._render();
+        _canvas.dispose();
+      },
+
 
       /**
        * Restore ctx after _finalizeAndAddPath is invoked
@@ -125,7 +139,7 @@
 
         var clipObject;
         if (!obj.eraser) {
-          clipObject = new ClipPathRect(obj);
+          clipObject = new fabric.StrokeClipPath(obj);
         } else {
           clipObject = obj.clipPath;
         }
@@ -149,7 +163,7 @@
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
         }
-        var pathData = this.convertPointsToSVGPath(this._points || []).join("");
+        var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
@@ -193,7 +207,16 @@
     }
   );
 
-  var ClipPathRect = fabric.util.createClass(fabric.Rect, {
+  fabric.StrokeClipPath = fabric.util.createClass(fabric.Rect, {
+
+    type: 'strokeClipPath',
+
+    stateProperties: fabric.Object.prototype.stateProperties.concat('_paths'),
+
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('_paths'),
+
+    _paths: [],
+
     initialize: function (parent, paths, options) {
       this.callSuper('initialize', Object.assign(options || {}, {
         width: parent.width,
@@ -205,6 +228,7 @@
       this._parent = parent;
       this._paths = paths || [];
     },
+
     _render: function (ctx) {
       this.callSuper('_render', ctx);
       this._paths.forEach(({ path, transformMatrix }) => {
@@ -214,9 +238,35 @@
         ctx.restore();
       })
     },
+
     addPath(path, transformMatrix) {
       this._paths.push({ path, transformMatrix });
       this.dirty = true;
-    }
+    },
+
+    toObject: function (propertiesToInclude) {
+      var _includeDefaultValues = this.includeDefaultValues;
+      var objsToObject = this._paths.map(function ({ path: obj, transformMatrix }) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = _includeDefaultValues;
+        var _obj = obj.toObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        return { path: _obj, transformMatrix };
+      });
+      var obj = this.callSuper('toObject', ['paths'].concat(propertiesToInclude));
+      obj.paths = objsToObject;
+      return obj;
+    },
   });
+
+  /**
+     * Returns {@link fabric.StrokeClipPath} instance from an object representation
+     * @static
+     * @memberOf fabric.StrokeClipPath
+     * @param {Object} object Object to create an instance from
+     * @param {Function} [callback] Callback to invoke when an fabric.StrokeClipPath instance is created
+     */
+  fabric.StrokeClipPath.fromObject = function (object, callback) {
+    return fabric.Object._fromObject('StrokeClipPath', object, callback);
+  };
 })();
