@@ -115,7 +115,7 @@
       _addPathToObjectEraser: function (obj, path) {
         var clipObject;
         if (!obj.eraser) {
-          clipObject = new fabric.StrokeClipPath();
+          clipObject = new fabric.EraserPath();
           clipObject.setParent(obj);
         } else {
           clipObject = obj.clipPath;
@@ -189,9 +189,9 @@
     }
   );
 
-  fabric.StrokeClipPath = fabric.util.createClass(fabric.Rect, {
+  fabric.EraserPath = fabric.util.createClass(fabric.Rect, {
 
-    type: 'strokeClipPath',
+    type: 'eraserPath',
 
     stateProperties: fabric.Object.prototype.stateProperties.concat('_paths'),
 
@@ -250,13 +250,13 @@
   });
 
   /**
-     * Returns {@link fabric.StrokeClipPath} instance from an object representation
+     * Returns {@link fabric.EraserPath} instance from an object representation
      * @static
-     * @memberOf fabric.StrokeClipPath
+     * @memberOf fabric.EraserPath
      * @param {Object} object Object to create an instance from
-     * @param {Function} [callback] Callback to invoke when an fabric.StrokeClipPath instance is created
+     * @param {Function} [callback] Callback to invoke when an fabric.EraserPath instance is created
      */
-  fabric.StrokeClipPath.fromObject = function (object, callback) {
+  fabric.EraserPath.fromObject = function (object, callback) {
     var paths = object.paths,
       options = fabric.util.object.clone(object, true);
     delete options.paths;
@@ -275,7 +275,7 @@
       fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
         options.clipPath = enlivedClipPath[0];
         var objects = paths.map(function (p, i) { return { path: enlivenedObjects[i], transformMatrix: p.transformMatrix } });
-        callback && callback(new fabric.StrokeClipPath(objects, options));
+        callback && callback(new fabric.EraserPath(objects, options));
       });
     });
   };
