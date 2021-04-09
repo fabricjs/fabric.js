@@ -30,6 +30,58 @@
       type: "eraser",
 
       /**
+       * Reserved for canvas background image
+       */
+      __opacity: 1,
+
+      toColor: function (color) {
+        return color instanceof fabric.Color ? color : new fabric.Color(color);
+      },
+
+      handleCanvasColor: function (source, target, prop, setter) {
+        var a = source[prop];
+        if (a && a instanceof fabric.Color && a.erasable) {
+          target[setter](null);
+        } else if (a) {
+          var color = this.toColor(a);
+          color.setAlpha(Math.pow(color.getAlpha(), 2));
+          source[setter](color.toRgba());
+          target[setter](color.toRgba());
+        }
+      },
+
+      /**
+       * If we want to erase background/overlay color we need to add an object to the canvas that will replace it
+       * Replacing background/overlay image with a group with a filled rect will do the job
+       * @param obj 
+       * @param path 
+       */
+      restoreCanvasColor: function (obj, path) {
+        if (obj && obj instanceof fabric.Color && obj.erasable) {
+          obj.setAlpha(Math.sqrt(obj.getAlpha()));
+        }
+      },
+
+      handleCanvasImage: function (source, target, prop, setter) {
+        var obj = source[prop];
+        if (obj && obj.erasable) {
+          target[setter](null);
+        } else if (obj && obj.opacity < 1) {
+          this.__opacity = obj.opacity;
+          obj.set({ opacity: 0 });
+        }
+      },
+
+      restoreCanvasImage: function (source, path, prop, setter) {
+        var obj = source[prop];
+        if (obj && obj.erasable) {
+          this._addPathToObjectEraser(obj, path);
+        } else if (obj && obj.opacity < 1) {
+          obj.set({ opacity: this.__opacity });
+        }
+      },
+
+      /**
        * @extends @class fabric.BaseBrush
        * @param {CanvasRenderingContext2D} ctx
        */
@@ -58,52 +110,6 @@
         this.canvas.clone(function (c) {
           _this.renderInit(c);
         });
-      },
-
-      toColor: function (color) {
-        return color instanceof fabric.Color ? color : new fabric.Color(color);
-      },
-
-      handleCanvasColor: function (source, target, prop, setter) {
-        var a = source[prop];
-        if (a && a instanceof fabric.Color && a.erasable) {
-          target[setter](null);
-        } else if (a) {
-          var color = this.toColor(a);
-          color.setAlpha(Math.pow(color.getAlpha(), 2));
-          source[setter](color.toRgba());
-          target[setter](color.toRgba());
-        }
-      },
-
-      restoreCanvasColor: function (obj, path) {
-        if (
-          obj &&
-          obj instanceof fabric.Color &&
-          obj.erasable
-        ) {
-          obj.setAlpha(Math.sqrt(obj.getAlpha()))
-          this._addPathToObjectEraser(obj, path);
-        }
-      },
-
-      handleCanvasImage: function (source, target, prop, setter) {
-        var obj = source[prop];
-        if (obj && obj.erasable) {
-          target[setter](null);
-        } else if (obj && obj.opacity < 1) {
-          this.__opacity = obj.opacity;
-          obj.set({ opacity: 0 });
-        }
-      },
-
-      restoreCanvasImage: function (source, path, prop, setter) {
-        var obj = source[prop];
-        if (obj && obj.erasable) {
-          this._addPathToObjectEraser(obj, path);
-        } else if (obj && obj.opacity < 1) {
-          obj.set({ opacity: this.__opacity });
-        }
       },
 
       /**
