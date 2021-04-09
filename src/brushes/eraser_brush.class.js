@@ -71,16 +71,8 @@
         } else if (a) {
           var color = this.toColor(a);
           color.setAlpha(Math.pow(color.getAlpha(), 2));
-          /*
-                  var rect = new fabric.Rect({
-                    width: source.width,
-                    height: source.height,
-                    fill: a
-                  })*/
-          console.log(color)
-          //source[setter](color);
-          //target[setter](color);
-
+          source[setter](color.toRgba());
+          target[setter](color.toRgba());
         }
       },
 
