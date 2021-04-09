@@ -65,18 +65,14 @@
        */
       renderInit(_canvas) {
         var canvas = this.canvas;
-        if (canvas.backgroundImage && !canvas.backgroundImage.erasable) {
-          canvas.backgroundImage.clone(function (_clone) {
-            _canvas.setBackgroundImage(_clone);
-          });
-        } else {
+        if (canvas.backgroundImage && canvas.backgroundImage.erasable) {
           _canvas.setBackgroundImage(null);
         }
-        if (canvas.backgroundColor && canvas.backgroundColor instanceof fabric.Object &&
-          !canvas.backgroundColor.erasable) {
-          canvas.setBackgroundColor.clone(function (_clone) {
-            _canvas.setBackgroundColor(_clone);
-          });
+        if (canvas.backgroundColor &&
+          canvas.backgroundColor instanceof fabric.Object &&
+          canvas.backgroundColor.erasable
+        ) {
+          _canvas.setBackgroundColor(null);
         } else {
           _canvas.setBackgroundColor(canvas.backgroundColor);
         }
@@ -89,7 +85,6 @@
         this._render();
         _canvas.dispose();
       },
-
 
       /**
        * Restore ctx after _finalizeAndAddPath is invoked
@@ -133,16 +128,18 @@
        * @param {fabric.Path} path
        */
       _addPathToObjectEraser: function (obj, path) {
-        var transformMatrix = fabric.util.invertTransform(
-          obj.calcTransformMatrix()
-        );
-
         var clipObject;
         if (!obj.eraser) {
-          clipObject = new fabric.StrokeClipPath(obj);
+          clipObject = new fabric.StrokeClipPath();
+          clipObject.setParent(obj);
         } else {
           clipObject = obj.clipPath;
         }
+
+        var transformMatrix = fabric.util.invertTransform(
+          obj.calcTransformMatrix()
+        );
+        //fabric.util.applyTransformToObject(path, transformMatrix);
         clipObject.addPath(path, transformMatrix);
 
         obj.set({
@@ -217,16 +214,20 @@
 
     _paths: [],
 
-    initialize: function (parent, paths, options) {
+    initialize: function (paths, options) {
       this.callSuper('initialize', Object.assign(options || {}, {
+        originX: 'center',
+        originY: 'center'
+      }));
+      this._paths = paths || [];
+    },
+
+    setParent: function (parent) {
+      this.set({
         width: parent.width,
         height: parent.height,
-        originX: 'center',
-        originY: 'center',
-        clipPath: parent.clipPath,
-      }));
-      this._parent = parent;
-      this._paths = paths || [];
+        clipPath: parent.clipPath
+      });
     },
 
     _render: function (ctx) {
@@ -267,6 +268,27 @@
      * @param {Function} [callback] Callback to invoke when an fabric.StrokeClipPath instance is created
      */
   fabric.StrokeClipPath.fromObject = function (object, callback) {
-    return fabric.Object._fromObject('StrokeClipPath', object, callback);
+    var objects = object.paths,
+      options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    if (typeof objects === 'string') {
+      // it has to be an url or something went wrong.
+      /*
+      fabric.loadSVGFromURL(objects, function (elements) {
+        var group = fabric.util.groupSVGElements(elements, object, objects);
+        group.set(options);
+        callback && callback(group);
+      });
+      */
+      return;
+    }
+    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
+      fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
+        var options = fabric.util.object.clone(object, true);
+        options.clipPath = enlivedClipPath[0];
+        delete options.objects;
+        callback && callback(new fabric.StrokeClipPath(enlivenedObjects, options));
+      });
+    });
   };
 })();
