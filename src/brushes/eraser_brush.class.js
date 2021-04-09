@@ -1,18 +1,4 @@
 (function () {
-  var ClipPathGroup = fabric.util.createClass(fabric.Group, {
-    _transformMatrix: null,
-
-    initialize: function (objects, transformMatrix, options) {
-      this.callSuper("initialize", objects, options);
-      this._transformMatrix = transformMatrix;
-    },
-
-    transform: function (ctx) {
-      var m = this._transformMatrix;
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      this.callSuper("transform", ctx);
-    }
-  });
 
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
@@ -133,27 +119,22 @@
        * @param {fabric.Path} path
        */
       _addPathToObjectEraser: function (obj, path) {
-        var points = obj.eraser ? obj.eraser.path : [];
-        var mergedEraserPaths = this.createPath(points.concat(path.path));
-        var rect = new fabric.Rect({
-          top: 0,
-          left: 0,
-          width: this.canvas.width,
-          height: this.canvas.height
-        });
         var transformMatrix = fabric.util.invertTransform(
           obj.calcTransformMatrix()
         );
-        var clipObject = new ClipPathGroup(
-          [rect, mergedEraserPaths],
-          transformMatrix,
-          { globalCompositeOperation: "destination-out" }
-        );
+
+        var clipObject;
+        if (!obj.eraser) {
+          clipObject = new ClipPathRect(obj);
+        } else {
+          clipObject = obj.clipPath;
+        }
+        clipObject.addPath(path, transformMatrix);
+
         obj.set({
           clipPath: clipObject,
-          inverted: true,
           dirty: true,
-          eraser: mergedEraserPaths
+          eraser: true
         });
       },
 
@@ -168,7 +149,7 @@
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
         }
-        var pathData = this.convertPointsToSVGPath(this._points).join("");
+        var pathData = this.convertPointsToSVGPath(this._points || []).join("");
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
@@ -211,4 +192,31 @@
       }
     }
   );
+
+  var ClipPathRect = fabric.util.createClass(fabric.Rect, {
+    initialize: function (parent, paths, options) {
+      this.callSuper('initialize', Object.assign(options || {}, {
+        width: parent.width,
+        height: parent.height,
+        originX: 'center',
+        originY: 'center',
+        clipPath: parent.clipPath,
+      }));
+      this._parent = parent;
+      this._paths = paths || [];
+    },
+    _render: function (ctx) {
+      this.callSuper('_render', ctx);
+      this._paths.forEach(({ path, transformMatrix }) => {
+        ctx.save();
+        ctx.transform(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3], transformMatrix[4], transformMatrix[5]);
+        path.render(ctx);
+        ctx.restore();
+      })
+    },
+    addPath(path, transformMatrix) {
+      this._paths.push({ path, transformMatrix });
+      this.dirty = true;
+    }
+  });
 })();
