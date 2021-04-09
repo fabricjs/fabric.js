@@ -871,8 +871,7 @@
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
-            erasable:                 this.erasable,
-            eraser:                   this.eraser ? this.eraser.toObject() : null
+            erasable:                 this.erasable
           };
 
       if (this.clipPath) {
