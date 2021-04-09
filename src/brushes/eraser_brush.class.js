@@ -254,7 +254,7 @@
         obj.includeDefaultValues = originalDefaults;
         return { path: _obj, transformMatrix };
       });
-      var obj = this.callSuper('toObject', ['paths'].concat(propertiesToInclude));
+      var obj = this.callSuper('toObject', propertiesToInclude);
       obj.paths = objsToObject;
       return obj;
     },
@@ -268,26 +268,25 @@
      * @param {Function} [callback] Callback to invoke when an fabric.StrokeClipPath instance is created
      */
   fabric.StrokeClipPath.fromObject = function (object, callback) {
-    var objects = object.paths,
+    var paths = object.paths,
       options = fabric.util.object.clone(object, true);
-    delete options.objects;
-    if (typeof objects === 'string') {
+    delete options.paths;
+    /*
+    if (typeof paths === 'string') {
       // it has to be an url or something went wrong.
-      /*
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
         callback && callback(group);
       });
-      */
       return;
     }
-    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
+    */
+    fabric.util.enlivenObjects(paths.map(function (p) { return p.path }), function (enlivenedObjects) {
       fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
-        var options = fabric.util.object.clone(object, true);
         options.clipPath = enlivedClipPath[0];
-        delete options.objects;
-        callback && callback(new fabric.StrokeClipPath(enlivenedObjects, options));
+        var objects = paths.map(function (p, i) { return { path: enlivenedObjects[i], transformMatrix: p.transformMatrix } });
+        callback && callback(new fabric.StrokeClipPath(objects, options));
       });
     });
   };
