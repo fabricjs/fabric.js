@@ -2,7 +2,7 @@
 
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
-     * Sets erasable option on background objects
+     * Sets erasable option on current background objects
      * @param {boolean} value 
      * @returns 
      */
