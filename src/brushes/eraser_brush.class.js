@@ -21,6 +21,12 @@
 
   /**
    * EraserBrush class
+   * See {@class fabric.EraserBrush#onMouseDown}
+   * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
+   * In order to support selective erasing all non erasable objects are rendered on the main ctx using a clone of the main canvas
+   * while the entire canvas is rendered on the top ctx.
+   * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
+   * This achieves the desired effect of seeming to erase only erasable objects.
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
    */
@@ -34,10 +40,26 @@
        */
       __opacity: 1,
 
+      /**
+       * @private
+       * @param {string|fabric.Color} color 
+       * @returns {fabric.Color}
+       */
       toColor: function (color) {
         return color instanceof fabric.Color ? color : new fabric.Color(color);
       },
 
+      /**
+       * We need to handle 2 cases:
+       * a. If the color is erasable we remove it from the bottom ctx so that when the top ctx is erased white space will be revealed
+       * b. If the color isn't erasable we defer to the normal flow: rendering on both top and bottom ctx.
+       * We transform opacity so it will appear the same to the user.
+       * 
+       * @param {fabric.Canvas} source
+       * @param {fabric.Canvas} target
+       * @param {'backgroundColor'|'overlayColor'} prop
+       * @param {'setBackgroundColor'|'setOverlayColor'} setter
+       */
       handleCanvasColor: function (source, target, prop, setter) {
         var a = source[prop];
         if (a && a instanceof fabric.Color && a.erasable) {
@@ -51,17 +73,27 @@
       },
 
       /**
-       * If we want to erase background/overlay color we need to add an object to the canvas that will replace it
-       * Replacing background/overlay image with a group with a filled rect will do the job
-       * @param obj 
-       * @param path 
+       * If we want to erase background/overlay color we need to add an object to the canvas that will mock it
+       * Replacing background/overlay image with a group consisting of the image and a filled rect will do the job
+       * @param source {fabric.Canvas} source
        */
-      restoreCanvasColor: function (obj, path) {
-        if (obj && obj instanceof fabric.Color && obj.erasable) {
-          obj.setAlpha(Math.sqrt(obj.getAlpha()));
+      restoreCanvasColor: function (source) {
+        if (source && source instanceof fabric.Color && source.erasable) {
+          source.setAlpha(Math.sqrt(source.getAlpha()));
         }
       },
 
+      /**
+       * We need to handle 2 cases:
+       * a. If the image is erasable we remove it from the bottom ctx so that when the top ctx is erased white space will be revealed
+       * b. If the image isn't erasable we defer to the normal flow: rendering on both top and bottom ctx. 
+       * We set opacity to 0 to hide the top image so it won't affect appearance in case opacity of image is different than 1.
+       * 
+       * @param {fabric.Canvas} source 
+       * @param {fabric.Canvas} target
+       * @param {'backgroundImage'|'overlayImage'} prop 
+       * @param {'setBackgroundImage'|'setOverlayImage'} setter
+       */
       handleCanvasImage: function (source, target, prop, setter) {
         var obj = source[prop];
         if (obj && obj.erasable) {
@@ -72,6 +104,13 @@
         }
       },
 
+      /**
+       * Restore {handleCanvasImage}
+       * @param {fabric.Image} source
+       * @param {fabric.Image} target
+       * @param {'backgroundImage'|'overlayImage'} prop
+       * @param {'setBackgroundImage'|'setOverlayImage'} setter
+       */
       restoreCanvasImage: function (source, path, prop, setter) {
         var obj = source[prop];
         if (obj && obj.erasable) {
@@ -91,11 +130,7 @@
       },
 
       /**
-       * Supports selective erasing: Only erasable objects will be visibly affected by the eraser brush.
-       * In order to support selective erasing all non erasable objects are rendered on the main ctx
-       * while the entire canvas is rendered on the top ctx.
-       * When erasing occurs, the path clips the top ctx and reveals the main ctx.
-       * This achieves the desired effect of seeming to erase only erasable objects.
+       * 
        * @param {fabric.Point} pointer
        * @param {fabric.IEvent} options
        * @returns
@@ -108,14 +143,16 @@
 
         var _this = this;
         this.canvas.clone(function (c) {
-          _this.renderInit(c);
+          _this._prepareForRendering(c);
         });
       },
 
       /**
-       * Use a clone of the canvas to render the non-erasable objects on the main context
+       * @private
+       * Prepare bottom ctx
+       * Use a clone of the main canvas to render the non-erasable objects on the bottom context
        */
-      renderInit(_canvas) {
+      _prepareForRendering(_canvas) {
         var canvas = this.canvas;
         this.handleCanvasImage(canvas, _canvas, 'backgroundImage', 'setBackgroundImage');
         this.handleCanvasImage(canvas, _canvas, 'overlayImage', 'setOverlayImage');
@@ -132,7 +169,7 @@
       },
 
       /**
-       * Restore ctx after _finalizeAndAddPath is invoked
+       * Restore top and bottom ctx after _finalizeAndAddPath is invoked
        * @param {fabric.Point} pointer
        * @param {fabric.IEvent} options
        * @returns
@@ -152,7 +189,7 @@
       },
 
       /**
-       * Adds path to existing eraser paths on object
+       * Adds path to existing clipPath of object
        * @private
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
@@ -224,6 +261,13 @@
     }
   );
 
+  /**
+   * Used by @class fabric.EraserBrush
+   * Can be used regardless of @class fabric.EraserBrush to create an inverted clip path made of strokes (=unclosed paths)
+   * @private
+   * @class fabric.EraserPath
+   * @extends fabric.Rect
+   */
   fabric.EraserPath = fabric.util.createClass(fabric.Rect, {
 
     type: 'eraserPath',
