@@ -107,21 +107,6 @@
       },
 
       /**
-       * Creates fabric.Path object to add on canvas
-       * @param {String} pathData Path data
-       * @return {fabric.Path} Path to add on canvas
-       */
-      createPath: function (pathData) {
-        var path = this.callSuper("createPath", pathData);
-        path.set({
-          globalCompositeOperation: "destination-out",
-          selectable: false,
-          evented: false
-        });
-        return path;
-      },
-
-      /**
        * Adds path to existing eraser paths on object
        * @private
        * @param {fabric.Object} obj
@@ -220,6 +205,9 @@
         originY: 'center'
       }));
       this._paths = paths || [];
+      this._paths.forEach(function (p) {
+        p.path.set({ globalCompositeOperation: "destination-out" });
+      })
     },
 
     setParent: function (parent) {
@@ -241,6 +229,7 @@
     },
 
     addPath(path, transformMatrix) {
+      path.set({ globalCompositeOperation: "destination-out" });
       this._paths.push({ path, transformMatrix });
       this.dirty = true;
     },
