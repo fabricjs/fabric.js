@@ -11,7 +11,7 @@
         changed = true;
         this.backgroundImage.erasable = value;
       }
-      if (this.backgroundColor && this.backgroundColor instanceof fabric.Object) {
+      if (this.backgroundColor && this.backgroundColor instanceof fabric.Color) {
         changed = true;
         this.backgroundColor.erasable = value;
       }
@@ -60,22 +60,69 @@
         });
       },
 
+      toColor: function (color) {
+        return color instanceof fabric.Color ? color : new fabric.Color(color);
+      },
+
+      handleCanvasColor: function (source, target, prop, setter) {
+        var a = source[prop];
+        if (a && a instanceof fabric.Color && a.erasable) {
+          target[setter](null);
+        } else if (a) {
+          var color = this.toColor(a);
+          color.setAlpha(Math.pow(color.getAlpha(), 2));
+          /*
+                  var rect = new fabric.Rect({
+                    width: source.width,
+                    height: source.height,
+                    fill: a
+                  })*/
+          console.log(color)
+          //source[setter](color);
+          //target[setter](color);
+
+        }
+      },
+
+      restoreCanvasColor: function (obj, path) {
+        if (
+          obj &&
+          obj instanceof fabric.Color &&
+          obj.erasable
+        ) {
+          obj.setAlpha(Math.sqrt(obj.getAlpha()))
+          this._addPathToObjectEraser(obj, path);
+        }
+      },
+
+      handleCanvasImage: function (source, target, prop, setter) {
+        var obj = source[prop];
+        if (obj && obj.erasable) {
+          target[setter](null);
+        } else if (obj && obj.opacity < 1) {
+          this.__opacity = obj.opacity;
+          obj.set({ opacity: 0 });
+        }
+      },
+
+      restoreCanvasImage: function (source, path, prop, setter) {
+        var obj = source[prop];
+        if (obj && obj.erasable) {
+          this._addPathToObjectEraser(obj, path);
+        } else if (obj && obj.opacity < 1) {
+          obj.set({ opacity: this.__opacity });
+        }
+      },
+
       /**
        * Use a clone of the canvas to render the non-erasable objects on the main context
        */
       renderInit(_canvas) {
         var canvas = this.canvas;
-        if (canvas.backgroundImage && canvas.backgroundImage.erasable) {
-          _canvas.setBackgroundImage(null);
-        }
-        if (canvas.backgroundColor &&
-          canvas.backgroundColor instanceof fabric.Object &&
-          canvas.backgroundColor.erasable
-        ) {
-          _canvas.setBackgroundColor(null);
-        } else {
-          _canvas.setBackgroundColor(canvas.backgroundColor);
-        }
+        this.handleCanvasImage(canvas, _canvas, 'backgroundImage', 'setBackgroundImage');
+        this.handleCanvasImage(canvas, _canvas, 'overlayImage', 'setOverlayImage');
+        this.handleCanvasColor(canvas, _canvas, 'backgroundColor', 'setBackgroundColor');
+        this.handleCanvasColor(canvas, _canvas, 'overlayColor', 'setOverlayColor');
         _canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
@@ -140,7 +187,7 @@
        * and add it to every intersected erasable object.
        */
       _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop;
+        var ctx = this.canvas.contextTop, canvas = this.canvas;
         ctx.closePath();
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
@@ -156,35 +203,25 @@
         }
 
         var path = this.createPath(pathData);
-        this.canvas.clearContext(this.canvas.contextTop);
-        this.canvas.fire("before:path:created", { path: path });
+        canvas.clearContext(canvas.contextTop);
+        canvas.fire("before:path:created", { path: path });
 
-        if (
-          this.canvas.backgroundImage &&
-          this.canvas.backgroundImage.erasable
-        ) {
-          this._addPathToObjectEraser(this.canvas.backgroundImage, path);
-        }
-        if (
-          this.canvas.backgroundColor &&
-          this.canvas.backgroundColor instanceof fabric.Object &&
-          this.canvas.backgroundColor.erasable
-        ) {
-          this._addPathToObjectEraser(this.canvas.backgroundColor, path);
-        }
-
+        this.restoreCanvasImage(canvas, path, 'backgroundImage', 'setBackgroundImage');
+        this.restoreCanvasImage(canvas, path, 'overlayImage', 'setOverlayImage');
+        this.restoreCanvasColor(canvas, path, 'backgroundColor', 'setBackgroundColor');
+        this.restoreCanvasColor(canvas, path, 'overlayColor', 'setOverlayColor');
         var _this = this;
-        this.canvas.forEachObject(function (obj) {
+        canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
             _this._addPathToObjectEraser(obj, path);
           }
         });
-        this.canvas.requestRenderAll();
+        canvas.requestRenderAll();
         path.setCoords();
         this._resetShadow();
 
         // fire event 'path' created
-        this.canvas.fire("path:created", { path: path });
+        canvas.fire("path:created", { path: path });
       }
     }
   );
