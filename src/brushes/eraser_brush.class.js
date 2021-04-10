@@ -301,7 +301,7 @@
       this.callSuper('_render', ctx);
       this._paths.forEach(({ path, transformMatrix }) => {
         ctx.save();
-        ctx.transform(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3], transformMatrix[4], transformMatrix[5]);
+        transformMatrix && ctx.transform(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3], transformMatrix[4], transformMatrix[5]);
         path.render(ctx);
         ctx.restore();
       })
