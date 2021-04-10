@@ -56,6 +56,14 @@
       _hasOverlay: false,
 
       /**
+       * Indicates that the ctx is ready and rendering can begin.
+       * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
+       * 
+       * @private
+       */
+      _ready: false,
+
+      /**
        * @private
        * @param {Function} callback 
        * @returns 
@@ -187,6 +195,7 @@
         // capture coordinates immediately
         // this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(pointer);
+        this._ready = false;
         var _this = this;
         this.prepareCanvas(this.canvas);
         this.canvas.clone(function (c) {
@@ -208,11 +217,13 @@
             return !obj.erasable;
           })
         );
+        this._ready = true;
         this._render();
         _canvas.dispose();
       },
 
       _render: function () {
+        if (!this._ready) return;
         this.canvas._shouldRenderOverlay = !this._hasOverlay;
         this.canvas.renderCanvas(
           this.canvas.contextTop,
