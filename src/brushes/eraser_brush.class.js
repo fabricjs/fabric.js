@@ -67,7 +67,8 @@
       },
 
       /**
-       * We group background/overlay image and color and assign the group to the canvas' image property
+       * In order to be able to clip out the canvas' overlay/background color
+       * we group background/overlay image and color and assign the group to the canvas' image property
        * @param {fabric.Canvas} canvas
        */
       prepareCanvas: function (canvas) {
@@ -267,25 +268,40 @@
 
       /**
        * Finalize erasing by restoring canvas drawables to original state
-       * @param {fabric.Canvas} source
-       * @param {fabric.Canvas} path
        */
-      applyEraserToCanvas: function (source, path) {
+      finalizeErasing: function () {
+        var canvas = this.canvas;
         this.forCanvasDrawables(
           function (drawable, imgProp, _, colorProp) {
-            var sourceImage = source.get(imgProp);
-            var sourceColor = source.get(colorProp);
-            if (sourceImage && sourceImage.erasable) {
-              this._addPathToObjectEraser(sourceImage, path);
-            } else if (sourceImage && sourceImage._originalOpacity) {
+            var sourceImage = canvas.get(imgProp);
+            var sourceColor = canvas.get(colorProp);
+            if (sourceImage && sourceImage._originalOpacity) {
               sourceImage.set({ opacity: sourceImage._originalOpacity });
               sourceImage._originalOpacity = undefined;
             }
-            if (sourceColor && sourceColor.erasable) {
-              this._addPathToObjectEraser(sourceColor, path);
-            } else if (sourceColor && sourceColor._originalOpacity) {
+            if (sourceColor && sourceColor._originalOpacity) {
               sourceColor.set({ opacity: sourceColor._originalOpacity });
               sourceColor._originalOpacity = undefined;
+            }
+          });
+      },
+
+      /**
+       * Add the eraser path the the objects clip path
+       * @param {fabric.Canvas} source
+       * @param {fabric.Canvas} path
+       */
+      applyEraserToCanvas: function (path) {
+        var canvas = this.canvas;
+        this.forCanvasDrawables(
+          function (drawable, imgProp, _, colorProp) {
+            var sourceImage = canvas.get(imgProp);
+            var sourceColor = canvas.get(colorProp);
+            if (sourceImage && sourceImage.erasable) {
+              this._addPathToObjectEraser(sourceImage, path);
+            }
+            if (sourceColor && sourceColor.erasable) {
+              this._addPathToObjectEraser(sourceColor, path);
             }
           });
       },
@@ -301,21 +317,24 @@
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
         }
+
+        canvas.clearContext(canvas.contextTop);
+        this.finalizeErasing();
+
         var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
           // Firefox 4, for example, renders a dot,
           // whereas Chrome 10 renders nothing
-          this.canvas.requestRenderAll();
+          canvas.requestRenderAll();
           return;
         }
 
         var path = this.createPath(pathData);
-        canvas.clearContext(canvas.contextTop);
         canvas.fire("before:path:created", { path: path });
 
-        this.applyEraserToCanvas(canvas, path);
+        this.applyEraserToCanvas(path);
         var _this = this;
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
