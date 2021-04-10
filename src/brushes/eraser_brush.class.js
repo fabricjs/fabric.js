@@ -1,6 +1,11 @@
 (function () {
   var _proto = fabric.util.object.clone(fabric.StaticCanvas.prototype);
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    /**
+     * See {@link fabric.EraserBrush#prepareCanvas}
+     * @param {string} key 
+     * @returns 
+     */
     get: function (key) {
       var drawableKey = key;
       switch (key) {
