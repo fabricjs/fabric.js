@@ -209,7 +209,7 @@
       },
 
       _render: function () {
-        this.canvas._shouldRenderOverlay = false;
+        this.canvas._shouldRenderOverlay = !this._hasOverlay;
         this.canvas.renderCanvas(
           this.canvas.contextTop,
           this.canvas.getObjects()
