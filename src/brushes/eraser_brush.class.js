@@ -36,12 +36,13 @@
 
   /**
    * EraserBrush class
-   * See {@link fabric.EraserBrush#onMouseDown}
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
-   * In order to support selective erasing all non erasable objects are rendered on the main ctx using a clone of the main canvas
+   * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx using a clone of the main canvas
    * while the entire canvas is rendered on the top ctx.
    * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
    * This achieves the desired effect of seeming to erase only erasable objects.
+   * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * 
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
    */
