@@ -379,10 +379,6 @@
 
     type: 'eraserPath',
 
-    stateProperties: fabric.Object.prototype.stateProperties.concat('_objects'),
-
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('_objects'),
-
     _objects: [],
 
     initialize: function (objects, options) {
