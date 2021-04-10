@@ -1,27 +1,42 @@
 (function () {
-  fabric.util.object.extend(fabric.Canvas.prototype, {
-    /**
-     * Sets erasable option on current background objects
-     * @param {boolean} value 
-     * @returns 
-     */
-    setErasable: function (value) {
-      var changed = false;
-      if (this.backgroundImage) {
-        changed = true;
-        this.backgroundImage.erasable = value;
+  var _proto = fabric.util.object.clone(fabric.StaticCanvas.prototype);
+  fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    get: function (key) {
+      var drawableKey = key;
+      switch (key) {
+        case "backgroundImage":
+          return this[drawableKey] && this[drawableKey].isType('group') ?
+            this[drawableKey].getObjects('image')[0] :
+            _proto.get.call(this, key);
+        case "backgroundColor":
+          drawableKey = "backgroundImage";
+          return this[drawableKey] && this[drawableKey].isType('group') ?
+            this[drawableKey].getObjects('rect')[0] :
+            _proto.get.call(this, key);
+        case "overlayImage":
+          return this[drawableKey] && this[drawableKey].isType('group') ?
+            this[drawableKey].getObjects('image')[0] :
+            _proto.get.call(this, key);
+        case "overlayColor":
+          drawableKey = "overlayImage";
+          return this[drawableKey] && this[drawableKey].isType('group') ?
+            this[drawableKey].getObjects('rect')[0] :
+            _proto.get.call(this, key);
+        default:
+          return _proto.get.call(this, key);
       }
-      if (this.backgroundColor && this.backgroundColor instanceof fabric.Color) {
-        changed = true;
-        this.backgroundColor.erasable = value;
-      }
-      return changed;
     },
+
+    _shouldRenderOverlay: true,
+
+    _renderOverlay: function (ctx) {
+      if (this._shouldRenderOverlay) _proto._renderOverlay.call(this, ctx);
+    }
   });
 
   /**
    * EraserBrush class
-   * See {@class fabric.EraserBrush#onMouseDown}
+   * See {@link fabric.EraserBrush#onMouseDown}
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
    * In order to support selective erasing all non erasable objects are rendered on the main ctx using a clone of the main canvas
    * while the entire canvas is rendered on the top ctx.
@@ -36,130 +51,121 @@
       type: "eraser",
 
       /**
-       * Reserved for canvas background image
+       * @private
        */
-      __opacity: 1,
+      _hasOverlay: false,
 
       /**
        * @private
-       * @param {string|fabric.Color} color 
-       * @returns {fabric.Color}
+       * @param {Function} callback 
+       * @returns 
        */
-      toColor: function (color) {
-        return color instanceof fabric.Color ? color : new fabric.Color(color);
+      forCanvasDrawables: function (callback) {
+        var _this = this;
+        callback.call(_this, 'background', 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
+        callback.call(_this, 'overlay', 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
       },
 
       /**
-       * We need to handle 2 cases:
-       * a. If the color is erasable we remove it from the bottom ctx so that when the top ctx is erased white space will be revealed
-       * b. If the color isn't erasable we defer to the normal flow: rendering on both top and bottom ctx.
-       * We transform opacity so it will appear the same to the user.
-       * 
-       * @param {fabric.Canvas} source
-       * @param {fabric.Canvas} target
-       * @param {string | fabric.Color} color color property of @argument source
-       * @param {'setBackgroundColor'|'setOverlayColor'} setter
+       * We group background/overlay image and color and assign the group to the canvas' image property
+       * @param {fabric.Canvas} canvas
        */
-      prepareCanvasColor: function (source, target, color, setter) {
-        if (color && color instanceof fabric.Color && color.erasable) {
-          target[setter](null);
-        } else if (color) {
-          var color = this.toColor(color);
-          color.setAlpha(Math.pow(color.getAlpha(), 2));
-          source[setter](color.toRgba());
-          target[setter](color.toRgba());
-        }
-      },
-
-      /**
-       * If we want to erase background/overlay color we need to add an object to the canvas that will mock it
-       * Replacing background/overlay image with a group consisting of the image and a filled rect will do the job
-       * @param {fabric.Canvas} source
-       * @param {fabric.Path} path
-       * @param {'backgroundColor'|'overlayColor'} prop
-       * @param {'setBackgroundColor'|'setOverlayColor'} setter
-       */
-      restoreCanvasColor: function (source, path, prop, setter) {
-        var a = source[prop];
-        if (a && a instanceof fabric.Color && a.erasable) {
-          a.setAlpha(Math.sqrt(a.getAlpha()));
-        }
-        if (a && a.erasable) {
-          return new fabric.Rect({
-            width: source.width,
-            height: source.height,
-            fill: a
+      prepareCanvas: function (canvas) {
+        this.forCanvasDrawables(
+          function (drawable, imgProp, imgSetter, colorProp, colorSetter) {
+            var image = canvas[imgProp], color = canvas[colorProp];
+            if (image && image.isType('group')) {
+              color = image._objects[0];
+              image = image._objects[1];
+            } else {
+              var mergedGroup = new fabric.Group([], {
+                width: canvas.width,
+                height: canvas.height,
+                erasable: false
+              });
+              if (image) {
+                mergedGroup.addWithUpdate(image);
+                mergedGroup._image = image;
+              }
+              if (color) {
+                color = new fabric.Rect({
+                  width: canvas.width,
+                  height: canvas.height,
+                  fill: color,
+                  erasable: typeof color === 'object' && color.erasable
+                });
+                mergedGroup.addWithUpdate(color);
+                mergedGroup._color = color;
+              }
+              canvas[imgSetter](mergedGroup);
+              canvas[colorSetter](null);
+            }
           });
-        }
       },
 
       /**
-       * We need to handle 2 cases:
-       * a. If the image is erasable we remove it from the bottom ctx so that when the top ctx is erased white space will be revealed
-       * b. If the image isn't erasable we defer to the normal flow: rendering on both top and bottom ctx. 
-       * We set opacity to 0 to hide the top image so it won't affect appearance in case opacity of image is different than 1.
-       * 
+       * Perpare canvas for drawing
        * @param {fabric.Canvas} source 
        * @param {fabric.Canvas} target
-       * @param {fabric.Image | undefined} image image property of source
-       * @param {'setBackgroundImage'|'setOverlayImage'} setter
        */
-      prepareCanvasImage: function (source, target, image, setter) {
-        if (image && image.erasable) {
-          target[setter](null);
-        } else if (image && image.opacity < 1) {
-          this.__opacity = image.opacity;
-          image.set({ opacity: 0 });
-        }
+      prepareCanvasForDrawing: function (source, target) {
+        this._hasOverlay = false;
+        this.forCanvasDrawables(
+          function (drawable, imgProp, _, colorProp) {
+            var sourceImage = source.get(imgProp);
+            var sourceColor = source.get(colorProp);
+            var targetImage = target.get(imgProp);
+            var targetColor = target.get(colorProp);
+            if (sourceImage && sourceImage.erasable) {
+              targetImage.set({ opacity: 0 });
+            } else if (sourceImage) {
+              if (drawable === 'overlay') {
+                // we need to draw on top of the eraser
+                this._hasOverlay = true;
+                targetImage.set({ opacity: 0 });
+              } else {
+                sourceImage._originalOpacity = sourceImage.opacity;
+                sourceImage.set({ opacity: 0 });
+              }
+            }
+            if (sourceColor && sourceColor.erasable) {
+              targetColor.set({ opacity: 0 });
+            } else if (sourceColor) {
+              if (drawable === 'overlay') {
+                // we need to draw on top of the eraser
+                this._hasOverlay = true;
+                targetColor.set({ opacity: 0 });
+              } else {
+                sourceColor._originalOpacity = sourceColor.opacity;
+                sourceColor.set({ opacity: 0 });
+              }
+            }
+          });
       },
 
       /**
-       * Restore {prepareCanvasImage}
-       * @param {fabric.Image} source
-       * @param {fabric.Path} path
-       * @param {'backgroundImage'|'overlayImage'} prop
-       * @param {'setBackgroundImage'|'setOverlayImage'} setter
+       * Finalize erasing by restoring canvas drawables to original state
+       * @param {fabric.Canvas} source
+       * @param {fabric.Canvas} path
        */
-      restoreCanvasImage: function (source, path, prop, setter) {
-        var obj = source[prop];
-        if (obj && obj.erasable) {
-          this._addPathToObjectEraser(obj, path);
-          return obj;
-        } else if (obj && obj.opacity < 1) {
-          obj.set({ opacity: this.__opacity });
-        }
-      },
-
-      prepareCanvas: function (source, target, imgProp, imgSetter, colorProp, colorSetter) {
-        var image = source[imgProp], color = source[colorProp];
-        // in case canvas has been erased image object will be a fabric.Group([image, color]) so we restore state
-        if (image && image.isType('group')) {
-          image = image._objects[1];
-          color = image._objects[0];
-          source[imgSetter](image);
-          source[colorSetter](color);
-        }
-        this.prepareCanvasImage(source, target, image, imgSetter);
-        this.prepareCanvasColor(source, target, color, colorSetter);
-      },
-
-      /**
-       * 
-       * @param {fabric.Image} source
-       * @param {fabric.Path} path
-       * @param {'backgroundImage'|'overlayImage'} imgProp
-       * @param {'setBackgroundImage'|'setOverlayImage'} imgSetter
-       * @param {'backgroundColor'|'overlayColor'} colorProp
-       * @param {'setBackgroundColor'|'setOverlayColor'} colorSetter
-       */
-      applyEraserToCanvas: function (canvas, path, imgProp, imgSetter, colorProp, colorSetter) {
-        var image = this.restoreCanvasImage(canvas, path, imgProp, imgSetter),
-          color = this.restoreCanvasColor(canvas, path, colorProp, colorSetter);
-        if (image && color) {
-          var mergedGroup = new fabric.Group([color, image]);
-          canvas[imgSetter](mergedGroup);
-          canvas[colorSetter](null);
-        }
+      applyEraserToCanvas: function (source, path) {
+        this.forCanvasDrawables(
+          function (drawable, imgProp) {
+            var sourceImage = source[imgProp]._image;
+            var sourceColor = source[imgProp]._color;
+            if (sourceImage && sourceImage.erasable) {
+              this._addPathToObjectEraser(sourceImage, path);
+            } else if (sourceImage && sourceImage._originalOpacity) {
+              sourceImage.set({ opacity: sourceImage._originalOpacity });
+              sourceImage._originalOpacity = undefined;
+            }
+            if (sourceColor && sourceColor.erasable) {
+              this._addPathToObjectEraser(sourceColor, path);
+            } else if (sourceColor && sourceColor._originalOpacity) {
+              sourceColor.set({ opacity: sourceColor._originalOpacity });
+              sourceColor._originalOpacity = undefined;
+            }
+          });
       },
 
       /**
@@ -169,6 +175,10 @@
       _saveAndTransform: function (ctx) {
         this.callSuper("_saveAndTransform", ctx);
         ctx.globalCompositeOperation = "destination-out";
+      },
+
+      needsFullRender: function () {
+        return this.callSuper("needsFullRender") || this._hasOverlay;
       },
 
       /**
@@ -184,6 +194,7 @@
         this._prepareForDrawing(pointer);
 
         var _this = this;
+        this.prepareCanvas(this.canvas);
         this.canvas.clone(function (c) {
           _this._prepareForRendering(c);
         });
@@ -196,8 +207,7 @@
        */
       _prepareForRendering: function (_canvas) {
         var canvas = this.canvas;
-        this.prepareCanvas(canvas, _canvas, 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
-        this.prepareCanvas(canvas, _canvas, 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
+        this.prepareCanvasForDrawing(canvas, _canvas);
         _canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
@@ -206,6 +216,23 @@
         );
         this._render();
         _canvas.dispose();
+      },
+
+      _render: function () {
+        this.canvas._shouldRenderOverlay = false;
+        this.canvas.renderCanvas(
+          this.canvas.contextTop,
+          this.canvas.getObjects()
+        );
+        this.callSuper("_render");
+        if (this._hasOverlay) {
+          this.canvas._shouldRenderOverlay = true;
+          var ctx = this.canvas.contextTop;
+          this._saveAndTransform(ctx);
+          this.canvas._renderOverlay(ctx);
+          ctx.restore();
+        }
+        this.canvas._shouldRenderOverlay = false;
       },
 
       /**
@@ -218,14 +245,6 @@
         var retVal = this.callSuper("onMouseUp", pointer, options);
         this.canvas.renderAll();
         return retVal;
-      },
-
-      _render: function () {
-        this.canvas.renderCanvas(
-          this.canvas.contextTop,
-          this.canvas.getObjects()
-        );
-        this.callSuper("_render");
       },
 
       /**
@@ -281,8 +300,7 @@
         canvas.clearContext(canvas.contextTop);
         canvas.fire("before:path:created", { path: path });
 
-        this.applyEraserToCanvas(canvas, path, 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
-        this.applyEraserToCanvas(canvas, path, 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
+        this.applyEraserToCanvas(canvas, path);
         var _this = this;
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
