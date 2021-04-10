@@ -105,6 +105,21 @@
 
       /**
        * Perpare canvas for drawing
+       * 
+       * Drawable logic is as follows:
+       * For background drawables:
+       * 1. erasable = true: 
+       *    we need to remove the drawable from the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
+       * 2. erasable = false: 
+       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
+       * 
+       * For overlay drawables:
+       * Must draw on top ctx to be on top of visible canvas
+       * 1. erasable = true: 
+       *    we need to draw the drawable on the top ctx as a normal object
+       * 2. erasable = false: 
+       *    we need to draw the drawable on top of the brush meaning we need to repaint for every stroke
+       * 
        * @param {fabric.Canvas} source 
        * @param {fabric.Canvas} target
        */
