@@ -5,7 +5,7 @@
      * @param {boolean} value 
      * @returns 
      */
-    setErasable(value) {
+    setErasable: function (value) {
       let changed = false;
       if (this.backgroundImage) {
         changed = true;
@@ -268,23 +268,23 @@
    * @class fabric.EraserPath
    * @extends fabric.Rect
    */
-  fabric.EraserPath = fabric.util.createClass(fabric.Rect, {
+  fabric.EraserPath = fabric.util.createClass(fabric.Rect, fabric.Collection, {
 
     type: 'eraserPath',
 
-    stateProperties: fabric.Object.prototype.stateProperties.concat('_paths'),
+    stateProperties: fabric.Object.prototype.stateProperties.concat('_objects'),
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('_paths'),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('_objects'),
 
-    _paths: [],
+    _objects: [],
 
-    initialize: function (paths, options) {
+    initialize: function (objects, options) {
       this.callSuper('initialize', Object.assign(options || {}, {
         originX: 'center',
         originY: 'center'
       }));
-      this._paths = paths || [];
-      this._paths.forEach(function (p) {
+      this._objects = objects || [];
+      this._objects.forEach(function (p) {
         p.path.set({ globalCompositeOperation: "destination-out" });
       })
     },
@@ -299,7 +299,7 @@
 
     _render: function (ctx) {
       this.callSuper('_render', ctx);
-      this._paths.forEach(({ path, transformMatrix }) => {
+      this._objects.forEach(({ path, transformMatrix }) => {
         ctx.save();
         transformMatrix && ctx.transform(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3], transformMatrix[4], transformMatrix[5]);
         path.render(ctx);
@@ -309,13 +309,13 @@
 
     addPath(path, transformMatrix) {
       path.set({ globalCompositeOperation: "destination-out" });
-      this._paths.push({ path, transformMatrix });
+      this._objects.push({ path, transformMatrix });
       this.dirty = true;
     },
 
     toObject: function (propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._paths.map(function ({ path: obj, transformMatrix }) {
+      var objsToObject = this._objects.map(function ({ path: obj, transformMatrix }) {
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
@@ -323,7 +323,7 @@
         return { path: _obj, transformMatrix };
       });
       var obj = this.callSuper('toObject', propertiesToInclude);
-      obj.paths = objsToObject;
+      obj.objects = objsToObject;
       return obj;
     },
   });
@@ -336,11 +336,11 @@
      * @param {Function} [callback] Callback to invoke when an fabric.EraserPath instance is created
      */
   fabric.EraserPath.fromObject = function (object, callback) {
-    var paths = object.paths,
+    var objects = object.objects,
       options = fabric.util.object.clone(object, true);
-    delete options.paths;
+    delete options.objects;
     /*
-    if (typeof paths === 'string') {
+    if (typeof objects === 'string') {
       // it has to be an url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
@@ -350,12 +350,22 @@
       return;
     }
     */
-    fabric.util.enlivenObjects(paths.map(function (p) { return p.path }), function (enlivenedObjects) {
-      fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
-        options.clipPath = enlivedClipPath[0];
-        var objects = paths.map(function (p, i) { return { path: enlivenedObjects[i], transformMatrix: p.transformMatrix } });
-        callback && callback(new fabric.EraserPath(objects, options));
-      });
-    });
+    fabric.util.enlivenObjects(
+      objects.map(function (p) {
+        return p.path;
+      }),
+      function (enlivenedObjects) {
+        fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
+          options.clipPath = enlivedClipPath[0];
+          var _objects = objects.map(function (p, i) {
+            return {
+              path: enlivenedObjects[i],
+              transformMatrix: p.transformMatrix
+            };
+          });
+          callback && callback(new fabric.EraserPath(_objects, options));
+        });
+      }
+    );
   };
 })();
