@@ -368,15 +368,15 @@
    * Used by {@link fabric.EraserBrush}
    * 
    * {@link fabric.EraserPath} is a workaround for clipping paths that are strokes and not fills.
-   * Clipping is done with the fill of the clip path, so to enable clipping paths by their stroke and achieving an eraser effect, 
+   * Clipping is done with the fill of the clip path, so to enable clipping out paths by their stroke and achieving an eraser effect, 
    * {@link fabric.EraserPath} fills a rect where the object that it needs to clip is drawn.
-   * Then it draws the paths that the {@link fabric.EraserBrush} has drawn onto the rect in `globalCompositionMode = "destination-out"`. 
+   * Then it draws the paths drawn by {@link fabric.EraserBrush} onto the rect in `globalCompositionMode = "destination-out"`. 
    * This removes the paths from the drawn rect resulting is a rect that has been erased.
    * 
    * {@link fabric.EraserPath} is attached to it's owning object as a clip path. 
    * Basically it achieves what the `inverted` prop achieves, only for stroked objects.
    * 
-   * Can be used regardless of {@link fabric.EraserBrush} to create an inverted clip path that contains strokes (=unclosed paths).
+   * Can be used regardless of {@link fabric.EraserBrush} to create an inverted clip path that contains strokes, unclosed paths or unfilled paths.
    * 
    * Without this workaround a clip path containing unclosed paths clips an object as if the path was closed and filled or disregards it.
    * 
