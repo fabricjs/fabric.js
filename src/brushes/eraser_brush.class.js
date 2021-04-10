@@ -57,15 +57,14 @@
        * 
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} target
-       * @param {'backgroundColor'|'overlayColor'} prop
+       * @param {string | fabric.Color} color color property of @argument source
        * @param {'setBackgroundColor'|'setOverlayColor'} setter
        */
-      handleCanvasColor: function (source, target, prop, setter) {
-        var a = source[prop];
-        if (a && a instanceof fabric.Color && a.erasable) {
+      prepareCanvasColor: function (source, target, color, setter) {
+        if (color && color instanceof fabric.Color && color.erasable) {
           target[setter](null);
-        } else if (a) {
-          var color = this.toColor(a);
+        } else if (color) {
+          var color = this.toColor(color);
           color.setAlpha(Math.pow(color.getAlpha(), 2));
           source[setter](color.toRgba());
           target[setter](color.toRgba());
@@ -75,11 +74,22 @@
       /**
        * If we want to erase background/overlay color we need to add an object to the canvas that will mock it
        * Replacing background/overlay image with a group consisting of the image and a filled rect will do the job
-       * @param source {fabric.Canvas} source
+       * @param {fabric.Canvas} source
+       * @param {fabric.Path} path
+       * @param {'backgroundColor'|'overlayColor'} prop
+       * @param {'setBackgroundColor'|'setOverlayColor'} setter
        */
-      restoreCanvasColor: function (source) {
-        if (source && source instanceof fabric.Color && source.erasable) {
-          source.setAlpha(Math.sqrt(source.getAlpha()));
+      restoreCanvasColor: function (source, path, prop, setter) {
+        var a = source[prop];
+        if (a && a instanceof fabric.Color && a.erasable) {
+          a.setAlpha(Math.sqrt(a.getAlpha()));
+        }
+        if (a && a.erasable) {
+          return new fabric.Rect({
+            width: source.width,
+            height: source.height,
+            fill: a
+          });
         }
       },
 
@@ -91,23 +101,22 @@
        * 
        * @param {fabric.Canvas} source 
        * @param {fabric.Canvas} target
-       * @param {'backgroundImage'|'overlayImage'} prop 
+       * @param {fabric.Image | undefined} image image property of source
        * @param {'setBackgroundImage'|'setOverlayImage'} setter
        */
-      handleCanvasImage: function (source, target, prop, setter) {
-        var obj = source[prop];
-        if (obj && obj.erasable) {
+      prepareCanvasImage: function (source, target, image, setter) {
+        if (image && image.erasable) {
           target[setter](null);
-        } else if (obj && obj.opacity < 1) {
-          this.__opacity = obj.opacity;
-          obj.set({ opacity: 0 });
+        } else if (image && image.opacity < 1) {
+          this.__opacity = image.opacity;
+          image.set({ opacity: 0 });
         }
       },
 
       /**
-       * Restore {handleCanvasImage}
+       * Restore {prepareCanvasImage}
        * @param {fabric.Image} source
-       * @param {fabric.Image} target
+       * @param {fabric.Path} path
        * @param {'backgroundImage'|'overlayImage'} prop
        * @param {'setBackgroundImage'|'setOverlayImage'} setter
        */
@@ -115,8 +124,41 @@
         var obj = source[prop];
         if (obj && obj.erasable) {
           this._addPathToObjectEraser(obj, path);
+          return obj;
         } else if (obj && obj.opacity < 1) {
           obj.set({ opacity: this.__opacity });
+        }
+      },
+
+      prepareCanvas: function (source, target, imgProp, imgSetter, colorProp, colorSetter) {
+        var image = source[imgProp], color = source[colorProp];
+        // in case canvas has been erased image object will be a fabric.Group([image, color]) so we restore state
+        if (image.isType('group')) {
+          image = image._objects[1];
+          color = image._objects[0];
+          source[imgSetter](image);
+          source[colorSetter](color);
+        }
+        this.prepareCanvasImage(source, target, image, imgSetter);
+        this.prepareCanvasColor(source, target, color, colorSetter);
+      },
+
+      /**
+       * 
+       * @param {fabric.Image} source
+       * @param {fabric.Path} path
+       * @param {'backgroundImage'|'overlayImage'} imgProp
+       * @param {'setBackgroundImage'|'setOverlayImage'} imgSetter
+       * @param {'backgroundColor'|'overlayColor'} colorProp
+       * @param {'setBackgroundColor'|'setOverlayColor'} colorSetter
+       */
+      applyEraserToCanvas: function (canvas, path, imgProp, imgSetter, colorProp, colorSetter) {
+        var image = this.restoreCanvasImage(canvas, path, imgProp, imgSetter),
+          color = this.restoreCanvasColor(canvas, path, colorProp, colorSetter);
+        if (image && color) {
+          var mergedGroup = new fabric.Group([color, image]);
+          canvas[imgSetter](mergedGroup);
+          canvas[colorSetter](null);
         }
       },
 
@@ -154,10 +196,8 @@
        */
       _prepareForRendering: function (_canvas) {
         var canvas = this.canvas;
-        this.handleCanvasImage(canvas, _canvas, 'backgroundImage', 'setBackgroundImage');
-        this.handleCanvasImage(canvas, _canvas, 'overlayImage', 'setOverlayImage');
-        this.handleCanvasColor(canvas, _canvas, 'backgroundColor', 'setBackgroundColor');
-        this.handleCanvasColor(canvas, _canvas, 'overlayColor', 'setOverlayColor');
+        this.prepareCanvas(canvas, _canvas, 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
+        this.prepareCanvas(canvas, _canvas, 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
         _canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
@@ -241,10 +281,8 @@
         canvas.clearContext(canvas.contextTop);
         canvas.fire("before:path:created", { path: path });
 
-        this.restoreCanvasImage(canvas, path, 'backgroundImage', 'setBackgroundImage');
-        this.restoreCanvasImage(canvas, path, 'overlayImage', 'setOverlayImage');
-        this.restoreCanvasColor(canvas, path, 'backgroundColor', 'setBackgroundColor');
-        this.restoreCanvasColor(canvas, path, 'overlayColor', 'setOverlayColor');
+        this.applyEraserToCanvas(canvas, path, 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
+        this.applyEraserToCanvas(canvas, path, 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
         var _this = this;
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
@@ -320,7 +358,8 @@
     toObject: function (propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
       var objsToObject = this._objects.map(function (o) {
-        var obj = o.path; transformMatrix = o.transformMatrix;
+        var obj = o.path;
+        transformMatrix = o.transformMatrix;
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
