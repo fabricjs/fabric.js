@@ -133,7 +133,7 @@
       prepareCanvas: function (source, target, imgProp, imgSetter, colorProp, colorSetter) {
         var image = source[imgProp], color = source[colorProp];
         // in case canvas has been erased image object will be a fabric.Group([image, color]) so we restore state
-        if (image.isType('group')) {
+        if (image && image.isType('group')) {
           image = image._objects[1];
           color = image._objects[0];
           source[imgSetter](image);
