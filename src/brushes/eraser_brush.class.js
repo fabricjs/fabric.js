@@ -358,8 +358,7 @@
     toObject: function (propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
       var objsToObject = this._objects.map(function (o) {
-        var obj = o.path;
-        transformMatrix = o.transformMatrix;
+        var obj = o.path, transformMatrix = o.transformMatrix;
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
