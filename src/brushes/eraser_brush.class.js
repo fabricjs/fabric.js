@@ -6,7 +6,7 @@
      * @returns 
      */
     setErasable: function (value) {
-      let changed = false;
+      var changed = false;
       if (this.backgroundImage) {
         changed = true;
         this.backgroundImage.erasable = value;
@@ -152,7 +152,7 @@
        * Prepare bottom ctx
        * Use a clone of the main canvas to render the non-erasable objects on the bottom context
        */
-      _prepareForRendering(_canvas) {
+      _prepareForRendering: function (_canvas) {
         var canvas = this.canvas;
         this.handleCanvasImage(canvas, _canvas, 'backgroundImage', 'setBackgroundImage');
         this.handleCanvasImage(canvas, _canvas, 'overlayImage', 'setOverlayImage');
@@ -299,28 +299,30 @@
 
     _render: function (ctx) {
       this.callSuper('_render', ctx);
-      this._objects.forEach(({ path, transformMatrix }) => {
+      this._objects.forEach(function (o) {
         ctx.save();
-        transformMatrix && ctx.transform(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3], transformMatrix[4], transformMatrix[5]);
-        path.render(ctx);
+        var m = o.transformMatrix;
+        m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        o.path.render(ctx);
         ctx.restore();
       })
     },
 
-    addPath(path, transformMatrix) {
+    addPath: function (path, transformMatrix) {
       path.set({ globalCompositeOperation: "destination-out" });
-      this._objects.push({ path, transformMatrix });
+      this._objects.push({ path: path, transformMatrix: transformMatrix });
       this.dirty = true;
     },
 
     toObject: function (propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects.map(function ({ path: obj, transformMatrix }) {
+      var objsToObject = this._objects.map(function (o) {
+        var obj = o.path; transformMatrix = o.transformMatrix;
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = _includeDefaultValues;
         var _obj = obj.toObject(propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
-        return { path: _obj, transformMatrix };
+        return { path: _obj, transformMatrix: transformMatrix };
       });
       var obj = this.callSuper('toObject', propertiesToInclude);
       obj.objects = objsToObject;
