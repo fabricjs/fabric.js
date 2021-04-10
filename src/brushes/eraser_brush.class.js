@@ -227,18 +227,6 @@
       },
 
       /**
-       * Restore top and bottom ctx after _finalizeAndAddPath is invoked
-       * @param {fabric.Point} pointer
-       * @param {fabric.IEvent} options
-       * @returns
-       */
-      onMouseUp: function (pointer, options) {
-        var retVal = this.callSuper("onMouseUp", pointer, options);
-        this.canvas.renderAll();
-        return retVal;
-      },
-
-      /**
        * Adds path to existing clipPath of object
        * @private
        * @param {fabric.Object} obj
