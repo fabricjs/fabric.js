@@ -34,6 +34,10 @@
 
     _shouldRenderOverlay: true,
 
+    /**
+     * See {@link fabric.EraserBrush#_render}
+     * @param {CanvasRenderingContext2D} ctx 
+     */
     _renderOverlay: function (ctx) {
       if (this._shouldRenderOverlay) _proto._renderOverlay.call(this, ctx);
     }
