@@ -126,6 +126,7 @@
        */
       prepareCanvasForDrawing: function (source, target) {
         this._hasOverlay = false;
+        target._shouldRenderOverlay = false;
         this.forCanvasDrawables(
           function (drawable, imgProp, _, colorProp) {
             var sourceImage = source.get(imgProp);
@@ -169,7 +170,7 @@
       },
 
       needsFullRender: function () {
-        return this.callSuper("needsFullRender") || this._hasOverlay;
+        return this.callSuper("needsFullRender") || (this._hasOverlay && this._points.length > 0);
       },
 
       /**
@@ -183,7 +184,9 @@
           return;
         }
         this._prepareForDrawing(pointer);
-
+        // capture coordinates immediately
+        // this allows to draw dots (when movement never occurs)
+        this._captureDrawingPath(pointer);
         var _this = this;
         this.prepareCanvas(this.canvas);
         this.canvas.clone(function (c) {
