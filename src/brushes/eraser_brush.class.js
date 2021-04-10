@@ -264,6 +264,9 @@
   /**
    * Used by @class fabric.EraserBrush
    * Can be used regardless of @class fabric.EraserBrush to create an inverted clip path made of strokes (=unclosed paths)
+   * It paints a rect and clips out the paths given to it so it can be used as a clip path for other objects
+   * This makes it possible using unclosed paths for clipping, without this a clip path containing unclosed paths clips an object as if the path was closed and filled
+   * 
    * @private
    * @class fabric.EraserPath
    * @extends fabric.Rect
