@@ -257,7 +257,7 @@
        */
       applyEraserToCanvas: function (source, path) {
         this.forCanvasDrawables(
-          function (drawable, imgProp) {
+          function (drawable, imgProp, _, colorProp) {
             var sourceImage = source.get(imgProp);
             var sourceColor = source.get(colorProp);
             if (sourceImage && sourceImage.erasable) {
