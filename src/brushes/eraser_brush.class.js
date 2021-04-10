@@ -207,7 +207,7 @@
           this.canvas._renderOverlay(ctx);
           ctx.restore();
         }
-        this.canvas._shouldRenderOverlay = false;
+        this.canvas._shouldRenderOverlay = true;
       },
 
       /**
