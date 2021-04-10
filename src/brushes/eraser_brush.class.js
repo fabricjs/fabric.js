@@ -144,31 +144,6 @@
       },
 
       /**
-       * Finalize erasing by restoring canvas drawables to original state
-       * @param {fabric.Canvas} source
-       * @param {fabric.Canvas} path
-       */
-      applyEraserToCanvas: function (source, path) {
-        this.forCanvasDrawables(
-          function (drawable, imgProp) {
-            var sourceImage = source[imgProp]._image;
-            var sourceColor = source[imgProp]._color;
-            if (sourceImage && sourceImage.erasable) {
-              this._addPathToObjectEraser(sourceImage, path);
-            } else if (sourceImage && sourceImage._originalOpacity) {
-              sourceImage.set({ opacity: sourceImage._originalOpacity });
-              sourceImage._originalOpacity = undefined;
-            }
-            if (sourceColor && sourceColor.erasable) {
-              this._addPathToObjectEraser(sourceColor, path);
-            } else if (sourceColor && sourceColor._originalOpacity) {
-              sourceColor.set({ opacity: sourceColor._originalOpacity });
-              sourceColor._originalOpacity = undefined;
-            }
-          });
-      },
-
-      /**
        * @extends @class fabric.BaseBrush
        * @param {CanvasRenderingContext2D} ctx
        */
@@ -273,6 +248,31 @@
           dirty: true,
           eraser: true
         });
+      },
+
+      /**
+       * Finalize erasing by restoring canvas drawables to original state
+       * @param {fabric.Canvas} source
+       * @param {fabric.Canvas} path
+       */
+      applyEraserToCanvas: function (source, path) {
+        this.forCanvasDrawables(
+          function (drawable, imgProp) {
+            var sourceImage = source.get(imgProp);
+            var sourceColor = source.get(colorProp);
+            if (sourceImage && sourceImage.erasable) {
+              this._addPathToObjectEraser(sourceImage, path);
+            } else if (sourceImage && sourceImage._originalOpacity) {
+              sourceImage.set({ opacity: sourceImage._originalOpacity });
+              sourceImage._originalOpacity = undefined;
+            }
+            if (sourceColor && sourceColor.erasable) {
+              this._addPathToObjectEraser(sourceColor, path);
+            } else if (sourceColor && sourceColor._originalOpacity) {
+              sourceColor.set({ opacity: sourceColor._originalOpacity });
+              sourceColor._originalOpacity = undefined;
+            }
+          });
       },
 
       /**
