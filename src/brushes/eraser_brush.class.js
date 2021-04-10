@@ -133,11 +133,11 @@
        *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
        * 
        * For overlay drawables:
-       * Must draw on top ctx to be on top of visible canvas
+       * Must draw on top ctx to be on top of visible canvas that is drawn on top ctx
        * 1. erasable = true: 
        *    we need to draw the drawable on the top ctx as a normal object
        * 2. erasable = false: 
-       *    we need to draw the drawable on top of the brush meaning we need to repaint for every stroke
+       *    we need to draw the drawable on top of the brush, meaning we need to repaint for every stroke
        * 
        * @param {fabric.Canvas} source 
        * @param {fabric.Canvas} target
