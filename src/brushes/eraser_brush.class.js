@@ -394,6 +394,10 @@
       })
     },
 
+    /**
+     * Used to set options when erasing
+     * @param {fabric.Object} parent The object that owns this clip path
+     */
     setParent: function (parent) {
       this.set({
         width: parent.width,
