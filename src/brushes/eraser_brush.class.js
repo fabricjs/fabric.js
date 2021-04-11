@@ -38,7 +38,7 @@
      * See {@link fabric.EraserBrush#_render}
      * @param {CanvasRenderingContext2D} ctx 
      */
-    _renderOverlay: function (ctx) {
+    _renderOverlay111: function (ctx) {
       if (this._shouldRenderOverlay) _proto._renderOverlay.call(this, ctx);
     }
   });
@@ -73,7 +73,7 @@
       /**
        * @private
        */
-      _hasOverlay: false,
+      _drawOverlayOnTop: false,
 
       /**
        * @private
@@ -134,59 +134,113 @@
         this._ready = true;
       },
 
-      prepareBackgroundDrawable(object) {
+      hideObject(object) {
         if (object) {
           object._originalOpacity = object.opacity;
           object.set({ opacity: 0 });
         }
       },
 
-      restoreBackgroundDrawable(object) {
+      restoreObjectVisibility(object) {
         if (object && object._originalOpacity) {
           object.set({ opacity: object._originalOpacity });
           object._originalOpacity = undefined;
         }
       },
 
-      renderBottomLayer: function () {
+      /**
+       * 
+       * @param {'bottom' | 'top' | 'overlay'} layer
+       */
+      prepareCanvasBackgroundForLayer: function (layer) {
+        if (layer === "overlay") return;
         var canvas = this.canvas;
         var image = canvas.get('backgroundImage');
         var color = canvas.get('backgroundColor');
-        if (image && !image.erasable) {
-          this.prepareBackgroundDrawable(image);
+        var erasablesOnLayer = layer === "top";
+        if (image && image.erasable === !erasablesOnLayer) {
+          this.hideObject(image);
         }
-        if (color && !color.erasable) {
-          this.prepareBackgroundDrawable(color);
+        if (color && color.erasable === !erasablesOnLayer) {
+          this.hideObject(color);
         }
-        canvas._shouldRenderOverlay = false;
+      },
+
+      /**
+       * 
+       * @param {'bottom' | 'top' | 'overlay'} layer
+       * @returns boolean render overlay above brush
+       */
+      prepareCanvasOverlayForLayer: function (layer) {
+        var canvas = this.canvas;
+        var image = canvas.get('overlayImage');
+        var color = canvas.get('overlayColor');
+        if (layer === "bottom") {
+          this.hideObject(image);
+          this.hideObject(color);
+          return false;
+        };
+        var erasablesOnLayer = layer === "top";
+        var renderOverlayOnTop = (image && !image.erasable) || (color && !color.erasable);
+        if (image && image.erasable === !erasablesOnLayer) {
+          this.hideObject(image);
+        }
+        if (color && color.erasable === !erasablesOnLayer) {
+          this.hideObject(color);
+        }
+        return renderOverlayOnTop;
+      },
+
+      /**
+       * 
+       * @param {'bottom' | 'top' | 'overlay'} layer 
+       * @returns boolean render overlay above brush
+       */
+      prepareCanvasForLayer: function (layer) {
+        this.prepareCanvasBackgroundForLayer(layer);
+        return this.prepareCanvasOverlayForLayer(layer);
+      },
+
+      restoreCanvasDrawables: function () {
+        var canvas = this.canvas;
+        this.restoreObjectVisibility(canvas.get('backgroundImage'));
+        this.restoreObjectVisibility(canvas.get('backgroundColor'));
+        this.restoreObjectVisibility(canvas.get('overlayImage'));
+        this.restoreObjectVisibility(canvas.get('overlayColor'));
+        canvas._shouldRenderOverlay = true;
+      },
+
+      renderBottomLayer: function () {
+        var canvas = this.canvas;
+        this.prepareCanvasForLayer('bottom');
         canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
             return !obj.erasable;
           })
         );
-        canvas._shouldRenderOverlay = true;
-        this.restoreBackgroundDrawable(image);
-        this.restoreBackgroundDrawable(color);
+        this.restoreCanvasDrawables();
       },
 
       renderTopLayer: function () {
         var canvas = this.canvas;
-        var hasOverlay = canvas.get('overlayImage') || canvas.get('overlayColor');
-        canvas._shouldRenderOverlay = !hasOverlay;
+        this._drawOverlayOnTop = this.prepareCanvasForLayer('top');
         canvas.renderCanvas(
           canvas.contextTop,
           canvas.getObjects()
         );
         this.callSuper('_render');
-        if (hasOverlay) {
-          canvas._shouldRenderOverlay = true;
-          var ctx = canvas.contextTop;
-          this._saveAndTransform(ctx);
-          canvas._renderOverlay(ctx);
-          ctx.restore();
-        }
-        canvas._shouldRenderOverlay = true;
+        this.restoreCanvasDrawables();
+      },
+
+      renderOverlay: function () {
+        this.prepareCanvasForLayer('overlay');
+        var canvas = this.canvas;
+        var ctx = canvas.contextTop;
+        this._saveAndTransform(ctx);
+        canvas._renderOverlay(ctx);
+        ctx.restore();
+        this.restoreCanvasDrawables();
       },
 
       /**
@@ -201,7 +255,7 @@
       needsFullRender: function () {
         var needsFullRender = this._needsFullRenderOnce;
         this._needsFullRenderOnce = false;
-        return this.callSuper("needsFullRender") || (this._hasOverlay && this._points.length > 0) || needsFullRender;
+        return this.callSuper("needsFullRender") || this._drawOverlayOnTop || needsFullRender;
       },
 
       /**
@@ -226,7 +280,7 @@
 
       _prepareCanvasForOriginalRendering: function () {
         if (this._isErasing) {
-          this.canvas._shouldRenderOverlay = !this._hasOverlay;
+          //this.canvas._shouldRenderOverlay = !this._drawOverlayOnTop;
         }
       },
 
@@ -253,17 +307,21 @@
         this.isRendering = 1;
         this.renderBottomLayer();
         this.renderTopLayer();
+        this.renderOverlay();
         this.isRendering = 0;
       },
 
       render: function ({ ctx }) {
-        if (/*this._isErasing*/ctx !== this.canvas.contextTop) {
-          if (this.isRendering) {
-            this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
-          } else {
-            this._render();
-          }
-        }
+        /*this._isErasing*/
+        /*
+                if (ctx !== this.canvas.contextTop) {
+                  if (this.isRendering) {
+                    this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
+                  } else {
+                    this._render();
+                  }
+                }
+                */
       },
 
       /**
