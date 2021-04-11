@@ -316,7 +316,7 @@
       /**
        * Rendering is done in 4 steps:
        * 1. Draw all non-erasable objects on bottom ctx with the exception of overlays {@link fabric.EraserBrush#renderBottomLayer}
-       * 2. Draw all objects on top ctx including relevant drawables {@link fabric.EraserBrush#renderTopLayer}
+       * 2. Draw all objects on top ctx including erasable drawables {@link fabric.EraserBrush#renderTopLayer}
        * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
        * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
        * 
