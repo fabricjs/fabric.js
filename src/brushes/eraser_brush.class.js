@@ -84,7 +84,6 @@
         this.callSuper('initialize', canvas);
         this._renderBound = this._render.bind(this);
         this.render = this.render.bind(this);
-        this._prepareCanvasForOriginalRendering = this._prepareCanvasForOriginalRendering.bind(this);
       },
 
       /**
@@ -253,9 +252,7 @@
       },
 
       needsFullRender: function () {
-        var needsFullRender = this._needsFullRenderOnce;
-        this._needsFullRenderOnce = false;
-        return this.callSuper("needsFullRender") || this._drawOverlayOnTop || needsFullRender;
+        return this.callSuper("needsFullRender") || this._drawOverlayOnTop;
       },
 
       /**
@@ -276,12 +273,7 @@
         this._isErasing = true;
         this.prepareCanvas(this.canvas);
         this._render();
-      },
-
-      _prepareCanvasForOriginalRendering: function () {
-        if (this._isErasing) {
-          //this.canvas._shouldRenderOverlay = !this._drawOverlayOnTop;
-        }
+        //this.canvas.on('after:render', this.render);
       },
 
       /**
@@ -311,17 +303,17 @@
         this.isRendering = 0;
       },
 
-      render: function ({ ctx }) {
-        /*this._isErasing*/
-        /*
-                if (ctx !== this.canvas.contextTop) {
-                  if (this.isRendering) {
-                    this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
-                  } else {
-                    this._render();
-                  }
-                }
-                */
+      /**
+       * @public
+       */
+      render: function () {
+        if (this._isErasing) {
+          if (this.isRendering) {
+            this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
+          } else {
+            this._render();
+          }
+        }
       },
 
       /**
@@ -385,7 +377,6 @@
         }
 
         canvas.clearContext(canvas.contextTop);
-        this.canvas.off('before:render', this._prepareCanvasForOriginalRendering);
         this.canvas.off('after:render', this.render);
         this._isErasing = false;
 
