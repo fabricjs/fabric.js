@@ -32,14 +32,10 @@
       }
     },
 
-    _shouldRenderOverlay: true,
-
-    /**
-     * See {@link fabric.EraserBrush#_render}
-     * @param {CanvasRenderingContext2D} ctx 
-     */
-    _renderOverlay111: function (ctx) {
-      if (this._shouldRenderOverlay) _proto._renderOverlay.call(this, ctx);
+    renderAll: function () {
+      if (this.freeDrawingBrush && this.freeDrawingBrush.isType('eraser') && !this.freeDrawingBrush.render()) {
+        _proto.renderAll.call(this);
+      }
     }
   });
 
@@ -206,7 +202,6 @@
         this.restoreObjectVisibility(canvas.get('backgroundColor'));
         this.restoreObjectVisibility(canvas.get('overlayImage'));
         this.restoreObjectVisibility(canvas.get('overlayColor'));
-        canvas._shouldRenderOverlay = true;
       },
 
       renderBottomLayer: function () {
@@ -273,7 +268,6 @@
         this._isErasing = true;
         this.prepareCanvas(this.canvas);
         this._render();
-        //this.canvas.on('after:render', this.render);
       },
 
       /**
@@ -313,7 +307,9 @@
           } else {
             this._render();
           }
+          return true;
         }
+        return false;
       },
 
       /**
@@ -377,7 +373,6 @@
         }
 
         canvas.clearContext(canvas.contextTop);
-        this.canvas.off('after:render', this.render);
         this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
