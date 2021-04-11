@@ -127,7 +127,7 @@
        * Used to hide a drawable from the rendering process
        * @param {fabric.Object} object 
        */
-      hideObject(object) {
+      hideObject: function (object) {
         if (object) {
           object._originalOpacity = object.opacity;
           object.set({ opacity: 0 });
@@ -139,7 +139,7 @@
        * {@link favric.EraserBrush#hideObject}
        * @param {fabric.Object} object
        */
-      restoreObjectVisibility(object) {
+      restoreObjectVisibility: function (object) {
         if (object && object._originalOpacity) {
           object.set({ opacity: object._originalOpacity });
           object._originalOpacity = undefined;
@@ -426,7 +426,7 @@
         });
 
         canvas.fire('erasing:end');
-        
+
         canvas.requestRenderAll();
         path.setCoords();
         this._resetShadow();
