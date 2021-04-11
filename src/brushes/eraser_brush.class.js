@@ -89,7 +89,7 @@
 
       /**
        * In order to be able to clip out the canvas' overlay/background color
-       * we group background/overlay image and color and assign the group to the canvas' image property
+       * we group background/overlay image and color and assign the group to the canvas' appropriate image property
        * @param {fabric.Canvas} canvas
        */
       prepareCanvas: function (canvas) {
@@ -147,7 +147,7 @@
       },
 
       /**
-       * Drawing Logic For background drawables (`backgroundImage`, `backgroundColor`)
+       * Drawing Logic For background drawables: (`backgroundImage`, `backgroundColor`)
        * 1. if erasable = true:
        *    we need to hide the drawable on the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
        * 2. if erasable = false:
@@ -170,7 +170,7 @@
 
       /**
        * Drawing Logic For overlay drawables (`overlayImage`, `overlayColor`)
-       * We must draw on top ctx to be on top of visible canvas (which is drawn on top ctx)
+       * We must draw on top ctx to be on top of visible canvas
        * 1. if erasable = true:
        *    we need to draw the drawable on the top ctx as a normal object
        * 2. if erasable = false:
@@ -222,7 +222,7 @@
       },
 
       /**
-       * render all non erasable objects on bottom layer with the exception of overlays
+       * render all non-erasable objects on bottom layer with the exception of overlays to avoid being clipped by the brush
        */
       renderBottomLayer: function () {
         var canvas = this.canvas;
@@ -237,7 +237,8 @@
       },
 
       /**
-       * render all erasable objects on top layer
+       * 1. render all erasable objects on top layer
+       * 2. render the brush
        */
       renderTopLayer: function () {
         var canvas = this.canvas;
@@ -303,10 +304,10 @@
 
       /**
        * Rendering is done in 4 steps:
-       * 1. Draw all non-erasable objects on bottom ctx with the exception of overlay
-       * 2. Draw all erasable objects on top ctx
-       * 3. Draw eraser
-       * 4. Draw non-erasable overlay
+       * 1. Draw all non-erasable objects on bottom ctx with the exception of overlay {@link fabric.EraserBrush#renderBottomLayer}
+       * 2. Draw all erasable objects on top ctx {@link fabric.EraserBrush#renderTopLayer}
+       * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
+       * 4. Draw non-erasable overlay {@link fabric.EraserBrush#renderOverlay}
        * 
        * @param {fabric.Canvas} canvas
        */
@@ -337,6 +338,8 @@
       /**
        * Adds path to existing clipPath of object
        * 
+       * @todo fix path transform to be applied on it up front instead of by {@link EraserPath}
+       * 
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -363,7 +366,8 @@
       },
 
       /**
-       * Add the eraser path the the objects clip path
+       * Add the eraser path to canvas drawables' clip paths
+       * 
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} path
        */
@@ -394,12 +398,13 @@
           this._points = this.decimatePoints(this._points, this.decimate);
         }
 
+        // clear
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
-        canvas.fire('erasing:end');
 
         var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
+          canvas.fire('erasing:end');
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
           // Firefox 4, for example, renders a dot,
@@ -411,6 +416,7 @@
         var path = this.createPath(pathData);
         canvas.fire("before:path:created", { path: path });
 
+        // finalize erasing
         this.applyEraserToCanvas(path);
         var _this = this;
         canvas.forEachObject(function (obj) {
@@ -418,6 +424,9 @@
             _this._addPathToObjectEraser(obj, path);
           }
         });
+
+        canvas.fire('erasing:end');
+        
         canvas.requestRenderAll();
         path.setCoords();
         this._resetShadow();
