@@ -266,6 +266,7 @@
         this._captureDrawingPath(pointer);
 
         this._isErasing = true;
+        this.canvas.fire('erasing:start');
         this.prepareCanvas(this.canvas);
         this._render();
       },
@@ -374,6 +375,7 @@
 
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
+        canvas.fire('erasing:end');
 
         var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
