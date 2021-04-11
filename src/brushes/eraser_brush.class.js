@@ -317,7 +317,7 @@
        * 1. Draw all non-erasable objects on bottom ctx with the exception of overlays {@link fabric.EraserBrush#renderBottomLayer}
        * 2. Draw all erasable objects on top ctx {@link fabric.EraserBrush#renderTopLayer}
        * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
-       * 4. Draw non-erasable overlay {@link fabric.EraserBrush#renderOverlay}
+       * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
        * 
        * @param {fabric.Canvas} canvas
        */
