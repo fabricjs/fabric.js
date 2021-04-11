@@ -70,8 +70,6 @@
     /** @lends fabric.EraserBrush.prototype */ {
       type: "eraser",
 
-      limitedToCanvasSize: true,
-
       /**
        * Indicates that the ctx is ready and rendering can begin.
        * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
@@ -165,8 +163,6 @@
           object._originalOpacity = undefined;
         }
       },
-
-      
 
       /**
        * Drawing Logic For background drawables (`backgroundImage`, `backgroundColor`)
