@@ -60,6 +60,8 @@
     /** @lends fabric.EraserBrush.prototype */ {
       type: "eraser",
 
+      limitedToCanvasSize: true,
+
       /**
        * @private
        */
@@ -72,6 +74,18 @@
        * @private
        */
       _ready: false,
+
+      /**
+       * @private
+       */
+      _isErasing: false,
+
+      initialize: function (canvas) {
+        this.callSuper('initialize', canvas);
+        this._renderBound = this._render.bind(this);
+        this.render = this.render.bind(this);
+        this._prepareCanvasForOriginalRendering = this._prepareCanvasForOriginalRendering.bind(this);
+      },
 
       /**
        * @private
@@ -143,8 +157,11 @@
        * @param {fabric.Canvas} target
        */
       prepareCanvasForDrawing: function (source, target) {
+        this._backgroundImageNeedsHandling = false;
+        this._backgroundColorNeedsHandling = false;
         this._hasOverlay = false;
         target._shouldRenderOverlay = false;
+
         this.forCanvasDrawables(
           function (drawable, imgProp, _, colorProp) {
             var sourceImage = source.get(imgProp);
@@ -159,8 +176,7 @@
                 this._hasOverlay = true;
                 targetImage.set({ opacity: 0 });
               } else {
-                sourceImage._originalOpacity = sourceImage.opacity;
-                sourceImage.set({ opacity: 0 });
+                this._backgroundImageNeedsHandling = true;
               }
             }
             if (sourceColor && sourceColor.erasable) {
@@ -171,11 +187,24 @@
                 this._hasOverlay = true;
                 targetColor.set({ opacity: 0 });
               } else {
-                sourceColor._originalOpacity = sourceColor.opacity;
-                sourceColor.set({ opacity: 0 });
+                this._backgroundColorNeedsHandling = true;
               }
             }
           });
+      },
+
+      prepareBackgroundDrawable(object) {
+        if (object) {
+          object._originalOpacity = object.opacity;
+          object.set({ opacity: 0 });
+        }
+      },
+
+      restoreBackgroundDrawable(object) {
+        if (object && object._originalOpacity) {
+          object.set({ opacity: object._originalOpacity });
+          object._originalOpacity = undefined;
+        }
       },
 
       /**
@@ -188,7 +217,9 @@
       },
 
       needsFullRender: function () {
-        return this.callSuper("needsFullRender") || (this._hasOverlay && this._points.length > 0);
+        var needsFullRender = this._needsFullRenderOnce;
+        this._needsFullRenderOnce = false;
+        return this.callSuper("needsFullRender") || (this._hasOverlay && this._points.length > 0) || needsFullRender;
       },
 
       /**
@@ -210,7 +241,15 @@
         this.prepareCanvas(this.canvas);
         this.canvas.clone(function (c) {
           _this._prepareForRendering(c);
+          _this._render();
+          c.dispose();
         });
+      },
+
+      _prepareCanvasForOriginalRendering: function () {
+        if (this._isErasing) {
+          this.canvas._shouldRenderOverlay = !this._hasOverlay;
+        }
       },
 
       /**
@@ -220,7 +259,10 @@
        */
       _prepareForRendering: function (_canvas) {
         var canvas = this.canvas;
+        //this.canvas.on('before:render', this._prepareCanvasForOriginalRendering);
         this.prepareCanvasForDrawing(canvas, _canvas);
+        //this.canvas.on('after:render', () => { this.canvas._shouldRenderOverlay = true });
+        this._isErasing = true;
         _canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
@@ -228,18 +270,20 @@
           })
         );
         this._ready = true;
-        this._render();
-        _canvas.dispose();
+        //this.canvas.on('after:render', this.render);
       },
 
       _render: function () {
         if (!this._ready) return;
+        this.isRendering = 1;
+        if (this._backgroundColorNeedsHandling) this.prepareBackgroundDrawable(this.canvas.get('backgroundColor'));
+        if (this._backgroundImageNeedsHandling) this.prepareBackgroundDrawable(this.canvas.get('backgroundImage'));
         this.canvas._shouldRenderOverlay = !this._hasOverlay;
         this.canvas.renderCanvas(
           this.canvas.contextTop,
           this.canvas.getObjects()
         );
-        this.callSuper("_render");
+        this.callSuper('_render');
         if (this._hasOverlay) {
           this.canvas._shouldRenderOverlay = true;
           var ctx = this.canvas.contextTop;
@@ -248,6 +292,19 @@
           ctx.restore();
         }
         this.canvas._shouldRenderOverlay = true;
+        if (this._backgroundColorNeedsHandling) this.restoreBackgroundDrawable(this.canvas.get('backgroundColor'));
+        if (this._backgroundImageNeedsHandling) this.restoreBackgroundDrawable(this.canvas.get('backgroundImage'));
+        this.isRendering = 0;
+      },
+
+      render: function ({ ctx }) {
+        if (/*this._isErasing*/ctx !== this.canvas.contextTop) {
+          if (this.isRendering) {
+            this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
+          } else {
+            this._render();
+          }
+        }
       },
 
       /**
@@ -332,6 +389,9 @@
 
         canvas.clearContext(canvas.contextTop);
         this.finalizeErasing();
+        this.canvas.off('before:render', this._prepareCanvasForOriginalRendering);
+        this.canvas.off('after:render', this.render);
+        this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
         if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
