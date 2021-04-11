@@ -179,6 +179,21 @@
     canvas.__onMouseUp(e);
   });
 
+  QUnit.test('activeOn object selection', function(assert) {
+    var rect = new fabric.Rect({ width: 200, height: 200, activeOn: 'down' });
+    canvas.add(rect);
+    var e = { clientX: 30, clientY: 15, which: 1, target: canvas.upperCanvasEl };
+    canvas.__onMouseDown(e);
+    assert.equal(canvas._activeObject, rect, 'with activeOn of down object is selected on mouse down');
+    canvas.__onMouseUp(e);
+    canvas.discardActiveObject();
+    rect.activeOn = 'up';
+    canvas.__onMouseDown(e);
+    assert.equal(canvas._activeObject, null, 'with activeOn of up object is not selected on mouse down');
+    canvas.__onMouseUp(e);
+    assert.equal(canvas._activeObject, rect, 'with activeOn of up object is selected on mouse up');
+  });
+
   QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
     var greenRect = new fabric.Rect({
       width: 300,
@@ -239,6 +254,28 @@
     canvas.__onMouseUp(e4);
   });
 
+  QUnit.test('specific bug #6314 for partial intersection with drag', function(assert) {
+    var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+    var renderRequested = false;
+    var greenRect = new fabric.Rect({
+      width: 300,
+      height: 300,
+      left: 50,
+      top: 0,
+      fill: 'green',
+    });
+    canvas.add(greenRect);
+    canvas._onMouseDown({ clientX: 25, clientY: 25, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseMove({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    canvas.requestRenderAll = function() {
+      renderRequested = true;
+    };
+    canvas._onMouseUp({ clientX: 100, clientY: 50, which: 1, target: canvas.upperCanvasEl });
+    assert.equal(renderRequested, true, 'a render has been requested');
+  });
+
+
   QUnit.test('mouse:up isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
@@ -277,6 +314,24 @@
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
     assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('mouse:up should return target and currentTarget', function(assert) {
+    var e1 = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 100, clientY: 100, which: 1 };
+    var rect1 = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50, lockMovementX: true, lockMovementY: true });
+    var rect2 = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
+    canvas.add(rect1);
+    canvas.add(rect2);
+    var opt;
+    canvas.on('mouse:up', function(_opt) {
+      opt = _opt;
+    });
+    canvas.__onMouseDown(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(opt.target, rect1, 'options match model - target');
+    assert.equal(opt.currentTarget, rect2, 'options match model - currentTarget');
   });
 
   QUnit.test('fires object:modified and object:moved', function(assert) {
@@ -666,7 +721,7 @@
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
     c._hoveredTarget = obj;
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
   });
@@ -688,7 +743,7 @@
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
-    c.currentTransform = {};
+    c._currentTransform = {};
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);

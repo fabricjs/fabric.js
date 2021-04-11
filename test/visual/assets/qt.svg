@@ -1,0 +1,35 @@
+<?xml version="1.0" standalone="yes"?>
+<svg width="400px" height="400px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <!-- Quadratic Bézier curve with implicit repetition -->
+  <path fill="none" stroke="red"
+        d="M 10,50
+           Q 25,25 40,50
+           t 30,0 30,0 30,0 30,0 30,0" />
+
+  <!-- Highlight the curve vertex and control points -->
+  <g>
+    <polyline points="10,50 25,25 40,50" stroke="rgba(0,0,0,.2)" fill="none" />
+    <circle cx="25" cy="25" r="1.5" />
+
+    <!-- Curve vertex points -->
+    <circle cx="10" cy="50" r="1.5"/>
+    <circle cx="40" cy="50" r="1.5"/>
+
+    <g id="SmoothQuadraticDown">
+      <polyline points="40,50 55,75 70,50" stroke="rgba(0,0,0,.2)" stroke-dasharray="2" fill="none" />
+      <circle cx="55" cy="75" r="1.5" fill="lightgrey" />
+      <circle cx="70" cy="50" r="1.5" />
+    </g>
+
+    <g id="SmoothQuadraticUp">
+      <polyline points="70,50 85,25 100,50" stroke="rgba(0,0,0,.2)" stroke-dasharray="2" fill="none" />
+      <circle cx="85" cy="25" r="1.5" fill="lightgrey" />
+      <circle cx="100" cy="50" r="1.5" />
+    </g>
+
+    <use xlink:href="#SmoothQuadraticDown" x="60" />
+    <use xlink:href="#SmoothQuadraticUp"   x="60" />
+    <use xlink:href="#SmoothQuadraticDown" x="120" />
+  </g>
+</svg>

@@ -72,7 +72,7 @@
 
     /**
      * Use this boolean property in order to split strings that have no white space concept.
-     * this is a cheap way to help with chinese/japaense
+     * this is a cheap way to help with chinese/japanese
      * @type Boolean
      * @since 2.6.0
      */
@@ -312,7 +312,7 @@
           splitByGrapheme = this.splitByGrapheme,
           graphemeLines = [],
           line = [],
-          // spaces in different languges?
+          // spaces in different languages?
           words = splitByGrapheme ? fabric.util.string.graphemeSplit(_line) : _line.split(this._wordJoiners),
           word = '',
           offset = 0,
@@ -335,7 +335,7 @@
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
-        if (lineWidth >= desiredWidth && !lineJustStarted) {
+        if (lineWidth > desiredWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;

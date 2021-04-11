@@ -1,4 +1,4 @@
-// set the fabric famework as a global for tests
+// set the fabric framework as a global for tests
 var chalk = require('chalk');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');

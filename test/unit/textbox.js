@@ -52,6 +52,8 @@
     styles: { },
     minWidth: 20,
     splitByGrapheme: false,
+    strokeUniform: false,
+    path: null,
   };
 
   QUnit.test('constructor', function(assert) {
@@ -514,6 +516,20 @@
     assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
     // assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
+  QUnit.test('The same text does not need to be wrapped.', function(assert) {
+    var str = '0123456789';
+    var measureTextbox = new fabric.Textbox(str, {
+      fontSize: 20,
+      splitByGrapheme: false,
+    });
+    var newTextbox = new fabric.Textbox(str, {
+      width: measureTextbox.width,
+      fontSize: 20,
+      splitByGrapheme: true,
+    });
+    assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
 
 })();

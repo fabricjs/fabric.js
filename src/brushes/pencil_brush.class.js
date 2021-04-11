@@ -34,7 +34,7 @@
     },
 
     /**
-     * Inovoked on mouse down
+     * Invoked on mouse down
      * @param {Object} pointer
      */
     onMouseDown: function(pointer, options) {
@@ -49,11 +49,14 @@
     },
 
     /**
-     * Inovoked on mouse move
+     * Invoked on mouse move
      * @param {Object} pointer
      */
     onMouseMove: function(pointer, options) {
       if (!this.canvas._isMainEvent(options.e)) {
+        return;
+      }
+      if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
         return;
       }
       if (this._captureDrawingPath(pointer) && this._points.length > 1) {
@@ -234,7 +237,7 @@
     },
 
     /**
-     * Decimate poins array with the decimate value
+     * Decimate points array with the decimate value
      */
     decimatePoints: function(points, distance) {
       if (points.length <= 2) {
@@ -279,6 +282,7 @@
 
       var path = this.createPath(pathData);
       this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.fire('before:path:created', { path: path });
       this.canvas.add(path);
       this.canvas.requestRenderAll();
       path.setCoords();

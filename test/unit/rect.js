@@ -1,38 +1,39 @@
 (function() {
 
   var REFERENCE_RECT = {
-    'version':                  fabric.version,
-    'type':                     'rect',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    0,
-    'height':                   0,
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         4,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'rx':                       0,
-    'ry':                       0,
-    'skewX':                    0,
-    'skewY':                    0
+    version:                  fabric.version,
+    type:                     'rect',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     0,
+    top:                      0,
+    width:                    0,
+    height:                   0,
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              1,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    shadow:                   null,
+    visible:                  true,
+    backgroundColor:          '',
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    rx:                       0,
+    ry:                       0,
+    skewX:                    0,
+    skewY:                    0,
+    strokeUniform:            false
   };
 
   QUnit.module('fabric.Rect');
@@ -78,8 +79,8 @@
       assert.deepEqual(rect.toObject(), REFERENCE_RECT);
 
       var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-      expectedObject.fill = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
-      expectedObject.stroke = {'type': 'linear','coords': {'x1': 0,'y1': 0,'x2': 200,'y2': 0},'colorStops': [{'offset': '0','color': 'rgb(255,0,0)','opacity': 1},{'offset': '1','color': 'rgb(0,0,255)','opacity': 1}],'offsetX': 0,'offsetY': 0};
+      expectedObject.fill = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
+      expectedObject.stroke = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
       fabric.Rect.fromObject(expectedObject, function(rect2) {
         assert.ok(rect2.fill instanceof fabric.Gradient);
         assert.ok(rect2.stroke instanceof fabric.Gradient);
@@ -128,7 +129,7 @@
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevil');
+    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elRectWithAttrs.setAttributeNS(namespace, 'vector-effect', 'non-scaling-stroke');
     //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
@@ -146,11 +147,11 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         rx:               11,
         ry:               12,
-        // strokeUniform:    true
+        strokeUniform:    true
       });
       assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
     });

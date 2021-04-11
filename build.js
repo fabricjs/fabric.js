@@ -126,7 +126,7 @@ var filesToInclude = [
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
   ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
-  'src/util/arc.js',
+  'src/util/path.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',

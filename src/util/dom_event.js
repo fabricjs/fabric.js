@@ -1,5 +1,5 @@
 (function () {
-  // since ie10 can use addEventListener but they do not support options, i need to check
+  // since ie11 can use addEventListener but they do not support options, i need to check
   var couldUseAttachEvent = !!fabric.document.createElement('div').attachEvent,
       touchEvents = ['touchstart', 'touchmove', 'touchend'];
   /**

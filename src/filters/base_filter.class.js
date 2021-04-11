@@ -194,7 +194,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * Generic isNeutral implementation for one parameter based filters.
    * Used only in image applyFilters to discard filters that will not have an effect
    * on the image
-   * Other filters may need their own verison ( ColorMatrix, HueRotation, gamma, ComposedFilter )
+   * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
    * @param {Object} options
    **/
   isNeutralState: function(/* options */) {

@@ -462,7 +462,7 @@
     fabric.loadSVGFromString(string, function(objects) {
       assert.equal(objects[0].fill, 'rgba(255,0,0,0.3)', 'first circle has opacity 0.3 from rgba');
       assert.equal(objects[0].fillOpacity, 1,'first circle has fill-opacity 1');
-      assert.equal(objects[1].fill, 'rgba(0,255,0,0.25)', 'first circle has opacity 0.5 from rgba and 0.5 from gtoup fill opacity');
+      assert.equal(objects[1].fill, 'rgba(0,255,0,0.25)', 'first circle has opacity 0.5 from rgba and 0.5 from group fill opacity');
       assert.equal(objects[1].fillOpacity, 0.5,'first circle has fill-opacity 0.5');
       assert.equal(objects[2].fill, 'rgba(255,0,0,0.5)', 'first circle has opacity 0.5 from group fill opacity');
       assert.equal(objects[2].fillOpacity, 0.5,'first circle has fill-opacity 0.5');

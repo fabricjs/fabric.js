@@ -42,7 +42,7 @@
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
     cObj.setupState();
-    //eqaul(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
+    //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray[0] = 2;
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
@@ -56,7 +56,7 @@
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
     cObj.setupState();
-    //eqaul(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
+    //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray = null;
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in array without throwing');

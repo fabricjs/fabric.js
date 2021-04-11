@@ -200,7 +200,7 @@
 
     /**
      * Returns object representation of an instance
-     * @methd toObject
+     * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */

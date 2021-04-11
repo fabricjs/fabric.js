@@ -44,7 +44,9 @@
     skewX:                    0,
     skewY:                    0,
     charSpacing:              0,
-    styles:                     { }
+    styles:                     { },
+    strokeUniform:            false,
+    path:                     null,
   };
 
 

@@ -238,7 +238,7 @@
         offsetX += object.width / 2;
         offsetY += object.height / 2;
       }
-      if (object.type === 'path') {
+      if (object.type === 'path' && this.gradientUnits !== 'percentage') {
         offsetX -= object.pathOffset.x;
         offsetY -= object.pathOffset.y;
       }
@@ -360,7 +360,7 @@
      * @param {SVGGradientElement} el SVG gradient element
      * @param {fabric.Object} instance
      * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
-     * @param {Object} svgOptions an object containing the size of the SVG in order to parse correctly graidents
+     * @param {Object} svgOptions an object containing the size of the SVG in order to parse correctly gradients
      * that uses gradientUnits as 'userSpaceOnUse' and percentages.
      * @param {Object.number} viewBoxWidth width part of the viewBox attribute on svg
      * @param {Object.number} viewBoxHeight height part of the viewBox attribute on svg

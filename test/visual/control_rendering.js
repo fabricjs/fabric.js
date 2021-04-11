@@ -116,7 +116,7 @@
   }
 
   tests.push({
-    test: 'circle corners greem',
+    test: 'circle corners green',
     code: circleControls,
     golden: 'controls4.png',
     percentage: 0.02,

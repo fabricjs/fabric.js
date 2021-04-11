@@ -34,7 +34,7 @@
 
     /**
      * Start angle of the circle, moving clockwise
-     * deprectated type, this should be in degree, this was an oversight.
+     * deprecated type, this should be in degree, this was an oversight.
      * probably will change to degrees in next major version
      * @type Number
      * @default 0
@@ -43,7 +43,7 @@
 
     /**
      * End angle of the circle
-     * deprectated type, this should be in degree, this was an oversight.
+     * deprecated type, this should be in degree, this was an oversight.
      * probably will change to degrees in next major version
      * @type Number
      * @default 2Pi

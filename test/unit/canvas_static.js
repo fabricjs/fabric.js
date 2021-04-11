@@ -23,7 +23,7 @@
                   ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
                   ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-                  '13.99], ["z", null]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
+                  '13.99], ["z"]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
 
   var PATH_WITHOUT_DEFAULTS_JSON = '{"version":"' + fabric.version + '","objects": [{"type": "path", "version":"' + fabric.version + '", "left": 268, "top": 266, "width": 51, "height": 49, "path": [["M", 18.511, 13.99],' +
                   ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
@@ -38,20 +38,20 @@
                   ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
                   ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-                  '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
+                  '13.99], ["z"]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
   var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
   var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   var RECT_JSON_WITH_PADDING = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
-                               '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                               '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                                '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
 
@@ -102,11 +102,12 @@
     fillRule: 'nonzero',
     paintFirst: 'fill',
     globalCompositeOperation: 'source-over',
-    crossOrigin: '',
+    crossOrigin: null,
     skewX: 0,
     skewY: 0,
     cropX: 0,
-    cropY: 0
+    cropY: 0,
+    strokeUniform: false
   };
 
   function _createImageElement() {
@@ -1621,6 +1622,25 @@
     canvas.setViewportTransform(vpt);
     assert.deepEqual(canvas.viewportTransform, vpt, 'viewport now is the set one');
     canvas.viewportTransform = fabric.StaticCanvas.prototype.viewportTransform;
+  });
+
+  QUnit.test('setViewportTransform calls objects setCoords', function(assert) {
+    var vpt = [2, 0, 0, 2, 50, 50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var rect = new fabric.Rect({ width: 10, heigth: 10 });
+    var rectBg = new fabric.Rect({ width: 10, heigth: 10 });
+    var rectOverlay = new fabric.Rect({ width: 10, heigth: 10 });
+    canvas.add(rect);
+    canvas.cancelRequestedRender();
+    canvas.backgroundImage = rectBg;
+    canvas.overlayImage = rectOverlay;
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0,0), 'rect linecoords are set for normal viewport');
+    assert.equal(rectBg.lineCoords, undefined, 'rectBg linecoords are not set');
+    assert.equal(rectOverlay.lineCoords, undefined, 'rectOverlay linecoords are not set');
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(50,50), 'rect linecoords are set');
+    assert.deepEqual(rectBg.lineCoords.tl,  new fabric.Point(0,0), 'rectBg linecoords are set');
+    assert.deepEqual(rectOverlay.lineCoords.tl,  new fabric.Point(0,0), 'rectOverlay linecoords are set');
   });
 
   QUnit.test('getZoom', function(assert) {

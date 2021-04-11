@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="yes"?>
+<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 10 315
+           l 100 -100
+           a 30 50 0 0 1 62.55 -72.45
+           l 20 -30
+           a 30 50 -45 0 1 115.1 -10.9
+           l 5 10 z" stroke="black" fill="green" stroke-width="2" fill-opacity="0.5"/>
+</svg>

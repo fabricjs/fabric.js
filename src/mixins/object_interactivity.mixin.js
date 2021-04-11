@@ -31,8 +31,8 @@
         }
 
         lines = this._getImageLines(forTouch ? this.oCoords[i].touchCorner : this.oCoords[i].corner);
-        // debugging
-
+        // // debugging
+        //
         // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
         // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
         //
@@ -73,59 +73,14 @@
      * @private
      */
     _setCornerCoords: function() {
-      var coords = this.oCoords,
-          newTheta = degreesToRadians(45 - this.angle),
-          cosTheta = fabric.util.cos(newTheta),
-          sinTheta = fabric.util.sin(newTheta),
-          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
-          /* 0.707106 stands for sqrt(2)/2 */
-          cornerHypotenuse = this.cornerSize * 0.707106,
-          touchHypotenuse = this.touchCornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * cosTheta,
-          sinHalfOffset = cornerHypotenuse * sinTheta,
-          touchCosHalfOffset = touchHypotenuse * cosTheta,
-          touchSinHalfOffset = touchHypotenuse * sinTheta,
-          x, y;
+      var coords = this.oCoords;
 
       for (var control in coords) {
-        x = coords[control].x;
-        y = coords[control].y;
-        coords[control].corner = {
-          tl: {
-            x: x - sinHalfOffset,
-            y: y - cosHalfOffset
-          },
-          tr: {
-            x: x + cosHalfOffset,
-            y: y - sinHalfOffset
-          },
-          bl: {
-            x: x - cosHalfOffset,
-            y: y + sinHalfOffset
-          },
-          br: {
-            x: x + sinHalfOffset,
-            y: y + cosHalfOffset
-          }
-        };
-        coords[control].touchCorner = {
-          tl: {
-            x: x - touchSinHalfOffset,
-            y: y - touchCosHalfOffset
-          },
-          tr: {
-            x: x + touchCosHalfOffset,
-            y: y - touchSinHalfOffset
-          },
-          bl: {
-            x: x - touchCosHalfOffset,
-            y: y + touchSinHalfOffset
-          },
-          br: {
-            x: x + touchSinHalfOffset,
-            y: y + touchCosHalfOffset
-          }
-        };
+        var controlObject = this.controls[control];
+        coords[control].corner = controlObject.calcCornerCoords(
+          this.angle, this.cornerSize, coords[control].x, coords[control].y, false);
+        coords[control].touchCorner = controlObject.calcCornerCoords(
+          this.angle, this.touchCornerSize, coords[control].x, coords[control].y, true);
       }
     },
 

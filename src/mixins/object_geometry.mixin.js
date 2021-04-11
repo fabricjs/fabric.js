@@ -193,12 +193,13 @@
         return false;
       }
       var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      var points = this.getCoords(true, calculate), point;
-      for (var i = 0; i < 4; i++) {
-        point = points[i];
-        if (point.x <= pointBR.x && point.x >= pointTL.x && point.y <= pointBR.y && point.y >= pointTL.y) {
-          return true;
-        }
+      var points = this.getCoords(true, calculate);
+      // if some point is on screen, the object is on screen.
+      if (points.some(function(point) {
+        return point.x <= pointBR.x && point.x >= pointTL.x &&
+        point.y <= pointBR.y && point.y >= pointTL.y;
+      })) {
+        return true;
       }
       // no points on screen, check intersection with absolute coordinates
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
@@ -238,7 +239,11 @@
       if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
         return true;
       }
-      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      var allPointsAreOutside = this.getCoords(true, calculate).every(function(point) {
+        return (point.x >= pointBR.x || point.x <= pointTL.x) &&
+        (point.y >= pointBR.y || point.y <= pointTL.y);
+      });
+      return allPointsAreOutside && this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
@@ -509,7 +514,7 @@
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height.
+     * Sets corner and controls position coordinates based on current angle, width and height, left and top.
      * oCoords are used to find the corners
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.
@@ -520,7 +525,9 @@
      */
     setCoords: function(skipCorners) {
       this.aCoords = this.calcACoords();
-      this.lineCoords = this.calcLineCoords();
+      // in case we are in a group, for how the inner group target check works,
+      // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
+      this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
       if (skipCorners) {
         return this;
       }

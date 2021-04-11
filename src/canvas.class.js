@@ -15,10 +15,6 @@
    * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:modified at the end of a transform or any change when statefull is true
-   * @fires object:rotated at the end of a rotation transform
-   * @fires object:scaled at the end of a scale transform
-   * @fires object:moved at the end of translation transform
-   * @fires object:skewed at the end of a skew transform
    * @fires object:rotating while an object is being rotated from the control
    * @fires object:scaling while an object is being scaled by controls
    * @fires object:moving while an object is being dragged
@@ -48,6 +44,11 @@
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
+   * the following events are deprecated:
+   * @fires object:rotated at the end of a rotation transform
+   * @fires object:scaled at the end of a scale transform
+   * @fires object:moved at the end of translation transform
+   * @fires object:skewed at the end of a skew transform
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -269,7 +270,11 @@
     targetFindTolerance:    0,
 
     /**
-     * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
+     * When true, target detection is skipped. Target detection will return always undefined.
+     * click selection won't work anymore, events will fire with no targets.
+     * if something is selected before setting it to true, it will be deselected at the first click.
+     * area selection will still work. check the `selection` property too.
+     * if you deactivate both, you should look into staticCanvas.
      * @type Boolean
      * @default
      */
@@ -450,29 +455,6 @@
     },
 
     /**
-     * Checks if point is contained within an area of given object
-     * @param {Event} e Event object
-     * @param {fabric.Object} target Object to test against
-     * @param {Object} [point] x,y object of point coordinates we want to check.
-     * @return {Boolean} true if point is contained within an area of given object
-     */
-    containsPoint: function (e, target, point) {
-      var ignoreZoom = true,
-          pointer = point || this.getPointer(e, ignoreZoom),
-          xy, isTouch = e ? isTouchEvent(e) : false;
-
-      if (target.group && target.group === this._activeObject && target.group.type === 'activeSelection') {
-        xy = this._normalizePointer(target.group, pointer);
-      }
-      else {
-        xy = { x: pointer.x, y: pointer.y };
-      }
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || !!target._findTargetCorner(pointer, isTouch));
-    },
-
-    /**
      * @private
      */
     _normalizePointer: function (object, pointer) {
@@ -515,13 +497,6 @@
       target.render(ctx);
       ctx.restore();
 
-      target === this._activeObject && target._renderControls(ctx, {
-        hasBorders: false,
-        transparentCorners: false
-      }, {
-        hasBorders: false,
-      });
-
       target.selectionBackgroundColor = originalColor;
 
       var isTransparent = fabric.util.isTransparent(
@@ -531,7 +506,7 @@
     },
 
     /**
-     * takes an event and determins if selection key has been pressed
+     * takes an event and determines if selection key has been pressed
      * @private
      * @param {Event} e Event object
      */
@@ -584,6 +559,7 @@
      * @private
      * @param {fabric.Object} target
      * @param {String} action
+     * @param {Boolean} altKey
      */
     _shouldCenterTransform: function (target, action, altKey) {
       if (!target) {
@@ -592,7 +568,7 @@
 
       var centerTransform;
 
-      if (action === 'scale' || action === 'scaleX' || action === 'scaleY') {
+      if (action === 'scale' || action === 'scaleX' || action === 'scaleY' || action === 'resizing') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
       else if (action === 'rotate') {
@@ -625,10 +601,6 @@
       else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
         origin.y = 'top';
       }
-      else if (corner === 'mtr') {
-        origin.x = 'center';
-        origin.y = 'center';
-      }
       return origin;
     },
 
@@ -658,7 +630,9 @@
       }
 
       var pointer = this.getPointer(e), corner = target.__corner,
-          actionHandler = !!corner && target.controls[corner].getActionHandler(),
+          control = target.controls[corner],
+          actionHandler = (alreadySelected && corner) ?
+            control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
@@ -699,26 +673,6 @@
       transform.original.originY = origin.y;
       this._currentTransform = transform;
       this._beforeTransform(e);
-    },
-
-    /**
-     * Translates object by "setting" its left/top
-     * @private
-     * @param {Number} x pointer's x coordinate
-     * @param {Number} y pointer's y coordinate
-     * @return {Boolean} true if the translation occurred
-     */
-    _translateObject: function (x, y) {
-      var transform = this._currentTransform,
-          target = transform.target,
-          newLeft = x - transform.offsetX,
-          newTop = y - transform.offsetY,
-          moveX = !target.get('lockMovementX') && target.left !== newLeft,
-          moveY = !target.get('lockMovementY') && target.top !== newTop;
-
-      moveX && target.set('left', newLeft);
-      moveY && target.set('top', newTop);
-      return moveX || moveY;
     },
 
     /**
@@ -804,18 +758,19 @@
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
           activeTarget, activeTargetSubs,
-          isTouch = isTouchEvent(e);
+          isTouch = isTouchEvent(e),
+          shouldLookForActive = (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
 
       // first check current group (if one exists)
       // active group does not check sub targets like normal groups.
       // if active group just exits.
       this.targets = [];
 
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      // if we hit the corner of an activeObject, let's return that.
+      if (shouldLookForActive && activeObject._findTargetCorner(pointer, isTouch)) {
         return activeObject;
       }
-      // if we hit the corner of an activeObject, let's return that.
-      if (aObjects.length === 1 && activeObject._findTargetCorner(pointer, isTouch)) {
+      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
@@ -849,7 +804,10 @@
       if (obj &&
           obj.visible &&
           obj.evented &&
-          this.containsPoint(null, obj, pointer)) {
+          // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
+          // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+          obj.containsPoint(pointer)
+      ) {
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, globalPointer.x, globalPointer.y);
           if (!isTransparent) {
@@ -876,7 +834,7 @@
       // until we call this function specifically to search inside the activeGroup
       while (i--) {
         var objToCheck = objects[i];
-        var pointerToUse = objToCheck.group && objToCheck.group.type !== 'activeSelection' ?
+        var pointerToUse = objToCheck.group ?
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
@@ -1124,38 +1082,50 @@
      */
     _fireSelectionEvents: function(oldObjects, e) {
       var somethingChanged = false, objects = this.getActiveObjects(),
-          added = [], removed = [], opt = { e: e };
+          added = [], removed = [];
       oldObjects.forEach(function(oldObject) {
         if (objects.indexOf(oldObject) === -1) {
           somethingChanged = true;
-          oldObject.fire('deselected', opt);
+          oldObject.fire('deselected', {
+            e: e,
+            target: oldObject
+          });
           removed.push(oldObject);
         }
       });
       objects.forEach(function(object) {
         if (oldObjects.indexOf(object) === -1) {
           somethingChanged = true;
-          object.fire('selected', opt);
+          object.fire('selected', {
+            e: e,
+            target: object
+          });
           added.push(object);
         }
       });
       if (oldObjects.length > 0 && objects.length > 0) {
-        opt.selected = added;
-        opt.deselected = removed;
-        // added for backward compatibility
-        opt.updated = added[0] || removed[0];
-        opt.target = this._activeObject;
-        somethingChanged && this.fire('selection:updated', opt);
+        somethingChanged && this.fire('selection:updated', {
+          e: e,
+          selected: added,
+          deselected: removed,
+          // added for backward compatibility
+          // deprecated
+          updated: added[0] || removed[0],
+          target: this._activeObject,
+        });
       }
       else if (objects.length > 0) {
-        opt.selected = added;
-        // added for backward compatibility
-        opt.target = this._activeObject;
-        this.fire('selection:created', opt);
+        this.fire('selection:created', {
+          e: e,
+          selected: added,
+          target: this._activeObject,
+        });
       }
       else if (oldObjects.length > 0) {
-        opt.deselected = removed;
-        this.fire('selection:cleared', opt);
+        this.fire('selection:cleared', {
+          e: e,
+          deselected: removed,
+        });
       }
     },
 
@@ -1174,6 +1144,10 @@
     },
 
     /**
+     * This is a private method for now.
+     * This is supposed to be equivalent to setActiveObject but without firing
+     * any event. There is commitment to have this stay this way.
+     * This is the functional part of setActiveObject.
      * @private
      * @param {Object} object to set as active
      * @param {Event} [e] Event (passed along when firing "object:selected")
@@ -1194,6 +1168,13 @@
     },
 
     /**
+     * This is a private method for now.
+     * This is supposed to be equivalent to discardActiveObject but without firing
+     * any events. There is commitment to have this stay this way.
+     * This is the functional part of discardActiveObject.
+     * @param {Event} [e] Event (passed along when firing "object:deselected")
+     * @param {Object} object to set as active
+     * @return {Boolean} true if the selection happened
      * @private
      */
     _discardActiveObject: function(e, object) {
@@ -1304,7 +1285,7 @@
         layoutProps.forEach(function(prop) {
           originalValues[prop] = instance[prop];
         });
-        this._activeObject.realizeTransform(instance);
+        fabric.util.addTransformToObject(instance, this._activeObject.calcOwnMatrix());
         return originalValues;
       }
       else {
