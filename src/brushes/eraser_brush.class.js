@@ -30,12 +30,6 @@
         default:
           return _proto.get.call(this, key);
       }
-    },
-
-    renderAll: function () {
-      if (this.freeDrawingBrush && this.freeDrawingBrush.isType('eraser') && !this.freeDrawingBrush.render()) {
-        _proto.renderAll.call(this);
-      }
     }
   });
 
@@ -47,6 +41,26 @@
    * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
    * This achieves the desired effect of seeming to erase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * 
+   * 
+/**
+       *
+       * Drawable logic is as follows:
+       * For background drawables:
+       * 1. erasable = true:
+       *    we need to remove the drawable from the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
+       * 2. erasable = false:
+       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
+       *
+       * For overlay drawables:
+       * Must draw on top ctx to be on top of visible canvas that is drawn on top ctx
+       * 1. erasable = true:
+       *    we need to draw the drawable on the top ctx as a normal object
+       * 2. erasable = false:
+       *    we need to draw the drawable on top of the brush, meaning we need to repaint for every stroke
+       *
+       * @param {fabric.Canvas} canvas
+       
    * 
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
@@ -129,6 +143,10 @@
         this._ready = true;
       },
 
+      /**
+       * Used to hide a drawable from the rendering process
+       * @param {fabric.Object} object 
+       */
       hideObject(object) {
         if (object) {
           object._originalOpacity = object.opacity;
@@ -136,6 +154,11 @@
         }
       },
 
+      /**
+       * Restores hiding an object 
+       * {@link favric.EraserBrush#hideObject}
+       * @param {fabric.Object} object
+       */
       restoreObjectVisibility(object) {
         if (object && object._originalOpacity) {
           object.set({ opacity: object._originalOpacity });
@@ -143,8 +166,14 @@
         }
       },
 
+      
+
       /**
-       * 
+       * Drawing Logic For background drawables (`backgroundImage`, `backgroundColor`)
+       * 1. if erasable = true:
+       *    we need to hide the drawable on the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
+       * 2. if erasable = false:
+       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
        * @param {'bottom' | 'top' | 'overlay'} layer
        */
       prepareCanvasBackgroundForLayer: function (layer) {
@@ -162,6 +191,13 @@
       },
 
       /**
+       * Drawing Logic For overlay drawables (`overlayImage`, `overlayColor`)
+       * We must draw on top ctx to be on top of visible canvas (which is drawn on top ctx)
+       * 1. if erasable = true:
+       *    we need to draw the drawable on the top ctx as a normal object
+       * 2. if erasable = false:
+       *    we need to draw the drawable on top of the brush,
+       *    this means we need to repaint for every stroke
        * 
        * @param {'bottom' | 'top' | 'overlay'} layer
        * @returns boolean render overlay above brush
@@ -187,7 +223,7 @@
       },
 
       /**
-       * 
+       * @private
        * @param {'bottom' | 'top' | 'overlay'} layer 
        * @returns boolean render overlay above brush
        */
@@ -196,6 +232,9 @@
         return this.prepareCanvasOverlayForLayer(layer);
       },
 
+      /**
+       * @private
+       */
       restoreCanvasDrawables: function () {
         var canvas = this.canvas;
         this.restoreObjectVisibility(canvas.get('backgroundImage'));
@@ -204,6 +243,9 @@
         this.restoreObjectVisibility(canvas.get('overlayColor'));
       },
 
+      /**
+       * render all non erasable objects on bottom layer with the exception of overlays
+       */
       renderBottomLayer: function () {
         var canvas = this.canvas;
         this.prepareCanvasForLayer('bottom');
@@ -216,6 +258,9 @@
         this.restoreCanvasDrawables();
       },
 
+      /**
+       * render all erasable objects on top layer
+       */
       renderTopLayer: function () {
         var canvas = this.canvas;
         this._drawOverlayOnTop = this.prepareCanvasForLayer('top');
@@ -227,6 +272,9 @@
         this.restoreCanvasDrawables();
       },
 
+      /**
+       * render all non-erasable overlays on top of the brush so that they won't get erased
+       */
       renderOverlay: function () {
         this.prepareCanvasForLayer('overlay');
         var canvas = this.canvas;
@@ -246,6 +294,10 @@
         ctx.globalCompositeOperation = "destination-out";
       },
 
+      /**
+       * we indicate {@link fabric.PencilBrush} to repaint itself if necessary
+       * @returns 
+       */
       needsFullRender: function () {
         return this.callSuper("needsFullRender") || this._drawOverlayOnTop;
       },
@@ -272,21 +324,12 @@
       },
 
       /**
-       *
-       * Drawable logic is as follows:
-       * For background drawables:
-       * 1. erasable = true:
-       *    we need to remove the drawable from the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
-       * 2. erasable = false:
-       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
-       *
-       * For overlay drawables:
-       * Must draw on top ctx to be on top of visible canvas that is drawn on top ctx
-       * 1. erasable = true:
-       *    we need to draw the drawable on the top ctx as a normal object
-       * 2. erasable = false:
-       *    we need to draw the drawable on top of the brush, meaning we need to repaint for every stroke
-       *
+       * Rendering is done in 4 steps:
+       * 1. Draw all non-erasable objects on bottom ctx with the exception of overlay
+       * 2. Draw all erasable objects on top ctx
+       * 3. Draw eraser
+       * 4. Draw non-erasable overlay
+       * 
        * @param {fabric.Canvas} canvas
        */
       _render: function () {
@@ -315,7 +358,7 @@
 
       /**
        * Adds path to existing clipPath of object
-       * @private
+       * 
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
