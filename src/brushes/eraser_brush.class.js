@@ -33,6 +33,16 @@
     }
   });
 
+  fabric.util.object.extend(fabric.Object.prototype, {
+    /**
+     * 
+     * @returns fabric.EraserPath | null
+     */
+    getEraser: function () {
+      return this.clipPath.isType("eraserPath") ? this.clipPath : null;
+    }
+  });
+
   /**
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
