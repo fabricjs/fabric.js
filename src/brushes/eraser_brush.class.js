@@ -36,31 +36,13 @@
   /**
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
-   * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx using a clone of the main canvas
-   * while the entire canvas is rendered on the top ctx. Canvas bakground/overlay image/color is handled as well, see {@link fabric.EraserBrush#prepareCanvasForDrawingBottomLayer}.
+   * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx
+   * while the entire canvas is rendered on the top ctx. 
+   * Canvas bakground/overlay image/color are handled as well.
    * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
    * This achieves the desired effect of seeming to erase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
    * 
-   * 
-/**
-       *
-       * Drawable logic is as follows:
-       * For background drawables:
-       * 1. erasable = true:
-       *    we need to remove the drawable from the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
-       * 2. erasable = false:
-       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
-       *
-       * For overlay drawables:
-       * Must draw on top ctx to be on top of visible canvas that is drawn on top ctx
-       * 1. erasable = true:
-       *    we need to draw the drawable on the top ctx as a normal object
-       * 2. erasable = false:
-       *    we need to draw the drawable on top of the brush, meaning we need to repaint for every stroke
-       *
-       * @param {fabric.Canvas} canvas
-       
    * 
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
