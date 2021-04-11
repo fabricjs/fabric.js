@@ -247,7 +247,8 @@
       },
 
       /**
-       * 1. render all erasable objects on top layer
+       * 1. render all objects on top layer, erasable and non-erasable
+       *    This is important for cases such as overlapping objects, the background object erasable and the foreground object not erasable.
        * 2. render the brush
        */
       renderTopLayer: function () {
@@ -315,7 +316,7 @@
       /**
        * Rendering is done in 4 steps:
        * 1. Draw all non-erasable objects on bottom ctx with the exception of overlays {@link fabric.EraserBrush#renderBottomLayer}
-       * 2. Draw all erasable objects on top ctx {@link fabric.EraserBrush#renderTopLayer}
+       * 2. Draw all objects on top ctx including relevant drawables {@link fabric.EraserBrush#renderTopLayer}
        * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
        * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
        * 
