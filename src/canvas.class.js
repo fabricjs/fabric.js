@@ -408,6 +408,10 @@
       return objsToRender;
     },
 
+    isErasing: function () {
+      return this.isDrawingMode && this.freeDrawingBrush && this.freeDrawingBrush.type === 'eraser' && this.freeDrawingBrush._isErasing;
+    },
+
     /**
      * Renders both the top canvas and the secondary container canvas.
      * @return {fabric.Canvas} instance
@@ -417,6 +421,11 @@
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
+      }
+      // while erasing the brush is in charge of rendering the canvas so we return
+      if (this.isErasing()) {
+        this.freeDrawingBrush._render();
+        return;
       }
       if (this.hasLostContext) {
         this.renderTopLayer(this.contextTop);
