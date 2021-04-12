@@ -93,8 +93,22 @@
        */
       forCanvasDrawables: function (callback) {
         var _this = this;
-        callback.call(_this, 'background', 'backgroundImage', 'setBackgroundImage', 'backgroundColor', 'setBackgroundColor');
-        callback.call(_this, 'overlay', 'overlayImage', 'setOverlayImage', 'overlayColor', 'setOverlayColor');
+        callback.call(
+          _this,
+          'background',
+          'backgroundImage',
+          'setBackgroundImage',
+          'backgroundColor',
+          'setBackgroundColor'
+        );
+        callback.call(
+          _this,
+          'overlay',
+          'overlayImage',
+          'setOverlayImage',
+          'overlayColor',
+          'setOverlayColor'
+        );
       },
 
       /**
@@ -413,7 +427,9 @@
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
 
-        var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join('') : 'M 0 0 Q 0 0 0 0 L 0 0';
+        var pathData = this._points && this._points.length > 1 ?
+          this.convertPointsToSVGPath(this._points).join('') :
+          'M 0 0 Q 0 0 0 0 L 0 0';
         if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
           canvas.fire('erasing:end');
           // do not create 0 width/height paths, as they are
@@ -485,7 +501,7 @@
       this._objects = objects || [];
       this._objects.forEach(function (p) {
         p.path.set({ globalCompositeOperation: 'destination-out' });
-      })
+      });
     },
 
     /**
@@ -508,7 +524,7 @@
         m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         o.path.render(ctx);
         ctx.restore();
-      })
+      });
     },
 
     addPath: function (path, transformMatrix) {
