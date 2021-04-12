@@ -9,21 +9,21 @@
     get: function (key) {
       var drawableKey = key;
       switch (key) {
-        case "backgroundImage":
+        case 'backgroundImage':
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('image')[0] :
             _proto.get.call(this, key);
-        case "backgroundColor":
-          drawableKey = "backgroundImage";
+        case 'backgroundColor':
+          drawableKey = 'backgroundImage';
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('rect')[0] :
             _proto.get.call(this, key);
-        case "overlayImage":
+        case 'overlayImage':
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('image')[0] :
             _proto.get.call(this, key);
-        case "overlayColor":
-          drawableKey = "overlayImage";
+        case 'overlayColor':
+          drawableKey = 'overlayImage';
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('rect')[0] :
             _proto.get.call(this, key);
@@ -39,7 +39,7 @@
      * @returns fabric.EraserPath | null
      */
     getEraser: function () {
-      return this.clipPath.isType("eraserPath") ? this.clipPath : null;
+      return this.clipPath.isType('eraserPath') ? this.clipPath : null;
     }
   });
 
@@ -60,7 +60,7 @@
   fabric.EraserBrush = fabric.util.createClass(
     fabric.PencilBrush,
     /** @lends fabric.EraserBrush.prototype */ {
-      type: "eraser",
+      type: 'eraser',
 
       /**
        * Indicates that the ctx is ready and rendering can begin.
@@ -165,11 +165,11 @@
        * @param {'bottom' | 'top' | 'overlay'} layer
        */
       prepareCanvasBackgroundForLayer: function (layer) {
-        if (layer === "overlay") return;
+        if (layer === 'overlay') return;
         var canvas = this.canvas;
         var image = canvas.get('backgroundImage');
         var color = canvas.get('backgroundColor');
-        var erasablesOnLayer = layer === "top";
+        var erasablesOnLayer = layer === 'top';
         if (image && image.erasable === !erasablesOnLayer) {
           this.hideObject(image);
         }
@@ -194,12 +194,12 @@
         var canvas = this.canvas;
         var image = canvas.get('overlayImage');
         var color = canvas.get('overlayColor');
-        if (layer === "bottom") {
+        if (layer === 'bottom') {
           this.hideObject(image);
           this.hideObject(color);
           return false;
         };
-        var erasablesOnLayer = layer === "top";
+        var erasablesOnLayer = layer === 'top';
         var renderOverlayOnTop = (image && !image.erasable) || (color && !color.erasable);
         if (image && image.erasable === !erasablesOnLayer) {
           this.hideObject(image);
@@ -280,8 +280,8 @@
        * @param {CanvasRenderingContext2D} ctx
        */
       _saveAndTransform: function (ctx) {
-        this.callSuper("_saveAndTransform", ctx);
-        ctx.globalCompositeOperation = "destination-out";
+        this.callSuper('_saveAndTransform', ctx);
+        ctx.globalCompositeOperation = 'destination-out';
       },
 
       /**
@@ -289,7 +289,7 @@
        * @returns 
        */
       needsFullRender: function () {
-        return this.callSuper("needsFullRender") || this._drawOverlayOnTop;
+        return this.callSuper('needsFullRender') || this._drawOverlayOnTop;
       },
 
       /**
@@ -413,8 +413,8 @@
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
 
-        var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join("") : "M 0 0 Q 0 0 0 0 L 0 0";
-        if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
+        var pathData = this._points && this._points.length > 1 ? this.convertPointsToSVGPath(this._points).join('') : 'M 0 0 Q 0 0 0 0 L 0 0';
+        if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
           canvas.fire('erasing:end');
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
@@ -425,7 +425,7 @@
         }
 
         var path = this.createPath(pathData);
-        canvas.fire("before:path:created", { path: path });
+        canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
         this.applyEraserToCanvas(path);
@@ -443,7 +443,7 @@
         this._resetShadow();
 
         // fire event 'path' created
-        canvas.fire("path:created", { path: path });
+        canvas.fire('path:created', { path: path });
       }
     }
   );
@@ -455,7 +455,7 @@
    * {@link fabric.EraserPath} is a workaround for clipping paths that are strokes and not fills.
    * Clipping is done with the fill of the clip path, so to enable clipping out paths by their stroke and achieving an eraser effect, 
    * {@link fabric.EraserPath} fills a rect where the object that it needs to clip is drawn.
-   * Then it draws the paths drawn by {@link fabric.EraserBrush} onto the rect in `globalCompositionMode = "destination-out"`. 
+   * Then it draws the paths drawn by {@link fabric.EraserBrush} onto the rect in `globalCompositionMode = 'destination-out'`. 
    * This removes the paths from the drawn rect resulting is a rect that has been erased.
    * 
    * {@link fabric.EraserPath} is attached to it's owning object as a clip path. 
@@ -484,7 +484,7 @@
       }));
       this._objects = objects || [];
       this._objects.forEach(function (p) {
-        p.path.set({ globalCompositeOperation: "destination-out" });
+        p.path.set({ globalCompositeOperation: 'destination-out' });
       })
     },
 
@@ -512,7 +512,7 @@
     },
 
     addPath: function (path, transformMatrix) {
-      path.set({ globalCompositeOperation: "destination-out" });
+      path.set({ globalCompositeOperation: 'destination-out' });
       this._objects.push({ path: path, transformMatrix: transformMatrix });
       this.dirty = true;
     },
