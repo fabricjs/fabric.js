@@ -165,7 +165,6 @@ var filesToInclude = [
   ifSpecifiedInclude('freedrawing', 'src/brushes/circle_brush.class.js'),
   ifSpecifiedInclude('freedrawing', 'src/brushes/spray_brush.class.js'),
   ifSpecifiedInclude('freedrawing', 'src/brushes/pattern_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'src/brushes/eraser_brush.class.js'),
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
@@ -233,6 +232,9 @@ var filesToInclude = [
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
+
+  //  extends fabric.StaticCanvas and fabric.Object, depends on fabric.PencilBrush and fabric.Rect
+  ifSpecifiedInclude('freedrawing', 'src/brushes/eraser_brush.class.js'),
 ];
 
 if (buildMinified) {
