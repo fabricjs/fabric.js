@@ -1,5 +1,5 @@
 (function () {
-  var _proto = fabric.util.object.clone(fabric.StaticCanvas.prototype);
+  var _get = fabric.StaticCanvas.prototype.get;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * See {@link fabric.EraserBrush#prepareCanvas}
@@ -12,23 +12,23 @@
         case 'backgroundImage':
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('image')[0] :
-            _proto.get.call(this, key);
+            _get.call(this, key);
         case 'backgroundColor':
           drawableKey = 'backgroundImage';
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('rect')[0] :
-            _proto.get.call(this, key);
+            _get.call(this, key);
         case 'overlayImage':
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('image')[0] :
-            _proto.get.call(this, key);
+            _get.call(this, key);
         case 'overlayColor':
           drawableKey = 'overlayImage';
           return this[drawableKey] && this[drawableKey].isType('group') ?
             this[drawableKey].getObjects('rect')[0] :
-            _proto.get.call(this, key);
+            _get.call(this, key);
         default:
-          return _proto.get.call(this, key);
+          return _get.call(this, key);
       }
     }
   });
