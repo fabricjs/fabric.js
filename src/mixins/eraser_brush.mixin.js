@@ -69,7 +69,7 @@
       return (
         this.isDrawingMode &&
         this.freeDrawingBrush &&
-        this.freeDrawingBrush.type === "eraser" &&
+        this.freeDrawingBrush.type === 'eraser' &&
         this.freeDrawingBrush._isErasing
       );
     },
@@ -236,7 +236,9 @@
        * @param {'bottom' | 'top' | 'overlay'} layer
        */
       prepareCanvasBackgroundForLayer: function (layer) {
-        if (layer === 'overlay') return;
+        if (layer === 'overlay') {
+          return;
+        }
         var canvas = this.canvas;
         var image = canvas.get('backgroundImage');
         var color = canvas.get('backgroundColor');
@@ -394,7 +396,9 @@
        * @param {fabric.Canvas} canvas
        */
       _render: function () {
-        if (!this._ready) return;
+        if (!this._ready) {
+          return;
+        }
         this.isRendering = 1;
         this.renderBottomLayer();
         this.renderTopLayer();
