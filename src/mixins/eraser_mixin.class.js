@@ -33,15 +33,72 @@
     }
   });
 
+  var toObject = fabric.Object.prototype.toObject;
   fabric.util.object.extend(fabric.Object.prototype, {
+    /**
+     * Indicates whether this object can be erased by {@link fabric.EraserBrush}
+     * @type boolean
+     * @default true
+     */
+    erasable: true,
+
     /**
      * 
      * @returns fabric.EraserPath | null
      */
     getEraser: function () {
       return this.clipPath.isType('eraserPath') ? this.clipPath : null;
+    },
+
+    /**
+     * Returns an object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function (additionalProperties) {
+      return toObject.call(this, ['erasable'].concat(additionalProperties));
     }
   });
+
+  fabric.util.object.extend(fabric.Canvas.prototype, {
+    /**
+     * Used by {@link #renderAll}
+     * @returns boolean
+     */
+    isErasing: function () {
+      return (
+        this.isDrawingMode &&
+        this.freeDrawingBrush &&
+        this.freeDrawingBrush.type === "eraser" &&
+        this.freeDrawingBrush._isErasing
+      );
+    },
+
+    /**
+     * While erasing, the brush is in charge of rendering the canvas
+     * It uses both layers to achieve diserd erasing effect
+     * 
+     * @returns fabric.Canvas
+     */
+    renderAll: function () {
+      if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+        this.clearContext(this.contextTop);
+        this.contextTopDirty = false;
+      }
+      // while erasing the brush is in charge of rendering the canvas so we return
+      if (this.isErasing()) {
+        this.freeDrawingBrush._render();
+        return;
+      }
+      if (this.hasLostContext) {
+        this.renderTopLayer(this.contextTop);
+      }
+      var canvasToDrawOn = this.contextContainer;
+      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+      return this;
+    }
+  });
+
 
   /**
    * EraserBrush class
