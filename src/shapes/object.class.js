@@ -592,7 +592,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
-      'skewX skewY fillRule paintFirst clipPath erasable strokeUniform'
+      'skewX skewY fillRule paintFirst clipPath strokeUniform'
     ).split(' '),
 
     /**
@@ -644,11 +644,6 @@
      * @default false
      */
     absolutePositioned: false,
-
-    /**
-     * Indicates whether this object can be erased by @class fabric.EraserBrush
-     */
-    erasable: true,
 
     /**
      * Constructor
@@ -870,8 +865,7 @@
             paintFirst:               this.paintFirst,
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
-            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
-            erasable:                 this.erasable
+            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
           };
 
       if (this.clipPath) {
