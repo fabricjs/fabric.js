@@ -409,10 +409,7 @@
     },
 
     isErasing: function () {
-      return this.isDrawingMode &&
-        this.freeDrawingBrush &&
-        this.freeDrawingBrush.type === 'eraser' &&
-        this.freeDrawingBrush._isErasing;
+      return this.isDrawingMode && this.freeDrawingBrush && this.freeDrawingBrush.type === 'eraser' && this.freeDrawingBrush._isErasing;
     },
 
     /**
