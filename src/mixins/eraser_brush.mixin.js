@@ -47,7 +47,7 @@
      * @returns fabric.EraserPath | null
      */
     getEraser: function () {
-      return this.clipPath.isType('eraserPath') ? this.clipPath : null;
+      return this.clipPath && this.clipPath.isType('eraserPath') ? this.clipPath : null;
     },
 
     /**
@@ -431,7 +431,7 @@
        */
       _addPathToObjectEraser: function (obj, path) {
         var clipObject;
-        if (!obj.eraser) {
+        if (!obj.getEraser()) {
           clipObject = new fabric.EraserPath();
           clipObject.setParent(obj);
         } else {
@@ -447,7 +447,6 @@
         obj.set({
           clipPath: clipObject,
           dirty: true,
-          eraser: true
         });
       },
 
