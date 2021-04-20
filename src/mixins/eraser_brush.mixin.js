@@ -285,16 +285,6 @@
 
       /**
        * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer 
-       * @returns boolean render overlay above brush
-       */
-      prepareCanvasForLayer: function (layer) {
-        this.prepareCanvasBackgroundForLayer(layer);
-        return this.prepareCanvasOverlayForLayer(layer);
-      },
-
-      /**
-       * @private
        */
       restoreCanvasDrawables: function () {
         var canvas = this.canvas;
@@ -305,7 +295,88 @@
       },
 
       /**
-       * render all non-erasable objects on bottom layer with the exception of overlays to avoid being clipped by the brush
+       * @private 
+       * This is designed to support erasing a group with both erasable and non-erasable objects.
+       * Iterates over collections to allow nested selective erasing.
+       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer} 
+       * to prepare the bottom layer by hiding erasable nested objects
+       * 
+       * @param {fabric.Collection} collection 
+       */
+      prepareCollectionTraversal(collection) {
+        var _this = this;
+        collection.forEachObject(function (obj) {
+          if (obj.forEachObject) {
+            _this.prepareCollectionTraversal(obj);
+          } else {
+            if (obj.erasable) {
+              _this.hideObject(obj);
+            }
+          }
+        });
+      },
+
+      /**
+       * @private
+       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer} 
+       * to reverse the action of {@link fabric.EraserBrush#prepareCollectionTraversal}
+       * 
+       * @param {fabric.Collection} collection
+       */
+      restoreCollectionTraversal(collection) {
+        var _this = this;
+        collection.forEachObject(function (obj) {
+          if (obj.forEachObject) {
+            _this.restoreCollectionTraversal(obj);
+          } else {
+            _this.restoreObjectVisibility(obj);
+          }
+        });
+      },
+
+      /**
+       * @private
+       * This is designed to support erasing a group with both erasable and non-erasable objects.
+       * 
+       * @param {'bottom' | 'top' | 'overlay'} layer
+       */
+      prepareCanvasObjectsForLayer: function (layer) {
+        if (layer !== 'bottom') return;
+        this.prepareCollectionTraversal(this.canvas);
+      },
+
+      /**
+       * @private
+       * @param {'bottom' | 'top' | 'overlay'} layer
+       */
+      restoreCanvasObjectsFromLayer: function (layer) {
+        if (layer !== 'bottom') return;
+        this.restoreCollectionTraversal(this.canvas);
+      },
+
+      /**
+       * @private
+       * @param {'bottom' | 'top' | 'overlay'} layer 
+       * @returns boolean render overlay above brush
+       */
+      prepareCanvasForLayer: function (layer) {
+        this.prepareCanvasBackgroundForLayer(layer);
+        this.prepareCanvasObjectsForLayer(layer);
+        return this.prepareCanvasOverlayForLayer(layer);
+      },
+
+      /**
+      * @private
+      * @param {'bottom' | 'top' | 'overlay'} layer
+      */
+      restoreCanvasFromLayer: function (layer) {
+        this.restoreCanvasDrawables();
+        this.restoreCanvasObjectsFromLayer(layer);
+      },
+
+      /**
+       * Render all non-erasable objects on bottom layer with the exception of overlays to avoid being clipped by the brush.
+       * Groups are rendered for nested selective erasing, non-erasable objects are visible while erasable objects are not.
        */
       renderBottomLayer: function () {
         var canvas = this.canvas;
@@ -313,16 +384,16 @@
         canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
-            return !obj.erasable;
+            return !obj.erasable || obj.isType('group');
           })
         );
-        this.restoreCanvasDrawables();
+        this.restoreCanvasFromLayer('bottom');
       },
 
       /**
-       * 1. render all objects on top layer, erasable and non-erasable
+       * 1. Render all objects on top layer, erasable and non-erasable
        *    This is important for cases such as overlapping objects, the background object erasable and the foreground object not erasable.
-       * 2. render the brush
+       * 2. Render the brush
        */
       renderTopLayer: function () {
         var canvas = this.canvas;
@@ -332,11 +403,11 @@
           canvas.getObjects()
         );
         this.callSuper('_render');
-        this.restoreCanvasDrawables();
+        this.restoreCanvasFromLayer('top');
       },
 
       /**
-       * render all non-erasable overlays on top of the brush so that they won't get erased
+       * Render all non-erasable overlays on top of the brush so that they won't get erased
        */
       renderOverlay: function () {
         this.prepareCanvasForLayer('overlay');
@@ -345,7 +416,7 @@
         this._saveAndTransform(ctx);
         canvas._renderOverlay(ctx);
         ctx.restore();
-        this.restoreCanvasDrawables();
+        this.restoreCanvasFromLayer('overlay');
       },
 
       /**
@@ -358,7 +429,7 @@
       },
 
       /**
-       * we indicate {@link fabric.PencilBrush} to repaint itself if necessary
+       * We indicate {@link fabric.PencilBrush} to repaint itself if necessary
        * @returns 
        */
       needsFullRender: function () {
@@ -431,6 +502,16 @@
        */
       _addPathToObjectEraser: function (obj, path) {
         var clipObject;
+        var _this = this;
+        //  object is collection, i.e group
+        if (obj.forEachObject) {
+          obj.forEachObject(function (_obj) {
+            if (_obj.erasable) {
+              _this._addPathToObjectEraser(_obj, path);
+            }
+          });
+          return;
+        }
         if (!obj.getEraser()) {
           clipObject = new fabric.EraserPath();
           clipObject.setParent(obj);
