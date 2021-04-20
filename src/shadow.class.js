@@ -98,9 +98,9 @@
 
       return {
         color: color.trim(),
-        offsetX: parseInt(offsetsAndBlur[1], 10) || 0,
-        offsetY: parseInt(offsetsAndBlur[2], 10) || 0,
-        blur: parseInt(offsetsAndBlur[3], 10) || 0
+        offsetX: parseFloat(offsetsAndBlur[1], 10) || 0,
+        offsetY: parseFloat(offsetsAndBlur[2], 10) || 0,
+        blur: parseFloat(offsetsAndBlur[3], 10) || 0
       };
     },
 
@@ -190,6 +190,6 @@
    * @memberOf fabric.Shadow
    */
   // eslint-disable-next-line max-len
-  fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
+  fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -1,5 +1,8 @@
 # Changelog
 
+## [NEXT]
+- fix(fabric.Shadow): `offsetX`, `offsetY` and `blur` supports float [#7019](https://github.com/fabricjs/fabric.js/pull/7019)
+
 ## [4.4.0]
 
 - fix(fabric.Object) wrong variable name `cornerStrokeColor ` [#6981](https://github.com/fabricjs/fabric.js/pull/6981)
