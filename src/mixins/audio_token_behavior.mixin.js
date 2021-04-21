@@ -9,7 +9,7 @@
       this.initAddedHandler();
       this.initRemovedHandler();
       this.initMousedownHandler();
-      this.initMouseupHandler();
+ //     this.initMouseupHandler();
     },
 
     onDeselect: function() {
@@ -17,7 +17,6 @@
       this.isPlaying = false;
       this.isPaused = false;
       this.selected = false;
-      this.canvas.requestRenderAll();
     },
 
     onPlay: function() {
@@ -49,6 +48,7 @@
       e.stopPropagation && e.stopPropagation();
     },
 
+    // do I need this?
     _mouseDownHandler: function(options) {
       if (!this.canvas || (options.e.button && options.e.button !== 1)) {
         return;
@@ -66,6 +66,7 @@
         return;
       }
       this.selected = this === this.canvas._activeObject;
+      this.canvas.requestRenderAll();
     },
 
     /**
@@ -76,12 +77,12 @@
       this.on('mousedown:before', this._mouseDownHandlerBefore);
     },
 
-    /**
-    * Initializes "mouseup" event handler
-    */
-    initMouseupHandler: function() {
-      this.on('mouseup', this.mouseUpHandler);
-    },
+    // /**
+    // * Initializes "mouseup" event handler
+    // */
+    // initMouseupHandler: function() {
+    //   this.on('mouseup', this._mouseUpHandler);
+    // },
 
     initAddedHandler: function() {
       //may need to 'register' the audio URL or update some kind of bookkeeping...?
@@ -91,18 +92,12 @@
       //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
     },
 
-    /**
-    * standard hander for mouse up, overridable
-    * @private
-    */
-    mouseUpHandler: function(options) {
-      this.__isMousedown = false;
-      if (this.group ||
-         (options.transform && options.transform.actionPerformed) ||
-         (options.e.button && options.e.button !== 1)) {
-        return;
-      }
+    // _mouseUpHandler: function() {
+    //   this.selected = true;
+    // },
 
+    playControlPressed: function(e) {
+      // may need e if we want to avoid play on right click or treat iPads special.
       if (this.selected) {
         this.selected = false;
         if (this.isPlaying) {

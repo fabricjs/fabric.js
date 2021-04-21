@@ -236,6 +236,8 @@ var filesToInclude = [
 
   ifSpecifiedInclude('audio_token', 'src/shapes/audio_token.class.js'),
   ifSpecifiedInclude('audio_token', 'src/mixins/audio_token_behavior.mixin.js'),
+  ifSpecifiedInclude('audio_token', 'src/mixins/audio_token_controls.js'),
+
 
 ];
 

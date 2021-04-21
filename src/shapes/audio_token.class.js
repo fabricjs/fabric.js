@@ -107,7 +107,7 @@
       else if (this.isPaused) {
         ctx.fillStyle = this.pausedColor;
       }
-      else if (this.isSelected) {
+      else if (this.selected) {
         ctx.fillStyle = this.selectedColor;
       }
       else {
@@ -169,6 +169,17 @@
      */
     _render: function(ctx) {
       this._stroke(ctx);
+      // most fabric controls only draw when the object is active, but we want this one as well
+    
+    //   if (this.canvas._activeObject !== this) {
+    //     this._renderPlayControls(ctx);
+    //   }
+    },
+
+    _renderPlayControls: function(ctx) {
+      if (this.controls.playControl) {
+        this.controls.playControl.render(ctx);
+      }
     },
 
     // I think I will want something like this to draw the audio token
