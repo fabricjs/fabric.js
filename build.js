@@ -233,6 +233,10 @@ var filesToInclude = [
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
+
+  ifSpecifiedInclude('audio_token', 'src/shapes/audio_token.class.js'),
+  ifSpecifiedInclude('audio_token', 'src/mixins/audio_token_behavior.mixin.js'),
+
 ];
 
 if (buildMinified) {
