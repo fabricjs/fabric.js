@@ -17434,6 +17434,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * everything would resolve to a single point and a pythagorean theorem for the distance
      * @private
      */
+
+    //TODO : This is used by ALL controls currently (even custom ones) with no obvious
+    // way to override - we should make a way!
     _setCornerCoords: function() {
       var coords = this.oCoords,
           newTheta = degreesToRadians(45 - this.angle),
@@ -30462,12 +30465,30 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     audioUrl: '',
 
-    //temp
-    idleColor: '#ffffff',
-    playingColor: '#ffffff',
-    pausedColor: '#ffffff',
-    selectedColor: '#ffffff',
+    hasBorders: false,
 
+    /**
+     * extra space taken up on the left by delete controls
+     * @type Number
+     * @default
+     */
+    leftMargin:            44,
+
+    //temp
+    idleColor: '#00ffff',
+    playingColor: '#ff00ff',
+    pausedColor: '#ffff00',
+    selectedColor: '#ff0000',
+
+    idleImage: null,
+    selectedImage: null,
+    playControlImage: null,
+    pauseControlImage: null,
+
+    idleImageURL: undefined,
+    selectedImageURL: undefined,
+    playControlImageURL: undefined,
+    pauseControlImageURL: undefined,
 
     /**
      * List of properties to consider when checking if
@@ -30489,6 +30510,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.cacheKey = 'audio_token' + fabric.Object.__uid++;
       this.callSuper('initialize', options);
       this.initBehavior();
+      this.initImages();
     },
 
     /**
@@ -30496,52 +30518,55 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderBackground: function(ctx) {
-      if (!this.backgroundColor) {
-        return;
-      }
-      var dim = this._getNonTransformedDimensions();
-      if (this.isPlaying) {
-        ctx.fillStyle = this.playingColor;
-      }
-      else if (this.isPaused) {
-        ctx.fillStyle = this.pausedColor;
-      }
-      else if (this.selected) {
-        ctx.fillStyle = this.selectedColor;
-      }
-      else {
-        ctx.fillStyle = this.idleColor;
-      }
-
-      ctx.fillRect(
-        -dim.x / 2,
-        -dim.y / 2,
-        dim.x,
-        dim.y
-      );
-      // if there is background color no other shadows
-      // should be casted
-      this._removeShadow(ctx);
+    _renderBackground: function() {
+      return;
     },
 
+    _isSelected: function() {
+      return this.canvas && this.canvas._activeObject === this;
+    },
+
+    initImages: function() {
+      if (this.idleImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.idleImage = document.createElement('img');
+        this.idleImage.src = this.idleImageURL;
+      }
+      if (this.selectedImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.selectedImage = document.createElement('img');
+        this.selectedImage.src = this.selectedImageURL;
+      }
+      if (this.pauseControlImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.pauseControlImage = document.createElement('img');
+        this.pauseControlImage.src = this.pauseControlImageURL;
+      }
+      if (this.playControlImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.playControlImage = document.createElement('img');
+        this.playControlImage.src = this.playControlImageURL;
+      }
+    },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {//this is all going to change
-      if (this.strokeWidth === 0) {
-        return;
+      var image = null;
+      if (this._isSelected() && this.selectedImage) {
+        image = this.selectedImage;
       }
-      var w = this.width / 2, h = this.height / 2;
-      ctx.beginPath();
-      ctx.moveTo(-w, -h);
-      ctx.lineTo(w, -h);
-      ctx.lineTo(w, h);
-      ctx.lineTo(-w, h);
-      ctx.lineTo(-w, -h);
-      ctx.closePath();
+      else if (!this._isSelected() && this.idleImage) {
+        image = this.idleImage;
+      }
+      var dim = this._getNonTransformedDimensions();
+      if (image) {
+        ctx.save();
+        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
+        ctx.restore();
+      }
     },
 
     /**
@@ -30551,7 +30576,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['playState'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['playState', 'audioUrl'].concat(propertiesToInclude));
     },
 
 
@@ -30570,40 +30595,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     _render: function(ctx) {
       this._stroke(ctx);
       // most fabric controls only draw when the object is active, but we want this one as well
-    
-    //   if (this.canvas._activeObject !== this) {
-    //     this._renderPlayControls(ctx);
-    //   }
+      if (this.canvas._activeObject !== this) {
+        this._renderPlayControls(ctx);
+      }
     },
 
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
-        this.controls.playControl.render(ctx);
+        this.controls.playControl.render(ctx, -20, 0, '', this);
+      }else {
+          console.log('this.controls.playControl' + this.controls.playControl)
       }
-    },
-
-    // I think I will want something like this to draw the audio token
-    _renderFill: function(ctx) {
-      var elementToDraw = this._element;
-      if (!elementToDraw) {
-        return;
-      }
-      var scaleX = this._filterScalingX, scaleY = this._filterScalingY,
-          w = this.width, h = this.height, min = Math.min, max = Math.max,
-          // crop values cannot be lesser than 0.
-          cropX = max(this.cropX, 0), cropY = max(this.cropY, 0),
-          elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-          elHeight = elementToDraw.naturalHeight || elementToDraw.height,
-          sX = cropX * scaleX,
-          sY = cropY * scaleY,
-          // the width height cannot exceed element width/height, starting from the crop offset.
-          sW = min(w * scaleX, elWidth - sX),
-          sH = min(h * scaleY, elHeight - sY),
-          x = -w / 2, y = -h / 2,
-          maxDestW = min(w, elWidth / scaleX - cropX),
-          maxDestH = min(h, elHeight / scaleX - cropY);
-
-      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
     },
   });
 
@@ -30638,7 +30640,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       console.log('deselect ' + this.cacheKey);
       this.isPlaying = false;
       this.isPaused = false;
-      this.selected = false;
     },
 
     onPlay: function() {
@@ -30660,14 +30661,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.isPaused = false;
       this.isPlaying = false;
       this.canvas.requestRenderAll();
-    },
-
-    /**
-    * @private
-    */
-    _stopEvent: function(e) {
-      e.preventDefault && e.preventDefault();
-      e.stopPropagation && e.stopPropagation();
     },
 
     // do I need this?
@@ -30714,23 +30707,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
     },
 
-    // _mouseUpHandler: function() {
-    //   this.selected = true;
-    // },
 
     playControlPressed: function(e) {
       // may need e if we want to avoid play on right click or treat iPads special.
-      if (this.selected) {
-        this.selected = false;
-        if (this.isPlaying) {
-          this.onPause();
-        }
-        else {
-          this.onPlay();
-        }
+      if (this.isPlaying) {
+        this.onPause();
       }
       else {
-        this.selected = true;
+        this.onPlay();
       }
     },
   });
@@ -30749,15 +30733,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   var deleteIconX = -0.5;
   var deleteIconY = -0.5;
   var deleteIconOffsetX = -25;
-  var deleteIconOffsetY = 100;
+  var deleteIconOffsetY = 50;
   var deleteimg = document.createElement('img');
 
   deleteimg.src = deleteIcon;
 
   var playIconX = -0.5;
   var playIconY = -0.5;
-  var playIconOffsetX = -25;
-  var playIconOffsetY = 20;
+  var playIconOffsetX = 50;
+  var playIconOffsetY = 50;
   var playImg = document.createElement('img');
   playImg.src = playIcon;
   var pauseImg = document.createElement('img');
@@ -30797,9 +30781,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         var scale = 1;
         var size = this.cornerSize * scale;
 
-        fabricObject.controls.deleteControl.y = deleteIconY;
-        fabricObject.controls.deleteControl.offsetX = deleteIconOffsetX * scale;
-        fabricObject.controls.deleteControl.offsetY = deleteIconOffsetY * scale;
+        this.y = deleteIconY;
+        this.offsetX = deleteIconOffsetX * scale;
+        this.offsetY = deleteIconOffsetY * scale;
 
         ctx.save();
         ctx.translate(left, top);
@@ -30838,11 +30822,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       render: function (ctx, left, top, styleOverride, fabricObject) {
         var scale = 1;
         var size = this.cornerSize * scale;
-        var controlImg = fabricObject.isPlaying ? pauseImg : playImg;
+        var controlImg;
+        if (fabricObject.isPlaying) {
+          controlImg = fabricObject.pauseControlImage ? fabricObject.pauseControlImage : pauseImg;
+        }
+        else {
+          controlImg = fabricObject.playControlImage ? fabricObject.playControlImage : playImg;
+        }
 
-        fabricObject.controls.playControl.y = playIconY;
-        fabricObject.controls.playControl.offsetX = playIconOffsetX * scale;
-        fabricObject.controls.playControl.offsetY = playIconOffsetY * scale;
+        this.y = playIconY;
+        this.offsetX = playIconOffsetX * scale;
+        this.offsetY = playIconOffsetY * scale;
 
         ctx.save();
         ctx.translate(left, top);
@@ -30850,7 +30840,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
-      cornerSize: 32
+      cornerSize: 64
     });
   }
 })();

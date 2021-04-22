@@ -16,7 +16,6 @@
       console.log('deselect ' + this.cacheKey);
       this.isPlaying = false;
       this.isPaused = false;
-      this.selected = false;
     },
 
     onPlay: function() {
@@ -38,14 +37,6 @@
       this.isPaused = false;
       this.isPlaying = false;
       this.canvas.requestRenderAll();
-    },
-
-    /**
-    * @private
-    */
-    _stopEvent: function(e) {
-      e.preventDefault && e.preventDefault();
-      e.stopPropagation && e.stopPropagation();
     },
 
     // do I need this?
@@ -92,23 +83,14 @@
       //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
     },
 
-    // _mouseUpHandler: function() {
-    //   this.selected = true;
-    // },
 
     playControlPressed: function(e) {
       // may need e if we want to avoid play on right click or treat iPads special.
-      if (this.selected) {
-        this.selected = false;
-        if (this.isPlaying) {
-          this.onPause();
-        }
-        else {
-          this.onPlay();
-        }
+      if (this.isPlaying) {
+        this.onPause();
       }
       else {
-        this.selected = true;
+        this.onPlay();
       }
     },
   });

@@ -10,15 +10,15 @@
   var deleteIconX = -0.5;
   var deleteIconY = -0.5;
   var deleteIconOffsetX = -25;
-  var deleteIconOffsetY = 100;
+  var deleteIconOffsetY = 50;
   var deleteimg = document.createElement('img');
 
   deleteimg.src = deleteIcon;
 
   var playIconX = -0.5;
   var playIconY = -0.5;
-  var playIconOffsetX = -25;
-  var playIconOffsetY = 20;
+  var playIconOffsetX = 50;
+  var playIconOffsetY = 50;
   var playImg = document.createElement('img');
   playImg.src = playIcon;
   var pauseImg = document.createElement('img');
@@ -58,9 +58,9 @@
         var scale = 1;
         var size = this.cornerSize * scale;
 
-        fabricObject.controls.deleteControl.y = deleteIconY;
-        fabricObject.controls.deleteControl.offsetX = deleteIconOffsetX * scale;
-        fabricObject.controls.deleteControl.offsetY = deleteIconOffsetY * scale;
+        this.y = deleteIconY;
+        this.offsetX = deleteIconOffsetX * scale;
+        this.offsetY = deleteIconOffsetY * scale;
 
         ctx.save();
         ctx.translate(left, top);
@@ -99,11 +99,17 @@
       render: function (ctx, left, top, styleOverride, fabricObject) {
         var scale = 1;
         var size = this.cornerSize * scale;
-        var controlImg = fabricObject.isPlaying ? pauseImg : playImg;
+        var controlImg;
+        if (fabricObject.isPlaying) {
+          controlImg = fabricObject.pauseControlImage ? fabricObject.pauseControlImage : pauseImg;
+        }
+        else {
+          controlImg = fabricObject.playControlImage ? fabricObject.playControlImage : playImg;
+        }
 
-        fabricObject.controls.playControl.y = playIconY;
-        fabricObject.controls.playControl.offsetX = playIconOffsetX * scale;
-        fabricObject.controls.playControl.offsetY = playIconOffsetY * scale;
+        this.y = playIconY;
+        this.offsetX = playIconOffsetX * scale;
+        this.offsetY = playIconOffsetY * scale;
 
         ctx.save();
         ctx.translate(left, top);
@@ -111,7 +117,7 @@
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
-      cornerSize: 32
+      cornerSize: 64
     });
   }
 })();

@@ -72,6 +72,9 @@
      * everything would resolve to a single point and a pythagorean theorem for the distance
      * @private
      */
+
+    //TODO : This is used by ALL controls currently (even custom ones) with no obvious
+    // way to override - we should make a way!
     _setCornerCoords: function() {
       var coords = this.oCoords,
           newTheta = degreesToRadians(45 - this.angle),

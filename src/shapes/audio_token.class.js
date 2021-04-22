@@ -62,12 +62,30 @@
      */
     audioUrl: '',
 
-    //temp
-    idleColor: '#ffffff',
-    playingColor: '#ffffff',
-    pausedColor: '#ffffff',
-    selectedColor: '#ffffff',
+    hasBorders: false,
 
+    /**
+     * extra space taken up on the left by delete controls
+     * @type Number
+     * @default
+     */
+    leftMargin: 44,
+
+    //temp
+    idleColor: '#00ffff',
+    playingColor: '#ff00ff',
+    pausedColor: '#ffff00',
+    selectedColor: '#ff0000',
+
+    idleImage: null,
+    selectedImage: null,
+    playControlImage: null,
+    pauseControlImage: null,
+
+    idleImageURL: undefined,
+    selectedImageURL: undefined,
+    playControlImageURL: undefined,
+    pauseControlImageURL: undefined,
 
     /**
      * List of properties to consider when checking if
@@ -89,6 +107,7 @@
       this.cacheKey = 'audio_token' + fabric.Object.__uid++;
       this.callSuper('initialize', options);
       this.initBehavior();
+      this.initImages();
     },
 
     /**
@@ -96,52 +115,55 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderBackground: function(ctx) {
-      if (!this.backgroundColor) {
-        return;
-      }
-      var dim = this._getNonTransformedDimensions();
-      if (this.isPlaying) {
-        ctx.fillStyle = this.playingColor;
-      }
-      else if (this.isPaused) {
-        ctx.fillStyle = this.pausedColor;
-      }
-      else if (this.selected) {
-        ctx.fillStyle = this.selectedColor;
-      }
-      else {
-        ctx.fillStyle = this.idleColor;
-      }
-
-      ctx.fillRect(
-        -dim.x / 2,
-        -dim.y / 2,
-        dim.x,
-        dim.y
-      );
-      // if there is background color no other shadows
-      // should be casted
-      this._removeShadow(ctx);
+    _renderBackground: function() {
+      return;
     },
 
+    _isSelected: function() {
+      return this.canvas && this.canvas._activeObject === this;
+    },
+
+    initImages: function() {
+      if (this.idleImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.idleImage = document.createElement('img');
+        this.idleImage.src = this.idleImageURL;
+      }
+      if (this.selectedImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.selectedImage = document.createElement('img');
+        this.selectedImage.src = this.selectedImageURL;
+      }
+      if (this.pauseControlImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.pauseControlImage = document.createElement('img');
+        this.pauseControlImage.src = this.pauseControlImageURL;
+      }
+      if (this.playControlImageURL) {
+        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+        this.playControlImage = document.createElement('img');
+        this.playControlImage.src = this.playControlImageURL;
+      }
+    },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {//this is all going to change
-      if (this.strokeWidth === 0) {
-        return;
+      var image = null;
+      if (this._isSelected() && this.selectedImage) {
+        image = this.selectedImage;
       }
-      var w = this.width / 2, h = this.height / 2;
-      ctx.beginPath();
-      ctx.moveTo(-w, -h);
-      ctx.lineTo(w, -h);
-      ctx.lineTo(w, h);
-      ctx.lineTo(-w, h);
-      ctx.lineTo(-w, -h);
-      ctx.closePath();
+      else if (!this._isSelected() && this.idleImage) {
+        image = this.idleImage;
+      }
+      var dim = this._getNonTransformedDimensions();
+      if (image) {
+        ctx.save();
+        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
+        ctx.restore();
+      }
     },
 
     /**
@@ -151,7 +173,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['playState'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['playState', 'audioUrl'].concat(propertiesToInclude));
     },
 
 
@@ -170,40 +192,17 @@
     _render: function(ctx) {
       this._stroke(ctx);
       // most fabric controls only draw when the object is active, but we want this one as well
-    
-    //   if (this.canvas._activeObject !== this) {
-    //     this._renderPlayControls(ctx);
-    //   }
+      if (this.canvas._activeObject !== this) {
+        this._renderPlayControls(ctx);
+      }
     },
 
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
-        this.controls.playControl.render(ctx);
+        this.controls.playControl.render(ctx, -20, 0, '', this);
+      }else {
+          console.log('this.controls.playControl' + this.controls.playControl)
       }
-    },
-
-    // I think I will want something like this to draw the audio token
-    _renderFill: function(ctx) {
-      var elementToDraw = this._element;
-      if (!elementToDraw) {
-        return;
-      }
-      var scaleX = this._filterScalingX, scaleY = this._filterScalingY,
-          w = this.width, h = this.height, min = Math.min, max = Math.max,
-          // crop values cannot be lesser than 0.
-          cropX = max(this.cropX, 0), cropY = max(this.cropY, 0),
-          elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-          elHeight = elementToDraw.naturalHeight || elementToDraw.height,
-          sX = cropX * scaleX,
-          sY = cropY * scaleY,
-          // the width height cannot exceed element width/height, starting from the crop offset.
-          sW = min(w * scaleX, elWidth - sX),
-          sH = min(h * scaleY, elHeight - sY),
-          x = -w / 2, y = -h / 2,
-          maxDestW = min(w, elWidth / scaleX - cropX),
-          maxDestH = min(h, elHeight / scaleX - cropY);
-
-      elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
     },
   });
 
