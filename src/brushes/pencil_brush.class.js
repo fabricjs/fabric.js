@@ -35,7 +35,7 @@
     initialize: function(canvas) {
       this.canvas = canvas;
       this._points = [];
-      this._detach = this._attachKeyboardListeners();
+      this._attachKeyboardListeners();
     },
 
     /**
@@ -57,11 +57,11 @@
 
       window.addEventListener('keydown', keyboardDown);
       window.addEventListener('keyup', keyboardUp);
-
-      return function disposer() {
+      this._detach = function disposer() {
         window.removeEventListener('keydown', keyboardDown);
         window.removeEventListener('keyup', keyboardUp);
       };
+      return this._detach;
     },
 
     needsFullRender: function () {
