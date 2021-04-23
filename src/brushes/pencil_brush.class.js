@@ -16,6 +16,7 @@
     /**
      * Draws a straight line between last recorded point to current pointer
      * Used for `shift` functionality
+     * In order to override the `shift` functionality call `brush._detach()`
      * 
      * @type boolean
      * @default false
