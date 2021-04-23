@@ -43,11 +43,11 @@
       var keyboardDown = function (e) {
         if (e.shiftKey) {
           e.preventDefault();
-          _this.straightMode = true;
+          _this.drawStraightLine = true;
         }
       };
       var keyboardUp = function () {
-        _this.straightMode = false;
+        _this.drawStraightLine = false;
       };
 
       window.addEventListener('keydown', keyboardDown);
@@ -60,7 +60,7 @@
     },
 
     needsFullRender: function () {
-      return this.callSuper("needsFullRender") || this.drawStraightLine;
+      return this.callSuper("needsFullRender") || this._hasStraightLine;
     },
 
     /**
@@ -155,6 +155,7 @@
         return false;
       }
       if (this.drawStraightLine && this._points.length > 1) {
+        this._hasStraightLine = true;
         this._points.pop();
       }
       this._points.push(point);
