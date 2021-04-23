@@ -14,6 +14,15 @@
     decimate: 0.4,
 
     /**
+     * Draws a straight line between last recorded point to current pointer
+     * Used for `shift` functionality
+     * 
+     * @type boolean
+     * @default false
+     */
+    drawStraightLine: false,
+
+    /**
      * Constructor
      * @param {fabric.Canvas} canvas
      * @return {fabric.PencilBrush} Instance of a pencil brush
@@ -21,6 +30,37 @@
     initialize: function(canvas) {
       this.canvas = canvas;
       this._points = [];
+      this._detach = this._attachKeyboardListeners();
+    },
+
+    /**
+     * Listens to `shift` key press
+     * @private
+     * @returns disposer
+     */
+    _attachKeyboardListeners: function () {
+      var _this = this;
+      var keyboardDown = function (e) {
+        if (e.shiftKey) {
+          e.preventDefault();
+          _this.straightMode = true;
+        }
+      };
+      var keyboardUp = function () {
+        _this.straightMode = false;
+      };
+
+      window.addEventListener('keydown', keyboardDown);
+      window.addEventListener('keyup', keyboardUp);
+
+      return function disposer() {
+        window.removeEventListener('keydown', keyboardDown);
+        window.removeEventListener('keyup', keyboardUp);
+      };
+    },
+
+    needsFullRender: function () {
+      return this.callSuper("needsFullRender") || this.drawStraightLine;
     },
 
     /**
@@ -113,6 +153,9 @@
     _addPoint: function(point) {
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
         return false;
+      }
+      if (this.drawStraightLine && this._points.length > 1) {
+        this._points.pop();
       }
       this._points.push(point);
       return true;
@@ -246,7 +289,7 @@
       var zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
           i, l = points.length - 1, lastPoint = points[0], newPoints = [lastPoint],
           cDistance;
-      for (i = 1; i < l; i++) {
+      for (i = 1; i <= l; i++) {
         cDistance = Math.pow(lastPoint.x - points[i].x, 2) + Math.pow(lastPoint.y - points[i].y, 2);
         if (cDistance >= adjustedDistance) {
           lastPoint = points[i];
