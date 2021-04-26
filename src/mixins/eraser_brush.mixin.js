@@ -44,10 +44,10 @@
 
     /**
      * 
-     * @returns fabric.EraserPath | null
+     * @returns {fabric.Group | null}
      */
     getEraser: function () {
-      return this.clipPath && this.clipPath.isType('eraserPath') ? this.clipPath : null;
+      return this.clipPath && this.clipPath.eraser ? this.clipPath : null;
     },
 
     /**
@@ -57,6 +57,19 @@
      */
     toObject: function (additionalProperties) {
       return toObject.call(this, ['erasable'].concat(additionalProperties));
+    }
+  });
+
+  var groupToObject = fabric.Group.prototype.toObject;
+  var groupToDatalessObject = fabric.Group.prototype.toDatalessObject;
+  fabric.util.object.extend(fabric.Group.prototype, {
+    /**
+     * Returns an object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function (additionalProperties) {
+      return groupToObject.call(this, ['eraser'].concat(additionalProperties));
     }
   });
 
@@ -495,8 +508,6 @@
       /**
        * Adds path to existing clipPath of object
        * 
-       * @todo fix path transform to be applied on it up front instead of by {@link EraserPath}
-       * 
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -513,21 +524,37 @@
           return;
         }
         if (!obj.getEraser()) {
-          clipObject = new fabric.EraserPath();
-          clipObject.setParent(obj);
+          var rect = new fabric.Rect({
+            width: obj.width,
+            height: obj.height,
+            clipPath: obj.clipPath,
+            originX: "center",
+            originY: "center"
+          });
+          var objects = [rect];
+          clipObject = new fabric.Group(objects, {
+            boundingObjects: objects,
+            eraser: true
+          });
         } else {
           clipObject = obj.clipPath;
         }
 
-        var transformMatrix = fabric.util.invertTransform(
-          obj.calcTransformMatrix()
-        );
-        //fabric.util.applyTransformToObject(path, transformMatrix);
-        clipObject.addPath(path, transformMatrix);
-
-        obj.set({
-          clipPath: clipObject,
-          dirty: true,
+        path.clone(function (path) {
+          path.globalCompositeOperation = "destination-out";
+          // http://fabricjs.com/using-transformations
+          var desiredTransform = fabric.util.multiplyTransformMatrices(
+            fabric.util.invertTransform(
+              obj.calcTransformMatrix()
+            ),
+            path.calcTransformMatrix()
+          );
+          fabric.util.applyTransformToObject(path, desiredTransform);
+          clipObject.addWithUpdate(path);
+          obj.set({
+            clipPath: clipObject,
+            dirty: true
+          });
         });
       },
 
@@ -604,130 +631,4 @@
       }
     }
   );
-
-  /**
-   * EraserPath class
-   * Used by {@link fabric.EraserBrush}
-   * 
-   * {@link fabric.EraserPath} is a workaround for clipping paths that are strokes and not fills.
-   * Clipping is done with the fill of the clip path, so to enable clipping out paths by their stroke and achieving an eraser effect, 
-   * {@link fabric.EraserPath} fills a rect where the object that it needs to clip is drawn.
-   * Then it draws the paths drawn by {@link fabric.EraserBrush} onto the rect in `globalCompositionMode = 'destination-out'`. 
-   * This removes the paths from the drawn rect resulting is a rect that has been erased.
-   * 
-   * {@link fabric.EraserPath} is attached to it's owning object as a clip path. 
-   * Basically it achieves what the `inverted` prop achieves, only for stroked objects.
-   * 
-   * Can be used regardless of {@link fabric.EraserBrush} to create an inverted clip path that contains strokes, unclosed paths or unfilled paths.
-   * 
-   * Without this workaround a clip path containing unclosed paths clips an object as if the path was closed and filled or disregards it.
-   * 
-   * It is possible to provide a clip path to this object, clipping out the drawn rect.
-   * 
-   * @private
-   * @class fabric.EraserPath
-   * @extends fabric.Rect
-   */
-  fabric.EraserPath = fabric.util.createClass(fabric.Rect, fabric.Collection, {
-
-    type: 'eraserPath',
-
-    _objects: [],
-
-    initialize: function (objects, options) {
-      this.callSuper('initialize', Object.assign(options || {}, {
-        originX: 'center',
-        originY: 'center'
-      }));
-      this._objects = objects || [];
-      this._objects.forEach(function (p) {
-        p.path.set({ globalCompositeOperation: 'destination-out' });
-      });
-    },
-
-    /**
-     * Used to set options when erasing
-     * @param {fabric.Object} parent The object that owns this clip path
-     */
-    setParent: function (parent) {
-      this.set({
-        width: parent.width,
-        height: parent.height,
-        clipPath: parent.clipPath
-      });
-    },
-
-    _render: function (ctx) {
-      this.callSuper('_render', ctx);
-      this._objects.forEach(function (o) {
-        ctx.save();
-        var m = o.transformMatrix;
-        m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        o.path.render(ctx);
-        ctx.restore();
-      });
-    },
-
-    addPath: function (path, transformMatrix) {
-      path.set({ globalCompositeOperation: 'destination-out' });
-      this._objects.push({ path: path, transformMatrix: transformMatrix });
-      this.dirty = true;
-    },
-
-    toObject: function (propertiesToInclude) {
-      var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects.map(function (o) {
-        var obj = o.path, transformMatrix = o.transformMatrix;
-        var originalDefaults = obj.includeDefaultValues;
-        obj.includeDefaultValues = _includeDefaultValues;
-        var _obj = obj.toObject(propertiesToInclude);
-        obj.includeDefaultValues = originalDefaults;
-        return { path: _obj, transformMatrix: transformMatrix };
-      });
-      var obj = this.callSuper('toObject', propertiesToInclude);
-      obj.objects = objsToObject;
-      return obj;
-    },
-  });
-
-  /**
-     * Returns {@link fabric.EraserPath} instance from an object representation
-     * @static
-     * @memberOf fabric.EraserPath
-     * @param {Object} object Object to create an instance from
-     * @param {Function} [callback] Callback to invoke when an fabric.EraserPath instance is created
-     */
-  fabric.EraserPath.fromObject = function (object, callback) {
-    var objects = object.objects,
-      options = fabric.util.object.clone(object, true);
-    delete options.objects;
-    /*
-    if (typeof objects === 'string') {
-      // it has to be an url or something went wrong.
-      fabric.loadSVGFromURL(objects, function (elements) {
-        var group = fabric.util.groupSVGElements(elements, object, objects);
-        group.set(options);
-        callback && callback(group);
-      });
-      return;
-    }
-    */
-    fabric.util.enlivenObjects(
-      objects.map(function (p) {
-        return p.path;
-      }),
-      function (enlivenedObjects) {
-        fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
-          options.clipPath = enlivedClipPath[0];
-          var _objects = objects.map(function (p, i) {
-            return {
-              path: enlivenedObjects[i],
-              transformMatrix: p.transformMatrix
-            };
-          });
-          callback && callback(new fabric.EraserPath(_objects, options));
-        });
-      }
-    );
-  };
 })();
