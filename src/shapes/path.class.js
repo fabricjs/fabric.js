@@ -322,11 +322,12 @@
           deltaX = maxX - minX,
           deltaY = maxY - minY;
 
+      //  account for strokeWidth
       return {
-        left: minX,
-        top: minY,
-        width: deltaX,
-        height: deltaY
+        left: minX - this.strokeWidth / 2,
+        top: minY - this.strokeWidth / 2,
+        width: deltaX + this.strokeWidth,
+        height: deltaY + this.strokeWidth
       };
     }
   });
