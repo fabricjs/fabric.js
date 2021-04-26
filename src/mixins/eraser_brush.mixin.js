@@ -134,7 +134,8 @@
 
       /**
        * Indicates that the ctx is ready and rendering can begin.
-       * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
+       * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} 
+       * firing before {@link fabric.EraserBrush#onMouseDown} has completed
        * 
        * @private
        */
@@ -524,9 +525,10 @@
           return;
         }
         if (!obj.getEraser()) {
+          var coords = obj.calcCoords();
           var rect = new fabric.Rect({
-            width: obj.width,
-            height: obj.height,
+            width: coords.br.x - coords.tl.x,
+            height: coords.br.y - coords.tl.y,
             clipPath: obj.clipPath,
             originX: "center",
             originY: "center"
