@@ -45,7 +45,8 @@
       var colorPropKey = layer + 'Color';
       var erasable = (options && options.erasable) || false;
       var target = this[colorPropKey];
-      if (typeof target === 'object' && target.isType('rect')) {
+      if (typeof target === 'object' && target.isType && target.isType('rect')) {
+        //this.__setBgOverlayColor(colorPropKey, color, callback);
         target.set({
           fill: color,
           erasable: erasable
@@ -53,6 +54,9 @@
       } else {
         this.__setBgOverlayColor(colorPropKey, color, callback);
         this[colorPropKey + 'Erasable'] = erasable;
+        if (typeof target === 'object') {
+          target.erasable = erasable;
+        }
       }
       return this;
     },
