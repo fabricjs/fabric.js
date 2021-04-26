@@ -58,6 +58,13 @@
     useSetOnGroup: false,
 
     /**
+     * Objects to use to calculate the group's bounds by.
+     * If empty the group calculates it's bounds normally, meaning by all of it's objects.
+     * @type Array
+     */
+    _boundingObjects: [],
+
+    /**
      * Constructor
      * @param {Object} objects Group objects
      * @param {Object} [options] Options object
@@ -75,6 +82,7 @@
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
       }
+      this._boundingObjects = options.boundingObjects || [];
 
       if (!isAlreadyGrouped) {
         var center = options && options.centerPoint;
@@ -152,10 +160,11 @@
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
      * @param {Object} object
+     * @param {{ action: 'add'|'set'}} [boundingObjectConfig] pass 'add' or 'set' to change the group's bounding objects respectively
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    addWithUpdate: function(object) {
+    addWithUpdate: function(object, boundingObjectConfig) {
       var nested = !!this.group;
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
@@ -167,6 +176,13 @@
         this._objects.push(object);
         object.group = this;
         object._set('canvas', this.canvas);
+        if (boundingObjectConfig && boundingObjectConfig.action) {
+          if (boundingObjectConfig.action === 'add') {
+            this.addBoundingObjects(object);
+          } else if (boundingObjectConfig.action === 'set') {
+            this.setBoundingObjects(object);
+          }
+        }
       }
       this._calcBounds();
       this._updateObjectsCoords();
@@ -239,7 +255,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var _includeDefaultValues = this.includeDefaultValues;
+      var _includeDefaultValues = this.includeDefaultValues, objects = this._objects;
       var objsToObject = this._objects.map(function(obj) {
         var originalDefaults = obj.includeDefaultValues;
         obj.includeDefaultValues = _includeDefaultValues;
@@ -247,8 +263,12 @@
         obj.includeDefaultValues = originalDefaults;
         return _obj;
       });
+      var boundingObjsToObject = this._boundingObjects.map(function (obj) {
+        return objects.indexOf(obj);
+      });
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
       obj.objects = objsToObject;
+      obj.boundingObjects = boundingObjsToObject;
       return obj;
     },
 
@@ -258,7 +278,7 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
-      var objsToObject, sourcePath = this.sourcePath;
+      var objsToObject, sourcePath = this.sourcePath, objects = this._objects;
       if (sourcePath) {
         objsToObject = sourcePath;
       }
@@ -272,8 +292,12 @@
           return _obj;
         });
       }
+      var boundingObjsToObject = this._boundingObjects.map(function (obj) {
+        return objects.indexOf(obj);
+      });
       var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
       obj.objects = objsToObject;
+      obj.boundingObjects = boundingObjsToObject;
       return obj;
     },
 
@@ -471,6 +495,36 @@
     },
 
     /**
+     * Set the group's bounding objects.
+     * The bounding objects are used to calculate the group's bounds by.
+     * @param {Array} objects objects that belong to this group that should constrain the group's bounding box
+     */
+    setBoundingObjects: function (objects) {
+      this._boundingObjects = Array.isArray(objects) ? objects : [objects];
+      this._calcBounds();
+    },
+
+    /**
+     * Add object to the group's bounding objects.
+     * @param {fArray} objects
+     */
+    addBoundingObjects: function (objects) {
+      this.setBoundingObjects(thtis._boundingObjects.concat(objects));
+    },
+
+    /**
+     * Remove object from the group's bounding objects.
+     * @param {Array} objects
+     */
+    removeBoundingObjects: function (objects) {
+      objects = Array.isArray(objects) ? objects : [objects];
+      this._boundingObjects = this._boundingObjects.filter(function (object) {
+        return objects.indexOf(object) === -1;
+      })
+      this._calcBounds();
+    },
+
+    /**
      * @private
      */
     _calcBounds: function(onlyWidthHeight) {
@@ -484,10 +538,12 @@
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
         coords = o.calcACoords();
-        for (j = 0; j < jLen; j++) {
-          prop = props[j];
-          aX.push(coords[prop].x);
-          aY.push(coords[prop].y);
+        if (!this._boundingObjects || this._boundingObjects.length === 0 || this._boundingObjects.indexOf(o) > -1) {
+          for (j = 0; j < jLen; j++) {
+            prop = props[j];
+            aX.push(coords[prop].x);
+            aY.push(coords[prop].y);
+          }
         }
         o.aCoords = coords;
       }
@@ -586,6 +642,9 @@
         var options = fabric.util.object.clone(object, true);
         options.clipPath = enlivedClipPath[0];
         delete options.objects;
+        options.boundingObjects = (options.boundingObjects || []).map(function (i) {
+          return enlivenedObjects[i];
+        });
         callback && callback(new fabric.Group(enlivenedObjects, options, true));
       });
     });
