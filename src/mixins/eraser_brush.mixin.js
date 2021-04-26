@@ -42,17 +42,17 @@
      * @param {Object} options
      */
     _setLayerColor: function (layer, color, callback, options) {
-      var colorKey = `${layer}Color`;
+      var colorPropKey = layer + 'Color';
       var erasable = (options && options.erasable) || false;
-      var target = this[colorKey];
+      var target = this[colorPropKey];
       if (typeof target === 'object' && target.isType('rect')) {
         target.set({
           fill: color,
           erasable: erasable
         });
       } else {
-        this.__setBgOverlayColor(colorKey, color, callback);
-        this[`_${colorKey}Erasable`] = erasable;
+        this.__setBgOverlayColor(colorPropKey, color, callback);
+        this[colorPropKey + 'Erasable'] = erasable;
       }
       return this;
     },
@@ -237,6 +237,7 @@
           function (drawable, imgProp, imgSetter, colorProp, colorSetter) {
             var image = canvas[imgProp], color = canvas[colorProp];
             if ((image || color) && (!image || !image.isType('group'))) {
+              var erasablePropKey = colorProp + 'Erasable';
               var mergedGroup = new fabric.Group([], {
                 width: canvas.width,
                 height: canvas.height,
@@ -253,9 +254,9 @@
                   fill: color,
                   erasable: typeof color === 'object' && typeof color.erasable === 'boolean' ?
                     color.erasable :
-                    canvas[`_${colorProp}Erasable`]
+                    canvas[erasablePropKey]
                 });
-                canvas[`_${colorProp}Erasable`] = undefined;
+                canvas[erasablePropKey] = undefined;
                 mergedGroup.addWithUpdate(color);
                 mergedGroup._color = color;
               }
@@ -365,7 +366,7 @@
        * 
        * @param {fabric.Collection} collection 
        */
-      prepareCollectionTraversal(collection) {
+      prepareCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
           if (obj.forEachObject) {
@@ -385,7 +386,7 @@
        * 
        * @param {fabric.Collection} collection
        */
-      restoreCollectionTraversal(collection) {
+      restoreCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
           if (obj.forEachObject) {
