@@ -1,5 +1,7 @@
 (function () {
   var _get = fabric.StaticCanvas.prototype.get;
+  var _setBackgroundColor = fabric.StaticCanvas.prototype.setBackgroundColor;
+  var _setOverlayColor = fabric.StaticCanvas.prototype.setOverlayColor;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * See {@link fabric.EraserBrush#prepareCanvas}
@@ -30,7 +32,52 @@
         default:
           return _get.call(this, key);
       }
-    }
+    },
+
+    /**
+     * Helper to set `erasable` on color
+     * @param {'bakground'|'overlay'} layer 
+     * @param {(String|fabric.Pattern)} Color or pattern
+     * @param {Function} callback Callback to invoke when color is set
+     * @param {Object} options
+     */
+    _setLayerColor: function (layer, color, callback, options) {
+      var colorKey = `${layer}Color`;
+      var erasable = (options && options.erasable) || false;
+      var target = this[colorKey];
+      if (typeof target === 'object' && target.isType('rect')) {
+        target.set({
+          fill: color,
+          erasable: erasable
+        });
+      } else {
+        this.__setBgOverlayColor(colorKey, color, callback);
+        this[`_${colorKey}Erasable`] = erasable;
+      }
+      return this;
+    },
+
+    /**
+     * Helper to set `erasable` on color
+     * @param {(String|fabric.Pattern)} Color or pattern 
+     * @param {Function} callback Callback to invoke when color is set
+     * @param {Object} options
+     * @return {fabric.Canvas} thisArg
+     */
+    setBackgroundColor: function (color, callback, options) {
+      return this._setLayerColor('background', color, callback, options);
+    },
+
+    /**
+     * Helper to set `erasable` on color
+     * @param {(String|fabric.Pattern)} Color or pattern 
+     * @param {Function} callback Callback to invoke when color is set
+     * @param {Object} options
+     * @return {fabric.Canvas} thisArg
+     */
+    setOverlayColor: function (color, callback, options) {
+      return this._setLayerColor('overlay', color, callback, options);
+    },
   });
 
   var toObject = fabric.Object.prototype.toObject;
@@ -61,7 +108,6 @@
   });
 
   var groupToObject = fabric.Group.prototype.toObject;
-  var groupToDatalessObject = fabric.Group.prototype.toDatalessObject;
   fabric.util.object.extend(fabric.Group.prototype, {
     /**
      * Returns an object representation of an instance
@@ -194,7 +240,7 @@
               var mergedGroup = new fabric.Group([], {
                 width: canvas.width,
                 height: canvas.height,
-                erasable: false
+                erasable: true
               });
               if (image) {
                 mergedGroup.addWithUpdate(image);
@@ -205,8 +251,11 @@
                   width: canvas.width,
                   height: canvas.height,
                   fill: color,
-                  erasable: typeof color === 'object' && color.erasable
+                  erasable: typeof color === 'object' && typeof color.erasable === 'boolean' ?
+                    color.erasable :
+                    canvas[`_${colorProp}Erasable`]
                 });
+                canvas[`_${colorProp}Erasable`] = undefined;
                 mergedGroup.addWithUpdate(color);
                 mergedGroup._color = color;
               }
