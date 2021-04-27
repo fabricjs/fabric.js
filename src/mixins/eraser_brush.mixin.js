@@ -1,5 +1,6 @@
 (function () {
   var __setBgOverlayColor = fabric.StaticCanvas.prototype.__setBgOverlayColor;
+  var ___setBgOverlay = fabric.StaticCanvas.prototype.__setBgOverlay;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     backgroundColor: undefined,
     overlayColor: undefined,
@@ -8,7 +9,7 @@
      * patches {@link CommonMethods#_initGradient}
      * @private
      * @param {'bakground'|'overlay'} property
-     * @param {(String|fabric.Pattern)} color Color or pattern
+     * @param {(String|fabric.Pattern|fabric.Rect)} color Color or pattern or rect
      * @param {Function} callback Callback to invoke when color is set
      * @param {Object} options
      * @return {fabric.Canvas} instance
@@ -24,6 +25,7 @@
         }, options));
         callback && callback(_this[property]);
       }
+
       __setBgOverlayColor.call(this, property, color, cb);
       //  invoke cb in case of gradient
       //  see {@link CommonMethods#_initGradient}
@@ -31,6 +33,29 @@
         cb();
       }
       return this;
+    },
+
+    /**
+     * patch serialization
+     * background/overlay properties could be objects if parsed by this mixin or could be legacy values
+     * @private
+     * @param {String} property Property to set (backgroundImage, overlayImage, backgroundColor, overlayColor)
+     * @param {(Object|String)} value Value to set
+     * @param {Object} loaded Set loaded property to true if property is set
+     * @param {Object} callback Callback function to invoke after property is set
+     */
+    __setBgOverlay: function (property, value, loaded, callback) {
+      var _this = this;
+
+      if ((property === 'backgroundColor' || property === 'overlayColor') && (value && typeof value === 'object' && value.type === 'rect')) {
+        fabric.util.enlivenObjects([value], function (enlivedObject) {
+          _this[property] = enlivedObject[0];
+          loaded[property] = true;
+          callback && callback();
+        });
+      } else {
+        ___setBgOverlay.call(this, property, value, loaded, callback);
+      }
     },
 
     /**
