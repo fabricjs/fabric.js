@@ -5,10 +5,6 @@
 
   // eslint-disable-next-line
   var deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
-  // eslint-disable-next-line
-  var playIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23FFFFFF;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:green;' width='165.545' height='362.18'/%3E%3Crect x='366.988' y='408.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:blue;' width='165.544' height='362.179'/%3E%3C/g%3E%3C/svg%3E";
-  // eslint-disable-next-line
-  var pauseIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23FF5555;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:orange;' width='165.545' height='362.18'/%3E%3Crect x='366.988' y='408.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:black;' width='165.544' height='362.179'/%3E%3C/g%3E%3C/svg%3E";
 
   var deleteIconX = -0.5;
   var deleteIconY = -0.5;
@@ -21,11 +17,6 @@
   var playIconY = -0.5;
   var playIconOffsetX = 50;
   var playIconOffsetY = 50;
-  var playImg = document.createElement('img');
-  playImg.src = playIcon;
-  var pauseImg = document.createElement('img');
-  pauseImg.src = pauseIcon;
-
 
   if (fabric.Audio_token) {
 
@@ -112,13 +103,11 @@
         var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
         var controlImg;
+
         // draw either the default icons or the ones defined by parent (audio_token)
-        if (fabricObject.isPlaying) {
-          controlImg = fabricObject.pauseControlImage ? fabricObject.pauseControlImage : pauseImg;
-        }
-        else {
-          controlImg = fabricObject.playControlImage ? fabricObject.playControlImage : playImg;
-        }
+        controlImg = fabricObject.isPlaying ?
+          fabricObject.pauseControlImage :
+          fabricObject.playControlImage;
 
         this.y = playIconY;
         this.offsetX = playIconOffsetX * scale;
