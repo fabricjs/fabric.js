@@ -9,7 +9,6 @@
       this.initAddedHandler();
       this.initRemovedHandler();
       this.initMousedownHandler();
- //     this.initMouseupHandler();
     },
 
     onDeselect: function() {
@@ -68,13 +67,6 @@
       this.on('mousedown:before', this._mouseDownHandlerBefore);
     },
 
-    // /**
-    // * Initializes "mouseup" event handler
-    // */
-    // initMouseupHandler: function() {
-    //   this.on('mouseup', this._mouseUpHandler);
-    // },
-
     initAddedHandler: function() {
       //may need to 'register' the audio URL or update some kind of bookkeeping...?
     },
@@ -82,7 +74,6 @@
     initRemovedHandler: function() {
       //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
     },
-
 
     playControlPressed: function(e) {
       // may need e if we want to avoid play on right click or treat iPads special.
