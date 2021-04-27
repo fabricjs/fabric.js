@@ -57,6 +57,7 @@
 
     /**
      * Audio URL? WIP - not sure how this will be used
+     * To be determined by: NEWXP-1949, likely passed in as a parameter on creation
      * @type string
      * @default
      */
@@ -82,10 +83,10 @@
     playControlImage: null,
     pauseControlImage: null,
 
-    idleImageURL: undefined,
-    selectedImageURL: undefined,
-    playControlImageURL: undefined,
-    pauseControlImageURL: undefined,
+    idleImageSrc: undefined,
+    selectedImageSrc: undefined,
+    playControlImageSrc: undefined,
+    pauseControlImageSrc: undefined,
 
     /**
      * List of properties to consider when checking if
@@ -124,25 +125,22 @@
     },
 
     initImages: function() {
-      if (this.idleImageURL) {
-        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+      if (this.idleImageSrc) {
+        //TODO: will this create multiple images if we have multiple instances? Or is this a property of the prototype?
         this.idleImage = document.createElement('img');
-        this.idleImage.src = this.idleImageURL;
+        this.idleImage.src = this.idleImageSrc;
       }
-      if (this.selectedImageURL) {
-        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+      if (this.selectedImageSrc) {
         this.selectedImage = document.createElement('img');
-        this.selectedImage.src = this.selectedImageURL;
+        this.selectedImage.src = this.selectedImageSrc;
       }
-      if (this.pauseControlImageURL) {
-        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+      if (this.pauseControlImageSrc) {
         this.pauseControlImage = document.createElement('img');
-        this.pauseControlImage.src = this.pauseControlImageURL;
+        this.pauseControlImage.src = this.pauseControlImageSrc;
       }
-      if (this.playControlImageURL) {
-        //TODO: will this create multiple images if we have multiple instances? Do I need to look at the doc for existing elements? Can I do this in the prototype?
+      if (this.playControlImageSrc) {
         this.playControlImage = document.createElement('img');
-        this.playControlImage.src = this.playControlImageURL;
+        this.playControlImage.src = this.playControlImageSrc;
       }
     },
 
