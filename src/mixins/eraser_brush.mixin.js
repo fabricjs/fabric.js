@@ -1,6 +1,7 @@
 (function () {
   var __setBgOverlayColor = fabric.StaticCanvas.prototype.__setBgOverlayColor;
   var ___setBgOverlay = fabric.StaticCanvas.prototype.__setBgOverlay;
+  var __setSVGBgOverlayColor = fabric.StaticCanvas.prototype._setSVGBgOverlayColor;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     backgroundColor: undefined,
     overlayColor: undefined,
@@ -55,6 +56,23 @@
         });
       } else {
         ___setBgOverlay.call(this, property, value, loaded, callback);
+      }
+    },
+
+    /**
+     * patch serialization
+     * background/overlay properties could be objects if parsed by this mixin or could be legacy values
+     * @private
+     */
+    _setSVGBgOverlayColor: function (markup, property, reviver) {
+      var filler = this[property + 'Color'];
+      if (filler && typeof filler === 'object' && filler.type === 'rect') {
+        var excludeFromExport = filler.excludeFromExport || (this[property] && this[property].excludeFromExport);
+        if (filler && !excludeFromExport && filler.toSVG) {
+          markup.push(filler.toSVG(reviver));
+        }
+      } else {
+        __setSVGBgOverlayColor.call(this, markup, property, reviver);
       }
     },
 
