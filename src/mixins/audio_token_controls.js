@@ -15,7 +15,6 @@
   var deleteIconOffsetX = -25;
   var deleteIconOffsetY = 50;
   var deleteimg = document.createElement('img');
-
   deleteimg.src = deleteIcon;
 
   var playIconX = -0.5;
@@ -49,6 +48,9 @@
       // of the audio_token
       offsetY: deleteIconOffsetY,
 
+      //touch area of the control
+      cornerSize: 32,
+
       cursorStyle: 'pointer',
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
@@ -58,7 +60,8 @@
         // sendTextboxEvent(WORKSHEET_EVENT.DELETED_AUDIO_TOKEN, target.width, target.height)
       },
       render: function (ctx, left, top, styleOverride, fabricObject) {
-        // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
+        // fabricObject.scale is the 'base' scale NOT affected by canvas size,
+        // scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
 
@@ -68,11 +71,9 @@
 
         ctx.save();
         ctx.translate(left, top);
-        ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
         ctx.drawImage(deleteimg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
-      cornerSize: 32
     });
 
     // custom play/pause control for the audio_token
@@ -94,6 +95,7 @@
       offsetY: playIconOffsetY,
 
       // these determine the touch-area of the control
+      // TODO: determine why this isn't changing the touch-size (currently too small!)
       cornerSize: 64,
       touchCornerSize: 64,
 
@@ -124,8 +126,6 @@
 
         ctx.save();
         ctx.translate(left, top);
-        // audio_tokens dont rotate at the moment, but they easily could
-        ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },

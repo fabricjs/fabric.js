@@ -12,9 +12,10 @@
     },
 
     onDeselect: function() {
+      if (this.isPlaying || this.isPaused) {
+        this.onStop();
+      }
       console.log('deselect ' + this.cacheKey);
-      this.isPlaying = false;
-      this.isPaused = false;
     },
 
     onPlay: function() {
