@@ -1,86 +1,58 @@
 (function () {
-  var _get = fabric.StaticCanvas.prototype.get;
-  var _setBackgroundColor = fabric.StaticCanvas.prototype.setBackgroundColor;
-  var _setOverlayColor = fabric.StaticCanvas.prototype.setOverlayColor;
+  var __setBgOverlayColor = fabric.StaticCanvas.prototype.__setBgOverlayColor;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+    backgroundColor: undefined,
+    overlayColor: undefined,
     /**
-     * See {@link fabric.EraserBrush#prepareCanvas}
-     * @param {string} key 
-     * @returns 
-     */
-    get: function (key) {
-      var drawableKey = key;
-      switch (key) {
-        case 'backgroundImage':
-          return this[drawableKey] && this[drawableKey].isType('group') ?
-            this[drawableKey].getObjects('image')[0] :
-            _get.call(this, key);
-        case 'backgroundColor':
-          drawableKey = 'backgroundImage';
-          return this[drawableKey] && this[drawableKey].isType('group') ?
-            this[drawableKey].getObjects('rect')[0] :
-            _get.call(this, key);
-        case 'overlayImage':
-          return this[drawableKey] && this[drawableKey].isType('group') ?
-            this[drawableKey].getObjects('image')[0] :
-            _get.call(this, key);
-        case 'overlayColor':
-          drawableKey = 'overlayImage';
-          return this[drawableKey] && this[drawableKey].isType('group') ?
-            this[drawableKey].getObjects('rect')[0] :
-            _get.call(this, key);
-        default:
-          return _get.call(this, key);
-      }
-    },
-
-    /**
-     * Helper to set `erasable` on color
-     * @param {'bakground'|'overlay'} layer 
-     * @param {(String|fabric.Pattern)} Color or pattern
+     * Create Rect that holds the color to support erasing
+     * patches {@link CommonMethods#_initGradient}
+     * @private
+     * @param {'bakground'|'overlay'} property
+     * @param {(String|fabric.Pattern)} color Color or pattern
      * @param {Function} callback Callback to invoke when color is set
      * @param {Object} options
+     * @return {fabric.Canvas} instance
+     * @chainable true
      */
-    _setLayerColor: function (layer, color, callback, options) {
-      var colorPropKey = layer + 'Color';
-      var erasable = (options && options.erasable) || false;
-      var target = this[colorPropKey];
-      if (typeof target === 'object' && target.isType && target.isType('rect')) {
-        //this.__setBgOverlayColor(colorPropKey, color, callback);
-        target.set({
-          fill: color,
-          erasable: erasable
-        });
-      } else {
-        this.__setBgOverlayColor(colorPropKey, color, callback);
-        this[colorPropKey + 'Erasable'] = erasable;
-        if (typeof target === 'object') {
-          target.erasable = erasable;
-        }
+    __setBgOverlayColor: function (property, color, callback, options) {
+      var _this = this;
+      var cb = function () {
+        _this[property] = new fabric.Rect(fabric.util.object.extend({
+          width: _this.width,
+          height: _this.height,
+          fill: _this[property],
+        }, options));
+        callback && callback(_this[property]);
+      }
+      __setBgOverlayColor.call(this, property, color, cb);
+      //  invoke cb in case of gradient
+      //  see {@link CommonMethods#_initGradient}
+      if (color && color.colorStops && !(color instanceof fabric.Gradient)) {
+        cb();
       }
       return this;
     },
 
     /**
-     * Helper to set `erasable` on color
-     * @param {(String|fabric.Pattern)} Color or pattern 
-     * @param {Function} callback Callback to invoke when color is set
-     * @param {Object} options
-     * @return {fabric.Canvas} thisArg
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {string} property 'background' or 'overlay'
      */
-    setBackgroundColor: function (color, callback, options) {
-      return this._setLayerColor('background', color, callback, options);
-    },
-
-    /**
-     * Helper to set `erasable` on color
-     * @param {(String|fabric.Pattern)} Color or pattern 
-     * @param {Function} callback Callback to invoke when color is set
-     * @param {Object} options
-     * @return {fabric.Canvas} thisArg
-     */
-    setOverlayColor: function (color, callback, options) {
-      return this._setLayerColor('overlay', color, callback, options);
+    _renderBackgroundOrOverlay: function (ctx, property) {
+      var fill = this[property + 'Color'], object = this[property + 'Image'],
+        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+      if (!fill && !object) {
+        return;
+      }
+      if (fill || object) {
+        ctx.save();
+        if (needsVpt) {
+          ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+        }
+        fill && fill.render(ctx);
+        object && object.render(ctx);
+        ctx.restore();
+      }
     },
   });
 
@@ -229,46 +201,6 @@
           'overlayColor',
           'setOverlayColor'
         );
-      },
-
-      /**
-       * In order to be able to clip out the canvas' overlay/background color
-       * we group background/overlay image and color and assign the group to the canvas' appropriate image property
-       * @param {fabric.Canvas} canvas
-       */
-      prepareCanvas: function (canvas) {
-        this.forCanvasDrawables(
-          function (drawable, imgProp, imgSetter, colorProp, colorSetter) {
-            var image = canvas[imgProp], color = canvas[colorProp];
-            if ((image || color) && (!image || !image.isType('group'))) {
-              var erasablePropKey = colorProp + 'Erasable';
-              var mergedGroup = new fabric.Group([], {
-                width: canvas.width,
-                height: canvas.height,
-                erasable: true
-              });
-              if (image) {
-                mergedGroup.addWithUpdate(image);
-                mergedGroup._image = image;
-              }
-              if (color) {
-                color = new fabric.Rect({
-                  width: canvas.width,
-                  height: canvas.height,
-                  fill: color,
-                  erasable: typeof color === 'object' && typeof color.erasable === 'boolean' ?
-                    color.erasable :
-                    canvas[erasablePropKey]
-                });
-                canvas[erasablePropKey] = undefined;
-                mergedGroup.addWithUpdate(color);
-                mergedGroup._color = color;
-              }
-              canvas[imgSetter](mergedGroup);
-              canvas[colorSetter](null);
-            }
-          });
-        this._ready = true;
       },
 
       /**
@@ -520,7 +452,7 @@
 
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this.prepareCanvas(this.canvas);
+        this._ready = true;
         this._render();
       },
 
