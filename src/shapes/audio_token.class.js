@@ -27,7 +27,7 @@
     type: 'audio_token',
 
     /**
-     * key used to retrieve the audio //not sure how this will work yet
+     * unique key - used for now just to confirm play/pause for specific tokens
      * @since 2.0.0
      * @type String
      * @default
@@ -49,7 +49,7 @@
     isPaused: false,
 
     /**
-     * Indicates where audio playback is currently (in ms)
+     * Indicates where audio playback is currently (in ms) //not used yet
      * @type number
      * @default
      */
@@ -66,18 +66,15 @@
     hasBorders: false,
 
     /**
-     * extra space taken up on the left by delete controls
+     * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number
      * @default
      */
     leftMargin: 44,
 
-    //temp
-    idleColor: '#00ffff',
-    playingColor: '#ff00ff',
-    pausedColor: '#ffff00',
-    selectedColor: '#ff0000',
-
+    /**
+     * Definable images for idle state, selected state, and play/pause controls
+     */
     idleImage: null,
     selectedImage: null,
     playControlImage: null,
@@ -91,7 +88,6 @@
     /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
-     * as well as for history (undo/redo) purposes
      * @type Array
      */
     stateProperties: fabric.Object.prototype.stateProperties.concat('isPlaying', 'isPaused'),
@@ -101,7 +97,7 @@
      * @param {Object} [options] Options object
      * @return {fabric.Audio_token} thisArg
      */
-    initialize: function(audioURL ,options) {
+    initialize: function(audioURL, options) {
       options || (options = { });
       this.filters = [];
       this.audioURL = audioURL;
@@ -145,26 +141,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _stroke: function(ctx) {//this is all going to change
-      var image = null;
-      if (this._isSelected() && this.selectedImage) {
-        image = this.selectedImage;
-      }
-      else if (!this._isSelected() && this.idleImage) {
-        image = this.idleImage;
-      }
-      var dim = this._getNonTransformedDimensions();
-      if (image) {
-        ctx.save();
-        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
-        ctx.restore();
-      }
-    },
-
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -173,7 +149,6 @@
     toObject: function(propertiesToInclude) {
       return this.callSuper('toObject', ['playState', 'audioUrl'].concat(propertiesToInclude));
     },
-
 
     /**
      * Returns string representation of an instance
@@ -188,7 +163,19 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this._stroke(ctx);
+      var image = null;
+      if (this._isSelected() && this.selectedImage) {
+        image = this.selectedImage;
+      }
+      else if (!this._isSelected() && this.idleImage) {
+        image = this.idleImage;
+      }
+      var dim = this._getNonTransformedDimensions();
+      if (image) {
+        ctx.save();
+        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
+        ctx.restore();
+      }
       // most fabric controls only draw when the object is active, but we want this one as well
       if (this.canvas._activeObject !== this) {
         this._renderPlayControls(ctx);
@@ -198,8 +185,6 @@
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
         this.controls.playControl.render(ctx, -20, 0, '', this);
-      }else {
-          console.log('this.controls.playControl' + this.controls.playControl)
       }
     },
   });

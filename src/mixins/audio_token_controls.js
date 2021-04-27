@@ -1,3 +1,6 @@
+// implementation taken from http://fabricjs.com/controls-api
+// and http://fabricjs.com/controls-api
+
 (function() {
 
   // eslint-disable-next-line
@@ -28,7 +31,7 @@
   if (fabric.Audio_token) {
 
     var audioTokenControls = fabric.Audio_token.prototype.controls = { };
-    // create custom textbox control for delete icon
+    // create custom audio_token control for delete icon
     audioTokenControls.deleteControl = new fabric.Control({
       // delete icon x position relative to audio_token
       x: deleteIconX,
@@ -49,13 +52,14 @@
       cursorStyle: 'pointer',
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
-
         canvas.remove(target);
         canvas.requestRenderAll();
-        //sendTextboxEvent(WORKSHEET_EVENT.DELETED_TEXTBOX, target.width, target.height)
+        // events are not yet implemented but this will eventually go here
+        // sendTextboxEvent(WORKSHEET_EVENT.DELETED_AUDIO_TOKEN, target.width, target.height)
       },
       render: function (ctx, left, top, styleOverride, fabricObject) {
-        var scale = 1;
+        // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
+        var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
 
         this.y = deleteIconY;
@@ -71,6 +75,7 @@
       cornerSize: 32
     });
 
+    // custom play/pause control for the audio_token
     audioTokenControls.playControl = new fabric.Control({
       // delete icon x position relative to audio_token
       x: playIconX,
@@ -88,18 +93,24 @@
       // of the audio_token
       offsetY: playIconOffsetY,
 
+      // these determine the touch-area of the control
+      cornerSize: 64,
+      touchCornerSize: 64,
+
       cursorStyle: 'pointer',
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
-        //sendTextboxEvent(WORKSHEET_EVENT.playD_TEXTBOX, target.width, target.height)
       },
+
       render: function (ctx, left, top, styleOverride, fabricObject) {
-        var scale = 1;
+        // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
+        var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
         var controlImg;
+        // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject.isPlaying) {
           controlImg = fabricObject.pauseControlImage ? fabricObject.pauseControlImage : pauseImg;
         }
@@ -113,11 +124,11 @@
 
         ctx.save();
         ctx.translate(left, top);
+        // audio_tokens dont rotate at the moment, but they easily could
         ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
-      cornerSize: 64
     });
   }
 })();

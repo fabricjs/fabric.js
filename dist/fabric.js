@@ -30430,7 +30430,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     type: 'audio_token',
 
     /**
-     * key used to retrieve the audio //not sure how this will work yet
+     * unique key - used for now just to confirm play/pause for specific tokens
      * @since 2.0.0
      * @type String
      * @default
@@ -30452,7 +30452,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     isPaused: false,
 
     /**
-     * Indicates where audio playback is currently (in ms)
+     * Indicates where audio playback is currently (in ms) //not used yet
      * @type number
      * @default
      */
@@ -30460,6 +30460,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     /**
      * Audio URL? WIP - not sure how this will be used
+     * To be determined by: NEWXP-1949, likely passed in as a parameter on creation
      * @type string
      * @default
      */
@@ -30468,18 +30469,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     hasBorders: false,
 
     /**
-     * extra space taken up on the left by delete controls
+     * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number
      * @default
      */
     leftMargin: 44,
 
-    //temp
-    idleColor: '#00ffff',
-    playingColor: '#ff00ff',
-    pausedColor: '#ffff00',
-    selectedColor: '#ff0000',
-
+    /**
+     * Definable images for idle state, selected state, and play/pause controls
+     */
     idleImage: null,
     selectedImage: null,
     playControlImage: null,
@@ -30493,7 +30491,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
-     * as well as for history (undo/redo) purposes
      * @type Array
      */
     stateProperties: fabric.Object.prototype.stateProperties.concat('isPlaying', 'isPaused'),
@@ -30503,7 +30500,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @param {Object} [options] Options object
      * @return {fabric.Audio_token} thisArg
      */
-    initialize: function(audioURL ,options) {
+    initialize: function(audioURL, options) {
       options || (options = { });
       this.filters = [];
       this.audioURL = audioURL;
@@ -30547,26 +30544,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _stroke: function(ctx) {//this is all going to change
-      var image = null;
-      if (this._isSelected() && this.selectedImage) {
-        image = this.selectedImage;
-      }
-      else if (!this._isSelected() && this.idleImage) {
-        image = this.idleImage;
-      }
-      var dim = this._getNonTransformedDimensions();
-      if (image) {
-        ctx.save();
-        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
-        ctx.restore();
-      }
-    },
-
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -30575,7 +30552,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     toObject: function(propertiesToInclude) {
       return this.callSuper('toObject', ['playState', 'audioUrl'].concat(propertiesToInclude));
     },
-
 
     /**
      * Returns string representation of an instance
@@ -30590,7 +30566,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this._stroke(ctx);
+      var image = null;
+      if (this._isSelected() && this.selectedImage) {
+        image = this.selectedImage;
+      }
+      else if (!this._isSelected() && this.idleImage) {
+        image = this.idleImage;
+      }
+      var dim = this._getNonTransformedDimensions();
+      if (image) {
+        ctx.save();
+        ctx.drawImage(image,  -dim.x / 2, -dim.y / 2, dim.x, dim.y);
+        ctx.restore();
+      }
       // most fabric controls only draw when the object is active, but we want this one as well
       if (this.canvas._activeObject !== this) {
         this._renderPlayControls(ctx);
@@ -30600,8 +30588,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
         this.controls.playControl.render(ctx, -20, 0, '', this);
-      }else {
-          console.log('this.controls.playControl' + this.controls.playControl)
       }
     },
   });
@@ -30630,7 +30616,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.initAddedHandler();
       this.initRemovedHandler();
       this.initMousedownHandler();
- //     this.initMouseupHandler();
     },
 
     onDeselect: function() {
@@ -30660,14 +30645,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.canvas.requestRenderAll();
     },
 
-    // do I need this?
-    _mouseDownHandler: function(options) {
-      if (!this.canvas || (options.e.button && options.e.button !== 1)) {
-        return;
-      }
-      this.__isMousedown = true;
-    },
-
     /**
     * Default event handler for the basic functionalities needed on mousedown:before
     * can be overridden to do something different.
@@ -30689,13 +30666,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.on('mousedown:before', this._mouseDownHandlerBefore);
     },
 
-    // /**
-    // * Initializes "mouseup" event handler
-    // */
-    // initMouseupHandler: function() {
-    //   this.on('mouseup', this._mouseUpHandler);
-    // },
-
     initAddedHandler: function() {
       //may need to 'register' the audio URL or update some kind of bookkeeping...?
     },
@@ -30703,7 +30673,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     initRemovedHandler: function() {
       //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
     },
-
 
     playControlPressed: function(e) {
       // may need e if we want to avoid play on right click or treat iPads special.
@@ -30717,6 +30686,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   });
 })();
 
+
+// implementation taken from http://fabricjs.com/controls-api
+// and http://fabricjs.com/controls-api
 
 (function() {
 
@@ -30748,7 +30720,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   if (fabric.Audio_token) {
 
     var audioTokenControls = fabric.Audio_token.prototype.controls = { };
-    // create custom textbox control for delete icon
+    // create custom audio_token control for delete icon
     audioTokenControls.deleteControl = new fabric.Control({
       // delete icon x position relative to audio_token
       x: deleteIconX,
@@ -30769,13 +30741,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       cursorStyle: 'pointer',
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
-
         canvas.remove(target);
         canvas.requestRenderAll();
-        //sendTextboxEvent(WORKSHEET_EVENT.DELETED_TEXTBOX, target.width, target.height)
+        // events are not yet implemented but this will eventually go here
+        // sendTextboxEvent(WORKSHEET_EVENT.DELETED_AUDIO_TOKEN, target.width, target.height)
       },
       render: function (ctx, left, top, styleOverride, fabricObject) {
-        var scale = 1;
+        // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
+        var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
 
         this.y = deleteIconY;
@@ -30791,6 +30764,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       cornerSize: 32
     });
 
+    // custom play/pause control for the audio_token
     audioTokenControls.playControl = new fabric.Control({
       // delete icon x position relative to audio_token
       x: playIconX,
@@ -30808,18 +30782,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // of the audio_token
       offsetY: playIconOffsetY,
 
+      // these determine the touch-area of the control
+      cornerSize: 64,
+      touchCornerSize: 64,
+
       cursorStyle: 'pointer',
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
-        //sendTextboxEvent(WORKSHEET_EVENT.playD_TEXTBOX, target.width, target.height)
       },
+
       render: function (ctx, left, top, styleOverride, fabricObject) {
-        var scale = 1;
+        // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
+        var scale = fabricObject.scaleX;
         var size = this.cornerSize * scale;
         var controlImg;
+        // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject.isPlaying) {
           controlImg = fabricObject.pauseControlImage ? fabricObject.pauseControlImage : pauseImg;
         }
@@ -30833,11 +30813,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         ctx.save();
         ctx.translate(left, top);
+        // audio_tokens dont rotate at the moment, but they easily could
         ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
-      cornerSize: 64
     });
   }
 })();

@@ -38,14 +38,6 @@
       this.canvas.requestRenderAll();
     },
 
-    // do I need this?
-    _mouseDownHandler: function(options) {
-      if (!this.canvas || (options.e.button && options.e.button !== 1)) {
-        return;
-      }
-      this.__isMousedown = true;
-    },
-
     /**
     * Default event handler for the basic functionalities needed on mousedown:before
     * can be overridden to do something different.
