@@ -263,31 +263,6 @@
       },
 
       /**
-       * @private
-       * @param {Function} callback 
-       * @returns 
-       */
-      forCanvasDrawables: function (callback) {
-        var _this = this;
-        callback.call(
-          _this,
-          'background',
-          'backgroundImage',
-          'setBackgroundImage',
-          'backgroundColor',
-          'setBackgroundColor'
-        );
-        callback.call(
-          _this,
-          'overlay',
-          'overlayImage',
-          'setOverlayImage',
-          'overlayColor',
-          'setOverlayColor'
-        );
-      },
-
-      /**
        * Used to hide a drawable from the rendering process
        * @param {fabric.Object} object 
        */
