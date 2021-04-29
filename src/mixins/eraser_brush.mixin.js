@@ -154,11 +154,12 @@
       if (eraser) {
         var eraserMarkup = this.eraserToSVG(reviver);
         this.clipPath = null;
-        var markup = _toSVG.call(this, function (markup) {
-          return markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >');
-        });
+        var markup = _toSVG.call(this, reviver);
         this.clipPath = eraser;
-        return [eraserMarkup, markup].join('\n');
+        return [
+          eraserMarkup,
+          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
+        ].join('\n');
       } else {
         return _toSVG.call(this, reviver);
       }
