@@ -128,6 +128,7 @@
 
     /**
      * use <mask> to achieve erasing for svg
+     * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * @param {Function} reviver 
      * @returns {string} markup
      */
