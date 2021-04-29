@@ -99,7 +99,8 @@
     },
   });
 
-  var toObject = fabric.Object.prototype.toObject;
+  var _toObject = fabric.Object.prototype.toObject;
+  var _toSVG = fabric.Object.prototype.toSVG;
   fabric.util.object.extend(fabric.Object.prototype, {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
@@ -122,11 +123,49 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function (additionalProperties) {
-      return toObject.call(this, ['erasable'].concat(additionalProperties));
+      return _toObject.call(this, ['erasable'].concat(additionalProperties));
+    },
+
+    /**
+     * use <mask> to achieve erasing for svg
+     * @param {Function} reviver 
+     * @returns {string} markup
+     */
+    eraserToSVG: function (reviver) {
+      var eraser = this.getEraser();
+      if (eraser) {
+        var fill = eraser._objects[0].fill;
+        eraser._objects[0].fill = 'white';
+        eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        var objectMarkup = ['<defs>', '<mask id="' + eraser.clipPathId + '" >', eraser.toSVG(reviver), '</mask>', '</defs>'];
+        eraser._objects[0].fill = fill;
+        return objectMarkup.join('\n');
+      }
+      return '';
+    },
+
+    /**
+     * use <mask> to achieve erasing for svg
+     * @param {Function} reviver
+     * @returns {string} markup
+     */
+    toSVG: function (reviver) {
+      var eraser = this.getEraser();
+      if (eraser) {
+        var eraserMarkup = this.eraserToSVG(reviver);
+        this.clipPath = null;
+        var markup = _toSVG.call(this, function (markup) {
+          return markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >');
+        });
+        this.clipPath = eraser;
+        return [eraserMarkup, markup].join('\n');
+      } else {
+        return _toSVG.call(this, reviver);
+      }
     }
   });
 
-  var groupToObject = fabric.Group.prototype.toObject;
+  var _groupToObject = fabric.Group.prototype.toObject;
   fabric.util.object.extend(fabric.Group.prototype, {
     /**
      * Returns an object representation of an instance
@@ -134,7 +173,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function (additionalProperties) {
-      return groupToObject.call(this, ['eraser'].concat(additionalProperties));
+      return _groupToObject.call(this, ['eraser'].concat(additionalProperties));
     }
   });
 
