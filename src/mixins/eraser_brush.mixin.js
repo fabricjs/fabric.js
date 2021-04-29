@@ -145,7 +145,7 @@
     },
 
     /**
-     * use <mask> to achieve erasing for svg
+     * use <mask> to achieve erasing for svg, override <clipPath>
      * @param {Function} reviver
      * @returns {string} markup
      */
