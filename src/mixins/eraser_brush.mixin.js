@@ -633,20 +633,24 @@
        * 
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} path
+       * @returns {Object} canvas drawables that were erased by the path
        */
       applyEraserToCanvas: function (path) {
         var canvas = this.canvas;
-        this.forCanvasDrawables(
-          function (drawable, imgProp, _, colorProp) {
-            var sourceImage = canvas.get(imgProp);
-            var sourceColor = canvas.get(colorProp);
-            if (sourceImage && sourceImage.erasable) {
-              this._addPathToObjectEraser(sourceImage, path);
-            }
-            if (sourceColor && sourceColor.erasable) {
-              this._addPathToObjectEraser(sourceColor, path);
-            }
-          });
+        var drawables = {};
+        [
+          'backgroundImage',
+          'backgroundColor',
+          'overlayImage',
+          'overlayColor',
+        ].forEach(function (prop) {
+          var drawable = canvas[prop];
+          if (drawable && drawable.erasable) {
+            this._addPathToObjectEraser(drawable, path);
+            drawables[prop] = drawable;
+          }
+        }, this);
+        return drawables;
       },
 
       /**
@@ -682,15 +686,17 @@
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
-        this.applyEraserToCanvas(path);
+        var drawables = this.applyEraserToCanvas(path);
         var _this = this;
+        var targets = [];
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path)) {
             _this._addPathToObjectEraser(obj, path);
+            targets.push(obj);
           }
         });
 
-        canvas.fire('erasing:end');
+        canvas.fire('erasing:end', { path: path, targets: targets, drawables: drawables });
 
         canvas.requestRenderAll();
         path.setCoords();
