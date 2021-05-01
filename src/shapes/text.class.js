@@ -1185,13 +1185,13 @@
       if (this.textAlign === 'center') {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'right' && this.direction === 'ltr') {
+      if (this.textAlign === 'right') {
         return this.width - lineWidth;
       }
       if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'justify-right' && this.direction === 'ltr' && this.isEndOfWrapping(lineIndex)) {
+      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;

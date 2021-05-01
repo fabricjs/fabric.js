@@ -26506,13 +26506,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (this.textAlign === 'center') {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'right' && this.direction === 'ltr') {
+      if (this.textAlign === 'right') {
         return this.width - lineWidth;
       }
       if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'justify-right' && this.direction === 'ltr' && this.isEndOfWrapping(lineIndex)) {
+      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;
@@ -27624,7 +27624,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        boundaries.left = this.width - boundaries.left;
+        boundaries.left = this.width - boundaries.left + this.width - this.getLineWidth(lineIndex);
       }
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -28933,13 +28933,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         lineIndex = 0,
         lineLeftOffset,
         line;
-    // handling of RTL: in order to get things work correctly,
-    // we assume RTL writing is mirrored compared to LTR writing.
-    // so in position detection we mirror the X offset, and when is time
-    // of rendering it, we mirror it again.
-    if (this.direction === 'rtl') {
-      mouseOffset.x = this.width * this.scaleX - mouseOffset.x;
-    }
     for (var i = 0, len = this._textLines.length; i < len; i++) {
       if (height <= mouseOffset.y) {
         height += this.getHeightOfLine(i) * this.scaleY;
@@ -28955,6 +28948,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     lineLeftOffset = this._getLineLeftOffset(lineIndex);
     width = lineLeftOffset * this.scaleX;
     line = this._textLines[lineIndex];
+    // handling of RTL: in order to get things work correctly,
+    // we assume RTL writing is mirrored compared to LTR writing.
+    // so in position detection we mirror the X offset, and when is time
+    // of rendering it, we mirror it again.
+    if (this.direction === 'rtl') {
+      mouseOffset.x = this.width * this.scaleX - mouseOffset.x + width;
+    }
     for (var j = 0, jlen = line.length; j < jlen; j++) {
       prevWidth = width;
       // i removed something about flipX here, check.
@@ -29054,6 +29054,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     40: 'moveCursorDown',
   },
 
+  keysMapRtl: {
+    9:  'exitEditing',
+    27: 'exitEditing',
+    33: 'moveCursorUp',
+    34: 'moveCursorDown',
+    35: 'moveCursorLeft',
+    36: 'moveCursorRight',
+    37: 'moveCursorRight',
+    38: 'moveCursorUp',
+    39: 'moveCursorLeft',
+    40: 'moveCursorDown',
+  },
+
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
@@ -29083,8 +29096,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
-    if (e.keyCode in this.keysMap) {
-      this[this.keysMap[e.keyCode]](e);
+    var keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
+    if (e.keyCode in keyMap) {
+      this[keyMap[e.keyCode]](e);
     }
     else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
       this[this.ctrlKeysMapDown[e.keyCode]](e);
