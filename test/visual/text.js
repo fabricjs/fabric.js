@@ -95,7 +95,7 @@
   function text3(canvas, callback) {
     var text = new fabric.Text('lorem ipsum\ndolor\nsit Amet2\nconsectgetur',
       { objectCaching: false, fontFamily: 'Arial', styles:
-        {'0': {'0': {'fill': 'red','fontSize': 20},'1': {'fill': 'red','fontSize': 30},'2': {'fill': 'red','fontSize': 40},'3': {'fill': 'red','fontSize': 50},'4': {'fill': 'red','fontSize': 60},'6': {'textBackgroundColor': 'yellow'},'7': {'textBackgroundColor': 'yellow','textDecoration': ' line-through','linethrough': true},'8': {'textBackgroundColor': 'yellow','textDecoration': ' line-through','linethrough': true},'9': {'textBackgroundColor': 'yellow'}},'1': {'0': {'textDecoration': 'underline'},'1': {'textDecoration': 'underline'},'2': {'fill': 'green','fontStyle': 'italic','textDecoration': 'underline'},'3': {'fill': 'green','fontStyle': 'italic','textDecoration': 'underline'},'4': {'fill': 'green','fontStyle': 'italic','textDecoration': 'underline'}},'2': {'0': {'fill': 'blue','fontWeight': 'bold'},'1': {'fill': 'blue','fontWeight': 'bold'},'2': {'fill': 'blue','fontWeight': 'bold','fontSize': 63},'4': {'fontFamily': 'Courier','textDecoration': ' underline','underline': true},'5': {'fontFamily': 'Courier','textDecoration': ' underline','underline': true},'6': {'fontFamily': 'Courier','textDecoration': ' overline','overline': true},'7': {'fontFamily': 'Courier','textDecoration': ' overline','overline': true},'8': {'fontFamily': 'Courier','textDecoration': ' overline','overline': true}},'3': {'0': {'fill': '#666','textDecoration': 'line-through'},'1': {'fill': '#666','textDecoration': 'line-through'},'2': {'fill': '#666','textDecoration': 'line-through'},'3': {'fill': '#666','textDecoration': 'line-through'},'4': {'fill': '#666','textDecoration': 'line-through'},'7': {'textDecoration': ' underline','underline': true},'8': {'stroke': '#ff1e15','strokeWidth': 2},'9': {'stroke': '#ff1e15','strokeWidth': 2}}}
+        {0: {0: {fill: 'red',fontSize: 20},1: {fill: 'red',fontSize: 30},2: {fill: 'red',fontSize: 40},3: {fill: 'red',fontSize: 50},4: {fill: 'red',fontSize: 60},6: {textBackgroundColor: 'yellow'},7: {textBackgroundColor: 'yellow',textDecoration: ' line-through',linethrough: true},8: {textBackgroundColor: 'yellow',textDecoration: ' line-through',linethrough: true},9: {textBackgroundColor: 'yellow'}},1: {0: {textDecoration: 'underline'},1: {textDecoration: 'underline'},2: {fill: 'green',fontStyle: 'italic',textDecoration: 'underline'},3: {fill: 'green',fontStyle: 'italic',textDecoration: 'underline'},4: {fill: 'green',fontStyle: 'italic',textDecoration: 'underline'}},2: {0: {fill: 'blue',fontWeight: 'bold'},1: {fill: 'blue',fontWeight: 'bold'},2: {fill: 'blue',fontWeight: 'bold',fontSize: 63},4: {fontFamily: 'Courier',textDecoration: ' underline',underline: true},5: {fontFamily: 'Courier',textDecoration: ' underline',underline: true},6: {fontFamily: 'Courier',textDecoration: ' overline',overline: true},7: {fontFamily: 'Courier',textDecoration: ' overline',overline: true},8: {fontFamily: 'Courier',textDecoration: ' overline',overline: true}},3: {0: {fill: '#666',textDecoration: 'line-through'},1: {fill: '#666',textDecoration: 'line-through'},2: {fill: '#666',textDecoration: 'line-through'},3: {fill: '#666',textDecoration: 'line-through'},4: {fill: '#666',textDecoration: 'line-through'},7: {textDecoration: ' underline',underline: true},8: {stroke: '#ff1e15',strokeWidth: 2},9: {stroke: '#ff1e15',strokeWidth: 2}}}
       }
     );
     canvas.add(text);
@@ -354,6 +354,98 @@
     height: 220,
     golden: 'text10.png',
     percentage: 0.06,
+  });
+
+  function text11(canvas, callback) {
+    var itext = new fabric.Text('hello\nworld', {
+      left: 4,
+      top: 4,
+      fontFamily: 'Helvetica',
+      fill: 'purple',
+      lineHeight: 1.1,
+      styles: {
+        0: {
+          0: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          1: {
+            fill: 'blue',
+            underline: true,
+            linethrough: true
+          },
+          2: {
+            fill: 'blue',
+            underline: true,
+            linethrough: true
+          },
+          3: {
+            fill: 'yellow',
+            underline: true,
+            linethrough: true
+          },
+        },
+      }
+    });
+    var itext2 = new fabric.Text('Version 4.2.0', {
+      left: 105,
+      top: 4,
+      fontFamily: 'Helvetica',
+      fill: 'blue',
+      lineHeight: 1.1,
+      styles: {
+        0: {
+          0: {
+            underline: true,
+            linethrough: true
+          },
+          1: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          2: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          3: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          4: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          5: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+          6: {
+            fill: 'red',
+            underline: true,
+            linethrough: true
+          },
+        },
+      }
+    });
+    canvas.add(itext);
+    canvas.add(itext2);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text and underline color',
+    code: text11,
+    width: 350,
+    height: 100,
+    golden: 'text11.png',
+    percentage: 0.01,
   });
 
   tests.forEach(visualTestLoop(QUnit));

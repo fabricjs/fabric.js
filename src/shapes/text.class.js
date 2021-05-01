@@ -1311,13 +1311,15 @@
             (currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy)
             && boxWidth > 0
           ) {
-            lastDecoration && lastFill &&
+            if (lastDecoration && lastFill) {
+              ctx.fillStyle = lastFill;
               ctx.fillRect(
                 leftOffset + lineLeftOffset + boxStart,
                 top + this.offsets[type] * size + dy,
                 boxWidth,
                 this.fontSize / 15
               );
+            }
             boxStart = charBox.left;
             boxWidth = charBox.width;
             lastDecoration = currentDecoration;
