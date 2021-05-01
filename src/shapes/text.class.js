@@ -259,11 +259,13 @@
     deltaY: 0,
 
     /**
+     * WARNING: EXPERIMENTAL. NOT SUPPORTED YET
      * determine the direction of the text.
      * This has to be set manually together with textAlign and originX for proper
      * experience.
      * some interesting link for the future
      * https://www.w3.org/International/questions/qa-bidi-unicode-controls
+     * @since 4.5.0
      * @type {String} 'ltr|rtl'
      * @default
      */
