@@ -259,6 +259,17 @@
     deltaY: 0,
 
     /**
+     * determine the direction of the text.
+     * This has to be set manually together with textAlign and originX for proper
+     * experience.
+     * some interesting link for the future
+     * https://www.w3.org/International/questions/qa-bidi-unicode-controls
+     * @type {String} 'ltr|rtl'
+     * @default
+     */
+    direction: 'ltr',
+
+    /**
      * Array of properties that define a style unit (of 'styles').
      * @type {Array}
      * @default
@@ -1174,13 +1185,13 @@
       if (this.textAlign === 'center') {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'right') {
+      if (this.textAlign === 'right' && this.direction === 'ltr') {
         return this.width - lineWidth;
       }
       if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
         return (this.width - lineWidth) / 2;
       }
-      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
+      if (this.textAlign === 'justify-right' && this.direction === 'ltr' && this.isEndOfWrapping(lineIndex)) {
         return this.width - lineWidth;
       }
       return 0;
