@@ -40,7 +40,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "node build.js modules=ALL requirejs exclude=gestures,accessors",
+    "build": "node build.js modules=ALL requirejs exclude=gestures,accessors,erasing",
     "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "link:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm link",

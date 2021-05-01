@@ -234,7 +234,7 @@ var filesToInclude = [
   ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
 
   //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
-  ifSpecifiedInclude('freedrawing', 'src/mixins/eraser_brush.mixin.js'),
+  ifSpecifiedInclude('erasing', 'src/mixins/eraser_brush.mixin.js'),
 ];
 
 if (buildMinified) {
