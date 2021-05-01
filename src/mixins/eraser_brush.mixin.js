@@ -1,4 +1,5 @@
 (function () {
+/** ERASER_START */
   var __setBgOverlayColor = fabric.StaticCanvas.prototype.__setBgOverlayColor;
   var ___setBgOverlay = fabric.StaticCanvas.prototype.__setBgOverlay;
   var __setSVGBgOverlayColor = fabric.StaticCanvas.prototype._setSVGBgOverlayColor;
@@ -682,4 +683,6 @@
       }
     }
   );
+
+/** ERASER_END */
 })();
