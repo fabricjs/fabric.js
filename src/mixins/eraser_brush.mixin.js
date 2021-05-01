@@ -157,7 +157,10 @@
         this.clipPath = null;
         var markup = _toSVG.call(this, reviver);
         this.clipPath = eraser;
-        return markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >\n' + eraserMarkup);
+        return [
+          eraserMarkup,
+          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
+        ].join('\n');
       } else {
         return _toSVG.call(this, reviver);
       }
