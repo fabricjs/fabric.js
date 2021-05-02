@@ -1,5 +1,5 @@
 (function () {
-/** ERASER_START */
+  /** ERASER_START */
   var __setBgOverlayColor = fabric.StaticCanvas.prototype.__setBgOverlayColor;
   var ___setBgOverlay = fabric.StaticCanvas.prototype.__setBgOverlay;
   var __setSVGBgOverlayColor = fabric.StaticCanvas.prototype._setSVGBgOverlayColor;
@@ -577,9 +577,7 @@
             originX: "center",
             originY: "center"
           });
-          var objects = [rect];
-          clipObject = new fabric.Group(objects, {
-            boundingObjects: objects,
+          clipObject = new fabric.Group([rect], {
             eraser: true
           });
         } else {
@@ -684,5 +682,5 @@
     }
   );
 
-/** ERASER_END */
+  /** ERASER_END */
 })();
