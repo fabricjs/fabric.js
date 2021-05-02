@@ -82,7 +82,7 @@
      */
     _setSVGBgOverlayColor: function (markup, property, reviver) {
       var filler = this[property + 'Color'];
-      if (filler && typeof filler === 'object' && filler.type === 'rect') {
+      if (filler && filler.isType && filler.isType('rect')) {
         var excludeFromExport = filler.excludeFromExport || (this[property] && this[property].excludeFromExport);
         if (filler && !excludeFromExport && filler.toSVG) {
           markup.push(filler.toSVG(reviver));
@@ -116,7 +116,7 @@
   });
 
   var _toObject = fabric.Object.prototype.toObject;
-  var _toSVG = fabric.Object.prototype.toSVG;
+  var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   fabric.util.object.extend(fabric.Object.prototype, {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
@@ -163,46 +163,23 @@
 
     /**
      * use <mask> to achieve erasing for svg, override <clipPath>
-     * @param {Function} reviver
-     * @returns {string} markup
+     * @param {string[]} objectMarkup 
+     * @param {Object} options 
+     * @returns 
      */
-    toSVG: function (reviver) {
+    _createBaseSVGMarkup: function (objectMarkup, options) {
       var eraser = this.getEraser();
       if (eraser) {
-        var eraserMarkup = this.eraserToSVG(reviver);
+        var eraserMarkup = this.eraserToSVG(options.reviver);
         this.clipPath = null;
-        var markup = _toSVG.call(this, reviver);
+        var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
         this.clipPath = eraser;
         return [
           eraserMarkup,
           markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
         ].join('\n');
       } else {
-        return _toSVG.call(this, reviver);
-      }
-    }
-  });
-
-  var _pathToSVG = fabric.Path.prototype.toSVG;
-  fabric.util.object.extend(fabric.Path.prototype, {
-    /**
-     * Path overrides {@link fabric.Object#toSVG} so we must override it as well
-     * @param {Function} reviver
-     * @returns {string} markup
-     */
-    toSVG: function (reviver) {
-      var eraser = this.getEraser();
-      if (eraser) {
-        var eraserMarkup = this.eraserToSVG(reviver);
-        this.clipPath = null;
-        var markup = _pathToSVG.call(this, reviver);
-        this.clipPath = eraser;
-        return [
-          eraserMarkup,
-          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
-        ].join('\n');
-      } else {
-        return _pathToSVG.call(this, reviver);
+        return __createBaseSVGMarkup.call(this, objectMarkup, options);
       }
     }
   });
