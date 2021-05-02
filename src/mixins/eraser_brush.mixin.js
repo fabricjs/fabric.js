@@ -11,30 +11,45 @@
      * patches {@link CommonMethods#_initGradient}
      * @private
      * @param {'bakground'|'overlay'} property
-     * @param {(String|fabric.Pattern|fabric.Rect)} color Color or pattern or rect
+     * @param {(String|fabric.Pattern|fabric.Rect|fabric.Group)} color Color or pattern or rect/group (in case of erasing)
      * @param {Function} callback Callback to invoke when color is set
      * @param {Object} options
      * @return {fabric.Canvas} instance
      * @chainable true
      */
     __setBgOverlayColor: function (property, color, callback, options) {
-      var _this = this;
-      var cb = function () {
-        _this[property] = new fabric.Rect(fabric.util.object.extend({
-          width: _this.width,
-          height: _this.height,
-          fill: _this[property],
-        }, options));
-        callback && callback(_this[property]);
+      if (color && color.isType && (color.isType("rect") || color.isType("group"))) {
+        // color is already an object
+        this[property] = color;
+        color.set(options);
+        callback && callback(this[property]);
+      } else {
+        var _this = this;
+        var cb = function () {
+          _this[property] = new fabric.Rect(fabric.util.object.extend({
+            width: _this.width,
+            height: _this.height,
+            fill: _this[property],
+          }, options));
+          callback && callback(_this[property]);
+        }
+        __setBgOverlayColor.call(this, property, color, cb);
+        //  invoke cb in case of gradient
+        //  see {@link CommonMethods#_initGradient}
+        if (color && color.colorStops && !(color instanceof fabric.Gradient)) {
+          cb();
+        }
       }
 
-      __setBgOverlayColor.call(this, property, color, cb);
-      //  invoke cb in case of gradient
-      //  see {@link CommonMethods#_initGradient}
-      if (color && color.colorStops && !(color instanceof fabric.Gradient)) {
-        cb();
-      }
       return this;
+    },
+
+    setBackgroundColor: function (backgroundColor, callback, options) {
+      return this.__setBgOverlayColor('backgroundColor', backgroundColor, callback, options);
+    },
+
+    setOverlayColor: function (overlayColor, callback, options) {
+      return this.__setBgOverlayColor('overlayColor', overlayColor, callback, options);
     },
 
     /**
