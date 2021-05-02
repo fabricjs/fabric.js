@@ -154,7 +154,7 @@
         var fill = eraser._objects[0].fill;
         eraser._objects[0].fill = 'white';
         eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var commons = ['id="' + eraser.clipPathId + '"', options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''].join(' ');
+        var commons = ['id="' + eraser.clipPathId + '"'/*, options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/].join(' ');
         var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
         eraser._objects[0].fill = fill;
         return objectMarkup.join('\n');
