@@ -148,13 +148,14 @@
      * @param {Function} reviver 
      * @returns {string} markup
      */
-    eraserToSVG: function (reviver) {
+    eraserToSVG: function (options) {
       var eraser = this.getEraser();
       if (eraser) {
         var fill = eraser._objects[0].fill;
         eraser._objects[0].fill = 'white';
         eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var objectMarkup = ['<defs>', '<mask id="' + eraser.clipPathId + '" >', eraser.toSVG(reviver), '</mask>', '</defs>'];
+        var commons = ['id="' + eraser.clipPathId + '"', options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''].join(' ');
+        var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
         eraser._objects[0].fill = fill;
         return objectMarkup.join('\n');
       }
@@ -170,7 +171,7 @@
     _createBaseSVGMarkup: function (objectMarkup, options) {
       var eraser = this.getEraser();
       if (eraser) {
-        var eraserMarkup = this.eraserToSVG(options.reviver);
+        var eraserMarkup = this.eraserToSVG(options);
         this.clipPath = null;
         var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
         this.clipPath = eraser;
