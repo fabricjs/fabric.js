@@ -11,14 +11,14 @@
      * patches {@link CommonMethods#_initGradient}
      * @private
      * @param {'bakground'|'overlay'} property
-     * @param {(String|fabric.Pattern|fabric.Rect|fabric.Group)} color Color or pattern or rect/group (in case of erasing)
+     * @param {(String|fabric.Pattern|fabric.Rect)} color Color or pattern or rect (in case of erasing)
      * @param {Function} callback Callback to invoke when color is set
      * @param {Object} options
      * @return {fabric.Canvas} instance
      * @chainable true
      */
     __setBgOverlayColor: function (property, color, callback, options) {
-      if (color && color.isType && (color.isType("rect") || color.isType("group"))) {
+      if (color && color.isType && color.isType('rect')) {
         // color is already an object
         this[property] = color;
         color.set(options);
