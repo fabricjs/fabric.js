@@ -53,7 +53,7 @@
     },
 
     /**
-     * patch serialization
+     * patch serialization - from json
      * background/overlay properties could be objects if parsed by this mixin or could be legacy values
      * @private
      * @param {String} property Property to set (backgroundImage, overlayImage, backgroundColor, overlayColor)
@@ -76,7 +76,7 @@
     },
 
     /**
-     * patch serialization
+     * patch serialization - to svg
      * background/overlay properties could be objects if parsed by this mixin or could be legacy values
      * @private
      */
@@ -179,6 +179,30 @@
         ].join('\n');
       } else {
         return _toSVG.call(this, reviver);
+      }
+    }
+  });
+
+  var _pathToSVG = fabric.Path.prototype.toSVG;
+  fabric.util.object.extend(fabric.Path.prototype, {
+    /**
+     * Path overrides {@link fabric.Object#toSVG} so we must override it as well
+     * @param {Function} reviver
+     * @returns {string} markup
+     */
+    toSVG: function (reviver) {
+      var eraser = this.getEraser();
+      if (eraser) {
+        var eraserMarkup = this.eraserToSVG(reviver);
+        this.clipPath = null;
+        var markup = _pathToSVG.call(this, reviver);
+        this.clipPath = eraser;
+        return [
+          eraserMarkup,
+          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
+        ].join('\n');
+      } else {
+        return _pathToSVG.call(this, reviver);
       }
     }
   });
