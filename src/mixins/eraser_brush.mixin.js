@@ -587,9 +587,10 @@
           return;
         }
         if (!obj.getEraser()) {
+          var size = obj._getNonTransformedDimensions();
           var rect = new fabric.Rect({
-            width: obj.width + obj.strokeWidth,
-            height: obj.height + obj.strokeWidth,
+            width: size.x,
+            height: size.y,
             clipPath: obj.clipPath,
             originX: "center",
             originY: "center"
