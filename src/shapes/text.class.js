@@ -861,7 +861,7 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      return -this.width / 2;
+      return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
     },
 
     /**
@@ -950,12 +950,17 @@
           boxWidth = 0,
           timeToRender,
           path = this.path,
-          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path;
+          shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
+          isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1,
+          drawingLeft;
 
       ctx.save();
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
         // render all the line in one pass without checking
+        // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
+        ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+        ctx.direction = isLtr ? 'ltr' : 'rtl';
         this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
@@ -965,7 +970,7 @@
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
-          left += charBox.kernedWidth - charBox.width;
+          left += sign * (charBox.kernedWidth - charBox.width);
           boxWidth += charBox.width;
         }
         else {
@@ -991,11 +996,14 @@
             ctx.restore();
           }
           else {
-            this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top, lineHeight);
+            drawingLeft = left;
+            ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+            ctx.direction = isLtr ? 'ltr' : 'rtl';
+            this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
           }
           charsToRender = '';
           actualStyle = nextStyle;
-          left += boxWidth;
+          left += sign * boxWidth;
           boxWidth = 0;
         }
       }
@@ -1183,18 +1191,33 @@
      * @return {Number} Line left offset
      */
     _getLineLeftOffset: function(lineIndex) {
-      var lineWidth = this.getLineWidth(lineIndex);
-      if (this.textAlign === 'center') {
-        return (this.width - lineWidth) / 2;
+      var lineWidth = this.getLineWidth(lineIndex),
+          lineDiff = this.width - lineWidth, textAlign = this.textAlign, direction = this.direction,
+          isEndOfWrapping;
+      if (textAlign === 'center') {
+        return lineDiff / 2;
       }
-      if (this.textAlign === 'right') {
-        return this.width - lineWidth;
+      if (textAlign === 'right' && direction === 'rtl') {
+        return 0;
       }
-      if (this.textAlign === 'justify-center' && this.isEndOfWrapping(lineIndex)) {
-        return (this.width - lineWidth) / 2;
+      if (textAlign === 'left' && direction === 'ltr') {
+        return 0;
       }
-      if (this.textAlign === 'justify-right' && this.isEndOfWrapping(lineIndex)) {
-        return this.width - lineWidth;
+      if (textAlign === 'right' && direction === 'ltr') {
+        return lineDiff;
+      }
+      if (textAlign === 'left' && direction === 'rtl') {
+        return -lineDiff;
+      }
+      isEndOfWrapping = this.isEndOfWrapping(lineIndex);
+      if (textAlign === 'justify-center' && isEndOfWrapping) {
+        return lineDiff / 2;
+      }
+      if (textAlign === 'justify-right' && direction === 'ltr' && isEndOfWrapping) {
+        return lineDiff;
+      }
+      if (textAlign === 'justify-left' && direction === 'rtl' && isEndOfWrapping) {
+        return lineDiff;
       }
       return 0;
     },

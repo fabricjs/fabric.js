@@ -356,7 +356,7 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        boundaries.left = this.width - boundaries.left + this.width - this.getLineWidth(lineIndex);
+        boundaries.left *= -1;
       }
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
