@@ -54,6 +54,7 @@
     splitByGrapheme: false,
     strokeUniform: false,
     path: null,
+    direction: 'ltr',
   };
 
   QUnit.test('constructor', function(assert) {

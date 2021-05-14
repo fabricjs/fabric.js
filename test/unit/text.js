@@ -46,14 +46,15 @@
     textAlign:                 'left',
     textBackgroundColor:       '',
     fillRule:                  'nonzero',
-    paintFirst:               'fill',
+    paintFirst:                'fill',
     globalCompositeOperation:  'source-over',
     skewX:                      0,
     skewY:                      0,
     charSpacing:                0,
     styles:                     {},
     path:                       null,
-    strokeUniform:              false
+    strokeUniform:              false,
+    direction:                  'ltr',
   };
 
   QUnit.test('constructor', function(assert) {

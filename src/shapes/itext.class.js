@@ -435,7 +435,7 @@
         }
         var drawStart = boundaries.left + lineOffset + boxStart,
             drawWidth = boxEnd - boxStart,
-            drawHeight = lineHeight, extraTop = 0, exchange;
+            drawHeight = lineHeight, extraTop = 0;
         if (this.inCompositionMode) {
           ctx.fillStyle = this.compositionColor || 'black';
           drawHeight = 1;
