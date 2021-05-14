@@ -23,7 +23,8 @@
         this[property] = color;
         color.set(options);
         callback && callback(this[property]);
-      } else {
+      }
+      else {
         var _this = this;
         var cb = function () {
           _this[property] = new fabric.Rect(fabric.util.object.extend({
@@ -32,7 +33,7 @@
             fill: _this[property],
           }, options));
           callback && callback(_this[property]);
-        }
+        };
         __setBgOverlayColor.call(this, property, color, cb);
         //  invoke cb in case of gradient
         //  see {@link CommonMethods#_initGradient}
@@ -64,13 +65,15 @@
     __setBgOverlay: function (property, value, loaded, callback) {
       var _this = this;
 
-      if ((property === 'backgroundColor' || property === 'overlayColor') && (value && typeof value === 'object' && value.type === 'rect')) {
+      if ((property === 'backgroundColor' || property === 'overlayColor') &&
+        (value && typeof value === 'object' && value.type === 'rect')) {
         fabric.util.enlivenObjects([value], function (enlivedObject) {
           _this[property] = enlivedObject[0];
           loaded[property] = true;
           callback && callback();
         });
-      } else {
+      }
+      else {
         ___setBgOverlay.call(this, property, value, loaded, callback);
       }
     },
@@ -87,7 +90,8 @@
         if (filler && !excludeFromExport && filler.toSVG) {
           markup.push(filler.toSVG(reviver));
         }
-      } else {
+      }
+      else {
         __setSVGBgOverlayColor.call(this, markup, property, reviver);
       }
     },
@@ -99,7 +103,7 @@
      */
     _renderBackgroundOrOverlay: function (ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
@@ -126,7 +130,7 @@
     erasable: true,
 
     /**
-     * 
+     *
      * @returns {fabric.Group | null}
      */
     getEraser: function () {
@@ -145,7 +149,7 @@
     /**
      * use <mask> to achieve erasing for svg
      * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * @param {Function} reviver 
+     * @param {Function} reviver
      * @returns {string} markup
      */
     eraserToSVG: function (options) {
@@ -154,7 +158,10 @@
         var fill = eraser._objects[0].fill;
         eraser._objects[0].fill = 'white';
         eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var commons = ['id="' + eraser.clipPathId + '"'/*, options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/].join(' ');
+        var commons = [
+          'id="' + eraser.clipPathId + '"',
+          /*options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/
+        ].join(' ');
         var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
         eraser._objects[0].fill = fill;
         return objectMarkup.join('\n');
@@ -164,9 +171,9 @@
 
     /**
      * use <mask> to achieve erasing for svg, override <clipPath>
-     * @param {string[]} objectMarkup 
-     * @param {Object} options 
-     * @returns 
+     * @param {string[]} objectMarkup
+     * @param {Object} options
+     * @returns
      */
     _createBaseSVGMarkup: function (objectMarkup, options) {
       var eraser = this.getEraser();
@@ -179,7 +186,8 @@
           eraserMarkup,
           markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
         ].join('\n');
-      } else {
+      }
+      else {
         return __createBaseSVGMarkup.call(this, objectMarkup, options);
       }
     }
@@ -214,7 +222,7 @@
     /**
      * While erasing, the brush is in charge of rendering the canvas
      * It uses both layers to achieve diserd erasing effect
-     * 
+     *
      * @returns fabric.Canvas
      */
     renderAll: function () {
@@ -241,13 +249,13 @@
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
    * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx
-   * while the entire canvas is rendered on the top ctx. 
+   * while the entire canvas is rendered on the top ctx.
    * Canvas bakground/overlay image/color are handled as well.
    * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
    * This achieves the desired effect of seeming to erase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
-   * 
-   * 
+   *
+   *
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
    */
@@ -259,7 +267,7 @@
       /**
        * Indicates that the ctx is ready and rendering can begin.
        * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
-       * 
+       *
        * @private
        */
       _ready: false,
@@ -282,7 +290,7 @@
 
       /**
        * Used to hide a drawable from the rendering process
-       * @param {fabric.Object} object 
+       * @param {fabric.Object} object
        */
       hideObject: function (object) {
         if (object) {
@@ -292,7 +300,7 @@
       },
 
       /**
-       * Restores hiding an object 
+       * Restores hiding an object
        * {@link favric.EraserBrush#hideObject}
        * @param {fabric.Object} object
        */
@@ -335,7 +343,7 @@
        * 2. if erasable = false:
        *    we need to draw the drawable on top of the brush,
        *    this means we need to repaint for every stroke
-       * 
+       *
        * @param {'bottom' | 'top' | 'overlay'} layer
        * @returns boolean render overlay above brush
        */
@@ -371,20 +379,21 @@
       },
 
       /**
-       * @private 
+       * @private
        * This is designed to support erasing a group with both erasable and non-erasable objects.
        * Iterates over collections to allow nested selective erasing.
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer} 
+       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
        * to prepare the bottom layer by hiding erasable nested objects
-       * 
-       * @param {fabric.Collection} collection 
+       *
+       * @param {fabric.Collection} collection
        */
       prepareCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
           if (obj.forEachObject) {
             _this.prepareCollectionTraversal(obj);
-          } else {
+          }
+          else {
             if (obj.erasable) {
               _this.hideObject(obj);
             }
@@ -394,9 +403,9 @@
 
       /**
        * @private
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer} 
+       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
        * to reverse the action of {@link fabric.EraserBrush#prepareCollectionTraversal}
-       * 
+       *
        * @param {fabric.Collection} collection
        */
       restoreCollectionTraversal: function (collection) {
@@ -404,7 +413,8 @@
         collection.forEachObject(function (obj) {
           if (obj.forEachObject) {
             _this.restoreCollectionTraversal(obj);
-          } else {
+          }
+          else {
             _this.restoreObjectVisibility(obj);
           }
         });
@@ -413,11 +423,11 @@
       /**
        * @private
        * This is designed to support erasing a group with both erasable and non-erasable objects.
-       * 
+       *
        * @param {'bottom' | 'top' | 'overlay'} layer
        */
       prepareCanvasObjectsForLayer: function (layer) {
-        if (layer !== 'bottom') return;
+        if (layer !== 'bottom') { return; }
         this.prepareCollectionTraversal(this.canvas);
       },
 
@@ -426,13 +436,13 @@
        * @param {'bottom' | 'top' | 'overlay'} layer
        */
       restoreCanvasObjectsFromLayer: function (layer) {
-        if (layer !== 'bottom') return;
+        if (layer !== 'bottom') { return; }
         this.restoreCollectionTraversal(this.canvas);
       },
 
       /**
        * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer 
+       * @param {'bottom' | 'top' | 'overlay'} layer
        * @returns boolean render overlay above brush
        */
       prepareCanvasForLayer: function (layer) {
@@ -506,14 +516,14 @@
 
       /**
        * We indicate {@link fabric.PencilBrush} to repaint itself if necessary
-       * @returns 
+       * @returns
        */
       needsFullRender: function () {
         return this.callSuper('needsFullRender') || this._drawOverlayOnTop;
       },
 
       /**
-       * 
+       *
        * @param {fabric.Point} pointer
        * @param {fabric.IEvent} options
        * @returns
@@ -539,7 +549,7 @@
        * 2. Draw all objects on top ctx including erasable drawables {@link fabric.EraserBrush#renderTopLayer}
        * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
        * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
-       * 
+       *
        * @param {fabric.Canvas} canvas
        */
       _render: function () {
@@ -560,7 +570,8 @@
         if (this._isErasing) {
           if (this.isRendering) {
             this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
-          } else {
+          }
+          else {
             this._render();
           }
           return true;
@@ -570,7 +581,7 @@
 
       /**
        * Adds path to existing clipPath of object
-       * 
+       *
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -592,18 +603,19 @@
             width: size.x,
             height: size.y,
             clipPath: obj.clipPath,
-            originX: "center",
-            originY: "center"
+            originX: 'center',
+            originY: 'center'
           });
           clipObject = new fabric.Group([rect], {
             eraser: true
           });
-        } else {
+        }
+        else {
           clipObject = obj.clipPath;
         }
 
         path.clone(function (path) {
-          path.globalCompositeOperation = "destination-out";
+          path.globalCompositeOperation = 'destination-out';
           // http://fabricjs.com/using-transformations
           var desiredTransform = fabric.util.multiplyTransformMatrices(
             fabric.util.invertTransform(
@@ -622,7 +634,7 @@
 
       /**
        * Add the eraser path to canvas drawables' clip paths
-       * 
+       *
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} path
        * @returns {Object} canvas drawables that were erased by the path
