@@ -54,7 +54,7 @@
 					gradient.addColorStop(1, "green");
 					return gradient;
 				},
-				patternTransform: [1, 0, 0, 1, -100, -100],
+				gradientTransform: [1, 0, 0, 1, -100, -100],
 			},
 		});
 		canvas.add(
