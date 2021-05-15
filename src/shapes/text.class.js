@@ -1347,10 +1347,14 @@
             (currentDecoration !== lastDecoration || currentFill !== lastFill || _size !== size || _dy !== dy)
             && boxWidth > 0
           ) {
+            var drawStart = leftOffset + lineLeftOffset + boxStart;
+            if (this.direction === 'rtl') {
+              drawStart = this.width - drawStart - boxWidth;
+            }
             if (lastDecoration && lastFill) {
               ctx.fillStyle = lastFill;
               ctx.fillRect(
-                leftOffset + lineLeftOffset + boxStart,
+                drawStart,
                 top + this.offsets[type] * size + dy,
                 boxWidth,
                 this.fontSize / 15
