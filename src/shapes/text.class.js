@@ -1202,33 +1202,30 @@
     _getLineLeftOffset: function(lineIndex) {
       var lineWidth = this.getLineWidth(lineIndex),
           lineDiff = this.width - lineWidth, textAlign = this.textAlign, direction = this.direction,
-          isEndOfWrapping;
+          isEndOfWrapping, leftOffset = 0, isEndOfWrapping = this.isEndOfWrapping(lineIndex);
+      if (textAlign === 'justify'
+        || (textAlign === 'justify-center' && !isEndOfWrapping)
+        || (textAlign === 'justify-right' && !isEndOfWrapping)
+        || (textAlign === 'justify-left' && !isEndOfWrapping)
+      ) {
+        return 0;
+      }
       if (textAlign === 'center') {
-        return lineDiff / 2;
+        leftOffset = lineDiff / 2;
       }
-      if (textAlign === 'right' && direction === 'rtl') {
-        return 0;
+      if (textAlign === 'right') {
+        leftOffset = lineDiff;
       }
-      if (textAlign === 'left' && direction === 'ltr') {
-        return 0;
+      if (textAlign === 'justify-center') {
+        leftOffset = lineDiff / 2;
       }
-      if (textAlign === 'right' && direction === 'ltr') {
-        return lineDiff;
+      if (textAlign === 'justify-right') {
+        leftOffset = lineDiff;
       }
-      if (textAlign === 'left' && direction === 'rtl') {
-        return -lineDiff;
+      if (direction === 'rtl') {
+        leftOffset -= lineDiff;
       }
-      isEndOfWrapping = this.isEndOfWrapping(lineIndex);
-      if (textAlign === 'justify-center' && isEndOfWrapping) {
-        return lineDiff / 2;
-      }
-      if (textAlign === 'justify-right' && direction === 'ltr' && isEndOfWrapping) {
-        return lineDiff;
-      }
-      if (textAlign === 'justify-left' && direction === 'rtl' && isEndOfWrapping) {
-        return lineDiff;
-      }
-      return 0;
+      return leftOffset;
     },
 
     /**
