@@ -202,6 +202,21 @@
   }
 
   /**
+   * Wrap an action handler with firing an event if the action is performed
+   * @param {Function} actionHandler the function to wrap
+   * @return {Function} a function with an action handler signature
+   */
+  function wrapWithFireEvent(eventName, actionHandler) {
+    return function(eventData, transform, x, y) {
+      var actionPerformed = actionHandler(eventData, transform, x, y);
+      if (actionPerformed) {
+        fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
+      }
+      return actionPerformed;
+    };
+  }
+
+  /**
    * Transforms a point described by x and y in a distance from the top left corner of the object
    * bounding box.
    * @param {Object} transform
@@ -294,7 +309,6 @@
       var dimBeforeSkewing = target._getTransformedDimensions().y;
       target.set('skewX', newSkew);
       compensateScaleForSkew(target, 'skewY', 'scaleY', 'y', dimBeforeSkewing);
-      fireEvent('skewing', commonEventInfo(eventData, transform, x, y));
     }
     return hasSkewed;
   }
@@ -338,7 +352,6 @@
       var dimBeforeSkewing = target._getTransformedDimensions().x;
       target.set('skewY', newSkew);
       compensateScaleForSkew(target, 'skewX', 'scaleX', 'x', dimBeforeSkewing);
-      fireEvent('skewing', commonEventInfo(eventData, transform, x, y));
     }
     return hasSkewed;
   }
@@ -389,7 +402,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originX = originX;
-    var finalHandler = wrapWithFixedAnchor(skewObjectX);
+    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectX));
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -439,7 +452,7 @@
 
     // once we have the origin, we find the anchor point
     transform.originY = originY;
-    var finalHandler = wrapWithFixedAnchor(skewObjectY);
+    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectY));
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -489,9 +502,6 @@
 
     hasRotated = target.angle !== angle;
     target.angle = angle;
-    if (hasRotated) {
-      fireEvent('rotating', commonEventInfo(eventData, transform, x, y));
-    }
     return hasRotated;
   }
 
@@ -553,7 +563,7 @@
             original = transform.original,
             originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
               Math.abs(dim.y * original.scaleY / target.scaleY),
-            scale = distance / originalDistance, hasScaled;
+            scale = distance / originalDistance;
         scaleX = original.scaleX * scale;
         scaleY = original.scaleY * scale;
       }
@@ -588,11 +598,7 @@
       by === 'x' && target.set('scaleX', scaleX);
       by === 'y' && target.set('scaleY', scaleY);
     }
-    hasScaled = oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
-    if (hasScaled) {
-      fireEvent('scaling', commonEventInfo(eventData, transform, x, y));
-    }
-    return hasScaled;
+    return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
   }
 
   /**
@@ -681,14 +687,10 @@
     var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width, hasResized,
+        oldWidth = target.width,
         newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
     target.set('width', Math.max(newWidth, 0));
-    hasResized = oldWidth !== newWidth;
-    if (hasResized) {
-      fireEvent('resizing', commonEventInfo(eventData, transform, x, y));
-    }
-    return hasResized;
+    return oldWidth !== newWidth;
   }
 
   /**
@@ -717,13 +719,13 @@
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
-  controls.rotationWithSnapping = wrapWithFixedAnchor(rotationWithSnapping);
-  controls.scalingEqually = wrapWithFixedAnchor(scaleObjectFromCorner);
-  controls.scalingX = wrapWithFixedAnchor(scaleObjectX);
-  controls.scalingY = wrapWithFixedAnchor(scaleObjectY);
+  controls.rotationWithSnapping = wrapWithFireEvent('rotating', wrapWithFixedAnchor(rotationWithSnapping));
+  controls.scalingEqually = wrapWithFireEvent('scaling', wrapWithFixedAnchor( scaleObjectFromCorner));
+  controls.scalingX = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectX));
+  controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFixedAnchor(changeWidth);
+  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth));
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
@@ -731,6 +733,7 @@
   controls.rotationStyleHandler = rotationStyleHandler;
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
+  controls.wrapWithFireEvent = wrapWithFireEvent;
   controls.getLocalPoint = getLocalPoint;
   fabric.controlsUtils = controls;
 

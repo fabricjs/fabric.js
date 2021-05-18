@@ -46,14 +46,15 @@
     textAlign:                 'left',
     textBackgroundColor:       '',
     fillRule:                  'nonzero',
-    paintFirst:               'fill',
+    paintFirst:                'fill',
     globalCompositeOperation:  'source-over',
     skewX:                      0,
     skewY:                      0,
     charSpacing:                0,
     styles:                     {},
     path:                       null,
-    strokeUniform:              false
+    strokeUniform:              false,
+    direction:                  'ltr',
   };
 
   QUnit.test('constructor', function(assert) {
@@ -867,6 +868,47 @@
   QUnit.test('cacheProperties for text', function(assert) {
     var text = new fabric.Text('a');
     assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-path');
+  });
+
+  QUnit.test('_getLineLeftOffset', function(assert) {
+    var text = new fabric.Text('long line of text\nshort');
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align left is 0');
+    text.textAlign = 'right';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'with align right is diff between width and lineWidth');
+    text.textAlign = 'center';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'with align center is split in 2');
+    text.textAlign = 'justify';
+    assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-center';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'like align center');
+    text.textAlign = 'justify-left';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last left');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align left');
+    text.textAlign = 'justify-right';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'like align right');
+  });
+
+  QUnit.test('_getLineLeftOffset with direction rtl', function(assert) {
+    var text = new fabric.Text('long line of text\nshort');
+    text.direction = 'rtl';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
+    text.textAlign = 'right';
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align right is 0');
+    text.textAlign = 'center';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'with align center is split in 2');
+    text.textAlign = 'justify';
+    assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-center';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'like align center');
+    text.textAlign = 'justify-left';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last left');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'like align left with rtl');
+    text.textAlign = 'justify-right';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
   });
 
 })();

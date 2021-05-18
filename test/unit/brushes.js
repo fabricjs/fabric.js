@@ -21,6 +21,16 @@
       assert.deepEqual(brush._points, [], 'points is an empty array');
     });
 
+	  QUnit.test('decimate points', function(assert) {
+	    var brush = new fabric.PencilBrush(canvas);
+	    var points = [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 5, y: 0 }];
+	    var distance = 6;
+	    var newPoints = brush.decimatePoints(points, distance);
+	    assert.equal(newPoints[0], points[0], 'first point is always present');
+	    assert.equal(newPoints[1], points[points.length-1], 'last point is always present');
+	    assert.equal(newPoints.length, 2, 'All points removed except first and last');
+	  });
+    
     [true, false].forEach(function(val) {
       QUnit.module('fabric.BaseBrush with canvas.enableRetinaScaling = ' + val, function(hooks) {
         hooks.beforeEach(function() {

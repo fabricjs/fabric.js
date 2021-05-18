@@ -802,4 +802,35 @@
     });
   });
 
+  QUnit.test('parseSVGFromString with empty <use/>', function(assert) {
+    var done = assert.async();
+    var string =
+      '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+        '<use/>' +
+        '<rect width="10" height="10" />' +
+      '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].type, 'rect');
+      done();
+    });
+  });
+
+  QUnit.test('parseSVGFromString with <use/> having base64 image href', function(assert) {
+    var done = assert.async();
+    var string =
+      '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+        '<defs>' +
+          '<image id="image" x="0" y="0" width="4346.7" height="4346.7" xlink:href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"/>' +
+        '</defs>' +
+        '<use xlink:href="#image"/>' +
+        '<rect width="10" height="10" />' +
+      '</svg>';
+
+    fabric.loadSVGFromString(string, function(objects) {
+      assert.equal(objects[0].type, 'image');
+      done();
+    });
+  });
+
 })();
