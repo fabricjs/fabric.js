@@ -114,6 +114,13 @@
     editingBorderColor: 'rgba(102,153,255,0.25)',
 
     /**
+     * Border color of text object while indicated
+     * @type String
+     * @default
+     */
+    indicationBorderColor: 'rgba(00,254,0,0.25)',
+
+    /**
      * Width of cursor (in px)
      * @type Number
      * @default
