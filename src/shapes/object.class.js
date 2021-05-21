@@ -1396,6 +1396,25 @@
     },
 
     /**
+     * Renders indication for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} [styleOverride] properties to override the object style
+     */
+    _renderIndication: function(ctx, styleOverride) {
+      var vpt = this.getViewportTransform(),
+          matrix = this.calcTransformMatrix(),
+          options;
+      styleOverride = styleOverride || { };
+      matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
+      options = fabric.util.qrDecompose(matrix);
+      ctx.save();
+      ctx.translate(options.translateX, options.translateY);
+      ctx.lineWidth = 1 * this.borderScaleFactor;
+      this.drawIndication(ctx, styleOverride);
+      ctx.restore();
+    },
+
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
