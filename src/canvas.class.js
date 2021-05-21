@@ -360,7 +360,8 @@
     _hoveredTargets: [],
 
     /**
-     * Keep track of the indicated target
+     * reference to an indicated target (hovered but not selected)
+     * also potentially just 'highlighted' (thinking towards keyboard accessibility)
      * @type fabric.Object
      * @private
      */
