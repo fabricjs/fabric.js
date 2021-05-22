@@ -1,7 +1,13 @@
 # Changelog
 
-## [NEXT]
+## [4.5.0]
+
+- fix(fabric.PencilBrush) decimate deleting end of a freedrawing line [#6966](https://github.com/fabricjs/fabric.js/pull/6966)
 - feat(fabric.Text): Adding support for RTL languages by adding `direction` property [#7046](https://github.com/fabricjs/fabric.js/pull/7046)
+- feat(fabric) Add an eraser brush as optional module [#6994](https://github.com/fabricjs/fabric.js/pull/6994)
+- fix v4: 'scaling' event triggered before object position is adjusted [#6650](https://github.com/fabricjs/fabric.js/pull/6650)
+- Fix(fabric.Object): CircleControls transparentCorners styling [#7015](https://github.com/fabricjs/fabric.js/pull/7015)
+- Fix(svg_import): svg parsing in case it uses empty use tag or use with image href [#7044](https://github.com/fabricjs/fabric.js/pull/7044)
 - fix(fabric.Shadow): `offsetX`, `offsetY` and `blur` supports float [#7019](https://github.com/fabricjs/fabric.js/pull/7019)
 
 ## [4.4.0]
