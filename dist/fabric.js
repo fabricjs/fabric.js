@@ -11298,8 +11298,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _hoveredTargets: [],
 
     /**
-     * reference to an indicated target (hovered but not selected)
-     * also potentially just 'highlighted' (thinking towards keyboard accessibility)
+     * Keep track of the indicated target
      * @type fabric.Object
      * @private
      */
@@ -12231,6 +12230,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     drawIndicatedObject: function(ctx) {
       if (this._indicatedObject) {
+        this._indicatedObject.render(ctx);
         this._indicatedObject._renderIndication(ctx);
       }
     },
@@ -15431,7 +15431,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
-      this.drawObject(ctx);
       this.drawIndication(ctx, styleOverride);
       ctx.restore();
     },
@@ -27377,7 +27376,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @type String
      * @default
      */
-    indicationBorderColor: 'rgba(102,153,255,0.5)',
+    indicationBorderColor: 'rgba(00,254,0,0.25)',
 
     /**
      * Width of cursor (in px)

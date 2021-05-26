@@ -1293,6 +1293,7 @@
      */
     drawIndicatedObject: function(ctx) {
       if (this._indicatedObject) {
+        this._indicatedObject.render(ctx);
         this._indicatedObject._renderIndication(ctx);
       }
     },
