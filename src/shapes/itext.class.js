@@ -118,7 +118,7 @@
      * @type String
      * @default
      */
-    indicationBorderColor: 'rgba(102,153,255,0.25)',
+    indicationBorderColor: 'rgba(102,153,255,0.5)',
 
     /**
      * Width of cursor (in px)
