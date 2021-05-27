@@ -1396,11 +1396,11 @@
     },
 
     /**
-     * Renders indication for the object
+     * Renders object with additional indication (highlight/colors/effect/etc)
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
      */
-    _renderIndication: function(ctx, styleOverride) {
+    _renderWithIndication: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
           options;
@@ -1410,6 +1410,7 @@
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
+      this.drawObject(ctx);
       this.drawIndication(ctx, styleOverride);
       ctx.restore();
     },

@@ -11298,7 +11298,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _hoveredTargets: [],
 
     /**
-     * Keep track of the indicated target
+     * reference to an indicated target (hovered but not selected)
+     * also potentially just 'highlighted' (thinking towards keyboard accessibility)
      * @type fabric.Object
      * @private
      */
@@ -12230,8 +12231,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     drawIndicatedObject: function(ctx) {
       if (this._indicatedObject) {
-        this._indicatedObject.render(ctx);
-        this._indicatedObject._renderIndication(ctx);
+        this._indicatedObject._renderWithIndication(ctx);
       }
     },
 
@@ -15417,11 +15417,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Renders indication for the object
+     * Renders object with additional indication (highlight/colors/effect/etc)
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
      */
-    _renderIndication: function(ctx, styleOverride) {
+    _renderWithIndication: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
           options;
@@ -15431,6 +15431,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
+      this.drawObject(ctx);
       this.drawIndication(ctx, styleOverride);
       ctx.restore();
     },
@@ -27376,7 +27377,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @type String
      * @default
      */
-    indicationBorderColor: 'rgba(00,254,0,0.25)',
+    indicationBorderColor: 'rgba(102,153,255,0.5)',
 
     /**
      * Width of cursor (in px)
@@ -27554,6 +27555,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
+
+      // because this renders on the upper canvas, there is an issue with z-order when
+      // an indicated object is drawn over a cursor, but the cursor shows through
+      if (this.canvas && this.canvas._indicatedObject && this !== this.canvas._indicatedObject) {
+        return;
+      }
+
       var boundaries = this._getCursorBoundaries(),
           ctx = this.canvas.contextTextbox;
       this.clearContextTop(true);
