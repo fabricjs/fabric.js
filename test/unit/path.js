@@ -115,6 +115,20 @@
     done();
   });
 
+  QUnit.test('set path after initialization', function (assert) {
+    var done = assert.async();
+    fabric.Object.NUM_FRACTION_DIGITS = 12;
+    assert.ok(typeof fabric.Path.prototype.setPath === 'function');
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
+    path.set('path', REFERENCE_PATH_OBJECT.path);
+    assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+    path.set('path', 'M 100 100 L 300 100 L 200 300 z');
+    makePathObject(function (clone) {
+      assert.deepEqual(path.toObject(), clone.toObject());
+      done();
+    });
+  });
+
   QUnit.test('toString', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
@@ -238,6 +252,48 @@
       assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
       done();
     });
+  });
+
+  QUnit.test('convertPointsToPath', function (assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Path.convertPointsToPath === 'function');
+    var points = [];
+    var pathData = [
+      ["M", 100.2, 99.8],
+      ["Q", 100, 100, 200, 100],
+      ["Q", 300, 100, 250, 200],
+      ["L", 199.8, 300.2]
+    ];
+    REFERENCE_PATH_OBJECT.path.forEach(function (item) {
+      if (item.length > 2) {
+        points.push(new fabric.Point(item[1], item[2]));
+      }
+    });
+    assert.deepEqual(fabric.util.parsePath(fabric.Path.convertPointsToPath(points)), pathData);
+    done();
+  });
+
+  QUnit.test('fromPoints', function (assert) {
+    var done = assert.async();
+    var pathData = [
+      ["M", 100.2, 99.8],
+      ["Q", 100, 100, 200, 100],
+      ["Q", 300, 100, 250, 200],
+      ["L", 199.8, 300.2]
+    ];
+    assert.ok(typeof fabric.Path.fromPoints === 'function');
+    var points = [];
+    REFERENCE_PATH_OBJECT.path.forEach(function (item) {
+      if (item.length > 2) {
+        points.push(new fabric.Point(item[1], item[2]));
+      }
+    });
+    const options = Object.assign({}, REFERENCE_PATH_OBJECT);
+    delete options.path;
+    var path = fabric.Path.fromPoints(points, options);
+    assert.ok(path instanceof fabric.Path);
+    assert.deepEqual(path.path, pathData);
+    done();
   });
 
   QUnit.test('fromElement', function(assert) {
