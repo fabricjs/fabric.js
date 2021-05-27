@@ -118,7 +118,6 @@
   QUnit.test('set path after initialization', function (assert) {
     var done = assert.async();
     fabric.Object.NUM_FRACTION_DIGITS = 12;
-    assert.ok(typeof fabric.Path.prototype.setPath === 'function');
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
     path.set('path', REFERENCE_PATH_OBJECT.path);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
