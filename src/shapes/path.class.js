@@ -66,18 +66,19 @@
       if (!this.path) {
         return;
       }
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {})
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
     },
 
     _set: function (key, value) {
       if (key === 'path') {
         var left = this.left,
-          top = this.top;
+            top = this.top;
         this.setPath(value);
         this.left = left;
         this.top = top;
         this.setCoords();
-      } else {
+      }
+      else {
         this.callSuper('_set', key, value);
       }
     },
@@ -368,7 +369,7 @@
   /**
    * @static
    * @memberOf fabric.Path
-   * @param {fabric.Point[]} points 
+   * @param {fabric.Point[]} points
    * @returns {string} svg path
    */
   fabric.Path.convertPointsToPath = function (points) {
