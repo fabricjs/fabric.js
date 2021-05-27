@@ -53,7 +53,7 @@
       this.setPath(path || [], options);
     },
 
-    setPath: function (path, options = {}) {
+    setPath: function (path, options) {
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
@@ -66,7 +66,7 @@
       if (!this.path) {
         return;
       }
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options);
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {})
     },
 
     _set: function (key, value) {
