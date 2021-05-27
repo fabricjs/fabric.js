@@ -374,7 +374,7 @@
   fabric.Path.convertPointsToPath = function (points) {
     var start = points[0].x;
     var minMax = points.reduce(
-      (prev, curr) => {
+      function (prev, curr) {
         return {
           min: Math.min(curr.x, prev.min),
           max: Math.max(curr.x, prev.max)
@@ -384,7 +384,7 @@
     );
     var width = minMax.max - minMax.min;
     return fabric.PencilBrush.prototype.convertPointsToSVGPath
-      .call({ width }, points)
+      .call({ width: width }, points)
       .join(' ');
   };
 
