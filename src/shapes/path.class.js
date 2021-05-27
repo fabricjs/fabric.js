@@ -50,10 +50,15 @@
     initialize: function (path, options) {
       options = options || {};
       this.callSuper('initialize', options);
-      this.setPath(path || [], options);
+      this._setPath(path || [], options);
     },
 
-    setPath: function (path, options) {
+    /**
+    * @private
+    * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+    * @param {Object} [options] Options object
+    */
+    _setPath: function (path, options) {
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
@@ -69,11 +74,14 @@
       fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
     },
 
+    /**
+     * @private
+     */
     _set: function (key, value) {
       if (key === 'path') {
         var left = this.left,
             top = this.top;
-        this.setPath(value);
+        this._setPath(value);
         this.left = left;
         this.top = top;
         this.setCoords();
