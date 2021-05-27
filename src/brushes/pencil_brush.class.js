@@ -16,12 +16,12 @@
     /**
      * Draws a straight line between last recorded point to current pointer
      * Used for `shift` functionality
-     * 
+     *
      * @example <caption>Override `shift` functionality</caption>
      * brush._detach();
      * @example <caption>Restore `shift` functionality</caption>
      * brush._attachKeyboardListeners();
-     * 
+     *
      * @type boolean
      * @default false
      */
@@ -49,7 +49,8 @@
         if (opt.e.shiftKey) {
           opt.e.preventDefault();
           _this.drawStraightLine = true;
-        } else {
+        }
+        else {
           _this.drawStraightLine = false;
         }
       };
@@ -68,7 +69,7 @@
     },
 
     needsFullRender: function () {
-      return this.callSuper("needsFullRender") || this._hasStraightLine;
+      return this.callSuper('needsFullRender') || this._hasStraightLine;
     },
 
     /**
