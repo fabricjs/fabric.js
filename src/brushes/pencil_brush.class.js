@@ -45,21 +45,24 @@
      */
     _attachKeyboardListeners: function () {
       var _this = this;
-      var keyboardDown = function (e) {
-        if (e.shiftKey) {
-          e.preventDefault();
+      var setShift = function (opt) {
+        if (opt.e.shiftKey) {
+          opt.e.preventDefault();
           _this.drawStraightLine = true;
+        } else {
+          _this.drawStraightLine = false;
         }
       };
-      var keyboardUp = function () {
+      var revokeShift = function () {
         _this.drawStraightLine = false;
       };
-
-      window.addEventListener('keydown', keyboardDown);
-      window.addEventListener('keyup', keyboardUp);
+      this.canvas.on('mouse:down', setShift);
+      this.canvas.on('mouse:move', setShift);
+      this.canvas.on('mouse:up', revokeShift);
       this._detach = function disposer() {
-        window.removeEventListener('keydown', keyboardDown);
-        window.removeEventListener('keyup', keyboardUp);
+        this.canvas.off('mouse:down', setShift);
+        this.canvas.off('mouse:move', setShift);
+        this.canvas.off('mouse:up', revokeShift);
       };
       return this._detach;
     },
