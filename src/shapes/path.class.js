@@ -47,13 +47,13 @@
      * @param {Object} [options] Options object
      * @return {fabric.Path} thisArg
      */
-    initialize: function(path, options) {
-      options = options || { };
+    initialize: function (path, options) {
+      options = options || {};
       this.callSuper('initialize', options);
-      if (!path) {
-        path = [];
-      }
+      this.setPath(path || [], options);
+    },
 
+    setPath: function (path, options = {}) {
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
@@ -67,6 +67,15 @@
         return;
       }
       fabric.Polyline.prototype._setPositionDimensions.call(this, options);
+    },
+
+    _set: function (key, value) {
+      if (key === 'path') {
+        this.setPath(value);
+        this.setCoords();
+      } else {
+        this.callSuper('_set', key, value);
+      }
     },
 
     /**
