@@ -365,6 +365,41 @@
     }
   };
 
+  /**
+   * @static
+   * @memberOf fabric.Path
+   * @param {fabric.Point[]} points 
+   * @returns {string} svg path
+   */
+  fabric.Path.convertPointsToPath = function (points) {
+    var start = points[0].x;
+    var minMax = points.reduce(
+      (prev, curr) => {
+        return {
+          min: Math.min(curr.x, prev.min),
+          max: Math.max(curr.x, prev.max)
+        };
+      },
+      { min: start, max: start }
+    );
+    var width = minMax.max - minMax.min;
+    return fabric.PencilBrush.prototype.convertPointsToSVGPath
+      .call({ width }, points)
+      .join(' ');
+  };
+
+  /**
+   * @static
+   * @memberOf fabric.Path
+   * @param {fabric.Point[]} points
+   * @param {Object} options path options
+   * @returns {fabric.Path} fabric.Path instance
+   */
+  fabric.Path.fromPoints = function (points, options) {
+    return new fabric.Path(fabric.Path.convertPointsToPath(points), options);
+  };
+
+
   /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
