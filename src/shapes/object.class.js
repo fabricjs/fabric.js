@@ -1410,8 +1410,9 @@
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
-      this.drawObject(ctx);
       this.drawIndication(ctx, styleOverride);
+      ctx.scale(matrix[0], matrix[3]);
+      this.drawObject(ctx);
       ctx.restore();
     },
 

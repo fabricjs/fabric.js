@@ -15431,8 +15431,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.save();
       ctx.translate(options.translateX, options.translateY);
       ctx.lineWidth = 1 * this.borderScaleFactor;
-      this.drawObject(ctx);
       this.drawIndication(ctx, styleOverride);
+      ctx.scale(matrix[0], matrix[3]);
+      this.drawObject(ctx);
       ctx.restore();
     },
 
@@ -27377,7 +27378,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @type String
      * @default
      */
-    indicationBorderColor: 'rgba(102,153,255,0.5)',
+    indicationBorderColor: 'rgb(102,153,255)',
 
     /**
      * Width of cursor (in px)
