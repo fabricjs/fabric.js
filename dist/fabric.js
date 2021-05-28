@@ -27378,7 +27378,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @type String
      * @default
      */
-    indicationBorderColor: 'rgb(102,153,255)',
+    indicationBorderColor: 'rgba(109,178,64,1)',
 
     /**
      * Width of cursor (in px)
