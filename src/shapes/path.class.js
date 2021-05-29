@@ -79,11 +79,7 @@
      */
     _set: function (key, value) {
       if (key === 'path') {
-        var left = this.left,
-            top = this.top;
         this._setPath(value);
-        this.left = left;
-        this.top = top;
         this.setCoords();
       }
       else {
