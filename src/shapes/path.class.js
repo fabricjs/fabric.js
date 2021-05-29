@@ -6,6 +6,7 @@
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
       _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
@@ -48,7 +49,8 @@
      * @return {fabric.Path} thisArg
      */
     initialize: function (path, options) {
-      options = options || {};
+      options = clone(options || {});
+      delete options.path;
       this.callSuper('initialize', options);
       this._setPath(path || [], options);
     },
@@ -72,6 +74,7 @@
         return;
       }
       fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
+      this.setCoords();
     },
 
     /**
@@ -79,12 +82,7 @@
      */
     _set: function (key, value) {
       if (key === 'path') {
-        var left = this.left,
-            top = this.top;
         this._setPath(value);
-        this.left = left;
-        this.top = top;
-        this.setCoords();
       }
       else {
         this.callSuper('_set', key, value);
