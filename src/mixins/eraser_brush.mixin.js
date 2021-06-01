@@ -301,7 +301,7 @@
 
       /**
        * Restores hiding an object
-       * {@link favric.EraserBrush#hideObject}
+       * {@link fabric.EraserBrush#hideObject}
        * @param {fabric.Object} object
        */
       restoreObjectVisibility: function (object) {
