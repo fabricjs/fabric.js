@@ -205,8 +205,58 @@
     }
   });
 
+  var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
   var _groupToObject = fabric.Group.prototype.toObject;
   fabric.util.object.extend(fabric.Group.prototype, {
+    /**
+     * Applies the eraser of the group to the given object
+     * @param {fabric.Object} object an object that is part of this group
+     */
+    applyEraserToObject(object) {
+      var transform = this.calcTransformMatrix();
+      var eraser = this.getEraser();
+      if (!eraser) {
+        return;
+      }
+      eraser.getObjects('path').forEach(function (path) {
+        if (object.intersectsWithObject(path)) {
+          var t = path.calcTransformMatrix();
+          path.clone(function (_path) {
+            const originalTransform = fabric.util.multiplyTransformMatrices(
+              transform,
+              t
+            );
+            fabric.util.applyTransformToObject(_path, originalTransform);
+            fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+              fabric.EraserBrush.prototype,
+              object,
+              _path
+            );
+          });
+        }
+      });
+    },
+
+    /**
+     * Applies the group's eraser to its objects
+     */
+    applyEraserToObjects: function () {
+      var _this = this;
+      this.erasable === true && this.forEachObject(function (object) {
+        _this.applyEraserToObject(object);
+      });
+    },
+
+    /**
+     * Propagate group's eraser to its objects
+     * @private 
+     */
+    _restoreObjectsState: function () {
+      this.applyEraserToObjects();
+      delete this.clipPath;
+      return __restoreObjectsState.call(this);
+    },
+
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
