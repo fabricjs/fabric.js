@@ -402,7 +402,7 @@
       prepareCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
-          if (obj.forEachObject && (collection instanceof fabric.StaticCanvas || obj.erasable === 'deep')) {
+          if (obj.forEachObject &&  obj.erasable === 'deep') {
             _this.prepareCollectionTraversal(obj);
           }
           else if (obj.erasable) {
@@ -421,7 +421,7 @@
       restoreCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
-          if (obj.forEachObject && (collection instanceof fabric.StaticCanvas || obj.erasable === 'deep')) {
+          if (obj.forEachObject &&  obj.erasable === 'deep') {
             _this.restoreCollectionTraversal(obj);
           }
           else {
