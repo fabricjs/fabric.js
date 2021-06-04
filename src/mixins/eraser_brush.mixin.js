@@ -124,10 +124,20 @@
   fabric.util.object.extend(fabric.Object.prototype, {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
-     * @type boolean
+     * The `deep` option introduces fine grained control over a group's `erasable` property.
+     * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
+     * @type boolean | 'deep'
      * @default true
      */
     erasable: true,
+
+    /**
+     * @private
+     * @returns boolean
+     */
+    _isErasable: function () {
+      return this.erasable !== false;
+    },
 
     /**
      *
@@ -327,10 +337,10 @@
         var image = canvas.get('backgroundImage');
         var color = canvas.get('backgroundColor');
         var erasablesOnLayer = layer === 'top';
-        if (image && image.erasable === !erasablesOnLayer) {
+        if (image && image._isErasable() === !erasablesOnLayer) {
           this.hideObject(image);
         }
-        if (color && color.erasable === !erasablesOnLayer) {
+        if (color && color._isErasable() === !erasablesOnLayer) {
           this.hideObject(color);
         }
       },
@@ -357,11 +367,11 @@
           return false;
         };
         var erasablesOnLayer = layer === 'top';
-        var renderOverlayOnTop = (image && !image.erasable) || (color && !color.erasable);
-        if (image && image.erasable === !erasablesOnLayer) {
+        var renderOverlayOnTop = (image && !image._isErasable()) || (color && !color._isErasable());
+        if (image && image._isErasable() === !erasablesOnLayer) {
           this.hideObject(image);
         }
-        if (color && color.erasable === !erasablesOnLayer) {
+        if (color && color._isErasable() === !erasablesOnLayer) {
           this.hideObject(color);
         }
         return renderOverlayOnTop;
@@ -589,7 +599,7 @@
         var clipObject;
         var _this = this;
         //  object is collection, i.e group
-        if (obj.forEachObject) {
+        if (obj.forEachObject && obj.erasable === 'deep') {
           obj.forEachObject(function (_obj) {
             if (_obj.erasable) {
               _this._addPathToObjectEraser(_obj, path);
