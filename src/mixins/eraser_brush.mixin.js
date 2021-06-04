@@ -126,7 +126,7 @@
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
      * The `deep` option introduces fine grained control over a group's `erasable` property.
      * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
-     * When set to `true` the eraser will erase the entire group.
+     * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
      * When set to `false` the eraser will leave all objects including the group untouched.
      * @type boolean | 'deep'
      * @default true
@@ -212,7 +212,7 @@
      * Applies the eraser of the group to the given object
      * @param {fabric.Object} object an object that is part of this group
      */
-    applyEraserToObject(object) {
+    applyEraserToObject: function(object) {
       var transform = this.calcTransformMatrix();
       var eraser = this.getEraser();
       if (!eraser) {
@@ -222,7 +222,7 @@
         if (object.intersectsWithObject(path)) {
           var t = path.calcTransformMatrix();
           path.clone(function (_path) {
-            const originalTransform = fabric.util.multiplyTransformMatrices(
+            var originalTransform = fabric.util.multiplyTransformMatrices(
               transform,
               t
             );
@@ -242,18 +242,20 @@
      */
     applyEraserToObjects: function () {
       var _this = this;
-      this.erasable === true && this.forEachObject(function (object) {
-        _this.applyEraserToObject(object);
-      });
+      if (this.erasable === true && this.getEraser()) {
+        this.forEachObject(function (object) {
+          _this.applyEraserToObject(object);
+        });
+        delete this.clipPath;
+      }
     },
 
     /**
-     * Propagate group's eraser to its objects
-     * @private 
+     * Propagate the group's eraser to its objects, crucial for proper functionality of the eraser within the group and nested objects.
+     * @private
      */
     _restoreObjectsState: function () {
       this.applyEraserToObjects();
-      delete this.clipPath;
       return __restoreObjectsState.call(this);
     },
 
