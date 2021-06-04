@@ -126,6 +126,8 @@
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
      * The `deep` option introduces fine grained control over a group's `erasable` property.
      * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
+     * When set to `true` the eraser will erase the entire group.
+     * When set to `false` the eraser will leave all objects including the group untouched.
      * @type boolean | 'deep'
      * @default true
      */
