@@ -402,13 +402,11 @@
       prepareCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
-          if (obj.forEachObject) {
+          if (obj.forEachObject && (collection instanceof fabric.StaticCanvas || obj.erasable === 'deep')) {
             _this.prepareCollectionTraversal(obj);
           }
-          else {
-            if (obj.erasable) {
+          else if (obj.erasable) {
               _this.hideObject(obj);
-            }
           }
         });
       },
@@ -423,7 +421,7 @@
       restoreCollectionTraversal: function (collection) {
         var _this = this;
         collection.forEachObject(function (obj) {
-          if (obj.forEachObject) {
+          if (obj.forEachObject && (collection instanceof fabric.StaticCanvas || obj.erasable === 'deep')) {
             _this.restoreCollectionTraversal(obj);
           }
           else {
