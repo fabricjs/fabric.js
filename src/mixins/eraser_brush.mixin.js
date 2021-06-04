@@ -406,7 +406,7 @@
             _this.prepareCollectionTraversal(obj);
           }
           else if (obj.erasable) {
-              _this.hideObject(obj);
+            _this.hideObject(obj);
           }
         });
       },
