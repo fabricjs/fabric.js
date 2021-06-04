@@ -134,14 +134,6 @@
     erasable: true,
 
     /**
-     * @private
-     * @returns boolean
-     */
-    _isErasable: function () {
-      return this.erasable !== false;
-    },
-
-    /**
      *
      * @returns {fabric.Group | null}
      */
@@ -376,6 +368,16 @@
       },
 
       /**
+       * 
+       * @private
+       * @param {fabric.Object} object 
+       * @returns boolean
+       */
+      _isErasable: function (object) {
+        return object.erasable !== false;
+      },
+
+      /**
        * Drawing Logic For background drawables: (`backgroundImage`, `backgroundColor`)
        * 1. if erasable = true:
        *    we need to hide the drawable on the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
@@ -391,10 +393,10 @@
         var image = canvas.get('backgroundImage');
         var color = canvas.get('backgroundColor');
         var erasablesOnLayer = layer === 'top';
-        if (image && image._isErasable() === !erasablesOnLayer) {
+        if (image && this._isErasable(image) === !erasablesOnLayer) {
           this.hideObject(image);
         }
-        if (color && color._isErasable() === !erasablesOnLayer) {
+        if (color && this._isErasable(color) === !erasablesOnLayer) {
           this.hideObject(color);
         }
       },
@@ -421,11 +423,11 @@
           return false;
         };
         var erasablesOnLayer = layer === 'top';
-        var renderOverlayOnTop = (image && !image._isErasable()) || (color && !color._isErasable());
-        if (image && image._isErasable() === !erasablesOnLayer) {
+        var renderOverlayOnTop = (image && !this._isErasable(image)) || (color && !this._isErasable(color));
+        if (image && this._isErasable(image) === !erasablesOnLayer) {
           this.hideObject(image);
         }
-        if (color && color._isErasable() === !erasablesOnLayer) {
+        if (color && this._isErasable(color) === !erasablesOnLayer) {
           this.hideObject(color);
         }
         return renderOverlayOnTop;
