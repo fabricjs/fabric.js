@@ -128,6 +128,7 @@
      * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
      * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
      * When set to `false` the eraser will leave all objects including the group untouched.
+     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      * @type boolean | 'deep'
      * @default true
      */
@@ -202,6 +203,7 @@
   fabric.util.object.extend(fabric.Group.prototype, {
     /**
      * Applies the eraser of the group to the given object
+     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      * @param {fabric.Object} object an object that is part of this group
      */
     applyEraserToObject: function(object) {
@@ -231,6 +233,7 @@
 
     /**
      * Applies the group's eraser to its objects
+     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      */
     applyEraserToObjects: function () {
       var _this = this;
@@ -311,7 +314,7 @@
    * This achieves the desired effect of seeming to erase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
    *
-   *
+   * @tutorial {@link http://fabricjs.com/erasing}
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
    */
