@@ -30436,6 +30436,36 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     actionName: 'rotate',
   });
 
+  objectControls.mlr = new fabric.Control({
+    x: -0.5,
+    y: 0,
+    actionHandler: controlsUtils.rotationWithSnapping,
+    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    offsetX: -40,
+    withConnection: true,
+    actionName: 'rotate',
+  });
+
+  objectControls.mbr = new fabric.Control({
+    x: 0,
+    y: 0.5,
+    actionHandler: controlsUtils.rotationWithSnapping,
+    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    offsetY: 40,
+    withConnection: true,
+    actionName: 'rotate',
+  });
+
+  objectControls.mrr = new fabric.Control({
+    x: 0.5,
+    y: 0,
+    actionHandler: controlsUtils.rotationWithSnapping,
+    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    offsetX: 40,
+    withConnection: true,
+    actionName: 'rotate',
+  });
+
   if (fabric.Textbox) {
     // this is breaking the prototype inheritance, no time / ideas to fix it.
     // is important to document that if you want to have all objects to have a
@@ -30445,6 +30475,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var textBoxControls = fabric.Textbox.prototype.controls = { };
 
     textBoxControls.mtr = objectControls.mtr;
+    textBoxControls.mlr = objectControls.mlr;
+    textBoxControls.mbr = objectControls.mbr;
+    textBoxControls.mrr = objectControls.mrr;
     textBoxControls.tr = objectControls.tr;
     textBoxControls.br = objectControls.br;
     textBoxControls.tl = objectControls.tl;
