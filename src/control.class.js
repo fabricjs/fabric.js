@@ -124,7 +124,7 @@
      * @type {String}
      * @default 'crosshair'
      */
-    cursorStyle: 'crosshair',
+    cursorStyle: 'move',
 
     /**
      * If controls has an offsetY or offsetX, draw a line that connects
