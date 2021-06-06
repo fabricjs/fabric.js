@@ -1312,7 +1312,8 @@
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
           maxHeight, currentFill, lastFill, path = this.path,
-          charSpacing = this._getWidthOfCharSpacing();
+          charSpacing = this._getWidthOfCharSpacing(),
+          offsetY = this.offsets[type];
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -1343,7 +1344,7 @@
             ctx.rotate(charBox.angle);
             ctx.fillRect(
               -charBox.kernedWidth / 2,
-              this.offsets[type] * _size + _dy,
+              offsetY * _size + _dy,
               charBox.kernedWidth,
               this.fontSize / 15
             );
@@ -1361,7 +1362,7 @@
               ctx.fillStyle = lastFill;
               ctx.fillRect(
                 drawStart,
-                top + this.offsets[type] * size + dy,
+                top + offsetY * size + dy,
                 boxWidth,
                 this.fontSize / 15
               );
@@ -1377,10 +1378,14 @@
             boxWidth += charBox.kernedWidth;
           }
         }
+        var drawStart = leftOffset + lineLeftOffset + boxStart;
+        if (this.direction === 'rtl') {
+          drawStart = this.width - drawStart - boxWidth;
+        }
         ctx.fillStyle = currentFill;
         currentDecoration && currentFill && ctx.fillRect(
-          leftOffset + lineLeftOffset + boxStart,
-          top + this.offsets[type] * size + dy,
+          drawStart,
+          top + offsetY * size + dy,
           boxWidth - charSpacing,
           this.fontSize / 15
         );
