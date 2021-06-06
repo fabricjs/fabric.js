@@ -362,7 +362,7 @@
   });
 
   function gradientStroke(canvas, callback) {
-		var line = new fabric.Line([10, 10, 200, 200], {
+    var line = new fabric.Line([10, 10, 200, 200], {
       stroke: new fabric.Gradient({
         type: 'linear',
         coords: {
@@ -387,32 +387,32 @@
         ],
         gradientTransform: [1, 0, 0, 1, 50, 0]
       }),
-			strokeWidth: 20,
-		});
-		canvas.add(
-			line
-		);
-		canvas.renderAll();
-		callback(canvas.lowerCanvasEl);
+      strokeWidth: 20,
+    });
+    canvas.add(
+      line
+    );
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
 
-	}
+  }
 
-	tests.push({
-		test: 'Use the gradient strokeStyle for line(other shape is ok)',
-		code: gradientStroke,
-		golden: 'gradientStroke.png',
-		newModule: 'Gradient stroke',
-		percentage: 0.09,
-		width: 300,
-		height: 300,
-	});
+  tests.push({
+    test: 'Use the gradient strokeStyle for line(other shape is ok)',
+    code: gradientStroke,
+    golden: 'gradientStroke.png',
+    newModule: 'Gradient stroke',
+    percentage: 0.02,
+    width: 300,
+    height: 300,
+  });
 
-	function textGradientFill(canvas, callback) {
-		var text = new fabric.Text('Some Text', {
-			fontSize: 40,
-			left: 25,
-			top: -25,
-			fontWeight: 'bold',
+  function textGradientFill(canvas, callback) {
+    var text = new fabric.Text('Some Text', {
+      fontSize: 40,
+      left: 25,
+      top: -25,
+      fontWeight: 'bold',
       fill: new fabric.Gradient({
         type: 'radial',
         coords: {
@@ -439,24 +439,24 @@
         ],
         gradientTransform: [1, 0, 0, 1, 50, 50]
       })
-		});
-		canvas.add(
-			text
-		);
-		canvas.renderAll();
-		callback(canvas.lowerCanvasEl);
+    });
+    canvas.add(
+      text
+    );
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
 
-	}
+  }
 
-	tests.push({
-		test: 'Use the gradient fillStyle for text',
-		code: textGradientFill,
-		golden: 'textGradientFill.png',
-		newModule: 'Text gradient fill',
-		percentage: 0.09,
-		width: 300,
-		height: 100,
-	});
+  tests.push({
+    test: 'Use the gradient fillStyle for text',
+    code: textGradientFill,
+    golden: 'textGradientFill.png',
+    newModule: 'Text gradient fill',
+    percentage: 0.04,
+    width: 300,
+    height: 100,
+  });
 
   tests.forEach(visualTestLoop(QUnit));
 })();
