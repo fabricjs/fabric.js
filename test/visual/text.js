@@ -468,5 +468,26 @@
     percentage: 0.02,
   });
 
+  function text13(canvas, callback) {
+    fabric.Textbox.fromObject(
+      JSON.parse('{"type":"textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"sans-serif","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"splitByGrapheme":false,"styles":{},"path":null}'),
+      function(text) {
+        canvas.add(text);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      }
+    );
+  }
+
+  tests.push({
+    test: 'Text with direction RTL and underline, single render',
+    code: text13,
+    width: 232,
+    height: 255,
+    disabled: fabric.isLikelyNode,
+    golden: 'text13.png',
+    percentage: 0.02,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
