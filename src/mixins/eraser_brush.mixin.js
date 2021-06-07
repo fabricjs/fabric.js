@@ -10,7 +10,7 @@
      * Create Rect that holds the color to support erasing
      * patches {@link CommonMethods#_initGradient}
      * @private
-     * @param {'bakground'|'overlay'} property
+     * @param {'background'|'overlay'} property
      * @param {(String|fabric.Pattern|fabric.Rect)} color Color or pattern or rect (in case of erasing)
      * @param {Function} callback Callback to invoke when color is set
      * @param {Object} options
@@ -206,7 +206,7 @@
      * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      * @param {fabric.Object} object an object that is part of this group
      */
-    applyEraserToObject: function(object) {
+    applyEraserToObject: function (object) {
       var transform = this.calcTransformMatrix();
       var eraser = this.getEraser();
       if (!eraser) {
@@ -309,7 +309,7 @@
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
    * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx
    * while the entire canvas is rendered on the top ctx.
-   * Canvas bakground/overlay image/color are handled as well.
+   * Canvas background/overlay image/color are handled as well.
    * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
    * This achieves the desired effect of seeming to erase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
@@ -371,9 +371,9 @@
       },
 
       /**
-       * 
+       *
        * @private
-       * @param {fabric.Object} object 
+       * @param {fabric.Object} object
        * @returns boolean
        */
       _isErasable: function (object) {
