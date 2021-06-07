@@ -367,7 +367,6 @@
      */
     _indicatedObject: undefined,
 
-
     /**
      * @private
      */
@@ -1283,17 +1282,6 @@
 
       if (activeObject) {
         activeObject._renderControls(ctx);
-      }
-    },
-
-    /**
-     * Draws the indicated objects 'indication' (borders)
-     * similar to activeObject, but not yet selected
-     * @param {CanvasRenderingContext2D} ctx Context to render controls on
-     */
-    drawIndicatedObject: function(ctx) {
-      if (this._indicatedObject) {
-        this._indicatedObject._renderWithIndication(ctx);
       }
     },
 

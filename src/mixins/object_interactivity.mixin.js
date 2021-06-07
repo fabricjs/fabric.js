@@ -224,12 +224,11 @@
         return;
       }
       styleOverride = styleOverride || {};
-      var wh = this._calculateCurrentDimensions(),
-          strokeWidth = this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth;
+      var width = this.width + this.padding,
+          height = this.height + this.padding;
       ctx.save();
       ctx.strokeStyle = styleOverride.indicationBorderColor || this.indicationBorderColor;
+      ctx.lineWidth = 1 * this.borderScaleFactor;
       ctx.strokeRect(
         -width / 2,
         -height / 2,
