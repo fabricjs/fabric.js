@@ -103,7 +103,7 @@
      */
     _renderBackgroundOrOverlay: function (ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
@@ -201,35 +201,6 @@
   var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
   var _groupToObject = fabric.Group.prototype.toObject;
   fabric.util.object.extend(fabric.Group.prototype, {
-    /**
-     * Applies the eraser of the group to the given object
-     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
-     * @param {fabric.Object} object an object that is part of this group
-     */
-    applyEraserToObject: function (object) {
-      var transform = this.calcTransformMatrix();
-      var eraser = this.getEraser();
-      if (!eraser) {
-        return;
-      }
-      eraser.getObjects('path').forEach(function (path) {
-        if (object.intersectsWithObject(path)) {
-          var t = path.calcTransformMatrix();
-          path.clone(function (_path) {
-            var originalTransform = fabric.util.multiplyTransformMatrices(
-              transform,
-              t
-            );
-            fabric.util.applyTransformToObject(_path, originalTransform);
-            fabric.EraserBrush.prototype._addPathToObjectEraser.call(
-              fabric.EraserBrush.prototype,
-              object,
-              _path
-            );
-          });
-        }
-      });
-    },
 
     /**
      * Applies the group's eraser to its objects
@@ -238,10 +209,33 @@
     applyEraserToObjects: function () {
       var _this = this;
       if (this.erasable === true && this.getEraser()) {
-        this.forEachObject(function (object) {
-          _this.applyEraserToObject(object);
+        var transform = this.calcTransformMatrix();
+        this.getEraser().clone(function (eraser) {
+          delete _this.clipPath;
+          eraser.getObjects('path')
+            .forEach(function (path) {
+              //  first we transform the path from the group's coordinate system to the canvas'
+              var originalTransform = fabric.util.multiplyTransformMatrices(
+                transform,
+                path.calcTransformMatrix()
+              );
+              fabric.util.applyTransformToObject(path, originalTransform);
+              fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                fabric.EraserBrush.prototype,
+                path,
+                _this,
+                eraser._objects[0],
+                function (_path) {
+                  _this._objects.forEach(function (object) {
+                    fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+                      fabric.EraserBrush.prototype,
+                      object,
+                      _path
+                    );
+                  });
+                });
+            });
         });
-        delete this.clipPath;
       }
     },
 
@@ -647,6 +641,35 @@
       },
 
       /**
+       * Utility to apply a clip path to a path.
+       * Used to preserve clipping on eraser paths in nested objects.
+       * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
+       * @param {fabric.Path} path The eraser path
+       * @param {fabric.Object} object The object the clip path belongs to
+       * @param {fabric.Object} clipPath The clipPath to apply to the path
+       * @param {Function} callback Callback to be invoked with the cloned path after clip path was set
+       */
+      applyClipPathToPath: function (path, object, clipPath, callback) {
+        clipPath.clone(function (_clipPath) {
+          path.clone(function (path) {
+            var transform = fabric.util.multiplyTransformMatrices(
+              fabric.util.invertTransform(path.calcTransformMatrix()),
+              object.calcTransformMatrix()
+            );
+            fabric.util.applyTransformToObject(
+              _clipPath,
+              fabric.util.multiplyTransformMatrices(
+                transform,
+                _clipPath.calcTransformMatrix()
+              )
+            );
+            path.set("clipPath", _clipPath);
+            callback(path);
+          });
+        });
+      },
+
+      /**
        * Adds path to existing clipPath of object
        *
        * @param {fabric.Object} obj
@@ -657,11 +680,23 @@
         var _this = this;
         //  object is collection, i.e group
         if (obj.forEachObject && obj.erasable === 'deep') {
-          obj.forEachObject(function (_obj) {
-            if (_obj.erasable) {
-              _this._addPathToObjectEraser(_obj, path);
-            }
+          var targets = obj._objects.filter(function (_obj) {
+            return _obj.erasable;
           });
+          if (targets.length > 0 && obj.clipPath) {
+            var clippingAgent = obj.clipPath.eraser
+              ? obj.clipPath._objects[0]
+              : obj.clipPath;
+            this.applyClipPathToPath(path, obj, clippingAgent, function (_path) {
+              targets.forEach(function (_obj) {
+                _this._addPathToObjectEraser(_obj, _path);
+              });
+            });
+          } else if (targets.length > 0) {
+            targets.forEach(function (_obj) {
+              _this._addPathToObjectEraser(_obj, path);
+            });
+          }
           return;
         }
         if (!obj.getEraser()) {
