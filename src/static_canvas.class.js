@@ -921,7 +921,6 @@
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
       }
-      this.drawIndicatedObject(ctx);
       this.fire('after:render', { ctx: ctx, });
     },
 

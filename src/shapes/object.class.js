@@ -1222,6 +1222,9 @@
       }
       this._render(ctx);
       this._drawClipPath(ctx);
+      if (this.canvas._indicatedObject === this) {
+        this.drawIndication(ctx);
+      }
       this.fill = originalFill;
       this.stroke = originalStroke;
     },
@@ -1392,27 +1395,6 @@
         drawBorders && this.drawBorders(ctx, styleOverride);
       }
       drawControls && this.drawControls(ctx, styleOverride);
-      ctx.restore();
-    },
-
-    /**
-     * Renders object with additional indication (highlight/colors/effect/etc)
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Object} [styleOverride] properties to override the object style
-     */
-    _renderWithIndication: function(ctx, styleOverride) {
-      var vpt = this.getViewportTransform(),
-          matrix = this.calcTransformMatrix(),
-          options;
-      styleOverride = styleOverride || { };
-      matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
-      options = fabric.util.qrDecompose(matrix);
-      ctx.save();
-      ctx.translate(options.translateX, options.translateY);
-      ctx.lineWidth = 1 * this.borderScaleFactor;
-      this.drawIndication(ctx, styleOverride);
-      ctx.scale(matrix[0], matrix[3]);
-      this.drawObject(ctx);
       ctx.restore();
     },
 
