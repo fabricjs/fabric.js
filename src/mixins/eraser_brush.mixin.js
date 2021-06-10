@@ -143,6 +143,15 @@
     },
 
     /**
+     * Get the object's actual clip path regardless of clipping done by erasing
+     * @returns {fabric.Object | undefined}
+     */
+    getClipPath: function () {
+      var eraser = this.getEraser();
+      return eraser ? eraser._objects[0].clipPath : this.clipPath;
+    },
+
+    /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
@@ -212,6 +221,7 @@
         var transform = this.calcTransformMatrix();
         this.getEraser().clone(function (eraser) {
           delete _this.clipPath;
+          var clipPath = eraser._objects[0].clipPath;
           eraser.getObjects('path')
             .forEach(function (path) {
               //  first we transform the path from the group's coordinate system to the canvas'
@@ -220,20 +230,21 @@
                 path.calcTransformMatrix()
               );
               fabric.util.applyTransformToObject(path, originalTransform);
-              fabric.EraserBrush.prototype.applyClipPathToPath.call(
-                fabric.EraserBrush.prototype,
-                path,
-                _this,
-                eraser._objects[0],
-                function (_path) {
-                  _this._objects.forEach(function (object) {
-                    fabric.EraserBrush.prototype._addPathToObjectEraser.call(
-                      fabric.EraserBrush.prototype,
-                      object,
-                      _path
-                    );
-                  });
-                });
+              if (clipPath) {
+                fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                  fabric.EraserBrush.prototype,
+                  path,
+                  clipPath,
+                  transform
+                );
+              }
+              _this._objects.forEach(function (object) {
+                fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+                  fabric.EraserBrush.prototype,
+                  object,
+                  path
+                );
+              });
             });
         });
       }
@@ -296,7 +307,6 @@
       return this;
     }
   });
-
 
   /**
    * EraserBrush class
@@ -645,26 +655,43 @@
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
        * @param {fabric.Path} path The eraser path
-       * @param {fabric.Object} object The object the clip path belongs to
        * @param {fabric.Object} clipPath The clipPath to apply to the path
-       * @param {Function} callback Callback to be invoked with the cloned path after clip path was set
+       * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
+       * @returns {fabric.Path} path with clip path
        */
-      applyClipPathToPath: function (path, object, clipPath, callback) {
-        clipPath.clone(function (_clipPath) {
-          path.clone(function (path) {
-            var transform = fabric.util.multiplyTransformMatrices(
-              fabric.util.invertTransform(path.calcTransformMatrix()),
-              object.calcTransformMatrix()
-            );
-            fabric.util.applyTransformToObject(
-              _clipPath,
-              fabric.util.multiplyTransformMatrices(
-                transform,
-                _clipPath.calcTransformMatrix()
-              )
-            );
-            path.set('clipPath', _clipPath);
-            callback(path);
+      applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
+        var pathTransform = path.calcTransformMatrix();
+        var clipPathTransform = clipPath.calcTransformMatrix();
+        var transform = fabric.util.multiplyTransformMatrices(
+          fabric.util.invertTransform(pathTransform),
+          clipPathContainerTransformMatrix
+        );
+        fabric.util.applyTransformToObject(
+          clipPath,
+          fabric.util.multiplyTransformMatrices(
+            transform,
+            clipPathTransform
+          )
+        );
+        path.clipPath = clipPath;
+        return path;
+      },
+
+      /**
+       * Utility to apply a clip path to a path.
+       * Used to preserve clipping on eraser paths in nested objects.
+       * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
+       * @param {fabric.Path} path The eraser path
+       * @param {fabric.Object} object The clipPath to apply to path belongs to object
+       * @param {Function} callback Callback to be invoked with the cloned path after applying the clip path
+       */
+      clonePathWithClipPath: function (path, object, callback) {
+        var objTransform = object.calcTransformMatrix();
+        var clipPath = object.getClipPath();
+        var _this = this;
+        path.clone(function (_path) {
+          clipPath.clone(function (_clipPath) {
+            callback(_this.applyClipPathToPath(_path, _clipPath, objTransform));
           });
         });
       },
@@ -684,10 +711,7 @@
             return _obj.erasable;
           });
           if (targets.length > 0 && obj.clipPath) {
-            var clippingAgent = obj.clipPath.eraser
-              ? obj.clipPath._objects[0]
-              : obj.clipPath;
-            this.applyClipPathToPath(path, obj, clippingAgent, function (_path) {
+            this.clonePathWithClipPath(path, obj, function (_path) {
               targets.forEach(function (_obj) {
                 _this._addPathToObjectEraser(_obj, _path);
               });
