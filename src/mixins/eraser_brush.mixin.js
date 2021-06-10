@@ -103,7 +103,7 @@
      */
     _renderBackgroundOrOverlay: function (ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
@@ -663,7 +663,7 @@
                 _clipPath.calcTransformMatrix()
               )
             );
-            path.set("clipPath", _clipPath);
+            path.set('clipPath', _clipPath);
             callback(path);
           });
         });
@@ -692,7 +692,8 @@
                 _this._addPathToObjectEraser(_obj, _path);
               });
             });
-          } else if (targets.length > 0) {
+          }
+          else if (targets.length > 0) {
             targets.forEach(function (_obj) {
               _this._addPathToObjectEraser(_obj, path);
             });
