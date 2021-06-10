@@ -212,16 +212,30 @@
   fabric.util.object.extend(fabric.Group.prototype, {
 
     /**
+     * @private
+     * @param {fabric.Path} path
+     */
+    _addEraserPathToObjects: function (path) {
+      this._objects.forEach(function (object) {
+        fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+          fabric.EraserBrush.prototype,
+          object,
+          path
+        );
+      });
+    },
+
+    /**
      * Applies the group's eraser to its objects
      * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      */
     applyEraserToObjects: function () {
       var _this = this;
       if (this.erasable === true && this.getEraser()) {
-        var transform = this.calcTransformMatrix();
-        this.getEraser().clone(function (eraser) {
-          delete _this.clipPath;
+        var transform = _this.calcTransformMatrix();
+        _this.getEraser().clone(function (eraser) {
           var clipPath = eraser._objects[0].clipPath;
+          _this.clipPath = clipPath ? clipPath : undefined;
           eraser.getObjects('path')
             .forEach(function (path) {
               //  first we transform the path from the group's coordinate system to the canvas'
@@ -231,20 +245,19 @@
               );
               fabric.util.applyTransformToObject(path, originalTransform);
               if (clipPath) {
-                fabric.EraserBrush.prototype.applyClipPathToPath.call(
-                  fabric.EraserBrush.prototype,
-                  path,
-                  clipPath,
-                  transform
-                );
+                clipPath.clone(function (_clipPath) {
+                  fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                    fabric.EraserBrush.prototype,
+                    path,
+                    _clipPath,
+                    transform
+                  );
+                  _this._addEraserPathToObjects(path);
+                });
               }
-              _this._objects.forEach(function (object) {
-                fabric.EraserBrush.prototype._addPathToObjectEraser.call(
-                  fabric.EraserBrush.prototype,
-                  object,
-                  path
-                );
-              });
+              else {
+                _this._addEraserPathToObjects(path);
+              }
             });
         });
       }
