@@ -209,7 +209,21 @@
 
   var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
   var _groupToObject = fabric.Group.prototype.toObject;
+  var __getBounds = fabric.Group.prototype._getBounds;
   fabric.util.object.extend(fabric.Group.prototype, {
+
+    /**
+     * If group is an eraser then dimensions should not change when paths are added or removed and should remain the size of the base rect
+     * @private
+     */
+    _getBounds: function (aX, aY, onlyWidthHeight) {
+      if (this.eraser) {
+        this.width = this._objects[0].width;
+        this.height = this._objects[0].height;
+        return;
+      }
+      __getBounds.call(this, aX, aY, onlyWidthHeight);
+    },
 
     /**
      * @private
