@@ -136,10 +136,10 @@
 
     /**
      *
-     * @returns {fabric.Group | null}
+     * @returns {fabric.Group | undefined}
      */
     getEraser: function () {
-      return this.clipPath && this.clipPath.eraser ? this.clipPath : null;
+      return this.clipPath && this.clipPath.eraser ? this.clipPath : undefined;
     },
 
     /**
