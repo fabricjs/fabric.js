@@ -211,10 +211,7 @@
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      // reset the transform of the context.
-      // we want to use oCoords to draw the controls because so we
-      // have 1:1 match between interaction and drawing
-      var retinaScaling = this.canvas.getRetinaScaling(), options, matrix, p;
+      var retinaScaling = this.canvas.getRetinaScaling();
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -222,28 +219,11 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
       this.setCoords();
-      // in case we are insde a group, let's see where the group would
-      // put the control on the canvas.
-      // fabric does not use this directly, but we want to allow developers
-      // to call Object._renderControls for objects in groups.
-      // we need translation and rotation only for the group because size
-      if (this.group) {
-        options = fabric.util.qrDecompose(this.group.calcTransformMatrix());
-        matrix = fabric.util.composeMatrix({
-          scaleX: 1,
-          scaleY: 1,
-          translateX: options.translateX,
-          translateY: options.translateY,
-          angle: options.angle,
-        });
-      }
       this.forEachControl(function(control, key, fabricObject) {
         if (control.getVisibility(fabricObject, key)) {
-          p = fabricObject.oCoords[key];
-          if (matrix) {
-            p = fabric.util.transformPoint(p, matrix);
-          }
-          control.render(ctx, p.x, p.y, styleOverride, fabricObject);
+          control.render(ctx,
+            fabricObject.oCoords[key].x,
+            fabricObject.oCoords[key].y, styleOverride, fabricObject);
         }
       });
       ctx.restore();

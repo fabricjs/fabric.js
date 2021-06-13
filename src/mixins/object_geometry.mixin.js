@@ -707,12 +707,7 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          options, p;
-      if (this.group) {
-        options = util.qrDecompose(this.group.calcTransformMatrix());
-        dim = util.sizeAfterTransform(dim.x, dim.y, options);
-      }
-      p = transformPoint(dim, vpt, true);
+          p = transformPoint(dim, vpt, true);
       return p.scalarAdd(2 * this.padding);
     },
   });
