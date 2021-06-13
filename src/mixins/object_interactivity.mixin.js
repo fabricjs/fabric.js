@@ -211,7 +211,7 @@
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling();
+      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -219,11 +219,18 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
       this.setCoords();
+      if (this.group) {
+        matrix = this.group.calcTransformMatrix();
+      }
       this.forEachControl(function(control, key, fabricObject) {
+        p = fabricObject.oCoords[key];
         if (control.getVisibility(fabricObject, key)) {
+          if (matrix) {
+            p = fabric.util.transformPoint(p, matrix);
+          }
           control.render(ctx,
-            fabricObject.oCoords[key].x,
-            fabricObject.oCoords[key].y, styleOverride, fabricObject);
+            p.x,
+            p.y, styleOverride, fabricObject);
         }
       });
       ctx.restore();
