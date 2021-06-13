@@ -660,7 +660,7 @@
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions = this._getNonTransformedDimensions(), dimX, dimY,
+      var dimensions, dimX, dimY,
           noSkew = skewX === 0 && skewY === 0;
 
       if (this.strokeUniform) {
@@ -668,6 +668,7 @@
         dimY = this.height;
       }
       else {
+        dimensions = this._getNonTransformedDimensions();
         dimX = dimensions.x;
         dimY = dimensions.y;
       }
@@ -706,7 +707,12 @@
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
-          p = transformPoint(dim, vpt, true);
+          options, p;
+      if (this.group) {
+        options = util.qrDecompose(this.group.calcTransformMatrix());
+        dim = util.sizeAfterTransform(dim.x, dim.y, options);
+      }
+      p = transformPoint(dim, vpt, true);
       return p.scalarAdd(2 * this.padding);
     },
   });

@@ -1391,12 +1391,11 @@
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       }
+      ctx.rotate(degreesToRadians(options.angle));
       if (styleOverride.forActiveSelection) {
-        ctx.rotate(degreesToRadians(options.angle));
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
       else {
-        ctx.rotate(degreesToRadians(this.angle));
         drawBorders && this.drawBorders(ctx, styleOverride);
       }
       drawControls && this.drawControls(ctx, styleOverride);
