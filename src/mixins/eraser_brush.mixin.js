@@ -153,7 +153,7 @@
 
     /**
      * Set the object's actual clip path regardless of clipping done by erasing
-     * @param {fabric.Object} clipPath
+     * @param {fabric.Object} [clipPath]
      */
     setClipPath: function (clipPath) {
       var eraser = this.getEraser();
