@@ -546,7 +546,7 @@
    */
   function applyViewboxTransform(element) {
     if (!fabric.svgViewBoxElementsRegEx.test(element.nodeName)) {
-      return;
+      return {};
     }
     var viewBoxAttr = element.getAttribute('viewBox'),
         scaleX = 1,
