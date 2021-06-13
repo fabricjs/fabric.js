@@ -152,6 +152,16 @@
     },
 
     /**
+     * Set the object's actual clip path regardless of clipping done by erasing
+     * @param {fabric.Object} clipPath
+     */
+    setClipPath: function (clipPath) {
+      var eraser = this.getEraser();
+      var target = eraser ? eraser._objects[0] : this;
+      target.set('clipPath', clipPath);
+    },
+
+    /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
