@@ -382,7 +382,7 @@
     enlargeSpaces: function() {
       var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-        if (this.textAlign !== 'justify' && (i === len - 1 || this.isEndOfWrapping(i))) {
+        if ((i === len - 1 || this.isEndOfWrapping(i))) {
           continue;
         }
         accumulatedSpace = 0;
