@@ -76,11 +76,11 @@
     var img = fabric.document.createElement('img');
     img.onload = function() {
       img.onload = null;
-      callback(img);
+      callback(img, false);
     };
     img.onerror = function(err) {
       img.onerror = null;
-      callback(img);
+      callback(img, true);
       console.log('Image loading errored', err);
     };
     img.src = filename;

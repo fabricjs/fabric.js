@@ -109,6 +109,34 @@
     assert.equal(shadow11.offsetX, 0);
     assert.equal(shadow11.offsetY, 0);
     assert.equal(shadow11.blur, 0);
+
+    var shadow12 = new fabric.Shadow('#FF0000 0.1px 0.1px 0.28px');
+
+    assert.equal(shadow12.color, '#FF0000');
+    assert.equal(shadow12.offsetX, 0.1);
+    assert.equal(shadow12.offsetY, 0.1);
+    assert.equal(shadow12.blur, 0.28);
+
+    var shadow13 = new fabric.Shadow('rgba(0,0,255,0.5) -0.1px -0.1px 0.28px');
+
+    assert.equal(shadow13.color, 'rgba(0,0,255,0.5)');
+    assert.equal(shadow13.offsetX, -0.1);
+    assert.equal(shadow13.offsetY, -0.1);
+    assert.equal(shadow13.blur, 0.28);
+
+    var shadow14 = new fabric.Shadow('rgba(0,0,255,0.5) -0.1 -0.1 0.77');
+
+    assert.equal(shadow14.color, 'rgba(0,0,255,0.5)');
+    assert.equal(shadow14.offsetX, -0.1);
+    assert.equal(shadow14.offsetY, -0.1);
+    assert.equal(shadow14.blur, 0.77);
+
+    var shadow15 = new fabric.Shadow('rgba(0,0,255,0.5) 0.1 0.1 1');
+
+    assert.equal(shadow15.color, 'rgba(0,0,255,0.5)');
+    assert.equal(shadow15.offsetX, 0.1);
+    assert.equal(shadow15.offsetY, 0.1);
+    assert.equal(shadow15.blur, 1);
   });
 
   QUnit.test('properties', function(assert) {

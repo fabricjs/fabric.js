@@ -1,0 +1,36 @@
+<!-- Expected: X & Y will be ignored in case of the outermost svg element -->
+<svg xmlns="http://www.w3.org/2000/svg" x="10" y="10" width="100" height="100" viewBox="0 0 100 100">
+		<!-- Expected: A green and magenta rect with a size of 12.5x25 will be visible at left/top -->
+    <svg viewBox="100 100 25 25" width="25" height="25">
+        <rect x="100" y="100" width="12.5" height="25" fill="#00FF00"/>
+        <!-- the viewbox causes that only a part (width="12.5") of the following rect is visible-->
+        <rect x="112.5" y="100" width="25" height="25" fill="#FF00FF"/>
+    </svg>
+
+		<!-- Expected:
+         - A blue and black rect (diagonally shifted) with a size of 25x25 will be visible at right/bottom corner.
+         - A turquoise rect with a size of 12.5x12.5 will be visible below of the blue rect
+     -->
+     <svg y="50" >
+         <rect x="0" y="0" width="25" height="25" fill="#00FFFF"/>
+         <rect x="25" y="25" width="25" height="25" fill="#FF0000"/>
+
+         <svg x="0" y="25" width="12.5" height="12.5">
+             <rect x="0" y="0" width="25" height="25" fill="#FFFF00"/>
+         </svg>
+     </svg>
+    <svg x="50" y="50" width="50" height="50">
+        <rect x="0" y="0" width="25" height="25" fill="#0000FF"/>
+        <rect x="25" y="25" width="25" height="25" fill="#000000"/>
+
+        <svg x="0" y="25" width="12.5" height="12.5">
+            <rect x="0" y="0" width="25" height="25" fill="#00FFFF"/>
+        </svg>
+    </svg>
+
+		<!-- Expected: A yellow rect will be drawn to the right of the blue rect. -->
+    <rect x="75" y="50" width="25" height="25" fill="yellow"/>
+
+    <!-- canvas size -->
+    <rect x="0" y="0" width="100" height="100" stroke="#FF0000" stroke-width="2" fill="none"/>
+</svg>

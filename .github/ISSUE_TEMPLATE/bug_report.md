@@ -1,12 +1,18 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case in a JSFIDDLE
+about: Create a report with a reproducible test case in a JSFIDDLE, For anything else use the github DISCUSSIONS feature. Anything different than a bug report will be closed automatically.
 
 ---
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 
 <!-- BUG TEMPLATE -->
 ## Version
-2.4.0
+3.6.0
 
 ## Test Case
 http://jsfiddle.net/fabricjs/Da7SP/

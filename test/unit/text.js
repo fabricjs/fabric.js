@@ -9,51 +9,52 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
-    'version':                   fabric.version,
-    'type':                      'text',
-    'originX':                   'left',
-    'originY':                   'top',
-    'left':                      0,
-    'top':                       0,
-    'width':                     CHAR_WIDTH,
-    'height':                    45.2,
-    'fill':                      'rgb(0,0,0)',
-    'stroke':                    null,
-    'strokeWidth':               1,
-    'strokeDashArray':           null,
-    'strokeLineCap':             'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':            'miter',
-    'strokeMiterLimit':          4,
-    'scaleX':                    1,
-    'scaleY':                    1,
-    'angle':                     0,
-    'flipX':                     false,
-    'flipY':                     false,
-    'opacity':                   1,
-    'shadow':                    null,
-    'visible':                   true,
-    'clipTo':                    null,
-    'backgroundColor':           '',
-    'text':                      'x',
-    'fontSize':                  40,
-    'fontWeight':                'normal',
-    'fontFamily':                'Times New Roman',
-    'fontStyle':                 'normal',
-    'lineHeight':                1.16,
-    'underline':                 false,
-    'overline':                  false,
-    'linethrough':               false,
-    'textAlign':                 'left',
-    'textBackgroundColor':       '',
-    'fillRule':                  'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation':  'source-over',
-    'skewX':                      0,
-    'skewY':                      0,
-    'transformMatrix':            null,
-    'charSpacing':                0,
-    'styles':                     {}
+    version:                   fabric.version,
+    type:                      'text',
+    originX:                   'left',
+    originY:                   'top',
+    left:                      0,
+    top:                       0,
+    width:                     CHAR_WIDTH,
+    height:                    45.2,
+    fill:                      'rgb(0,0,0)',
+    stroke:                    null,
+    strokeWidth:               1,
+    strokeDashArray:           null,
+    strokeLineCap:             'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:            'miter',
+    strokeMiterLimit:          4,
+    scaleX:                    1,
+    scaleY:                    1,
+    angle:                     0,
+    flipX:                     false,
+    flipY:                     false,
+    opacity:                   1,
+    shadow:                    null,
+    visible:                   true,
+    backgroundColor:           '',
+    text:                      'x',
+    fontSize:                  40,
+    fontWeight:                'normal',
+    fontFamily:                'Times New Roman',
+    fontStyle:                 'normal',
+    lineHeight:                1.16,
+    underline:                 false,
+    overline:                  false,
+    linethrough:               false,
+    textAlign:                 'left',
+    textBackgroundColor:       '',
+    fillRule:                  'nonzero',
+    paintFirst:                'fill',
+    globalCompositeOperation:  'source-over',
+    skewX:                      0,
+    skewY:                      0,
+    charSpacing:                0,
+    styles:                     {},
+    path:                       null,
+    strokeUniform:              false,
+    direction:                  'ltr',
   };
 
   QUnit.test('constructor', function(assert) {
@@ -180,18 +181,6 @@
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
   });
 
-  QUnit.test('setShadow', function(assert) {
-    var text = createTextObject();
-    assert.ok(typeof text.setShadow === 'function');
-    assert.equal(text.setShadow('10px 8px 2px red'), text, 'should be chainable');
-
-    assert.ok(text.shadow instanceof fabric.Shadow, 'should inherit from fabric.Shadow');
-    assert.equal(text.shadow.color, 'red');
-    assert.equal(text.shadow.offsetX, 10);
-    assert.equal(text.shadow.offsetY, 8);
-    assert.equal(text.shadow.blur, 2);
-  });
-
   QUnit.test('fabric.Text.fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
@@ -222,27 +211,27 @@
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
-
-    var elTextWithAttrs = fabric.document.createElement('text');
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elTextWithAttrs = fabric.document.createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
-    elTextWithAttrs.setAttribute('x', 10);
-    elTextWithAttrs.setAttribute('y', 20);
-    elTextWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elTextWithAttrs.setAttribute('opacity', 0.45);
-    elTextWithAttrs.setAttribute('stroke', 'blue');
-    elTextWithAttrs.setAttribute('stroke-width', 3);
-    elTextWithAttrs.setAttribute('stroke-dasharray', '5, 2');
-    elTextWithAttrs.setAttribute('stroke-linecap', 'round');
-    elTextWithAttrs.setAttribute('stroke-linejoin', 'bevil');
-    elTextWithAttrs.setAttribute('stroke-miterlimit', 5);
-    elTextWithAttrs.setAttribute('font-family', 'Monaco');
-    elTextWithAttrs.setAttribute('font-style', 'italic');
-    elTextWithAttrs.setAttribute('font-weight', 'bold');
-    elTextWithAttrs.setAttribute('font-size', '123');
-    elTextWithAttrs.setAttribute('letter-spacing', '1em');
-    elTextWithAttrs.setAttribute('text-decoration', 'underline');
-    elTextWithAttrs.setAttribute('text-anchor', 'middle');
+    elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
+    elTextWithAttrs.setAttributeNS(namespace, 'y', 20);
+    elTextWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
+    elTextWithAttrs.setAttributeNS(namespace, 'opacity', 0.45);
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
+    elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
+    elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-weight', 'bold');
+    elTextWithAttrs.setAttributeNS(namespace, 'font-size', '123');
+    elTextWithAttrs.setAttributeNS(namespace, 'letter-spacing', '1em');
+    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
+    elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
     fabric.Text.fromElement(elTextWithAttrs, function(textWithAttrs) {
       // temp workaround for text objects not obtaining width under node
@@ -262,7 +251,7 @@
         strokeWidth:      3,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
-        strokeLineJoin:   'bevil',
+        strokeLineJoin:   'bevel',
         strokeMiterLimit: 5,
         fontFamily:       'Monaco',
         paintFirst:       'fill',
@@ -659,7 +648,7 @@
       overline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline ';
+    var expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -669,7 +658,7 @@
       underline: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline ';
+    var expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
@@ -680,7 +669,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -692,7 +681,7 @@
       linethrough: true,
     };
     var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through ';
+    var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
@@ -842,6 +831,84 @@
     assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
     assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
+  QUnit.test('text with a path', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    assert.ok(text.path, 'text has a path');
+    assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
+    assert.equal(text.width, 100, 'text is big as the path width');
+    assert.equal(text.height, 100, 'text is big as the path height');
+  });
+
+  QUnit.test('text with a path toObject', function(assert) {
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    var toObject = text.toObject();
+    assert.ok(toObject.path, 'export has a path');
+  });
+
+  QUnit.test('text with a path fromObject', function(assert) {
+    var done = assert.async();
+    var text = new fabric.Text('a', {
+      path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
+    });
+    var toObject = text.toObject();
+    fabric.Text.fromObject(toObject, function(text) {
+      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.ok(text.path instanceof fabric.Path, 'the path is a path');
+      assert.ok(toObject.path, 'the input has still a path property');
+      done();
+    });
+  });
+
+  QUnit.test('cacheProperties for text', function(assert) {
+    var text = new fabric.Text('a');
+    assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-path');
+  });
+
+  QUnit.test('_getLineLeftOffset', function(assert) {
+    var text = new fabric.Text('long line of text\nshort');
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align left is 0');
+    text.textAlign = 'right';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'with align right is diff between width and lineWidth');
+    text.textAlign = 'center';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'with align center is split in 2');
+    text.textAlign = 'justify';
+    assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-center';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'like align center');
+    text.textAlign = 'justify-left';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last left');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align left');
+    text.textAlign = 'justify-right';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'like align right');
+  });
+
+  QUnit.test('_getLineLeftOffset with direction rtl', function(assert) {
+    var text = new fabric.Text('long line of text\nshort');
+    text.direction = 'rtl';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
+    text.textAlign = 'right';
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align right is 0');
+    text.textAlign = 'center';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'with align center is split in 2');
+    text.textAlign = 'justify';
+    assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-center';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'like align center');
+    text.textAlign = 'justify-left';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last left');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'like align left with rtl');
+    text.textAlign = 'justify-right';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
   });
 
 })();

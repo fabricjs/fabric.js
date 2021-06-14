@@ -31,7 +31,6 @@
     opacity: 1,
     shadow: null,
     visible: true,
-    clipTo: null,
     text: 'x',
     fontSize: 40,
     fontWeight: 'normal',
@@ -49,11 +48,13 @@
     globalCompositeOperation: 'source-over',
     skewX: 0,
     skewY: 0,
-    transformMatrix: null,
     charSpacing: 0,
     styles: { },
     minWidth: 20,
     splitByGrapheme: false,
+    strokeUniform: false,
+    path: null,
+    direction: 'ltr',
   };
 
   QUnit.test('constructor', function(assert) {
@@ -139,6 +140,14 @@
     assert.equal(textbox.isEmptyStyles(1), true, 'style is empty at line 1');
   });
 
+  QUnit.test('isEmptyStyles does not crash on null styles', function(assert) {
+    var textbox = new fabric.Textbox('x x', { width: 5 });
+    textbox.styles = null;
+    assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
+    assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
+    assert.equal(textbox.isEmptyStyles(1), true, 'style is empty');
+  });
+
   QUnit.test('isEmptyStyles alternate lines', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe\nya yb', {
       width: 5,
@@ -172,6 +181,30 @@
     textbox.charSpacing = 800;
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
+  });
+  QUnit.test('wrapping with charspacing and splitByGrapheme positive', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
+      width: 190,
+      splitByGrapheme: true,
+      charSpacing: 400
+    });
+    assert.deepEqual(
+      textbox.textLines,
+      ['xaxbx', 'cxdey', 'aybid'],
+      'lines match splitByGrapheme charSpacing 400'
+    );
+  });
+  QUnit.test('wrapping with charspacing and splitByGrapheme negative', function(assert) {
+    var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
+      width: 190,
+      splitByGrapheme: true,
+      charSpacing: -100
+    });
+    assert.deepEqual(
+      textbox.textLines,
+      ['xaxbxcxdeyay', 'bid'],
+      'lines match splitByGrapheme charSpacing -100'
+    );
   });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
@@ -232,21 +265,55 @@
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
-  QUnit.test('_scaleObject with textbox', function(assert) {
+  QUnit.test('texbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
+    canvas.setActiveObject(text);
     var canvasEl = canvas.getElement(),
         canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.width,
       clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+      type: 'mousedown',
     };
     var originalWidth = text.width;
-    canvas._setupCurrentTransform(eventStub, text, true);
-    var scaled = canvas._scaleObject(eventStub.clientX + 20, eventStub.clientY, 'x');
-    assert.equal(scaled, true, 'return true if textbox scaled');
+    canvas.__onMouseDown(eventStub);
+    canvas.__onMouseMove({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mousemove',
+    });
+    canvas.__onMouseUp({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mouseup',
+    });
     assert.equal(text.width, originalWidth + 20, 'width increased');
-    assert.equal(canvas._currentTransform.newScaleX, text.width / originalWidth, 'newScaleX is not undefined');
+  });
+  QUnit.test('texbox will change width from the ml corner', function(assert) {
+    var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var eventStub = {
+      clientX: canvasOffset.left + text.left,
+      clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
+      type: 'mousedown',
+    };
+    var originalWidth = text.width;
+    canvas.__onMouseDown(eventStub);
+    canvas.__onMouseMove({
+      clientX: eventStub.clientX - 20,
+      clientY: eventStub.clientY,
+      type: 'mousemove',
+    });
+    canvas.__onMouseUp({
+      clientX: eventStub.clientX + 20,
+      clientY: eventStub.clientY,
+      type: 'mouseup',
+    });
+    assert.equal(text.width, originalWidth + 20, 'width increased');
   });
   QUnit.test('_removeExtraneousStyles', function(assert) {
     var iText = new fabric.Textbox('a\nq\qo', { styles: {
@@ -450,6 +517,20 @@
     assert.equal(textbox.styleHas('fontFamily'), true, 'style has fontFamily');
     // assert.equal(textbox.styleHas('fontFamily', 0), false, 'style does not have fontFamily on line 0');
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
+  });
+
+  QUnit.test('The same text does not need to be wrapped.', function(assert) {
+    var str = '0123456789';
+    var measureTextbox = new fabric.Textbox(str, {
+      fontSize: 20,
+      splitByGrapheme: false,
+    });
+    var newTextbox = new fabric.Textbox(str, {
+      width: measureTextbox.width,
+      fontSize: 20,
+      splitByGrapheme: true,
+    });
+    assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
 
 })();

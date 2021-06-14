@@ -1,4 +1,4 @@
-// set the fabric famework as a global for tests
+// set the fabric framework as a global for tests
 var chalk = require('chalk');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
@@ -10,6 +10,7 @@ global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
 global.getFixture = require('./lib/visualTestLoop').getFixture;
 global.getAsset = require('./lib/visualTestLoop').getAsset;
 global.getAssetName = require('./lib/visualTestLoop').getAssetName;
+global.simulateEvent = require('./lib/event.simulate').simulateEvent;
 global.imageDataToChalk = function(imageData) {
   // actually this does not work on travis-ci, so commenting it out
   return '';
@@ -38,6 +39,7 @@ var jsdom = require('jsdom');
 class CustomResourceLoader extends jsdom.ResourceLoader {
   fetch(url, options) {
     return super.fetch(url, options).catch(e => {
+      console.log('JSDOM CATCHED FETCHING', url);
       throw new Error('JSDOM FETCH CATCHED');
     });
   }

@@ -53,39 +53,38 @@
     var clone = group.toObject();
 
     var expectedObject = {
-      'version':                  fabric.version,
-      'type':                     'activeSelection',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     50,
-      'top':                      100,
-      'width':                    80,
-      'height':                   60,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              0,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'clipTo':                   null,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'transformMatrix':          null,
-      'skewX':                    0,
-      'skewY':                    0,
-      'objects':                  clone.objects
+      version:                  fabric.version,
+      type:                     'activeSelection',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     50,
+      top:                      100,
+      width:                    80,
+      height:                   60,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              0,
+      strokeDashArray:          null,
+      strokeLineCap:            'butt',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'miter',
+      strokeMiterLimit:         4,
+      scaleX:                   1,
+      scaleY:                   1,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      angle:                    0,
+      flipX:                    false,
+      flipY:                    false,
+      opacity:                  1,
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                    0,
+      skewY:                    0,
+      strokeUniform:            false,
+      objects:                  clone.objects
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -100,7 +99,7 @@
     group.includeDefaultValues = false;
     var clone = group.toObject();
     var objects = [{
-      'version':                  fabric.version,
+      version:                  fabric.version,
       type: 'rect',
       left: 10,
       top: -30,
@@ -108,7 +107,7 @@
       height: 10,
       strokeWidth: 0
     }, {
-      'version':                  fabric.version,
+      version:                  fabric.version,
       type: 'rect',
       left: -40,
       top: -10,
@@ -117,13 +116,13 @@
       strokeWidth: 0
     }];
     var expectedObject = {
-      'version':            fabric.version,
-      'type':               'activeSelection',
-      'left':               50,
-      'top':                100,
-      'width':              80,
-      'height':             60,
-      'objects':            objects
+      version:            fabric.version,
+      type:               'activeSelection',
+      left:               50,
+      top:                100,
+      width:              80,
+      height:             60,
+      objects:            objects
     };
     assert.deepEqual(clone, expectedObject);
   });
@@ -164,7 +163,7 @@
 
     assert.equal(group.get('lockMovementX'), false);
 
-    // TODO acitveGroup
+    // TODO activeGroup
     // group.getObjects()[0].lockMovementX = true;
     // assert.equal(group.get('lockMovementX'), true);
     //

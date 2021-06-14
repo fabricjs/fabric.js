@@ -1,0 +1,4 @@
+<?xml version="1.0" standalone="yes"?>
+<svg width="400px" height="400px" viewBox="1 1 14 14" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 2 5 l 2 -2 L 4 4 h 3 H 9 C 8 3 10 3 10 3 c 1 -1 2 0 1 1 S 8 5 9 7 v 1 s 2 -1 1 2 Q 9 10 10 11 T 12 11 t -1 -1 v 2 T 10 12 S 9 12 7 11 c 0 -1 0 -1 -2 -2 z m 0 2 l 1 0 l 0 1 l -1 0 z" stroke="black" fill="green" stroke-width="0.1" opacity="0.5"/>
+</svg>

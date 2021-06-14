@@ -2,34 +2,6 @@
 
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) {
-      return path;
-    }
-    var imgEl = _createImageElement();
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
-  }
-
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_WIDTH = 276,
-      IMG_HEIGHT  = 110;
-
-  function _createImageElement() {
-    return fabric.document.createElement('img');
-  }
-
-  function createImageObject(callback) {
-    var elImage = _createImageElement();
-    elImage.width = IMG_WIDTH;
-    elImage.height = IMG_HEIGHT;
-    elImage.onload = callback;
-    elImage.src = IMG_SRC;
-  }
-
   QUnit.module('fabric.Object', {
     afterEach: function() {
       fabric.perfLimitSizeTotal = 2097152;
@@ -102,7 +74,7 @@
     assert.equal(88, cObj.get('height'));
   });
 
-  // QUnit.test('Dinamically generated accessors', function(assert) {
+  // QUnit.test('Dynamically generated accessors', function(assert) {
   //   var cObj = new fabric.Object({ });
   //
   //   assert.equal('function', typeof cObj.getWidth);
@@ -134,16 +106,16 @@
 
   QUnit.test('toJSON', function(assert) {
     var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
-                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,' +
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
-                          '"transformMatrix":null,"skewX":0,"skewY":0}';
+                          '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
+                          '"skewX":0,"skewY":0}';
 
     var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
-                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevil","strokeMiterLimit":5,' +
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
-                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
-                        '"transformMatrix":null,"skewX":0,"skewY":0}';
+                        '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
+                        '"skewX":0,"skewY":0}';
 
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.toJSON === 'function');
@@ -155,7 +127,7 @@
       .set('flipY', true)
       .set('strokeDashArray', [5, 2])
       .set('strokeLineCap', 'round')
-      .set('strokeLineJoin', 'bevil')
+      .set('strokeLineJoin', 'bevel')
       .set('strokeMiterLimit', 5);
 
     assert.equal(JSON.stringify(cObj.toJSON()), augmentedJSON);
@@ -163,73 +135,71 @@
 
   QUnit.test('toObject', function(assert) {
     var emptyObjectRepr = {
-      'version':                  fabric.version,
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     0,
-      'top':                      0,
-      'width':                    0,
-      'height':                   0,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'clipTo':                   null,
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'skewX':                      0,
-      'skewY':                      0,
-      'transformMatrix':          null
+      version:                  fabric.version,
+      type:                     'object',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     0,
+      top:                      0,
+      width:                    0,
+      height:                   0,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              1,
+      strokeDashArray:          null,
+      strokeLineCap:            'butt',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'miter',
+      strokeMiterLimit:         4,
+      scaleX:                   1,
+      scaleY:                   1,
+      angle:                    0,
+      flipX:                    false,
+      flipY:                    false,
+      opacity:                  1,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                      0,
+      skewY:                      0,
+      strokeUniform:              false
     };
 
     var augmentedObjectRepr = {
-      'version':                  fabric.version,
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     10,
-      'top':                      20,
-      'width':                    30,
-      'height':                   40,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          [5, 2],
-      'strokeLineCap':            'round',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'bevil',
-      'strokeMiterLimit':         5,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    true,
-      'flipY':                    false,
-      'opacity':                  0.13,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'clipTo':                   null,
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'transformMatrix':          null,
-      'skewX':                      0,
-      'skewY':                      0
+      version:                  fabric.version,
+      type:                     'object',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     10,
+      top:                      20,
+      width:                    30,
+      height:                   40,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              1,
+      strokeDashArray:          [5, 2],
+      strokeLineCap:            'round',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'bevel',
+      strokeMiterLimit:         5,
+      scaleX:                   1,
+      scaleY:                   1,
+      angle:                    0,
+      flipX:                    true,
+      flipY:                    false,
+      opacity:                  0.13,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      skewX:                      0,
+      skewY:                      0,
+      strokeUniform:              false
     };
 
     var cObj = new fabric.Object();
@@ -243,7 +213,7 @@
       .set('opacity', 0.13)
       .set('strokeDashArray', [5, 2])
       .set('strokeLineCap', 'round')
-      .set('strokeLineJoin', 'bevil')
+      .set('strokeLineJoin', 'bevel')
       .set('strokeMiterLimit', 5);
 
     assert.deepEqual(augmentedObjectRepr, cObj.toObject());
@@ -283,17 +253,16 @@
       height: 40,
       strokeDashArray: [5, 2],
       strokeLineCap: 'round',
-      strokeLineJoin: 'bevil',
+      strokeLineJoin: 'bevel',
       strokeMiterLimit: 5,
       flipX: true,
       opacity: 0.13,
-      transformMatrix: [3, 0, 3, 1, 0, 0]
     };
 
     var cObj = new fabric.Object(),
         toObjectObj;
     cObj.includeDefaultValues = false;
-    assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always mantained');
+    assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always maintained');
 
     cObj.set('left', 10)
       .set('top', 20)
@@ -303,13 +272,10 @@
       .set('opacity', 0.13)
       .set('strokeDashArray', [5, 2])
       .set('strokeLineCap', 'round')
-      .set('strokeLineJoin', 'bevil')
-      .set('strokeMiterLimit', 5)
-      .set('transformMatrix', [3, 0, 3, 1, 0, 0]);
+      .set('strokeLineJoin', 'bevel')
+      .set('strokeMiterLimit', 5);
     toObjectObj = cObj.toObject();
     assert.deepEqual(augmentedObjectRepr, toObjectObj);
-    assert.notEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
-    assert.deepEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
     assert.notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     assert.deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
   });
@@ -383,9 +349,9 @@
   });
 
   QUnit.test('drawControls', function(assert) {
-    var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
-
-    var dummyContext = canvas.getContext('2d');
+    var cObj = new fabric.Object(), _canvas = fabric.document.createElement('canvas');
+    cObj.canvas = canvas;
+    var dummyContext = _canvas.getContext('2d');
     assert.ok(typeof cObj.drawControls === 'function');
     assert.equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });
@@ -442,6 +408,31 @@
     var canvasEl = cObj.toCanvasElement();
 
     assert.ok(typeof canvasEl.getContext === 'function', 'the element returned is a canvas');
+  });
+
+  QUnit.test('toCanvasElement activeSelection', function(assert) {
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+
+    var cObj2 = new fabric.Rect({
+      width: 100, height: 100, fill: 'red', strokeWidth: 0
+    });
+
+    canvas.add(cObj, cObj2);
+
+    var activeSel = new fabric.ActiveSelection([cObj, cObj2], { canvas: canvas });
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 1');
+
+    activeSel.toCanvasElement();
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 2');
+
+    activeSel.destroy();
+
+    assert.equal(cObj.canvas, canvas, 'canvas is the main one step 3');
+
   });
 
   QUnit.test('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
@@ -531,6 +522,10 @@
     assert.equal(object.strokeDashArray.length, 3, 'strokeDash array is odd');
     object._setLineDash(canvas.contextContainer, object.strokeDashArray, null);
     assert.equal(object.strokeDashArray.length, 6, 'strokeDash array now is even');
+
+    assert.equal(canvas.contextContainer.getLineDash().length, 6, 'object pushed line dash to canvas');
+    object._setLineDash(canvas.contextContainer, [], null);
+    assert.equal(canvas.contextContainer.getLineDash().length, 6, 'bailed immediately as array empty');
   });
 
   QUnit.test('straighten', function(assert) {
@@ -810,179 +805,6 @@
     assert.equal(object.moveTo(), object, 'should be chainable');
   });
 
-  QUnit.test('setGradient', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.setGradient === 'function');
-
-    assert.equal(object.setGradient('fill', {
-      x1: 0,
-      y1: 0,
-      x2: 100,
-      y2: 100,
-      colorStops: {
-        '0': 'rgb(255,0,0)',
-        '1': 'rgb(0,128,0)'
-      }
-    }), object, 'should be chainable');
-
-    assert.ok(typeof object.toObject().fill == 'object');
-    assert.ok(object.fill instanceof fabric.Gradient);
-
-    var fill = object.fill;
-
-    assert.equal(fill.type, 'linear');
-
-    assert.equal(fill.coords.x1, 0);
-    assert.equal(fill.coords.y1, 0);
-
-    assert.equal(fill.coords.x2, 100);
-    assert.equal(fill.coords.y2, 100);
-
-    assert.equal(fill.colorStops[0].offset, 0);
-    assert.equal(fill.colorStops[1].offset, 1);
-    assert.equal(fill.colorStops[0].color, 'rgb(255,0,0)');
-    assert.equal(fill.colorStops[1].color, 'rgb(0,128,0)');
-  });
-
-  QUnit.test('setGradient with gradientTransform', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.setGradient === 'function');
-
-    assert.equal(object.setGradient('fill', {
-      x1: 0,
-      y1: 0,
-      x2: 100,
-      y2: 100,
-      gradientTransform: [1, 0, 0, 4, 5, 5],
-      colorStops: {
-        '0': 'rgb(255,0,0)',
-        '1': 'rgb(0,128,0)'
-      }
-    }), object, 'should be chainable');
-
-    assert.ok(typeof object.toObject().fill == 'object');
-    assert.ok(object.fill instanceof fabric.Gradient);
-
-    var fill = object.fill;
-
-    assert.equal(fill.type, 'linear');
-
-    assert.equal(fill.coords.x1, 0);
-    assert.equal(fill.coords.y1, 0);
-
-    assert.equal(fill.coords.x2, 100);
-    assert.equal(fill.coords.y2, 100);
-
-    assert.deepEqual(fill.gradientTransform, [1, 0, 0, 4, 5, 5]);
-
-    assert.equal(fill.colorStops[0].offset, 0);
-    assert.equal(fill.colorStops[1].offset, 1);
-    assert.equal(fill.colorStops[0].color, 'rgb(255,0,0)');
-    assert.equal(fill.colorStops[1].color, 'rgb(0,128,0)');
-  });
-
-  QUnit.test('setPatternFill', function(assert) {
-    var done = assert.async();
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.setPatternFill === 'function');
-
-    createImageObject(function(img) {
-      assert.equal(object.setPatternFill({source: img}), object, 'should be chainable');
-
-      assert.ok(typeof object.toObject().fill == 'object');
-      assert.ok(object.fill instanceof fabric.Pattern);
-
-      assert.equal(object.fill.source, img);
-      assert.equal(object.fill.repeat, 'repeat');
-      assert.equal(object.fill.offsetX, 0);
-      assert.equal(object.fill.offsetY, 0);
-
-      assert.equal(object.setPatternFill({source: img, repeat: 'repeat-y', offsetX: 100, offsetY: 50}), object, 'should be chainable');
-
-      assert.ok(typeof object.fill == 'object');
-      assert.ok(object.fill instanceof fabric.Pattern);
-
-      assert.equal(object.fill.source, img);
-      assert.equal(object.fill.repeat, 'repeat-y');
-      assert.equal(object.fill.offsetX, 100);
-      assert.equal(object.fill.offsetY, 50);
-
-      done();
-    });
-  });
-
-  QUnit.test('setShadow', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.setShadow === 'function');
-
-    assert.equal(object.setShadow({
-      color: 'red',
-      blur: 10,
-      offsetX: 5,
-      offsetY: 15
-    }), object, 'should be chainable');
-
-    assert.ok(typeof object.toObject().shadow === 'object');
-    assert.ok(object.shadow instanceof fabric.Shadow);
-
-    assert.equal(object.shadow.color, 'red');
-    assert.equal(object.shadow.blur, 10);
-    assert.equal(object.shadow.offsetX, 5);
-    assert.equal(object.shadow.offsetY, 15);
-
-    assert.equal(object.setShadow(null), object, 'should be chainable');
-    assert.ok(!(object.shadow instanceof fabric.Shadow));
-    assert.equal(object.shadow, null);
-
-  });
-
-  QUnit.test('set shadow', function(assert) {
-    var object = new fabric.Object();
-
-    object.set('shadow', '10px 5px 0 #FF0000');
-
-    assert.ok(object.shadow instanceof fabric.Shadow);
-
-    assert.equal(object.shadow.color, '#FF0000');
-    assert.equal(object.shadow.blur, 0);
-    assert.equal(object.shadow.offsetX, 10);
-    assert.equal(object.shadow.offsetY, 5);
-
-    object.set('shadow', null);
-
-    assert.ok(!(object.shadow instanceof fabric.Shadow));
-
-    assert.equal(object.shadow, null);
-  });
-
-  QUnit.test('setColor', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.setColor === 'function');
-
-    assert.equal(object.setColor('123456'), object, 'should be chainable');
-    assert.equal(object.get('fill'), '123456');
-  });
-
-  QUnit.test('clipTo', function(assert) {
-    var object = new fabric.Object({
-      left: 40,
-      top: 40,
-      width: 40,
-      height: 50,
-      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false); }
-    });
-
-    assert.equal(typeof object.clipTo, 'function');
-
-    var deserializedObject = new fabric.Object(JSON.parse(JSON.stringify(object)));
-    assert.equal(typeof deserializedObject.clipTo, 'function');
-  });
-
   QUnit.test('getTotalObjectScaling with zoom', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     canvas.setZoom(3);
@@ -1016,6 +838,21 @@
     assert.deepEqual(objectScale, {
       scaleX: object.scaleX * group.scaleX,
       scaleY: object.scaleY * group.scaleY
+    });
+  });
+
+  QUnit.test('getObjectScaling in group with object rotated', function(assert) {
+    var object = new fabric.Object({ scaleX: 3, scaleY: 2, angle: 45 });
+    var group = new fabric.Group();
+    group.scaleX = 2;
+    group.scaleY = 3;
+    object.group = group;
+    var objectScale = object.getObjectScaling();
+    objectScale.scaleX = objectScale.scaleX.toFixed(3);
+    objectScale.scaleY = objectScale.scaleY.toFixed(3);
+    assert.deepEqual(objectScale, {
+      scaleX: '7.649',
+      scaleY: '4.707',
     });
   });
 
@@ -1217,7 +1054,7 @@
     var group = new fabric.Group();
     group.scaleX = 2;
     group.scaleY = 2;
-    object.setShadow({
+    object.shadow = new fabric.Shadow({
       color: 'red',
       blur: 10,
       offsetX: 5,
@@ -1262,25 +1099,25 @@
     var object = new fabric.Object({ fill: 'blue' });
     object.dirty = false;
     object._set('fill', 'red');
-    assert.equal(object.dirty, true, 'dirty is rised');
+    assert.equal(object.dirty, true, 'dirty is raised');
   });
   QUnit.test('_set rise dirty flag only if value changed', function(assert) {
     var object = new fabric.Object({ fill: 'blue' });
     object.dirty = false;
     object._set('fill', 'blue');
-    assert.equal(object.dirty, false, 'dirty is not rised');
+    assert.equal(object.dirty, false, 'dirty is not raised');
   });
   QUnit.test('isNotVisible', function(assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
-    assert.equal(object.isNotVisible(), false, 'object is default visilbe');
+    assert.equal(object.isNotVisible(), false, 'object is default visible');
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 1 });
-    assert.equal(object.isNotVisible(), false, 'object is visilbe with width and height equal 0, but strokeWidth 1');
+    assert.equal(object.isNotVisible(), false, 'object is visible with width and height equal 0, but strokeWidth 1');
     object = new fabric.Object({ opacity: 0, fill: 'blue' });
-    assert.equal(object.isNotVisible(), true, 'object is not visilbe with opacity 0');
+    assert.equal(object.isNotVisible(), true, 'object is not visible with opacity 0');
     object = new fabric.Object({ fill: 'blue', visible: false });
-    assert.equal(object.isNotVisible(), true, 'object is not visilbe with visible false');
+    assert.equal(object.isNotVisible(), true, 'object is not visible with visible false');
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
-    assert.equal(object.isNotVisible(), true, 'object is not visilbe with also strokeWidth equal 0');
+    assert.equal(object.isNotVisible(), true, 'object is not visible with also strokeWidth equal 0');
   });
   QUnit.test('shouldCache', function(assert) {
     var object = new fabric.Object();

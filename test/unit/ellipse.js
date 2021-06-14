@@ -26,40 +26,39 @@
   QUnit.test('toObject', function(assert) {
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
-      'version':                  fabric.version,
-      'type':                     'ellipse',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     0,
-      'top':                      0,
-      'width':                    0,
-      'height':                   0,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeDashOffset':         0,
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         4,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'skewX':                    0,
-      'skewY':                    0,
-      'rx':                       0,
-      'ry':                       0,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'fillRule':                 'nonzero',
-      'paintFirst':               'fill',
-      'globalCompositeOperation': 'source-over',
-      'clipTo':                   null,
-      'transformMatrix':          null
+      version:                  fabric.version,
+      type:                     'ellipse',
+      originX:                  'left',
+      originY:                  'top',
+      left:                     0,
+      top:                      0,
+      width:                    0,
+      height:                   0,
+      fill:                     'rgb(0,0,0)',
+      stroke:                   null,
+      strokeWidth:              1,
+      strokeDashArray:          null,
+      strokeLineCap:            'butt',
+      strokeDashOffset:         0,
+      strokeLineJoin:           'miter',
+      strokeMiterLimit:         4,
+      scaleX:                   1,
+      scaleY:                   1,
+      angle:                    0,
+      flipX:                    false,
+      flipY:                    false,
+      opacity:                  1,
+      skewX:                    0,
+      skewY:                    0,
+      rx:                       0,
+      ry:                       0,
+      shadow:                   null,
+      visible:                  true,
+      backgroundColor:          '',
+      fillRule:                 'nonzero',
+      paintFirst:               'fill',
+      globalCompositeOperation: 'source-over',
+      strokeUniform:            false,
     };
     assert.ok(typeof ellipse.toObject === 'function');
     assert.deepEqual(ellipse.toObject(), defaultProperties);
@@ -118,7 +117,8 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
-    var elEllipse        = fabric.document.createElement('ellipse'),
+    var namespace        = 'http://www.w3.org/2000/svg';
+    var elEllipse        = fabric.document.createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,
@@ -128,20 +128,20 @@
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
-        strokeLineJoin   = 'bevil',
+        strokeLineJoin   = 'bevel',
         strokeMiterLimit = 5;
 
-    elEllipse.setAttribute('rx', rx);
-    elEllipse.setAttribute('ry', ry);
-    elEllipse.setAttribute('cx', left);
-    elEllipse.setAttribute('cy', top);
-    elEllipse.setAttribute('fill', fill);
-    elEllipse.setAttribute('opacity', opacity);
-    elEllipse.setAttribute('stroke-width', strokeWidth);
-    elEllipse.setAttribute('stroke-dasharray', '5, 2');
-    elEllipse.setAttribute('stroke-linecap', strokeLineCap);
-    elEllipse.setAttribute('stroke-linejoin', strokeLineJoin);
-    elEllipse.setAttribute('stroke-miterlimit', strokeMiterLimit);
+    elEllipse.setAttributeNS(namespace, 'rx', rx);
+    elEllipse.setAttributeNS(namespace, 'ry', ry);
+    elEllipse.setAttributeNS(namespace, 'cx', left);
+    elEllipse.setAttributeNS(namespace, 'cy', top);
+    elEllipse.setAttributeNS(namespace, 'fill', fill);
+    elEllipse.setAttributeNS(namespace, 'opacity', opacity);
+    elEllipse.setAttributeNS(namespace, 'stroke-width', strokeWidth);
+    elEllipse.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    elEllipse.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
+    elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
+    elEllipse.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
     fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
       assert.ok(oEllipse instanceof fabric.Ellipse);

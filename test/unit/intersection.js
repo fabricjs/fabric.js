@@ -47,7 +47,7 @@
         intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
     assert.ok(typeof fabric.Intersection.intersectLineLine === 'function', 'has intersectLineLine function');
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
-    assert.equal(intersection.status, 'Intersection', 'it return a inteserction result');
+    assert.equal(intersection.status, 'Intersection', 'it return a intersection result');
     assert.deepEqual(intersection.points[0], new fabric.Point(5, 5), 'intersect in 5,5');
   });
 

@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "10"
+  - "12"
 
 addons:
   apt:
@@ -12,7 +12,6 @@ addons:
     - libjpeg8-dev
     - librsvg2-dev
     - libcairo2-dev
-    - g++-4.9
 
 stages:
   - Linting and Building
@@ -27,9 +26,6 @@ cache:
 env:
   global:
     - LAUNCHER=Node
-
-matrix:
-  fast_finish: true
 
 jobs:
   fast_finish: true
@@ -65,15 +61,13 @@ jobs:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Node
-      node_js: "12"
+      node_js: "14"
     - stage: Unit Tests
       env: LAUNCHER=Node
-      node_js: "10"
-    - stage: Unit Tests
-      node_js: "8"
+      node_js: "12"
     - stage: Visual Tests
       env: LAUNCHER=Node
-      node_js: "10"
+      node_js: "12"
       script: npm run build:fast && npm run test:visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
@@ -87,17 +81,17 @@ jobs:
       addons:
         apt:
           packages: # avoid installing packages
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
-      os: osx
-    - stage: Extra OS
-      env: CANFAIL=TRUE
-      node_js: "10"
-      script: npm run build:fast && npm run test:visual
-      os: windows
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
+    #   os: osx
+    # - stage: Extra OS
+    #   env: CANFAIL=TRUE
+    #   node_js: "10"
+    #   script: npm run build:fast && npm run test:visual
+    #   os: windows
 script: npm run build:fast && npm run test
 
-dist: xenial
+dist: bionic

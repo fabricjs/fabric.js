@@ -30,7 +30,7 @@
     };
     collection.add(obj);
     assert.equal(collection._objects[1], obj, 'add object in the array');
-    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAddded');
+    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAdded');
     collection.renderOnAddRemove = true;
     assert.equal(collection.rendered, 0, 'this.renderAll has not been called');
     collection.add(obj);
@@ -48,14 +48,14 @@
     collection._objects = [{ prop: 0 }, {prop: 1}];
     assert.ok(typeof collection.insertAt === 'function', 'has insertAdd method');
     var previousObject = collection._objects[index];
-    var previousLenght = collection._objects.length;
+    var previousLength = collection._objects.length;
     collection.insertAt(obj, index, nonSplicing);
     assert.equal(collection._objects[index], obj, 'add object in the array at specified index');
     assert.equal(collection._objects[index + 1], previousObject, 'add old object in the array at next index');
-    assert.equal(collection._objects.length, previousLenght + 1, 'length is incremented');
+    assert.equal(collection._objects.length, previousLength + 1, 'length is incremented');
 
     nonSplicing = true;
-    previousLenght = collection._objects.length;
+    previousLength = collection._objects.length;
     var newObject = { prop: 5 };
     previousObject = collection._objects[index];
     var returned = collection.insertAt(newObject, index, nonSplicing);
@@ -63,14 +63,14 @@
     assert.equal(collection._objects[index], newObject, 'add newobject in the array at specified index');
     assert.notEqual(collection._objects[index + 1], previousObject, 'old object is not in the array at next index');
     assert.equal(collection._objects.indexOf(previousObject), -1, 'old object is no more in array');
-    assert.equal(collection._objects.length, previousLenght, 'length is not incremented');
+    assert.equal(collection._objects.length, previousLength, 'length is not incremented');
     assert.ok(typeof collection._onObjectAdded === 'undefined', 'do not have a standard _onObjectAdded method');
     assert.equal(fired, 0, 'fired is 0');
     collection._onObjectAdded = function() {
       fired++;
     };
     collection.insertAt(obj, 1);
-    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAddded');
+    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAdded');
     collection.renderOnAddRemove = true;
     collection.insertAt(obj, 1);
     assert.equal(collection.rendered, 1, 'this.renderAll has been called');
@@ -79,18 +79,18 @@
   QUnit.test('remove', function(assert) {
     var obj = { prop: 4 }, obj2 = { prop: 2 }, obj3 = { prop: 3 }, fired = 0;
     collection.add({ prop: 0 }, {prop: 1}, obj2, obj, obj3);
-    var previousLenght = collection._objects.length;
+    var previousLength = collection._objects.length;
     assert.ok(typeof collection.remove === 'function', 'has remove method');
     var returned = collection.remove(obj);
     assert.equal(returned, collection, 'is chainable');
     assert.equal(collection._objects.indexOf(obj), -1, 'obj is no more in array');
-    assert.equal(collection._objects.length, previousLenght - 1, 'length has changed');
+    assert.equal(collection._objects.length, previousLength - 1, 'length has changed');
     assert.equal(fired, 0, 'fired is 0');
     collection._onObjectRemoved = function() {
       fired++;
     };
     collection.remove(obj2);
-    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAddded');
+    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAdded');
     collection.remove(obj2);
     assert.equal(fired, 1, 'fired is not incremented again if there is no object to remove');
 
@@ -100,10 +100,10 @@
     assert.equal(collection.rendered, 0, 'this.renderAll has not been called');
     collection.remove(obj2);
     assert.equal(collection.rendered, 1, 'this.renderAll has been called');
-    previousLenght = collection._objects.length;
+    previousLength = collection._objects.length;
     fired = 0;
     collection.remove(obj, obj3);
-    assert.equal(collection._objects.length, previousLenght - 2, 'we have 2 objects less');
+    assert.equal(collection._objects.length, previousLength - 2, 'we have 2 objects less');
     assert.equal(fired, 2, 'fired is incremented for every object removed');
     assert.equal(collection.rendered, 2, 'this.renderAll has been called just once more');
   });

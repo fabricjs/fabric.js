@@ -32,6 +32,23 @@
     assert.equal(cObj.isControlVisible('tl'), true);
   });
 
+  QUnit.test('setControlVisible is per object', function(assert) {
+    assert.ok(fabric.Object);
+
+    var cObj = new fabric.Object({ });
+    var cObj2 = new fabric.Object({ });
+
+    cObj.setControlVisible('tl', false);
+    assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
+    assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
+    cObj.controls.tl.setVisibility(false);
+    assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
+    cObj.setControlVisible('tl', true);
+    assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precedence');
+    // restore original visibility
+    cObj.controls.tl.setVisibility(true);
+  });
+
   QUnit.test('setControlsVisibility', function(assert) {
     assert.ok(fabric.Object);
 
@@ -132,6 +149,62 @@
 
   });
 
+  // set size for bottom left corner and have different results for bl than normal setCornerCoords test
+  QUnit.test('_setCornerCoords_customControlSize', function(assert) {
+    //set custom corner size
+    fabric.Object.prototype.controls.bl.sizeX = 30;
+    fabric.Object.prototype.controls.bl.sizeY = 10;
+
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
+    assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
+    cObj.setCoords();
+
+    assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tl.corner.tl.y.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tl.corner.tr.x.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.tl.corner.tr.y.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tl.corner.bl.x.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tl.corner.bl.y.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.tl.corner.br.x.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.tl.corner.br.y.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.bl.corner.tl.x.toFixed(2), -5.0);
+    assert.equal(cObj.oCoords.bl.corner.tl.y.toFixed(2), 15.0);
+    assert.equal(cObj.oCoords.bl.corner.tr.x.toFixed(2), 25.0);
+    assert.equal(cObj.oCoords.bl.corner.tr.y.toFixed(2), 15.0);
+    assert.equal(cObj.oCoords.bl.corner.bl.x.toFixed(2), -5.0);
+    assert.equal(cObj.oCoords.bl.corner.bl.y.toFixed(2), 25.0);
+    assert.equal(cObj.oCoords.bl.corner.br.x.toFixed(2), 25.0);
+    assert.equal(cObj.oCoords.bl.corner.br.y.toFixed(2), 25.0);
+    assert.equal(cObj.oCoords.tr.corner.tl.x.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.tr.corner.tl.y.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tr.corner.tr.x.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.tr.corner.tr.y.toFixed(2), 3.5);
+    assert.equal(cObj.oCoords.tr.corner.bl.x.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.tr.corner.bl.y.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.tr.corner.br.x.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.tr.corner.br.y.toFixed(2), 16.5);
+    assert.equal(cObj.oCoords.br.corner.tl.x.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.br.corner.tl.y.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.br.corner.tr.x.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.br.corner.tr.y.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.br.corner.bl.x.toFixed(2), 13.5);
+    assert.equal(cObj.oCoords.br.corner.bl.y.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.br.corner.br.x.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.br.corner.br.y.toFixed(2), 26.5);
+    assert.equal(cObj.oCoords.mtr.corner.tl.x.toFixed(2), 8.5);
+    assert.equal(cObj.oCoords.mtr.corner.tl.y.toFixed(2), -36.5);
+    assert.equal(cObj.oCoords.mtr.corner.tr.x.toFixed(2), 21.5);
+    assert.equal(cObj.oCoords.mtr.corner.tr.y.toFixed(2), -36.5);
+    assert.equal(cObj.oCoords.mtr.corner.bl.x.toFixed(2), 8.5);
+    assert.equal(cObj.oCoords.mtr.corner.bl.y.toFixed(2), -23.5);
+    assert.equal(cObj.oCoords.mtr.corner.br.x.toFixed(2), 21.5);
+    assert.equal(cObj.oCoords.mtr.corner.br.y.toFixed(2), -23.5);
+
+    // reset
+    fabric.Object.prototype.controls.bl.sizeX = null;
+    fabric.Object.prototype.controls.bl.sizeY = null;
+  });
+
   QUnit.test('_findTargetCorner', function(assert) {
     var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
     assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
@@ -149,7 +222,26 @@
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
     assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
     assert.equal(cObj._findTargetCorner({ x: 0, y: 0 }), false);
+  });
 
+  QUnit.test('_findTargetCorner for touches', function(assert) {
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    cObj.setCoords();
+    cObj.canvas = {
+      _activeObject: cObj
+    };
+    var pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.cornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.cornerSize / 3
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr), 'br', 'cornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event cornerSize/3 near br returns br');
+    pointNearBr = {
+      x: cObj.oCoords.br.x + cObj.touchCornerSize / 3,
+      y: cObj.oCoords.br.y + cObj.touchCornerSize / 3,
+    };
+    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
   });
 
   QUnit.test('_calculateCurrentDimensions', function(assert) {

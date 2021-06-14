@@ -3,14 +3,18 @@
 
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
-    function testing(val) {
-      assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+    function testing(val, changePerc) {
+      if (changePerc !== 1) {
+        assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+      }
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor('red', 'blue', 16, {
-      onComplete: function() {
+      onComplete: function(val, changePerc, timePerc) {
         // animate color need some fixing
-        // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
       },
       onChange: testing,
@@ -59,6 +63,24 @@
       assert.equal(Math.round(object.shadow.offsetX), 100, 'property has been animated');
       done();
     }, 1000);
+  });
+
+  QUnit.test('animate with color', function(assert) {
+    var done = assert.async(), properties = fabric.Object.prototype.colorProperties,
+        object = new fabric.Object();
+
+    properties.forEach(function (prop, index) {
+      object.set(prop, 'red');
+      object.animate(prop, 'blue');
+      assert.ok(true, 'animate without options does not crash');
+
+      setTimeout(function () {
+        assert.equal(object[prop], new fabric.Color('blue').toRgba(), 'property [' + prop + '] has been animated');
+        if (index === properties.length - 1) {
+          done();
+        }
+      }, 1000);
+    });
   });
 
   QUnit.test('animate with decrement', function(assert) {

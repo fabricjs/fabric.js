@@ -1,42 +1,41 @@
 (function(){
 
   var LINE_OBJECT = {
-    'version':                  fabric.version,
-    'type':                     'line',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     11,
-    'top':                      12,
-    'width':                    2,
-    'height':                   2,
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeDashOffset':         0,
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         4,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'x1':                       -1,
-    'y1':                       -1,
-    'x2':                       1,
-    'y2':                       1,
-    'shadow':                   null,
-    'visible':                  true,
-    'clipTo':                   null,
-    'backgroundColor':          '',
-    'fillRule':                 'nonzero',
-    'paintFirst':               'fill',
-    'globalCompositeOperation': 'source-over',
-    'skewX':                    0,
-    'skewY':                    0,
-    'transformMatrix':          null
+    version:                  fabric.version,
+    type:                     'line',
+    originX:                  'left',
+    originY:                  'top',
+    left:                     11,
+    top:                      12,
+    width:                    2,
+    height:                   2,
+    fill:                     'rgb(0,0,0)',
+    stroke:                   null,
+    strokeWidth:              1,
+    strokeDashArray:          null,
+    strokeLineCap:            'butt',
+    strokeDashOffset:         0,
+    strokeLineJoin:           'miter',
+    strokeMiterLimit:         4,
+    scaleX:                   1,
+    scaleY:                   1,
+    angle:                    0,
+    flipX:                    false,
+    flipY:                    false,
+    opacity:                  1,
+    x1:                       -1,
+    y1:                       -1,
+    x2:                       1,
+    y2:                       1,
+    shadow:                   null,
+    visible:                  true,
+    backgroundColor:          '',
+    fillRule:                 'nonzero',
+    paintFirst:               'fill',
+    globalCompositeOperation: 'source-over',
+    skewX:                    0,
+    skewY:                    0,
+    strokeUniform:            false
   };
 
   QUnit.module('fabric.Line');
@@ -93,7 +92,8 @@
   QUnit.test('fromElement', function(assert) {
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
-    var lineEl           = fabric.document.createElement('line'),
+    var namespace        = 'http://www.w3.org/2000/svg';
+    var lineEl           = fabric.document.createElementNS(namespace, 'line'),
         x1               = 11,
         y1               = 23,
         x2               = 34,
@@ -102,19 +102,19 @@
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
-        strokeLineJoin   = 'bevil',
+        strokeLineJoin   = 'bevel',
         strokeMiterLimit = 5;
 
-    lineEl.setAttribute('x1', x1);
-    lineEl.setAttribute('x2', x2);
-    lineEl.setAttribute('y1', y1);
-    lineEl.setAttribute('y2', y2);
-    lineEl.setAttribute('stroke', stroke);
-    lineEl.setAttribute('stroke-width', strokeWidth);
-    lineEl.setAttribute('stroke-dasharray', '5, 2');
-    lineEl.setAttribute('stroke-linecap', strokeLineCap);
-    lineEl.setAttribute('stroke-linejoin', strokeLineJoin);
-    lineEl.setAttribute('stroke-miterlimit', strokeMiterLimit);
+    lineEl.setAttributeNS(namespace, 'x1', x1);
+    lineEl.setAttributeNS(namespace, 'x2', x2);
+    lineEl.setAttributeNS(namespace, 'y1', y1);
+    lineEl.setAttributeNS(namespace, 'y2', y2);
+    lineEl.setAttributeNS(namespace, 'stroke', stroke);
+    lineEl.setAttributeNS(namespace, 'stroke-width', strokeWidth);
+    lineEl.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+    lineEl.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
+    lineEl.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
+    lineEl.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
     fabric.Line.fromElement(lineEl, function(oLine) {
       assert.ok(oLine instanceof fabric.Line);
@@ -130,9 +130,9 @@
       assert.equal(oLine.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var lineElWithMissingAttributes = fabric.document.createElement('line');
-      lineElWithMissingAttributes.setAttribute('x1', 10);
-      lineElWithMissingAttributes.setAttribute('y1', 20);
+      var lineElWithMissingAttributes = fabric.document.createElementNS(namespace, 'line');
+      lineElWithMissingAttributes.setAttributeNS(namespace, 'x1', 10);
+      lineElWithMissingAttributes.setAttributeNS(namespace, 'y1', 20);
 
       fabric.Line.fromElement(lineElWithMissingAttributes, function(oLine2) {
         assert.equal(oLine2.get('x2'), 0, 'missing attributes count as 0 values');
@@ -141,7 +141,7 @@
     });
   });
 
-  QUnit.test('straight lines may have 0 width or heigth', function(assert) {
+  QUnit.test('straight lines may have 0 width or height', function(assert) {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 
@@ -161,7 +161,8 @@
   });
 
   QUnit.test('stroke-width in a style', function(assert) {
-    var lineEl = fabric.document.createElement('line');
+    var namespace = 'http://www.w3.org/2000/svg';
+    var lineEl = fabric.document.createElementNS(namespace, 'line');
     lineEl.setAttribute('style', 'stroke-width:4');
     fabric.Line.fromElement(lineEl, function(oLine) {
       assert.ok(4, oLine.strokeWidth);

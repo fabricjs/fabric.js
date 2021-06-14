@@ -30,7 +30,7 @@
       assert.equal(fabric.util.toFixed(what, 5), 166.66667, 'should leave 5 fractional digits');
       assert.equal(fabric.util.toFixed(what, 0), 167, 'should leave 0 fractional digits');
 
-      var fractionless = (typeof what == 'number')
+      var fractionless = (typeof what === 'number')
         ? parseInt(what)
         : what.substring(0, what.indexOf('.'));
 
@@ -440,10 +440,11 @@
       return;
     }
 
-    fabric.util.loadImage(IMG_URL, function(obj) {
+    fabric.util.loadImage(IMG_URL, function(obj, isError) {
       if (obj) {
         var oImg = new fabric.Image(obj);
         assert.ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
+        assert.ok(!isError);
       }
       done();
     });
@@ -473,9 +474,10 @@
       return;
     }
     try {
-      fabric.util.loadImage(IMG_URL, function(img) {
+      fabric.util.loadImage(IMG_URL, function(img, isError) {
         assert.equal(img.src, IMG_URL, 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
+        assert.ok(!isError);
         done();
       }, null, 'anonymous');
     }
@@ -693,19 +695,6 @@
     assert.ok(typeof destination.ffffffffff === 'undefined');
   });
 
-  QUnit.test('fabric.util.getFunctionBody', function(assert) {
-    assert.equal(fabric.util.getFunctionBody('function(){}'), '');
-
-    assert.equal(fabric.util.getFunctionBody('function(){return 1 + 2}'),
-      'return 1 + 2');
-
-    assert.equal(fabric.util.getFunctionBody('function () {\n  return "blah" }'),
-      '\n  return "blah" ');
-
-    assert.equal(fabric.util.getFunctionBody('function foo (a , boo_bar, baz123 )\n{\n if (1) { alert(12345) } }'),
-      '\n if (1) { alert(12345) } ');
-  });
-
   QUnit.test('getKlass', function(assert) {
     assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
     assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
@@ -760,12 +749,6 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
     m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
-  });
-
-  QUnit.test('customTransformMatrix', function(assert) {
-    assert.ok(typeof fabric.util.customTransformMatrix === 'function');
-    var m1 = fabric.util.customTransformMatrix(5, 4, 45);
-    assert.deepEqual(m1, [5, 0, 4.999999999999999, 4, 0, 0]);
   });
 
   QUnit.test('resetObjectTransform', function(assert) {
@@ -851,7 +834,7 @@
     assert.equal(Math.round(rotated.y), 0);
     var rotated = fabric.util.rotatePoint(point, origin, Math.PI / 2);
     assert.equal(Math.round(rotated.x), 3);
-    assert.equal(Math.round(rotated.y), -2);
+    assert.equal(Math.round(rotated.y), 1);
   });
 
   QUnit.test('transformPoint', function(assert) {
@@ -1096,5 +1079,15 @@
       height: 50,
     });
     assert.equal(scale, 2, 'findScaleToFit is 2');
+  });
+
+  QUnit.test('fabric.util.isTouchEvent', function(assert) {
+    assert.ok(typeof fabric.util.isTouchEvent === 'function');
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchstart' }));
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchend' }));
+    assert.ok(fabric.util.isTouchEvent({ type: 'touchmove' }));
+    assert.ok(fabric.util.isTouchEvent({ pointerType: 'touch' }));
+    assert.notOk(fabric.util.isTouchEvent({ type: 'mousedown' }));
+    assert.notOk(fabric.util.isTouchEvent({ pointerType: 'mouse' }));
   });
 })();
