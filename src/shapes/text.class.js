@@ -970,6 +970,7 @@
         // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
         ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
         ctx.direction = isLtr ? 'ltr' : 'rtl';
+        ctx.textAlign = isLtr ? 'left' : 'right';
         this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
@@ -1008,6 +1009,7 @@
             drawingLeft = left;
             ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
             ctx.direction = isLtr ? 'ltr' : 'rtl';
+            ctx.textAlign = isLtr ? 'left' : 'right';
             this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
           }
           charsToRender = '';
