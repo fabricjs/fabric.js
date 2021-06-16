@@ -11297,6 +11297,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _hoveredTargets: [],
 
     /**
+     * reference to an indicated target (hovered but not selected)
+     * also potentially just 'highlighted' (thinking towards keyboard accessibility)
+     * @type fabric.Object
+     * @private
+     */
+    _indicatedObject: undefined,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -12094,6 +12102,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (object.onSelect({ e: e })) {
         return false;
       }
+      this.clearIndicatedObject();
       this._activeObject = object;
       return true;
     },
@@ -12130,6 +12139,38 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._discardActiveObject(e);
       this._fireSelectionEvents(currentActives, e);
       return this;
+    },
+
+    /**
+     * @private
+     * @param {Object} object to set as indicated for highlighting
+     * @return {Boolean} true if the selection happened
+     */
+    setIndicatedObject: function(object) {
+      if (this._indicatedObject === object) {
+        return false;
+      }
+
+      // active objects have special rendering that should replace indicated objects
+      if (this._activeObject === object) {
+        // if active object is the new indicated object we ant to be sure to clear the old one
+        this.clearIndicatedObject();
+        return false;
+      }
+
+      this._indicatedObject = object;
+      this.requestRenderAll();
+      return true;
+    },
+
+    /**
+    * @private
+    * @param {Object} object to set as indicated for highlighting
+    * @return {Boolean} true if the selection happened
+    */
+    clearIndicatedObject: function() {
+      this._indicatedObject = undefined;
+      this.requestRenderAll();
     },
 
     /**
@@ -15189,6 +15230,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       this._render(ctx);
       this._drawClipPath(ctx);
+      if (this.canvas._indicatedObject === this) {
+        this.drawIndication(ctx);
+      }
       this.fill = originalFill;
       this.stroke = originalStroke;
     },
@@ -17576,6 +17620,36 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * Draws borders of an object's bounding box.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {Object} styleOverride object to override the object style
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawIndicationBorders: function(ctx, styleOverride) {
+      if (!styleOverride.indicationBorderColor && !this.indicationBorderColor) {
+        return;
+      }
+      styleOverride = styleOverride || {};
+      var width = this.width + this.padding,
+          height = this.height + this.padding;
+      ctx.save();
+      ctx.strokeStyle = styleOverride.indicationBorderColor || this.indicationBorderColor;
+      ctx.lineWidth = 1 * this.borderScaleFactor;
+      ctx.strokeRect(
+        -width / 2,
+        -height / 2,
+        width,
+        height
+      );
+
+      ctx.restore();
+      return this;
+    },
+
+    /**
      * Draws borders of an object's bounding box when it is inside a group.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
@@ -17639,6 +17713,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return this;
     },
+
+    /**
+     * Draws something special to highlight an indicated object.
+     * Requires public properties: width, height
+     * Requires public options: cornerSize, padding
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {Object} styleOverride object to override the object style
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawIndication: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
+      this.drawIndicationBorders(ctx, styleOverride);
+      return this;
+    },
+
 
     /**
      * Returns true if the specified control is visible, false otherwise.
@@ -27255,6 +27345,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     editingBorderColor: 'rgba(102,153,255,0.25)',
 
     /**
+     * Border color of text object while indicated
+     * @type String
+     * @default
+     */
+    indicationBorderColor: 'rgba(109,178,64,1)',
+
+    /**
      * Width of cursor (in px)
      * @type Number
      * @default
@@ -27430,6 +27527,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
+
+      // because this renders on the upper canvas, there is an issue with z-order when
+      // an indicated object is drawn over a cursor, but the cursor shows through
+      if (this.canvas && this.canvas._indicatedObject && this !== this.canvas._indicatedObject) {
+        return;
+      }
+
       var boundaries = this._getCursorBoundaries(),
           ctx = this.canvas.contextTextbox;
       this.clearContextTop(true);

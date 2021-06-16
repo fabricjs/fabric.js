@@ -1222,6 +1222,9 @@
       }
       this._render(ctx);
       this._drawClipPath(ctx);
+      if (this.canvas._indicatedObject === this) {
+        this.drawIndication(ctx);
+      }
       this.fill = originalFill;
       this.stroke = originalStroke;
     },

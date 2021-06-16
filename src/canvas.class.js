@@ -360,6 +360,14 @@
     _hoveredTargets: [],
 
     /**
+     * reference to an indicated target (hovered but not selected)
+     * also potentially just 'highlighted' (thinking towards keyboard accessibility)
+     * @type fabric.Object
+     * @private
+     */
+    _indicatedObject: undefined,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -1157,6 +1165,7 @@
       if (object.onSelect({ e: e })) {
         return false;
       }
+      this.clearIndicatedObject();
       this._activeObject = object;
       return true;
     },
@@ -1193,6 +1202,38 @@
       this._discardActiveObject(e);
       this._fireSelectionEvents(currentActives, e);
       return this;
+    },
+
+    /**
+     * @private
+     * @param {Object} object to set as indicated for highlighting
+     * @return {Boolean} true if the selection happened
+     */
+    setIndicatedObject: function(object) {
+      if (this._indicatedObject === object) {
+        return false;
+      }
+
+      // active objects have special rendering that should replace indicated objects
+      if (this._activeObject === object) {
+        // if active object is the new indicated object we ant to be sure to clear the old one
+        this.clearIndicatedObject();
+        return false;
+      }
+
+      this._indicatedObject = object;
+      this.requestRenderAll();
+      return true;
+    },
+
+    /**
+    * @private
+    * @param {Object} object to set as indicated for highlighting
+    * @return {Boolean} true if the selection happened
+    */
+    clearIndicatedObject: function() {
+      this._indicatedObject = undefined;
+      this.requestRenderAll();
     },
 
     /**

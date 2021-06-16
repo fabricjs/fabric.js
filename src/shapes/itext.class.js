@@ -114,6 +114,13 @@
     editingBorderColor: 'rgba(102,153,255,0.25)',
 
     /**
+     * Border color of text object while indicated
+     * @type String
+     * @default
+     */
+    indicationBorderColor: 'rgba(109,178,64,1)',
+
+    /**
      * Width of cursor (in px)
      * @type Number
      * @default
@@ -289,6 +296,13 @@
       if (!this.isEditing || !this.canvas || !this.canvas.contextTextbox) {
         return;
       }
+
+      // because this renders on the upper canvas, there is an issue with z-order when
+      // an indicated object is drawn over a cursor, but the cursor shows through
+      if (this.canvas && this.canvas._indicatedObject && this !== this.canvas._indicatedObject) {
+        return;
+      }
+
       var boundaries = this._getCursorBoundaries(),
           ctx = this.canvas.contextTextbox;
       this.clearContextTop(true);

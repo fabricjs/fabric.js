@@ -214,6 +214,36 @@
     },
 
     /**
+     * Draws borders of an object's bounding box.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {Object} styleOverride object to override the object style
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawIndicationBorders: function(ctx, styleOverride) {
+      if (!styleOverride.indicationBorderColor && !this.indicationBorderColor) {
+        return;
+      }
+      styleOverride = styleOverride || {};
+      var width = this.width + this.padding,
+          height = this.height + this.padding;
+      ctx.save();
+      ctx.strokeStyle = styleOverride.indicationBorderColor || this.indicationBorderColor;
+      ctx.lineWidth = 1 * this.borderScaleFactor;
+      ctx.strokeRect(
+        -width / 2,
+        -height / 2,
+        width,
+        height
+      );
+
+      ctx.restore();
+      return this;
+    },
+
+    /**
      * Draws borders of an object's bounding box when it is inside a group.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
@@ -277,6 +307,22 @@
 
       return this;
     },
+
+    /**
+     * Draws something special to highlight an indicated object.
+     * Requires public properties: width, height
+     * Requires public options: cornerSize, padding
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {Object} styleOverride object to override the object style
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawIndication: function(ctx, styleOverride) {
+      styleOverride = styleOverride || {};
+      this.drawIndicationBorders(ctx, styleOverride);
+      return this;
+    },
+
 
     /**
      * Returns true if the specified control is visible, false otherwise.
