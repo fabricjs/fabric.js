@@ -20950,6 +20950,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      if (!this.active || (this.group && this.group !== this.canvas.getActiveGroup())) {
+        this.set('opacity', 1);
+      }
+      else {
+        this.set('opacity', 0.333);
+      }
+      
       fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
