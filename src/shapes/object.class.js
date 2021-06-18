@@ -1210,7 +1210,7 @@
       this._render(ctx);
       this._drawClipPath(ctx);
       this.fill = originalFill;
-      this.stroke = originalStroke;
+      this.stroke = originalStroke;     
     },
 
     _drawClipPath: function(ctx) {
