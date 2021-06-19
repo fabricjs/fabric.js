@@ -182,7 +182,6 @@
           return;
         }
         var offset = new fabric.Point((eraserSize.width - newSize.width) / 2, (eraserSize.height - newSize.height) / 2);
-        var paths = eraser.getObjects('path');
         eraser.set(newSize);
         eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
         rect.set(newSize);
@@ -190,9 +189,10 @@
         if (center) {
           return;
         }
-        paths.forEach(function (path) {
+        eraser.getObjects('path').forEach(function (path) {
           path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
         });
+        this.setCoords();
       }
     },
 
