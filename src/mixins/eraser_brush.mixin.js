@@ -166,7 +166,7 @@
      * Updates eraser size and positions it to top left corner of object
      * @private
      * @param {Object} [dimensions] uses object's dimensions if unspecified
-     * @param {number} [dimensions.width] 
+     * @param {number} [dimensions.width]
      * @param {number} [dimensions.height]
      * @param {boolean} [center=false] postion the eraser relative to object's center or it's top left corner
      */
@@ -176,25 +176,21 @@
         this.setCoords();
         var rect = eraser._objects[0];
         var size = { width: rect.width, height: rect.height };
-        var newSize = { width: dimensions?.width || this.width, height: dimensions?.height || this.height };
-        if (size.width === newSize.width && size.height === newSize.height) return;
+        var newSize = fabric.util.object.extends({ width: this.width, height: this.height }, dimensions);
+        if (size.width === newSize.width && size.height === newSize.height) {
+          return;
+        }
         var offset = new fabric.Point((size.width - newSize.width) / 2, (size.height - newSize.height) / 2);
-        var paths = eraser.getObjects("path");
+        var paths = eraser.getObjects('path');
         eraser.set(newSize);
-        eraser.setPositionByOrigin(
-          new fabric.Point(0, 0),
-          "center",
-          "center"
-        );
+        eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
         rect.set(newSize);
         eraser.set('dirty', true);
-        if (center) return;
+        if (center) {
+          return;
+        }
         paths.forEach(function (path) {
-          path.setPositionByOrigin(
-            path.getCenterPoint().add(offset),
-            "center",
-            "center"
-          );
+          path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
         });
       }
     },
@@ -205,7 +201,9 @@
 
     _set: function (key, value) {
       __set.call(this, key, value);
-      if (key === 'width' || key === 'height') this._onResize();
+      if (key === 'width' || key === 'height') {
+        this._onResize();
+      }
       return this;
     },
 
