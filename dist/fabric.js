@@ -20950,15 +20950,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      if(this.isMoving){
+          this.opacity = 0.33
+      }else if(this.opacity == 0.33){
+        this.opacity = 1
+      }
       
-      // if(this.type == 'image'){
-      //   let activeObject = this.canvas.getActiveObject()
-      //   if(activeObject && activeObject.id && activeObject.id == this.id){
-      //     this.opacity = 0.33
-      //   }else if(activeObject && activeObject.id){
-      //     this.opacity = 1
-      //   }
-      // }
       fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
