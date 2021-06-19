@@ -164,7 +164,7 @@
     },
 
     /**
-     * Updates eraser size and positions it to top left corner of object
+     * Updates eraser size and position to match object's size
      * @private
      * @param {Object} [dimensions] uses object's dimensions if unspecified
      * @param {number} [dimensions.width]
