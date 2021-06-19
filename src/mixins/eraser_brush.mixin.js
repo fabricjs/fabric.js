@@ -186,12 +186,11 @@
         eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
         rect.set(newSize);
         eraser.set('dirty', true);
-        if (center) {
-          return;
+        if (!center) {
+          eraser.getObjects('path').forEach(function (path) {
+            path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
+          });
         }
-        eraser.getObjects('path').forEach(function (path) {
-          path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
-        });
         this.setCoords();
       }
     },
