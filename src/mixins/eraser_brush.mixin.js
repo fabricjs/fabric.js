@@ -120,6 +120,7 @@
   });
 
   var __set = fabric.Object.prototype._set;
+  var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   fabric.util.object.extend(fabric.Object.prototype, {
@@ -173,14 +174,14 @@
     _updateEraserDimensions: function (dimensions, center) {
       var eraser = this.getEraser();
       if (eraser) {
-        this.setCoords();
         var rect = eraser._objects[0];
-        var size = { width: rect.width, height: rect.height };
-        var newSize = fabric.util.object.extend({ width: this.width, height: this.height }, dimensions);
-        if (size.width === newSize.width && size.height === newSize.height) {
+        var eraserSize = { width: rect.width, height: rect.height };
+        var size = this._getNonTransformedDimensions();
+        var newSize = fabric.util.object.extend({ width: size.x, height: size.y }, dimensions);
+        if (eraserSize.width === newSize.width && eraserSize.height === newSize.height) {
           return;
         }
-        var offset = new fabric.Point((size.width - newSize.width) / 2, (size.height - newSize.height) / 2);
+        var offset = new fabric.Point((eraserSize.width - newSize.width) / 2, (eraserSize.height - newSize.height) / 2);
         var paths = eraser.getObjects('path');
         eraser.set(newSize);
         eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
@@ -195,16 +196,17 @@
       }
     },
 
-    _onResize: function () {
-      this._updateEraserDimensions();
-    },
-
     _set: function (key, value) {
       __set.call(this, key, value);
       if (key === 'width' || key === 'height') {
-        this._onResize();
+        this._updateEraserDimensions();
       }
       return this;
+    },
+
+    render: function (ctx) {
+      this._updateEraserDimensions();
+      _render.call(this, ctx);
     },
 
     /**
