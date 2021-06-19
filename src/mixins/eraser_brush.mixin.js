@@ -176,7 +176,7 @@
         this.setCoords();
         var rect = eraser._objects[0];
         var size = { width: rect.width, height: rect.height };
-        var newSize = fabric.util.object.extends({ width: this.width, height: this.height }, dimensions);
+        var newSize = fabric.util.object.extend({ width: this.width, height: this.height }, dimensions);
         if (size.width === newSize.width && size.height === newSize.height) {
           return;
         }
