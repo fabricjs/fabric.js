@@ -119,6 +119,7 @@
     },
   });
 
+  var __set = fabric.Object.prototype._set;
   var _toObject = fabric.Object.prototype.toObject;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   fabric.util.object.extend(fabric.Object.prototype, {
@@ -159,6 +160,53 @@
       var eraser = this.getEraser();
       var target = eraser ? eraser._objects[0] : this;
       target.set('clipPath', clipPath);
+    },
+
+    /**
+     * Updates eraser size and positions it to top left corner of object
+     * @private
+     * @param {Object} [dimensions] uses object's dimensions if unspecified
+     * @param {number} [dimensions.width] 
+     * @param {number} [dimensions.height]
+     * @param {boolean} [center=false] postion the eraser relative to object's center or it's top left corner
+     */
+    _updateEraserDimensions: function (dimensions, center) {
+      var eraser = this.getEraser();
+      if (eraser) {
+        this.setCoords();
+        var rect = eraser._objects[0];
+        var size = { width: rect.width, height: rect.height };
+        var newSize = { width: dimensions?.width || this.width, height: dimensions?.height || this.height };
+        if (size.width === newSize.width && size.height === newSize.height) return;
+        var offset = new fabric.Point((size.width - newSize.width) / 2, (size.height - newSize.height) / 2);
+        var paths = eraser.getObjects("path");
+        eraser.set(newSize);
+        eraser.setPositionByOrigin(
+          new fabric.Point(0, 0),
+          "center",
+          "center"
+        );
+        rect.set(newSize);
+        eraser.set('dirty', true);
+        if (center) return;
+        paths.forEach(function (path) {
+          path.setPositionByOrigin(
+            path.getCenterPoint().add(offset),
+            "center",
+            "center"
+          );
+        });
+      }
+    },
+
+    _onResize: function () {
+      this._updateEraserDimensions();
+    },
+
+    _set: function (key, value) {
+      __set.call(this, key, value);
+      if (key === 'width' || key === 'height') this._onResize();
+      return this;
     },
 
     /**
@@ -306,6 +354,7 @@
     }
   });
 
+  var __onResize = fabric.Canvas.prototype._onResize;
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
      * Used by {@link #renderAll}
@@ -318,6 +367,21 @@
         this.freeDrawingBrush.type === 'eraser' &&
         this.freeDrawingBrush._isErasing
       );
+    },
+
+    _onResize: function () {
+      __onResize.call(this);
+      var newSize = { width: this.width, height: this.height };
+      var needsRendering = false;
+      if (typeof this.backgroundColor === 'object' && this.backgroundColor.getEraser) {
+        this.backgroundColor.set(newSize);
+        needsRendering = true;
+      }
+      if (typeof this.overlayColor === 'object' && this.overlayColor.getEraser) {
+        this.overlayColor.set(newSize);
+        needsRendering = true;
+      }
+      needsRendering && this.requestRenderAll();
     },
 
     /**
