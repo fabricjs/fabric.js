@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '4.5.0' };
+var fabric = fabric || { version: '4.5.1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -707,8 +707,8 @@ fabric.CommonMethods = {
      * @return {fabric.Point} The new rotated point
      */
     rotatePoint: function(point, origin, radians) {
-      point.subtractEquals(origin);
-      var v = fabric.util.rotateVector(point, radians);
+      var newPoint = new fabric.Point(point.x - origin.x, point.y - origin.y),
+          v = fabric.util.rotateVector(newPoint, radians);
       return new fabric.Point(v.x, v.y).addEquals(origin);
     },
 
@@ -4468,7 +4468,7 @@ fabric.warn = console.warn;
    */
   function applyViewboxTransform(element) {
     if (!fabric.svgViewBoxElementsRegEx.test(element.nodeName)) {
-      return;
+      return {};
     }
     var viewBoxAttr = element.getAttribute('viewBox'),
         scaleX = 1,
@@ -15275,7 +15275,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
         if (stroke.toLive) {
-          if (stroke.gradientUnits === 'percentage' || stroke.gradientTrasnform || stroke.patternTransform) {
+          if (stroke.gradientUnits === 'percentage' || stroke.gradientTransform || stroke.patternTransform) {
             // need to transform gradient in a pattern.
             // this is a slow process. If you are hitting this codepath, and the object
             // is not using caching, you should consider switching it on.
@@ -26296,6 +26296,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
         ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
         ctx.direction = isLtr ? 'ltr' : 'rtl';
+        ctx.textAlign = isLtr ? 'left' : 'right';
         this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
@@ -26334,6 +26335,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             drawingLeft = left;
             ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
             ctx.direction = isLtr ? 'ltr' : 'rtl';
+            ctx.textAlign = isLtr ? 'left' : 'right';
             this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
           }
           charsToRender = '';
@@ -26375,7 +26377,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     handleFiller: function(ctx, property, filler) {
       var offsetX, offsetY;
       if (filler.toLive) {
-        if (filler.gradientUnits === 'percentage' || filler.gradientTrasnform || filler.patternTransform) {
+        if (filler.gradientUnits === 'percentage' || filler.gradientTransform || filler.patternTransform) {
           // need to transform gradient in a pattern.
           // this is a slow process. If you are hitting this codepath, and the object
           // is not using caching, you should consider switching it on.
@@ -26638,7 +26640,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           topOffset = this._getTopOffset(), top,
           boxStart, boxWidth, charBox, currentDecoration,
           maxHeight, currentFill, lastFill, path = this.path,
-          charSpacing = this._getWidthOfCharSpacing();
+          charSpacing = this._getWidthOfCharSpacing(),
+          offsetY = this.offsets[type];
 
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         heightOfLine = this.getHeightOfLine(i);
@@ -26669,7 +26672,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             ctx.rotate(charBox.angle);
             ctx.fillRect(
               -charBox.kernedWidth / 2,
-              this.offsets[type] * _size + _dy,
+              offsetY * _size + _dy,
               charBox.kernedWidth,
               this.fontSize / 15
             );
@@ -26687,7 +26690,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
               ctx.fillStyle = lastFill;
               ctx.fillRect(
                 drawStart,
-                top + this.offsets[type] * size + dy,
+                top + offsetY * size + dy,
                 boxWidth,
                 this.fontSize / 15
               );
@@ -26703,10 +26706,14 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             boxWidth += charBox.kernedWidth;
           }
         }
+        var drawStart = leftOffset + lineLeftOffset + boxStart;
+        if (this.direction === 'rtl') {
+          drawStart = this.width - drawStart - boxWidth;
+        }
         ctx.fillStyle = currentFill;
         currentDecoration && currentFill && ctx.fillRect(
-          leftOffset + lineLeftOffset + boxStart,
-          top + this.offsets[type] * size + dy,
+          drawStart,
+          top + offsetY * size + dy,
           boxWidth - charSpacing,
           this.fontSize / 15
         );
