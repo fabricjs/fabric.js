@@ -360,7 +360,7 @@
     var itext = new fabric.Text('hello\nworld', {
       left: 4,
       top: 4,
-      fontFamily: 'Helvetica',
+      fontFamily: 'Arial',
       fill: 'purple',
       lineHeight: 1.1,
       styles: {
@@ -391,7 +391,7 @@
     var itext2 = new fabric.Text('Version 4.2.0', {
       left: 105,
       top: 4,
-      fontFamily: 'Helvetica',
+      fontFamily: 'Arial',
       fill: 'blue',
       lineHeight: 1.1,
       styles: {
@@ -465,7 +465,7 @@
     height: 150,
     disabled: fabric.isLikelyNode,
     golden: 'text12.png',
-    percentage: 0.09,
+    percentage: 0.095,
   });
 
   function text13(canvas, callback) {
