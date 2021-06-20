@@ -465,7 +465,7 @@
     height: 150,
     disabled: fabric.isLikelyNode,
     golden: 'text12.png',
-    percentage: 0.02,
+    percentage: 0.09,
   });
 
   function text13(canvas, callback) {
@@ -486,7 +486,7 @@
     height: 255,
     disabled: fabric.isLikelyNode,
     golden: 'text13.png',
-    percentage: 0.02,
+    percentage: 0.09,
   });
 
   tests.forEach(visualTestLoop(QUnit));
