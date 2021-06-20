@@ -486,7 +486,7 @@
     height: 255,
     disabled: fabric.isLikelyNode,
     golden: 'text13.png',
-    percentage: 0.09,
+    percentage: 0.092,
   });
 
   tests.forEach(visualTestLoop(QUnit));
