@@ -142,10 +142,19 @@ fabric.Collection = {
   /**
    * Returns true if collection contains an object
    * @param {Object} object Object to check against
+   * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
    */
-  contains: function(object) {
-    return this._objects.indexOf(object) > -1;
+  contains: function (object, deep) {
+    if (this._objects.indexOf(object) > -1) {
+      return true;
+    }
+    else if (deep) {
+      return this._objects.some(function (obj) {
+        return typeof obj.contains === 'function' && obj.contains(object, true);
+      });
+    }
+    return false;
   },
 
   /**
