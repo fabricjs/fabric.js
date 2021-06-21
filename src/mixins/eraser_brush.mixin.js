@@ -161,6 +161,7 @@
       var eraser = this.getEraser();
       var target = eraser ? eraser._objects[0] : this;
       target.set('clipPath', clipPath);
+      this.set('dirty', true);
     },
 
     /**
