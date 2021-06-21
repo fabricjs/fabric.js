@@ -1,5 +1,6 @@
 (function() {
   var canvas = new fabric.Canvas();
+  var parsePath = fabric.util.parsePath;
   QUnit.module('fabric.BaseBrush', function(hooks) {
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
@@ -40,8 +41,8 @@
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           brush.onMouseDown(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-          assert.equal(pathData, 'M 9.999 10 L 10.001 10', 'path data create a small line that looks like a point');
+          var pathData = brush.convertPointsToSVGPath(brush._points);
+          assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
@@ -51,8 +52,8 @@
           brush.onMouseMove(pointer, { e: {} });
           brush.onMouseMove(pointer, { e: {} });
           brush.onMouseMove(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-          assert.equal(pathData, 'M 9.999 10 L 10.001 10', 'path data create a small line that looks like a point');
+          var pathData = brush.convertPointsToSVGPath(brush._points);
+          assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
         });
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
@@ -65,8 +66,12 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer2, { e: {} });
           brush.onMouseMove(pointer3, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-          assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 12.5 Q 15 15 17.5 17.5 Q 20 20 17.5 17.5 Q 15 15 17.5 17.5 L 20.001 20.001', 'path data create a complex path');
+          var pathData = brush.convertPointsToSVGPath(brush._points);
+          assert.deepEqual(
+            pathData,
+            parsePath('M 9.999 9.999 Q 10 10 12.5 12.5 Q 15 15 17.5 17.5 Q 20 20 17.5 17.5 Q 15 15 17.5 17.5 L 20.001 20.001'),
+            'path data create a complex path'
+          );
           assert.equal(brush._points.length, 6, 'concident points are discarded');
         });
         QUnit.test('fabric pencil brush multiple points outside canvas', function(assert) {
@@ -81,8 +86,12 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer4, { e: {} });
           brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-          assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 17.5 130 Q 20 160 170 130 Q 320 100 210 100 L 99.999 100', 'path data create a path that goes beyond canvas');
+          var pathData = brush.convertPointsToSVGPath(brush._points);
+          assert.deepEqual(
+            pathData,
+            parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 17.5 130 Q 20 160 170 130 Q 320 100 210 100 L 99.999 100'),
+            'path data create a path that goes beyond canvas'
+          );
           assert.equal(brush._points.length, 6, 'all points are available');
         });
         QUnit.test('fabric pencil brush multiple points outside canvas, limitedToCanvasSize true', function(assert) {
@@ -98,8 +107,12 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer4, { e: {} });
           brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points).join('');
-          assert.equal(pathData, 'M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 57.5 100 L 100.001 100', 'path data create a path that does not go beyond canvas');
+          var pathData = brush.convertPointsToSVGPath(brush._points);
+          assert.deepEqual(
+            pathData,
+            parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 57.5 100 L 100.001 100'),
+            'path data create a path that does not go beyond canvas'
+          );
           assert.equal(brush._points.length, 4, '2 points have been discarded');
         });
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
