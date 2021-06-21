@@ -662,16 +662,16 @@
   }
 
   /**
-   * 
+   *
    * @param {string} pathString
-   * @return {(string|number)[][]} An array of SVG path commands 
+   * @return {(string|number)[][]} An array of SVG path commands
    * @example <caption>Usage</caption>
    * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
    *   ['M', 3, 4],
    *   ['Q', 3, 5, 2, 1, 4, 0],
    *   ['Q', 9, 12, 2, 1, 4, 0],
    * ];
-   * 
+   *
    */
   function parsePath(pathString) {
     var result = [],
@@ -742,7 +742,7 @@
   };
 
   /**
-   * 
+   *
    * Converts points to a smooth SVG path
    * @param {Array} points Array of points
    * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If undefined it will be inferred using `points`.
@@ -750,10 +750,10 @@
    */
   function getSmoothPathFromPoints(points, correction) {
     var path = [], i,
-      p1 = new fabric.Point(points[0].x, points[0].y),
-      p2 = new fabric.Point(points[1].x, points[1].y),
-      len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
-    
+        p1 = new fabric.Point(points[0].x, points[0].y),
+        p2 = new fabric.Point(points[1].x, points[1].y),
+        len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
+
     //  if no correction is passed we infer it by calculating the path's width
     if (correction === undefined) {
       var start = points[0].x;
