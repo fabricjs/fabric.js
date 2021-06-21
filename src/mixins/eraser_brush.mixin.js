@@ -674,7 +674,7 @@
         this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ?
-          this.convertPointsToSVGPath(this._points).join('') :
+          this.convertPointsToSVGPath(this._points) :
           null;
         if (!pathData || this._isEmptySVGPath(pathData)) {
           canvas.fire('erasing:end');
