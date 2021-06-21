@@ -745,7 +745,7 @@
    * 
    * Converts points to a smooth SVG path
    * @param {Array} points Array of points
-   * @param {number} correction Apply a correction to the path (usually we use `width / 1000`)
+   * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If undefined it will be inferred using `points`.
    * @return {(string|number)[][]} An array of SVG path commands
    */
   function getSmoothPathFromPoints(points, correction) {
@@ -753,6 +753,22 @@
       p1 = new fabric.Point(points[0].x, points[0].y),
       p2 = new fabric.Point(points[1].x, points[1].y),
       len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
+    
+    //  if no correction is passed we infer it by calculating the path's width
+    if (correction === undefined) {
+      var start = points[0].x;
+      var minMax = points.reduce(
+        function (prev, curr) {
+          return {
+            min: Math.min(curr.x, prev.min),
+            max: Math.max(curr.x, prev.max)
+          };
+        },
+        { min: start, max: start }
+      );
+      var width = minMax.max - minMax.min;
+      correction = width / 1000;
+    }
 
     if (manyPoints) {
       multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
