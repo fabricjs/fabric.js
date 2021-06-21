@@ -103,7 +103,7 @@
      */
     _renderBackgroundOrOverlay: function (ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
@@ -303,7 +303,7 @@
      */
     applyEraserToObjects: function () {
       var _this = this;
-      if (this.erasable === true && this.getEraser()) {
+      if (this.getEraser()) {
         var transform = _this.calcTransformMatrix();
         _this.getEraser().clone(function (eraser) {
           var clipPath = eraser._objects[0].clipPath;
@@ -340,7 +340,7 @@
      * @private
      */
     _restoreObjectsState: function () {
-      this.applyEraserToObjects();
+      this.erasable === true && this.applyEraserToObjects();
       return __restoreObjectsState.call(this);
     },
 
