@@ -61,6 +61,8 @@
     });
     expected.clipPath = expectedClipPath;
     assert.deepEqual(expected, cObj.toObject());
+    cObj.clipPath.excludeFromExport = true;
+    assert.true(cObj.toObject().clipPath === undefined);
   });
 
   QUnit.test('from object with clipPath', function(assert) {
