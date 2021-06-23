@@ -514,11 +514,18 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      if(this.isMoving){
+      if(typeof this.activeSelected != 'undefined'){
+        if(this.activeSelected){
+          console.log('this.activeSelected',this.activeSelected, this.opacity) 
           this.opacity = 0.33
-      }else if(this.opacity == 0.33){
-        this.opacity = 1
+        }else{
+          this.opacity = 1
+          console.log('this.activeSelected',this.activeSelected, this.opacity) 
+
+        }
       }
+      this._renderFill(ctx)
+      
       
       fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
