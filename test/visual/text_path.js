@@ -75,5 +75,29 @@
     height: 270,
   });
 
+  function textpath4(canvas, callback) {
+    var path = new fabric.Path('M 0 0 Q 180 0 180 -101.25 Q 180 -180 90 -180 Q 0 -180 0 -112.5 Q 0 -45 78.75 -45 Q 135 -45 146.25 -90');
+    var text = new fabric.Text('Text on a swirl path with textAlign right in rtl direction', {
+      left: 50,
+      top: 50,
+      fontSize: 24,
+      textAlign: 'right',
+      direction: 'rtl',
+      path: path
+    });
+    canvas.add(text);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'textpath aligned right in rtl direction',
+    code: textpath4,
+    golden: 'textpath4.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
