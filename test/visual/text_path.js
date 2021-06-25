@@ -77,12 +77,12 @@
 
   function textpath4(canvas, callback) {
     var path = new fabric.Path('M 0 0 Q 180 0 180 -101.25 Q 180 -180 90 -180 Q 0 -180 0 -112.5 Q 0 -45 78.75 -45 Q 135 -45 146.25 -90');
-    var text = new fabric.Text('Text on a swirl path with textAlign right in rtl direction', {
+    var text = new fabric.Text('Text on a swirl path with textAlign right', {
       left: 50,
       top: 50,
-      fontSize: 24,
+      fontSize: 28,
       textAlign: 'right',
-      direction: 'rtl',
+      charSpacing: 50,
       path: path
     });
     canvas.add(text);
@@ -91,7 +91,7 @@
   }
 
   tests.push({
-    test: 'textpath aligned right in rtl direction',
+    test: 'textpath aligned right',
     code: textpath4,
     golden: 'textpath4.png',
     percentage: 0.09,
