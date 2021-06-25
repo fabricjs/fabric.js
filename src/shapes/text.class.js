@@ -218,7 +218,7 @@
      * @type String
      * @default
      */
-    side:               "left",
+    side:               'left',
 
     /**
      * @private
@@ -758,7 +758,7 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.side == "right" || this.direction == "rtl";
+          reverse = this.side === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       if (path) {
@@ -773,19 +773,19 @@
           width += graphemeInfo.kernedWidth;
           prevGrapheme = grapheme;
         }
-        switch(this.textAlign) {
-          case "center":
+        switch (this.textAlign) {
+          case 'center':
             positionInPath = (totalPathLength - width) / 2;
-          break;
-          case "right":
+            break;
+          case 'right':
             positionInPath = (totalPathLength - width);
-          break;
-          //justify not yet supported
+            break;
+          //todo - add support for justify
         }
-        if (this.direction == "ltr") {
+        if (this.direction === 'ltr') {
           positionInPath += this.startOffset;
         }
-        else if (this.direction == "rtl") {
+        else if (this.direction === 'rtl') {
           positionInPath -= this.startOffset;
         }
       }
@@ -835,10 +835,10 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      if (this.side == "left") {
+      if (this.side === 'left') {
         graphemeInfo.angle = info.angle;
       }
-      else if (this.side == "right") {
+      else if (this.side === 'right') {
         graphemeInfo.angle = info.angle + Math.PI;
       }
     },
