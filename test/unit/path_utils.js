@@ -58,4 +58,24 @@
     assert.deepEqual(infos[3].length, 20, 'the command 3 a L has length 20');
     assert.deepEqual(infos[4].length, 20, 'the command 4 a Z has length 20');
   });
+
+  QUnit.test('fabric.util.getSmoothPathFromPointsWithCorrection', function (assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.getSmoothPathFromPoints === 'function');
+    assert.ok(typeof fabric.util.getSmoothPathFromPointsWithCorrection === 'function');
+    var points = [];
+    var pathData = [
+      ["M", 100.2, 99.8],
+      ["Q", 100, 100, 200, 100],
+      ["Q", 300, 100, 250, 200],
+      ["L", 199.8, 300.2]
+    ];
+    [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']].forEach(function (item) {
+      if (item.length > 2) {
+        points.push(new fabric.Point(item[1], item[2]));
+      }
+    });
+    assert.deepEqual(fabric.util.getSmoothPathFromPointsWithCorrection(points), pathData, 'path is correct');
+    done();
+  });
 })();
