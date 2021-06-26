@@ -1040,31 +1040,57 @@
   });
 
   QUnit.test('toObject excludeFromExport', function(assert) {
-    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect(), clipPath = makeRect();
     canvas.clear();
     canvas.add(rect, rect2, rect3);
-    assert.equal(canvas.toObject().objects.length, 3, 'all objects get exported');
+    canvas.clipPath = clipPath;
+    var canvasObj = canvas.toObject();
+    assert.equal(canvasObj.objects.length, 3, 'all objects get exported');
+    assert.deepEqual(canvasObj.clipPath, clipPath.toObject(), 'clipPath exported');
     rect.excludeFromExport = true;
     rect2.excludeFromExport = true;
-    assert.equal(canvas.toObject().objects.length, 1, 'only one object gets exported');
+    clipPath.excludeFromExport = true;
+    canvasObj = canvas.toObject();
+    assert.equal(canvasObj.objects.length, 1, 'only one object gets exported');
+    assert.equal(canvasObj.clipPath, undefined, 'clipPath not exported');
   });
 
-  QUnit.test('toObject excludeFromExport bgImage overlay', function(assert) {
+  QUnit.test('toObject excludeFromExport bg overlay', function(assert) {
     var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    var bgColor = new fabric.Gradient({
+      type: 'linear',
+      colorStops: [
+        { offset: 0, color: 'black' },
+        { offset: 1, color: 'white' },
+      ],
+      coords: {
+        x1: 0,
+        x2: 300,
+        y1: 0,
+        y2: 0,
+      },
+    });
     canvas.clear();
     canvas.backgroundImage = rect;
     canvas.overlayImage = rect2;
+    canvas.backgroundColor = bgColor;
+    canvas.setOverlayColor('red');
     canvas.add(rect3);
     var rectToObject = rect.toObject();
     var rect2ToObject = rect2.toObject();
+    var bgc2ToObject = bgColor.toObject();
     var canvasToObject = canvas.toObject();
-    assert.deepEqual(canvasToObject.backgroundImage, rectToObject, 'background exported');
-    assert.deepEqual(canvasToObject.overlayImage, rect2ToObject, 'overlay exported');
+    assert.deepEqual(canvasToObject.backgroundImage, rectToObject, 'background image exported');
+    assert.deepEqual(canvasToObject.overlayImage, rect2ToObject, 'overlay image exported');
+    assert.deepEqual(canvasToObject.background, bgc2ToObject, 'background color exported');
+    assert.equal(canvasToObject.overlay, 'red', 'overlay color exported');
     rect.excludeFromExport = true;
     rect2.excludeFromExport = true;
+    bgColor.excludeFromExport = true;
     canvasToObject = canvas.toObject();
-    assert.equal(canvasToObject.backgroundImage, undefined, 'background not exported');
-    assert.equal(canvasToObject.overlayImage, undefined, 'overlay not exported');
+    assert.equal(canvasToObject.backgroundImage, undefined, 'background image not exported');
+    assert.equal(canvasToObject.overlayImage, undefined, 'overlay image not exported');
+    assert.equal(canvasToObject.background, undefined, 'background color not exported');
   });
 
 
