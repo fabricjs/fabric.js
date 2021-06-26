@@ -1040,13 +1040,19 @@
   });
 
   QUnit.test('toObject excludeFromExport', function(assert) {
-    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
+    var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect(), clipPath = makeRect();
     canvas.clear();
     canvas.add(rect, rect2, rect3);
-    assert.equal(canvas.toObject().objects.length, 3, 'all objects get exported');
+    canvas.clipPath = clipPath;
+    var canvasObj = canvas.toObject();
+    assert.equal(canvasObj.objects.length, 3, 'all objects get exported');
+    assert.deepEqual(canvasObj.clipPath, clipPath.toObject(), 'clipPath exported');
     rect.excludeFromExport = true;
     rect2.excludeFromExport = true;
-    assert.equal(canvas.toObject().objects.length, 1, 'only one object gets exported');
+    clipPath.excludeFromExport = true;
+    canvasObj = canvas.toObject();
+    assert.equal(canvasObj.objects.length, 1, 'only one object gets exported');
+    assert.equal(canvasObj.clipPath, undefined, 'clipPath not exported');
   });
 
   QUnit.test('toObject excludeFromExport bg overlay', function(assert) {
