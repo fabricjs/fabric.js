@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1@next]
+
+- fix(fabric.EraserBrush): test eraser intersection with objects taking into account canvas viewport transform [#7147](https://github.com/fabricjs/fabric.js/pull/7147)
+- fix(fabric.Object): support `excludeFromExport` set on `clipPath` [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+- fix(fabric.Group): support `excludeFromExport` set on objects [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+- fix(fabric.StaticCanvas): support `excludeFromExport` set on `backgroundColor`, `overlayColor`, `clipPath` [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+
 ## [4.5.1]
 
 - fix(fabric.Text): fixes decoration rendering when there is a single rendering for full text line [#7104](https://github.com/fabricjs/fabric.js/pull/7104)
