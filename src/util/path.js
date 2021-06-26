@@ -789,7 +789,7 @@
    * @return {(string|number)[][]} An array of SVG path commands
    */
   function getSmoothPathFromPointsWithCorrection(points) {
-    //  we infer `coorection` by calculating the path's width
+    //  we infer `correction` by calculating the path's width
     var start = points[0].x;
     var minMax = points.reduce(
       function (prev, curr) {
