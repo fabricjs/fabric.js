@@ -1,5 +1,20 @@
 # Changelog
 
+## [next]
+
+- fix(fabric.EraserBrush): test eraser intersection with objects taking into account canvas viewport transform [#7147](https://github.com/fabricjs/fabric.js/pull/7147)
+- fix(fabric.Object): support `excludeFromExport` set on `clipPath` [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+- fix(fabric.Group): support `excludeFromExport` set on objects [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+- fix(fabric.StaticCanvas): support `excludeFromExport` set on `backgroundColor`, `overlayColor`, `clipPath` [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
+
+## [4.5.1]
+
+- fix(fabric.Text): fixes decoration rendering when there is a single rendering for full text line [#7104](https://github.com/fabricjs/fabric.js/pull/7104)
+- fix(fabric.Text): spell error which made the gradientTransform not working [#7059](https://github.com/fabricjs/fabric.js/pull/7059)
+- fix(fabric.util): unwanted mutation in fabric.util.rotatePoint [#7117](https://github.com/fabricjs/fabric.js/pull/7117)
+- fix(svg parser): Ensure that applyViewboxTransform returns an object and not undefined/null [#7030](https://github.com/fabricjs/fabric.js/pull/7030)
+- fix(fabric.Text): support firefox with ctx.textAlign for RTL text [#7126](https://github.com/fabricjs/fabric.js/pull/7126)
+
 ## [4.5.0]
 
 - fix(fabric.PencilBrush) decimate deleting end of a freedrawing line [#6966](https://github.com/fabricjs/fabric.js/pull/6966)
