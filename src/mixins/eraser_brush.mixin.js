@@ -103,7 +103,7 @@
      */
     _renderBackgroundOrOverlay: function (ctx, property) {
       var fill = this[property + 'Color'], object = this[property + 'Image'],
-        v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
+          v = this.viewportTransform, needsVpt = this[property + 'Vpt'];
       if (!fill && !object) {
         return;
       }
