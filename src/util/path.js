@@ -781,30 +781,6 @@
     return path;
   }
 
-
-  /**
-   * Converts points to a smooth SVG path.
-   * This utility calculates the path's correction value from `points`.
-   * @param {{ x: number,y: number }[]} points 
-   * @return {(string|number)[][]} An array of SVG path commands
-   */
-  function getSmoothPathFromPointsWithCorrection(points) {
-    //  we infer `correction` by calculating the path's width
-    var start = points[0].x;
-    var minMax = points.reduce(
-      function (prev, curr) {
-        return {
-          min: Math.min(curr.x, prev.min),
-          max: Math.max(curr.x, prev.max)
-        };
-      },
-      { min: start, max: start }
-    );
-    var width = minMax.max - minMax.min;
-    var correction = width / 1000;
-    return getSmoothPathFromPoints(points, correction);
-  }
-
   /**
    * Calculate bounding box of a elliptic-arc
    * @deprecated
@@ -852,7 +828,6 @@
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
-  fabric.util.getSmoothPathFromPointsWithCorrection = getSmoothPathFromPointsWithCorrection;
   fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
   fabric.util.fromArcToBeziers = fromArcToBeziers;
   /**
