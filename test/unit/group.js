@@ -15,6 +15,13 @@
     return new fabric.Group([rect1, rect2], {strokeWidth: 0});
   }
 
+  function makeGroupWith2ObjectsAndNoExport() {
+    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
+      rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, excludeFromExport: true });
+
+    return new fabric.Group([rect1, rect2], { strokeWidth: 0 });
+  }
+
   function makeGroupWith4Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
@@ -224,6 +231,18 @@
       objects: objects
     };
     assert.deepEqual(clone, expectedObject);
+  });
+
+
+  QUnit.test('toObject with excludeFromExport set on an object', function (assert) {
+    var group = makeGroupWith2Objects();
+    var group2 = makeGroupWith2ObjectsAndNoExport();
+    var clone = group.toObject();
+    var clone2 = group2.toObject();
+    assert.deepEqual(clone2.objects, group2._objects.filter(obj => !obj.excludeFromExport).map(obj => obj.toObject()));
+    delete clone.objects;
+    delete clone2.objects;
+    assert.deepEqual(clone, clone2);
   });
 
   QUnit.test('render', function(assert) {

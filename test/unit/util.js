@@ -30,7 +30,7 @@
       assert.equal(fabric.util.toFixed(what, 5), 166.66667, 'should leave 5 fractional digits');
       assert.equal(fabric.util.toFixed(what, 0), 167, 'should leave 0 fractional digits');
 
-      var fractionless = (typeof what == 'number')
+      var fractionless = (typeof what === 'number')
         ? parseInt(what)
         : what.substring(0, what.indexOf('.'));
 
@@ -834,7 +834,7 @@
     assert.equal(Math.round(rotated.y), 0);
     var rotated = fabric.util.rotatePoint(point, origin, Math.PI / 2);
     assert.equal(Math.round(rotated.x), 3);
-    assert.equal(Math.round(rotated.y), -2);
+    assert.equal(Math.round(rotated.y), 1);
   });
 
   QUnit.test('transformPoint', function(assert) {
