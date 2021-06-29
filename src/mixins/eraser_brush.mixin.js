@@ -642,7 +642,7 @@
         canvas.renderCanvas(
           canvas.getContext(),
           canvas.getObjects().filter(function (obj) {
-            return !obj.erasable || obj.isType('group');
+            return !obj.erasable || obj.forEachObject;
           })
         );
         this.restoreCanvasFromLayer('bottom');
