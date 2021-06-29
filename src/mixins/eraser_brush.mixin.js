@@ -902,9 +902,9 @@
         this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ?
-          this.convertPointsToSVGPath(this._points).join('') :
-          'M 0 0 Q 0 0 0 0 L 0 0';
-        if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
+          this.convertPointsToSVGPath(this._points) :
+          null;
+        if (!pathData || this._isEmptySVGPath(pathData)) {
           canvas.fire('erasing:end');
           // do not create 0 width/height paths, as they are
           // rendered inconsistently across browsers
