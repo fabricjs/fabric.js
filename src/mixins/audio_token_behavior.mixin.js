@@ -6,8 +6,6 @@
      * Initializes all the interactive behavior of Audio_token
      */
     initBehavior: function() {
-      this.initAddedHandler();
-      this.initRemovedHandler();
       this.initMousedownHandler();
     },
 
@@ -15,27 +13,26 @@
       if (this.isPlaying || this.isPaused) {
         this.onStop();
       }
-      console.log('deselect ' + this.cacheKey);
     },
 
     onPlay: function() {
-      console.log('playing ' + this.cacheKey);
       this.isPaused = false;
       this.isPlaying = true;
+      this.canvas && this.canvas.fire('audio:play', { target: this });
       this.canvas.requestRenderAll();
     },
 
     onPause: function() {
-      console.log('paused ' + this.cacheKey);
       this.isPaused = true;
       this.isPlaying = false;
+      this.canvas && this.canvas.fire('audio:pause', { target: this });
       this.canvas.requestRenderAll();
     },
 
     onStop: function() {
-      console.log('stopped ' + this.cacheKey);
       this.isPaused = false;
       this.isPlaying = false;
+      this.canvas && this.canvas.fire('audio:stop', { target: this });
       this.canvas.requestRenderAll();
     },
 
@@ -60,16 +57,7 @@
       this.on('mousedown:before', this._mouseDownHandlerBefore);
     },
 
-    initAddedHandler: function() {
-      //may need to 'register' the audio URL or update some kind of bookkeeping...?
-    },
-
-    initRemovedHandler: function() {
-      //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
-    },
-
-    playControlPressed: function(e) {
-      // may need e if we want to avoid play on right click or treat iPads special.
+    playControlPressed: function() {
       if (this.isPlaying) {
         this.onPause();
       }

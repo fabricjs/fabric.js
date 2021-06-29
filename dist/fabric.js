@@ -30591,10 +30591,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @param {Object} [options] Options object
      * @return {fabric.Audio_token} thisArg
      */
-    initialize: function(audioURL, options) {
+    initialize: function(mediaID, options) {
       options || (options = { });
       this.filters = [];
-      this.audioURL = audioURL;
+      this.mediaID = mediaID;
       this.cacheKey = 'audio_token' + fabric.Object.__uid++;
       this.callSuper('initialize', options);
       this.initBehavior();
@@ -30630,8 +30630,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     toObject: function(propertiesToInclude) {
       return this.callSuper('toObject', [
-        'playState',
-        'audioUrl',
+        'mediaID',
         'idleImageSrc',
         'selectedImageSrc',
         'pauseControlImageSrc',
@@ -30712,8 +30711,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * Initializes all the interactive behavior of Audio_token
      */
     initBehavior: function() {
-      this.initAddedHandler();
-      this.initRemovedHandler();
       this.initMousedownHandler();
     },
 
@@ -30721,27 +30718,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.isPlaying || this.isPaused) {
         this.onStop();
       }
-      console.log('deselect ' + this.cacheKey);
     },
 
     onPlay: function() {
-      console.log('playing ' + this.cacheKey);
       this.isPaused = false;
       this.isPlaying = true;
+      this.canvas && this.canvas.fire('audio:play', { target: this });
       this.canvas.requestRenderAll();
     },
 
     onPause: function() {
-      console.log('paused ' + this.cacheKey);
       this.isPaused = true;
       this.isPlaying = false;
+      this.canvas && this.canvas.fire('audio:pause', { target: this });
       this.canvas.requestRenderAll();
     },
 
     onStop: function() {
-      console.log('stopped ' + this.cacheKey);
       this.isPaused = false;
       this.isPlaying = false;
+      this.canvas && this.canvas.fire('audio:stop', { target: this });
       this.canvas.requestRenderAll();
     },
 
@@ -30766,16 +30762,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.on('mousedown:before', this._mouseDownHandlerBefore);
     },
 
-    initAddedHandler: function() {
-      //may need to 'register' the audio URL or update some kind of bookkeeping...?
-    },
-
-    initRemovedHandler: function() {
-      //may need to 'deregister' the audio URL or update some kind of bookkeeping...?
-    },
-
-    playControlPressed: function(e) {
-      // may need e if we want to avoid play on right click or treat iPads special.
+    playControlPressed: function() {
       if (this.isPlaying) {
         this.onPause();
       }
