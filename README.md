@@ -250,6 +250,7 @@ For example:
 
 - [Fabric on Bountysource](https://www.bountysource.com/trackers/23217-fabric-js)
 - [Fabric on CodeTriage](http://www.codetriage.com/kangax/fabric.js)
+- [Contributing](./CONTRIBUTING.md)
 
 ### Staying in touch
 
