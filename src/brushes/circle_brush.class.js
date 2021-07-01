@@ -107,6 +107,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     }
     var group = new fabric.Group(circles);
     group.canvas = this.canvas;
+    this._addClipPathToResult(group);
 
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);

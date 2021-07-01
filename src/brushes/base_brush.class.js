@@ -142,6 +142,22 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   },
 
   /**
+ * @private
+ * @param {fabric.Object} result 
+ */
+  _addClipPathToResult: function (result) {
+    if (!this.clipPath) return;
+    this.clipPath.clone(function (clipPath) {
+      var desiredTransform = fabric.util.multiplyTransformMatrices(
+        fabric.util.invertTransform(result.calcTransformMatrix()),
+        clipPath.calcTransformMatrix()
+      );
+      fabric.util.applyTransformToObject(clipPath, desiredTransform);
+      result.set('clipPath', clipPath);
+    });
+  },
+
+  /**
    * Subclasses should override this method
    * @private
    * @param {CanvasRenderingContext2D} ctx
