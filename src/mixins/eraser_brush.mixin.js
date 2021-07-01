@@ -521,7 +521,10 @@
           ctx,
           canvas.getObjects()
         );
-        this.callSuper('_render');
+        this._saveAndTransform(ctx);
+        this.render(ctx);
+        this.callSuper('_drawClipPath', ctx);
+        ctx.restore();
         this.restoreCanvasFromLayer('top');
       },
 
