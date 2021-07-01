@@ -1210,17 +1210,19 @@
      * @return {Boolean} true if the selection happened
      */
     setIndicatedObject: function(object) {
+      var indicatedObjectTypes = ['audio_token'];
       if (this._indicatedObject === object) {
         return false;
       }
-
-      // active objects have special rendering that should replace indicated objects
-      if (this._activeObject === object) {
+      if (object.isMoving) {
+        return false;
+      }
+      // active objects have special rendering that should replace indicated objects (except indicatedObjectTypes)
+      if (this._activeObject === object && !indicatedObjectTypes.includes(object.type)) {
         // if active object is the new indicated object we ant to be sure to clear the old one
         this.clearIndicatedObject();
         return false;
       }
-
       this._indicatedObject = object;
       this.requestRenderAll();
       return true;

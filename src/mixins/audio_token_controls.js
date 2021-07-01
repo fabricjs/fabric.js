@@ -91,13 +91,31 @@
       touchCornerSize: 64,
 
       cursorStyle: 'pointer',
+      // We overwrite RENDER with a new implementation for rendering active (clicked) state of the control
+      //
+      // mouseDownHandler: function (eventData, target) {
+      //   target.controls.playControl.render = function (ctx, left, top, styleOverride, target) {
+      //     var scale = target.scaleX;
+      //     var size = target.controls.playControl.cornerSize * scale;
+      //     var activeStateImg = target.isPlaying
+      //       ? target.clickedPauseControlImage
+      //       : target.clickedPlayControlImage;
+      //     target.controls.playControl.y = playIconY;
+      //     target.controls.playControl.offsetX = playIconOffsetX * scale;
+      //     target.controls.playControl.offsetY = playIconOffsetY * scale;
+      //
+      //     ctx.save();
+      //     ctx.translate(left, top);
+      //     ctx.drawImage(activeStateImg, -size / 2, -size / 2, size, size);
+      //     ctx.restore();
+      //   };
+      // },
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
       },
-
       render: function (ctx, left, top, styleOverride, fabricObject) {
         // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
@@ -105,10 +123,16 @@
         var controlImg;
 
         // draw either the default icons or the ones defined by parent (audio_token)
-        controlImg = fabricObject.isPlaying ?
-          fabricObject.pauseControlImage :
-          fabricObject.playControlImage;
-
+        if (fabricObject === fabricObject.canvas._indicatedObject) {
+          controlImg = fabricObject.isPlaying ?
+            fabricObject.hoveredPauseControlImage :
+            fabricObject.hoveredPlayControlImage;
+        }
+        else {
+          controlImg = fabricObject.isPlaying ?
+            fabricObject.pauseControlImage :
+            fabricObject.playControlImage;
+        }
         this.y = playIconY;
         this.offsetX = playIconOffsetX * scale;
         this.offsetY = playIconOffsetY * scale;
