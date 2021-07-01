@@ -69,7 +69,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    */
   clipPath: undefined,
 
-
   /**
    * Sets brush styles
    * @private
@@ -130,6 +129,12 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @param {CanvasRenderingContext2D} ctx
    */
   drawClipPathOnCache: function (ctx) {
+    if (this.clipPath && this.clipPath.absolutePositioned) {
+      //  we remove `absolutePositioned`
+      //  because it has no effect (the brush has no transform) 
+      //  and it will try to call `calcTransformMatrix` which will throw an error
+      delete this.clipPath.absolutePositioned;
+    }
     fabric.Object.prototype.drawClipPathOnCache.call(this, ctx);
   },
 
