@@ -147,7 +147,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @param {fabric.Object} result
    */
   _addClipPathToResult: function (result) {
-    if (!this.clipPath) return;
+    if (!this.clipPath) {
+      return;
+    }
     this.clipPath.clone(function (clipPath) {
       var desiredTransform = fabric.util.multiplyTransformMatrices(
         fabric.util.invertTransform(result.calcTransformMatrix()),
