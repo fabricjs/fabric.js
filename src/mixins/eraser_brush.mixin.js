@@ -294,7 +294,7 @@
        * @private
        */
       _drawClipPath: function () {
-        
+
       },
 
       /**
