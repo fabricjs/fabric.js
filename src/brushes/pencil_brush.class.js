@@ -140,13 +140,11 @@
     /**
      * Draw a smooth path on the topCanvas using quadraticCurveTo
      * @private
+     * @param {CanvasRenderingContext2D} ctx
      */
-    _render: function() {
-      var ctx  = this.canvas.contextTop, i, len,
-          p1 = this._points[0],
-          p2 = this._points[1];
+    render: function(ctx) {
+      var i, len, p1 = this._points[0], p2 = this._points[1];
 
-      this._saveAndTransform(ctx);
       ctx.beginPath();
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
@@ -173,7 +171,6 @@
       // the bezier control point
       ctx.lineTo(p1.x, p1.y);
       ctx.stroke();
-      ctx.restore();
     },
 
     /**
