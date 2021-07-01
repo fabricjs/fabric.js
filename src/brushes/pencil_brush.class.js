@@ -213,7 +213,7 @@
         this.shadow.affectStroke = true;
         path.shadow = new fabric.Shadow(this.shadow);
       }
-      this._addClipPathToResult(group);
+      this._addClipPathToResult(path);
       return path;
     },
 
