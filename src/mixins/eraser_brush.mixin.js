@@ -285,7 +285,7 @@
       initialize: function (canvas) {
         this.callSuper('initialize', canvas);
         this._renderBound = this._render.bind(this);
-        this.render = this.render.bind(this);
+        this.renderAll = this.renderAll.bind(this);
       },
 
       /**
@@ -566,7 +566,7 @@
       /**
        * @public
        */
-      render: function () {
+      renderAll: function () {
         if (this._isErasing) {
           if (this.isRendering) {
             this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
