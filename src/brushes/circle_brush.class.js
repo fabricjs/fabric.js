@@ -52,17 +52,14 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   },
 
   /**
-   * Render the full state of the brush
    * @private
+   * @param {CanvasRenderingContext2D} ctx
    */
-  _render: function() {
-    var ctx  = this.canvas.contextTop, i, len,
-        points = this.points;
-    this._saveAndTransform(ctx);
+  render: function (ctx) {
+    var i, len, points = this.points;
     for (i = 0, len = points.length; i < len; i++) {
       this.dot(ctx, points[i]);
     }
-    ctx.restore();
   },
 
   /**
