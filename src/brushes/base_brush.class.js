@@ -65,7 +65,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
   /**
    * Same as fabric.Object `clipPath` property.
-   * The clip path is positioned relative to the top left corner of the canvas.
+   * The clip path is positioned relative to the top left corner of the viewport.
    */
   clipPath: undefined,
 
@@ -125,16 +125,18 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   },
 
   /**
+   * needed for `absolutePositioned` `clipPath`
+   * @private
+   */
+  calcTransformMatrix: function () {
+    return fabric.util.invertTransform(this.canvas.viewportTransform);
+  },
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
   drawClipPathOnCache: function (ctx) {
-    if (this.clipPath && this.clipPath.absolutePositioned) {
-      //  we remove `absolutePositioned`
-      //  because it has no effect (the brush has no transform) 
-      //  and it will try to call `calcTransformMatrix` which will throw an error
-      delete this.clipPath.absolutePositioned;
-    }
     fabric.Object.prototype.drawClipPathOnCache.call(this, ctx);
   },
 
@@ -143,7 +145,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @param {CanvasRenderingContext2D} ctx
    */
   _drawClipPath: function (ctx) {
+    const v = fabric.util.invertTransform(this.canvas.viewportTransform);
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     fabric.Object.prototype._drawClipPath.call(this, ctx);
+    ctx.restore();
   },
 
   /**
@@ -155,9 +161,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     if (!this.clipPath) {
       return;
     }
+    var t = result.calcTransformMatrix();
+    if (!this.clipPath.absolutePositioned) {
+      t = fabric.util.multiplyTransformMatrices(this.canvas.viewportTransform, t);
+    }
     this.clipPath.clone(function (clipPath) {
       var desiredTransform = fabric.util.multiplyTransformMatrices(
-        fabric.util.invertTransform(result.calcTransformMatrix()),
+        fabric.util.invertTransform(t),
         clipPath.calcTransformMatrix()
       );
       fabric.util.applyTransformToObject(clipPath, desiredTransform);
