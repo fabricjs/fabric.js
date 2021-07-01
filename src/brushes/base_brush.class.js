@@ -47,7 +47,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @type Number
    * @default
    */
-  strokeMiterLimit:         10,
+  strokeMiterLimit: 10,
 
   /**
    * Stroke Dash Array.
@@ -61,8 +61,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @type Boolean
    * @default false
   */
-
   limitedToCanvasSize: false,
+
+  /**
+   * Same as fabric.Object `clipPath` property
+   * originX = 'left', originY = 'top'
+   */
+  clipPath: undefined,
 
 
   /**
@@ -117,7 +122,44 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
   needsFullRender: function() {
     var color = new fabric.Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
+    return color.getAlpha() < 1 || !!this.shadow || (this.clipPath && this.clipPath.isCacheDirty());
+  },
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  drawClipPathOnCache: function (ctx) {
+    fabric.Object.prototype.drawClipPathOnCache.call(this, ctx);
+  },
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  _drawClipPath: function (ctx) {
+    fabric.Object.prototype._drawClipPath.call(this, ctx);
+  },
+
+  /**
+   * Subclasses should override this method
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  render: function (ctx /*eslint-disable-line no-unused-vars*/) {
+
+  },
+
+  /**
+   * Render the full state of the brush
+   * @private
+   */
+  _render: function () {
+    var ctx = this.canvas.contextTop;
+    this._saveAndTransform(ctx);
+    this.render(ctx);
+    this._drawClipPath(ctx);
+    ctx.restore();
   },
 
   /**
