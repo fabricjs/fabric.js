@@ -162,7 +162,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       );
       fabric.util.applyTransformToObject(clipPath, desiredTransform);
       result.set('clipPath', clipPath);
-    });
+    }, ['inverted']);
   },
 
   /**
