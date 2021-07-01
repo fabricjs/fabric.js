@@ -30,6 +30,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
         ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
     this.dot(ctx, point);
+    this._drawClipPath(ctx);
     ctx.restore();
   },
 

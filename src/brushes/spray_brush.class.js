@@ -181,6 +181,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
     this._renderChunk(ctx, sprayChunk);
+    this._drawClipPath(ctx);
     ctx.restore();
   },
 

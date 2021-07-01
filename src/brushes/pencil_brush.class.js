@@ -76,6 +76,7 @@
           }
           this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
           ctx.stroke();
+          this._drawClipPath(ctx);
           ctx.restore();
         }
       }
