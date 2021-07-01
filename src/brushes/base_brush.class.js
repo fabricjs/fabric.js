@@ -145,6 +145,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @param {CanvasRenderingContext2D} ctx
    */
   _drawClipPath: function (ctx) {
+    if (!this.clipPath) {
+      return;
+    }
+    this.clipPath.canvas = this.canvas;
     var v = fabric.util.invertTransform(this.canvas.viewportTransform);
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
