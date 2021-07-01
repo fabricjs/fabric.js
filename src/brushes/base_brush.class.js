@@ -64,8 +64,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   limitedToCanvasSize: false,
 
   /**
-   * Same as fabric.Object `clipPath` property
-   * originX = 'left', originY = 'top'
+   * Same as fabric.Object `clipPath` property.
+   * The clip path is positioned relative to the top left corner of the canvas.
    */
   clipPath: undefined,
 
@@ -142,9 +142,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   },
 
   /**
- * @private
- * @param {fabric.Object} result 
- */
+   * Adds the clip path to the resulting object created by the brush
+   * @private
+   * @param {fabric.Object} result
+   */
   _addClipPathToResult: function (result) {
     if (!this.clipPath) return;
     this.clipPath.clone(function (clipPath) {
