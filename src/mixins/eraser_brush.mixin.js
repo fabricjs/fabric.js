@@ -289,6 +289,15 @@
       },
 
       /**
+       * Disable clip path drawing.
+       * Clip path must be handled differently when erasing.
+       * @private
+       */
+      _drawClipPath: function () {
+        
+      },
+
+      /**
        * Used to hide a drawable from the rendering process
        * @param {fabric.Object} object
        */
@@ -484,11 +493,23 @@
       renderTopLayer: function () {
         var canvas = this.canvas;
         this._drawOverlayOnTop = this.prepareCanvasForLayer('top');
+        if (this.clipPath) {
+          var ctx = canvas.getContext();
+          canvas.renderCanvas(
+            ctx,
+            canvas.getObjects()
+          );
+          var inverted = this.clipPath.inverted;
+          this.clipPath.set('inverted', !!inverted);
+          this.callSuper('_drawClipPath', ctx);
+          this.clipPath.set('inverted', inverted)
+        }
         canvas.renderCanvas(
           canvas.contextTop,
           canvas.getObjects()
         );
         this.callSuper('_render');
+        this.callSuper('_drawClipPath', ctx);
         this.restoreCanvasFromLayer('top');
       },
 
@@ -519,7 +540,7 @@
        * @returns
        */
       needsFullRender: function () {
-        return this.callSuper('needsFullRender') || this._drawOverlayOnTop;
+        return this.callSuper('needsFullRender') || this._drawOverlayOnTop || this.clipPath;
       },
 
       /**
