@@ -12,7 +12,9 @@
 - feat(fabric.PencilBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
 - feat(fabric.PatternBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
 - feat(fabric.SprayBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.EraserBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
 - Breaking: renamed `fabric.SprayBrush` `render` method to `renderChunk`.
+- Breaking: renamed `fabric.EraserBrush` `render` method to `renderAll`.
 
 ## [4.5.1]
 
