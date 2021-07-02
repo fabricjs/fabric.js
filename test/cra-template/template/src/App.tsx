@@ -1,13 +1,13 @@
 import React, { useRef, useEffect } from 'react';
-import { fabric } from 'fabric';
+import { fabric } from './fabric';
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
-  const ref = useRef<HTMLCanvasElement>();
-  const fc = useRef<HTMLCanvasElement>();
+  const ref = useRef<HTMLCanvasElement>(null);
+  const fc = useRef<fabric.Canvas>();
   useEffect(() => {
-    fc.currect = new fabric.Canvas(ref.current!);
+    fc.current = new fabric.Canvas(ref.current!);
   }, []);
 
   return (
