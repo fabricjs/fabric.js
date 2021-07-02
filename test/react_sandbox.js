@@ -101,7 +101,7 @@ function createServer(port = 5000) {
     }
   }).listen(port);
 
-  console.log(`Server is listening to port ${port}`);
+  console.log(`Server is listening on port ${port}`);
 }
 
 //  cli
