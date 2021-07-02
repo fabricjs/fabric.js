@@ -21,3 +21,18 @@
   margin: 20px;
   padding: 20px;
 }
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.App-deploy {
+  display: flex;
+  align-items: center;
+}
+
+.App-deploy > * {
+  margin: 0 10px;
+}

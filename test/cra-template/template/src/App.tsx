@@ -1,10 +1,10 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css';
 import { fabric } from './fabric';
 
 const SIZE = { width: 500, height: 500 };
 
-function App() {
+function useCanvasRef() {
   const fc = useRef<fabric.Canvas | null>(null);
   const setRef = useCallback((ref: HTMLCanvasElement | null) => {
     if (!ref) {
@@ -24,42 +24,23 @@ function App() {
       fc.current = null;
     }
   }, []);
+  return [fc, setRef] as [typeof fc, typeof setRef];
+}
+
+function App() {
+  const [fc, setRef] = useCanvasRef();
+
+  useEffect(() => {
+    // do stuff with canvas after initialization
+    const canvas = fc.current;
+  }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="http://fabricjs.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Fabric Docs
-        </a>
-        <h2>
-          Fabric React Sandbox
-        </h2>
-        <a
-          className="App-link"
-          href="https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Contribution Guide
-        </a>
-      </header>
-      <div className="App-canvas">
-        <canvas
-          width={SIZE.width}
-          height={SIZE.height}
-          ref={setRef}
-        />
-      </div>
-      <footer className="App-footer">
-        <code>fabric</code> is being watched for changes. All you need to do is start coding!<br />
-        To edit this test app open <code>./src/App.tsx</code><br />
-      </footer>
-    </div>
+    <canvas
+      width={SIZE.width}
+      height={SIZE.height}
+      ref={setRef}
+    />
   );
 }
 
