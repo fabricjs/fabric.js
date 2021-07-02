@@ -40,7 +40,7 @@ function startReactSandbox() {
       console.log(chalk.blue.bold('> error listening to/building fabric'));
     }
   });
-  createServer();
+  createServer(5000);
   try {
     cp.spawn('npm', ['start'], { shell: true, cwd: appDir, stdio: 'inherit' });
   } catch (error) {
