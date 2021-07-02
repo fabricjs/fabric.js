@@ -1,13 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import './App.css';
 import { fabric } from './fabric';
 
 function App() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const fc = useRef<fabric.Canvas>();
-  useEffect(() => {
-    const canvas = new fabric.Canvas(ref.current!, { backgroundColor: 'white' });
+  const fc = useRef<fabric.Canvas | null>(null);
+  const setRef = useCallback((ref: HTMLCanvasElement | null) => {
+    if (!ref) {
+      fc.current?.dispose();
+      fc.current = null;
+      return;
+    }
+    const canvas = new fabric.Canvas(ref, { backgroundColor: 'white' });
     fc.current = canvas;
+    return () => {
+      fc.current?.dispose();
+      fc.current = null;
+    }
   }, []);
 
   return (
@@ -37,7 +45,7 @@ function App() {
         <canvas
           width={500}
           height={500}
-          ref={ref}
+          ref={setRef}
         />
       </div>
       <footer className="App-footer">
