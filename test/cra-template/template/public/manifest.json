@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "fabric React Sandbox",
+  "name": "fabric React Sandbox",
   "icons": [
     {
       "src": "favicon.ico",
