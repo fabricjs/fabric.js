@@ -2,6 +2,7 @@ const fs = require('fs');
 const Axios = require('axios');
 const chalk = require('chalk');
 const path = require('path');
+const http = require('http');
 const cp = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
 const APP_NAME = 'react-sandbox';
@@ -39,6 +40,7 @@ function startReactSandbox() {
       console.log(chalk.blue.bold('> error listening to/building fabric'));
     }
   });
+  createServer();
   try {
     cp.spawn('npm', ['start'], { shell: true, cwd: appDir, stdio: 'inherit' });
   } catch (error) {
@@ -83,9 +85,33 @@ async function createAndOpenCodeSandbox() {
   cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${uri}`);
 }
 
+function createServer(port = 5000) {
+  http.createServer(async (req, res) => {
+    if (req.url === '/codesandbox') {
+      const uri = await createCodeSandbox();
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify({ uri }));
+    } else {
+      res.writeHead(400, {
+        'Content-Type': 'application/json'
+      });
+      res.end();
+    }
+  }).listen(port);
 
-module.exports = {
-  startReactSandbox,
-  createCodeSandbox,
-  createAndOpenCodeSandbox
+  console.log(`Server is listening to port ${port}`);
+}
+
+//  cli
+
+const cmd = process.argv.slice(2)[0];
+
+if (cmd === 'start') {
+  startReactSandbox();
+} else if (cmd === 'deploy') {
+  createAndOpenCodeSandbox();
+} else if (cmd === 'serve') {
+  createServer();
 }
