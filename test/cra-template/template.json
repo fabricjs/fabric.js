@@ -2,7 +2,7 @@
   "package": {
     "dependencies": {
       "fabric": "file:..",
-      "@types/fabric": "@types/fabric:@latest",
+      "@types/fabric": "latest",
       "@testing-library/jest-dom": "^5.11.4",
       "@testing-library/react": "^11.1.0",
       "@testing-library/user-event": "^12.1.10",
@@ -14,7 +14,10 @@
       "web-vitals": "^1.0.1"
     },
     "eslintConfig": {
-      "extends": ["react-app", "react-app/jest"]
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
     }
   }
 }
