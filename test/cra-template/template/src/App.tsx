@@ -2,11 +2,18 @@ import React, { useCallback, useRef } from 'react';
 import './App.css';
 import { fabric } from './fabric';
 
+const SIZE = { width: 500, height: 500 };
+
 function App() {
   const fc = useRef<fabric.Canvas | null>(null);
   const setRef = useCallback((ref: HTMLCanvasElement | null) => {
     if (!ref) {
-      fc.current?.dispose();
+      if (fc.current) {
+        const el = fc.current.getElement();
+        fc.current.dispose();
+        el.width = SIZE.width;
+        el.height = SIZE.height;
+      }
       fc.current = null;
       return;
     }
@@ -43,8 +50,8 @@ function App() {
       </header>
       <div className="App-canvas">
         <canvas
-          width={500}
-          height={500}
+          width={SIZE.width}
+          height={SIZE.height}
           ref={setRef}
         />
       </div>
