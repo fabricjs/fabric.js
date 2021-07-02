@@ -1,6 +1,6 @@
 {
-  "short_name": "fabric React Sandbox",
-  "name": "fabric React Sandbox",
+  "short_name": "Fabric.js React Sandbox",
+  "name": "Fabric.js React Sandbox",
   "icons": [
     {
       "src": "favicon.ico",
