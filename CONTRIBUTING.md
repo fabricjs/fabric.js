@@ -46,6 +46,15 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
+### Setting up a local environment
+
+To set up a dev environment with react run the following command. It will create an app at `test/react-sandbox` and listen for changes made in the source code.
+Use this command as you would use `npm start` in a react project.
+
+```bash
+npm run dev:react
+```
+
 ### Pull request guidelines
 
 Here are a few notes you should take into account:
