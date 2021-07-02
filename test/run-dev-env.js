@@ -1,7 +1,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const path = require('path');
-const { execSync, exec } = require('child_process');
+const cp = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
 const APP_NAME = 'react-sandbox';
 const appDir = path.resolve(__dirname, APP_NAME);
@@ -12,14 +12,14 @@ const fabricDest = path.resolve(appDir, 'src', 'fabric.js');
 
 function copyBuildToApp() {
   console.log(`> building dist`);
-  execSync('node build.js modules=ALL requirejs fast', { cwd: main });
+  cp.execSync('node build.js modules=ALL requirejs fast', { cwd: main });
   fs.copyFileSync(fabricSource, fabricDest);
   console.log(`> generated ${fabricDest}`);
 }
 
 function startDevEnv() {
   if (!fs.existsSync(appDir)) {
-    execSync(`npx create-react-app test/${APP_NAME} --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
+    cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
   }
   copyBuildToApp();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
@@ -31,7 +31,7 @@ function startDevEnv() {
     }
   });
   try {
-    exec('npm start', { cwd: appDir, detached: true, stdio: 'inherit' });
+    cp.spawn('npm', ['start'], { shell: true, cwd: appDir, stdio: 'inherit' });
   } catch (error) {
     console.log(chalk.yellow.bold('\n> stopped watching for changes in fabric'));
     process.exit(1);
