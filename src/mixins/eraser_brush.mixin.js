@@ -476,12 +476,15 @@
       renderBottomLayer: function () {
         var canvas = this.canvas;
         this.prepareCanvasForLayer('bottom');
+        var group = new fabric.Group(canvas.getObjects().filter(function (obj) {
+          return !obj.erasable || obj.isType('group');
+        }), { clipPath: this.clipPath });
+        group.canvas = this.canvas;
         canvas.renderCanvas(
           canvas.getContext(),
-          canvas.getObjects().filter(function (obj) {
-            return !obj.erasable || obj.isType('group');
-          })
+          [group]
         );
+        group.ungroupOnCanvas()
         this.restoreCanvasFromLayer('bottom');
       },
 
@@ -492,6 +495,7 @@
        * @private
        */
       renderClippedOutLayer: function () {
+        return
         if (!this.clipPath) {
           return;
         }
