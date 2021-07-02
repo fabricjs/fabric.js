@@ -1,7 +1,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, exec } = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
 const APP_NAME = 'react-sandbox';
 const appDir = path.resolve(__dirname, APP_NAME);
@@ -11,9 +11,10 @@ const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric.js');
 
 function copyBuildToApp() {
-  execSync('node build.js modules=ALL requirejs', { cwd: main });
+  console.log(`> building dist`);
+  execSync('node build.js modules=ALL requirejs fast', { cwd: main });
   fs.copyFileSync(fabricSource, fabricDest);
-  console.log(`built ${fabricDest}`);
+  console.log(`> generated ${fabricDest}`);
 }
 
 function startDevEnv() {
@@ -22,9 +23,15 @@ function startDevEnv() {
   }
   copyBuildToApp();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
-  fs.watch(src, { recursive: true }, copyBuildToApp);
+  fs.watch(src, { recursive: true }, () => {
+    try {
+      copyBuildToApp();
+    } catch (error) {
+      console.log(chalk.blue.bold('> error listening to/building fabric'));
+    }
+  });
   try {
-    execSync('npm start', { cwd: appDir, detached: true });
+    exec('npm start', { cwd: appDir, detached: true, stdio: 'inherit' });
   } catch (error) {
     console.log(chalk.yellow.bold('\n> stopped watching for changes in fabric'));
     process.exit(1);
