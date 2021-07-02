@@ -62,8 +62,8 @@
     "all": "npm run build && npm run test && npm run test:visual && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site",
     "testem": "testem .",
     "testem:ci": "testem ci",
-    "react_sandbox:start": "node test/start_react_sandbox",
-    "react_sandbox:deploy": "node test/create_code_sandbox"
+    "react_sandbox:start": "node test/react_sandbox_cli start",
+    "react_sandbox:deploy": "node test/react_sandbox_cli deploy"
   },
   "optionalDependencies": {
     "canvas": "^2.6.1",
