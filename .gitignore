@@ -9,3 +9,4 @@ before_commit
 .idea/
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
+/test/test-fabric
