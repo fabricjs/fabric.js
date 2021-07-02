@@ -1,4 +1,5 @@
 const fs = require('fs');
+const chalk = require('chalk');
 const path = require('path');
 const { execSync } = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
@@ -16,12 +17,17 @@ function copyBuildToApp() {
 
 function startDevEnv() {
   if (!fs.existsSync(appDir)) {
-    console.log('dfgsdfgsdfg', templateDir)
     execSync(`npx create-react-app test/test-fabric --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
   }
   copyBuildToApp();
+  console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
   fs.watch(src, { recursive: true }, copyBuildToApp);
-  execSync('npm start', { cwd: appDir, detached: true });
+  try {
+    execSync('npm start', { cwd: appDir, detached: true });
+  } catch (error) {
+    console.log(chalk.yellow.bold('\n> stopped watching for changes in fabric'));
+    process.exit(1);
+  }
 }
 
 startDevEnv();
