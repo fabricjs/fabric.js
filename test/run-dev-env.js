@@ -3,7 +3,8 @@ const chalk = require('chalk');
 const path = require('path');
 const { execSync } = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
-const appDir = path.resolve(__dirname, 'test-fabric');
+const APP_NAME = 'react-sandbox';
+const appDir = path.resolve(__dirname, APP_NAME);
 const main = path.resolve(__dirname, '..');
 const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
@@ -17,7 +18,7 @@ function copyBuildToApp() {
 
 function startDevEnv() {
   if (!fs.existsSync(appDir)) {
-    execSync(`npx create-react-app test/test-fabric --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
+    execSync(`npx create-react-app test/${APP_NAME} --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
   }
   copyBuildToApp();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
