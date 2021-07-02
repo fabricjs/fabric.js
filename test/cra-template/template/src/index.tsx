@@ -8,9 +8,13 @@ function useDeployCodeSandbox() {
   const [pending, setPending] = useState(false);
   const deployCodeSandbox = useCallback(async () => {
     setPending(true);
-    const { uri } = await (await fetch('/codesandbox')).json();
+    try {
+      const { uri } = await (await fetch('/codesandbox')).json();
+      window.open(uri, '_blank');
+    } catch (error) {
+      console.error(error);
+    }
     setPending(false);
-    window.open(uri, '_blank');
   }, []);
   return [pending, deployCodeSandbox] as [boolean, () => void];
 }
