@@ -13,6 +13,32 @@ const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric.js');
 
+function execGitCommand(cmd) {
+  return cp.execSync(cmd).toString()
+    .replace(/\n/g, ',')
+    .split(',')
+    .map(value => value.trim())
+    .filter(value => value.length > 0);
+}
+
+function getGitInfo() {
+  const branch = execGitCommand('git branch --show-current')[0];
+  const tag = execGitCommand('git describe --tags')[0];
+  const changes = execGitCommand('git status --porcelain').map(value => {
+    const [type, path] = value.split(' ');
+    return { type, path };
+  });
+  return {
+    branch,
+    tag,
+    changes
+  }
+}
+
+function writeGitInfoToApp() {
+  fs.writeFileSync(path.resolve(appDir, 'src', 'git.json'), JSON.stringify(getGitInfo(), null, '\t'));
+}
+
 function buildDist() {
   cp.execSync('node build.js modules=ALL requirejs fast', { cwd: main });
 }
@@ -33,10 +59,12 @@ function createReactAppIfNeeded() {
 function startReactSandbox() {
   createReactAppIfNeeded();
   copyBuildToApp();
+  writeGitInfoToApp();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
   fs.watch(src, { recursive: true }, () => {
     try {
       copyBuildToApp();
+      writeGitInfoToApp();
     } catch (error) {
       console.log(chalk.blue.bold('> error listening to/building fabric'));
     }
@@ -61,6 +89,7 @@ const FILES = [
   'src/index.css',
   'src/fabric.d.ts',
   'src/fabric.js',
+  'src/git.json',
   'public/index.html',
   'src/reportWebVitals.ts',
 ]
@@ -95,6 +124,11 @@ function createServer(port = 5000) {
         'Content-Type': 'application/json'
       });
       res.end(JSON.stringify({ uri }));
+    } else if (req.url === '/git') {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(getGitInfo(), null, '\t'));
     } else {
       res.writeHead(400, {
         'Content-Type': 'application/json'
