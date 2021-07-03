@@ -103,7 +103,7 @@ function createServer(port = 5000) {
     }
   }).listen(port);
 
-  console.log(chalk.yellow(`> Codesandbox server is listening on port ${port}`));
+  console.log(chalk.yellow.bold(`> codesandbox server is listening on port ${port}`));
 }
 
 //  cli
