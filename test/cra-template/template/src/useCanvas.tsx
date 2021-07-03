@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { fabric } from './fabric';
 
-export function useFabricCanvas() {
+export function useCanvas() {
     const fc = useRef<fabric.Canvas | null>(null);
     const setRef = useCallback((ref: HTMLCanvasElement | null) => {
         fc.current?.dispose();
