@@ -757,55 +757,14 @@
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
-          positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.side === 'right';
+          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
 
       this.__charBounds[lineIndex] = lineBounds;
-      if (path) {
-        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
-        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-        startingPoint.x += path.pathOffset.x;
-        startingPoint.y += path.pathOffset.y;
-        for (i = 0; i < line.length; i++) {
-          grapheme = line[i];
-          graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-          lineBounds[i] = graphemeInfo;
-          width += graphemeInfo.kernedWidth;
-          prevGrapheme = grapheme;
-        }
-        switch (this.textAlign) {
-          case 'center':
-            positionInPath = (totalPathLength - width) / 2;
-            break;
-          case 'right':
-            positionInPath = (totalPathLength - width);
-            break;
-          //todo - add support for justify
-        }
-        if (this.direction === 'ltr') {
-          positionInPath += this.startOffset;
-        }
-        else if (this.direction === 'rtl') {
-          positionInPath -= this.startOffset;
-        }
-      }
-      for (i = reverse ? line.length - 1 : 0; reverse ? i >= 0 : i < line.length; reverse ? i-- : i++) {
+      for (i = 0; i < line.length; i++) {
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-        if (path) {
-          if (positionInPath > totalPathLength) {
-            positionInPath %= totalPathLength;
-          }
-          else if (positionInPath < 0) {
-            positionInPath += totalPathLength;
-          }
-          // it would probably much faster to send all the grapheme position for a line
-          // and calculate path position/angle at once.
-          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
-        }
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
-        positionInPath += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
@@ -816,6 +775,37 @@
         kernedWidth: 0,
         height: this.fontSize
       };
+      if (path) {
+        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+        startingPoint.x += path.pathOffset.x;
+        startingPoint.y += path.pathOffset.y;
+        switch (this.textAlign) {
+          case 'center':
+            positionInPath = (totalPathLength - width) / 2;
+            break;
+          case 'right':
+            positionInPath = (totalPathLength - width);
+            break;
+          //todo - add support for justify
+        }
+        positionInPath += this.startOffset;
+      }
+      if (path) {
+        for (i = 0; i < line.length; i++) {
+          graphemeInfo = lineBounds[i];
+          if (positionInPath > totalPathLength) {
+            positionInPath %= totalPathLength;
+          }
+          else if (positionInPath < 0) {
+            positionInPath += totalPathLength;
+          }
+          // it would probably much faster to send all the grapheme position for a line
+          // and calculate path position/angle at once.
+          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+          positionInPath += graphemeInfo.kernedWidth;
+        }
+      }
       return { width: width, numOfSpaces: numOfSpaces };
     },
 
@@ -835,12 +825,7 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      if (this.side === 'left') {
-        graphemeInfo.angle = info.angle;
-      }
-      else if (this.side === 'right') {
-        graphemeInfo.angle = info.angle + Math.PI;
-      }
+      graphemeInfo.angle = info.angle;
     },
 
     /**
