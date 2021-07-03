@@ -2,6 +2,7 @@
   "package": {
     "private": true,
     "dependencies": {
+      "fabric": "latest",
       "@types/fabric": "latest",
       "@testing-library/jest-dom": "^5.11.4",
       "@testing-library/react": "^11.1.0",
