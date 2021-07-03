@@ -714,21 +714,8 @@
       maxX -= strokeOffset;
       maxY -= strokeOffset;
       // selection border
-      if (this.selectionDashArray.length > 1 && !supportLineDash) {
-        ctx.beginPath();
-
-        fabric.util.drawDashedLine(ctx, minX, minY, maxX, minY, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, minX, maxY, maxX, maxY, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, minX, minY, minX, maxY, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, maxX, minY, maxX, maxY, this.selectionDashArray);
-
-        ctx.closePath();
-        ctx.stroke();
-      }
-      else {
-        fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
-        ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
-      }
+      fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
+      ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
     },
 
     /**
