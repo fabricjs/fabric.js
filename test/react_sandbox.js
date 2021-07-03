@@ -13,6 +13,22 @@ const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric.js');
 
+const FILES = [
+  'package.json',
+  '.env',
+  '.eslintignore',
+  'src/useCanvas.ts',
+  'src/App.tsx',
+  'src/hooks.ts',
+  'src/SandboxUI.tsx',
+  'src/index.tsx',
+  'src/styles.css',
+  'src/fabric.d.ts',
+  'src/fabric.js',
+  'public/index.html',
+  'src/reportWebVitals.ts',
+]
+
 function execGitCommand(cmd) {
   return cp.execSync(cmd).toString()
     .replace(/\n/g, ',')
@@ -28,10 +44,12 @@ function getGitInfo() {
     const [type, path] = value.split(' ');
     return { type, path };
   });
+  const userName = execGitCommand('git config user.name');
   return {
     branch,
     tag,
-    changes
+    changes,
+    user: userName
   }
 }
 
@@ -75,21 +93,6 @@ async function startReactSandbox() {
     process.exit(1);
   }
 }
-
-const FILES = [
-  'package.json',
-  '.env',
-  '.eslintignore',
-  'src/hooks.tsx',
-  'src/App.tsx',
-  'src/index.tsx',
-  'src/App.css',
-  'src/index.css',
-  'src/fabric.d.ts',
-  'src/fabric.js',
-  'public/index.html',
-  'src/reportWebVitals.ts',
-]
 
 async function createCodeSandbox() {
   createReactAppIfNeeded();
