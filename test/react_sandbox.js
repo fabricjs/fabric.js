@@ -35,10 +35,6 @@ function getGitInfo() {
   }
 }
 
-function writeGitInfoToApp() {
-  fs.writeFileSync(path.resolve(appDir, 'src', 'git.json'), JSON.stringify(getGitInfo(), null, '\t'));
-}
-
 function buildDist() {
   cp.execSync('node build.js modules=ALL requirejs fast', { cwd: main });
 }
@@ -56,20 +52,23 @@ function createReactAppIfNeeded() {
   }
 }
 
-function startReactSandbox() {
+async function startReactSandbox() {
   createReactAppIfNeeded();
   copyBuildToApp();
-  writeGitInfoToApp();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
   fs.watch(src, { recursive: true }, () => {
     try {
       copyBuildToApp();
-      writeGitInfoToApp();
     } catch (error) {
       console.log(chalk.blue.bold('> error listening to/building fabric'));
     }
   });
-  createServer(5000);
+  const port = await createServer(5000);
+  const packagePath = path.resolve(appDir, 'package.json');
+  const package = JSON.parse(fs.readFileSync(packagePath).toString());
+  console.log(package)
+  package.proxy = `http://localhost:${port}`;
+  fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
   try {
     cp.spawn('npm', ['start'], { shell: true, cwd: appDir, stdio: 'inherit' });
   } catch (error) {
@@ -89,7 +88,6 @@ const FILES = [
   'src/index.css',
   'src/fabric.d.ts',
   'src/fabric.js',
-  'src/git.json',
   'public/index.html',
   'src/reportWebVitals.ts',
 ]
@@ -116,8 +114,13 @@ async function createAndOpenCodeSandbox() {
   cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${uri}`);
 }
 
+/**
+ * 
+ * @param {number} [port]
+ * @returns {Promise<number>} port
+ */
 function createServer(port = 5000) {
-  http.createServer(async (req, res) => {
+  const server = http.createServer(async (req, res) => {
     if (req.url === '/codesandbox') {
       const uri = await createCodeSandbox();
       res.writeHead(200, {
@@ -135,12 +138,35 @@ function createServer(port = 5000) {
       });
       res.end();
     }
-  }).listen(port);
+  });
 
-  console.log(chalk.yellow.bold(`> codesandbox server is listening on port ${port}`));
+  return new Promise((resolve, reject) => {
+    const initialPort = port;
+    const listen = () => {
+      server.listen(port)
+        .on('listening', () => {
+          resolve(port);
+        })
+        .on('error', (error) => {
+          server.close();
+          if (error.code === 'EADDRINUSE' && port - initialPort < 100) {
+            port++;
+            listen();
+          } else {
+            console.error(error);
+            reject(error);
+            process.exit(1);
+          }
+        });
+    };
+    listen();
+  }).then(port => {
+    console.log(chalk.yellow.bold(`> codesandbox server is listening on port ${port}`));
+    return port;
+  });
 }
 
-//  cli
+//  cli 
 
 const cmd = process.argv.slice(2)[0];
 
