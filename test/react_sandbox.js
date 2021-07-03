@@ -66,7 +66,6 @@ async function startReactSandbox() {
   const port = await createServer(5000);
   const packagePath = path.resolve(appDir, 'package.json');
   const package = JSON.parse(fs.readFileSync(packagePath).toString());
-  console.log(package)
   package.proxy = `http://localhost:${port}`;
   fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
   try {
@@ -105,7 +104,7 @@ async function createCodeSandbox() {
     files
   });
   const uri = `https://codesandbox.io/s/${sandbox_id}`;
-  console.log(chalk.yellow(`Created code sandbox ${uri}`));
+  console.log(chalk.yellow(`created code sandbox ${uri}`));
   return uri;
 }
 
@@ -132,6 +131,9 @@ function createServer(port = 5000) {
         'Content-Type': 'application/json'
       });
       res.end(JSON.stringify(getGitInfo(), null, '\t'));
+    } else if ('/open-ide') {
+      cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${path.resolve(appDir, 'src', 'App.tsx')}`);
+      res.end();
     } else {
       res.writeHead(400, {
         'Content-Type': 'application/json'
@@ -161,7 +163,7 @@ function createServer(port = 5000) {
     };
     listen();
   }).then(port => {
-    console.log(chalk.yellow.bold(`> codesandbox server is listening on port ${port}`));
+    console.log(chalk.yellow.bold(`> sandbox server is listening on port ${port}`));
     return port;
   });
 }
