@@ -33,9 +33,7 @@ export function useGitInfo() {
       .catch(() => {
         try {
           setInfo(require('./git.json'));
-        } catch (error) {
-
-        }
+        } catch (error) { }
       });
   }, []);
   useEffect(() => {
@@ -54,7 +52,14 @@ export function openIDE() {
 const STORAGE_KEY = 'fabric:react-sandbox:footer';
 
 export function useShowFooter() {
-  const [showFooter, setShowFooter] = useState(localStorage.getItem(STORAGE_KEY) || require('./git.json') !== null ? 0 : -1);
+  const [showFooter, setShowFooter] = useState(() => {
+    let hasConfig = false;
+    try {
+      require('./git.json');
+      hasConfig = true;
+    } catch (error) { }
+    return hasConfig || localStorage.getItem(STORAGE_KEY) ? 0 : -1
+  });
   useEffect(() => {
     showFooter === -1 && setShowFooter(1);
   }, [showFooter]);
