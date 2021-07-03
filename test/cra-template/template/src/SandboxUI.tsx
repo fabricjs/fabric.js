@@ -1,13 +1,13 @@
 import React from 'react';
 import { openIDE, useDeployCodeSandbox, useGitInfo, useShowFooter } from './hooks';
 
-function SandboxUI({ children, hidden }: React.PropsWithChildren<{ hidden?: boolean }>) {
+function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: boolean }) {
   const [pending, deployCodeSandbox] = useDeployCodeSandbox();
   const gitInfo = useGitInfo();
   const [showFooter, setShowFooter] = useShowFooter();
 
   return hidden ?
-    children :
+    <>{children}</> :
     (
       <div className="App">
         <header className="App-header">
