@@ -54,6 +54,7 @@ const FILES = [
   'package.json',
   '.env',
   '.eslintignore',
+  'src/hooks.tsx',
   'src/App.tsx',
   'src/index.tsx',
   'src/App.css',
@@ -102,7 +103,7 @@ function createServer(port = 5000) {
     }
   }).listen(port);
 
-  console.log(`Server is listening on port ${port}`);
+  console.log(`Codesandbox server is listening on port ${port}`);
 }
 
 //  cli
