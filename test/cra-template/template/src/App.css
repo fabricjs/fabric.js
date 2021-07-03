@@ -12,6 +12,16 @@ code {
     monospace;
 }
 
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+*[hidden=true] {
+  display: none !important;
+}
+
 .App {
   text-align: center;
 }
@@ -20,10 +30,6 @@ code {
   display: flex;
   justify-content: space-around;
   align-items: center;
-}
-
-*[hidden=true] {
-  display: none !important;
 }
 
 .App-footer {
@@ -57,12 +63,6 @@ code {
   background-color: tomato;
   margin: 20px;
   padding: 20px;
-}
-
-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
 }
 
 .App-deploy {
