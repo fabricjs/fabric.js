@@ -102,6 +102,7 @@ async function createCodeSandbox() {
     files[fileName] = { content: fs.readFileSync(filePath).toString() };
     return files;
   }, {});
+  files['src/git.json'] = { content: getGitInfo() };
   const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
     template: 'create-react-app-typescript',
     files
