@@ -213,14 +213,6 @@
     startOffset:               0,
 
     /**
-     * Which side of the path the text should be drawn on.
-     * Only used when text has a path
-     * @type String
-     * @default
-     */
-    side:               'left',
-
-    /**
      * @private
      */
     _fontSizeFraction: 0.222,
