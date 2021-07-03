@@ -52,7 +52,7 @@ To set up a dev environment with react run the following command. It will create
 Use this command as you would use `npm start` in a react project.
 
 ```bash
-npm run dev:react
+npm run react_sandbox:start
 ```
 
 ### Working on fabricjs.com
