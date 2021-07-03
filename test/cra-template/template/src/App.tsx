@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import './styles.css';
-//  open `./fabric.ts` to change the import source (local build or published module)
+import React, { useEffect } from 'react';
+//  import from local build `./fabric` or from published module `fabric`
 import { fabric } from './fabric';
 import { useCanvas } from './useCanvas';
 
