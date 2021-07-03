@@ -3,6 +3,7 @@ const Axios = require('axios');
 const chalk = require('chalk');
 const path = require('path');
 const http = require('http');
+const os = require('os');
 const cp = require('child_process');
 const templateDir = path.resolve(__dirname, 'cra-template');
 const APP_NAME = 'react-sandbox';
