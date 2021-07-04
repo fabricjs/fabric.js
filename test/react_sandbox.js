@@ -20,7 +20,6 @@ const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
 const FILES = [
   // config files
   'package.json',
-  '.env',
   '.eslintignore',
 
   // App files
@@ -132,15 +131,10 @@ async function startReactSandbox() {
   }
 }
 
-function processFile(filePath) {
-  if (fs.lstatSync(filePath).isDirectory()) {
-    fs.readdirSync(filePath)
-      .forEach(file => {
-        files[path.join(fileName, file).replace(/\\/g, '/')] = { content: fs.readFileSync(path.resolve(filePath, file)).toString() };
-      });
-  } else {
-    files[fileName] = { content: fs.readFileSync(filePath).toString() };
-  }
+function createDeployedEnv() {
+  let env = fs.readFileSync(path.resolve(appDir, '.env')).toString();
+  env += '\nREACT_APP_SANDBOX_DEPLOYED=true\n';
+  return env;
 }
 
 /**
@@ -151,6 +145,7 @@ async function createCodeSandbox() {
   copyBuildToApp();
   writeDiff();
   const files = {
+    '.env': { content: createDeployedEnv() },
     'src/git.json': { content: getGitInfo() }
   };
   const processFile = (fileName) => {
