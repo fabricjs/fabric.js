@@ -8,7 +8,6 @@ export function useDeployCodeSandbox() {
     setPending(true);
     try {
       const { uri } = await (await fetch('/codesandbox')).json();
-      console.log('dfglkdfglkndfg')
       window.open(uri, '_blank');
     } catch (error) {
       console.error(error);
