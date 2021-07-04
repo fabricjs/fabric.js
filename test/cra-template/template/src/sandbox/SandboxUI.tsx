@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Badge, Button, Col, Container, Image, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { CommentsContext } from './Comments';
 import githubIcon from './GitHub-Mark-64px.png';
-import { openIDE, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
+import { openIDE, SANDBOX_DEPLOYED, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
 
 function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: boolean }) {
   const [pending, deployCodeSandbox] = useDeployCodeSandbox();
@@ -14,6 +14,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
     setShowModal(0);
     showComments === -1 && setShowComments(1);
   }, [showComments]);
+  const [showDownload, setShowDownload] = useState(false);
 
   return hidden ?
     <>{children}</> :
@@ -95,20 +96,44 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             >
               Contribution Guide
             </Button>
-            <Button
-              onClick={deployCodeSandbox}
-              disabled={pending}
-              variant="outline-success"
-            >
-              {
-                pending ?
-                  <Spinner animation="border" /> :
-                  <>
-                    Deploy to codesandbox
-                    <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
-                  </>
-              }
-            </Button>
+            {
+              !SANDBOX_DEPLOYED ?
+                <Button
+                  onClick={deployCodeSandbox}
+                  disabled={pending}
+                  variant="outline-success"
+                >
+                  {
+                    pending ?
+                      <Spinner animation="border" /> :
+                      <>
+                        Deploy to codesandbox
+                        <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
+                      </>
+                  }
+                </Button> :
+                <OverlayTrigger
+                  trigger={['focus', 'hover']}
+                  flip
+                  placement="left"
+                  overlay={
+                    <Tooltip id="download_diff">
+                      Download the diff file if you want to apply these changes to your local repository.<br />
+                      Click for more instructions.
+                    </Tooltip>
+                  }
+                >
+                  <Button
+                    as="a"
+                    href="/diff/upstream.diff"
+                    download="fabric.diff"
+                    onClick={() => setShowDownload(true)}
+                    variant="outline-primary"
+                  >
+                    Download diff
+                  </Button>
+                </OverlayTrigger>
+            }
           </div>
         </header>
         <CommentsContext.Provider value={comments}>
@@ -139,13 +164,47 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             </p>
             <p>
               <h5>Working on the App</h5>
-              To edit this test app open <button onClick={openIDE}><code>./src/App.tsx</code></button>.<br />
+              To edit this test app open <Button variant="link" onClick={openIDE}><code>./src/App.tsx</code></Button>.<br />
               You will notice there are actions available to make developing much simpler, the most awesome is <strong>deploying to codesandbox</strong>.
             </p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="success" onClick={hideModal}>Let's get started</Button>
           </Modal.Footer>
+        </Modal>
+        <Modal
+          show={showDownload}
+          onHide={() => setShowDownload(false)}
+          backdrop="static"
+          centered
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Using <code>.diff</code> files</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h5>Commit your local changes before proceeding.</h5>
+            <div className="my-4">
+              <p>
+                If you want to apply the changes from this sandbox to your local repository run the following command from <code>fabric</code> folder
+              </p>
+              <div className="m-2">
+                <code>
+                  git apply {'<path/to/downloaded/.diff>'}
+                </code>
+              </div>
+            </div>
+            <div className="my-4">
+              <p>
+                If you want to apply the changes only to the build folder <code>dist</code> run the following command
+              </p>
+              <div className="m-2">
+                <code>
+                  git apply --include dist/fabric.js {'<path/to/downloaded/.diff>'}
+                </code>
+              </div>
+            </div>
+          </Modal.Body>
         </Modal>
       </div >
     );
