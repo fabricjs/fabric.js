@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { Badge, Button, Col, Container, Image, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { CommentsContext } from './Comments';
+import { OpenIDE } from './common';
 import githubIcon from './GitHub-Mark-64px.png';
-import { openIDE, SANDBOX_DEPLOYED, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
+import { SANDBOX_DEPLOYED, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
 
 function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: boolean }) {
   const [pending, deployCodeSandbox] = useDeployCodeSandbox();
@@ -164,7 +165,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             </p>
             <p>
               <h5>Working on the App</h5>
-              To edit this test app open <Button variant="link" onClick={openIDE}><code>./src/App.tsx</code></Button>.<br />
+              To edit this test app open <OpenIDE />.<br />
               You will notice there are actions available to make developing much simpler, the most awesome is <strong>deploying to codesandbox</strong>.
             </p>
           </Modal.Body>
