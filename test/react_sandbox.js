@@ -18,23 +18,10 @@ const diffPath = path.resolve(diffFolder, 'upstream.diff');
 const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
 
 const FILES = [
-  // config files
   'package.json',
   '.eslintignore',
-
-  // App files
-  'src/App.tsx',
-  'src/index.tsx',
-  'src/styles.css',
-
-  // folders
-  'src/fabric',
-  'src/sandbox',
-  'src/diff',
-
-  // generics
   'public/index.html',
-  'src/reportWebVitals.ts',
+  'src',
 ];
 
 const BINARY_EXT = [
@@ -99,14 +86,22 @@ function copyBuildToApp() {
   console.log(`> generated ${fabricDest}`);
 }
 
-function createReactAppIfNeeded() {
+/**
+ * 
+ * @param {'ts'|'js'} [template='js']
+ */
+function createReactAppIfNeeded(template = 'js') {
   if (!fs.existsSync(appDir)) {
-    cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${templateDir}`, { cwd: main, stdio: 'inherit' });
+    cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${path.resolve(templateDir, template)}`, { cwd: main, stdio: 'inherit' });
   }
 }
 
-async function startReactSandbox() {
-  createReactAppIfNeeded();
+/**
+ *
+ * @param {'ts'|'js'} [template='js']
+ */
+async function startReactSandbox(template = 'js') {
+  createReactAppIfNeeded(template);
   copyBuildToApp();
   writeDiff();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
@@ -175,9 +170,10 @@ async function createCodeSandbox() {
       files[fileName] = { content: fs.readFileSync(filePath).toString() };
     });
 
+  const isTypescript = fs.existsSync(path.resolve(appDir, 'src', 'App.tsx'));
   try {
     const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
-      template: 'create-react-app-typescript',
+      template: isTypescript ? 'create-react-app-typescript' : 'create-react-app',
       files
     });
     const uri = `https://codesandbox.io/s/${sandbox_id}`;
@@ -268,9 +264,11 @@ function createServer(port = 5000) {
 //  cli 
 
 const cmd = process.argv.slice(2)[0];
+const typescript = process.argv.slice(2).indexOf('--typescript') > -1;
+const template = typescript ? 'ts' : 'js';
 
 if (cmd === 'start') {
-  startReactSandbox();
+  startReactSandbox(template);
 } else if (cmd === 'deploy') {
   createAndOpenCodeSandbox();
 } else if (cmd === 'serve') {
