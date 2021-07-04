@@ -60,3 +60,7 @@ for (const fileName in files) {
   fs.ensureFileSync(dest, files[fileName]);
   fs.writeFileSync(dest, files[fileName]);
 }
+const envPath = path.resolve(destDir, 'template', '.env');
+let env = fs.readFileSync(envPath).toString();
+env = env.replace('REACT_APP_TEMPLATE=ts', 'REACT_APP_TEMPLATE=js');
+fs.writeFileSync(envPath, env);
