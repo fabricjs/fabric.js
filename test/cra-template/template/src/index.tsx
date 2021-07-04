@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Canvas from './App';
 import reportWebVitals from './reportWebVitals';
-import SandboxUI from './SandboxUI';
+import SandboxUI from './sandbox';
 import './styles.css';
 
 function App() {

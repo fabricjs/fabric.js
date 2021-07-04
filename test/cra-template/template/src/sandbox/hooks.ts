@@ -32,7 +32,7 @@ export function useGitInfo() {
       .then(setInfo)
       .catch(() => {
         try {
-          setInfo(require('./git.json'));
+          setInfo(require('../git.json'));
         } catch (error) { }
       });
   }, []);
@@ -55,7 +55,7 @@ export function useShowFooter() {
   const [showFooter, setShowFooter] = useState(() => {
     let hasConfig = false;
     try {
-      require('./git.json');
+      require('../git.json');
       hasConfig = true;
     } catch (error) { }
     return hasConfig || localStorage.getItem(STORAGE_KEY) ? 0 : -1

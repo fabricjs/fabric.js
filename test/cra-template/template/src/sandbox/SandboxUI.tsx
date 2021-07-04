@@ -35,7 +35,10 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
               disabled={pending}
               style={{ cursor: pending ? 'progress' : 'pointer' }}
             >
-              <div className="App-deploy">Deploy to codesandbox <img src="https://codesandbox.io/csb-ios.svg" width={24} /></div>
+              <div className="App-deploy">
+                {pending ? 'Deploying' : 'Deploy'} to codesandbox
+                <img src="https://codesandbox.io/csb-ios.svg" width={24} alt="" />
+              </div>
             </button>
           </div>
           <a
