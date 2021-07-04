@@ -45,6 +45,7 @@ const files = transformTSTraversal(srcDir);
 
 fs.copySync(srcDir, destDir, {
   filter: (src, dest) => {
+    if (path.basename(src) === 'package.json') return false;
     const fileExt = path.extname(src).slice(1);
     return Object.keys(EXT).every(ext => ext !== fileExt) || src.endsWith('.d.ts');
   }
