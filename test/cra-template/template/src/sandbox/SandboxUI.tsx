@@ -26,7 +26,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             {
               gitInfo &&
               <p>
-                branch: <code>{gitInfo.branch}</code>, tag: <code>{gitInfo.tag}</code><br />
+                user: <code>{gitInfo.user}</code>, branch: <code>{gitInfo.branch}</code>, tag: <code>{gitInfo.tag}</code><br />
                 {gitInfo.changes.length > 0 && <strong>This branch has uncommitted changes</strong>}
               </p>
             }

@@ -16,6 +16,7 @@ export function useDeployCodeSandbox() {
 }
 
 export interface GitInfo {
+  user: string,
   branch: string,
   tag: string,
   changes: {
