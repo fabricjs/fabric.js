@@ -11,11 +11,17 @@ function App() {
   }, [fc]);
 
   return (
-    <canvas
-      width={500}
-      height={500}
-      ref={setRef}
-    />
+    <>
+      <p>
+        {/**edit this line */}
+        This is the place to explain what this app tests, fixes, changes and does.
+      </p>
+      <canvas
+        width={500}
+        height={500}
+        ref={setRef}
+      />
+    </>
   );
 }
 
