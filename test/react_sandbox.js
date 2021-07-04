@@ -5,6 +5,7 @@ const path = require('path');
 const http = require('http');
 const os = require('os');
 const cp = require('child_process');
+
 const templateDir = path.resolve(__dirname, 'cra-template');
 const APP_NAME = 'react-sandbox';
 const appDir = path.resolve(__dirname, APP_NAME);
@@ -64,7 +65,12 @@ function buildDist() {
 function copyBuildToApp() {
   console.log(`> building dist`);
   buildDist();
-  fs.copyFileSync(fabricSource, fabricDest);
+  let content = fs.readFileSync(fabricSource).toString();
+  const gitInfo = getGitInfo();
+  content += `\n// fabric react sandbox`;
+  content += `\n// last git tag ${gitInfo.tag}`;
+  content += `\nfabric.version='#${gitInfo.tag}';\n`;
+  fs.writeFileSync(fabricDest, content);
   console.log(`> generated ${fabricDest}`);
 }
 
