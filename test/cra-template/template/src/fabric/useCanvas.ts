@@ -59,6 +59,6 @@ export function useCanvas(init?: (canvas: fabric.Canvas) => any, saveState = tru
                 fc.current = null;
             }
         };
-    }, []);
+    }, [saveState]);
     return [fc, setRef] as [typeof fc, typeof setRef];
 }
