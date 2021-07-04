@@ -43,9 +43,14 @@ const srcDir = path.resolve(__dirname, "ts");
 const destDir = path.resolve(__dirname, "js");
 const files = transformTSTraversal(srcDir);
 
+const BLACKLIST = [
+  'package.json',
+  'README.md'
+]
+
 fs.copySync(srcDir, destDir, {
   filter: (src, dest) => {
-    if (path.basename(src) === 'package.json') return false;
+    if (BLACKLIST.some(p => p.endsWith(path.basename(src)))) return false;
     const fileExt = path.extname(src).slice(1);
     return Object.keys(EXT).every(ext => ext !== fileExt) || src.endsWith('.d.ts');
   }
