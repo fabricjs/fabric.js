@@ -13,8 +13,9 @@ const main = path.resolve(__dirname, '..');
 const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric', 'build.js');
-const diffPath = path.resolve(appDir, 'src', 'diff', '.diff');
-const stagingDiffPath = path.resolve(appDir, 'src', 'diff', 'staging.diff');
+const diffFolder = path.resolve(appDir, 'src', 'diff');
+const diffPath = path.resolve(diffFolder, '.diff');
+const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
 
 const FILES = [
   // config files
@@ -64,8 +65,11 @@ function getGitInfo() {
  * writes the diff files to the app for version control
  */
 function writeDiff() {
-  cp.execSync(`git diff > ${stagingDiffPath}`);
+  if (!fs.existsSync(path.resolve(diffFolder))) {
+    fs.mkdirSync(diffFolder);
+  }
   cp.execSync(`git diff upstream/master > ${diffPath}`);
+  cp.execSync(`git diff > ${stagingDiffPath}`);
   //cp.execSync(`git apply --include dist/fabric.js ${diffPath}`);
 }
 
