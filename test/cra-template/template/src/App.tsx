@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 //  open `./fabric/fabric.ts` to change the import source (local build or published module)
 import { fabric, useCanvas } from './fabric';
 import { Comments } from './sandbox';
