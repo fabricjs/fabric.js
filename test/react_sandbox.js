@@ -65,6 +65,7 @@ function writeDiff() {
   if (!fs.existsSync(path.resolve(diffFolder))) {
     fs.mkdirSync(diffFolder);
   }
+  console.log(`> writing diff files`);
   cp.execSync(`git diff upstream/master > ${diffPath}`);
   cp.execSync(`git diff > ${stagingDiffPath}`);
   //cp.execSync(`git apply --include dist/fabric.js ${diffPath}`);
