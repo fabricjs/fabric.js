@@ -2,7 +2,6 @@
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
       isTouchEvent = fabric.util.isTouchEvent;
 
   /**
