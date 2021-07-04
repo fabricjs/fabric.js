@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+export const SANDBOX_DEPLOYED = Boolean(process.env.REACT_APP_SANDBOX_DEPLOYED);
 
 export function useDeployCodeSandbox() {
   const [pending, setPending] = useState(false);
@@ -6,6 +8,7 @@ export function useDeployCodeSandbox() {
     setPending(true);
     try {
       const { uri } = await (await fetch('/codesandbox')).json();
+      console.log('dfglkdfglkndfg')
       window.open(uri, '_blank');
     } catch (error) {
       console.error(error);
@@ -49,22 +52,12 @@ export function openIDE() {
   return fetch('/open-ide');
 }
 
-function isDeployed() {
-  try {
-    require('../git.json');
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-
 const STORAGE_KEY_MODAL = 'fabric:react-sandbox:modal';
 const STORAGE_KEY_COMMENTS = 'fabric:react-sandbox:comments';
 
 export function useShowModal() {
   const [show, setShow] = useState(() => {
-    return isDeployed() || localStorage.getItem(STORAGE_KEY_MODAL) ? 0 : -1;
+    return SANDBOX_DEPLOYED || localStorage.getItem(STORAGE_KEY_MODAL) ? 0 : -1;
   });
   useEffect(() => {
     show === -1 && setShow(1);
@@ -77,7 +70,7 @@ export function useShowModal() {
 
 export function useShowComments() {
   const [show, setShow] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY_COMMENTS) ? 0 : isDeployed() ? 1 : -1;
+    return localStorage.getItem(STORAGE_KEY_COMMENTS) ? 0 : SANDBOX_DEPLOYED ? 1 : -1;
   });
   useEffect(() => {
     show > -1 && localStorage.setItem(STORAGE_KEY_COMMENTS, 'true');
