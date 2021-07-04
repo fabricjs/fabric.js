@@ -93,6 +93,7 @@ function copyBuildToApp() {
 function createReactAppIfNeeded(template = 'js') {
   if (!fs.existsSync(appDir)) {
     console.log(chalk.blue.bold(`> creating sandbox using cra-template-${template}`));
+    template === 'js' && console.log(chalk.yellow.bold(`> if you want to use typescript run $${process.argv} -- --typescript`));
     cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${path.resolve(templateDir, template)}`, { cwd: main, stdio: 'inherit' });
   }
 }
@@ -223,7 +224,13 @@ function createServer(port = 5000) {
         res.end(JSON.stringify(getGitInfo(), null, '\t'));
         break;
       case '/open-ide':
-        runApplication(path.resolve(appDir, 'src', 'App.tsx'));
+        let appFile = path.resolve(appDir, 'src', 'App.tsx');
+        if (!fs.existsSync(appFile)) {
+          appFile = path.resolve(appDir, 'src', 'App.jsx');
+        }
+        if (fs.existsSync(appFile)) {
+          runApplication(appFile);
+        }
         res.writeHead(200);
         res.end();
         break;
@@ -262,16 +269,19 @@ function createServer(port = 5000) {
   });
 }
 
-//  cli 
+async function cli() {
+  const cmd = process.argv.slice(2)[0];
+  const typescript = process.argv.slice(2).indexOf('--typescript') > -1;
+  const template = typescript ? 'ts' : 'js';
 
-const cmd = process.argv.slice(2)[0];
-const typescript = process.argv.slice(2).indexOf('--typescript') > -1;
-const template = typescript ? 'ts' : 'js';
-
-if (cmd === 'start') {
-  startReactSandbox(template);
-} else if (cmd === 'deploy') {
-  createAndOpenCodeSandbox();
-} else if (cmd === 'serve') {
-  createServer();
+  if (cmd === 'start') {
+    startReactSandbox(template);
+  } else if (cmd === 'deploy') {
+    createAndOpenCodeSandbox();
+  } else if (cmd === 'serve') {
+    const port = await createServer();
+    runApplication(`http://localhost:${port}`);
+  }
 }
+
+cli();
