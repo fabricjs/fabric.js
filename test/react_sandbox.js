@@ -93,7 +93,7 @@ function copyBuildToApp() {
 function createReactAppIfNeeded(template = 'js') {
   if (!fs.existsSync(appDir)) {
     console.log(chalk.blue.bold(`> creating sandbox using cra-template-${template}`));
-    template === 'js' && console.log(chalk.yellow.bold(`> if you want to use typescript run $${process.argv} -- --typescript`));
+    template === 'js' && console.log(chalk.yellow.bold(`> if you want to use typescript re-run with --typescript flag`));
     cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${path.resolve(templateDir, template)}`, { cwd: main, stdio: 'inherit' });
   }
 }
