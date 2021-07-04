@@ -12,16 +12,6 @@ code {
     monospace;
 }
 
-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-*[hidden=true] {
-  display: none !important;
-}
-
 .f1 {
   flex: 1;
 }
@@ -50,21 +40,6 @@ button {
   padding: 5rem;
 }
 
-.App-footer button.close {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 1rem;
-  padding: 1rem;
-  color: red;
-  font-size: large;
-}
-
-.App-link {
-  color: #21b1da;
-  margin: 0 1rem;
-}
-
 .App-canvas {
   display: flex;
   flex-direction: column;
@@ -73,13 +48,4 @@ button {
   background-color: var(--bs-info);
   margin: 20px;
   padding: 20px;
-}
-
-.App-deploy {
-  display: flex;
-  align-items: center;
-}
-
-.App-deploy > * {
-  margin: 0 10px;
 }
