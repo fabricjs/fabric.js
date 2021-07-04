@@ -58,6 +58,12 @@ function getGitInfo() {
   }
 }
 
+function writeDiff() {
+  execGitCommand(`git diff > ${path.resolve(appDir, 'fabric', 'diff', 'staging.diff')}`);
+  execGitCommand(`git diff upstream/master > ${path.resolve(appDir, 'fabric', 'diff', '.diff')}`);
+  execGitCommand(`git diff upstream/master -- dist/fabric.js > ${path.resolve(appDir, 'fabric', 'diff', 'build.diff')}`);
+}
+
 function buildDist() {
   cp.execSync('node build.js modules=ALL requirejs fast', { cwd: main });
 }
