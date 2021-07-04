@@ -13,6 +13,8 @@ const main = path.resolve(__dirname, '..');
 const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric', 'build.js');
+const diffPath = path.resolve(appDir, 'src', 'diff', '.diff');
+const stagingDiffPath = path.resolve(appDir, 'src', 'diff', 'staging.diff');
 
 const FILES = [
   // config files
@@ -58,10 +60,13 @@ function getGitInfo() {
   }
 }
 
+/**
+ * writes the diff files to the app for version control
+ */
 function writeDiff() {
-  execGitCommand(`git diff > ${path.resolve(appDir, 'fabric', 'diff', 'staging.diff')}`);
-  execGitCommand(`git diff upstream/master > ${path.resolve(appDir, 'fabric', 'diff', '.diff')}`);
-  execGitCommand(`git diff upstream/master -- dist/fabric.js > ${path.resolve(appDir, 'fabric', 'diff', 'build.diff')}`);
+  cp.execSync(`git diff > ${stagingDiffPath}`);
+  cp.execSync(`git diff upstream/master > ${diffPath}`);
+  //cp.execSync(`git apply --include dist/fabric.js ${diffPath}`);
 }
 
 function buildDist() {
@@ -89,10 +94,12 @@ function createReactAppIfNeeded() {
 async function startReactSandbox() {
   createReactAppIfNeeded();
   copyBuildToApp();
+  writeDiff();
   console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
   fs.watch(src, { recursive: true }, () => {
     try {
       copyBuildToApp();
+      writeDiff();
     } catch (error) {
       console.log(chalk.blue.bold('> error listening to/building fabric'));
     }
