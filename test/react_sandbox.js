@@ -31,6 +31,7 @@ const FILES = [
   // folders
   'src/fabric',
   'src/sandbox',
+  'src/diff',
 
   // generics
   'public/index.html',
@@ -138,18 +139,26 @@ async function createCodeSandbox() {
   }, {
     'src/git.json': { content: getGitInfo() }
   });
-  const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
-    template: 'create-react-app-typescript',
-    files
-  });
-  const uri = `https://codesandbox.io/s/${sandbox_id}`;
-  console.log(chalk.yellow(`created code sandbox ${uri}`));
-  return uri;
+  try {
+    const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
+      template: 'create-react-app-typescript',
+      files
+    });
+    const uri = `https://codesandbox.io/s/${sandbox_id}`;
+    console.log(chalk.yellow(`created code sandbox ${uri}`));
+    return uri;
+  } catch (error) {
+    throw error.toJSON();
+  }
 }
 
 async function createAndOpenCodeSandbox() {
   const uri = await createCodeSandbox();
-  cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${uri}`);
+  runApplication(uri);
+}
+
+function runApplication(cmd) {
+  cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${cmd}`);
 }
 
 /**
@@ -159,25 +168,38 @@ async function createAndOpenCodeSandbox() {
  */
 function createServer(port = 5000) {
   const server = http.createServer(async (req, res) => {
-    if (req.url === '/codesandbox') {
-      const uri = await createCodeSandbox();
-      res.writeHead(200, {
-        'Content-Type': 'application/json'
-      });
-      res.end(JSON.stringify({ uri }));
-    } else if (req.url === '/git') {
-      res.writeHead(200, {
-        'Content-Type': 'application/json'
-      });
-      res.end(JSON.stringify(getGitInfo(), null, '\t'));
-    } else if ('/open-ide') {
-      cp.execSync(`${os.platform().startsWith('win') ? 'start' : 'open'} ${path.resolve(appDir, 'src', 'App.tsx')}`);
-      res.end();
-    } else {
-      res.writeHead(400, {
-        'Content-Type': 'application/json'
-      });
-      res.end();
+    switch (req.url) {
+      case '/codesandbox':
+        try {
+          const uri = await createCodeSandbox();
+          res.writeHead(200, {
+            'Content-Type': 'application/json'
+          });
+          res.end(JSON.stringify({ uri }, null, '\t'));
+        } catch (error) {
+          res.writeHead(500, {
+            'Content-Type': 'application/json'
+          });
+          res.end(JSON.stringify({ error }, null, '\t'));
+        }
+        break;
+      case '/git':
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        });
+        res.end(JSON.stringify(getGitInfo(), null, '\t'));
+        break;
+      case '/open-ide':
+        runApplication(path.resolve(appDir, 'src', 'App.tsx'));
+        res.writeHead(200);
+        res.end();
+        break;
+      default:
+        res.writeHead(400, {
+          'Content-Type': 'text/plain'
+        });
+        res.end(`unknown endpoint ${req.url}`);
+        break;
     }
   });
 
