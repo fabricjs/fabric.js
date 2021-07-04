@@ -14,7 +14,7 @@ const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
 const fabricDest = path.resolve(appDir, 'src', 'fabric', 'build.js');
 const diffFolder = path.resolve(appDir, 'src', 'diff');
-const diffPath = path.resolve(diffFolder, '.diff');
+const diffPath = path.resolve(diffFolder, 'upstream.diff');
 const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
 
 const FILES = [
@@ -166,6 +166,15 @@ async function createCodeSandbox() {
     }
   }
   FILES.forEach(processFile);
+  // add diff files to public diretory so we can download them drom the app
+  const diffFolderName = 'src/diff';
+  fs.readdirSync(path.resolve(appDir, diffFolderName))
+    .forEach(file => {
+      const fileName = path.join('public', 'diff', file).replace(/\\/g, '/');
+      const filePath = path.resolve(appDir, diffFolderName, file);
+      files[fileName] = { content: fs.readFileSync(filePath).toString() };
+    });
+
   try {
     const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
       template: 'create-react-app-typescript',
