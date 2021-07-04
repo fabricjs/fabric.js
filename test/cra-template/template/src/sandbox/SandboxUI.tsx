@@ -26,6 +26,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             {
               gitInfo &&
               <p>
+                <img alt="" src={require('./GitHub-Mark-64px.png')} />
                 user: <code>{gitInfo.user}</code>, branch: <code>{gitInfo.branch}</code>, tag: <code>{gitInfo.tag}</code><br />
                 {gitInfo.changes.length > 0 && <strong>This branch has uncommitted changes</strong>}
               </p>
