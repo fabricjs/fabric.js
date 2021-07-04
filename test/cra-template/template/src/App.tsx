@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-//  import from local build `./fabric` or from published module `fabric`
-import { fabric } from './fabric';
-import { useCanvas } from './useCanvas';
+//  open `./fabric/fabric.ts` to change the import source (local build or published module)
+import { fabric, useCanvas } from './fabric';
 
 function App() {
   const [fc, setRef] = useCanvas();
@@ -9,7 +8,7 @@ function App() {
   useEffect(() => {
     // do stuff with canvas after initialization
     const canvas = fc.current;
-  }, []);
+  }, [fc]);
 
   return (
     <canvas
