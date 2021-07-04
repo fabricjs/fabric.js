@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
-import { openIDE, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
-import githubIcon from './GitHub-Mark-64px.png'
-import { Badge, Button, Col, Container, Image, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import React, { useCallback } from 'react';
+import { Badge, Button, Col, Container, Image, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { CommentsContext } from './Comments';
+import githubIcon from './GitHub-Mark-64px.png';
+import { openIDE, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
 
 function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: boolean }) {
   const [pending, deployCodeSandbox] = useDeployCodeSandbox();
@@ -98,11 +98,16 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             <Button
               onClick={deployCodeSandbox}
               disabled={pending}
-              style={{ cursor: pending ? 'progress' : 'pointer' }}
               variant="outline-success"
             >
-              {pending ? 'Deploying' : 'Deploy'} to codesandbox
-              <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
+              {
+                pending ?
+                  <Spinner animation="border" /> :
+                  <>
+                    Deploy to codesandbox
+                    <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
+                  </>
+              }
             </Button>
           </div>
         </header>

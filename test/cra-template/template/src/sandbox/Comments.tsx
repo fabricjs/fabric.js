@@ -1,5 +1,6 @@
 import React, { useCallback, useContext } from 'react';
 import { Offcanvas } from 'react-bootstrap';
+import { openIDE } from './hooks';
 
 export const CommentsContext = React.createContext<[show: number, setShow: (value: number) => any] | null>(null);
 
@@ -13,7 +14,12 @@ function Comments({ children }: { children?: React.ReactNode }) {
         <Offcanvas.Title>Comments</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>
-        {children || 'This is the place to explain what this app tests, fixes, changes and does.'}
+        {children ||
+          <>
+            This is the place to explain what this app tests, fixes, changes and does.<br />
+            To edit comments open <button onClick={openIDE}><code>./src/App.tsx</code></button>
+          </>
+        }
       </Offcanvas.Body>
     </Offcanvas>
   );
