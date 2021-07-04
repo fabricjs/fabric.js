@@ -8,7 +8,6 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
-      supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
       objectCaching = !fabric.isLikelyNode,
       ALIASING_LIMIT = 2;
 
