@@ -1,21 +1,21 @@
 import React, { useEffect } from 'react';
 //  open `./fabric/fabric.ts` to change the import source (local build or published module)
 import { fabric, useCanvas } from './fabric';
+import { Comments } from './sandbox';
 
 function App() {
   const [fc, setRef] = useCanvas(canvas => {
     // do stuff with canvas after initialization
-    const text = new fabric.Text('Fabric.js sandbox');
+    const text = new fabric.Text('Fabric.js Sandbox');
     canvas.add(text);
     text.center();
   });
 
   return (
     <>
-      <p>
-        {/**edit this line */}
-        This is the place to explain what this app tests, fixes, changes and does.
-      </p>
+      <Comments>
+        {/**add comments explaning what this is all about */}
+      </Comments>
       <canvas
         width={500}
         height={500}

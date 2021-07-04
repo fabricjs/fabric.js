@@ -22,14 +22,23 @@ button {
   display: none !important;
 }
 
+.f1 {
+  flex: 1;
+}
+
 .App {
   text-align: center;
 }
 
 .App-header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
+}
+
+.github.badge {
+  position: absolute;
+  bottom: 0;
 }
 
 .App-footer {
@@ -61,7 +70,7 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: tomato;
+  background-color: var(--bs-info);
   margin: 20px;
   padding: 20px;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useDeployCodeSandbox() {
   const [pending, setPending] = useState(false);
@@ -49,23 +49,38 @@ export function openIDE() {
   return fetch('/open-ide');
 }
 
+function isDeployed() {
+  try {
+    require('../git.json');
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
-const STORAGE_KEY = 'fabric:react-sandbox:footer';
 
-export function useShowFooter() {
-  const [showFooter, setShowFooter] = useState(() => {
-    let hasConfig = false;
-    try {
-      require('../git.json');
-      hasConfig = true;
-    } catch (error) { }
-    return hasConfig || localStorage.getItem(STORAGE_KEY) ? 0 : -1
+const STORAGE_KEY_MODAL = 'fabric:react-sandbox:modal';
+const STORAGE_KEY_COMMENTS = 'fabric:react-sandbox:comments';
+
+export function useShowModal() {
+  const [show, setShow] = useState(() => {
+    return isDeployed() || localStorage.getItem(STORAGE_KEY_MODAL) ? 0 : -1;
   });
   useEffect(() => {
-    showFooter === -1 && setShowFooter(1);
-  }, [showFooter]);
+    show === -1 && setShow(1);
+  }, [show]);
   useEffect(() => {
-    showFooter > -1 && localStorage.setItem(STORAGE_KEY, 'true');
-  }, [showFooter]);
-  return [showFooter, setShowFooter] as [number, React.Dispatch<number>];
+    show > -1 && localStorage.setItem(STORAGE_KEY_MODAL, 'true');
+  }, [show]);
+  return [show, setShow] as [number, React.Dispatch<number>];
+}
+
+export function useShowComments() {
+  const [show, setShow] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_COMMENTS) ? 0 : isDeployed() ? 1 : -1;
+  });
+  useEffect(() => {
+    show > -1 && localStorage.setItem(STORAGE_KEY_COMMENTS, 'true');
+  }, [show]);
+  return [show, setShow] as [number, React.Dispatch<number>];
 }
