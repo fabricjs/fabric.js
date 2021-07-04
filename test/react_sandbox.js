@@ -11,20 +11,24 @@ const appDir = path.resolve(__dirname, APP_NAME);
 const main = path.resolve(__dirname, '..');
 const src = path.resolve(main, 'src');
 const fabricSource = path.resolve(main, 'dist', 'fabric.js');
-const fabricDest = path.resolve(appDir, 'src', 'fabric.js');
+const fabricDest = path.resolve(appDir, 'src', 'fabric', 'build.js');
 
 const FILES = [
+  // config files
   'package.json',
   '.env',
   '.eslintignore',
-  'src/useCanvas.ts',
+
+  // App files
   'src/App.tsx',
-  'src/hooks.ts',
-  'src/SandboxUI.tsx',
   'src/index.tsx',
   'src/styles.css',
-  'src/fabric.d.ts',
-  'src/fabric.js',
+
+  // folders
+  'src/fabric',
+  'src/sandbox',
+
+  // generics
   'public/index.html',
   'src/reportWebVitals.ts',
 ]
@@ -44,7 +48,7 @@ function getGitInfo() {
     const [type, path] = value.split(' ');
     return { type, path };
   });
-  const userName = execGitCommand('git config user.name');
+  const userName = execGitCommand('git config user.name')[0];
   return {
     branch,
     tag,
@@ -98,11 +102,19 @@ async function createCodeSandbox() {
   createReactAppIfNeeded();
   buildDist();
   const files = FILES.reduce((files, fileName) => {
-    const filePath = path.resolve(appDir, fileName)
-    files[fileName] = { content: fs.readFileSync(filePath).toString() };
+    const filePath = path.resolve(appDir, fileName);
+    if (fs.lstatSync(filePath).isDirectory()) {
+      fs.readdirSync(filePath)
+        .forEach(file => {
+          files[path.join(fileName, file).replace(/\\/g, '/')] = { content: fs.readFileSync(path.resolve(filePath, file)).toString() };
+        });
+    } else {
+      files[fileName] = { content: fs.readFileSync(filePath).toString() };
+    }
     return files;
-  }, {});
-  files['src/git.json'] = { content: getGitInfo() };
+  }, {
+    'src/git.json': { content: getGitInfo() }
+  });
   const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
     template: 'create-react-app-typescript',
     files
