@@ -3,12 +3,12 @@ import React, { useEffect } from 'react';
 import { fabric, useCanvas } from './fabric';
 
 function App() {
-  const [fc, setRef] = useCanvas();
-
-  useEffect(() => {
+  const [fc, setRef] = useCanvas(canvas => {
     // do stuff with canvas after initialization
-    const canvas = fc.current;
-  }, [fc]);
+    const text = new fabric.Text('Fabric.js sandbox');
+    canvas.add(text);
+    text.center();
+  });
 
   return (
     <>
