@@ -13,7 +13,7 @@ function transformTS(filePath) {
   return data.code;
 }
 
-const EXT = { ts: 'js', tsx: 'jsx' };
+const EXT = { ts: 'js', tsx: 'js' };
 
 function changeExtension(file) {
   const ext = path.extname(file);
