@@ -83,7 +83,7 @@ function copyBuildToApp(context) {
   console.log(`> generated ${fabricDest}`);
 }
 
-function createReactAppIfNeeded(context) {
+function createReactAppIfNeeded(context, start = false) {
   const { template, appPath, fabricPath } = context;
   if (!fs.existsSync(appPath)) {
     const templateDir = process.cwd();
@@ -99,6 +99,7 @@ function createReactAppIfNeeded(context) {
       template
     }
     fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
+    start && startReactSandbox(context);
   } else {
     console.log(chalk.yellow(`> the path ${appPath} already exists`));
     process.exit(1);
@@ -288,6 +289,11 @@ function applyCommonPositionals(yargs) {
     describe: 'build the sandbox with typescript',
     default: false
   });
+  yargs.positional('start', {
+    type: 'boolean',
+    describe: 'start the sandbox after building has completed',
+    default: false
+  });
 }
 
 function runInContext(cb, argv) {
@@ -304,14 +310,14 @@ function runInContext(cb, argv) {
 yargs
   .scriptName('fabric.js react sandbox')
   .usage('$0 <cmd> [args]')
-  .command('build <fabricPath> [appPath] [typescript]', 'build the sandbox', applyCommonPositionals, argv => {
+  .command('build <fabricPath> [appPath] [typescript] [--start]', 'build the sandbox', applyCommonPositionals, argv => {
     const context = {
       fabricPath: path.resolve(process.cwd(), argv.fabricPath),
       appPath: path.resolve(process.cwd(), argv.appPath),
-      template: argv.typescript ? 'ts' : 'js'
+      template: argv.typescript ? 'ts' : 'js',
     }
     Object.freeze(context);
-    createReactAppIfNeeded(context);
+    createReactAppIfNeeded(context, argv.start);
   })
   .command('start', 'start the sandbox', applyCommonPositionals, runInContext.bind(undefined, startReactSandbox))
   .command('deploy', 'deploy to codesandbox.io', applyCommonPositionals, runInContext.bind(undefined, createAndOpenCodeSandbox))
