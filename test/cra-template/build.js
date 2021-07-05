@@ -69,5 +69,5 @@ fs.writeFileSync(envPath, env);
 
 // copy sandbox.js
 const sandboxPath = path.resolve(__dirname, 'sandbox.js');
-fs.copySync(sandboxPath, path.resolve(srcDir, 'sandbox.js'));
-fs.copySync(sandboxPath, path.resolve(destDir, 'sandbox.js'));
+fs.copySync(sandboxPath, path.resolve(srcDir, 'template', 'sandbox.js'));
+fs.copySync(sandboxPath, path.resolve(destDir, 'template', 'sandbox.js'));
