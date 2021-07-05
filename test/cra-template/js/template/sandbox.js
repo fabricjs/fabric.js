@@ -92,7 +92,7 @@ function createReactAppIfNeeded(context) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
-    const packagePath = path.resolve(appPath, 'sandbox.json');
+    const packagePath = path.resolve(appPath, 'package.json');
     const package = JSON.parse(fs.readFileSync(packagePath).toString());
     package.sandbox = {
       fabric: fabricPath,
