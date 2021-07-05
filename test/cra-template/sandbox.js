@@ -85,13 +85,12 @@ function copyBuildToApp(context) {
 }
 
 function createReactAppIfNeeded(context) {
-  const { template, appPath, fabricPath } = context;
+  const { template, appPath } = context;
   if (!fs.existsSync(appPath)) {
-    const templateDir = path.resolve('.');
+    const templateDir = process.cwd();
     console.log(chalk.blue(`> creating sandbox using cra-template-${template}`));
     template === 'js' && console.log(chalk.yellow(`> if you want to use typescript re-run with --typescript flag`));
-    cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${path.resolve(templateDir, template)}`, {
-      cwd: fabricPath,
+    cp.execSync(`npx create-react-app ${context.appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
   }
@@ -268,7 +267,7 @@ function createServer(context, port = 5000) {
 }
 
 function getCommonCmd(cmd) {
-  return `${cmd} <fabricPath> [appPath] [typescript]`;
+  return `${cmd} <fabricPath> <appPath> [typescript]`;
 }
 
 function applyCommonPositionals(yargs) {
@@ -294,7 +293,7 @@ function runInContext(cb, argv) {
     appPath: path.resolve(process.cwd(), argv.appPath),
     template: argv.typescript ? 'ts' : 'js'
   }
-  console.log(context)
+  Object.freeze(context);
   cb(context);
 }
 
