@@ -26,22 +26,22 @@ function bufferToBase64DataUrl(buffer, mimeType) {
   return 'data:' + mimeType + ';base64,' + buffer.toString('base64');
 }
 
-function execGitCommand(cmd) {
-  return cp.execSync(cmd).toString()
+function execGitCommand(context, cmd) {
+  return cp.execSync(cmd, { cwd: context.fabricPath }).toString()
     .replace(/\n/g, ',')
     .split(',')
     .map(value => value.trim())
     .filter(value => value.length > 0);
 }
 
-function getGitInfo() {
-  const branch = execGitCommand('git branch --show-current')[0];
-  const tag = execGitCommand('git describe --tags')[0];
-  const changes = execGitCommand('git status --porcelain').map(value => {
+function getGitInfo(context) {
+  const branch = execGitCommand(context, 'git branch --show-current')[0];
+  const tag = execGitCommand(context, 'git describe --tags')[0];
+  const changes = execGitCommand(context, 'git status --porcelain').map(value => {
     const [type, path] = value.split(' ');
     return { type, path };
   });
-  const userName = execGitCommand('git config user.name')[0];
+  const userName = execGitCommand(context, 'git config user.name')[0];
   return {
     branch,
     tag,
@@ -61,9 +61,8 @@ function writeDiff(context) {
     fs.mkdirSync(diffFolder);
   }
   console.log(`> writing diff files`);
-  cp.execSync(`git diff upstream/master > ${diffPath}`);
-  cp.execSync(`git diff > ${stagingDiffPath}`);
-  //cp.execSync(`git apply --include dist/fabric.js ${diffPath}`);
+  cp.execSync(`git diff upstream/master > ${diffPath}`, { cwd: context.fabricPath });
+  cp.execSync(`git diff > ${stagingDiffPath}`, { cwd: context.fabricPath });
 }
 
 function buildDist(context) {
@@ -76,7 +75,7 @@ function copyBuildToApp(context) {
   console.log(`> building dist`);
   buildDist(context);
   let content = fs.readFileSync(fabricSource).toString();
-  const gitInfo = getGitInfo();
+  const gitInfo = getGitInfo(context);
   content += `\n// fabric react sandbox`;
   content += `\n// last git tag ${gitInfo.tag}`;
   content += `\nfabric.version='#${gitInfo.tag}';\n`;
@@ -85,7 +84,7 @@ function copyBuildToApp(context) {
 }
 
 function createReactAppIfNeeded(context) {
-  const { template, appPath } = context;
+  const { template, appPath, fabricPath } = context;
   if (!fs.existsSync(appPath)) {
     const templateDir = process.cwd();
     console.log(chalk.blue(`> creating sandbox using cra-template-${template}`));
@@ -93,12 +92,15 @@ function createReactAppIfNeeded(context) {
     cp.execSync(`npx create-react-app ${context.appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
+    fs.writeFileSync(path.resolve(appPath, 'sandbox.json'), JSON.stringify({ fabric: fabricPath, template }, null, '\t'));
+  } else {
+    console.log(chalk.yellow(`> the path ${appPath} already exists`));
+    process.exit(1);
   }
 }
 
 async function startReactSandbox(context) {
   const { appPath, fabricPath } = context;
-  createReactAppIfNeeded(context);
   copyBuildToApp(context);
   writeDiff(context);
   console.log(chalk.yellow('\n> watching for changes in fabric'));
@@ -116,7 +118,7 @@ async function startReactSandbox(context) {
   package.proxy = `http://localhost:${port}`;
   fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
   try {
-    cp.spawn('npm', ['start'], { shell: true, cwd: appPath, stdio: 'inherit' });
+    //cp.spawn('npm', ['start'], { shell: true, cwd: appPath, stdio: 'inherit' });
   } catch (error) {
     console.log(chalk.yellow('\n> stopped watching for changes in fabric'));
     process.exit(1);
@@ -134,12 +136,11 @@ function createDeployedEnv(context) {
  */
 async function createCodeSandbox(context) {
   const { appPath } = context;
-  createReactAppIfNeeded(context);
   copyBuildToApp(context);
   writeDiff(context);
   const files = {
     '.env': { content: createDeployedEnv(context) },
-    'src/git.json': { content: getGitInfo() }
+    'src/git.json': { content: getGitInfo(context) }
   };
   const processFile = (fileName) => {
     const filePath = path.resolve(appPath, fileName);
@@ -218,7 +219,7 @@ function createServer(context, port = 5000) {
         res.writeHead(200, {
           'Content-Type': 'application/json'
         });
-        res.end(JSON.stringify(getGitInfo(), null, '\t'));
+        res.end(JSON.stringify(getGitInfo(context), null, '\t'));
         break;
       case '/open-ide':
         let appFile = path.resolve(appPath, 'src', 'App.tsx');
@@ -300,6 +301,7 @@ function runInContext(cb, argv) {
 yargs
   .scriptName('fabric.js react sandbox')
   .usage('$0 <cmd> [args]')
+  .command(getCommonCmd('build'), 'build the sandbox', applyCommonPositionals, runInContext.bind(undefined, startReactSandbox))
   .command(getCommonCmd('start'), 'start the sandbox', applyCommonPositionals, runInContext.bind(undefined, startReactSandbox))
   .command(getCommonCmd('deploy'), 'deploy to codesandbox.io', applyCommonPositionals, runInContext.bind(undefined, createAndOpenCodeSandbox))
   .command(getCommonCmd('serve'), 'start the server', applyCommonPositionals, runInContext.bind(undefined, async context => {
