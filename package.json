@@ -63,7 +63,8 @@
     "testem": "testem .",
     "testem:ci": "testem ci",
     "react_sandbox:start": "node test/react_sandbox start",
-    "react_sandbox:deploy": "node test/react_sandbox deploy"
+    "react_sandbox:deploy": "node test/react_sandbox deploy",
+    "react_sandbox:serve": "node test/react_sandbox serve"
   },
   "optionalDependencies": {
     "canvas": "^2.6.1",
