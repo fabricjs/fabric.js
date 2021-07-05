@@ -10,3 +10,4 @@ before_commit
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
 /test/react-sandbox
+**/node_modules
