@@ -228,7 +228,7 @@ function createServer(port = 5000) {
       case '/open-ide':
         let appFile = path.resolve(appDir, 'src', 'App.tsx');
         if (!fs.existsSync(appFile)) {
-          appFile = path.resolve(appDir, 'src', 'App.jsx');
+          appFile = path.resolve(appDir, 'src', 'App.js');
         }
         if (fs.existsSync(appFile)) {
           runApplication(appFile);
