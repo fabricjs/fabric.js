@@ -7097,6 +7097,13 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     withConnection: false,
 
     /**
+     * Indicating if the control button is hold down for a while
+     * @type {Boolean}
+     * @default false
+     */
+    heldDown: false,
+
+    /**
      * The control actionHandler, provide one to handle action ( control being moved )
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
@@ -12102,7 +12109,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (object.onSelect({ e: e })) {
         return false;
       }
-      this.clearIndicatedObject();
+      if (!object.canBeActiveAndIndicated) {
+        this.clearIndicatedObject();
+      }
       this._activeObject = object;
       return true;
     },
@@ -12147,15 +12156,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {Boolean} true if the selection happened
      */
     setIndicatedObject: function(object) {
-      var indicatedObjectTypes = ['audio_token'];
       if (this._indicatedObject === object) {
         return false;
       }
       if (object.isMoving) {
         return false;
       }
-      // active objects have special rendering that should replace indicated objects (except indicatedObjectTypes)
-      if (this._activeObject === object && !indicatedObjectTypes.includes(object.type)) {
+      // active objects have special rendering that should replace indicated objects
+      if (this._activeObject === object && !object.canBeActiveAndIndicated) {
         // if active object is the new indicated object we ant to be sure to clear the old one
         this.clearIndicatedObject();
         return false;
@@ -14663,6 +14671,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @default false
      */
     isHighlightLayer: false,
+
+    /**
+     * Active objects have special rendering that should replace indicated objects
+     * @type boolean
+     * @default false
+     */
+    canBeActiveAndIndicated: false,
 
     /**
      * Constructor
@@ -30574,6 +30589,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     hasBorders: false,
 
+    canBeActiveAndIndicated: true,
+
     /**
      * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number
@@ -30905,25 +30922,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       touchCornerSize: 64,
 
       cursorStyle: 'pointer',
-      // We overwrite RENDER with a new implementation for rendering active (clicked) state of the control
-      //
-      // mouseDownHandler: function (eventData, target) {
-      //   target.controls.playControl.render = function (ctx, left, top, styleOverride, target) {
-      //     var scale = target.scaleX;
-      //     var size = target.controls.playControl.cornerSize * scale;
-      //     var activeStateImg = target.isPlaying
-      //       ? target.clickedPauseControlImage
-      //       : target.clickedPlayControlImage;
-      //     target.controls.playControl.y = playIconY;
-      //     target.controls.playControl.offsetX = playIconOffsetX * scale;
-      //     target.controls.playControl.offsetY = playIconOffsetY * scale;
-      //
-      //     ctx.save();
-      //     ctx.translate(left, top);
-      //     ctx.drawImage(activeStateImg, -size / 2, -size / 2, size, size);
-      //     ctx.restore();
-      //   };
-      // },
+      mouseDownHandler: function (eventData, target) {
+        target.controls.playControl.heldDown = true;
+      },
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
@@ -30938,19 +30939,22 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject === fabricObject.canvas._indicatedObject) {
-          controlImg = fabricObject.isPlaying ?
-            fabricObject.hoveredPauseControlImage :
-            fabricObject.hoveredPlayControlImage;
+          if (fabricObject.controls.playControl.heldDown) {
+            controlImg = fabricObject.isPlaying ?
+              fabricObject.clickedPauseControlImage
+              : fabricObject.clickedPlayControlImage;
+          }
+          else {
+            controlImg = fabricObject.isPlaying ?
+              fabricObject.hoveredPauseControlImage :
+              fabricObject.hoveredPlayControlImage;
+          }
         }
         else {
           controlImg = fabricObject.isPlaying ?
             fabricObject.pauseControlImage :
             fabricObject.playControlImage;
         }
-        this.y = playIconY;
-        this.offsetX = playIconOffsetX * scale;
-        this.offsetY = playIconOffsetY * scale;
-
         ctx.save();
         ctx.translate(left, top);
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);

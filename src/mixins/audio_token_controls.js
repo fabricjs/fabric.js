@@ -69,7 +69,7 @@
 
     // custom play/pause control for the audio_token
     audioTokenControls.playControl = new fabric.Control({
-      // delete icon x position relative to audio_token
+      // play icon x position relative to audio_token
       x: playIconX,
 
       // play icon y position relative to audio_token
@@ -91,25 +91,9 @@
       touchCornerSize: 64,
 
       cursorStyle: 'pointer',
-      // We overwrite RENDER with a new implementation for rendering active (clicked) state of the control
-      //
-      // mouseDownHandler: function (eventData, target) {
-      //   target.controls.playControl.render = function (ctx, left, top, styleOverride, target) {
-      //     var scale = target.scaleX;
-      //     var size = target.controls.playControl.cornerSize * scale;
-      //     var activeStateImg = target.isPlaying
-      //       ? target.clickedPauseControlImage
-      //       : target.clickedPlayControlImage;
-      //     target.controls.playControl.y = playIconY;
-      //     target.controls.playControl.offsetX = playIconOffsetX * scale;
-      //     target.controls.playControl.offsetY = playIconOffsetY * scale;
-      //
-      //     ctx.save();
-      //     ctx.translate(left, top);
-      //     ctx.drawImage(activeStateImg, -size / 2, -size / 2, size, size);
-      //     ctx.restore();
-      //   };
-      // },
+      mouseDownHandler: function (eventData, target) {
+        target.controls.playControl.heldDown = true;
+      },
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
@@ -124,19 +108,26 @@
 
         // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject === fabricObject.canvas._indicatedObject) {
-          controlImg = fabricObject.isPlaying ?
-            fabricObject.hoveredPauseControlImage :
-            fabricObject.hoveredPlayControlImage;
+          if (fabricObject.controls.playControl.heldDown) {
+            controlImg = fabricObject.isPlaying ?
+              fabricObject.clickedPauseControlImage
+              : fabricObject.clickedPlayControlImage;
+          }
+          else {
+            controlImg = fabricObject.isPlaying ?
+              fabricObject.hoveredPauseControlImage :
+              fabricObject.hoveredPlayControlImage;
+          }
         }
         else {
           controlImg = fabricObject.isPlaying ?
             fabricObject.pauseControlImage :
             fabricObject.playControlImage;
         }
+
         this.y = playIconY;
         this.offsetX = playIconOffsetX * scale;
         this.offsetY = playIconOffsetY * scale;
-
         ctx.save();
         ctx.translate(left, top);
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);

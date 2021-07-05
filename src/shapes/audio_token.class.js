@@ -65,6 +65,8 @@
 
     hasBorders: false,
 
+    canBeActiveAndIndicated: true,
+
     /**
      * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number

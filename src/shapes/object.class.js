@@ -655,6 +655,13 @@
     isHighlightLayer: false,
 
     /**
+     * Active objects have special rendering that should replace indicated objects
+     * @type boolean
+     * @default false
+     */
+    canBeActiveAndIndicated: false,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      */

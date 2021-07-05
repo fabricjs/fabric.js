@@ -103,6 +103,13 @@
     withConnection: false,
 
     /**
+     * Indicating if the control button is hold down for a while
+     * @type {Boolean}
+     * @default false
+     */
+    heldDown: false,
+
+    /**
      * The control actionHandler, provide one to handle action ( control being moved )
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
