@@ -94,8 +94,8 @@ function copyBuildToApp() {
  */
 function createReactAppIfNeeded(template = 'js') {
   if (!fs.existsSync(appDir)) {
-    console.log(chalk.blue.bold(`> creating sandbox using cra-template-${template}`));
-    template === 'js' && console.log(chalk.yellow.bold(`> if you want to use typescript re-run with --typescript flag`));
+    console.log(chalk.blue(`> creating sandbox using cra-template-${template}`));
+    template === 'js' && console.log(chalk.yellow(`> if you want to use typescript re-run with --typescript flag`));
     cp.execSync(`npx create-react-app test/${APP_NAME} --template file:${path.resolve(templateDir, template)}`, { cwd: main, stdio: 'inherit' });
   }
 }
@@ -108,13 +108,13 @@ async function startReactSandbox(template = 'js') {
   createReactAppIfNeeded(template);
   copyBuildToApp();
   writeDiff();
-  console.log(chalk.yellow.bold('\n> watching for changes in fabric'));
+  console.log(chalk.yellow('\n> watching for changes in fabric'));
   fs.watch(src, { recursive: true }, () => {
     try {
       copyBuildToApp();
       writeDiff();
     } catch (error) {
-      console.log(chalk.blue.bold('> error listening to/building fabric'));
+      console.log(chalk.blue('> error listening to/building fabric'));
     }
   });
   const port = await createServer(5000);
@@ -125,7 +125,7 @@ async function startReactSandbox(template = 'js') {
   try {
     cp.spawn('npm', ['start'], { shell: true, cwd: appDir, stdio: 'inherit' });
   } catch (error) {
-    console.log(chalk.yellow.bold('\n> stopped watching for changes in fabric'));
+    console.log(chalk.yellow('\n> stopped watching for changes in fabric'));
     process.exit(1);
   }
 }
@@ -266,7 +266,7 @@ function createServer(port = 5000) {
     };
     listen();
   }).then(port => {
-    console.log(chalk.yellow.bold(`> sandbox server is listening on port ${port}`));
+    console.log(chalk.yellow(`> sandbox server is listening on port ${port}`));
     return port;
   });
 }
