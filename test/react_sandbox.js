@@ -19,7 +19,6 @@ const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
 
 const FILES = [
   'package.json',
-  'tsconfig.json',
   '.eslintignore',
   'public/index.html',
   'src',
