@@ -86,10 +86,10 @@
      * @param {Object} [options] Options object
      * @return {fabric.Audio_token} thisArg
      */
-    initialize: function(audioURL, options) {
+    initialize: function(mediaID, options) {
       options || (options = { });
       this.filters = [];
-      this.audioURL = audioURL;
+      this.mediaID = mediaID;
       this.cacheKey = 'audio_token' + fabric.Object.__uid++;
       this.callSuper('initialize', options);
       this.initBehavior();
@@ -129,8 +129,7 @@
      */
     toObject: function(propertiesToInclude) {
       return this.callSuper('toObject', [
-        'playState',
-        'audioUrl',
+        'mediaID',
         'idleImageSrc',
         'selectedImageSrc',
         'pauseControlImageSrc',
