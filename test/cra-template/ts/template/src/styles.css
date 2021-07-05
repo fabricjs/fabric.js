@@ -29,6 +29,7 @@ code {
 .github.badge {
   position: absolute;
   bottom: 0;
+  transform: translate(-0.5rem, 0.5rem);
 }
 
 .App-footer {
