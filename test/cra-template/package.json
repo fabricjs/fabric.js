@@ -26,10 +26,7 @@
   "scripts": {
     "build": "node build",
     "prepublish": "npm run build",
-    "sandbox": "node sandbox",
-    "start": "node sandbox start",
-    "deploy": "node sandbox deploy",
-    "serve": "node sandbox serve"
+    "start": "node sandbox build"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",

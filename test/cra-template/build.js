@@ -39,8 +39,8 @@ function transformTSTraversal(folderPath) {
 }
 
 
-const srcDir = path.resolve(__dirname, "ts");
-const destDir = path.resolve(__dirname, "js");
+const srcDir = path.resolve(__dirname, 'ts');
+const destDir = path.resolve(__dirname, 'js');
 const files = transformTSTraversal(srcDir);
 
 const BLACKLIST = [
@@ -60,7 +60,14 @@ for (const fileName in files) {
   fs.ensureFileSync(dest, files[fileName]);
   fs.writeFileSync(dest, files[fileName]);
 }
+
+// change .env
 const envPath = path.resolve(destDir, 'template', '.env');
 let env = fs.readFileSync(envPath).toString();
 env = env.replace('REACT_APP_TEMPLATE=ts', 'REACT_APP_TEMPLATE=js');
 fs.writeFileSync(envPath, env);
+
+// copy sandbox.js
+const sandboxPath = path.resolve(__dirname, 'sandbox.js');
+fs.copySync(sandboxPath, path.resolve(srcDir, 'sandbox.js'));
+fs.copySync(sandboxPath, path.resolve(destDir, 'sandbox.js'));

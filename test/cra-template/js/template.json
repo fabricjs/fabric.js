@@ -22,6 +22,12 @@
         "react-app/jest"
       ]
     },
-    "proxy": "http://localhost:5000"
+    "proxy": "http://localhost:5000",
+    "scripts": {
+      "start": "node sandbox start",
+      "deploy": "node sandbox deploy",
+      "serve": "node sandbox serve",
+      "app": "react-scripts start"
+    }
   }
 }
