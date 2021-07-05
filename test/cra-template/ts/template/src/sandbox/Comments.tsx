@@ -6,7 +6,7 @@ export const CommentsContext = React.createContext<[show: number, setShow: (valu
 
 function Comments({ children }: { children?: React.ReactNode }) {
   const [show, setShow] = useContext(CommentsContext)!;
-  const hideModal = useCallback(() => setShow(0), []);
+  const hideModal = useCallback(() => setShow(0), [setShow]);
 
   return (
     <Offcanvas show={show === 1} onHide={hideModal}>

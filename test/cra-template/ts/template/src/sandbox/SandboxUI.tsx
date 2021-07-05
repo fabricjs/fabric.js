@@ -14,7 +14,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
   const hideModal = useCallback(() => {
     setShowModal(0);
     showComments === -1 && setShowComments(1);
-  }, [showComments]);
+  }, [showComments, setShowModal, setShowComments]);
   const [showDownload, setShowDownload] = useState(false);
 
   return hidden ?

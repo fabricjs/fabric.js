@@ -17,7 +17,7 @@ function SandboxUI({
   const hideModal = useCallback(() => {
     setShowModal(0);
     showComments === -1 && setShowComments(1);
-  }, [showComments]);
+  }, [showComments, setShowModal, setShowComments]);
   const [showDownload, setShowDownload] = useState(false);
   return hidden ? <>{children}</> : <div className="App">
         <header className="App-header my-3">

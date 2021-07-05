@@ -7,7 +7,7 @@ function Comments({
   children
 }) {
   const [show, setShow] = useContext(CommentsContext);
-  const hideModal = useCallback(() => setShow(0), []);
+  const hideModal = useCallback(() => setShow(0), [setShow]);
   return <Offcanvas show={show === 1} onHide={hideModal}>
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Comments</Offcanvas.Title>
