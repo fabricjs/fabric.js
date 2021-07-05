@@ -110,7 +110,7 @@ async function startReactSandbox(context) {
   const { appPath, fabricPath } = context;
   copyBuildToApp(context);
   writeDiff(context);
-  console.log(chalk.yellow('\n> watching for changes in fabric'));
+  console.log(chalk.yellow(`\n> watching for changes in fabric ${fabricPath}`));
   fs.watch(path.resolve(fabricPath, 'src'), { recursive: true }, () => {
     try {
       copyBuildToApp(context);
