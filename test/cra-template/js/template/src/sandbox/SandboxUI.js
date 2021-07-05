@@ -4,6 +4,106 @@ import { CommentsContext } from './Comments';
 import { OpenIDE } from './common';
 import githubIcon from './GitHub-Mark-64px.png';
 import { SANDBOX_DEPLOYED, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
+const GitInfoDisplay = React.memo(({
+  user,
+  branch,
+  tag,
+  changes
+}) => {
+  return <Container className="p-2">
+      <Row>
+        <Col md="auto">user</Col>
+        <Col><code>{user}</code></Col>
+      </Row>
+      <Row>
+        <Col md="auto">branch</Col>
+        <Col><code>{branch}</code></Col>
+      </Row>
+      <Row>
+        <Col md="auto">tag</Col>
+        <Col><code>{tag}</code></Col>
+      </Row>
+      <Row className="my-3">
+        {changes.length > 0 && <strong>This branch has uncommitted changes</strong>}
+      </Row>
+    </Container>;
+});
+const GitActions = React.memo(info => {
+  const {
+    user,
+    tag
+  } = info || {
+    tag: undefined,
+    user: 'fabricjs'
+  };
+  return <>
+      <Modal.Header closeButton>
+        <Modal.Title>Using <code>.diff</code> files</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <h5>Commit your local changes before proceeding.</h5>
+        <p>
+          The following commands update your local <code>fabric</code> repository with the changes from this sandbox, run them for that folder.
+        </p>
+        <div className="my-4">
+          <h6>
+            Merge
+          </h6>
+          <div className="m-2">
+            <code>
+              git fetch upstream<br />
+              git merge {tag || '<tag>'}
+            </code>
+          </div>
+        </div>
+        <div className="my-4">
+          <h6>
+            Checkout (overwrite) local files
+          </h6>
+          <div className="m-2">
+            <code>
+              git fetch upstream<br />
+              git checkout {tag || '<tag>'} -- [file]
+            </code>
+          </div>
+        </div>
+        <div className="my-4">
+          <h6>
+            Apply changes manually
+          </h6>
+          <div className="m-2">
+            <code>
+              git apply {'<path/to/downloaded/.diff>'}
+            </code>
+          </div>
+        </div>
+        <div className="my-4">
+          <h6>
+            Apply changes manually only to the build folder <code>dist</code>
+          </h6>
+          <div className="m-2">
+            <code>
+              git apply --include dist/fabric.js {'<path/to/downloaded/.diff>'}
+            </code>
+          </div>
+        </div>
+        {info && <div className="my-4">
+            <h6>
+              Github info
+            </h6>
+            <GitInfoDisplay {...info} />
+          </div>}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button as="a" href={`https://github.com/${user}/fabric.js/tree/${tag || ''}`} target="_blank" rel="noopener noreferrer" variant="outline-primary">
+          Browse repository
+        </Button>
+        <Button as="a" href="/diff/upstream.diff" download="fabric.diff" variant="outline-success">
+          Download <code>.diff</code> file
+        </Button>
+      </Modal.Footer>
+    </>;
+});
 
 function SandboxUI({
   children,
@@ -23,34 +123,18 @@ function SandboxUI({
         <header className="App-header my-3">
           <div className="f1">
             {gitInfo && <OverlayTrigger overlay={<Tooltip id="git">
-                    <Container className="p-2">
-                      <Row className="m-3">
-                        Click to browse this repository
-                      </Row>
-                      <Row>
-                        <Col md="auto">user</Col>
-                        <Col><code>{gitInfo.user}</code></Col>
-                      </Row>
-                      <Row>
-                        <Col md="auto">branch</Col>
-                        <Col><code>{gitInfo.branch}</code></Col>
-                      </Row>
-                      <Row>
-                        <Col md="auto">tag</Col>
-                        <Col><code>{gitInfo.tag}</code></Col>
-                      </Row>
-                      <Row className="my-3">
-                        {gitInfo.changes.length > 0 && <strong>This branch has uncommitted changes</strong>}
-                      </Row>
-                    </Container>
+                    <p className="m-3">
+                      <strong>Click for more options</strong>
+                    </p>
+                    <GitInfoDisplay {...gitInfo} />
                   </Tooltip>} trigger={['focus', 'hover']} flip placement="right">
                 {({
             ref,
             ...props
           }) => <div className="position-relative" {...props}>
-                    <a ref={ref} href={`https://github.com/${gitInfo.user}/fabric.js/tree/${gitInfo.tag}`} target="_blank" rel="noopener noreferrer">
+                    <Button ref={ref} onClick={() => setShowDownload(true)} variant="light">
                       <Image src={githubIcon} width={48} />
-                    </a>
+                    </Button>
                     {gitInfo.changes.length > 0 && <Badge className="github" bg="secondary"><small>Uncommitted Changes</small></Badge>}
                   </div>}
               </OverlayTrigger>}
@@ -67,19 +151,12 @@ function SandboxUI({
             <Button as="a" href="https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" variant="link">
               Contribution Guide
             </Button>
-            {!SANDBOX_DEPLOYED ? <Button onClick={deployCodeSandbox} disabled={pending} variant="outline-success">
-                  {pending ? <Spinner animation="border" /> : <>
-                        Deploy to codesandbox
-                        <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
-                      </>}
-                </Button> : <OverlayTrigger trigger={['focus', 'hover']} flip placement="left" overlay={<Tooltip id="download_diff">
-                      Download the diff file if you want to apply these changes to your local repository.<br />
-                      Click for more instructions.
-                    </Tooltip>}>
-                  <Button as="a" href="/diff/upstream.diff" download="fabric.diff" onClick={() => setShowDownload(true)} variant="outline-primary">
-                    Download diff
-                  </Button>
-                </OverlayTrigger>}
+            {!SANDBOX_DEPLOYED && <Button onClick={deployCodeSandbox} disabled={pending} variant="outline-success">
+                {pending ? <Spinner animation="border" /> : <>
+                      Deploy to codesandbox
+                      <Image src="https://codesandbox.io/csb-ios.svg" width={24} className="mx-1" />
+                    </>}
+              </Button>}
           </div>
         </header>
         <CommentsContext.Provider value={comments}>
@@ -111,32 +188,7 @@ function SandboxUI({
           </Modal.Footer>
         </Modal>
         <Modal show={showDownload} onHide={() => setShowDownload(false)} backdrop="static" centered size="lg">
-          <Modal.Header closeButton>
-            <Modal.Title>Using <code>.diff</code> files</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h5>Commit your local changes before proceeding.</h5>
-            <div className="my-4">
-              <p>
-                If you want to apply the changes from this sandbox to your local repository run the following command from <code>fabric</code> folder
-              </p>
-              <div className="m-2">
-                <code>
-                  git apply {'<path/to/downloaded/.diff>'}
-                </code>
-              </div>
-            </div>
-            <div className="my-4">
-              <p>
-                If you want to apply the changes only to the build folder <code>dist</code> run the following command
-              </p>
-              <div className="m-2">
-                <code>
-                  git apply --include dist/fabric.js {'<path/to/downloaded/.diff>'}
-                </code>
-              </div>
-            </div>
-          </Modal.Body>
+          <GitActions {...gitInfo} />
         </Modal>
       </div>;
 }
