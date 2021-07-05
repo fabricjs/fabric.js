@@ -137,7 +137,9 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
               <OverlayTrigger
                 overlay={
                   <Tooltip id="git">
-                    <strong className="m-3">Click for more options</strong>
+                    <p className="m-3">
+                      <strong>Click for more options</strong>
+                    </p>
                     <GitInfoDisplay {...gitInfo} />
                   </Tooltip>
                 }
