@@ -30887,7 +30887,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     // custom play/pause control for the audio_token
     audioTokenControls.playControl = new fabric.Control({
-      // delete icon x position relative to audio_token
+      // play icon x position relative to audio_token
       x: playIconX,
 
       // play icon y position relative to audio_token
@@ -30942,6 +30942,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
             fabricObject.pauseControlImage :
             fabricObject.playControlImage;
         }
+
+        this.y = playIconY;
+        this.offsetX = playIconOffsetX * scale;
+        this.offsetY = playIconOffsetY * scale;
         ctx.save();
         ctx.translate(left, top);
         ctx.drawImage(controlImg, -size / 2, -size / 2, size, size);
