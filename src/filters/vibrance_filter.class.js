@@ -49,7 +49,7 @@
      * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
      * 
-     * @param {Number} brightness
+     * @param {Number} vibrance
      * @default
      */
     vibrance: 0,
