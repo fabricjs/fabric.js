@@ -111,6 +111,16 @@ function updateFabricPath(appPath, fabricPath) {
   fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
 }
 
+function ensureFabric(context) {
+  if (!validateFabricPath(context.fabricPath)) {
+    console.log('> this app relies on fabric to function');
+    context.fabricPath && console.log(`> couldn't find fabric at given path: ${context.fabricPath}`);
+    const validPath = promptFabricPath();
+    context.fabricPath = validPath;
+    updateFabricPath(context.appPath, validPath);
+  }
+}
+
 function createReactApp(context) {
   const { template, appPath } = context;
   if (!fs.existsSync(appPath)) {
@@ -121,7 +131,7 @@ function createReactApp(context) {
       stdio: 'inherit'
     });
   } else {
-    console.log(chalk.yellow(`> the path ${appPath} already exists`));
+    console.log(chalk.yellow(`> ${appPath} already exists`));
     process.exit(1);
   }
 }
@@ -294,20 +304,14 @@ function createServer(context, port = 5000) {
   });
 }
 
-function runInContext(cb, argv) {
+function runInContext(cb) {
   const package = require('./package.json');
   const context = {
     appPath: process.cwd(),
     fabricPath: package.sandboxConfig.fabric,
     template: package.sandboxConfig.template
   }
-  if (!validateFabricPath(context.fabricPath)) {
-    console.log('> this app relies on fabric to function');
-    context.fabricPath && console.log(`> couldn't find fabric at given path: ${context.fabricPath}`);
-    const validPath = promptFabricPath();
-    context.fabricPath = validPath;
-    updateFabricPath(process.cwd(), validPath);
-  }
+  ensureFabric(context);
   Object.freeze(context);
   cb(context);
 }
@@ -353,7 +357,10 @@ yargs
       Object.freeze(context);
       createReactApp(context);
       context.fabricPath && updateFabricPath(context.appPath, context.fabricPath);
-      argv.start && startReactSandbox(context);
+      if (argv.start) {
+        ensureFabric(context);
+        startReactSandbox(context);
+      }
     }
   )
   .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
