@@ -97,14 +97,21 @@ function validateFabricPath(fabricPath) {
 function promptFabricPath() {
   const fabricPath = path.resolve(process.cwd(), prompt('enter the path pointing to fabric folder: '));
   if (!validateFabricPath(fabricPath)) {
-    console.log(`> couldn't find fabric at given path: ${fabricPath}`);
+    console.log(chalk.red.bold(`> couldn't find fabric at given path: ${fabricPath}`));
     return promptFabricPath();
   }
   console.log(`> fabric has been found, thanks!`);
   return fabricPath;
 }
 
-function createReactAppIfNeeded(context, start = false) {
+function updateFabricPath(appPath, fabricPath) {
+  const packagePath = path.resolve(appPath, 'package.json');
+  const package = require(packagePath);
+  package.sandboxConfig = { ...package.sandboxConfig, fabric: fabricPath };
+  fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
+}
+
+function createReactApp(context) {
   const { template, appPath } = context;
   if (!fs.existsSync(appPath)) {
     const templateDir = process.cwd();
@@ -113,7 +120,6 @@ function createReactAppIfNeeded(context, start = false) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
-    start && startReactSandbox(context);
   } else {
     console.log(chalk.yellow(`> the path ${appPath} already exists`));
     process.exit(1);
@@ -300,8 +306,7 @@ function runInContext(cb, argv) {
     context.fabricPath && console.log(`> couldn't find fabric at given path: ${context.fabricPath}`);
     const validPath = promptFabricPath();
     context.fabricPath = validPath;
-    package.sandboxConfig = { fabric: validPath, template: context.template };
-    fs.writeFileSync(path.resolve(process.cwd(), 'package.json'), JSON.stringify(package, null, '\t'));
+    updateFabricPath(process.cwd(), validPath);
   }
   Object.freeze(context);
   cb(context);
@@ -310,32 +315,45 @@ function runInContext(cb, argv) {
 yargs
   .scriptName('fabric.js react sandbox')
   .usage('$0 <cmd> [args]')
-  .command('build [appPath] [typescript] [start]',
+  .command('build <app>',
     'build the sandbox',
     yargs => {
-      yargs.positional('appPath', {
-        type: 'string',
-        describe: 'the path where you want the sandbox to be created at',
-        default: `./${APP_NAME}`,
-      });
-      yargs.positional('typescript', {
-        type: 'boolean',
-        describe: 'build the sandbox with typescript',
-        default: false
-      });
-      yargs.positional('start', {
-        type: 'boolean',
-        describe: 'start the sandbox after building has completed',
-        default: false
-      });
+      return yargs
+        .positional('app', {
+          type: 'string',
+          describe: 'the path where you want the sandbox to be created at',
+          default: `./${APP_NAME}`,
+        })
+        .option('fabric', {
+          type: 'string',
+          describe: 'the path pointing to fabric folder'
+        })
+        .option('typescript', {
+          type: 'boolean',
+          describe: 'build the sandbox with typescript',
+          default: false
+        })
+        .option('start', {
+          type: 'boolean',
+          describe: 'start the sandbox after building has completed',
+          default: false
+        });
     },
     argv => {
       const context = {
-        appPath: path.resolve(process.cwd(), argv.appPath),
+        fabricPath: argv.fabric ? path.resolve(process.cwd(), argv.fabric) : null,
+        appPath: path.resolve(process.cwd(), argv.app),
         template: argv.typescript ? 'ts' : 'js',
       }
+      if (context.fabricPath && !validateFabricPath(context.fabricPath)) {
+        console.log(chalk.red.bold(`> couldn't find fabric at given path: ${context.fabricPath}`));
+        process.exit(1);
+        return;
+      }
       Object.freeze(context);
-      createReactAppIfNeeded(context, argv.start);
+      createReactApp(context);
+      updateFabricPath(context.appPath, context.fabricPath);
+      argv.start && startReactSandbox(context);
     }
   )
   .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
