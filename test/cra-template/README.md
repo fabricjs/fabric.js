@@ -24,7 +24,7 @@ npm run dev
 ```
 3. open `./common` and start working.
 
-File changes from `./common` will be built to the app.
+File changes from `./common` will get built to the app.
 **Make sure you work on files in `./common`.**
 
 
