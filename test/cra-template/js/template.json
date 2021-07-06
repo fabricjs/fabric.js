@@ -18,7 +18,8 @@
     },
     "devDependencies": {
       "axios": "^0.21.1",
-      "yargs": "^17.0.1"
+      "yargs": "^17.0.1",
+      "prompt-sync": "^4.2.0"
     },
     "eslintConfig": {
       "extends": [
@@ -32,6 +33,10 @@
       "deploy": "node sandbox deploy",
       "serve": "node sandbox serve",
       "app": "react-scripts start"
+    },
+    "sandboxConfig": {
+      "fabric": null,
+      "template": "ts"
     }
   }
 }
