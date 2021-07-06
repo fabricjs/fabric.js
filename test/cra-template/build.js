@@ -38,36 +38,66 @@ function transformTSTraversal(folderPath) {
   return files;
 }
 
+// build
 
-const srcDir = path.resolve(__dirname, 'ts');
-const destDir = path.resolve(__dirname, 'js');
-const files = transformTSTraversal(srcDir);
+const srcDir = path.resolve(__dirname, 'common');
+const jsDir = path.resolve(__dirname, 'js');
+const tsDir = path.resolve(__dirname, 'ts');
+const BLACKLIST = [];
 
-const BLACKLIST = [
-  'package.json',
-  'README.md'
-]
-
-fs.copySync(srcDir, destDir, {
-  filter: (src, dest) => {
-    if (BLACKLIST.some(p => p.endsWith(path.basename(src)))) return false;
-    const fileExt = path.extname(src).slice(1);
-    return Object.keys(EXT).every(ext => ext !== fileExt) || src.endsWith('.d.ts');
+function finalizeBuild(templateDir, template) {
+  // update template.json
+  const templateJSONPath = path.resolve(templateDir, 'template.json');
+  const templateData = JSON.parse(fs.readFileSync(templateJSONPath).toString());
+  templateData.sandboxConfig = {
+    fabric: null,
+    template
   }
-});
-for (const fileName in files) {
-  const dest = path.resolve(destDir, fileName);
-  fs.ensureFileSync(dest, files[fileName]);
-  fs.writeFileSync(dest, files[fileName]);
+  fs.writeFileSync(templateJSONPath, JSON.stringify(templateData, null, '\t'));
+
+  // update app .env
+  const envPath = path.resolve(templateDir, 'template', '.env');
+  let env = fs.readFileSync(envPath).toString();
+  env += `\nREACT_APP_TEMPLATE=${template}\n`;
+  fs.writeFileSync(envPath, env);
+
+  // copy sandbox.js
+  const sandboxPath = path.resolve(__dirname, 'sandbox.js');
+  fs.copySync(sandboxPath, path.resolve(templateDir, 'template', 'sandbox.js'));
 }
 
-// change .env
-const envPath = path.resolve(destDir, 'template', '.env');
-let env = fs.readFileSync(envPath).toString();
-env = env.replace('REACT_APP_TEMPLATE=ts', 'REACT_APP_TEMPLATE=js');
-fs.writeFileSync(envPath, env);
+function buildJSTemplate() {
+  // copy non ts files
+  fs.copySync(srcDir, jsDir, {
+    filter: (src, dest) => {
+      if (BLACKLIST.some(p => p.endsWith(path.basename(src)))) return false;
+      const fileExt = path.extname(src).slice(1);
+      return Object.keys(EXT).every(ext => ext !== fileExt) || src.endsWith('.d.ts');
+    }
+  });
 
-// copy sandbox.js
-const sandboxPath = path.resolve(__dirname, 'sandbox.js');
-fs.copySync(sandboxPath, path.resolve(srcDir, 'template', 'sandbox.js'));
-fs.copySync(sandboxPath, path.resolve(destDir, 'template', 'sandbox.js'));
+  // transform ts files to js and write to folder
+  const files = transformTSTraversal(srcDir);
+  for (const fileName in files) {
+    const dest = path.resolve(jsDir, fileName);
+    fs.ensureFileSync(dest, files[fileName]);
+    fs.writeFileSync(dest, files[fileName]);
+  }
+
+  finalizeBuild(jsDir, 'js');
+}
+
+function buildTSTemplate() {
+  // copy files
+  fs.copySync(srcDir, tsDir, {
+    filter: (src, dest) => {
+      if (BLACKLIST.some(p => p.endsWith(path.basename(src)))) return false;
+      return true;
+    }
+  });
+
+  finalizeBuild(tsDir, 'ts');
+}
+
+buildJSTemplate();
+buildTSTemplate();
