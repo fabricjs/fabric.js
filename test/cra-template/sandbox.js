@@ -382,7 +382,9 @@ yargs
         } else {
           fs.unlinkSync(dest);
         }
-        console.log(`> updated ${filename}`);
+        console.log(
+          `> updated ${filename}${!filename.startsWith('src') ? ', you may need to restart the dev server for changes to take place' : ''}`
+        );
       } catch (error) {
         // console.log(error);
       }
