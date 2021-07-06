@@ -6,6 +6,7 @@ const http = require('http');
 const os = require('os');
 const cp = require('child_process');
 const yargs = require('yargs');
+const prompt = require('prompt-sync')();
 
 const APP_NAME = 'react-sandbox';
 
@@ -83,8 +84,27 @@ function copyBuildToApp(context) {
   console.log(`> generated ${fabricDest}`);
 }
 
+function validateFabricPath(fabricPath) {
+  const packagePath = path.resolve(fabricPath, 'package.json');
+  if (fabricPath && fs.existsSync(fabricPath) && fs.existsSync(packagePath)) {
+    const packageJSON = require(packagePath);
+    return packageJSON.name === 'fabric';
+  }
+  return false;
+}
+
+function promptFabricPath() {
+  const fabricPath = prompt('enter the path pointing to fabric folder: ');
+  if (!validateFabricPath(fabricPath)) {
+    console.log(`> couldn't find fabric at given path: ${fabricPath}`);
+    return promptFabricPath();
+  }
+  console.log(`> fabric has been found, thanks!`);
+  return fabricPath;
+}
+
 function createReactAppIfNeeded(context, start = false) {
-  const { template, appPath, fabricPath } = context;
+  const { template, appPath } = context;
   if (!fs.existsSync(appPath)) {
     const templateDir = process.cwd();
     console.log(chalk.blue(`> creating sandbox using cra-template-${template}`));
@@ -92,13 +112,6 @@ function createReactAppIfNeeded(context, start = false) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
-    const packagePath = path.resolve(appPath, 'package.json');
-    const package = JSON.parse(fs.readFileSync(packagePath).toString());
-    package.sandbox = {
-      fabric: fabricPath,
-      template
-    }
-    fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
     start && startReactSandbox(context);
   } else {
     console.log(chalk.yellow(`> the path ${appPath} already exists`));
@@ -183,7 +196,7 @@ async function createCodeSandbox(context) {
       files
     });
     const uri = `https://codesandbox.io/s/${sandbox_id}`;
-    console.log(chalk.yellow(`created code sandbox ${uri}`));
+    console.log(chalk.yellow(`> created code sandbox ${uri}`));
     return uri;
   } catch (error) {
     throw error.toJSON();
@@ -274,34 +287,20 @@ function createServer(context, port = 5000) {
   });
 }
 
-function applyCommonPositionals(yargs) {
-  yargs.positional('fabricPath', {
-    type: 'string',
-    describe: 'the path pointing to the fabric local repository'
-  });
-  yargs.positional('appPath', {
-    type: 'string',
-    describe: 'the path where you want the sandbox to be created at',
-    default: `./${APP_NAME}`,
-  });
-  yargs.positional('typescript', {
-    type: 'boolean',
-    describe: 'build the sandbox with typescript',
-    default: false
-  });
-  yargs.positional('start', {
-    type: 'boolean',
-    describe: 'start the sandbox after building has completed',
-    default: false
-  });
-}
-
 function runInContext(cb, argv) {
   const package = require('./package.json');
   const context = {
-    fabricPath: package.sandbox.fabric,
     appPath: process.cwd(),
-    template: package.sandbox.template
+    fabricPath: package.sandboxConfig.fabric,
+    template: package.sandboxConfig.template
+  }
+  if (!validateFabricPath(context.fabricPath)) {
+    console.log('> this app relies on fabric to function');
+    context.fabricPath && console.log(`> couldn't find fabric at given path: ${context.fabricPath}`);
+    const validPath = promptFabricPath();
+    context.fabricPath = validPath;
+    package.sandboxConfig = { fabric: validPath, template: context.template };
+    fs.writeFileSync(path.resolve(process.cwd(), 'package.json'), JSON.stringify(package, null, '\t'));
   }
   Object.freeze(context);
   cb(context);
@@ -310,20 +309,40 @@ function runInContext(cb, argv) {
 yargs
   .scriptName('fabric.js react sandbox')
   .usage('$0 <cmd> [args]')
-  .command('build <fabricPath> [appPath] [typescript] [--start]', 'build the sandbox', applyCommonPositionals, argv => {
-    const context = {
-      fabricPath: path.resolve(process.cwd(), argv.fabricPath),
-      appPath: path.resolve(process.cwd(), argv.appPath),
-      template: argv.typescript ? 'ts' : 'js',
+  .command('build [appPath] [typescript] [start]',
+    'build the sandbox',
+    yargs => {
+      yargs.positional('appPath', {
+        type: 'string',
+        describe: 'the path where you want the sandbox to be created at',
+        default: `./${APP_NAME}`,
+      });
+      yargs.positional('typescript', {
+        type: 'boolean',
+        describe: 'build the sandbox with typescript',
+        default: false
+      });
+      yargs.positional('start', {
+        type: 'boolean',
+        describe: 'start the sandbox after building has completed',
+        default: false
+      });
+    },
+    argv => {
+      const context = {
+        appPath: path.resolve(process.cwd(), argv.appPath),
+        template: argv.typescript ? 'ts' : 'js',
+      }
+      Object.freeze(context);
+      createReactAppIfNeeded(context, argv.start);
     }
-    Object.freeze(context);
-    createReactAppIfNeeded(context, argv.start);
-  })
-  .command('start', 'start the sandbox', applyCommonPositionals, runInContext.bind(undefined, startReactSandbox))
-  .command('deploy', 'deploy to codesandbox.io', applyCommonPositionals, runInContext.bind(undefined, createAndOpenCodeSandbox))
-  .command('serve', 'start the sandbox server', applyCommonPositionals, runInContext.bind(undefined, async context => {
+  )
+  .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
+  .command('deploy', 'deploy to codesandbox.io', {}, runInContext.bind(undefined, createAndOpenCodeSandbox))
+  .command('serve', 'start the sandbox server', {}, runInContext.bind(undefined, async context => {
     const port = await createServer(context);
     runApplication(`http://localhost:${port}`);
-  }))
+  })
+  )
   .help()
   .argv;
