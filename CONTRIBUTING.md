@@ -46,6 +46,20 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
+### Setting up a local environment
+
+Coming Soon!
+
+### Working on fabricjs.com
+
+To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
+To start the dev server run `npm start` inside the `fabricjs.com` directory (after installing dependecies).
+If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for futher instructions.
+
+**Adding a DEMO**:
+Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
+Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
+
 ### Pull request guidelines
 
 Here are a few notes you should take into account:
