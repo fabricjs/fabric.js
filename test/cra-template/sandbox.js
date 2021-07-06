@@ -6,7 +6,7 @@ const http = require('http');
 const os = require('os');
 const cp = require('child_process');
 const yargs = require('yargs');
-const prompt = require('prompt-sync')();
+const prompt = require('prompt-sync')({ sigint: true });
 
 const APP_NAME = 'react-sandbox';
 
@@ -85,6 +85,7 @@ function copyBuildToApp(context) {
 }
 
 function validateFabricPath(fabricPath) {
+  if (!fabricPath) return false;
   const packagePath = path.resolve(fabricPath, 'package.json');
   if (fabricPath && fs.existsSync(fabricPath) && fs.existsSync(packagePath)) {
     const packageJSON = require(packagePath);
@@ -94,7 +95,7 @@ function validateFabricPath(fabricPath) {
 }
 
 function promptFabricPath() {
-  const fabricPath = prompt('enter the path pointing to fabric folder: ');
+  const fabricPath = path.resolve(process.cwd(), prompt('enter the path pointing to fabric folder: '));
   if (!validateFabricPath(fabricPath)) {
     console.log(`> couldn't find fabric at given path: ${fabricPath}`);
     return promptFabricPath();
