@@ -101,14 +101,17 @@ const GitActions = React.memo((info?: Partial<GitInfo> | null) => {
         >
           Browse repository
         </Button>
-        <Button
-          as="a"
-          href="/diff/upstream.diff"
-          download="fabric.diff"
-          variant="outline-success"
-        >
-          Download <code>.diff</code> file
-        </Button>
+        {
+          SANDBOX_DEPLOYED &&
+          <Button
+            as="a"
+            href="/diff/upstream.diff"
+            download="fabric.diff"
+            variant="outline-success"
+          >
+            Download <code>.diff</code> file
+          </Button>
+        }
       </Modal.Footer>
     </>
   );
