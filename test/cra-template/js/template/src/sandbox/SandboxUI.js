@@ -98,9 +98,9 @@ const GitActions = React.memo(info => {
         <Button as="a" href={`https://github.com/${user}/fabric.js/tree/${tag || ''}`} target="_blank" rel="noopener noreferrer" variant="outline-primary">
           Browse repository
         </Button>
-        <Button as="a" href="/diff/upstream.diff" download="fabric.diff" variant="outline-success">
-          Download <code>.diff</code> file
-        </Button>
+        {SANDBOX_DEPLOYED && <Button as="a" href="/diff/upstream.diff" download="fabric.diff" variant="outline-success">
+            Download <code>.diff</code> file
+          </Button>}
       </Modal.Footer>
     </>;
 });
