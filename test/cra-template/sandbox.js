@@ -352,7 +352,7 @@ yargs
       }
       Object.freeze(context);
       createReactApp(context);
-      updateFabricPath(context.appPath, context.fabricPath);
+      context.fabricPath && updateFabricPath(context.appPath, context.fabricPath);
       argv.start && startReactSandbox(context);
     }
   )
