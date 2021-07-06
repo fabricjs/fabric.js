@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const Axios = require('axios');
 const chalk = require('chalk');
 const path = require('path');
@@ -304,10 +304,10 @@ function createServer(context, port = 5000) {
   });
 }
 
-function runInContext(cb) {
-  const package = require('./package.json');
+function runInContext(appPath, cb) {
+  const package = require(path.resolve(appPath, 'package.json'));
   const context = {
-    appPath: process.cwd(),
+    appPath,
     fabricPath: package.sandboxConfig.fabric,
     template: package.sandboxConfig.template
   }
@@ -363,8 +363,8 @@ yargs
     }
   )
   .command('dev', 'start the dev environment', {}, argv => {
+    const common = path.resolve(__dirname, 'common', 'template');
     const devApp = path.resolve(__dirname, 'dev-sandbox');
-    const common = path.resolve(__dirname, 'common');
     const context = {
       appPath: devApp,
       template: 'ts',
@@ -372,15 +372,33 @@ yargs
     if (!fs.existsSync(devApp)) {
       createReactApp(context);
     }
-    ensureFabric(context);
     fs.watch(common, { recursive: true }, (eventType, filename) => {
-      console.log(eventType, filename)
+      try {
+        const src = path.resolve(common, filename);
+        const dest = path.resolve(devApp, filename);
+        if (fs.lstatSync(src).isDirectory()) return;
+        if (fs.existsSync(src)) {
+          fs.writeFileSync(dest, fs.readFileSync(src));
+        } else {
+          fs.unlinkSync(dest);
+        }
+        console.log(`> updated ${filename}`);
+      } catch (error) {
+        // console.log(error);
+      }
     });
-    startReactSandbox(context);
+    // copy relevant files in case they have changed after the app had been built
+    fs.copySync(common, devApp, {
+      filter: (src, dest) => {
+        return fs.existsSync(dest);
+      }
+    });
+    runInContext(devApp, startReactSandbox);
+    console.log(chalk.bold(`> Edit files under ./common, they will be written to the app`));
   })
-  .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
-  .command('deploy', 'deploy to codesandbox.io', {}, runInContext.bind(undefined, createAndOpenCodeSandbox))
-  .command('serve', 'start the sandbox server', {}, runInContext.bind(undefined, async context => {
+  .command('start', 'start the sandbox', {}, runInContext.bind(undefined, process.cwd(), startReactSandbox))
+  .command('deploy', 'deploy to codesandbox.io', {}, runInContext.bind(undefined, process.cwd(), createAndOpenCodeSandbox))
+  .command('serve', 'start the sandbox server', {}, runInContext.bind(undefined, process.cwd(), async context => {
     const port = await createServer(context);
     runApplication(`http://localhost:${port}`);
   })
