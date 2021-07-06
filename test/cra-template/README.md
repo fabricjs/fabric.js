@@ -7,13 +7,26 @@ This is repository contains `cra-template-ts` and `cra-template-js`
 npm run start <path/to/fabric/local/repo> <path/to/app> -- [--typescript] [--start]
 ```
 
-### Dev
+### Build
 
-The `js` template is generated using a build script so make sure you work on the `ts` template.
+The templates are generated from `./common` using the build script `build.js`.
 
 ```sh
 npm run build
 ```
+
+### Dev
+
+1. install dependencies.
+2. start the dev app `dev-sandbox`.
+```sh
+npm run dev
+```
+3. open `./common` and start working.
+
+File changes from `./common` will be built to the app.
+**Make sure you work on files in `./common`.**
+
 
 For more information, please refer to:
 
