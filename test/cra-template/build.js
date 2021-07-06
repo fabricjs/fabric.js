@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs-extra');
-const babel = require("@babel/core");
+const cp = require('child_process');
+const babel = require('@babel/core');
 
 /**
  * https://babeljs.io/docs/en/babel-preset-typescript#via-node-api
@@ -60,6 +61,8 @@ for (const fileName in files) {
   fs.ensureFileSync(dest, files[fileName]);
   fs.writeFileSync(dest, files[fileName]);
 }
+
+cp.execSync('eslint --config .eslintrc.json js');
 
 // change .env
 const envPath = path.resolve(destDir, 'template', '.env');
