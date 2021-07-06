@@ -96,10 +96,10 @@ function validateFabricPath(fabricPath) {
 function promptFabricPath() {
   const fabricPath = prompt('enter the path pointing to fabric folder: ');
   if (!validateFabricPath(fabricPath)) {
-    console.log(`couldn't find fabric at given path: ${fabricPath}`);
+    console.log(`> couldn't find fabric at given path: ${fabricPath}`);
     return promptFabricPath();
   }
-  console.log(`fabric has been found, thanks!`);
+  console.log(`> fabric has been found, thanks!`);
   return fabricPath;
 }
 
@@ -196,7 +196,7 @@ async function createCodeSandbox(context) {
       files
     });
     const uri = `https://codesandbox.io/s/${sandbox_id}`;
-    console.log(chalk.yellow(`created code sandbox ${uri}`));
+    console.log(chalk.yellow(`> created code sandbox ${uri}`));
     return uri;
   } catch (error) {
     throw error.toJSON();
@@ -295,8 +295,8 @@ function runInContext(cb, argv) {
     template: package.sandboxConfig.template
   }
   if (!validateFabricPath(context.fabricPath)) {
-    console.log('this app relies on fabric to function');
-    context.fabricPath && console.log(`couldn't find fabric at given path: ${context.fabricPath}`);
+    console.log('> this app relies on fabric to function');
+    context.fabricPath && console.log(`> couldn't find fabric at given path: ${context.fabricPath}`);
     const validPath = promptFabricPath();
     context.fabricPath = validPath;
     package.sandboxConfig = { fabric: validPath, template: context.template };
