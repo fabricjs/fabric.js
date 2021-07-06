@@ -354,7 +354,6 @@ yargs
         process.exit(1);
         return;
       }
-      Object.freeze(context);
       createReactApp(context);
       context.fabricPath && updateFabricPath(context.appPath, context.fabricPath);
       if (argv.start) {
@@ -363,6 +362,24 @@ yargs
       }
     }
   )
+  .command('dev', 'start the dev environment', {}, argv => {
+    const devApp = path.resolve(__dirname, 'dev-sandbox');
+    const common = path.resolve(__dirname, 'common');
+    if (fs.existsSync(devApp)) {
+      cp.execSync('npm start', { cwd: devApp });
+    } else {
+      const context = {
+        appPath: devApp,
+        template: 'ts',
+      }
+      createReactApp(context);
+      ensureFabric(context);
+      fs.watch(common, { recursive: true }, (eventType, filename) => {
+        console.log(eventType, filename)
+      });
+      startReactSandbox(context);
+    }
+  })
   .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
   .command('deploy', 'deploy to codesandbox.io', {}, runInContext.bind(undefined, createAndOpenCodeSandbox))
   .command('serve', 'start the sandbox server', {}, runInContext.bind(undefined, async context => {
