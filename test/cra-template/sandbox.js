@@ -337,9 +337,9 @@ yargs
       createReactAppIfNeeded(context, argv.start);
     }
   )
-  .command('start', 'start the sandbox', applyCommonPositionals, runInContext.bind(undefined, startReactSandbox))
-  .command('deploy', 'deploy to codesandbox.io', applyCommonPositionals, runInContext.bind(undefined, createAndOpenCodeSandbox))
-  .command('serve', 'start the sandbox server', applyCommonPositionals, runInContext.bind(undefined, async context => {
+  .command('start', 'start the sandbox', {}, runInContext.bind(undefined, startReactSandbox))
+  .command('deploy', 'deploy to codesandbox.io', {}, runInContext.bind(undefined, createAndOpenCodeSandbox))
+  .command('serve', 'start the sandbox server', {}, runInContext.bind(undefined, async context => {
     const port = await createServer(context);
     runApplication(`http://localhost:${port}`);
   })
