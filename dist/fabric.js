@@ -30915,6 +30915,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
+        target.controls.playControl.heldDown = false;
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
       },

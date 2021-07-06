@@ -97,6 +97,7 @@
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
 
+        target.controls.playControl.heldDown = false;
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
       },
