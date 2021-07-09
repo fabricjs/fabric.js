@@ -1207,6 +1207,14 @@
     },
 
     /**
+     * Returns currently indicated object
+     * @return {fabric.Object} indicated object
+     */
+    getIndicatedObject: function () {
+      return this._indicatedObject;
+    },
+
+    /**
      * @private
      * @param {Object} object to set as indicated for highlighting
      * @return {Boolean} true if the selection happened
