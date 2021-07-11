@@ -2,6 +2,10 @@
 
 ## [next]
 
+- feat(fabric.util): added `convertPointsToSVGPath` that will convert from a list of points to a smooth curve. [#7140](https://github.com/fabricjs/fabric.js/pull/7140)
+- fix(fabric.Object): fix cache invalidation issue when objects are rotating [#7183](https://github.com/fabricjs/fabric.js/pull/7183)
+- fix(fabric.Canvas): rectangle selection works with changing viewport [#7088](https://github.com/fabricjs/fabric.js/pull/7088)
+- feat(fabric.Text): textPath now support textAlign [#7156](https://github.com/fabricjs/fabric.js/pull/7156)
 - fix(fabric.EraserBrush): test eraser intersection with objects taking into account canvas viewport transform [#7147](https://github.com/fabricjs/fabric.js/pull/7147)
 - fix(fabric.Object): support `excludeFromExport` set on `clipPath` [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
 - fix(fabric.Group): support `excludeFromExport` set on objects [#7148](https://github.com/fabricjs/fabric.js/pull/7148).
@@ -10,6 +14,8 @@
 - fix(fabric.EraserBrush): support canvas resizing (overlay/background drawables) [#7100](https://github.com/fabricjs/fabric.js/pull/7100).
 - fix(fabric.EraserBrush): propagate `clipPath` of group to erased objects when necessary so it is correct when ungrouping/removing from group [#7100](https://github.com/fabricjs/fabric.js/pull/7100).
 - fix(fabric.EraserBrush): introduce `erasable = deep` option for `fabric.Group` [#7100](https://github.com/fabricjs/fabric.js/pull/7100).
+- feat(fabric.Collection): the `contains` method now accepts a second boolean parameter `deep`, checking all descendants, `collection.contains(obj, true)` [#7139](https://github.com/fabricjs/fabric.js/pull/7139).
+- fix(fabric.StaticCanvas): disposing canvas now restores canvas size and style to original state.
 
 ## [4.5.1]
 
