@@ -4,6 +4,7 @@ import { CommentsContext } from './Comments';
 import { OpenIDE } from './common';
 import githubIcon from './GitHub-Mark-64px.png';
 import { GitInfo, SANDBOX_DEPLOYED, useDeployCodeSandbox, useGitInfo, useShowComments, useShowModal } from './hooks';
+import diff from '../diff/upstream.diff';
 
 const PatchIcon = React.memo((props: ImageProps & React.RefAttributes<HTMLImageElement>) =>
   <Image
@@ -119,7 +120,7 @@ const GitActions = React.memo((info?: Partial<GitInfo> | null) => {
           </Button>
           <Button
             as="a"
-            href="/diff/upstream.diff"
+            href={diff}
             download="fabric.diff"
             variant="outline-success"
             className="mx-2"
