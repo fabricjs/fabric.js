@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const fs = require('fs-extra');
 const Axios = require('axios');
 const chalk = require('chalk');
@@ -403,4 +404,7 @@ yargs
   })
   )
   .help()
+  .demandCommand()
+  .recommendCommands()
+  .strict()
   .argv;
