@@ -49,7 +49,7 @@ function finalizeBuild(templateDir, template) {
   // update template.json
   const templateJSONPath = path.resolve(templateDir, 'template.json');
   const templateData = JSON.parse(fs.readFileSync(templateJSONPath).toString());
-  templateData.sandboxConfig = {
+  templateData.package.sandboxConfig = {
     fabric: null,
     template
   }
