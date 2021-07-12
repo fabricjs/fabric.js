@@ -130,6 +130,11 @@ function createReactApp(context) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
+    // write template to `sandboxConfig`
+    const packagePath = path.resolve(appPath, 'package.json');
+    const package = require(packagePath);
+    package.sandboxConfig = { template };
+    fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
   } else {
     console.log(chalk.yellow(`> ${appPath} already exists`));
     process.exit(1);
