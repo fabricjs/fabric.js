@@ -104,6 +104,13 @@ function promptFabricPath() {
   return fabricPath;
 }
 
+function updatePackage(appPath, template) {
+  const packagePath = path.resolve(appPath, 'package.json');
+  const package = require(packagePath);
+  package.sandboxConfig = { template };
+  fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
+}
+
 function updateFabricPath(appPath, fabricPath) {
   const packagePath = path.resolve(appPath, 'package.json');
   const package = require(packagePath);
@@ -130,11 +137,7 @@ function createReactApp(context) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
-    // write template to `sandboxConfig`
-    const packagePath = path.resolve(appPath, 'package.json');
-    const package = require(packagePath);
-    package.sandboxConfig = { template };
-    fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
+    updatePackage(appPath, template);
   } else {
     console.log(chalk.yellow(`> ${appPath} already exists`));
     process.exit(1);
