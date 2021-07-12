@@ -55,7 +55,7 @@ function getGitInfo(context) {
  * writes the diff files to the app for version control
  */
 function writeDiff(context) {
-  const diffFolder = path.resolve(context.appPath, 'public', 'diff');
+  const diffFolder = path.resolve(context.appPath, 'src', 'diff');
   const diffPath = path.resolve(diffFolder, 'upstream.diff');
   const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
   if (!fs.existsSync(path.resolve(diffFolder))) {
@@ -104,13 +104,6 @@ function promptFabricPath() {
   return fabricPath;
 }
 
-function updatePackage(appPath, template) {
-  const packagePath = path.resolve(appPath, 'package.json');
-  const package = require(packagePath);
-  package.sandboxConfig = { template };
-  fs.writeFileSync(packagePath, JSON.stringify(package, null, '\t'));
-}
-
 function updateFabricPath(appPath, fabricPath) {
   const packagePath = path.resolve(appPath, 'package.json');
   const package = require(packagePath);
@@ -137,7 +130,6 @@ function createReactApp(context) {
     cp.execSync(`npx create-react-app ${appPath} --template file:${path.resolve(templateDir, template)}`, {
       stdio: 'inherit'
     });
-    updatePackage(appPath, template);
   } else {
     console.log(chalk.yellow(`> ${appPath} already exists`));
     process.exit(1);
