@@ -32,8 +32,13 @@ code {
 
 .github.badge {
   position: absolute;
+  left: 0;
+  right: 0;
   bottom: 0;
-  transform: translate(-0.5rem, 0.5rem);
+  transform: translate(0, 2rem);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: inherit;
 }
 
 .App-footer {
