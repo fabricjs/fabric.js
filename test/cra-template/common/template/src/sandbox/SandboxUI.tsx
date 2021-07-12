@@ -346,7 +346,7 @@ function SandboxUI({ children, hidden }: { children: React.ReactNode, hidden?: b
             </Button>
             <Button
               as="a"
-              href="/diff/upstream.diff"
+              href={diff}
               download="fabric.diff"
               variant="outline-success"
               className="mx-2"
