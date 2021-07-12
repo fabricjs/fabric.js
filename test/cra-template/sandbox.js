@@ -197,15 +197,6 @@ async function createCodeSandbox(context) {
     }
   }
   FILES.forEach(processFile);
-  // add diff files to public diretory so we can download them drom the app
-  const diffFolderName = 'src/diff';
-  fs.readdirSync(path.resolve(appPath, diffFolderName))
-    .forEach(file => {
-      const fileName = path.join('public', 'diff', file).replace(/\\/g, '/');
-      const filePath = path.resolve(appPath, diffFolderName, file);
-      files[fileName] = { content: fs.readFileSync(filePath).toString() };
-    });
-
   const isTypescript = fs.existsSync(path.resolve(appPath, 'src', 'App.tsx'));
   try {
     const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
