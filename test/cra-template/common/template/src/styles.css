@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+.flex {
+  display: flex !important;
+}
+
 .f1 {
   flex: 1;
 }
