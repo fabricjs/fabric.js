@@ -313,8 +313,8 @@ function runInContext(appPath, cb) {
   const package = require(path.resolve(appPath, 'package.json'));
   const context = {
     appPath,
-    fabricPath: package.sandboxConfig ? package.sandboxConfig.fabric : null,
-    template: package.sandboxConfig ? package.sandboxConfig.template : null
+    fabricPath: package.sandboxConfig.fabric,
+    template: package.sandboxConfig.template
   }
   ensureFabric(context);
   Object.freeze(context);
