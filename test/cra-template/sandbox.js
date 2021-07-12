@@ -55,7 +55,7 @@ function getGitInfo(context) {
  * writes the diff files to the app for version control
  */
 function writeDiff(context) {
-  const diffFolder = path.resolve(context.appPath, 'src', 'diff');
+  const diffFolder = path.resolve(context.appPath, 'public', 'diff');
   const diffPath = path.resolve(diffFolder, 'upstream.diff');
   const stagingDiffPath = path.resolve(diffFolder, 'staging.diff');
   if (!fs.existsSync(path.resolve(diffFolder))) {
