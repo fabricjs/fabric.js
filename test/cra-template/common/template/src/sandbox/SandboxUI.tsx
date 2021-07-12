@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button, Col, Container, Image, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Image, ImageProps, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { CommentsContext } from './Comments';
 import { OpenIDE } from './common';
 import githubIcon from './GitHub-Mark-64px.png';
