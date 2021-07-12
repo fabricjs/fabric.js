@@ -395,6 +395,12 @@ yargs
         return fs.existsSync(dest);
       }
     });
+    // update app .env
+    const envPath = path.resolve(devApp, '.env');
+    let env = fs.readFileSync(envPath).toString();
+    env += `\nREACT_APP_TEMPLATE=${context.template}\n`;
+    fs.writeFileSync(envPath, env);
+
     runInContext(devApp, startReactSandbox);
     console.log(chalk.bold(`> Edit files under ./common, they will be written to the app`));
   })
