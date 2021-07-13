@@ -68,6 +68,13 @@
     canBeActiveAndIndicated: true,
 
     /**
+     * Special rendering (like grayscale filter) for not active objects
+     * @type boolean
+     * @default false
+     */
+    isGrayScaleEnabled: false,
+
+    /**
      * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number
      * @default
@@ -119,6 +126,8 @@
       this.hoveredPauseControlImage.src = fabric.Audio_token.prototype.hoveredPauseControlImageSrc;
       this.clickedPlayControlImage.src = fabric.Audio_token.prototype.clickedPlayControlImageSrc;
       this.clickedPauseControlImage.src = fabric.Audio_token.prototype.clickedPauseControlImageSrc;
+      this.grayScaleIdleImage.src = fabric.Audio_token.prototype.grayScaleIdleImageSrc;
+      this.grayScalePlayControlImage.src = fabric.Audio_token.prototype.grayScalePlayControlImageSrc;
     },
 
     /**
@@ -137,7 +146,9 @@
         'hoveredPlayControlImageSrc',
         'hoveredPauseControlImageSrc',
         'clickedPlayControlImageSrc',
-        'clickedPauseControlImageSrc'].concat(propertiesToInclude));
+        'clickedPauseControlImageSrc',
+        'grayScaleIdleImageSrc',
+        'grayScalePlayControlImageSrc'].concat(propertiesToInclude));
     },
 
     /**
@@ -156,9 +167,8 @@
       var image = null;
       if (this._isSelected() && this.selectedImage) {
         image = this.selectedImage;
-      }
-      else if (!this._isSelected() && this.idleImage) {
-        image = this.idleImage;
+      } else if (!this._isSelected() && (this.idleImage || this.grayScaleIdleImage)) {
+        image = this.isGrayScaleEnabled ? this.grayScaleIdleImage : this.idleImage;
       }
       var dim = this._getNonTransformedDimensions();
       if (image) {
@@ -167,9 +177,7 @@
         ctx.restore();
       }
       // most fabric controls only draw when the object is active, but we want this one as well
-      if (this.canvas.getActiveObject() !== this) {
-        this._renderPlayControls(ctx);
-      }
+      this._renderPlayControls(ctx);
     },
 
     _renderPlayControls: function(ctx) {
@@ -190,6 +198,8 @@
     hoveredPauseControlImageSrc: hoveredPauseControlImageSrc,
     clickedPlayControlImageSrc: clickedPlayControlImageSrc,
     clickedPauseControlImageSrc: clickedPauseControlImageSrc,
+    grayScaleIdleImageSrc: grayScaleIdleImageSrc,
+    grayScalePlayControlImageSrc: grayScalePlayControlImageSrc,
     idleImage: document.createElement('img'),
     selectedImage: document.createElement('img'),
     pauseControlImage: document.createElement('img'),
@@ -197,7 +207,9 @@
     hoveredPlayControlImage: document.createElement('img'),
     hoveredPauseControlImage: document.createElement('img'),
     clickedPlayControlImage: document.createElement('img'),
-    clickedPauseControlImage: document.createElement('img')
+    clickedPauseControlImage: document.createElement('img'),
+    grayScaleIdleImage: document.createElement('img'),
+    grayScalePlayControlImage: document.createElement('img')
   });
 
   /**

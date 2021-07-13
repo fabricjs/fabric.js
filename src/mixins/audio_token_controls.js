@@ -7,8 +7,8 @@
   var deleteIconY = -0.5;
   var deleteIconOffsetX = -25;
   var deleteIconOffsetY = 50;
-  var deleteimg = document.createElement('img');
-  deleteimg.src = deleteIconSrc;
+  var deleteImg = document.createElement('img');
+  deleteImg.src = deleteIconSrc;
 
   var playIconX = -0.5;
   var playIconY = -0.5;
@@ -59,7 +59,7 @@
 
         ctx.save();
         ctx.translate(left, top);
-        ctx.drawImage(deleteimg, -size / 2, -size / 2, size, size);
+        ctx.drawImage(deleteImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
     });
@@ -101,26 +101,30 @@
       render: function (ctx, left, top, styleOverride, fabricObject) {
         // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
-        var size = this.cornerSize * scale;
+        var size = fabricObject === fabricObject.canvas.getActiveObject()
+          ? this.cornerSize * scale
+          : this.cornerSize;
         var controlImg;
 
         // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject === fabricObject.canvas.getIndicatedObject()) {
           if (fabricObject.controls.playControl.heldDown) {
-            controlImg = fabricObject.isPlaying ?
-              fabricObject.clickedPauseControlImage
+            controlImg = fabricObject.isPlaying
+              ? fabricObject.clickedPauseControlImage
               : fabricObject.clickedPlayControlImage;
+          } else {
+            controlImg = fabricObject.isPlaying
+              ? fabricObject.hoveredPauseControlImage
+              : fabricObject.hoveredPlayControlImage;
           }
-          else {
-            controlImg = fabricObject.isPlaying ?
-              fabricObject.hoveredPauseControlImage :
-              fabricObject.hoveredPlayControlImage;
-          }
-        }
-        else {
-          controlImg = fabricObject.isPlaying ?
-            fabricObject.pauseControlImage :
-            fabricObject.playControlImage;
+        } else if (fabricObject.isGrayScaleEnabled) {
+          controlImg = !fabricObject.isPlaying
+            ? fabricObject.grayScalePlayControlImage
+            : null;
+        } else {
+          controlImg = fabricObject.isPlaying
+            ? fabricObject.pauseControlImage
+            : fabricObject.playControlImage;
         }
 
         this.y = playIconY;

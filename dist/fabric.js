@@ -30538,6 +30538,8 @@ var hoveredPlayControlImageSrc = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0i
 var hoveredPauseControlImageSrc = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNThweCIgaGVpZ2h0PSI2MnB4IiB2aWV3Qm94PSIwIDAgNTggNjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+YnV0dG9uL3BhdXNlLWhvdmVyPC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxjaXJjbGUgaWQ9InBhdGgtMSIgY3g9IjI5IiBjeT0iMjkiIHI9IjI5Ij48L2NpcmNsZT4KICAgICAgICA8ZmlsdGVyIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0iYXV0byIgaWQ9ImZpbHRlci0yIj4KICAgICAgICAgICAgPGZlQ29sb3JNYXRyaXggaW49IlNvdXJjZUdyYXBoaWMiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAuOTA1ODgyIDAgMCAwIDAgMC4xMTM3MjUgMCAwIDAgMCAwLjE5NjA3OCAwIDAgMCAxLjAwMDAwMCAwIj48L2ZlQ29sb3JNYXRyaXg+CiAgICAgICAgPC9maWx0ZXI+CiAgICA8L2RlZnM+CiAgICA8ZyBpZD0iYXVkaW8tJmFtcDstaW1hZ2UiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJiaXRzIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDI3LjAwMDAwMCwgLTMyMy4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9InBhdXNlLXN0YXRlcyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDI3LjAwMDAwMCwgMjQzLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9InBhdXNlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgODAuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbCIgZmlsbD0iI0ZGQUZCRSIgY3g9IjI5IiBjeT0iMzMiIHI9IjI5Ij48L2NpcmNsZT4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iT3ZhbCI+CiAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgZmlsbD0iI0ZGRENFNSIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgZmlsbC1vcGFjaXR5PSIwLjUiIGZpbGw9IiNGRkZGRkYiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iaWNvbi9wYXVzZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4wMDAwMDAsIDUuMDAwMDAwKSIgZmlsdGVyPSJ1cmwoI2ZpbHRlci0yKSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHJlY3QgaWQ9ImFydGJvYXJkIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNi41LDEwIEMxOC40MzI5OTY2LDEwIDIwLDExLjU2NzAwMzQgMjAsMTMuNSBMMjAsMzQuNSBDMjAsMzYuNDMyOTk2NiAxOC40MzI5OTY2LDM4IDE2LjUsMzggQzE0LjU2NzAwMzQsMzggMTMsMzYuNDMyOTk2NiAxMywzNC41IEwxMywxMy41IEMxMywxMS41NjcwMDM0IDE0LjU2NzAwMzQsMTAgMTYuNSwxMCBaIE0zMS41LDEwIEMzMy40MzI5OTY2LDEwIDM1LDExLjU2NzAwMzQgMzUsMTMuNSBMMzUsMzQuNSBDMzUsMzYuNDMyOTk2NiAzMy40MzI5OTY2LDM4IDMxLjUsMzggQzI5LjU2NzAwMzQsMzggMjgsMzYuNDMyOTk2NiAyOCwzNC41IEwyOCwxMy41IEMyOCwxMS41NjcwMDM0IDI5LjU2NzAwMzQsMTAgMzEuNSwxMCBaIiBpZD0iQ29tYmluZWQtU2hhcGUiIGZpbGw9IiNFNzFEMzIiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+';
 var clickedPlayControlImageSrc = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNThweCIgaGVpZ2h0PSI1OHB4IiB2aWV3Qm94PSIwIDAgNTggNTgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+YnV0dG9uL3BsYXktY2xpY2s8L3RpdGxlPgogICAgPGcgaWQ9ImF1ZGlvLSZhbXA7LWltYWdlIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iYml0cyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTMyOS4wMDAwMDAsIC00MDcuMDAwMDAwKSI+CiAgICAgICAgICAgIDxnIGlkPSJwbGF5LXN0YXRlcyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzI5LjAwMDAwMCwgMjQzLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMTYwLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJwbGF5IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgNC4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbCIgZmlsbD0iIzhFMDMxMSIgY3g9IjI5IiBjeT0iMjkiIHI9IjI5Ij48L2NpcmNsZT4KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb24vcGxheSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4wMDAwMDAsIDUuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iYXJ0Ym9hcmQiIHg9IjAiIHk9IjAiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTM5LjM4NTA1MTIsMjIuNzg3MDg1MiBDNDAuMTY0NDYxNSwyMy41NjUzNjg3IDQwLjIwODQ1NTksMjQuODE0MTU3MSAzOS40ODU3NDcyLDI1LjY0NTM1OTcgTDM5LjQ4NTczNzksMjUuNjQ1MzUxNiBDMzYuNTI4MTI2OCwyOS4wNDY5NjM0IDMzLjMyNDMxMjksMzEuODkxNjI2MyAyOS44NzQyOTYyLDM0LjE3OTM0MDQgQzI2LjUwNzE2MjgsMzYuNDEyMDk0MyAyMi40MDkzNzM4LDM4LjQ0MzMzIDE3LjU4MDkyOTEsNDAuMjczMDQ3NyBDMTcuNDEyMzY3OCw0MC4zMzY5MjMyIDE3LjIzNjI3MDQsNDAuMzc4Nzg2MiAxNy4wNTY5OTY4LDQwLjM5NzYwMDEgQzE1LjkwNTgwNDEsNDAuNTE4NDEyNyAxNC44NzQ2NDAxLDM5LjY4MzEyNDQgMTQuNzUzODIzOCwzOC41MzE5MzIgQzE0LjI1MTI3NDYsMzMuNzQzMjYzNiAxNCwyOC45NTQ1OTUyIDE0LDI0LjE2NTkyNjggQzE0LDE5LjQwMzU2MzMgMTQuMjQ4NTIxNiwxNC42NDExOTk3IDE0Ljc0NTU2NDgsOS44Nzg4MzYxOCBDMTQuNzY2ODQyNiw5LjY3NDk2NTY3IDE0LjgxNzkxMjgsOS40NzUzMTkyOCAxNC44OTcxNDQyLDkuMjg2MjczNDggQzE1LjM0NDU2MjcsOC4yMTg3MzQ4OCAxNi41NzI2NzgyLDcuNzE2MDI4MjUgMTcuNjQwMjE2OCw4LjE2MzQ0NjggTDE3LjY0MDIyMzgsOC4xNjM0MzAwNyBDMjEuNTI0NzI5OSw5Ljc5MTQ3NDM0IDI1LjI0OTk5MTksMTEuNzg3ODEzOCAyOC44MTYwMDk3LDE0LjE1MjQ0ODUgQzMyLjYzMDAxODgsMTYuNjgxNTI2NyAzNi4xNTMwMzI2LDE5LjU1OTczOSAzOS4zODUwNTEyLDIyLjc4NzA4NTIgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlLUNvcHktMiIgZmlsbD0iI0ZGRkZGRiIgZmlsbC1ydWxlPSJub256ZXJvIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==';
 var clickedPauseControlImageSrc = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNThweCIgaGVpZ2h0PSI1OHB4IiB2aWV3Qm94PSIwIDAgNTggNTgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+YnV0dG9uL3BhdXNlLWNsaWNrPC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxmaWx0ZXIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJhdXRvIiBpZD0iZmlsdGVyLTEiPgogICAgICAgICAgICA8ZmVDb2xvck1hdHJpeCBpbj0iU291cmNlR3JhcGhpYyIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMC45MDU4ODIgMCAwIDAgMCAwLjExMzcyNSAwIDAgMCAwIDAuMTk2MDc4IDAgMCAwIDEuMDAwMDAwIDAiPjwvZmVDb2xvck1hdHJpeD4KICAgICAgICA8L2ZpbHRlcj4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSJhdWRpby0mYW1wOy1pbWFnZSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImJpdHMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00MjcuMDAwMDAwLCAtNDA3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0icGF1c2Utc3RhdGVzIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MjcuMDAwMDAwLCAyNDMuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAxNjAuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9InBhdXNlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgNC4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbCIgZmlsbD0iI0ZGQUZCRSIgY3g9IjI5IiBjeT0iMjkiIHI9IjI5Ij48L2NpcmNsZT4KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb24vcGF1c2UiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUuMDAwMDAwLCA1LjAwMDAwMCkiIGZpbHRlcj0idXJsKCNmaWx0ZXItMSkiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGc+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHJlY3QgaWQ9ImFydGJvYXJkIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTYuNSwxMCBDMTguNDMyOTk2NiwxMCAyMCwxMS41NjcwMDM0IDIwLDEzLjUgTDIwLDM0LjUgQzIwLDM2LjQzMjk5NjYgMTguNDMyOTk2NiwzOCAxNi41LDM4IEMxNC41NjcwMDM0LDM4IDEzLDM2LjQzMjk5NjYgMTMsMzQuNSBMMTMsMTMuNSBDMTMsMTEuNTY3MDAzNCAxNC41NjcwMDM0LDEwIDE2LjUsMTAgWiBNMzEuNSwxMCBDMzMuNDMyOTk2NiwxMCAzNSwxMS41NjcwMDM0IDM1LDEzLjUgTDM1LDM0LjUgQzM1LDM2LjQzMjk5NjYgMzMuNDMyOTk2NiwzOCAzMS41LDM4IEMyOS41NjcwMDM0LDM4IDI4LDM2LjQzMjk5NjYgMjgsMzQuNSBMMjgsMTMuNSBDMjgsMTEuNTY3MDAzNCAyOS41NjcwMDM0LDEwIDMxLjUsMTAgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlIiBmaWxsPSIjRTcxRDMyIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==';
+var grayScaleIdleImageSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAABkCAYAAABU19jRAAAFk0lEQVR4Xu2dP1LcMBTGJXoKQgW2ZxgKLkAKOhpyhFBSwhGSIyRHgJKSPUJo6CjIBSgYZuyFilDQo4w2bMZr764l60l6K3/b7Myu/PTe+36jf7ZkKVbsMx6Pj4QQR0qpXf0thNhYsRBehRDXUsoH/Z1l2fUq+S85O1uW5Z2Ucp+zj9S+KaV+F0XxmdoulT1WwDw9PV29v79/pQouBTtra2uj7e3tYy6xRAdmPB7/UEp945IQzn5IKX9mWfY9po/RgKmqSsUMfNXrzvM8inbBKwUotKiGBicYMACFFpSmtVDgeAdmiDMdv2gsth5ihuUNGL1eopT6FSt5Q65XSvnF1/qOF2CqqvqzggtqqTH2muf5J+qgyIHBWIVaIjd71GMbMmDKsjyVUp67hYerfWRAKXVWFMUFhW0SYKqquhJCYIWWQhF/NkZ5njuvGDsDg1mQP4WpLVPMopyAweCWWtIg9pwGw72BASxBxPVVSW9oegGDbsiXjuHs9u2erIHBADecqAFqsh4IWwGDqXMACQNXYTvltgIGi3KB1QxUnc3injEwgCWQepGqMYXGCBjMiCKpGLZao5lTJzC46xxWtZi1mdzl7gQGXVFMCcPX3dU1LQUG6y3hBYtdY9f6zFJg0LrEli9O/ctamYXAAJY4YnGpdRE0AIaLQsz8sAIGrQsz9SK5Mw+auS0MgImkELNqjYABLMxUi+xOE5pWCwNgIivErPqlwGBjPDO1GLjTPABgpoVB68JAIYYu1FsZAMNQIG4uzQUGh/lwk4mPP/VDjf63MOiO+AjE0ZNpKwNgOKrD0CcAw1CUpkuXl5ctL/f29sTBwcHk99vbW3F/f98qc3JyQh7dDDB4jIE8vyQGOQEzfexh0iVh/EKiL7kRTsDo4HQrA2DIZaYzCGDocjkISwBmEDLTBfn4+Ngytr6+LjY3Nye/v7y8iLe3t1aZnZ0dOidqliZdEnYFeMltkkb1rgINDE7iTlJe+qD0jUiJzfX0iU3Y4kgDgxMvmSp8c3PT8mxra0voxTv90Yt2z8/PrTKHh4e+InrVwODMf1/pdbTLbZakwwEwjqL6vBzA+MxugrYBTIKi+gyJKzAY9PpU3cE210EvDmV2EHVgl46wcDcwxV3CnSzc4daASwqHde3k1oAOGWsxPIVnefMRwPCERXvFbZaEB6j4sjLxDMAwF4ibe2yBwUPg3FD55w8nYGYeAsc4BsB0ZQD7kroyhP9nMgBgAIRVBlrAYDO+Vf4GVXjuZnyMYwbFgFWwOB/GKl0ovBAY7CAAHM0MLD2yDN0SgGlmAKdoggmrDHQCg1bGKp9JFzY62BnAJM2AVXDGwAAaq7wmWdjq5RQAJkkGrIKyBgbQWOU3qcK9XrClM4DHHpLiwCgYp1f4oZUxynFShZxeEqozgV0FSfGwNBiS1xB/tDLYHZk+NzQvOp/mCVtR0iamqyuaRt/5ovN6mgBNmtCYwqKjtwKmLMtTKeV5mmkbZlRKqbOiKC5Mo7cC5mM8g837ptnlX26U5/mxjZvWwGB9xia9fMt2rbcs8rwXMJg58QXB0DOjGdE8W72BATSG0vAr1hsW60HvvNhx+4AfEYs86tsN1e05tTC1NRoMhPlzYz3AJe+S6gYx5eZLjO3UeVkkJC0MFvf4wmKzKGcSBTkwGAybpD1IGafBLfm0uitk3OXuypC//03uOvet3UsL0xjb3Ekp9/s6iOvMM0AxC+qqzTswtZkUXoLRpYbD/9RjleBd0qIKccfbgYo5l4YCZVp1sBamGSvAcQMnNCjRgZk6gAMAzMFpbow3v5KuZLQWZl4IONSonZX6YT50sve3xAqYZhhDvE8VYqbTHxfLJ+5cKqK6Vq/vCCGOlFK7+lsIsUFlO5CdVyHEtZTyQX9nWXYdqF6Sav4ChFLJY8IozyoAAAAASUVORK5CYII=';
+var grayScalePlayControlImageSrc = 'data:image/png;base64,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';
 
 var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
 
@@ -30612,6 +30614,13 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     canBeActiveAndIndicated: true,
 
     /**
+     * Special rendering (like grayscale filter) for not active objects
+     * @type boolean
+     * @default false
+     */
+    isGrayScaleEnabled: false,
+
+    /**
      * extra space taken up on the left by delete controls (used for collision detection)
      * @type Number
      * @default
@@ -30663,6 +30672,8 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       this.hoveredPauseControlImage.src = fabric.Audio_token.prototype.hoveredPauseControlImageSrc;
       this.clickedPlayControlImage.src = fabric.Audio_token.prototype.clickedPlayControlImageSrc;
       this.clickedPauseControlImage.src = fabric.Audio_token.prototype.clickedPauseControlImageSrc;
+      this.grayScaleIdleImage.src = fabric.Audio_token.prototype.grayScaleIdleImageSrc;
+      this.grayScalePlayControlImage.src = fabric.Audio_token.prototype.grayScalePlayControlImageSrc;
     },
 
     /**
@@ -30681,7 +30692,9 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         'hoveredPlayControlImageSrc',
         'hoveredPauseControlImageSrc',
         'clickedPlayControlImageSrc',
-        'clickedPauseControlImageSrc'].concat(propertiesToInclude));
+        'clickedPauseControlImageSrc',
+        'grayScaleIdleImageSrc',
+        'grayScalePlayControlImageSrc'].concat(propertiesToInclude));
     },
 
     /**
@@ -30700,9 +30713,8 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       var image = null;
       if (this._isSelected() && this.selectedImage) {
         image = this.selectedImage;
-      }
-      else if (!this._isSelected() && this.idleImage) {
-        image = this.idleImage;
+      } else if (!this._isSelected() && (this.idleImage || this.grayScaleIdleImage)) {
+        image = this.isGrayScaleEnabled ? this.grayScaleIdleImage : this.idleImage;
       }
       var dim = this._getNonTransformedDimensions();
       if (image) {
@@ -30711,9 +30723,7 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         ctx.restore();
       }
       // most fabric controls only draw when the object is active, but we want this one as well
-      if (this.canvas.getActiveObject() !== this) {
-        this._renderPlayControls(ctx);
-      }
+      this._renderPlayControls(ctx);
     },
 
     _renderPlayControls: function(ctx) {
@@ -30734,6 +30744,8 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     hoveredPauseControlImageSrc: hoveredPauseControlImageSrc,
     clickedPlayControlImageSrc: clickedPlayControlImageSrc,
     clickedPauseControlImageSrc: clickedPauseControlImageSrc,
+    grayScaleIdleImageSrc: grayScaleIdleImageSrc,
+    grayScalePlayControlImageSrc: grayScalePlayControlImageSrc,
     idleImage: document.createElement('img'),
     selectedImage: document.createElement('img'),
     pauseControlImage: document.createElement('img'),
@@ -30741,7 +30753,9 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     hoveredPlayControlImage: document.createElement('img'),
     hoveredPauseControlImage: document.createElement('img'),
     clickedPlayControlImage: document.createElement('img'),
-    clickedPauseControlImage: document.createElement('img')
+    clickedPauseControlImage: document.createElement('img'),
+    grayScaleIdleImage: document.createElement('img'),
+    grayScalePlayControlImage: document.createElement('img')
   });
 
   /**
@@ -30837,8 +30851,8 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
   var deleteIconY = -0.5;
   var deleteIconOffsetX = -25;
   var deleteIconOffsetY = 50;
-  var deleteimg = document.createElement('img');
-  deleteimg.src = deleteIconSrc;
+  var deleteImg = document.createElement('img');
+  deleteImg.src = deleteIconSrc;
 
   var playIconX = -0.5;
   var playIconY = -0.5;
@@ -30889,7 +30903,7 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
 
         ctx.save();
         ctx.translate(left, top);
-        ctx.drawImage(deleteimg, -size / 2, -size / 2, size, size);
+        ctx.drawImage(deleteImg, -size / 2, -size / 2, size, size);
         ctx.restore();
       },
     });
@@ -30931,26 +30945,30 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       render: function (ctx, left, top, styleOverride, fabricObject) {
         // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
-        var size = this.cornerSize * scale;
+        var size = fabricObject === fabricObject.canvas.getActiveObject()
+          ? this.cornerSize * scale
+          : this.cornerSize;
         var controlImg;
 
         // draw either the default icons or the ones defined by parent (audio_token)
         if (fabricObject === fabricObject.canvas.getIndicatedObject()) {
           if (fabricObject.controls.playControl.heldDown) {
-            controlImg = fabricObject.isPlaying ?
-              fabricObject.clickedPauseControlImage
+            controlImg = fabricObject.isPlaying
+              ? fabricObject.clickedPauseControlImage
               : fabricObject.clickedPlayControlImage;
+          } else {
+            controlImg = fabricObject.isPlaying
+              ? fabricObject.hoveredPauseControlImage
+              : fabricObject.hoveredPlayControlImage;
           }
-          else {
-            controlImg = fabricObject.isPlaying ?
-              fabricObject.hoveredPauseControlImage :
-              fabricObject.hoveredPlayControlImage;
-          }
-        }
-        else {
-          controlImg = fabricObject.isPlaying ?
-            fabricObject.pauseControlImage :
-            fabricObject.playControlImage;
+        } else if (fabricObject.isGrayScaleEnabled) {
+          controlImg = !fabricObject.isPlaying
+            ? fabricObject.grayScalePlayControlImage
+            : null;
+        } else {
+          controlImg = fabricObject.isPlaying
+            ? fabricObject.pauseControlImage
+            : fabricObject.playControlImage;
         }
 
         this.y = playIconY;
