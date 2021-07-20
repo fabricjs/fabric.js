@@ -1165,7 +1165,9 @@
       if (object.onSelect({ e: e })) {
         return false;
       }
-      this.clearIndicatedObject();
+      if (!object.canBeActiveAndIndicated) {
+        this.clearIndicatedObject();
+      }
       this._activeObject = object;
       return true;
     },
@@ -1205,6 +1207,14 @@
     },
 
     /**
+     * Returns currently indicated object
+     * @return {fabric.Object} indicated object
+     */
+    getIndicatedObject: function () {
+      return this._indicatedObject;
+    },
+
+    /**
      * @private
      * @param {Object} object to set as indicated for highlighting
      * @return {Boolean} true if the selection happened
@@ -1213,14 +1223,15 @@
       if (this._indicatedObject === object) {
         return false;
       }
-
+      if (object.isMoving) {
+        return false;
+      }
       // active objects have special rendering that should replace indicated objects
-      if (this._activeObject === object) {
+      if (this._activeObject === object && !object.canBeActiveAndIndicated) {
         // if active object is the new indicated object we ant to be sure to clear the old one
         this.clearIndicatedObject();
         return false;
       }
-
       this._indicatedObject = object;
       this.requestRenderAll();
       return true;
