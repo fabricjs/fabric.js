@@ -2148,8 +2148,8 @@ fabric.CommonMethods = {
   // with 100 segemnts. This will good enough to calculate the length of the curve
   function pathIterator(iterator, x1, y1) {
     var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
-    for (perc = 0.01; perc <= 1; perc += 0.01) {
-      p = iterator(perc);
+    for (perc = 1; perc <= 100; perc += 1) {
+      p = iterator(perc / 100);
       tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
       tempP = p;
     }
