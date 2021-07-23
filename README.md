@@ -24,7 +24,7 @@
 [![Bountysource](https://api.bountysource.com/badge/tracker?tracker_id=23217)](https://www.bountysource.com/trackers/23217-fabric-js?utm_source=23217&utm_medium=shield&utm_campaign=TRACKER_BADGE)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=kangax&url=http://github.com/kangax/fabric.js&title=Fabric.js&language=&tags=github&category=software)
 
-**Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
+**Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also a **SVG-to-canvas parser**.
 
 <a href="http://fabricjs.com/kitchensink" target="_blank"><img src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:300px;box-shadow:rgba(0,0,0,0.3) 0 0 5px"></a>
 
@@ -32,7 +32,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Non-Technical Introduction to Fabric
 
-Fabric.js allows you to easily create simple shapes like rectangles, circles, triangles and other polygons or more complex shapes made up of many paths, onto the HTML `<canvas>` element on a webpage using JavaScript.  Fabric.js will then allow you to manipulate the size, position and rotation of these objects with a mouse.  It’s also possible to change some of the attributes of these objects such as their color, transparency, depth position on the webpage or selecting groups of these objects using the Fabric.js library. Fabric.js will also allow you to convert an SVG image into JavaScript data that can be used for putting it onto the `<canvas>` element.
+Fabric.js allows you to easily create simple shapes like rectangles, circles, triangles and other polygons or more complex shapes made up of many paths, onto the HTML `<canvas>` element on a webpage using JavaScript.  Fabric.js will then allow you to manipulate the size, position and rotation of these objects with a mouse.  It’s also possible to change some of the attributes of these objects such as their color, transparency, depth position on the webpage or selecting groups of these objects using the Fabric.js library. Fabric.js will also allow you to convert a SVG image into JavaScript data that can be used for putting it onto the `<canvas>` element.
 
 
 [Contributions](https://github.com/kangax/fabric.js/wiki/Love-Fabric%3F-Help-us-by...) are very much welcome!
@@ -62,7 +62,7 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 
 ### History
 
-Fabric.js started as a foundation for design editor on [printio.ru](http://printio.ru) — interactive online store with ability to create your own designs. The idea was to create [Javascript-based editor](http://printio.ru/ringer_man_tees/new), which would make it easy to manipulate vector shapes and images on T-Shirts. Since performance was one of the most critical requirements, we chose canvas over SVG. While SVG is excellent with static shapes, it's not as performant as canvas when it comes to dynamic manipulation of objects (movement, scaling, rotation, etc.). Fabric.js was heavily inspired by [Ernest Delgado's canvas experiment](http://www.ernestdelgado.com/public-tests/canvasphoto/demo/canvas.html). In fact, code from Ernest's experiment was the foundation of an entire framework. Later, Fabric.js grew into a collection of distinct object types and got an SVG-to-canvas parser.
+Fabric.js started as a foundation for design editor on [printio.ru](http://printio.ru) — interactive online store with ability to create your own designs. The idea was to create [Javascript-based editor](http://printio.ru/ringer_man_tees/new), which would make it easy to manipulate vector shapes and images on T-Shirts. Since performance was one of the most critical requirements, we chose canvas over SVG. While SVG is excellent with static shapes, it's not as performant as canvas when it comes to dynamic manipulation of objects (movement, scaling, rotation, etc.). Fabric.js was heavily inspired by [Ernest Delgado's canvas experiment](http://www.ernestdelgado.com/public-tests/canvasphoto/demo/canvas.html). In fact, code from Ernest's experiment was the foundation of an entire framework. Later, Fabric.js grew into a collection of distinct object types and got a SVG-to-canvas parser.
 
 ### Installation Instructions
 
