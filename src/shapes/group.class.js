@@ -164,7 +164,7 @@
           // if this group is inside another group, we need to pre transform the object
           fabric.util.removeTransformFromObject(object, this.group.calcTransformMatrix());
         }
-        this._objects.push(object);
+        this.add(object);
         object.group = this;
         object._set('canvas', this.canvas);
       }
@@ -205,12 +205,16 @@
       this.dirty = true;
       object.group = this;
       object._set('canvas', this.canvas);
+      this.fire('object:added', { target: object });
+      object.fire('added', { target: this });
     },
 
     /**
      * @private
      */
-    _onObjectRemoved: function(object) {
+    _onObjectRemoved: function (object) {
+      this.fire('object:removed', { target: object });
+      object.fire('removed', { target: this });
       this.dirty = true;
       delete object.group;
     },
