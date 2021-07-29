@@ -123,6 +123,9 @@
   var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
+  /**
+   * @fires erasing:end
+   */
   fabric.util.object.extend(fabric.Object.prototype, {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
@@ -355,6 +358,10 @@
   });
 
   var __onResize = fabric.Canvas.prototype._onResize;
+  /**
+   * @fires erasing:start
+   * @fires erasing:end
+   */
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
      * Used by {@link #renderAll}
@@ -857,6 +864,9 @@
             clipPath: clipObject,
             dirty: true
           });
+          obj.fire('erasing:end', {
+            path: path
+          });
         });
       },
 
@@ -928,6 +938,8 @@
           }
         });
 
+        // `targets` are the direct `_objects` of canvas
+        // use object's `erasing:end` event if you need to monitor nested objects
         canvas.fire('erasing:end', { path: path, targets: targets, drawables: drawables });
 
         canvas.requestRenderAll();
