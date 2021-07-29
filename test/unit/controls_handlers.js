@@ -191,5 +191,23 @@
       assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
       assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
     });
+    QUnit.test('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', function(assert) {
+      transform.target.canvas.on('object:scaling', function() {
+        assert.ok(false);
+      });
+      var eventData = {some: 'data'}, x = 15, y = 25;
+      var actionHandler = function (eventDataIn, transformIn, xIn, yIn) {
+        assert.equal(eventDataIn, eventData);
+        assert.equal(transformIn, transform);
+        assert.equal(xIn, x);
+        assert.equal(yIn, y);
+        return false;
+      };
+      var wrapped = fabric.controlsUtils.wrapWithFireEvent(
+        'scaling',
+        fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)
+      );
+      wrapped(eventData, transform, x, y);
+    });
   });
 })();

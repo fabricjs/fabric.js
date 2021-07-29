@@ -1,6 +1,7 @@
 (function() {
 
   var collection = fabric.Collection;
+  var collection2 = fabric.util.object.clone(collection);
 
   QUnit.module('fabric.Collection', {
     beforeEach: function() {
@@ -9,6 +10,7 @@
       delete collection.renderOnAddRemove;
       delete collection._onObjectAdded;
       delete collection._onObjectRemoved;
+      collection2._objects = [];
     }
   });
 
@@ -173,7 +175,16 @@
     assert.equal(returned, false, 'collection is empty so does not contains obj');
     collection.add(obj);
     returned = collection.contains(obj);
-    assert.equal(returned, true, 'collection contais obj');
+    assert.equal(returned, true, 'collection contains obj');
+    var obj2 = { type: 'b' };
+    collection2.add(obj2);
+    collection.add(collection2);
+    returned = collection.contains(obj2);
+    assert.equal(returned, false, 'collection deeply contains obj, this check is shallow');
+    returned = collection.contains(obj2, false);
+    assert.equal(returned, false, 'collection deeply contains obj, this check is shallow');
+    returned = collection.contains(obj2, true);
+    assert.equal(returned, true, 'collection deeply contains obj');
   });
 
   QUnit.test('complexity', function(assert) {
