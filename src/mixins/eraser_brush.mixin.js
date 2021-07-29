@@ -867,6 +867,9 @@
           obj.fire('erasing:end', {
             path: path
           });
+          if (obj.group && Array.isArray(_this.__subTargets)) {
+            _this.__subTargets.push(obj);
+          }
         });
       },
 
@@ -930,6 +933,7 @@
         // finalize erasing
         var drawables = this.applyEraserToCanvas(path);
         var _this = this;
+        this.__subTargets = [];
         var targets = [];
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path, true)) {
@@ -937,10 +941,13 @@
             targets.push(obj);
           }
         });
-
-        // `targets` are the direct `_objects` of canvas
-        // use object's `erasing:end` event if you need to monitor nested objects
-        canvas.fire('erasing:end', { path: path, targets: targets, drawables: drawables });
+        canvas.fire('erasing:end', {
+          path: path,
+          targets: targets,
+          subTargets: this.__subTargets,
+          drawables: drawables
+        });
+        delete this.__subTargets;
 
         canvas.requestRenderAll();
         path.setCoords();
