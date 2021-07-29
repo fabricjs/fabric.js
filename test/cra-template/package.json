@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "node build",
+    "postinstall": "npm run build",
     "prepublish": "npm run build",
     "start": "node sandbox build",
     "dev": "node sandbox dev"
