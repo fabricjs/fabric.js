@@ -218,7 +218,7 @@
      * @type {String} 'left|right'
      * @default
      */
-     side:               'left',
+    side:               'left',
 
     /**
      * @private
@@ -758,7 +758,7 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.side === "right";
+          reverse = this.side === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
@@ -797,8 +797,8 @@
       }
       if (path) {
         for (i = reverse ? line.length - 1 : 0;
-            reverse ? i >= 0 : i < line.length;
-            reverse ? i-- : i++) {
+          reverse ? i >= 0 : i < line.length;
+          reverse ? i-- : i++) {
           graphemeInfo = lineBounds[i];
           if (positionInPath > totalPathLength) {
             positionInPath %= totalPathLength;
@@ -833,10 +833,10 @@
       graphemeInfo.renderTop = info.y - startingPoint.y;
       graphemeInfo.angle = info.angle;
       switch (this.side) {
-        case "left":
+        case 'left':
           graphemeInfo.angle = info.angle;
           break;
-        case "right":
+        case 'right':
           graphemeInfo.angle = info.angle + Math.PI;
           break;
       }
