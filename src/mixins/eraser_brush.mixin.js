@@ -360,7 +360,7 @@
   var __onResize = fabric.Canvas.prototype._onResize;
   /**
    * @fires erasing:start
-   * @fires erasing:end
+   * @fires erasing:end use object's `erasing:end` event if you need to monitor nested objects
    */
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
