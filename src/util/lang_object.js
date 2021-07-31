@@ -56,11 +56,12 @@
    * Creates an empty object and copies all enumerable properties of another object to it
    * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
    * @memberOf fabric.util.object
-   * TODO: this function return an empty object if you try to clone null
    * @param {Object} object Object to clone
    * @param {Boolean} deep Whether to clone nested objects
    * @return {Object}
    */
+
+  //TODO: this function return an empty object if you try to clone null
   function clone(object, deep) {
     return extend({ }, object, deep);
   }
