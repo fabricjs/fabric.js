@@ -70,9 +70,6 @@
           fabric.util.parsePath(path)
         );
 
-      if (!this.path) {
-        return;
-      }
       fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
     },
 
