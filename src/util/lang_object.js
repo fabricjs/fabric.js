@@ -8,7 +8,7 @@
    * @memberOf fabric.util.object
    * @param {Object} destination Where to copy to
    * @param {Object} source Where to copy from
-   * @param {Boolean} deep Whether to extend nested objects
+   * @param {Boolean} [deep] Whether to extend nested objects
    * @return {Object}
    */
 
@@ -57,7 +57,7 @@
    * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
    * @memberOf fabric.util.object
    * @param {Object} object Object to clone
-   * @param {Boolean} deep Whether to clone nested objects
+   * @param {Boolean} [deep] Whether to clone nested objects
    * @return {Object}
    */
 
