@@ -123,6 +123,9 @@
   var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
+  /**
+   * @fires erasing:end
+   */
   fabric.util.object.extend(fabric.Object.prototype, {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
@@ -355,6 +358,10 @@
   });
 
   var __onResize = fabric.Canvas.prototype._onResize;
+  /**
+   * @fires erasing:start
+   * @fires erasing:end
+   */
   fabric.util.object.extend(fabric.Canvas.prototype, {
     /**
      * Used by {@link #renderAll}
@@ -857,6 +864,12 @@
             clipPath: clipObject,
             dirty: true
           });
+          obj.fire('erasing:end', {
+            path: path
+          });
+          if (obj.group && Array.isArray(_this.__subTargets)) {
+            _this.__subTargets.push(obj);
+          }
         });
       },
 
@@ -920,6 +933,7 @@
         // finalize erasing
         var drawables = this.applyEraserToCanvas(path);
         var _this = this;
+        this.__subTargets = [];
         var targets = [];
         canvas.forEachObject(function (obj) {
           if (obj.erasable && obj.intersectsWithObject(path, true)) {
@@ -927,8 +941,13 @@
             targets.push(obj);
           }
         });
-
-        canvas.fire('erasing:end', { path: path, targets: targets, drawables: drawables });
+        canvas.fire('erasing:end', {
+          path: path,
+          targets: targets,
+          subTargets: this.__subTargets,
+          drawables: drawables
+        });
+        delete this.__subTargets;
 
         canvas.requestRenderAll();
         path.setCoords();
