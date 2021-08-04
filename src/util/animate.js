@@ -26,7 +26,7 @@
     var aborted = false;
     var abort = function () {
       aborted = true;
-    }
+    };
 
     requestAnimFrame(function(timestamp) {
       options || (options = { });
