@@ -436,6 +436,11 @@
       type: 'eraser',
 
       /**
+       * When set to `true` the brush will create a visual effect of undoing erasing
+       */
+      inverted: false,
+
+      /**
        * Indicates that the ctx is ready and rendering can begin.
        * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
        *
@@ -690,7 +695,7 @@
        */
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
-        ctx.globalCompositeOperation = 'destination-out';
+        ctx.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
       },
 
       /**
@@ -756,6 +761,12 @@
           return true;
         }
         return false;
+      },
+
+      createPath: function (pathData) {
+        var path = this.callSuper('createPath', pathData);
+        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        return path;
       },
 
       /**
@@ -850,7 +861,6 @@
         }
 
         path.clone(function (path) {
-          path.globalCompositeOperation = 'destination-out';
           // http://fabricjs.com/using-transformations
           var desiredTransform = fabric.util.multiplyTransformMatrices(
             fabric.util.invertTransform(
