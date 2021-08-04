@@ -22,6 +22,10 @@
    * @param {Function} [options.abort] Additional function with logic. If returns true, onComplete is called.
    */
   function animate(options) {
+    var aborted = false;
+    var abort = function () {
+      aborted = true;
+    }
 
     requestAnimFrame(function(timestamp) {
       options || (options = { });
@@ -47,7 +51,7 @@
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
             valuePerc = Math.abs((current - startValue) / byValue);
-        if (abort()) {
+        if (this.aborted || abort()) {
           onComplete(endValue, 1, 1);
           return;
         }
@@ -62,6 +66,8 @@
         }
       })(start);
     });
+
+    return abort;
   }
 
   var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
