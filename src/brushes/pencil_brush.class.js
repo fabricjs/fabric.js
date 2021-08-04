@@ -110,7 +110,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return true;
       }
-      this.drawStraightLine = options.e[this.straightLineKey];
+      this.drawStraightLine = false;
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
       return false;
