@@ -835,6 +835,7 @@
         if (!obj.getEraser()) {
           var size = obj._getNonTransformedDimensions();
           var rect = new fabric.Rect({
+            fill: 'rgb(0,0,0)',
             width: size.x,
             height: size.y,
             clipPath: obj.clipPath,
