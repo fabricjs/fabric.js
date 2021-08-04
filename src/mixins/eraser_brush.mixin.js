@@ -696,6 +696,7 @@
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
         ctx.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        this.inverted && (ctx.strokeStyle = 'rgba(255,255,255,0)');
       },
 
       /**
