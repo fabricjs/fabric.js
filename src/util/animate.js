@@ -20,6 +20,7 @@
    * @param {Function} [options.easing] Easing function
    * @param {Number} [options.duration=500] Duration of change (in ms)
    * @param {Function} [options.abort] Additional function with logic. If returns true, onComplete is called.
+   * @returns {Function} abort function
    */
   function animate(options) {
     var aborted = false;
