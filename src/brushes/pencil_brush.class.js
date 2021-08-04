@@ -17,15 +17,17 @@
      * Draws a straight line between last recorded point to current pointer
      * Used for `shift` functionality
      *
-     * @example <caption>Override `shift` functionality</caption>
-     * brush._detach();
-     * @example <caption>Restore `shift` functionality</caption>
-     * brush._attachKeyboardListeners();
-     *
      * @type boolean
      * @default false
      */
     drawStraightLine: false,
+
+    /**
+     * The event modifier key that makes the brush draw a straight line.
+     * If `null` or 'none' or any other string that is not a modifier key the feature is disabled.
+     * @type {'altKey' | 'shiftKey' | 'ctrlKey' | 'none' | undefined | null}
+     */
+    straightLineKey: 'shiftKey',
 
     /**
      * Constructor
@@ -35,37 +37,6 @@
     initialize: function(canvas) {
       this.canvas = canvas;
       this._points = [];
-      this._attachKeyboardListeners();
-    },
-
-    /**
-     * Listens to `shift` key press
-     * @private
-     * @returns disposer
-     */
-    _attachKeyboardListeners: function () {
-      var _this = this;
-      var setShift = function (opt) {
-        if (opt.e.shiftKey) {
-          opt.e.preventDefault();
-          _this.drawStraightLine = true;
-        }
-        else {
-          _this.drawStraightLine = false;
-        }
-      };
-      var revokeShift = function () {
-        _this.drawStraightLine = false;
-      };
-      this.canvas.on('mouse:down', setShift);
-      this.canvas.on('mouse:move', setShift);
-      this.canvas.on('mouse:up', revokeShift);
-      this._detach = function disposer() {
-        this.canvas.off('mouse:down', setShift);
-        this.canvas.off('mouse:move', setShift);
-        this.canvas.off('mouse:up', revokeShift);
-      };
-      return this._detach;
     },
 
     needsFullRender: function () {
@@ -90,6 +61,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      this.drawStraightLine = options.e[this.straightLineKey];
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
@@ -105,6 +77,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      this.drawStraightLine = options.e[this.straightLineKey];
       if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
         return;
       }
@@ -137,6 +110,7 @@
       if (!this.canvas._isMainEvent(options.e)) {
         return true;
       }
+      this.drawStraightLine = options.e[this.straightLineKey];
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
       return false;
