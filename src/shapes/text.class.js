@@ -210,7 +210,7 @@
      * @type Number
      * @default
      */
-    startOffset:               0,
+    pathStartOffset:               0,
 
     /**
      * Which side of the path the text should be drawn on.
@@ -218,7 +218,7 @@
      * @type {String} 'left|right'
      * @default
      */
-    side:               'left',
+     pathSide:               'left',
 
     /**
      * @private
@@ -758,7 +758,7 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.side === 'right';
+          reverse = this.pathSide === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
@@ -793,7 +793,7 @@
             break;
           //todo - add support for justify
         }
-        positionInPath += reverse ? -this.startOffset : this.startOffset;
+        positionInPath += this.pathStartOffset * reverse ? -1 : 1;
       }
       if (path) {
         for (i = reverse ? line.length - 1 : 0;
@@ -831,15 +831,7 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      graphemeInfo.angle = info.angle;
-      switch (this.side) {
-        case 'left':
-          graphemeInfo.angle = info.angle;
-          break;
-        case 'right':
-          graphemeInfo.angle = info.angle + Math.PI;
-          break;
-      }
+      graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
     },
 
     /**
