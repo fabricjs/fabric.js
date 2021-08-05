@@ -218,7 +218,7 @@
      * @type {String} 'left|right'
      * @default
      */
-     pathSide:               'left',
+    pathSide:               'left',
 
     /**
      * @private
