@@ -793,7 +793,7 @@
             break;
           //todo - add support for justify
         }
-        positionInPath += this.pathStartOffset * reverse ? -1 : 1;
+        positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
       }
       if (path) {
         for (i = reverse ? line.length - 1 : 0;
