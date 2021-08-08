@@ -210,7 +210,15 @@
      * @type Number
      * @default
      */
-    startOffset:               0,
+    pathStartOffset:               0,
+
+    /**
+     * Which side of the path the text should be drawn on.
+     * Only used when text has a path
+     * @type {String} 'left|right'
+     * @default
+     */
+    pathSide:               'left',
 
     /**
      * @private
@@ -749,7 +757,8 @@
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
-          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
+          positionInPath = 0, startingPoint, totalPathLength, path = this.path,
+          reverse = this.pathSide === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
@@ -773,18 +782,23 @@
         startingPoint.x += path.pathOffset.x;
         startingPoint.y += path.pathOffset.y;
         switch (this.textAlign) {
+          case 'left':
+            positionInPath = reverse ? (totalPathLength - width) : 0;
+            break;
           case 'center':
             positionInPath = (totalPathLength - width) / 2;
             break;
           case 'right':
-            positionInPath = (totalPathLength - width);
+            positionInPath = reverse ? 0 : (totalPathLength - width);
             break;
           //todo - add support for justify
         }
-        positionInPath += this.startOffset;
+        positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
       }
       if (path) {
-        for (i = 0; i < line.length; i++) {
+        for (i = reverse ? line.length - 1 : 0;
+          reverse ? i >= 0 : i < line.length;
+          reverse ? i-- : i++) {
           graphemeInfo = lineBounds[i];
           if (positionInPath > totalPathLength) {
             positionInPath %= totalPathLength;
@@ -817,7 +831,7 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      graphemeInfo.angle = info.angle;
+      graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
     },
 
     /**
