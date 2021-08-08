@@ -59,7 +59,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onChange = callbacks.onChange || empty,
         _this = this;
 
-    fabric.util.animate({
+    return fabric.util.animate({
       startValue: object.top,
       endValue: this.getCenter().top,
       duration: this.FX_DURATION,
@@ -73,8 +73,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onComplete();
       }
     });
-
-    return this;
   },
 
   /**
@@ -94,7 +92,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onChange = callbacks.onChange || empty,
         _this = this;
 
-    fabric.util.animate({
+    return fabric.util.animate({
       startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
@@ -108,8 +106,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onComplete();
       }
     });
-
-    return this;
   }
 });
 
@@ -133,7 +129,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * object.animate('left', { duration: ... });
    *
    */
-  animate: function() {
+  animate: function () {
+    var aborters = [];
     if (arguments[0] && typeof arguments[0] === 'object') {
       var propsToAnimate = [], prop, skipCallbacks;
       for (prop in arguments[0]) {
@@ -142,13 +139,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (var i = 0, len = propsToAnimate.length; i < len; i++) {
         prop = propsToAnimate[i];
         skipCallbacks = i !== len - 1;
-        this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+        aborters.push(this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks));
       }
     }
     else {
-      this._animate.apply(this, arguments);
+      aborters.push(this._animate.apply(this, arguments));
     }
-    return this;
+    return function () {
+      aborters.forEach(function (abort) {
+        abort();
+      });
+    };
   },
 
   /**
