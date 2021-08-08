@@ -173,6 +173,28 @@
     }, 100);
   });
 
+  QUnit.test('animate with imperative abort', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    var context;
+    var abort = object._animate('left', 223, {
+      abort: function () {
+        context = this;
+        return false;
+      }
+    });
+
+    assert.ok(typeof abort === 'function');
+    abort();
+
+    setTimeout(function () {
+      assert.equal(123, Math.round(object.get('left')));
+      assert.equal(context, undefined, 'declarative abort should not be called after imperative abort was called');
+      done();
+    }, 100);
+  });
+
   QUnit.test('animate easing easeInQuad', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.util.ease.easeInQuad === 'function');
