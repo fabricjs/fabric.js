@@ -227,10 +227,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     };
 
     if (propIsColor) {
-      fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
+      return fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
     }
     else {
-      fabric.util.animate(_options);
+      return fabric.util.animate(_options);
     }
   }
 });
