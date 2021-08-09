@@ -929,6 +929,8 @@
         }
 
         var path = this.createPath(pathData);
+        //  needed for `intersectsWithObject`
+        path.setCoords();
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
@@ -937,7 +939,7 @@
         this.__subTargets = [];
         var targets = [];
         canvas.forEachObject(function (obj) {
-          if (obj.erasable && obj.intersectsWithObject(path, true)) {
+          if (obj.erasable && obj.intersectsWithObject(path, true, true)) {
             _this._addPathToObjectEraser(obj, path);
             targets.push(obj);
           }
