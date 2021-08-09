@@ -541,8 +541,6 @@
         this.prepareCanvasForLayer('overlay');
         var canvas = this.canvas;
         var ctx = canvas.contextTop;
-        this._saveAndTransform(ctx);
-        ctx.globalCompositeOperation = 'source-over';
         canvas._renderOverlay(ctx);
         this.restoreCanvasFromLayer('overlay');
       },
