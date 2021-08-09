@@ -1,6 +1,5 @@
 (function () {
   /** ERASER_START */
-
   var __set = fabric.Object.prototype._set;
   var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
@@ -543,6 +542,7 @@
         var canvas = this.canvas;
         var ctx = canvas.contextTop;
         this._saveAndTransform(ctx);
+        ctx.globalCompositeOperation = 'source-over';
         canvas._renderOverlay(ctx);
         this.restoreCanvasFromLayer('overlay');
       },
