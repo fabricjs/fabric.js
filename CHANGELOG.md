@@ -1,7 +1,16 @@
 # Changelog
 
 ## [next]
-
+- feat(fabric.Object): Improve drawing of controls in group. (#7119)
+- fix(EraserBrush): intersectsWithObject edge cases (#7290)
+- fix(EraserBrush): dump canvas bg/overlay color support (#7289)
+- feat(fabric.Text) added pathSide property to text on path (#7259)
+- fix(EraserBrush) force fill value (#7269)
+- fix(fabric.StaticCanvas) properly remove objects on canvas.clear (#6937)
+- feat(fabric.EraserBrush): improved erasing:end event (#7258)
+- fix(shapes): fabric.Object._fromObject never should return (#7201)
+- feat(fabric.filters) Added vibrance filter (for increasing saturation of muted colors) (#7189)
+- fix(fabric.StaticCanvas): restore canvas size when disposing (#7181)
 - feat(fabric.util): added `convertPointsToSVGPath` that will convert from a list of points to a smooth curve. [#7140](https://github.com/fabricjs/fabric.js/pull/7140)
 - fix(fabric.Object): fix cache invalidation issue when objects are rotating [#7183](https://github.com/fabricjs/fabric.js/pull/7183)
 - fix(fabric.Canvas): rectangle selection works with changing viewport [#7088](https://github.com/fabricjs/fabric.js/pull/7088)
