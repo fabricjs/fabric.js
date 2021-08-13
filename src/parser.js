@@ -471,12 +471,23 @@
     var nodelist = _getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
     while (nodelist.length && i < nodelist.length) {
       var el = nodelist[i],
-          xlink = (el.getAttribute('xlink:href') || el.getAttribute('href')).substr(1),
+          xlinkAttribute = el.getAttribute('xlink:href') || el.getAttribute('href');
+
+      if (xlinkAttribute === null) {
+        return;
+      }
+
+      var xlink = xlinkAttribute.substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
           el2 = elementById(doc, xlink).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
-          parentNode, oldLength = nodelist.length, attr, j, attrs, len, namespace = fabric.svgNS;
+          parentNode,
+          oldLength = nodelist.length, attr,
+          j,
+          attrs,
+          len,
+          namespace = fabric.svgNS;
 
       applyViewboxTransform(el2);
       if (/^svg$/i.test(el2.nodeName)) {
@@ -535,7 +546,7 @@
    */
   function applyViewboxTransform(element) {
     if (!fabric.svgViewBoxElementsRegEx.test(element.nodeName)) {
-      return;
+      return {};
     }
     var viewBoxAttr = element.getAttribute('viewBox'),
         scaleX = 1,
@@ -558,7 +569,7 @@
     parsedDim.toBeParsed = toBeParsed;
 
     if (missingViewBox) {
-      if (((x || y) && element.parentNode.nodeName !== '#document')) {
+      if (((x || y) && element.parentNode && element.parentNode.nodeName !== '#document')) {
         translateMatrix = ' translate(' + parseUnit(x) + ' ' + parseUnit(y) + ') ';
         matrix = (element.getAttribute('transform') || '') + translateMatrix;
         element.setAttribute('transform', matrix);

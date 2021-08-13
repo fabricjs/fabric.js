@@ -216,6 +216,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/vibrance_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blur_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/gamma_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/composed_filter.class.js'),
@@ -232,6 +233,9 @@ var filesToInclude = [
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
+
+  //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
+  ifSpecifiedInclude('erasing', 'src/mixins/eraser_brush.mixin.js'),
 ];
 
 if (buildMinified) {

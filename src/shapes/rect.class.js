@@ -112,24 +112,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderDashedStroke: function(ctx) {
-      var x = -this.width / 2,
-          y = -this.height / 2,
-          w = this.width,
-          h = this.height;
-
-      ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
-      ctx.closePath();
-    },
-
-    /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance

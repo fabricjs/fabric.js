@@ -523,7 +523,7 @@
       }
 
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-
+      this._originalCanvasStyle = this.lowerCanvasEl.style;
       if (this.interactive) {
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
@@ -813,7 +813,7 @@
      * @chainable
      */
     clear: function () {
-      this._objects.length = 0;
+      this.remove.apply(this, this.getObjects());
       this.backgroundImage = null;
       this.overlayImage = null;
       this.backgroundColor = '';
@@ -1159,7 +1159,7 @@
         version: fabric.version,
         objects: this._toObjects(methodName, propertiesToInclude),
       };
-      if (clipPath) {
+      if (clipPath && !clipPath.excludeFromExport) {
         data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
       }
       extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
@@ -1202,24 +1202,32 @@
      * @private
      */
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
-      var data = { }, bgImage = this.backgroundImage, overlay = this.overlayImage;
+      var data = {}, bgImage = this.backgroundImage, overlayImage = this.overlayImage,
+          bgColor = this.backgroundColor, overlayColor = this.overlayColor;
 
-      if (this.backgroundColor) {
-        data.background = this.backgroundColor.toObject
-          ? this.backgroundColor.toObject(propertiesToInclude)
-          : this.backgroundColor;
+      if (bgColor && bgColor.toObject) {
+        if (!bgColor.excludeFromExport) {
+          data.background = bgColor.toObject(propertiesToInclude);
+        }
+      }
+      else if (bgColor) {
+        data.background = bgColor;
       }
 
-      if (this.overlayColor) {
-        data.overlay = this.overlayColor.toObject
-          ? this.overlayColor.toObject(propertiesToInclude)
-          : this.overlayColor;
+      if (overlayColor && overlayColor.toObject) {
+        if (!overlayColor.excludeFromExport) {
+          data.overlay = overlayColor.toObject(propertiesToInclude);
+        }
       }
+      else if (overlayColor) {
+        data.overlay = overlayColor;
+      }
+
       if (bgImage && !bgImage.excludeFromExport) {
         data.backgroundImage = this._toObject(bgImage, methodName, propertiesToInclude);
       }
-      if (overlay && !overlay.excludeFromExport) {
-        data.overlayImage = this._toObject(overlay, methodName, propertiesToInclude);
+      if (overlayImage && !overlayImage.excludeFromExport) {
+        data.overlayImage = this._toObject(overlayImage, methodName, propertiesToInclude);
       }
 
       return data;
@@ -1762,6 +1770,13 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
+      // restore canvas style
+      this.lowerCanvasEl.classList.remove('lower-canvas');
+      this.lowerCanvasEl.style = this._originalCanvasStyle;
+      delete this._originalCanvasStyle;
+      // restore canvas size to original size in case retina scaling was applied
+      this.lowerCanvasEl.setAttribute('width', this.width);
+      this.lowerCanvasEl.setAttribute('height', this.height);
       fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
       this.lowerCanvasEl = undefined;
       return this;

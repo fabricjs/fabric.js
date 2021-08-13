@@ -7,80 +7,83 @@
       createClass = fabric.util.createClass;
 
   /**
-   * Saturate filter class
-   * @class fabric.Image.filters.Saturation
+   * Vibrance filter class
+   * @class fabric.Image.filters.Vibrance
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.Saturation#initialize} for constructor definition
+   * @see {@link fabric.Image.filters.Vibrance#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
-   * var filter = new fabric.Image.filters.Saturation({
-   *   saturation: 1
+   * var filter = new fabric.Image.filters.Vibrance({
+   *   vibrance: 1
    * });
    * object.filters.push(filter);
    * object.applyFilters();
    */
-  filters.Saturation = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Saturation.prototype */ {
+  filters.Vibrance = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Vibrance.prototype */ {
 
     /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Saturation',
+    type: 'Vibrance',
 
     fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
-      'uniform float uSaturation;\n' +
+      'uniform float uVibrance;\n' +
       'varying vec2 vTexCoord;\n' +
       'void main() {\n' +
         'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'float rgMax = max(color.r, color.g);\n' +
-        'float rgbMax = max(rgMax, color.b);\n' +
-        'color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;\n' +
-        'color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;\n' +
-        'color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;\n' +
+        'float max = max(color.r, max(color.g, color.b));\n' +
+        'float avg = (color.r + color.g + color.b) / 3.0;\n' +
+        'float amt = (abs(max - avg) * 2.0) * uVibrance;\n' +
+        'color.r += max != color.r ? (max - color.r) * amt : 0.00;\n' +
+        'color.g += max != color.g ? (max - color.g) * amt : 0.00;\n' +
+        'color.b += max != color.b ? (max - color.b) * amt : 0.00;\n' +
         'gl_FragColor = color;\n' +
       '}',
 
     /**
-     * Saturation value, from -1 to 1.
-     * Increases/decreases the color saturation.
+     * Vibrance value, from -1 to 1.
+     * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
      * 
-     * @param {Number} saturation
+     * @param {Number} vibrance
      * @default
      */
-    saturation: 0,
+    vibrance: 0,
 
-    mainParameter: 'saturation',
+    mainParameter: 'vibrance',
 
     /**
      * Constructor
-     * @memberOf fabric.Image.filters.Saturate.prototype
+     * @memberOf fabric.Image.filters.Vibrance.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.saturate=0] Value to saturate the image (-1...1)
+     * @param {Number} [options.vibrance=0] Vibrance value for the image (between -1 and 1)
      */
 
     /**
-     * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
+     * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
      *
      * @param {Object} options
      * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
     applyTo2d: function(options) {
-      if (this.saturation === 0) {
+      if (this.vibrance === 0) {
         return;
       }
       var imageData = options.imageData,
           data = imageData.data, len = data.length,
-          adjust = -this.saturation, i, max;
+          adjust = -this.vibrance, i, max, avg, amt;
 
       for (i = 0; i < len; i += 4) {
         max = Math.max(data[i], data[i + 1], data[i + 2]);
-        data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
-        data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
-        data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+        avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        amt = ((Math.abs(max - avg) * 2 / 255) * adjust);
+        data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
+        data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
+        data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
       }
     },
 
@@ -92,7 +95,7 @@
      */
     getUniformLocations: function(gl, program) {
       return {
-        uSaturation: gl.getUniformLocation(program, 'uSaturation'),
+        uVibrance: gl.getUniformLocation(program, 'uVibrance'),
       };
     },
 
@@ -103,7 +106,7 @@
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
     sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
+      gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
     },
   });
 
@@ -112,8 +115,8 @@
    * @static
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Saturation} Instance of fabric.Image.filters.Saturate
+   * @return {fabric.Image.filters.Vibrance} Instance of fabric.Image.filters.Vibrance
    */
-  fabric.Image.filters.Saturation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+  fabric.Image.filters.Vibrance.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);

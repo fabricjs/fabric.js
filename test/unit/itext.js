@@ -47,6 +47,7 @@
     styles:                     { },
     strokeUniform:            false,
     path:                     null,
+    direction:                'ltr',
   };
 
 

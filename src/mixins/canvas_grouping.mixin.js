@@ -139,10 +139,10 @@
           continue;
         }
 
-        if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2)) ||
-            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
-            (allowIntersect && currentObject.containsPoint(selectionX1Y1)) ||
-            (allowIntersect && currentObject.containsPoint(selectionX2Y2))
+        if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2, true)) ||
+            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2, true) ||
+            (allowIntersect && currentObject.containsPoint(selectionX1Y1, null, true)) ||
+            (allowIntersect && currentObject.containsPoint(selectionX2Y2, null, true))
         ) {
           group.push(currentObject);
           // only add one object if it's a click

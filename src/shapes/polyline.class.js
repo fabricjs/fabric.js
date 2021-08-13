@@ -187,21 +187,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderDashedStroke: function(ctx) {
-      var p1, p2;
-
-      ctx.beginPath();
-      for (var i = 0, len = this.points.length; i < len; i++) {
-        p1 = this.points[i];
-        p2 = this.points[i + 1] || p1;
-        fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
-      }
-    },
-
-    /**
      * Returns complexity of an instance
      * @return {Number} complexity of this instance
      */
