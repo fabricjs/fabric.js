@@ -155,7 +155,7 @@
 
       if (this._iTextInstances) {
         this._iTextInstances.forEach(function(obj) {
-          if (obj.isEditing) {
+          if (obj.isEditing && obj.hiddenTextarea) {
             obj.hiddenTextarea.focus();
           }
         });
