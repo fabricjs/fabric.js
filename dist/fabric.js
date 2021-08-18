@@ -30971,7 +30971,6 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         var canvas = target.canvas;
         canvas.remove(target);
         canvas.requestRenderAll();
-        console.log('MOUSE UP!!!!')
         // events are not yet implemented but this will eventually go here
         // sendTextboxEvent(WORKSHEET_EVENT.DELETED_AUDIO_TOKEN, target.width, target.height)
       },
