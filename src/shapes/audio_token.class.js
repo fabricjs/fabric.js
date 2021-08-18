@@ -82,6 +82,20 @@
     leftMargin: 44,
 
     /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 36,
+
+    /**
+     * Size in pixels of the (before any scaling) touch area of the play control
+     * @type Number
+     * @default
+     */
+    playControlSize: 64,
+
+    /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
      * @type Array
