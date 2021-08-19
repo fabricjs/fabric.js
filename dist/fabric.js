@@ -30628,6 +30628,20 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     leftMargin: 44,
 
     /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 36,
+
+    /**
+     * Size in pixels of the (before any scaling) touch area of the play control
+     * @type Number
+     * @default
+     */
+    playControlSize: 64,
+
+    /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
      * @type Array
@@ -30836,6 +30850,75 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       }
       else {
         this.onPlay();
+      }
+    },
+
+    // for most objects, all 'controls' are the same size, for audio_tokens we need to treat them uniquely
+    _setCornerCoords: function() {
+      var coords = this.oCoords,
+          newTheta = fabric.util.degreesToRadians(45 - this.angle),
+          cosTheta = fabric.util.cos(newTheta),
+          sinTheta = fabric.util.sin(newTheta),
+          controlSize = this.cornerSize;
+
+      for (var control in coords) {
+        switch (control) {
+          case 'deleteControl':
+            controlSize = this.deleteControlSize;
+            break;
+          case 'playControl':
+            controlSize = this.playControlSize;
+            break;
+          default:
+            // 'corner' is fabrics default term for controls...because they are in the corners?
+            controlSize = this.cornerSize;
+        }
+
+        var cornerHypotenuse = controlSize * 0.707106,
+            touchHypotenuse = controlSize * 0.707106,
+            cosHalfOffset = cornerHypotenuse * cosTheta,
+            sinHalfOffset = cornerHypotenuse * sinTheta,
+            touchCosHalfOffset = touchHypotenuse * cosTheta,
+            touchSinHalfOffset = touchHypotenuse * sinTheta,
+            x = coords[control].x,
+            y = coords[control].y;
+
+        coords[control].corner = {
+          tl: {
+            x: x - sinHalfOffset,
+            y: y - cosHalfOffset
+          },
+          tr: {
+            x: x + cosHalfOffset,
+            y: y - sinHalfOffset
+          },
+          bl: {
+            x: x - cosHalfOffset,
+            y: y + sinHalfOffset
+          },
+          br: {
+            x: x + sinHalfOffset,
+            y: y + cosHalfOffset
+          }
+        };
+        coords[control].touchCorner = {
+          tl: {
+            x: x - touchSinHalfOffset,
+            y: y - touchCosHalfOffset
+          },
+          tr: {
+            x: x + touchCosHalfOffset,
+            y: y - touchSinHalfOffset
+          },
+          bl: {
+            x: x - touchCosHalfOffset,
+            y: y + touchSinHalfOffset
+          },
+          br: {
+            x: x + touchSinHalfOffset,
+            y: y + touchCosHalfOffset
+          }
+        };
       }
     },
   });
