@@ -433,9 +433,8 @@
     if (typeof objects === 'string') {
       // it has to be an url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
-        var layer = fabric.util.groupSVGElements(elements, object, objects);
-        layer.set(options);
-        callback && callback(layer);
+        typeof objects !== 'undefined' && (options.sourcePath = objects);
+        callback && callback(new fabric.Layer(elements, options));
       });
       return;
     }
