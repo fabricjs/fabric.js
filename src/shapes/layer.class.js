@@ -198,6 +198,7 @@
      * @private
      */
     _applyLayoutStrategy: function (maintainPosition) {
+      return;
       if (this.layoutStrategy === 'wrap-content') {
         this._applyBoundingRect(maintainPosition);
         this.setCoords();
