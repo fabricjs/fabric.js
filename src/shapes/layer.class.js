@@ -180,8 +180,8 @@
       return {
         left: minXY.x || 0,
         top: minXY.y || 0,
-        width: (maxXY.x - minXY.x) || 0,
-        height: (maxXY.y - minXY.y) || 0
+        width: (maxXY.x - minXY.x) / this.scaleX || 0,
+        height: (maxXY.y - minXY.y) / this.scaleY || 0
       };
     },
 
@@ -198,11 +198,8 @@
      * @private
      */
     _applyLayoutStrategy: function (maintainPosition) {
-      return
       if (this.layoutStrategy === 'wrap-content') {
-        var pre = this.calcTransformMatrix();
         this._applyBoundingRect(maintainPosition);
-        this.applyTransformToObjects(pre);
         this.setCoords();
         this.dirty = true;
       }
