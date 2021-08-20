@@ -1,28 +1,28 @@
 (function () {
   var canvas = this.canvas = new fabric.StaticCanvas(null, { enableRetinaScaling: false, width: 600, height: 600 });
 
-  function makeGroupWith2Objects() {
+  function makeLayerWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
     return new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
   }
 
-  function makeGroupWith2ObjectsWithOpacity() {
+  function makeLayerWith2ObjectsWithOpacity() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, opacity: 0.8 });
 
     return new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
   }
 
-  function makeGroupWith2ObjectsAndNoExport() {
+  function makeLayerWith2ObjectsAndNoExport() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, excludeFromExport: true });
 
     return new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
   }
 
-  function makeGroupWith4Objects() {
+  function makeLayerWith4Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
       rect3 = new fabric.Rect({ top: 40, left: 0, width: 20, height: 40 }),
@@ -41,14 +41,14 @@
   });
 
   QUnit.test('constructor', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(layer);
     assert.ok(layer instanceof fabric.Layer, 'should be instance of fabric.Layer');
   });
 
   QUnit.test('toString', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     assert.equal(layer.toString(), '#<fabric.Layer: (2)>', 'should return proper representation');
   });
 
@@ -77,7 +77,7 @@
   });
 
   QUnit.test('add', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     var rect1 = new fabric.Rect(),
       rect2 = new fabric.Rect(),
       rect3 = new fabric.Rect();
@@ -107,7 +107,7 @@
   });
 
   QUnit.test('size', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(typeof layer.size === 'function');
     assert.equal(layer.size(), 2);
@@ -119,7 +119,7 @@
   });
 
   QUnit.test('set', function (assert) {
-    var layer = makeGroupWith2Objects(),
+    var layer = makeLayerWith2Objects(),
       firstObject = layer.getObjects()[0];
 
     assert.ok(typeof layer.set === 'function');
@@ -152,7 +152,7 @@
   });
 
   QUnit.test('toObject', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(typeof layer.toObject === 'function');
 
@@ -201,7 +201,7 @@
   });
 
   QUnit.test('toObject without default values', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     layer.includeDefaultValues = false;
     var clone = layer.toObject();
     var expectedObject = {
@@ -218,23 +218,23 @@
 
 
   QUnit.test('toObject with excludeFromExport set on an object', function (assert) {
-    var layer = makeGroupWith2Objects();
-    var group2 = makeGroupWith2ObjectsAndNoExport();
+    var layer = makeLayerWith2Objects();
+    var layer2 = makeLayerWith2ObjectsAndNoExport();
     var clone = layer.toObject();
-    var clone2 = group2.toObject();
-    assert.deepEqual(clone2.objects, group2._objects.filter(obj => !obj.excludeFromExport).map(obj => obj.toObject()));
+    var clone2 = layer2.toObject();
+    assert.deepEqual(clone2.objects, layer2._objects.filter(obj => !obj.excludeFromExport).map(obj => obj.toObject()));
     delete clone.objects;
     delete clone2.objects;
     assert.deepEqual(clone, clone2);
   });
 
   QUnit.test('render', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     assert.ok(typeof layer.render === 'function');
   });
 
   QUnit.test('item', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(typeof layer.item === 'function');
     assert.equal(layer.item(0), layer.getObjects()[0]);
@@ -243,11 +243,11 @@
   });
 
   QUnit.test('moveTo', function (assert) {
-    var layer = makeGroupWith4Objects(),
-      groupEl1 = layer.getObjects()[0],
-      groupEl2 = layer.getObjects()[1],
-      groupEl3 = layer.getObjects()[2],
-      groupEl4 = layer.getObjects()[3];
+    var layer = makeLayerWith4Objects(),
+      layerEl1 = layer.getObjects()[0],
+      layerEl2 = layer.getObjects()[1],
+      layerEl3 = layer.getObjects()[2],
+      layerEl4 = layer.getObjects()[3];
 
     layer.forEachObject((obj, index) => {
       obj.id = index + 1;
@@ -256,33 +256,33 @@
     assert.ok(typeof layer.item(0).moveTo === 'function');
 
     // [ 1, 2, 3, 4 ]
-    assert.equal(layer.item(0).id, groupEl1.id, 'wrong position');
-    assert.equal(layer.item(1).id, groupEl2.id, 'wrong position');
-    assert.equal(layer.item(2).id, groupEl3.id, 'wrong position');
-    assert.equal(layer.item(3).id, groupEl4.id, 'wrong position');
+    assert.equal(layer.item(0).id, layerEl1.id, 'wrong position');
+    assert.equal(layer.item(1).id, layerEl2.id, 'wrong position');
+    assert.equal(layer.item(2).id, layerEl3.id, 'wrong position');
+    assert.equal(layer.item(3).id, layerEl4.id, 'wrong position');
     assert.equal(layer.item(9999), undefined);
 
     layer.item(0).moveTo(3);
 
     // moved 1 to level 3 — [2, 3, 4, 1]
-    assert.equal(layer.item(3).id, groupEl1.id, 'wrong position');
-    assert.equal(layer.item(0).id, groupEl2.id, 'wrong position');
-    assert.equal(layer.item(1).id, groupEl3.id, 'wrong position');
-    assert.equal(layer.item(2).id, groupEl4.id, 'wrong position');
+    assert.equal(layer.item(3).id, layerEl1.id, 'wrong position');
+    assert.equal(layer.item(0).id, layerEl2.id, 'wrong position');
+    assert.equal(layer.item(1).id, layerEl3.id, 'wrong position');
+    assert.equal(layer.item(2).id, layerEl4.id, 'wrong position');
     assert.equal(layer.item(9999), undefined);
 
     layer.item(0).moveTo(2);
 
     // moved 2 to level 2 — [3, 4, 2, 1]
-    assert.equal(layer.item(3).id, groupEl1.id, 'wrong position');
-    assert.equal(layer.item(2).id, groupEl2.id, 'wrong position');
-    assert.equal(layer.item(0).id, groupEl3.id, 'wrong position');
-    assert.equal(layer.item(1).id, groupEl4.id, 'wrong position');
+    assert.equal(layer.item(3).id, layerEl1.id, 'wrong position');
+    assert.equal(layer.item(2).id, layerEl2.id, 'wrong position');
+    assert.equal(layer.item(0).id, layerEl3.id, 'wrong position');
+    assert.equal(layer.item(1).id, layerEl4.id, 'wrong position');
     assert.equal(layer.item(9999), undefined);
   });
 
   QUnit.test('complexity', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(typeof layer.complexity === 'function');
     assert.equal(layer.complexity(), 2);
@@ -290,7 +290,7 @@
 
   QUnit.test('containsPoint', function (assert) {
 
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     layer.set({ originX: 'center', originY: 'center' }).setCoords();
 
     //  Rect #1     top: 100, left: 100, width: 30, height: 10
@@ -314,14 +314,14 @@
   });
 
   QUnit.test('forEachObject', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.ok(typeof layer.forEachObject === 'function');
     assert.equal(layer.forEachObject(function () { }), layer, 'should be chainable');
 
     var iteratedObjects = [];
-    layer.forEachObject(function (groupObject) {
-      iteratedObjects.push(groupObject);
+    layer.forEachObject(function (layerObject) {
+      iteratedObjects.push(layerObject);
     });
 
     assert.equal(iteratedObjects[0], layer.getObjects()[0], 'iteration give back objects in same order');
@@ -330,26 +330,26 @@
 
   QUnit.test('fromObject', function (assert) {
     var done = assert.async();
-    var layer = makeGroupWith2ObjectsWithOpacity();
+    var layer = makeLayerWith2ObjectsWithOpacity();
 
     assert.ok(typeof fabric.Layer.fromObject === 'function');
-    var groupObject = layer.toObject();
+    var layerObject = layer.toObject();
 
-    fabric.Layer.fromObject(groupObject, function (newGroupFromObject) {
+    fabric.Layer.fromObject(layerObject, function (newLayerFromObject) {
 
-      var objectFromOldGroup = layer.toObject();
-      var objectFromNewGroup = newGroupFromObject.toObject();
+      var objectFromOldLayer = layer.toObject();
+      var objectFromNewLayer = newLayerFromObject.toObject();
 
-      assert.ok(newGroupFromObject instanceof fabric.Layer);
+      assert.ok(newLayerFromObject instanceof fabric.Layer);
 
-      assert.deepEqual(objectFromOldGroup.objects[0], objectFromNewGroup.objects[0]);
-      assert.deepEqual(objectFromOldGroup.objects[1], objectFromNewGroup.objects[1]);
+      assert.deepEqual(objectFromOldLayer.objects[0], objectFromNewLayer.objects[0]);
+      assert.deepEqual(objectFromOldLayer.objects[1], objectFromNewLayer.objects[1]);
 
       // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
-      delete objectFromOldGroup.objects;
-      delete objectFromNewGroup.objects;
+      delete objectFromOldLayer.objects;
+      delete objectFromNewLayer.objects;
 
-      assert.deepEqual(objectFromOldGroup, objectFromNewGroup);
+      assert.deepEqual(objectFromOldLayer, objectFromNewLayer);
 
       done();
     });
@@ -365,23 +365,23 @@
       absolutePositioned: true
     });
 
-    var groupObject = new fabric.Layer([
+    var layerObject = new fabric.Layer([
       new fabric.Rect({ width: 100, height: 100, fill: 'red' }),
       new fabric.Rect({ width: 100, height: 100, fill: 'yellow', left: 100 }),
       new fabric.Rect({ width: 100, height: 100, fill: 'blue', top: 100 }),
       new fabric.Rect({ width: 100, height: 100, fill: 'green', left: 100, top: 100 })
     ]);
-    groupObject.clipPath = clipPath;
+    layerObject.clipPath = clipPath;
 
-    var groupToObject = groupObject.toObject();
+    var layerToObject = layerObject.toObject();
 
-    fabric.Layer.fromObject(groupToObject, function (newGroupFromObject) {
+    fabric.Layer.fromObject(layerToObject, function (newLayerFromObject) {
 
-      var objectFromNewGroup = newGroupFromObject.toObject();
+      var objectFromNewLayer = newLayerFromObject.toObject();
 
-      assert.ok(newGroupFromObject instanceof fabric.Layer);
-      assert.ok(newGroupFromObject.clipPath instanceof fabric.Rect, 'clipPath has been restored');
-      assert.deepEqual(objectFromNewGroup, groupToObject, 'double serialization gives same results');
+      assert.ok(newLayerFromObject instanceof fabric.Layer);
+      assert.ok(newLayerFromObject.clipPath instanceof fabric.Rect, 'clipPath has been restored');
+      assert.deepEqual(objectFromNewLayer, layerToObject, 'double serialization gives same results');
 
       done();
     });
@@ -389,13 +389,13 @@
 
   QUnit.test('fromObject restores oCoords', function (assert) {
     var done = assert.async();
-    var layer = makeGroupWith2ObjectsWithOpacity();
+    var layer = makeLayerWith2ObjectsWithOpacity();
 
-    var groupObject = layer.toObject();
+    var layerObject = layer.toObject();
 
-    fabric.Layer.fromObject(groupObject, function (newGroupFromObject) {
-      assert.ok(newGroupFromObject._objects[0].lineCoords.tl, 'acoords 0 are restored');
-      assert.ok(newGroupFromObject._objects[1].lineCoords.tl, 'acoords 1 are restored');
+    fabric.Layer.fromObject(layerObject, function (newLayerFromObject) {
+      assert.ok(newLayerFromObject._objects[0].lineCoords.tl, 'acoords 0 are restored');
+      assert.ok(newLayerFromObject._objects[1].lineCoords.tl, 'acoords 1 are restored');
 
       done();
     });
@@ -403,12 +403,12 @@
 
   QUnit.test('fromObject does not delete objects from source', function (assert) {
     var done = assert.async();
-    var layer = makeGroupWith2ObjectsWithOpacity();
-    var groupObject = layer.toObject();
+    var layer = makeLayerWith2ObjectsWithOpacity();
+    var layerObject = layer.toObject();
 
-    fabric.Layer.fromObject(groupObject, function (newGroupFromObject) {
-      assert.equal(newGroupFromObject.objects, undefined, 'the objects array has not been pulled in');
-      assert.notEqual(groupObject.objects, undefined, 'the objects array has not been deleted from object source');
+    fabric.Layer.fromObject(layerObject, function (newLayerFromObject) {
+      assert.equal(newLayerFromObject.objects, undefined, 'the objects array has not been pulled in');
+      assert.notEqual(layerObject.objects, undefined, 'the objects array has not been deleted from object source');
       done();
     });
   });
@@ -416,14 +416,14 @@
   QUnit.test('fromObject with svg url', function (assert) {
     var done = assert.async();
     var url = 'data:image/svg+xml,%3csvg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="612px" height="502.174px" viewBox="0 65.326 612 502.174" enable-background="new 0 65.326 612 502.174" xml:space="preserve"%3e %3cellipse fill="%23C6C6C6" cx="283.5" cy="487.5" rx="259" ry="80"/%3e %3cpath id="bird" d="M210.333%2c65.331C104.367%2c66.105-12.349%2c150.637%2c1.056%2c276.449c4.303%2c40.393%2c18.533%2c63.704%2c52.171%2c79.03 c36.307%2c16.544%2c57.022%2c54.556%2c50.406%2c112.954c-9.935%2c4.88-17.405%2c11.031-19.132%2c20.015c7.531-0.17%2c14.943-0.312%2c22.59%2c4.341 c20.333%2c12.375%2c31.296%2c27.363%2c42.979%2c51.72c1.714%2c3.572%2c8.192%2c2.849%2c8.312-3.078c0.17-8.467-1.856-17.454-5.226-26.933 c-2.955-8.313%2c3.059-7.985%2c6.917-6.106c6.399%2c3.115%2c16.334%2c9.43%2c30.39%2c13.098c5.392%2c1.407%2c5.995-3.877%2c5.224-6.991 c-1.864-7.522-11.009-10.862-24.519-19.229c-4.82-2.984-0.927-9.736%2c5.168-8.351l20.234%2c2.415c3.359%2c0.763%2c4.555-6.114%2c0.882-7.875 c-14.198-6.804-28.897-10.098-53.864-7.799c-11.617-29.265-29.811-61.617-15.674-81.681c12.639-17.938%2c31.216-20.74%2c39.147%2c43.489 c-5.002%2c3.107-11.215%2c5.031-11.332%2c13.024c7.201-2.845%2c11.207-1.399%2c14.791%2c0c17.912%2c6.998%2c35.462%2c21.826%2c52.982%2c37.309 c3.739%2c3.303%2c8.413-1.718%2c6.991-6.034c-2.138-6.494-8.053-10.659-14.791-20.016c-3.239-4.495%2c5.03-7.045%2c10.886-6.876 c13.849%2c0.396%2c22.886%2c8.268%2c35.177%2c11.218c4.483%2c1.076%2c9.741-1.964%2c6.917-6.917c-3.472-6.085-13.015-9.124-19.18-13.413 c-4.357-3.029-3.025-7.132%2c2.697-6.602c3.905%2c0.361%2c8.478%2c2.271%2c13.908%2c1.767c9.946-0.925%2c7.717-7.169-0.883-9.566 c-19.036-5.304-39.891-6.311-61.665-5.225c-43.837-8.358-31.554-84.887%2c0-90.363c29.571-5.132%2c62.966-13.339%2c99.928-32.156 c32.668-5.429%2c64.835-12.446%2c92.939-33.85c48.106-14.469%2c111.903%2c16.113%2c204.241%2c149.695c3.926%2c5.681%2c15.819%2c9.94%2c9.524-6.351 c-15.893-41.125-68.176-93.328-92.13-132.085c-24.581-39.774-14.34-61.243-39.957-91.247 c-21.326-24.978-47.502-25.803-77.339-17.365c-23.461%2c6.634-39.234-7.117-52.98-31.273C318.42%2c87.525%2c265.838%2c64.927%2c210.333%2c65.331 z M445.731%2c203.01c6.12%2c0%2c11.112%2c4.919%2c11.112%2c11.038c0%2c6.119-4.994%2c11.111-11.112%2c11.111s-11.038-4.994-11.038-11.111 C434.693%2c207.929%2c439.613%2c203.01%2c445.731%2c203.01z"/%3e %3c/svg%3e';
-    var groupObject = {
+    var layerObject = {
       left: 10,
       top: 10,
       objects: url
     };
-    fabric.Layer.fromObject(groupObject, function (newGroupFromObject) {
-      assert.equal(newGroupFromObject.sourcePath, url, 'the url is copied in sourcePath');
-      assert.equal(newGroupFromObject._objects.length, 2, '2 objects are created');
+    fabric.Layer.fromObject(layerObject, function (newLayerFromObject) {
+      assert.equal(newLayerFromObject.sourcePath, url, 'the url is copied in sourcePath');
+      assert.equal(newLayerFromObject._objects.length, 2, '2 objects are created');
       done();
     });
   });
@@ -442,33 +442,33 @@
   }
 
   QUnit.test('toSVG', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     assert.ok(typeof layer.toSVG === 'function');
     assertSVG(assert, layer);
   });
   /*
     QUnit.test('toSVG with a clipPath', function (assert) {
-      var layer = makeGroupWith2Objects();
+      var layer = makeLayerWith2Objects();
       layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
       assertSVG(assert, layer);
     });
   
     QUnit.test('toSVG with a clipPath absolutePositioned', function (assert) {
-      var layer = makeGroupWith2Objects();
+      var layer = makeLayerWith2Objects();
       layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
       layer.clipPath.absolutePositioned = true;
       assertSVG(assert, layer);
     });
   
     QUnit.test('toSVG with a layer as a clipPath', function (assert) {
-      var layer = makeGroupWith2Objects();
-      layer.clipPath = makeGroupWith2Objects();
+      var layer = makeLayerWith2Objects();
+      layer.clipPath = makeLayerWith2Objects();
       assertSVG(assert, layer);
     });
   */
   QUnit.test('cloning layer with 2 objects', function (assert) {
     var done = assert.async();
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
     layer.clone(function (clone) {
 
       assert.ok(clone !== layer);
@@ -479,11 +479,11 @@
   });
 
   QUnit.test('get with locked objects', function (assert) {
-    var layer = makeGroupWith2Objects();
+    var layer = makeLayerWith2Objects();
 
     assert.equal(layer.get('lockMovementX'), false);
 
-    // TODO acitveGroup
+    // TODO acitveLayer
     // layer.getObjects()[0].lockMovementX = true;
     // assert.equal(layer.get('lockMovementX'), true);
     //
@@ -529,15 +529,15 @@
   });
 
   QUnit.test('layer reference on an object', function (assert) {
-    var layer = makeGroupWith2Objects();
-    var firstObjInGroup = layer.getObjects()[0];
-    var secondObjInGroup = layer.getObjects()[1];
+    var layer = makeLayerWith2Objects();
+    var firstObjInLayer = layer.getObjects()[0];
+    var secondObjInLayer = layer.getObjects()[1];
 
-    assert.equal(firstObjInGroup.layer, layer);
-    assert.equal(secondObjInGroup.layer, layer);
+    assert.equal(firstObjInLayer.layer, layer);
+    assert.equal(secondObjInLayer.layer, layer);
 
-    layer.remove(firstObjInGroup);
-    assert.ok(typeof firstObjInGroup.layer === 'undefined');
+    layer.remove(firstObjInLayer);
+    assert.ok(typeof firstObjInLayer.layer === 'undefined');
   });
 
   QUnit.test('insertAt', function (assert) {
@@ -557,7 +557,7 @@
   });
 
   QUnit.test('dirty flag propagation from children up', function (assert) {
-    var g1 = makeGroupWith4Objects();
+    var g1 = makeLayerWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
@@ -569,7 +569,7 @@
   });
 
   QUnit.test('dirty flag propagation from children up is stopped if layer is not caching', function (assert) {
-    var g1 = makeGroupWith4Objects();
+    var g1 = makeLayerWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
@@ -581,7 +581,7 @@
   });
 
   QUnit.test('dirty flag propagation from children up does not happen if value does not change really', function (assert) {
-    var g1 = makeGroupWith4Objects();
+    var g1 = makeLayerWith4Objects();
     var obj = g1.item(0);
     obj.fill = 'red';
     g1.dirty = false;
@@ -595,7 +595,7 @@
   });
 
   QUnit.test('dirty flag propagation from children up with', function (assert) {
-    var g1 = makeGroupWith4Objects();
+    var g1 = makeLayerWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
@@ -609,7 +609,7 @@
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by layer', function (assert) {
-    var g1 = makeGroupWith4Objects();
+    var g1 = makeLayerWith4Objects();
     var obj = g1.item(0);
     var dims = obj._getCacheCanvasDimensions();
     g1.scaleX = 2;
@@ -639,8 +639,8 @@
   QUnit.test('layer toDatalessObject', function (assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
-      pathGroup = new fabric.Layer([rect1, rect2], { sourcePath: 'sourcePath' }),
-      layer = new fabric.Layer([pathGroup]),
+      pathLayer = new fabric.Layer([rect1, rect2], { sourcePath: 'sourcePath' }),
+      layer = new fabric.Layer([pathLayer]),
       dataless = layer.toDatalessObject();
 
     assert.equal(dataless.objects[0].objects, 'sourcePath', 'the paths have been changed with the sourcePath');
@@ -674,20 +674,20 @@
       rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       layer = new fabric.Layer([rect1, rect2]),
-      group2 = new fabric.Layer([rect3, rect4]),
-      group3 = new fabric.Layer([layer, group2]);
+      layer2 = new fabric.Layer([rect3, rect4]),
+      layer3 = new fabric.Layer([layer, layer2]);
 
-    assert.equal(group3.willDrawShadow(), false, 'layer will not cast shadow because objects do not have it');
-    group3.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow');
-    delete group3.shadow;
-    group2.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because inner group2 has shadow');
-    delete group2.shadow;
+    assert.equal(layer3.willDrawShadow(), false, 'layer will not cast shadow because objects do not have it');
+    layer3.shadow = { offsetX: 1, offsetY: 2, };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow');
+    delete layer3.shadow;
+    layer2.shadow = { offsetX: 1, offsetY: 2, };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because inner layer2 has shadow');
+    delete layer2.shadow;
     rect1.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because inner rect1 has shadow');
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because inner rect1 has shadow');
     assert.equal(layer.willDrawShadow(), true, 'layer will cast shadow because inner rect1 has shadow');
-    assert.equal(group2.willDrawShadow(), false, 'layer will not cast shadow because no child has shadow');
+    assert.equal(layer2.willDrawShadow(), false, 'layer will not cast shadow because no child has shadow');
   });
 
   QUnit.test('layer willDrawShadow with no offsets', function (assert) {
@@ -696,23 +696,23 @@
       rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       layer = new fabric.Layer([rect1, rect2]),
-      group2 = new fabric.Layer([rect3, rect4]),
-      group3 = new fabric.Layer([layer, group2]);
+      layer2 = new fabric.Layer([rect3, rect4]),
+      layer3 = new fabric.Layer([layer, layer2]);
 
-    assert.equal(group3.willDrawShadow(), false, 'layer will not cast shadow because objects do not have it');
-    group3.shadow = { offsetX: 0, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), false, 'layer will NOT cast shadow because layer itself has shadow but not offsets');
-    group3.shadow = { offsetX: 2, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetX different than 0');
-    group3.shadow = { offsetX: 0, offsetY: 2 };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetY different than 0');
-    group3.shadow = { offsetX: -2, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetX different than 0');
-    group3.shadow = { offsetX: 0, offsetY: -2 };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetY different than 0');
+    assert.equal(layer3.willDrawShadow(), false, 'layer will not cast shadow because objects do not have it');
+    layer3.shadow = { offsetX: 0, offsetY: 0 };
+    assert.equal(layer3.willDrawShadow(), false, 'layer will NOT cast shadow because layer itself has shadow but not offsets');
+    layer3.shadow = { offsetX: 2, offsetY: 0 };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetX different than 0');
+    layer3.shadow = { offsetX: 0, offsetY: 2 };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetY different than 0');
+    layer3.shadow = { offsetX: -2, offsetY: 0 };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetX different than 0');
+    layer3.shadow = { offsetX: 0, offsetY: -2 };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself has shadow and one offsetY different than 0');
     rect1.shadow = { offsetX: 1, offsetY: 2, };
-    group3.shadow = { offsetX: 0, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'layer will cast shadow because layer itself will not, but rect 1 will');
+    layer3.shadow = { offsetX: 0, offsetY: 0 };
+    assert.equal(layer3.willDrawShadow(), true, 'layer will cast shadow because layer itself will not, but rect 1 will');
 
   });
 
@@ -722,22 +722,22 @@
       rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true }),
       rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true }),
       layer = new fabric.Layer([rect1, rect2], { objectCaching: true }),
-      group2 = new fabric.Layer([rect3, rect4], { objectCaching: true }),
-      group3 = new fabric.Layer([layer, group2], { objectCaching: true });
+      layer2 = new fabric.Layer([rect3, rect4], { objectCaching: true }),
+      layer3 = new fabric.Layer([layer, layer2], { objectCaching: true });
 
-    assert.equal(group3.shouldCache(), true, 'group3 will cache because no child has shadow');
-    assert.equal(group2.shouldCache(), false, 'group2 will not cache because is drawing on parent group3 cache');
+    assert.equal(layer3.shouldCache(), true, 'layer3 will cache because no child has shadow');
+    assert.equal(layer2.shouldCache(), false, 'layer2 will not cache because is drawing on parent layer3 cache');
     assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because is drawing on parent2 layer cache');
 
-    group2.shadow = { offsetX: 2, offsetY: 0 };
+    layer2.shadow = { offsetX: 2, offsetY: 0 };
     rect1.shadow = { offsetX: 0, offsetY: 2 };
 
-    assert.equal(group3.shouldCache(), false, 'group3 will cache because children have shadow');
-    assert.equal(group2.shouldCache(), true, 'group2 will cache because is not drawing on parent group3 cache and no children have shadow');
-    assert.equal(layer.shouldCache(), false, 'layer will not cache because even if is not drawing on parent group3 cache children have shadow');
+    assert.equal(layer3.shouldCache(), false, 'layer3 will cache because children have shadow');
+    assert.equal(layer2.shouldCache(), true, 'layer2 will cache because is not drawing on parent layer3 cache and no children have shadow');
+    assert.equal(layer.shouldCache(), false, 'layer will not cache because even if is not drawing on parent layer3 cache children have shadow');
 
     assert.equal(rect1.shouldCache(), true, 'rect1 will cache because none of its parent is caching');
-    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because group2 is caching');
+    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because layer2 is caching');
 
   });
 
@@ -797,23 +797,23 @@
       assert.equal(rect2.scaleY, 3, 'scaleY has been scaled inverted because of angle 90');
     });
   
-    QUnit.test('add and coordinates with nested groups', function (assert) {
+    QUnit.test('add and coordinates with nested layers', function (assert) {
       var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group0 = new fabric.Layer([rect1, rect2]),
+        layer0 = new fabric.Layer([rect1, rect2]),
         rect3 = new fabric.Rect({ top: 2, left: 9, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect4 = new fabric.Rect({ top: 3, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group1 = new fabric.Layer([rect3, rect4], { scaleX: 3, scaleY: 4 }),
-        layer = new fabric.Layer([group0, group1], { angle: 90, scaleX: 2, scaleY: 0.5 }),
+        layer1 = new fabric.Layer([rect3, rect4], { scaleX: 3, scaleY: 4 }),
+        layer = new fabric.Layer([layer0, layer1], { angle: 90, scaleX: 2, scaleY: 0.5 }),
         rect5 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' });
   
-      group1.add(rect5);
+      layer1.add(rect5);
       assert.equal(rect5.top, -5.5, 'top has been moved');
       assert.equal(rect5.left, -19.5, 'left has been moved');
       assert.equal(rect5.scaleX, 2, 'scaleX has been scaled');
       assert.equal(rect5.scaleY, 0.5, 'scaleY has been scaled');
       layer.destroy();
-      group1.destroy();
+      layer1.destroy();
       assert.equal(rect5.top, 1, 'top is back to original minus rounding errors');
       assert.equal(rect5.left, 1, 'left is back to original');
       assert.equal(rect5.scaleX, 1, 'scaleX is back to original');
