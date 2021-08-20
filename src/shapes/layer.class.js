@@ -3,8 +3,8 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
-    min = fabric.util.array.min,
-    max = fabric.util.array.max;
+      min = fabric.util.array.min,
+      max = fabric.util.array.max;
 
   if (fabric.Layer) {
     return;
@@ -97,7 +97,7 @@
     },
 
     /**
-     * 
+     *
      * @param {number[]} pre layer transform to remove
      * @param {number[]} [post] layer transform to add, if no value is provided the current transform is used
      */
@@ -160,10 +160,10 @@
      */
     getBoundingRect: function (absolute, calculate) {
       var aX = [],
-        aY = [],
-        o, coords,
-        i = 0, iLen = this._objects.length,
-        j;
+          aY = [],
+          o, coords,
+          i = 0, iLen = this._objects.length,
+          j;
 
       for (; i < iLen; ++i) {
         o = this._objects[i];
@@ -175,7 +175,7 @@
       }
 
       var minXY = new fabric.Point(min(aX), min(aY)),
-        maxXY = new fabric.Point(max(aX), max(aY));
+          maxXY = new fabric.Point(max(aX), max(aY));
 
       return {
         left: minXY.x || 0,
@@ -364,8 +364,8 @@
      */
     getSvgStyles: function () {
       var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
-        'opacity: ' + this.opacity + ';' : '',
-        visibility = this.visible ? '' : ' visibility: hidden;';
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
       return [
         opacity,
         this.getSvgFilter(),
@@ -423,7 +423,7 @@
    */
   fabric.Layer.fromObject = function (object, callback) {
     var objects = object.objects,
-      options = fabric.util.object.clone(object, true);
+        options = fabric.util.object.clone(object, true);
     delete options.objects;
     if (typeof objects === 'string') {
       // it has to be an url or something went wrong.
