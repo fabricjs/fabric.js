@@ -67,7 +67,18 @@
         object.layer = this;
         object.setCoords();
       }, this);
-      this._applyBoundingRect();
+      var rect = this.getBoundingRect(true, true);
+      this.width = options.width || rect.width;
+      this.height = options.height || rect.height;
+      var point = new fabric.Point(options.left || rect.left, options.top || rect.top);
+      var originX = 'left', originY = 'top';
+      if (options.originX && options.left) {
+        originX = options.originX;
+      }
+      if (options.originY && options.top) {
+        originY = options.originY;
+      }
+      this.setPositionByOrigin(point, originX, originY);
       this.setCoords();
       this._attachTransformHandler();
     },
