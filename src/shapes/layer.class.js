@@ -146,7 +146,8 @@
      */
     _applyBoundingRect: function () {
       const rect = this.getBoundingRect(true);
-      this.set(rect);
+      this.set({ width: rect.width, height: rect.height });
+      this.setPositionByOrigin({ x: rect.left, y: rect.top }, 'left', 'top');
     },
 
     /**
