@@ -62,7 +62,7 @@
      */
     initialize: function (objects, options) {
       this.callSuper('initialize', options || {});
-      this._objects = objects;
+      this._objects = objects || [];
       this.forEachObject(function (object) {
         object.layer = this;
       }, this);
