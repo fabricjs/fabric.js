@@ -66,7 +66,7 @@
       this.forEachObject(function (object) {
         object.layer = this;
       }, this);
-      this._applyLayoutStrategy(false);
+      this._applyBoundingRect();
       this._attachTransformHandler();
     },
 
@@ -163,24 +163,22 @@
      */
     _applyBoundingRect: function (maintainPosition = false) {
       const rect = this.getBoundingRect(true, true);
-      var center = this.getCenterPoint();
-      // this.set({ width: rect.width, height: rect.height });
-      // this.setPositionByOrigin({ x: rect.left, y: rect.top }, 'left', 'top');
-      /*
-      if (maintainPosition) {
-        this.setPositionByOrigin(center, 'center', 'center');
-      } else {
-      
-      }*/
-      //this.setCoords();
-      this.dirty = true;
+      this.set({ width: rect.width, height: rect.height });
+      !maintainPosition && this.setPositionByOrigin({ x: rect.left, y: rect.top }, 'left', 'top');
     },
 
     /**
      * @private
      */
     _applyLayoutStrategy: function (maintainPosition) {
-      this.layoutStrategy === 'wrap-content' && this._applyBoundingRect(maintainPosition);
+      return
+      if (this.layoutStrategy === 'wrap-content') {
+        var pre = this.calcTransformMatrix();
+        this._applyBoundingRect(maintainPosition);
+        this.applyTransformToObjects(pre);
+        this.setCoords();
+        this.dirty = true;
+      }
     },
 
     /**
