@@ -82,7 +82,7 @@
         parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
-      value = '';
+      value = null;
     }
     else if (attr === 'strokeUniform') {
       return (value === 'non-scaling-stroke');
