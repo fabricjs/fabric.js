@@ -364,21 +364,6 @@
     },
 
     /**
-     * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
-    _toSVG: function (reviver) {
-      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t\t', this._objects[i].toSVG(reviver));
-      }
-      svgString.push('</g>\n');
-      return svgString;
-    },
-
-    /**
      * Returns styles-string for svg-export, specific version for layer
      * @return {String}
      */
@@ -391,6 +376,21 @@
         this.getSvgFilter(),
         visibility
       ].join('');
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    _toSVG: function (reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
+      }
+      svgString.push('</g>\n');
+      return svgString;
     },
 
     /**
