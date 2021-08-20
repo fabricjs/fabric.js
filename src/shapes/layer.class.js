@@ -321,36 +321,6 @@
       });
     },
 
-    /**
-     * make a layer an active selection, remove the layer from canvas
-     * the layer has to be on canvas for this to work.
-     * @return {fabric.ActiveSelection} thisArg
-     * @chainable
-     */
-    toActiveSelection: function () {
-      if (!this.canvas) {
-        return;
-      }
-      var objects = this._objects, canvas = this.canvas;
-      this._objects = [];
-      var options = this.toObject();
-      delete options.objects;
-      var activeSelection = new fabric.ActiveSelection([]);
-      activeSelection.set(options);
-      activeSelection.type = 'activeSelection';
-      canvas.remove(this);
-      objects.forEach(function (object) {
-        object.layer = activeSelection;
-        object.dirty = true;
-        canvas.add(object);
-      });
-      activeSelection.canvas = canvas;
-      activeSelection._objects = objects;
-      canvas._activeObject = activeSelection;
-      activeSelection.setCoords();
-      return activeSelection;
-    },
-
     /* _TO_SVG_START_ */
     /**
      * Returns transform-string for svg-export
