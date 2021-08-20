@@ -65,8 +65,10 @@
       this._objects = objects || [];
       this.forEachObject(function (object) {
         object.layer = this;
+        object.setCoords();
       }, this);
       this._applyBoundingRect();
+      this.setCoords();
       this._attachTransformHandler();
     },
 
@@ -105,6 +107,20 @@
           this.applyTransformToObjects(pre);
         },
     */
+
+    /**
+     * @private
+     */
+    _set: function (key, value) {
+      if (key === 'canvas') {
+        var i = this._objects.length;
+        while (i--) {
+          this._objects[i]._set(key, value);
+        }
+      }
+      fabric.Object.prototype._set.call(this, key, value);
+    },
+
     /**
      * @private
      */
