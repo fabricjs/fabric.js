@@ -66,7 +66,7 @@
       this.forEachObject(function (object) {
         object.layer = this;
       }, this);
-      this._applyLayoutStrategy();
+      this._applyLayoutStrategy(false);
       this._attachTransformHandler();
     },
 
@@ -79,15 +79,32 @@
         _this._originalTransform = _this.calcTransformMatrix();
       });
       this.on('modified', function () {
-        var pre = fabric.util.invertTransform(_this._originalTransform),
-          post = _this.calcTransformMatrix(),
-          transform = fabric.util.multiplyTransformMatrices(post, pre);
-        this.forEachObject(function (object) {
-          fabric.util.addTransformToObject(object, transform);
-        });
+        _this.applyTransformToObjects(_this._originalTransform);
       });
     },
 
+    /**
+     * 
+     * @param {number[]} pre layer transform to remove
+     * @param {number[]} [post] layer transform to add, if no value is provided the current transform is used
+     */
+    applyTransformToObjects: function (pre, post) {
+      var inv = fabric.util.invertTransform(pre);
+      post = post || this.calcTransformMatrix();
+      this.forEachObject(function (object) {
+        var localTransform = fabric.util.multiplyTransformMatrices(inv, object.calcTransformMatrix());
+        var transform = fabric.util.multiplyTransformMatrices(post, localTransform);
+        fabric.util.applyTransformToObject(object, transform);
+        object.setCoords();
+      });
+    },
+    /*
+        setPositionByOrigin: function (pos, originX, originY) {
+          var pre = this.calcTransformMatrix();
+          this.callSuper('setPositionByOrigin', pos, originX, originY);
+          this.applyTransformToObjects(pre);
+        },
+    */
     /**
      * @private
      */
@@ -144,17 +161,26 @@
     /**
      * @private
      */
-    _applyBoundingRect: function () {
-      const rect = this.getBoundingRect(true);
-      this.set({ width: rect.width, height: rect.height });
-      this.setPositionByOrigin({ x: rect.left, y: rect.top }, 'left', 'top');
+    _applyBoundingRect: function (maintainPosition = false) {
+      const rect = this.getBoundingRect(true, true);
+      var center = this.getCenterPoint();
+      // this.set({ width: rect.width, height: rect.height });
+      // this.setPositionByOrigin({ x: rect.left, y: rect.top }, 'left', 'top');
+      /*
+      if (maintainPosition) {
+        this.setPositionByOrigin(center, 'center', 'center');
+      } else {
+      
+      }*/
+      //this.setCoords();
+      this.dirty = true;
     },
 
     /**
      * @private
      */
-    _applyLayoutStrategy: function () {
-      this.layoutStrategy === 'wrap-content' && this._applyBoundingRect();
+    _applyLayoutStrategy: function (maintainPosition) {
+      this.layoutStrategy === 'wrap-content' && this._applyBoundingRect(maintainPosition);
     },
 
     /**
