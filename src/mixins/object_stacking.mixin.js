@@ -6,8 +6,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   sendToBack: function() {
-    if (this.group) {
-      fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
+    if (this.group || this.layer) {
+      fabric.StaticCanvas.prototype.sendToBack.call(this.group || this.layer, this);
     }
     else if (this.canvas) {
       this.canvas.sendToBack(this);
@@ -21,8 +21,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringToFront: function() {
-    if (this.group) {
-      fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
+    if (this.group || this.layer) {
+      fabric.StaticCanvas.prototype.bringToFront.call(this.group || this.layer, this);
     }
     else if (this.canvas) {
       this.canvas.bringToFront(this);
@@ -37,8 +37,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   sendBackwards: function(intersecting) {
-    if (this.group) {
-      fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
+    if (this.group || this.layer) {
+      fabric.StaticCanvas.prototype.sendBackwards.call(this.group || this.layer, this, intersecting);
     }
     else if (this.canvas) {
       this.canvas.sendBackwards(this, intersecting);
@@ -53,8 +53,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringForward: function(intersecting) {
-    if (this.group) {
-      fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
+    if (this.group || this.layer) {
+      fabric.StaticCanvas.prototype.bringForward.call(this.group || this.layer, this, intersecting);
     }
     else if (this.canvas) {
       this.canvas.bringForward(this, intersecting);
@@ -71,6 +71,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   moveTo: function(index) {
     if (this.group && this.group.type !== 'activeSelection') {
       fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
+    }
+    else if (this.layer) {
+      fabric.StaticCanvas.prototype.moveTo.call(this.layer, this, index);
     }
     else if (this.canvas) {
       this.canvas.moveTo(this, index);
