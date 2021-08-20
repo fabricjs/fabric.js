@@ -46,6 +46,27 @@
     return this;
   }
 
+  function _once(eventName, handler) {
+    var _handler = function () {
+      handler();
+      this.off(eventName, _handler);
+    }.bind(this);
+    this.on(eventName, _handler);
+  }
+
+  function once(eventName, handler) {
+    // one object with key/value pairs was passed
+    if (arguments.length === 1) {
+      for (var prop in eventName) {
+        _once.call(this, prop, eventName[prop]);
+      }
+    }
+    else {
+      _once.call(this, eventName, handler);
+    }
+    return this;
+  }
+
   /**
    * Stops event observing for a particular event handler. Calling this method
    * without arguments removes all handlers for all events
@@ -114,6 +135,7 @@
   fabric.Observable = {
     fire: fire,
     on: on,
+    once: once,
     off: off,
   };
 })();
