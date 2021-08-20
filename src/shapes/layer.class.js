@@ -358,8 +358,7 @@
      * @return {String}
      */
     getSvgTransform: function (full, additionalTransform) {
-      var transform = fabric.util.invertTransform(full ? this.calcTransformMatrix() : this.calcOwnMatrix()),
-        svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
+      var svgTransform = 'transform="' + fabric.util.matrixToSVG([1, 0, 0, 1, 0, 0]);
       return svgTransform +
         (additionalTransform || '') + '" ';
     },
