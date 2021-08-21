@@ -966,8 +966,8 @@
      */
     getObjectOpacity: function() {
       var opacity = this.opacity;
-      if (this.group) {
-        opacity *= this.group.getObjectOpacity();
+      if (this.group || this.layer) {
+        opacity *= (this.group || this.layer).getObjectOpacity();
       }
       return opacity;
     },
@@ -996,20 +996,21 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
-      else if (key === 'dirty' && this.group) {
-        this.group.set('dirty', value);
+      else if (key === 'dirty' && (this.group || this.layer)) {
+        (this.group || this.layer).set('dirty', value);
       }
 
       this[key] = value;
 
       if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
+        var container = this.group || this.layer;
+        groupNeedsUpdate = container && container.isOnACache();
         if (this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
+          groupNeedsUpdate && container.set('dirty', true);
         }
         else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
-          this.group.set('dirty', true);
+          container.set('dirty', true);
         }
       }
       return this;
@@ -1059,7 +1060,7 @@
       if (this.isNotVisible()) {
         return;
       }
-      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.layer && !this.isOnScreen()) {
         return;
       }
       ctx.save();
@@ -1163,7 +1164,7 @@
     shouldCache: function() {
       this.ownCaching = this.needsItsOwnCache() || (
         this.objectCaching &&
-        (!this.group || !this.group.isOnACache())
+        ((!this.group || !this.group.isOnACache()) || (!this.layer || !this.layer.isOnACache()))
       );
       return this.ownCaching;
     },
@@ -1703,9 +1704,11 @@
 
       var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
+          originalLayer = this.layer,
           originalShadow = this.shadow, abs = Math.abs,
           multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1);
       delete this.group;
+      delete this.layer;
       if (options.withoutTransform) {
         utils.resetObjectTransform(this);
       }
@@ -1755,6 +1758,9 @@
       this.set('canvas', originalCanvas);
       if (originalGroup) {
         this.group = originalGroup;
+      }
+      if (originalLayer) {
+        this.layer = originalLayer;
       }
       this.set(origParams).setCoords();
       // canvas.dispose will call image.dispose that will nullify the elements
