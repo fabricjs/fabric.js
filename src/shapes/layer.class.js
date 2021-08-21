@@ -256,11 +256,12 @@
      */
     drawObject: function (ctx) {
       var m = fabric.util.invertTransform(this.calcTransformMatrix());
+      ctx.save();
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].render(ctx);
       }
-      this.transform(ctx);
+      ctx.restore();
       this._drawClipPath(ctx);
     },
 
