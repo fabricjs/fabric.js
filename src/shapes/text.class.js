@@ -12,7 +12,7 @@
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path pathStartOffset pathSide').split(' ');
 
   /**
    * Text class
@@ -39,7 +39,9 @@
       'charSpacing',
       'textAlign',
       'styles',
-      'path'
+      'path',
+      'pathStartOffset',
+      'pathSide'
     ],
 
     /**
@@ -1515,6 +1517,8 @@
         'charSpacing',
         'path',
         'direction',
+        'pathStartOffset',
+        'pathSide'
       ].concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProperties);
       obj.styles = clone(this.styles, true);
