@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+- feat(Observable.once): Add once event handler (#7317)
 - feat(fabric.Object): Improve drawing of controls in group. (#7119)
 - fix(EraserBrush): intersectsWithObject edge cases (#7290)
 - fix(EraserBrush): dump canvas bg/overlay color support (#7289)
