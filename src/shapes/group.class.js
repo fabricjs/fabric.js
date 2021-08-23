@@ -167,8 +167,6 @@
         this.supressAddedEvent = true;
         this.add(object);
         this.supressAddedEvent = false;
-        object.group = this;
-        object._set('canvas', this.canvas);
       }
       this._calcBounds();
       this._updateObjectsCoords();
