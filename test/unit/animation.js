@@ -3,10 +3,14 @@
 
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
-    function testing(val, changePerc) {
-      if (changePerc !== 1) {
+    function testing(val, complete) {
+      if (complete !== 1) {
         assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
       }
+      else {
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+      }
+      assert.ok(typeof val === 'string', 'expected type is String');
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor('red', 'blue', 16, {
@@ -20,6 +24,23 @@
       onChange: testing,
     });
   });
+
+  // QUnit.test('fabric.util.animate', function(assert) {
+  //   var done = assert.async();
+  //   function testing(val) {
+  //     assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+  //     assert.ok(typeof val === 'String');
+  //   }
+  //   assert.ok(typeof fabric.util.animate === 'function', 'fabric.util.animate is a function');
+  //   fabric.util.animate('red', 'blue', 16, {
+  //     onComplete: function() {
+  //       // animate color need some fixing
+  //       // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
+  //       done();
+  //     },
+  //     onChange: testing,
+  //   });
+  // });
 
   QUnit.test('animate', function(assert) {
     var done = assert.async();

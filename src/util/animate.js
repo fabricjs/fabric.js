@@ -23,11 +23,7 @@
    * @returns {Function} abort function
    */
   function animate(options) {
-    var aborted = false;
-    var abort = function () {
-      aborted = true;
-    };
-
+    var cancel = false;
     requestAnimFrame(function(timestamp) {
       options || (options = { });
 
@@ -52,11 +48,12 @@
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
             valuePerc = Math.abs((current - startValue) / byValue);
-        
-        if (aborted) {
-          return
+        if (cancel) {
+          return;
         }
         if (abort(current, valuePerc, timePerc)) {
+          // remove this in 4.0
+          // does to even make sense to abort and run onComplete?
           onComplete(endValue, 1, 1);
           return;
         }
@@ -71,8 +68,9 @@
         }
       })(start);
     });
-
-    return abort;
+    return function() {
+      cancel = true;
+    };
   }
 
   var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
