@@ -164,7 +164,9 @@
           // if this group is inside another group, we need to pre transform the object
           fabric.util.removeTransformFromObject(object, this.group.calcTransformMatrix());
         }
+        this.supressAddedEvent = true;
         this.add(object);
+        this.supressAddedEvent = false;
         object.group = this;
         object._set('canvas', this.canvas);
       }
@@ -177,6 +179,7 @@
       else {
         this.setCoords();
       }
+      this._fireGroupEvent('added', object);
       return this;
     },
 
@@ -189,12 +192,14 @@
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       fabric.util.resetObjectTransform(this);
-
+      this.supressRemovedEvent = true;
       this.remove(object);
+      this.supressRemovedEvent = false;
       this._calcBounds();
       this._updateObjectsCoords();
       this.setCoords();
       this.dirty = true;
+      this._fireGroupEvent('removed', object);
       return this;
     },
 
@@ -205,18 +210,26 @@
       this.dirty = true;
       object.group = this;
       object._set('canvas', this.canvas);
-      this.fire('object:added', { target: object });
-      object.fire('added', { target: this });
+      !this.supressAddedEvent && this._fireGroupEvent('added', object);
     },
 
     /**
      * @private
      */
     _onObjectRemoved: function (object) {
-      this.fire('object:removed', { target: object });
-      object.fire('removed', { target: this });
+      !this.supressRemovedEvent && this._fireGroupEvent('removed', object);
       this.dirty = true;
       delete object.group;
+    },
+
+    /**
+     * 
+     * @param {'added'|'removed'} prefix 
+     * @param {fabric.Object} object 
+     */
+    _fireGroupEvent: function (prefix, object) {
+      this.fire(`object:${prefix}`, { target: object });
+      object.fire(prefix, { target: this });
     },
 
     /**
