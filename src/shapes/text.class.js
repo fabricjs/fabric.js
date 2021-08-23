@@ -1506,7 +1506,14 @@
       additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProps);
       obj.styles = clone(this.styles, true);
-      obj.path = this.path && this.path.toObject();
+      if(obj.path) {
+        obj.path = this.path.toObject();
+      }
+      else {
+        delete obj.path;
+        delete obj.pathStartOffset;
+        delete obj.pathSide;
+      }
       return obj;
     },
 
