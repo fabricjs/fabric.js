@@ -1506,7 +1506,7 @@
       additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', additionalProps);
       obj.styles = clone(this.styles, true);
-      if(obj.path) {
+      if (obj.path) {
         obj.path = this.path.toObject();
       }
       else {
