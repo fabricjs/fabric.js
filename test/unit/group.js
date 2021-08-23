@@ -87,9 +87,22 @@
     assert.strictEqual(group.item(group.size() - 1), rect1, 'last object should be newly added one');
     assert.equal(group.getObjects().length, 3, 'there should be 3 objects');
 
+    var fullMatrix = rect2.calcOwnMatrix();
+    var firedGroup = 0, firedObject = 0;
+    group.on('object:added', function (ev) {
+      firedGroup++;
+      assert.ok(ev.target === rect2 || ev.target === rect3);
+    });
+    rect2.on('added', function (ev) {
+      firedObject++;
+      assert.equal(ev.target, group);
+      assert.deepEqual(fullMatrix, rect2.calcOwnMatrix());
+    });
     group.add(rect2, rect3);
     assert.strictEqual(group.item(group.size() - 1), rect3, 'last object should be last added one');
     assert.equal(group.size(), 5, 'there should be 5 objects');
+    assert.equal(firedGroup, 2);
+    assert.equal(firedObject, 1);
   });
 
   QUnit.test('remove', function(assert) {
@@ -688,9 +701,22 @@
         group = new fabric.Group([rect1]);
 
     var coords = group.oCoords;
+    var fullMatrix = rect2.calcOwnMatrix();
+    var firedGroup = 0, firedObject = 0;
+    group.on('object:added', function (ev) {
+      firedGroup++;
+      assert.equal(ev.target, rect2);
+    });
+    rect2.on('added', function (ev) {
+      firedObject++;
+      assert.equal(ev.target, group);
+      assert.deepEqual(fullMatrix, fabric.util.multiplyTransformMatrices(group.calcOwnMatrix(), rect2.calcOwnMatrix()));
+    });
     group.addWithUpdate(rect2);
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
+    assert.equal(firedGroup, 1);
+    assert.equal(firedObject, 1);
   });
 
   QUnit.test('group removeWithUpdate', function(assert) {
@@ -699,6 +725,17 @@
         group = new fabric.Group([rect1, rect2]);
 
     var coords = group.oCoords;
+    var fullMatrix = fabric.util.multiplyTransformMatrices(group.calcOwnMatrix(), rect2.calcOwnMatrix());
+    var firedGroup = 0, firedObject = 0;
+    group.on('object:removed', function (ev) {
+      firedGroup++;
+      assert.equal(ev.target, rect2);
+    });
+    rect2.on('removed', function (ev) {
+      firedObject++;
+      assert.equal(ev.target, group);
+      assert.deepEqual(rect2.calcOwnMatrix(), fullMatrix);
+    });
     group.removeWithUpdate(rect2);
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
