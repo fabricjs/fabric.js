@@ -178,7 +178,7 @@
     var object = new fabric.Object({ left: 123, top: 124 });
 
     var context;
-    var abort = object.animate({ left: 223, top: 224 }, {
+    var abort = object._animate('left', 223, {
       abort: function () {
         context = this;
         return false;
@@ -190,7 +190,6 @@
 
     setTimeout(function () {
       assert.equal(123, Math.round(object.get('left')));
-      assert.equal(124, Math.round(object.get('top')));
       assert.equal(context, undefined, 'declarative abort should not be called after imperative abort was called');
       done();
     }, 100);
