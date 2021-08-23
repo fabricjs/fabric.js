@@ -48,7 +48,7 @@
 
   function _once(eventName, handler) {
     var _handler = function () {
-      handler.apply(this, arguments)
+      handler.apply(this, arguments);
       this.off(eventName, _handler);
     }.bind(this);
     this.on(eventName, _handler);
