@@ -27,6 +27,7 @@ QUnit.test('fire once', function (assert) {
 
   var eventFired = 0;
   foo.once('bar:baz', function () {
+    assert.equal(this, foo);
     eventFired++;
   });
 
@@ -42,15 +43,21 @@ QUnit.test('fire once multiple handlers', function (assert) {
   var eventFired = 0;
   var eventFired2 = 0;
   var eventFired3 = 0;
+  var eventData = { a: 'b', c: 'd' };
   foo.once({
     'bar:baz': function () {
       eventFired++;
+      assert.equal(this, foo);
     },
     'blah:blah': function () {
       eventFired2++;
+      assert.equal(this, foo);
     },
-    'blah:blah:bloo': function () {
+    'blah:blah:bloo': function (e) {
       eventFired3++;
+      assert.equal(this, foo);
+      assert.deepEqual(arguments[0], eventData);
+      assert.equal(e, eventData);
     }
   });
   foo.fire('bar:baz');
@@ -64,6 +71,7 @@ QUnit.test('fire once multiple handlers', function (assert) {
   assert.equal(eventFired, 1);
   assert.equal(eventFired2, 1);
   assert.equal(eventFired3, 0);
+  foo.fire('blah:blah:bloo', eventData);
 });
 
 QUnit.test('off', function(assert) {
