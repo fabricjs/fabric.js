@@ -52,7 +52,11 @@
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
             valuePerc = Math.abs((current - startValue) / byValue);
-        if (aborted || abort()) {
+        
+        if (aborted) {
+          return
+        }
+        if (abort(current, valuePerc, timePerc)) {
           onComplete(endValue, 1, 1);
           return;
         }
