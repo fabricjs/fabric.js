@@ -13,7 +13,7 @@
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
     ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
-    ' path pathStartOffset pathSide').split(' ');
+    ' direction path pathStartOffset pathSide').split(' ');
 
   /**
    * Text class
