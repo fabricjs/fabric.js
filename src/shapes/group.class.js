@@ -179,7 +179,7 @@
       else {
         this.setCoords();
       }
-      this._fireGroupEvent('added', object);
+      object && this._fireGroupEvent('added', object);
       return this;
     },
 
@@ -199,7 +199,7 @@
       this._updateObjectsCoords();
       this.setCoords();
       this.dirty = true;
-      this._fireGroupEvent('removed', object);
+      object && this._fireGroupEvent('removed', object);
       return this;
     },
 
@@ -228,7 +228,7 @@
      * @param {fabric.Object} object 
      */
     _fireGroupEvent: function (prefix, object) {
-      this.fire(`object:${prefix}`, { target: object });
+      this.fire('object:' + prefix, { target: object });
       object.fire(prefix, { target: this });
     },
 
