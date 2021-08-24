@@ -498,6 +498,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      this.path && this.path._render(ctx);
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
