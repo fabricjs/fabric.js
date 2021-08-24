@@ -400,14 +400,13 @@
       }
       this._splitText();
       this._clearCache();
-      var textHeight = this.calcTextHeight();
       if (this.path) {
-        this.width = this.path.width + textHeight;
-        this.height = this.path.height + textHeight;
+        this.width = this.path.width;
+        this.height = this.path.height;
       }
       else {
         this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
-        this.height = textHeight;
+        this.height = this.calcTextHeight();
       }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.

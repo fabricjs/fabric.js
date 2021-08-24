@@ -778,6 +778,12 @@
           additionalHeight = height * 0.1;
         }
       }
+      if (this.type === 'text' && this.path) { 
+        shouldRedraw = true;
+        shouldResizeCanvas = true;
+        additionalWidth = this.fontSize * this.zoomX;
+        additionalHeight = this.fontSize * this.zoomY;
+      }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
           canvas.width = Math.ceil(width + additionalWidth);
