@@ -499,7 +499,7 @@
      */
     _render: function(ctx) {
       var path = this.path;
-      path && !path.isNotVisible(); path._render(ctx);
+      path && !path.isNotVisible() && path._render(ctx);
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
