@@ -778,11 +778,11 @@
           additionalHeight = height * 0.1;
         }
       }
-      if (this.type === 'text' && this.path) { 
+      if (this instanceof fabric.Text && this.path) { 
         shouldRedraw = true;
         shouldResizeCanvas = true;
-        additionalWidth = this.fontSize * this.zoomX;
-        additionalHeight = this.fontSize * this.zoomY;
+        additionalWidth += this.getHeightOfLine(0) * this.zoomX;
+        additionalHeight += this.getHeightOfLine(0) * this.zoomY;
       }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
