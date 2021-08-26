@@ -778,7 +778,7 @@
           additionalHeight = height * 0.1;
         }
       }
-      if (this instanceof fabric.Text && this.path) { 
+      if (this instanceof fabric.Text && this.path) {
         shouldRedraw = true;
         shouldResizeCanvas = true;
         additionalWidth += this.getHeightOfLine(0) * this.zoomX;
