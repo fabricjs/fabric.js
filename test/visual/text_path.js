@@ -127,7 +127,8 @@
   function textpath6(canvas, callback) {
     var path = new fabric.Path('M 0 0 A 150 350 0 0 1 250 0', {
       strokeWidth: 2,
-      stroke: 'red',
+      stroke: 'blue',
+      opacity: 0.5,
       left: 25,
       top: 25,
       fill: 'transparent'
@@ -140,14 +141,13 @@
       pathStartOffset: 100,
       path: path
     });
-    canvas.add(path);
     canvas.add(text);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }
 
   tests.push({
-    test: 'textpath with pathSide and pathStartOffset',
+    test: 'textpath with pathSide and pathStartOffset and painted path',
     code: textpath6,
     golden: 'textpath6.png',
     percentage: 0.09,
