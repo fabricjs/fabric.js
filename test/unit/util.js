@@ -1091,7 +1091,7 @@
     assert.notOk(fabric.util.isTouchEvent({ pointerType: 'mouse' }));
   });
 
-  QUnit.test('fabric.util.transformPath can scale a path', function(assert) {
+  QUnit.test('fabric.util.transformPath can scale a path by 2', function(assert) {
     assert.ok(typeof fabric.util.transformPath === 'function');
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
@@ -1100,7 +1100,6 @@
     assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 z');
   });
   QUnit.test('fabric.util.transformPath can apply a generic transform', function(assert) {
-    assert.ok(typeof fabric.util.transformPath === 'function');
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
