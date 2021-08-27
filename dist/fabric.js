@@ -475,19 +475,10 @@ fabric.Collection = {
   /**
    * Returns true if collection contains an object
    * @param {Object} object Object to check against
-   * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
    */
-  contains: function (object, deep) {
-    if (this._objects.indexOf(object) > -1) {
-      return true;
-    }
-    else if (deep) {
-      return this._objects.some(function (obj) {
-        return typeof obj.contains === 'function' && obj.contains(object, true);
-      });
-    }
-    return false;
+  contains: function(object) {
+    return this._objects.indexOf(object) > -1;
   },
 
   /**
@@ -1144,8 +1135,6 @@ fabric.CommonMethods = {
     },
 
     /**
-     * WARNING: THIS WAS TO SUPPORT OLD BROWSERS. deprecated.
-     * WILL BE REMOVED IN FABRIC 5.0
      * Draws a dashed line between two points
      *
      * This method is used to draw dashed line around selection area.
@@ -1157,7 +1146,6 @@ fabric.CommonMethods = {
      * @param {Number} x2 end x coordinate
      * @param {Number} y2 end y coordinate
      * @param {Array} da dash array pattern
-     * @deprecated
      */
     drawDashedLine: function(ctx, x, y, x2, y2, da) {
       var dx = x2 - x,
@@ -2335,18 +2323,6 @@ fabric.CommonMethods = {
     }
   }
 
-  /**
-   *
-   * @param {string} pathString
-   * @return {(string|number)[][]} An array of SVG path commands
-   * @example <caption>Usage</caption>
-   * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
-   *   ['M', 3, 4],
-   *   ['Q', 3, 5, 2, 1, 4, 0],
-   *   ['Q', 9, 12, 2, 1, 4, 0],
-   * ];
-   *
-   */
   function parsePath(pathString) {
     var result = [],
         coords = [],
@@ -2416,46 +2392,6 @@ fabric.CommonMethods = {
   };
 
   /**
-   *
-   * Converts points to a smooth SVG path
-   * @param {{ x: number,y: number }[]} points Array of points
-   * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
-   * @return {(string|number)[][]} An array of SVG path commands
-   */
-  function getSmoothPathFromPoints(points, correction) {
-    var path = [], i,
-        p1 = new fabric.Point(points[0].x, points[0].y),
-        p2 = new fabric.Point(points[1].x, points[1].y),
-        len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
-    correction = correction || 0;
-
-    if (manyPoints) {
-      multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
-      multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
-    }
-    path.push(['M', p1.x - multSignX * correction, p1.y - multSignY * correction]);
-    for (i = 1; i < len; i++) {
-      if (!p1.eq(p2)) {
-        var midPoint = p1.midPointFrom(p2);
-        // p1 is our bezier control point
-        // midpoint is our endpoint
-        // start point is p(i-1) value.
-        path.push(['Q', p1.x, p1.y, midPoint.x, midPoint.y]);
-      }
-      p1 = points[i];
-      if ((i + 1) < points.length) {
-        p2 = points[i + 1];
-      }
-    }
-    if (manyPoints) {
-      multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
-      multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
-    }
-    path.push(['L', p1.x + multSignX * correction, p1.y + multSignY * correction]);
-    return path;
-  }
-
-  /**
    * Calculate bounding box of a elliptic-arc
    * @deprecated
    * @param {Number} fx start point of arc
@@ -2501,7 +2437,6 @@ fabric.CommonMethods = {
 
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
-  fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
   fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
   fabric.util.fromArcToBeziers = fromArcToBeziers;
   /**
@@ -2625,7 +2560,6 @@ fabric.CommonMethods = {
    * @memberOf fabric.util.object
    * @param {Object} destination Where to copy to
    * @param {Object} source Where to copy from
-   * @param {Boolean} [deep] Whether to extend nested objects
    * @return {Object}
    */
 
@@ -2671,14 +2605,11 @@ fabric.CommonMethods = {
 
   /**
    * Creates an empty object and copies all enumerable properties of another object to it
-   * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
    * @memberOf fabric.util.object
+   * TODO: this function return an empty object if you try to clone null
    * @param {Object} object Object to clone
-   * @param {Boolean} [deep] Whether to clone nested objects
    * @return {Object}
    */
-
-  //TODO: this function return an empty object if you try to clone null
   function clone(object, deep) {
     return extend({ }, object, deep);
   }
@@ -8972,7 +8903,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
 
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      this._originalCanvasStyle = this.lowerCanvasEl.style;
+
       if (this.interactive) {
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
@@ -9262,7 +9193,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @chainable
      */
     clear: function () {
-      this.remove.apply(this, this.getObjects());
+      this._objects.length = 0;
       this.backgroundImage = null;
       this.overlayImage = null;
       this.backgroundColor = '';
@@ -9608,7 +9539,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         version: fabric.version,
         objects: this._toObjects(methodName, propertiesToInclude),
       };
-      if (clipPath && !clipPath.excludeFromExport) {
+      if (clipPath) {
         data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
       }
       extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
@@ -9651,32 +9582,24 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @private
      */
     __serializeBgOverlay: function(methodName, propertiesToInclude) {
-      var data = {}, bgImage = this.backgroundImage, overlayImage = this.overlayImage,
-          bgColor = this.backgroundColor, overlayColor = this.overlayColor;
+      var data = { }, bgImage = this.backgroundImage, overlay = this.overlayImage;
 
-      if (bgColor && bgColor.toObject) {
-        if (!bgColor.excludeFromExport) {
-          data.background = bgColor.toObject(propertiesToInclude);
-        }
-      }
-      else if (bgColor) {
-        data.background = bgColor;
+      if (this.backgroundColor) {
+        data.background = this.backgroundColor.toObject
+          ? this.backgroundColor.toObject(propertiesToInclude)
+          : this.backgroundColor;
       }
 
-      if (overlayColor && overlayColor.toObject) {
-        if (!overlayColor.excludeFromExport) {
-          data.overlay = overlayColor.toObject(propertiesToInclude);
-        }
+      if (this.overlayColor) {
+        data.overlay = this.overlayColor.toObject
+          ? this.overlayColor.toObject(propertiesToInclude)
+          : this.overlayColor;
       }
-      else if (overlayColor) {
-        data.overlay = overlayColor;
-      }
-
       if (bgImage && !bgImage.excludeFromExport) {
         data.backgroundImage = this._toObject(bgImage, methodName, propertiesToInclude);
       }
-      if (overlayImage && !overlayImage.excludeFromExport) {
-        data.overlayImage = this._toObject(overlayImage, methodName, propertiesToInclude);
+      if (overlay && !overlay.excludeFromExport) {
+        data.overlayImage = this._toObject(overlay, methodName, propertiesToInclude);
       }
 
       return data;
@@ -10219,13 +10142,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      // restore canvas style
-      this.lowerCanvasEl.classList.remove('lower-canvas');
-      this.lowerCanvasEl.style = this._originalCanvasStyle;
-      delete this._originalCanvasStyle;
-      // restore canvas size to original size in case retina scaling was applied
-      this.lowerCanvasEl.setAttribute('width', this.width);
-      this.lowerCanvasEl.setAttribute('height', this.height);
       fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
       this.lowerCanvasEl = undefined;
       return this;
@@ -10397,7 +10313,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.lineCap = this.strokeLineCap;
     ctx.miterLimit = this.strokeMiterLimit;
     ctx.lineJoin = this.strokeLineJoin;
-    ctx.setLineDash(this.strokeDashArray || []);
+    if (fabric.StaticCanvas.supports('setLineDash')) {
+      ctx.setLineDash(this.strokeDashArray || []);
+    }
   },
 
   /**
@@ -10642,26 +10560,43 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     /**
      * Converts points to SVG path
      * @param {Array} points Array of points
-     * @return {(string|number)[][]} SVG path commands
+     * @return {String} SVG path
      */
-    convertPointsToSVGPath: function (points) {
-      var correction = this.width / 1000;
-      return fabric.util.getSmoothPathFromPoints(points, correction);
-    },
+    convertPointsToSVGPath: function(points) {
+      var path = [], i, width = this.width / 1000,
+          p1 = new fabric.Point(points[0].x, points[0].y),
+          p2 = new fabric.Point(points[1].x, points[1].y),
+          len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
 
-    /**
-     * @private
-     * @param {(string|number)[][]} pathData SVG path commands
-     * @returns {boolean}
-     */
-    _isEmptySVGPath: function (pathData) {
-      var pathString = pathData.map(function (segment) { return segment.join(' '); }).join(' ');
-      return pathString === 'M 0 0 Q 0 0 0 0 L 0 0';
+      if (manyPoints) {
+        multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
+        multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
+      }
+      path.push('M ', p1.x - multSignX * width, ' ', p1.y - multSignY * width, ' ');
+      for (i = 1; i < len; i++) {
+        if (!p1.eq(p2)) {
+          var midPoint = p1.midPointFrom(p2);
+          // p1 is our bezier control point
+          // midpoint is our endpoint
+          // start point is p(i-1) value.
+          path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
+        }
+        p1 = points[i];
+        if ((i + 1) < points.length) {
+          p2 = points[i + 1];
+        }
+      }
+      if (manyPoints) {
+        multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
+        multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
+      }
+      path.push('L ', p1.x + multSignX * width, ' ', p1.y + multSignY * width);
+      return path;
     },
 
     /**
      * Creates fabric.Path object to add on canvas
-     * @param {(string|number)[][]} pathData Path data
+     * @param {String} pathData Path data
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function(pathData) {
@@ -10718,8 +10653,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
       }
-      var pathData = this.convertPointsToSVGPath(this._points);
-      if (this._isEmptySVGPath(pathData)) {
+      var pathData = this.convertPointsToSVGPath(this._points).join('');
+      if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
         // rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot,
@@ -11176,7 +11111,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      isTouchEvent = fabric.util.isTouchEvent;
+      abs = Math.abs,
+      supportLineDash = fabric.StaticCanvas.supports('setLineDash'),
+      isTouchEvent = fabric.util.isTouchEvent,
+      STROKE_OFFSET = 0.5;
 
   /**
    * Canvas class
@@ -11860,20 +11798,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {CanvasRenderingContext2D} ctx to draw the selection on
      */
     _drawSelection: function (ctx) {
-      var selector = this._groupSelector,
-          viewportStart = new fabric.Point(selector.ex, selector.ey),
-          start = fabric.util.transformPoint(viewportStart, this.viewportTransform),
-          viewportExtent = new fabric.Point(selector.ex + selector.left, selector.ey + selector.top),
-          extent = fabric.util.transformPoint(viewportExtent, this.viewportTransform),
-          minX = Math.min(start.x, extent.x),
-          minY = Math.min(start.y, extent.y),
-          maxX = Math.max(start.x, extent.x),
-          maxY = Math.max(start.y, extent.y),
-          strokeOffset = this.selectionLineWidth / 2;
+      var groupSelector = this._groupSelector,
+          left = groupSelector.left,
+          top = groupSelector.top,
+          aleft = abs(left),
+          atop = abs(top);
 
       if (this.selectionColor) {
         ctx.fillStyle = this.selectionColor;
-        ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
+
+        ctx.fillRect(
+          groupSelector.ex - ((left > 0) ? 0 : -left),
+          groupSelector.ey - ((top > 0) ? 0 : -top),
+          aleft,
+          atop
+        );
       }
 
       if (!this.selectionLineWidth || !this.selectionBorderColor) {
@@ -11882,13 +11821,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       ctx.lineWidth = this.selectionLineWidth;
       ctx.strokeStyle = this.selectionBorderColor;
 
-      minX += strokeOffset;
-      minY += strokeOffset;
-      maxX -= strokeOffset;
-      maxY -= strokeOffset;
       // selection border
-      fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
-      ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+      if (this.selectionDashArray.length > 1 && !supportLineDash) {
+
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop);
+
+        ctx.beginPath();
+
+        fabric.util.drawDashedLine(ctx, px, py, px + aleft, py, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py + atop - 1, px + aleft, py + atop - 1, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px, py + atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px + aleft - 1, py, px + aleft - 1, py + atop, this.selectionDashArray);
+
+        ctx.closePath();
+        ctx.stroke();
+      }
+      else {
+        fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
+        ctx.strokeRect(
+          groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+          groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
+          aleft,
+          atop
+        );
+      }
     },
 
     /**
@@ -13200,8 +13157,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this.selection && (!target ||
         (!target.selectable && !target.isEditing && target !== this._activeObject))) {
         this._groupSelector = {
-          ex: this._absolutePointer.x,
-          ey: this._absolutePointer.y,
+          ex: pointer.x,
+          ey: pointer.y,
           top: 0,
           left: 0
         };
@@ -13294,7 +13251,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = this._absolutePointer;
+        pointer = this._pointer;
 
         groupSelector.left = pointer.x - groupSelector.ex;
         groupSelector.top = pointer.y - groupSelector.ey;
@@ -13640,10 +13597,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           continue;
         }
 
-        if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2, true)) ||
-            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2, true) ||
-            (allowIntersect && currentObject.containsPoint(selectionX1Y1, null, true)) ||
-            (allowIntersect && currentObject.containsPoint(selectionX2Y2, null, true))
+        if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2)) ||
+            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
+            (allowIntersect && currentObject.containsPoint(selectionX1Y1)) ||
+            (allowIntersect && currentObject.containsPoint(selectionX2Y2))
         ) {
           group.push(currentObject);
           // only add one object if it's a click
@@ -14017,6 +13974,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash'),
       objectCaching = !fabric.isLikelyNode,
       ALIASING_LIMIT = 2;
 
@@ -14876,7 +14834,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
           };
 
-      if (this.clipPath && !this.clipPath.excludeFromExport) {
+      if (this.clipPath) {
         object.clipPath = this.clipPath.toObject(propertiesToInclude);
         object.clipPath.inverted = this.clipPath.inverted;
         object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
@@ -14939,17 +14897,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Object} object with scaleX and scaleY properties
      */
     getObjectScaling: function() {
-      // if the object is a top level one, on the canvas, we go for simple aritmetic
-      // otherwise the complex method with angles will return approximations and decimals
-      // and will likely kill the cache when not needed
-      // https://github.com/fabricjs/fabric.js/issues/7157
-      if (!this.group) {
-        return {
-          scaleX: this.scaleX,
-          scaleY: this.scaleY,
-        };
-      }
-      // if we are inside a group total zoom calculation is complex, we defer to generic matrices
       var options = fabric.util.qrDecompose(this.calcTransformMatrix());
       return { scaleX: Math.abs(options.scaleX), scaleY: Math.abs(options.scaleY) };
     },
@@ -15372,8 +15319,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Sets line dash
      * @param {CanvasRenderingContext2D} ctx Context to set the dash line on
      * @param {Array} dashArray array representing dashes
+     * @param {Function} alternative function to call if browser does not support lineDash
      */
-    _setLineDash: function(ctx, dashArray) {
+    _setLineDash: function(ctx, dashArray, alternative) {
       if (!dashArray || dashArray.length === 0) {
         return;
       }
@@ -15381,7 +15329,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (1 & dashArray.length) {
         dashArray.push.apply(dashArray, dashArray);
       }
-      ctx.setLineDash(dashArray);
+      if (supportsLineDash) {
+        ctx.setLineDash(dashArray);
+      }
+      else {
+        alternative && alternative(ctx);
+      }
     },
 
     /**
@@ -15404,11 +15357,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       }
-      ctx.rotate(degreesToRadians(options.angle));
-      if (styleOverride.forActiveSelection || this.group) {
+      if (styleOverride.forActiveSelection) {
+        ctx.rotate(degreesToRadians(options.angle));
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
       else {
+        ctx.rotate(degreesToRadians(this.angle));
         drawBorders && this.drawBorders(ctx, styleOverride);
       }
       drawControls && this.drawControls(ctx, styleOverride);
@@ -15551,7 +15505,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       else if (this.strokeUniform) {
         ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
-      this._setLineDash(ctx, this.strokeDashArray);
+      this._setLineDash(ctx, this.strokeDashArray, this._renderDashedStroke);
       this._setStrokeStyles(ctx, this);
       ctx.stroke();
       ctx.restore();
@@ -16904,7 +16858,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions, dimX, dimY,
+      var dimensions = this._getNonTransformedDimensions(), dimX, dimY,
           noSkew = skewX === 0 && skewY === 0;
 
       if (this.strokeUniform) {
@@ -16912,7 +16866,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         dimY = this.height;
       }
       else {
-        dimensions = this._getNonTransformedDimensions();
         dimX = dimensions.x;
         dimY = dimensions.y;
       }
@@ -17544,7 +17497,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
 
       ctx.strokeRect(
         -width / 2,
@@ -17597,7 +17550,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height =
             bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
       ctx.save();
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
+      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray, null);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
       ctx.strokeRect(
         -width / 2,
@@ -17622,29 +17575,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
-      ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
+      ctx.setTransform(this.canvas.getRetinaScaling(), 0, 0, this.canvas.getRetinaScaling(), 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
         ctx.strokeStyle = styleOverride.cornerStrokeColor || this.cornerStrokeColor;
       }
-      this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
+      this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray, null);
       this.setCoords();
-      if (this.group) {
-        // fabricJS does not really support drawing controls inside groups,
-        // this piece of code here helps having at least the control in places.
-        // If an application needs to show some objects as selected because of some UI state
-        // can still call Object._renderControls() on any object they desire, independently of groups.
-        // using no padding, circular controls and hiding the rotating cursor is higly suggested,
-        matrix = this.group.calcTransformMatrix();
-      }
       this.forEachControl(function(control, key, fabricObject) {
-        p = fabricObject.oCoords[key];
         if (control.getVisibility(fabricObject, key)) {
-          if (matrix) {
-            p = fabric.util.transformPoint(p, matrix);
-          }
-          control.render(ctx, p.x, p.y, styleOverride, fabricObject);
+          control.render(ctx,
+            fabricObject.oCoords[key].x,
+            fabricObject.oCoords[key].y, styleOverride, fabricObject);
         }
       });
       ctx.restore();
@@ -17970,7 +17912,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
-      coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
+      coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 },
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
@@ -18118,10 +18061,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _render: function(ctx) {
       ctx.beginPath();
 
-
-      var p = this.calcLinePoints();
-      ctx.moveTo(p.x1, p.y1);
-      ctx.lineTo(p.x2, p.y2);
+      if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
+        // move from center (of virtual box) to its left/top corner
+        // we can't assume x1, y1 is top left and x2, y2 is bottom right
+        var p = this.calcLinePoints();
+        ctx.moveTo(p.x1, p.y1);
+        ctx.lineTo(p.x2, p.y2);
+      }
 
       ctx.lineWidth = this.strokeWidth;
 
@@ -18132,6 +18078,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.strokeStyle = this.stroke || ctx.fillStyle;
       this.stroke && this._renderStroke(ctx);
       ctx.strokeStyle = origStrokeStyle;
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var p = this.calcLinePoints();
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, p.x1, p.y1, p.x2, p.y2, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -18489,10 +18447,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @memberOf fabric.Circle
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @return {void}
+   * @return {Object} Instance of fabric.Circle
    */
   fabric.Circle.fromObject = function(object, callback) {
-    fabric.Object._fromObject('Circle', object, callback);
+    return fabric.Object._fromObject('Circle', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -18554,6 +18512,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.closePath();
 
       this._renderPaintInOrder(ctx);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, -widthBy2, heightBy2, 0, -heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, 0, -heightBy2, widthBy2, heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, widthBy2, heightBy2, -widthBy2, heightBy2, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /* _TO_SVG_START_ */
@@ -18767,10 +18740,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @memberOf fabric.Ellipse
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
-   * @return {void}
+   * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromObject = function(object, callback) {
-    fabric.Object._fromObject('Ellipse', object, callback);
+    return fabric.Object._fromObject('Ellipse', object, callback);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -18887,6 +18860,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.closePath();
 
       this._renderPaintInOrder(ctx);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var x = -this.width / 2,
+          y = -this.height / 2,
+          w = this.width,
+          h = this.height;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -19154,6 +19145,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var p1, p2;
+
+      ctx.beginPath();
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        p1 = this.points[i];
+        p2 = this.points[i + 1] || p1;
+        fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
+      }
+    },
+
+    /**
      * Returns complexity of an instance
      * @return {Number} complexity of this instance
      */
@@ -19249,6 +19255,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._renderPaintInOrder(ctx);
     },
 
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      this.callSuper('_renderDashedStroke', ctx);
+      ctx.closePath();
+    },
   });
 
   /* _FROM_SVG_START_ */
@@ -19277,10 +19291,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @memberOf fabric.Polygon
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
-   * @return {void}
    */
   fabric.Polygon.fromObject = function(object, callback) {
-    fabric.Object._fromObject('Polygon', object, callback, 'points');
+    return fabric.Object._fromObject('Polygon', object, callback, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -19910,17 +19923,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toObject: function(propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects
-        .filter(function (obj) {
-          return !obj.excludeFromExport;
-        })
-        .map(function (obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
+      var objsToObject = this._objects.map(function(obj) {
+        var originalDefaults = obj.includeDefaultValues;
+        obj.includeDefaultValues = _includeDefaultValues;
+        var _obj = obj.toObject(propertiesToInclude);
+        obj.includeDefaultValues = originalDefaults;
+        return _obj;
+      });
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
       obj.objects = objsToObject;
       return obj;
@@ -20674,6 +20683,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.lineTo(-w, h);
       ctx.lineTo(-w, -h);
       ctx.closePath();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var x = -this.width / 2,
+          y = -this.height / 2,
+          w = this.width,
+          h = this.height;
+
+      ctx.save();
+      this._setStrokeStyles(ctx, this);
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
+      ctx.closePath();
+      ctx.restore();
     },
 
     /**
@@ -24659,7 +24690,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @example
    * var filter = new fabric.Image.filters.Saturation({
-   *   saturation: 1
+   *   saturation: 100
    * });
    * object.filters.push(filter);
    * object.applyFilters();
@@ -24687,14 +24718,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         'gl_FragColor = color;\n' +
       '}',
 
-    /**
-     * Saturation value, from -1 to 1.
-     * Increases/decreases the color saturation.
-     * A value of 0 has no effect.
-     * 
-     * @param {Number} saturation
-     * @default
-     */
     saturation: 0,
 
     mainParameter: 'saturation',
@@ -24759,130 +24782,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
    * @return {fabric.Image.filters.Saturation} Instance of fabric.Image.filters.Saturate
    */
   fabric.Image.filters.Saturation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
-})(typeof exports !== 'undefined' ? exports : this);
-
-
-(function(global) {
-
-  'use strict';
-
-  var fabric  = global.fabric || (global.fabric = { }),
-      filters = fabric.Image.filters,
-      createClass = fabric.util.createClass;
-
-  /**
-   * Vibrance filter class
-   * @class fabric.Image.filters.Vibrance
-   * @memberOf fabric.Image.filters
-   * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.Vibrance#initialize} for constructor definition
-   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @example
-   * var filter = new fabric.Image.filters.Vibrance({
-   *   vibrance: 1
-   * });
-   * object.filters.push(filter);
-   * object.applyFilters();
-   */
-  filters.Vibrance = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Vibrance.prototype */ {
-
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'Vibrance',
-
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform float uVibrance;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'float max = max(color.r, max(color.g, color.b));\n' +
-        'float avg = (color.r + color.g + color.b) / 3.0;\n' +
-        'float amt = (abs(max - avg) * 2.0) * uVibrance;\n' +
-        'color.r += max != color.r ? (max - color.r) * amt : 0.00;\n' +
-        'color.g += max != color.g ? (max - color.g) * amt : 0.00;\n' +
-        'color.b += max != color.b ? (max - color.b) * amt : 0.00;\n' +
-        'gl_FragColor = color;\n' +
-      '}',
-
-    /**
-     * Vibrance value, from -1 to 1.
-     * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
-     * A value of 0 has no effect.
-     * 
-     * @param {Number} vibrance
-     * @default
-     */
-    vibrance: 0,
-
-    mainParameter: 'vibrance',
-
-    /**
-     * Constructor
-     * @memberOf fabric.Image.filters.Vibrance.prototype
-     * @param {Object} [options] Options object
-     * @param {Number} [options.vibrance=0] Vibrance value for the image (between -1 and 1)
-     */
-
-    /**
-     * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
-     *
-     * @param {Object} options
-     * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
-     */
-    applyTo2d: function(options) {
-      if (this.vibrance === 0) {
-        return;
-      }
-      var imageData = options.imageData,
-          data = imageData.data, len = data.length,
-          adjust = -this.vibrance, i, max, avg, amt;
-
-      for (i = 0; i < len; i += 4) {
-        max = Math.max(data[i], data[i + 1], data[i + 2]);
-        avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-        amt = ((Math.abs(max - avg) * 2 / 255) * adjust);
-        data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
-        data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
-        data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
-      }
-    },
-
-    /**
-     * Return WebGL uniform locations for this filter's shader.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {WebGLShaderProgram} program This filter's compiled shader program.
-     */
-    getUniformLocations: function(gl, program) {
-      return {
-        uVibrance: gl.getUniformLocation(program, 'uVibrance'),
-      };
-    },
-
-    /**
-     * Send data from this filter to its shader program's uniforms.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
-     */
-    sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
-    },
-  });
-
-  /**
-   * Returns filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Vibrance} Instance of fabric.Image.filters.Vibrance
-   */
-  fabric.Image.filters.Vibrance.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -25632,22 +25531,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     path:               null,
 
     /**
-     * Offset amount for text path starting position
-     * Only used when text has a path
-     * @type Number
-     * @default
-     */
-    pathStartOffset:               0,
-
-    /**
-     * Which side of the path the text should be drawn on.
-     * Only used when text has a path
-     * @type {String} 'left|right'
-     * @default
-     */
-    pathSide:               'left',
-
-    /**
      * @private
      */
     _fontSizeFraction: 0.222,
@@ -25925,8 +25808,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var path = this.path;
-      path && !path.isNotVisible() && path._render(ctx);
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
@@ -26186,15 +26067,29 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
-          positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.pathSide === 'right';
+          positionInPath = 0, startingPoint, totalPathLength, path = this.path;
 
       this.__charBounds[lineIndex] = lineBounds;
+      if (path) {
+        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
+        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+        startingPoint.x += path.pathOffset.x;
+        startingPoint.y += path.pathOffset.y;
+      }
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
         graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        if (path) {
+          if (positionInPath > totalPathLength) {
+            positionInPath %= totalPathLength;
+          }
+          // it would probably much fater to send all the grapheme position for a line
+          // and calculate path position/angle at once.
+          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+        }
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
+        positionInPath += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
       // this latest bound box represent the last character of the line
@@ -26205,42 +26100,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         kernedWidth: 0,
         height: this.fontSize
       };
-      if (path) {
-        totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-        startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
-        startingPoint.x += path.pathOffset.x;
-        startingPoint.y += path.pathOffset.y;
-        switch (this.textAlign) {
-          case 'left':
-            positionInPath = reverse ? (totalPathLength - width) : 0;
-            break;
-          case 'center':
-            positionInPath = (totalPathLength - width) / 2;
-            break;
-          case 'right':
-            positionInPath = reverse ? 0 : (totalPathLength - width);
-            break;
-          //todo - add support for justify
-        }
-        positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
-      }
-      if (path) {
-        for (i = reverse ? line.length - 1 : 0;
-          reverse ? i >= 0 : i < line.length;
-          reverse ? i-- : i++) {
-          graphemeInfo = lineBounds[i];
-          if (positionInPath > totalPathLength) {
-            positionInPath %= totalPathLength;
-          }
-          else if (positionInPath < 0) {
-            positionInPath += totalPathLength;
-          }
-          // it would probably much faster to send all the grapheme position for a line
-          // and calculate path position/angle at once.
-          this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
-          positionInPath += graphemeInfo.kernedWidth;
-        }
-      }
       return { width: width, numOfSpaces: numOfSpaces };
     },
 
@@ -26260,7 +26119,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
+      graphemeInfo.angle = info.angle;
     },
 
     /**
