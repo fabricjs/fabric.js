@@ -12,7 +12,8 @@
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
+    ' direction path pathStartOffset pathSide').split(' ');
 
   /**
    * Text class
@@ -39,7 +40,9 @@
       'charSpacing',
       'textAlign',
       'styles',
-      'path'
+      'path',
+      'pathStartOffset',
+      'pathSide'
     ],
 
     /**
@@ -197,9 +200,25 @@
     shadow:               null,
 
     /**
-     * fabric.Path that the text can follow.
-     * This feature is in BETA.
+     * fabric.Path that the text should follow.
+     * since 4.6.0 the path will be drawn automatically.
+     * if you want to make the path visible, give it a stroke and strokeWidth or fill value
+     * if you want it to be hidden, assign visible = false to the path.
+     * This feature is in BETA, and SVG import/export is not yet supported.
      * @type fabric.Path
+     * @example
+     * var textPath = new fabric.Text('Text on a path', {
+     *     top: 150,
+     *     left: 150,
+     *     textAlign: 'center',
+     *     charSpacing: -50,
+     *     path: new fabric.Path('M 0 0 C 50 -100 150 -100 200 0', {
+     *         strokeWidth: 1,
+     *         visible: false
+     *     }),
+     *     pathSide: 'left',
+     *     pathStartOffset: 0
+     * });
      * @default
      */
     path:               null,
@@ -498,6 +517,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      var path = this.path;
+      path && !path.isNotVisible() && path._render(ctx);
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
@@ -794,8 +815,6 @@
           //todo - add support for justify
         }
         positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
-      }
-      if (path) {
         for (i = reverse ? line.length - 1 : 0;
           reverse ? i >= 0 : i < line.length;
           reverse ? i-- : i++) {
@@ -1500,25 +1519,13 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var additionalProperties = [
-        'text',
-        'fontSize',
-        'fontWeight',
-        'fontFamily',
-        'fontStyle',
-        'lineHeight',
-        'underline',
-        'overline',
-        'linethrough',
-        'textAlign',
-        'textBackgroundColor',
-        'charSpacing',
-        'path',
-        'direction',
-      ].concat(propertiesToInclude);
-      var obj = this.callSuper('toObject', additionalProperties);
+      var allProperties = additionalProps.concat(propertiesToInclude);
+      var obj = this.callSuper('toObject', allProperties);
+      // styles will be overridden with a properly cloned structure
       obj.styles = clone(this.styles, true);
-      obj.path = this.path && this.path.toObject();
+      if (obj.path) {
+        obj.path = this.path.toObject();
+      }
       return obj;
     },
 

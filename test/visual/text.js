@@ -328,7 +328,7 @@
   });
 
   function text10(canvas, callback) {
-    var path = new fabric.Path('M5 100 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0 z');
+    var path = new fabric.Path('M5 100 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0 z', { visible: false });
     var test = new fabric.Text('this is a long text we need to wrap around a shape. - BETA feature -', {
       left: 10,
       top: 10,
