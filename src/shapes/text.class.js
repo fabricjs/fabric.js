@@ -1503,16 +1503,12 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      additionalProps.concat(propertiesToInclude);
-      var obj = this.callSuper('toObject', additionalProps);
+      var allProperties = additionalProps.concat(propertiesToInclude);
+      var obj = this.callSuper('toObject', allProperties);
+      // styles will be overridden with a properly cloned structure
       obj.styles = clone(this.styles, true);
       if (obj.path) {
         obj.path = this.path.toObject();
-      }
-      else {
-        delete obj.path;
-        delete obj.pathStartOffset;
-        delete obj.pathSide;
       }
       return obj;
     },
