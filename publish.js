@@ -2,6 +2,9 @@ var cp = require('child_process');
 var path = require('path');
 var fs = require('fs');
 
+// useful changelog regexp for atom
+// \(#([0-9]+)\) [#$1](https://github.com/fabricjs/fabric.js/pull/$1)
+
 // eslint-disable-next-line no-undef
 var pkgPath = path.resolve(__dirname, './package.json');
 var pkgText = fs.readFileSync(pkgPath); // get original pkg text to restore it later
