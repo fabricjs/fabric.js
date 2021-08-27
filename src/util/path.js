@@ -857,11 +857,8 @@
 
   /**
    * Join path commands to go back to svg format
-   * @deprecated
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {Number} fx
-   * @param {Number} fy
-   * @param {Array} coords coords of the arc, without the front 'A/a'
+   * @param {Array} pathData fabricJS parsed path commands
+   * @return {String} joined path 'M 0 0 L 20 30'
    */
   fabric.util.joinPath = function(pathData) {
     return pathData.map(function (segment) { return segment.join(' '); }).join(' ');
