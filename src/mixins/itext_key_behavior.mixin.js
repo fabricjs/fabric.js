@@ -18,9 +18,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
     ' paddingｰtop: ' + style.fontSize + ';';
 
-    if (this.hiddenTextareaAppendTo) {
-      this.hiddenTextareaAppendTo.appendChild(this.hiddenTextarea);
-    } else {
+    if (this.hiddenTextareaContainer) {
+      this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
+    }
+    else {
       fabric.document.body.appendChild(this.hiddenTextarea);
     }
 
