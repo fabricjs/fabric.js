@@ -192,7 +192,7 @@
      * @returns {boolean}
      */
     _isEmptySVGPath: function (pathData) {
-      var pathString = pathData.map(function (segment) { return segment.join(' '); }).join(' ');
+      var pathString = fabric.util.joinPath(pathData);
       return pathString === 'M 0 0 Q 0 0 0 0 L 0 0';
     },
 

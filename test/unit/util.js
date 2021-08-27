@@ -1090,4 +1090,13 @@
     assert.notOk(fabric.util.isTouchEvent({ type: 'mousedown' }));
     assert.notOk(fabric.util.isTouchEvent({ pointerType: 'mouse' }));
   });
+
+  QUnit.test('fabric.util.transformPath can scale a path', function(assert) {
+    assert.ok(typeof fabric.util.transformPath === 'function');
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
+    var oldPath = path.path;
+    var newPath = fabric.util.transformPath(path.path, [2, 0, 0, 2, 0, 0], path.pathOffset);
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
+    assert.equal(fabric.util.joinPath(newPath), 'M -100 -100 L 100 -100 L 40 100 z');
+  });
 })();

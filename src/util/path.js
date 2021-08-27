@@ -784,7 +784,7 @@
    * Transform a path by transforming each segment.
    * it has to be a simplified path or it won't work.
    * WARNING: this depends from pathOffset for correct operation
-   * @param {Array} path fabricJS parsed path commands
+   * @param {Array} path fabricJS parsed and simplified path commands
    * @param {Array} transform matrix that represent the transformation
    * @param {Object} [pathOffset] the fabric.Path pathOffset
    * @param {Number} pathOffset.x
@@ -855,6 +855,17 @@
     });
   };
 
+  /**
+   * Join path commands to go back to svg format
+   * @deprecated
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Number} fx
+   * @param {Number} fy
+   * @param {Array} coords coords of the arc, without the front 'A/a'
+   */
+  fabric.util.joinPath = function(pathData) {
+    return pathData.map(function (segment) { return segment.join(' '); }).join(' ');
+  };
   fabric.util.parsePath = parsePath;
   fabric.util.makePathSimpler = makePathSimpler;
   fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
