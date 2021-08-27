@@ -201,6 +201,9 @@
 
     /**
      * fabric.Path that the text can follow.
+     * since 4.6.0 the path will be drawn automatically.
+     * if you want to make the path visible, give it a stroke and strokeWidth value
+     * if you want it to be hidden, assign visible = false to the path.
      * This feature is in BETA.
      * @type fabric.Path
      * @default
@@ -501,6 +504,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+      var path = this.path;
+      path && !path.isNotVisible() && path._render(ctx);
       this._setTextStyles(ctx);
       this._renderTextLinesBackground(ctx);
       this._renderTextDecoration(ctx, 'underline');
