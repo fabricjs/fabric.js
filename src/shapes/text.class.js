@@ -12,7 +12,8 @@
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
-    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles path').split(' ');
+    ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
+    ' direction path pathStartOffset pathSide').split(' ');
 
   /**
    * Text class
@@ -39,7 +40,9 @@
       'charSpacing',
       'textAlign',
       'styles',
-      'path'
+      'path',
+      'pathStartOffset',
+      'pathSide'
     ],
 
     /**
@@ -1498,25 +1501,13 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var additionalProperties = [
-        'text',
-        'fontSize',
-        'fontWeight',
-        'fontFamily',
-        'fontStyle',
-        'lineHeight',
-        'underline',
-        'overline',
-        'linethrough',
-        'textAlign',
-        'textBackgroundColor',
-        'charSpacing',
-        'path',
-        'direction',
-      ].concat(propertiesToInclude);
-      var obj = this.callSuper('toObject', additionalProperties);
+      var allProperties = additionalProps.concat(propertiesToInclude);
+      var obj = this.callSuper('toObject', allProperties);
+      // styles will be overridden with a properly cloned structure
       obj.styles = clone(this.styles, true);
-      obj.path = this.path && this.path.toObject();
+      if (obj.path) {
+        obj.path = this.path.toObject();
+      }
       return obj;
     },
 

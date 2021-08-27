@@ -48,6 +48,8 @@
     strokeUniform:            false,
     path:                     null,
     direction:                'ltr',
+    pathStartOffset:            0,
+    pathSide:                   'left',
   };
 
 
