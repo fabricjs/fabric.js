@@ -198,6 +198,9 @@
 
     /**
      * fabric.Path that the text can follow.
+     * since 4.6.0 the path will be drawn automatically.
+     * if you want to make the path visible, give it a stroke and strokeWidth value
+     * if you want it to be hidden, assign visible = false to the path.
      * This feature is in BETA.
      * @type fabric.Path
      * @default
