@@ -200,12 +200,25 @@
     shadow:               null,
 
     /**
-     * fabric.Path that the text can follow.
+     * fabric.Path that the text should follow.
      * since 4.6.0 the path will be drawn automatically.
-     * if you want to make the path visible, give it a stroke and strokeWidth value
+     * if you want to make the path visible, give it a stroke and strokeWidth or fill value
      * if you want it to be hidden, assign visible = false to the path.
-     * This feature is in BETA.
+     * This feature is in BETA, and SVG import/export is not yet supported.
      * @type fabric.Path
+     * @example
+     * var textPath = new fabric.Text('Text on a path', {
+     *     top: 150,
+     *     left: 150,
+     *     textAlign: 'center',
+     *     charSpacing: -50,
+     *     path: new fabric.Path('M 0 0 C 50 -100 150 -100 200 0', {
+     *         strokeWidth: 1,
+     *         visible: false
+     *     }),
+     *     pathSide: 'left',
+     *     pathStartOffset: 0
+     * });
      * @default
      */
     path:               null,
