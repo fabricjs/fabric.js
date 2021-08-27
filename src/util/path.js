@@ -798,7 +798,7 @@
         [1, 0, 0, 1, -pathOffset.x, -pathOffset.y]
       );
     }
-    return path.path.map(function(pathSegment) {
+    return path.map(function(pathSegment) {
       var newSegment = pathSegment.slice(0), point = {};
       for (var i = 1; i < pathSegment.length - 1; i += 2) {
         point.x = pathSegment[i];
