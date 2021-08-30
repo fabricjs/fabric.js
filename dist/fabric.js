@@ -30859,19 +30859,20 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
           newTheta = fabric.util.degreesToRadians(45 - this.angle),
           cosTheta = fabric.util.cos(newTheta),
           sinTheta = fabric.util.sin(newTheta),
-          controlSize = this.cornerSize;
+          controlSize = this.cornerSize,
+          scale = this.scaleX;
 
       for (var control in coords) {
         switch (control) {
           case 'deleteControl':
-            controlSize = this.deleteControlSize;
+            controlSize = this.deleteControlSize * scale;
             break;
           case 'playControl':
-            controlSize = this.playControlSize;
+            controlSize = this.playControlSize * scale;
             break;
           default:
             // 'corner' is fabrics default term for controls...because they are in the corners?
-            controlSize = this.cornerSize;
+            controlSize = this.cornerSize * scale;
         }
 
         var cornerHypotenuse = controlSize * 0.707106,
