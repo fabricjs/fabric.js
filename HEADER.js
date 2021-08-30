@@ -125,7 +125,7 @@ fabric.textureSize = 2048;
  * @type Boolean
  * @default
  */
-fabric.disableStyleCopyPaste = false;
+fabric.disableStyleCopyPaste = true;
 
 /**
  * Enable webgl for filtering picture is available
