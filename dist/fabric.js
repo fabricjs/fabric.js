@@ -30737,7 +30737,7 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         ctx.restore();
       }
       // most fabric controls only draw when the object is active, but we want this one as well
-      this._renderPlayControls(ctx);
+     // this._renderPlayControls(ctx);
     },
 
     _renderPlayControls: function(ctx) {

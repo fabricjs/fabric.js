@@ -191,7 +191,7 @@
         ctx.restore();
       }
       // most fabric controls only draw when the object is active, but we want this one as well
-      this._renderPlayControls(ctx);
+     // this._renderPlayControls(ctx);
     },
 
     _renderPlayControls: function(ctx) {
