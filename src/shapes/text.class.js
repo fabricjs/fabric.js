@@ -13,7 +13,7 @@
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
     ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
-    ' direction path pathStartOffset pathSide').split(' ');
+    ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
   /**
    * Text class
@@ -42,7 +42,8 @@
       'styles',
       'path',
       'pathStartOffset',
-      'pathSide'
+      'pathSide',
+      'pathAlign'
     ],
 
     /**
@@ -238,6 +239,15 @@
      * @default
      */
     pathSide:               'left',
+
+    /**
+     * How text is aligned to the path. This property determines
+     * the perpendicular position of each character relative to the path.
+     * (one of "baseline", "center", "ascender", "descender")
+     * @type String
+     * @default
+     */
+     pathAlign:               'baseline',
 
     /**
      * @private
@@ -844,13 +854,34 @@
      */
     _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
       var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
-          path = this.path;
+          path = this.path, offsetDist = 0;
 
       // we are at currentPositionOnPath. we want to know what point on the path is.
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
       graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
+
+      if (this.type === 'text' && this.path) {
+        switch (this.pathAlign) {
+          case 'center':
+            offsetDist = graphemeInfo.height / 4;
+            break;
+          case 'ascender':
+            offsetDist = graphemeInfo.height / 1.5;
+            break;
+          case 'descender':
+            offsetDist = graphemeInfo.height / -3.75;
+            break;
+        }
+      }
+
+      if (offsetDist) {
+        var angle = graphemeInfo.angle - Math.PI / 2;
+        var vec = fabric.util.calcVectorPoint(angle, offsetDist);
+        graphemeInfo.renderLeft -= vec.x;
+        graphemeInfo.renderTop -= vec.y;
+      }
     },
 
     /**

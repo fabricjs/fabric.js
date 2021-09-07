@@ -108,6 +108,20 @@
   }
 
   /**
+   * Calculates the coordinates of a vector from angle and distance
+   * @param {Number} angle the angle of the vector in radians
+   * @param {Number} distance the distance/length of the vector
+   * @return {Object.x} x coordinate of point
+   * @return {Object.y} y coordinate of point
+   */
+  function calcVectorPoint(angle, distance) {
+    var coords = {};
+    coords.x = fabric.util.cos(angle) * distance;
+    coords.y = fabric.util.sin(angle) * distance;
+    return coords;
+  }
+
+  /**
    * Calculate bounding box of a beziercurve
    * @param {Number} x0 starting point
    * @param {Number} y0
@@ -862,6 +876,7 @@
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   fabric.util.transformPath = transformPath;
+  fabric.util.calcVectorPoint = calcVectorPoint;
   /**
    * Typo of `fromArcToBeziers` kept for not breaking the api once corrected.
    * Will be removed in fabric 5.0
