@@ -247,7 +247,7 @@
      * @type String
      * @default
      */
-     pathAlign:               'baseline',
+    pathAlign:               'baseline',
 
     /**
      * @private
