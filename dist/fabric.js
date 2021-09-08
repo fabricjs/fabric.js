@@ -30867,6 +30867,24 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       }
     },
 
+    // we need an externalized way to know this so worksheet can set the mouse cursor
+    // even if this is NOT the fabric canvas' _activeObject
+    isPointerOverPlayControl: function(e) {
+      // I dont think this is needed, but some error checking cant hurt...
+      if (!e.pointer ||
+          !this.oCoords.playControl ||
+          !this.oCoords.playControl.touchCorner) {
+        return false;
+      }
+
+      var touchArea = this._getImageLines(this.oCoords.playControl.touchCorner);
+      var crossPoints = this._findCrossPoints({ x: e.pointer.x, y: e.pointer.y }, touchArea);
+      if (crossPoints !== 0 && crossPoints % 2 === 1) {
+        return true;
+      }
+      return false;
+    },
+
     // for most objects, all 'controls' are the same size, for audio_tokens we need to treat them uniquely
     _setCornerCoords: function() {
       var coords = this.oCoords,
