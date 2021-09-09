@@ -96,6 +96,20 @@
     playControlSize: 64,
 
     /**
+     * Distance in pixels (before any scaling) of the x-offset of the play control from parent's x
+     * @type Number
+     * @default
+     */
+    playControlXOffset: -20,
+
+    /**
+     * Distance in pixels (before any scaling) of the y-offset of the play control from parent's y
+     * @type Number
+     * @default
+     */
+    playControlYOffset: 0,
+
+    /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
      * @type Array
@@ -196,7 +210,7 @@
 
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
-        this.controls.playControl.render(ctx, -20, 0, '', this);
+        this.controls.playControl.render(ctx, this.playControlXOffset, this.playControlYOffset, '', this, true);
       }
     },
     // override a base 'drawIndication' in the object_interactivity.mixin.js that is currently used to draw borders

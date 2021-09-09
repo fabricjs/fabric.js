@@ -30642,6 +30642,20 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     playControlSize: 64,
 
     /**
+     * Distance in pixels (before any scaling) of the x-offset of the play control from parent's x
+     * @type Number
+     * @default
+     */
+    playControlXOffset: -20,
+
+    /**
+     * Distance in pixels (before any scaling) of the y-offset of the play control from parent's y
+     * @type Number
+     * @default
+     */
+    playControlYOffset: 0,
+
+    /**
      * List of properties to consider when checking if
      * state of an object is changed ({@link fabric.Object#hasStateChanged})
      * @type Array
@@ -30742,7 +30756,7 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
 
     _renderPlayControls: function(ctx) {
       if (this.controls.playControl) {
-        this.controls.playControl.render(ctx, -20, 0, '', this);
+        this.controls.playControl.render(ctx, this.playControlXOffset, this.playControlYOffset, '', this, true);
       }
     },
     // override a base 'drawIndication' in the object_interactivity.mixin.js that is currently used to draw borders
@@ -30851,6 +30865,24 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
       else {
         this.onPlay();
       }
+    },
+
+    // we need an externalized way to know this so worksheet can set the mouse cursor
+    // even if this is NOT the fabric canvas' _activeObject
+    isPointerOverPlayControl: function(e) {
+      // I dont think this is needed, but some error checking cant hurt...
+      if (!e.pointer ||
+          !this.oCoords.playControl ||
+          !this.oCoords.playControl.touchCorner) {
+        return false;
+      }
+
+      var touchArea = this._getImageLines(this.oCoords.playControl.touchCorner);
+      var crossPoints = this._findCrossPoints({ x: e.pointer.x, y: e.pointer.y }, touchArea);
+      if (crossPoints !== 0 && crossPoints % 2 === 1) {
+        return true;
+      }
+      return false;
     },
 
     // for most objects, all 'controls' are the same size, for audio_tokens we need to treat them uniquely
@@ -31026,12 +31058,19 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
       },
-      render: function (ctx, left, top, styleOverride, fabricObject) {
+      render: function() {
+      // do nothing
+      },
+      render: function (ctx, left, top, styleOverride, fabricObject, forceRender) {
+        // This control has a special render flow, we want to be sure we dont render it 2x in one frame
+        // if it is the 'active' object - it is _always_ rendered along with it's parent unlike other controls
+        if (!forceRender) {
+          return;
+        }
         // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
-        var size = fabricObject === fabricObject.canvas.getActiveObject()
-          ? this.cornerSize * scale
-          : this.cornerSize;
+        // the size doesn't need scaling applied (the position still does though)
+        var size = this.cornerSize;
         var controlImg;
 
         // draw either the default icons or the ones defined by parent (audio_token)
@@ -31040,16 +31079,19 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
             controlImg = fabricObject.isPlaying
               ? fabricObject.clickedPauseControlImage
               : fabricObject.clickedPlayControlImage;
-          } else {
+          }
+          else {
             controlImg = fabricObject.isPlaying
               ? fabricObject.hoveredPauseControlImage
               : fabricObject.hoveredPlayControlImage;
           }
-        } else if (fabricObject.isGrayScaleEnabled) {
+        }
+        else if (fabricObject.isGrayScaleEnabled) {
           controlImg = !fabricObject.isPlaying
             ? fabricObject.grayScalePlayControlImage
             : null;
-        } else {
+        }
+        else {
           controlImg = fabricObject.isPlaying
             ? fabricObject.pauseControlImage
             : fabricObject.playControlImage;
