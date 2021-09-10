@@ -145,7 +145,6 @@
     },
 
     initImages: function() {
-      // TODO: Do we need a way to override the images?
       this.idleImage.src = fabric.Audio_token.prototype.idleImageSrc;
       this.selectedImage.src = fabric.Audio_token.prototype.selectedImageSrc;
       this.pauseControlImage.src = fabric.Audio_token.prototype.pauseControlImageSrc;
@@ -165,18 +164,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', [
-        'mediaID',
-        'idleImageSrc',
-        'selectedImageSrc',
-        'pauseControlImageSrc',
-        'playControlImageSrc',
-        'hoveredPlayControlImageSrc',
-        'hoveredPauseControlImageSrc',
-        'clickedPlayControlImageSrc',
-        'clickedPauseControlImageSrc',
-        'grayScaleIdleImageSrc',
-        'grayScalePlayControlImageSrc'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['mediaID'].concat(propertiesToInclude));
     },
 
     /**
