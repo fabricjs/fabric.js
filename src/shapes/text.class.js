@@ -862,18 +862,16 @@
       graphemeInfo.renderTop = info.y - startingPoint.y;
       graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
 
-      if (this.type === 'text' && this.path) {
-        switch (this.pathAlign) {
-          case 'center':
-            offsetDist = graphemeInfo.height / 4;
-            break;
-          case 'ascender':
-            offsetDist = graphemeInfo.height / 1.5;
-            break;
-          case 'descender':
-            offsetDist = graphemeInfo.height / -3.75;
-            break;
-        }
+      switch (this.pathAlign) {
+        case 'center':
+          offsetDist = graphemeInfo.height / 4;
+          break;
+        case 'ascender':
+          offsetDist = graphemeInfo.height / 1.5;
+          break;
+        case 'descender':
+          offsetDist = graphemeInfo.height / -3.75;
+          break;
       }
 
       if (offsetDist) {
