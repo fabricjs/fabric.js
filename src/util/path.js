@@ -870,7 +870,6 @@
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   fabric.util.transformPath = transformPath;
-  fabric.util.calcVectorPoint = calcVectorPoint;
   /**
    * Typo of `fromArcToBeziers` kept for not breaking the api once corrected.
    * Will be removed in fabric 5.0
