@@ -25,7 +25,7 @@ When making a PR for a feature branch, GitHub defaults to the public version of 
 
 ### ES5 
 Be aware that Fabricjs uses ES5, it also has different spacing/linting rules than most of the other Amplify projects. Please follow the existing conventions when adding code. 
-
+ 
 ## Fabric.js
 
 <!-- build/coverage status, climate -->
