@@ -20,9 +20,11 @@ Information on how this fork has been customized for usage @ Amplify please see 
 
 A diff with all changes since the fork can be found [here](https://github.com/amplify-education/fabric.js/compare/v4.2.0...amplify-education:main).
 
-### Note on Github Repo - Making PRs
+### GitHub - Making PRs
+When making a PR for a feature branch, GitHub defaults to the public version of Fabricjs (NOT the amplify fork). When making a PR you need to adjust the 'base repository' (Change from 'fabricjs/fabric.js' TO 'amplify-education/fabriuc.js'). After that GitHub will default to 'base: master', (but that deosnt exist!) Change the dropdown from 'base:master' to 'base:main' and you should see your changes. 
 
-When making a PR for a feature branch, GitHub defaults to the public version of Fabricjs (NOT the amplify fork). When making a PR you need to adjust the 'base' repository (Change from ) and then it will default to master branch, but that deosnt exist so you need to adjust the base to main
+### ES5 
+Be aware that Fabricjs uses ES5, it also has different spacing/linting rules than most of the other Amplify projects. Please follow the existing conventions when adding code. 
 
 ## Fabric.js
 
