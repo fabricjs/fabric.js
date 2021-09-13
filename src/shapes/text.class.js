@@ -875,10 +875,9 @@
       }
 
       if (offsetDist) {
-        var angle = graphemeInfo.angle - Math.PI / 2;
-        var vec = fabric.util.calcVectorPoint(angle, offsetDist);
-        graphemeInfo.renderLeft -= vec.x;
-        graphemeInfo.renderTop -= vec.y;
+        // offsets the grapheme in the direction perpenticular to the path's tangent
+        graphemeInfo.renderLeft -= fabric.util.sin(graphemeInfo.angle) * offsetDist;
+        graphemeInfo.renderTop += fabric.util.cos(graphemeInfo.angle) * offsetDist;
       }
     },
 
