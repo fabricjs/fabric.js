@@ -63,7 +63,7 @@
     "prepublishOnly": "npm run build"
   },
   "optionalDependencies": {
-    "canvas": "^2.6.1",
+    "canvas": "2.6.1",
     "jsdom": "^15.2.1"
   },
   "devDependencies": {
