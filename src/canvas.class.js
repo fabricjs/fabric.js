@@ -343,6 +343,13 @@
     targets: [],
 
     /**
+     * When the option is enabled, PointerEvent is used instead of MouseEvent.
+     * @type Boolean
+     * @default
+     */
+    enablePointerEvents: false,
+
+    /**
      * Keep track of the hovered target
      * @type fabric.Object
      * @private
