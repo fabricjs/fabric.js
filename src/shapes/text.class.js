@@ -244,6 +244,7 @@
      * How text is aligned to the path. This property determines
      * the perpendicular position of each character relative to the path.
      * (one of "baseline", "center", "ascender", "descender")
+     * This feature is in BETA, and its behavior may change
      * @type String
      * @default
      */
@@ -563,7 +564,20 @@
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
     _setTextStyles: function(ctx, charStyle, forMeasuring) {
-      ctx.textBaseline = 'alphabetic';
+      ctx.textBaseline = 'alphabetical';
+      if (this.path) {
+        switch (this.pathAlign) {
+          case 'center':
+            ctx.textBaseline = 'middle';
+            break;
+          case 'ascender':
+            ctx.textBaseline = 'top';
+            break;
+          case 'descender':
+            ctx.textBaseline = 'bottom';
+            break;
+        }
+      }
       ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
     },
 
@@ -854,31 +868,13 @@
      */
     _setGraphemeOnPath: function(positionInPath, graphemeInfo, startingPoint) {
       var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
-          path = this.path, offsetDist = 0;
+          path = this.path;
 
       // we are at currentPositionOnPath. we want to know what point on the path is.
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
       graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
-
-      switch (this.pathAlign) {
-        case 'center':
-          offsetDist = graphemeInfo.height / 4;
-          break;
-        case 'ascender':
-          offsetDist = graphemeInfo.height / 1.5;
-          break;
-        case 'descender':
-          offsetDist = graphemeInfo.height / -3.75;
-          break;
-      }
-
-      if (offsetDist) {
-        // offsets the grapheme in the direction perpenticular to the path's tangent
-        graphemeInfo.renderLeft -= fabric.util.sin(graphemeInfo.angle) * offsetDist;
-        graphemeInfo.renderTop += fabric.util.cos(graphemeInfo.angle) * offsetDist;
-      }
     },
 
     /**
