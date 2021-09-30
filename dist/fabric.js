@@ -20634,6 +20634,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     strokeWidth: 0,
 
     /**
+     * extra space taken up on the left by delete controls (used for collision detection)
+     * @type Number
+     * @default
+     */
+    leftMargin: 44,
+
+    /**
      * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')`.
      * This allows for relative urls as image src.
      * @since 2.7.0
