@@ -29172,6 +29172,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
+
     // decisions about style changes.
     var nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText,
         charCount = this._text.length,
@@ -29246,7 +29247,34 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
+
+    if (
+      // this is preplaced textbox
+      this.defaultLines &&
+      // and there is textbox value (safe check)
+      this.hiddenTextarea.value &&
+      // and amount of lines in the text is bigger than amount of default lines
+      this.hiddenTextarea.value.split('\n').length > this.defaultLines.length &&
+      // and user pressed enter
+      insertedText.indexOf('\n') !== -1
+    ) {
+      var emptyFinalLinesCounter = 0;
+      var i = this.hiddenTextarea.value.length - 1;
+
+      // we go through text and calculate how many empty lines are at the end of textbox (final lines)
+      while (i >= 0 && this.hiddenTextarea.value[i] === '\n') {
+        emptyFinalLinesCounter++;
+        i--;
+      }
+
+      // if more than 1, we can delete the last one
+      if (emptyFinalLinesCounter > 1) {
+        this.hiddenTextarea.value = this.hiddenTextarea.value.slice(0, -1);
+      }
+    }
+
     this.updateFromTextArea();
+
     this.fire('changed');
     if (this.canvas) {
       this.canvas.fire('text:changed', { target: this });
