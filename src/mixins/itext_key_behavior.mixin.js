@@ -240,7 +240,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       // if more than 1, we can delete the last one
       if (emptyFinalLinesCounter > 1) {
-        this.hiddenTextarea.value = this.hiddenTextarea.value.slice(0, -1);
+        var newValue = this.hiddenTextarea.value.slice(0, -1);
+        var newSelection = this.fromStringToGraphemeSelection(
+          this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, newValue);
+        this.hiddenTextarea.value = newValue;
+        this.hiddenTextarea.selectionStart = newSelection.selectionStart;
+        this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
     }
 
