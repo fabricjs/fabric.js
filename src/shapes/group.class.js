@@ -399,12 +399,15 @@
      * this method will be reduced to using the utility.
      * @private
      * @deprecated
-     * @param {fabric.Object} object
-     * @param {Array} parentMatrix parent transformation
+     * @param {fabric.Object} object that is inside the group
+     * @param {Array} parentMatrix parent transformation of the object.
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object, parentMatrix) {
-      fabric.util.addTransformToObject(object, parentMatrix);
+      fabric.util.addTransformToObject(
+        object,
+        parentMatrix || this.calcTransformMatrix()
+      );
       return object;
     },
 
