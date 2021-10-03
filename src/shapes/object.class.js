@@ -1401,6 +1401,9 @@
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       }
+      if (this.flipX) {
+        options.angle -= 180;
+      }
       ctx.rotate(degreesToRadians(options.angle));
       if (styleOverride.forActiveSelection || this.group) {
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
