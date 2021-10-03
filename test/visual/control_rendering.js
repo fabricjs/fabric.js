@@ -261,5 +261,28 @@
     fabricClass: 'Canvas',
   });
 
+  function controlboxFlippedX(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 4, angle: 15, flipX: true,
+      cornerSize: 12, cornerColor: 'green', cornerStrokeColor: 'pink',
+      transparentCorners: true, borderScaleFactor: 3,
+      fill: 'red', top: 35, left: 35,
+    });
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox with flipped X',
+    code: controlboxFlippedX,
+    golden: 'controls11.png',
+    percentage: 0.004,
+    width: 150,
+    height: 170,
+    fabricClass: 'Canvas',
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
