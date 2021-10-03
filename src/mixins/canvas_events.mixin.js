@@ -407,24 +407,27 @@
     __onMouseUp: function (e) {
       var target, transform = this._currentTransform,
           groupSelector = this._groupSelector, shouldRender = false,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0)),
+          rightFired = checkClick(e, RIGHT_CLICK), middleFired = checkClick(e, MIDDLE_CLICK);
       this._cacheTransformEventData(e);
       target = this._target;
       this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
-      if (checkClick(e, RIGHT_CLICK)) {
+      if (rightFired) {
         if (this.fireRightClick) {
           this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
         }
-        return;
       }
 
-      if (checkClick(e, MIDDLE_CLICK)) {
+      if (middleFired) {
         if (this.fireMiddleClick) {
           this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
         }
         this._resetTransformEventData();
+      }
+
+      if (middleFired || rightFired) {
         return;
       }
 
@@ -666,19 +669,22 @@
     __onMouseDown: function (e) {
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'down:before');
-      var target = this._target;
+      var target = this._target, rightFired = checkClick(e, RIGHT_CLICK),
+          middleFired = checkClick(e, MIDDLE_CLICK);
       // if right click just fire events
-      if (checkClick(e, RIGHT_CLICK)) {
+      if (rightFired) {
         if (this.fireRightClick) {
           this._handleEvent(e, 'down', RIGHT_CLICK);
         }
-        return;
       }
 
-      if (checkClick(e, MIDDLE_CLICK)) {
+      if (middleFired) {
         if (this.fireMiddleClick) {
           this._handleEvent(e, 'down', MIDDLE_CLICK);
         }
+      }
+
+      if (rightFired || middleFired) {
         return;
       }
 
