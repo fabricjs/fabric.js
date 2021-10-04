@@ -98,15 +98,13 @@
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
       },
-      render: function() {
-      // do nothing
-      },
       render: function (ctx, left, top, styleOverride, fabricObject, forceRender) {
         // This control has a special render flow, we want to be sure we dont render it 2x in one frame
         // if it is the 'active' object - it is _always_ rendered along with it's parent unlike other controls
         if (!forceRender) {
           return;
         }
+
         // fabricObject.scale is the 'base' scale, scaleX and scaleY are identical, and control the actual drawing scale
         var scale = fabricObject.scaleX;
         // the size doesn't need scaling applied (the position still does though)
@@ -114,7 +112,7 @@
         var controlImg;
 
         // draw either the default icons or the ones defined by parent (audio_token)
-        if (fabricObject === fabricObject.canvas.getIndicatedObject()) {
+        if (fabricObject === fabricObject.canvas.getIndicatedObject() && !fabricObject.isMoving) {
           if (fabricObject.controls.playControl.heldDown) {
             controlImg = fabricObject.isPlaying
               ? fabricObject.clickedPauseControlImage
@@ -127,11 +125,12 @@
           }
         }
         else if (fabricObject.isGrayScaleEnabled) {
-          controlImg = !fabricObject.isPlaying
-            ? fabricObject.grayScalePlayControlImage
-            : null;
+          controlImg = fabricObject.isPlaying
+            ? null
+            : fabricObject.grayScalePlayControlImage;
         }
         else {
+          fabricObject.controls.playControl.heldDown = false;
           controlImg = fabricObject.isPlaying
             ? fabricObject.pauseControlImage
             : fabricObject.playControlImage;
