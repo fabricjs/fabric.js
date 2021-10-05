@@ -67,10 +67,6 @@
     "testem": "testem .",
     "testem:ci": "testem ci"
   },
-  "optionalDependencies": {
-    "canvas": "^2.8.0",
-    "jsdom": "^15.2.1"
-  },
   "devDependencies": {
     "chalk": "^2.4.1",
     "eslint": "4.18.x",
