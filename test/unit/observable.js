@@ -353,3 +353,35 @@ QUnit.test('chaining', function(assert) {
   assert.equal(event1Fired, false);
   assert.equal(event2Fired, false);
 });
+
+QUnit.test('prepending events', function (assert) {
+  var foo = {},
+    firingOrder = [],
+    handler1 = function () {
+      firingOrder.push(1);
+    },
+    handler2 = function () {
+      firingOrder.push(2);
+    },
+    handler3 = function () {
+      firingOrder.push(3);
+    },
+    handler4 = function () {
+      firingOrder.push(4);
+    },
+    handler5 = function () {
+      firingOrder.push(5);
+    };
+
+  fabric.util.object.extend(foo, fabric.Observable);
+  foo.on('bar:baz', handler1);
+  foo.on('bar:baz', handler2);
+  foo.on('bar:baz', handler3, true);
+  foo.fire('bar:baz');
+  assert.deepEqual(firingOrder, [3, 1, 2], 'Firing order is wrong');
+  foo.on('bar:baz', handler4, true);
+  foo.on('bar:baz', handler5);
+  firingOrder = [];
+  foo.fire('bar:baz');
+  assert.deepEqual(firingOrder, [4, 3, 1, 2, 5], 'Firing order is wrong');
+});
