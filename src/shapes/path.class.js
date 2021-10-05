@@ -75,18 +75,6 @@
 
     /**
      * @private
-     */
-    _set: function (key, value) {
-      if (key === 'path') {
-        this._setPath(value);
-      }
-      else {
-        this.callSuper('_set', key, value);
-      }
-    },
-
-    /**
-     * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
     _renderPathCommands: function(ctx) {

@@ -58,7 +58,7 @@
 
   function updatePath(pathObject, value, preservePosition) {
     const { left, top } = pathObject;
-    pathObject.set("path", value);
+    pathObject._setPath(value);
     preservePosition && pathObject.set({ left, top });
   }
 
