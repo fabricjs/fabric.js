@@ -24,10 +24,11 @@
    * @alias on
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
+   * @param {boolean} [prepend] whether to prepend the handler so it will be fired before the rest of the handlers
    * @return {Self} thisArg
    * @chainable
    */
-  function on(eventName, handler) {
+  function on(eventName, handler, prepend) {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
@@ -41,28 +42,33 @@
       if (!this.__eventListeners[eventName]) {
         this.__eventListeners[eventName] = [];
       }
-      this.__eventListeners[eventName].push(handler);
+      if (prepend) {
+        this.__eventListeners[eventName].unshift(handler);
+      }
+      else {
+        this.__eventListeners[eventName].push(handler);
+      }
     }
     return this;
   }
 
-  function _once(eventName, handler) {
+  function _once(eventName, handler, prepend) {
     var _handler = function () {
       handler.apply(this, arguments);
       this.off(eventName, _handler);
     }.bind(this);
-    this.on(eventName, _handler);
+    this.on(eventName, _handler, prepend);
   }
 
-  function once(eventName, handler) {
+  function once(eventName, handler, prepend) {
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       for (var prop in eventName) {
-        _once.call(this, prop, eventName[prop]);
+        _once.call(this, prop, eventName[prop], prepend);
       }
     }
     else {
-      _once.call(this, eventName, handler);
+      _once.call(this, eventName, handler, prepend);
     }
     return this;
   }
