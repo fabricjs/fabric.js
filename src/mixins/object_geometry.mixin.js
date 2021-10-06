@@ -533,7 +533,7 @@
       }
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this.oCoords = this.calcOCoords();
-      this._setCornerCoords && this._setCornerCoords();
+      this._setControlCoords && this._setControlCoords();
       return this;
     },
 

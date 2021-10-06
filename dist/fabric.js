@@ -14207,6 +14207,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @default
      */
     touchCornerSize:               24,
+    /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 36,
 
     /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
@@ -16798,7 +16804,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this.oCoords = this.calcOCoords();
-      this._setCornerCoords && this._setCornerCoords();
+      this._setControlCoords && this._setControlCoords();
       return this;
     },
 
@@ -17497,33 +17503,40 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Sets the coordinates of the draggable boxes in the corners of
-     * the image used to scale/rotate it.
-     * note: if we would switch to ROUND corner area, all of this would disappear.
-     * everything would resolve to a single point and a pythagorean theorem for the distance
+     * Sets the coordinates of the controls, using cornerSize as the default
+     * and then a switch for custom controls
      * @private
      */
 
-    //TODO : This is used by ALL controls currently (even custom ones) with no obvious
-    // way to override - we should make a way!
-    _setCornerCoords: function() {
+    _setControlCoords: function() {
       var coords = this.oCoords,
-          newTheta = degreesToRadians(45 - this.angle),
+          newTheta = fabric.util.degreesToRadians(45 - this.angle),
           cosTheta = fabric.util.cos(newTheta),
           sinTheta = fabric.util.sin(newTheta),
-          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
-          /* 0.707106 stands for sqrt(2)/2 */
-          cornerHypotenuse = this.cornerSize * 0.707106,
-          touchHypotenuse = this.touchCornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * cosTheta,
-          sinHalfOffset = cornerHypotenuse * sinTheta,
-          touchCosHalfOffset = touchHypotenuse * cosTheta,
-          touchSinHalfOffset = touchHypotenuse * sinTheta,
-          x, y;
+          controlSize = this.cornerSize,
+          scale = this.scaleX;
 
       for (var control in coords) {
-        x = coords[control].x;
-        y = coords[control].y;
+        switch (control) {
+          case 'deleteControl':
+            controlSize = (this.deleteControlSize || this.cornerSize) * scale;
+            break;
+          case 'playControl':
+            controlSize = (this.playControlSize || this.cornerSize) * scale;
+            break;
+          default:
+            controlSize = this.cornerSize * scale;
+        }
+
+        var cornerHypotenuse = controlSize * 0.707106,
+            touchHypotenuse = controlSize * 0.707106,
+            cosHalfOffset = cornerHypotenuse * cosTheta,
+            sinHalfOffset = cornerHypotenuse * sinTheta,
+            touchCosHalfOffset = touchHypotenuse * cosTheta,
+            touchSinHalfOffset = touchHypotenuse * sinTheta,
+            x = coords[control].x,
+            y = coords[control].y;
+
         coords[control].corner = {
           tl: {
             x: x - sinHalfOffset,
@@ -20718,6 +20731,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     cropY: 0,
+
+    /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 28,
 
     /**
      * Indicates whether this canvas will use image smoothing when painting this image.
@@ -30668,13 +30688,6 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
     leftMargin: 44,
 
     /**
-     * Size in pixels of the (before any scaling) touch area of the delete control
-     * @type Number
-     * @default
-     */
-    deleteControlSize: 36,
-
-    /**
      * Size in pixels of the (before any scaling) touch area of the play control
      * @type Number
      * @default
@@ -30911,76 +30924,6 @@ var deleteIconSrc = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'
         return true;
       }
       return false;
-    },
-
-    // for most objects, all 'controls' are the same size, for audio_tokens we need to treat them uniquely
-    _setCornerCoords: function() {
-      var coords = this.oCoords,
-          newTheta = fabric.util.degreesToRadians(45 - this.angle),
-          cosTheta = fabric.util.cos(newTheta),
-          sinTheta = fabric.util.sin(newTheta),
-          controlSize = this.cornerSize,
-          scale = this.scaleX;
-
-      for (var control in coords) {
-        switch (control) {
-          case 'deleteControl':
-            controlSize = this.deleteControlSize * scale;
-            break;
-          case 'playControl':
-            controlSize = this.playControlSize * scale;
-            break;
-          default:
-            // 'corner' is fabrics default term for controls...because they are in the corners?
-            controlSize = this.cornerSize * scale;
-        }
-
-        var cornerHypotenuse = controlSize * 0.707106,
-            touchHypotenuse = controlSize * 0.707106,
-            cosHalfOffset = cornerHypotenuse * cosTheta,
-            sinHalfOffset = cornerHypotenuse * sinTheta,
-            touchCosHalfOffset = touchHypotenuse * cosTheta,
-            touchSinHalfOffset = touchHypotenuse * sinTheta,
-            x = coords[control].x,
-            y = coords[control].y;
-
-        coords[control].corner = {
-          tl: {
-            x: x - sinHalfOffset,
-            y: y - cosHalfOffset
-          },
-          tr: {
-            x: x + cosHalfOffset,
-            y: y - sinHalfOffset
-          },
-          bl: {
-            x: x - cosHalfOffset,
-            y: y + sinHalfOffset
-          },
-          br: {
-            x: x + sinHalfOffset,
-            y: y + cosHalfOffset
-          }
-        };
-        coords[control].touchCorner = {
-          tl: {
-            x: x - touchSinHalfOffset,
-            y: y - touchCosHalfOffset
-          },
-          tr: {
-            x: x + touchCosHalfOffset,
-            y: y - touchSinHalfOffset
-          },
-          bl: {
-            x: x - touchCosHalfOffset,
-            y: y + touchSinHalfOffset
-          },
-          br: {
-            x: x + touchSinHalfOffset,
-            y: y + touchCosHalfOffset
-          }
-        };
-      }
     },
   });
 })();

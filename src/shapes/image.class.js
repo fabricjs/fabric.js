@@ -124,6 +124,13 @@
     cropY: 0,
 
     /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 28,
+
+    /**
      * Indicates whether this canvas will use image smoothing when painting this image.
      * Also influence if the cacheCanvas for this image uses imageSmoothing
      * @since 4.0.0-beta.11

@@ -181,6 +181,12 @@
      * @default
      */
     touchCornerSize:               24,
+    /**
+     * Size in pixels of the (before any scaling) touch area of the delete control
+     * @type Number
+     * @default
+     */
+    deleteControlSize: 36,
 
     /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
