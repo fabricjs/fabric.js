@@ -66,33 +66,40 @@
     },
 
     /**
-     * Sets the coordinates of the draggable boxes in the corners of
-     * the image used to scale/rotate it.
-     * note: if we would switch to ROUND corner area, all of this would disappear.
-     * everything would resolve to a single point and a pythagorean theorem for the distance
+     * Sets the coordinates of the controls, using cornerSize as the default
+     * and then a switch for custom controls
      * @private
      */
 
-    //TODO : This is used by ALL controls currently (even custom ones) with no obvious
-    // way to override - we should make a way!
-    _setCornerCoords: function() {
+    _setControlCoords: function() {
       var coords = this.oCoords,
-          newTheta = degreesToRadians(45 - this.angle),
+          newTheta = fabric.util.degreesToRadians(45 - this.angle),
           cosTheta = fabric.util.cos(newTheta),
           sinTheta = fabric.util.sin(newTheta),
-          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
-          /* 0.707106 stands for sqrt(2)/2 */
-          cornerHypotenuse = this.cornerSize * 0.707106,
-          touchHypotenuse = this.touchCornerSize * 0.707106,
-          cosHalfOffset = cornerHypotenuse * cosTheta,
-          sinHalfOffset = cornerHypotenuse * sinTheta,
-          touchCosHalfOffset = touchHypotenuse * cosTheta,
-          touchSinHalfOffset = touchHypotenuse * sinTheta,
-          x, y;
+          controlSize = this.cornerSize,
+          scale = this.scaleX;
 
       for (var control in coords) {
-        x = coords[control].x;
-        y = coords[control].y;
+        switch (control) {
+          case 'deleteControl':
+            controlSize = (this.deleteControlSize || this.cornerSize) * scale;
+            break;
+          case 'playControl':
+            controlSize = (this.playControlSize || this.cornerSize) * scale;
+            break;
+          default:
+            controlSize = this.cornerSize * scale;
+        }
+
+        var cornerHypotenuse = controlSize * 0.707106,
+            touchHypotenuse = controlSize * 0.707106,
+            cosHalfOffset = cornerHypotenuse * cosTheta,
+            sinHalfOffset = cornerHypotenuse * sinTheta,
+            touchCosHalfOffset = touchHypotenuse * cosTheta,
+            touchSinHalfOffset = touchHypotenuse * sinTheta,
+            x = coords[control].x,
+            y = coords[control].y;
+
         coords[control].corner = {
           tl: {
             x: x - sinHalfOffset,

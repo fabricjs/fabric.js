@@ -82,13 +82,6 @@
     leftMargin: 44,
 
     /**
-     * Size in pixels of the (before any scaling) touch area of the delete control
-     * @type Number
-     * @default
-     */
-    deleteControlSize: 36,
-
-    /**
      * Size in pixels of the (before any scaling) touch area of the play control
      * @type Number
      * @default
