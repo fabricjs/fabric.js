@@ -78,6 +78,10 @@
           sinTheta = fabric.util.sin(newTheta),
           controlSize = this.cornerSize,
           scale = this.scaleX;
+      // For user-added images which user can re-scale, we can't use the object scale here
+      if (this.controlsIgnoreObjectScale && this.canvas) {
+        scale =  this.canvas.getZoom();
+      }
 
       for (var control in coords) {
         switch (control) {

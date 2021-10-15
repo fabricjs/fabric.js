@@ -131,6 +131,15 @@
     deleteControlSize: 28,
 
     /**
+     * Option to ignore the object scaling for determining touch area of controls.
+     * Useful for objects which can be scaled by the user if we DONT want the control
+     * to scale along with the object.
+     * @type Boolean
+     * @default
+     */
+    controlsIgnoreObjectScale: true,
+
+    /**
      * Indicates whether this canvas will use image smoothing when painting this image.
      * Also influence if the cacheCanvas for this image uses imageSmoothing
      * @since 4.0.0-beta.11

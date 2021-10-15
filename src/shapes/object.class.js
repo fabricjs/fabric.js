@@ -189,6 +189,15 @@
     deleteControlSize: 36,
 
     /**
+     * Option to ignore the object scaling for determining touch area of controls.
+     * Useful for objects which can be scaled by the user if we DONT want the control
+     * to scale along with the object.
+     * @type Boolean
+     * @default
+     */
+    controlsIgnoreObjectScale: false,
+
+    /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
      * @default

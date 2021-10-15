@@ -14215,6 +14215,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     deleteControlSize: 36,
 
     /**
+     * Option to ignore the object scaling for determining touch area of controls.
+     * Useful for objects which can be scaled by the user if we DONT want the control
+     * to scale along with the object.
+     * @type Boolean
+     * @default
+     */
+    controlsIgnoreObjectScale: false,
+
+    /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
      * @default
@@ -17515,6 +17524,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           sinTheta = fabric.util.sin(newTheta),
           controlSize = this.cornerSize,
           scale = this.scaleX;
+      // For user-added images which user can re-scale, we can't use the object scale here
+      if (this.controlsIgnoreObjectScale && this.canvas) {
+        scale =  this.canvas.getZoom();
+      }
 
       for (var control in coords) {
         switch (control) {
@@ -20738,6 +20751,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     deleteControlSize: 28,
+
+    /**
+     * Option to ignore the object scaling for determining touch area of controls.
+     * Useful for objects which can be scaled by the user if we DONT want the control
+     * to scale along with the object.
+     * @type Boolean
+     * @default
+     */
+    controlsIgnoreObjectScale: true,
 
     /**
      * Indicates whether this canvas will use image smoothing when painting this image.
