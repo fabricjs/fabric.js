@@ -224,7 +224,7 @@
      */
     _onDrop: function (e) {
       this._simpleEventHandler('drop:before', e);
-      this._simpleEventHandler('drop', e);
+      return this._simpleEventHandler('drop', e);
     },
 
     /**
