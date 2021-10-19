@@ -440,7 +440,7 @@
     assert.deepEqual(eventsArray, eventsArray2, 'after first initialize, functions do not change.');
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop:Before', 'Drop'].forEach(function(eventType) {
     QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
       var funcName = '_on' + eventType;
       var eventName = eventType.toLowerCase();
@@ -459,7 +459,7 @@
     });
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop:Before', 'Drop'].forEach(function(eventType) {
     QUnit.test('Fabric event fired - ' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
@@ -474,7 +474,7 @@
     });
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop:Before', 'Drop'].forEach(function(eventType) {
     QUnit.test('_simpleEventHandler fires on object and canvas' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
