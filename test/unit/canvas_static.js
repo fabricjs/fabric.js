@@ -455,12 +455,18 @@
     canvas.overlayImage = bg;
 
     var objectsRemoved = [];
+    var objectsRemovedEvent = [];
     canvas.on('object:removed', function(e) {
       objectsRemoved.push(e.target);
     });
     var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect();
+      rect2 = makeRect(),
+      rect3 = makeRect();
+    [rect1, rect2, rect3].forEach(function (obj) {
+      obj.on('removed', function () {
+        objectsRemovedEvent.push(obj);
+      });
+    })
     canvas.add(rect1, rect2, rect3);
 
     assert.equal(canvas.clear(), canvas, 'should be chainable');
@@ -468,6 +474,9 @@
     assert.strictEqual(objectsRemoved[0], rect1, 'clear should fire remove on previously added object');
     assert.strictEqual(objectsRemoved[1], rect2, 'clear should fire remove on previously added object');
     assert.strictEqual(objectsRemoved[2], rect3, 'clear should fire remove on previously added object');
+    assert.strictEqual(objectsRemovedEvent[0], rect1, 'clear should fire remove on previously added object, object level event');
+    assert.strictEqual(objectsRemovedEvent[1], rect2, 'clear should fire remove on previously added object, object level event');
+    assert.strictEqual(objectsRemovedEvent[2], rect3, 'clear should fire remove on previously added object, object level event');
     assert.equal(canvas.backgroundColor, '', 'clear remove background color');
     assert.equal(canvas.overlayColor, '', 'clear remove overlay color');
     assert.equal(canvas.backgroundImage, null, 'clear remove bg image');
@@ -1531,9 +1540,16 @@
   QUnit.test('dispose clear references', function(assert) {
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
+    var called = [];
     canvas2.add(makeRect(), makeRect(), makeRect());
+    canvas2.forEachObject(function (obj) {
+      obj.on('removed', function () {
+        called.push(obj);
+      })
+    });
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
+    assert.deepEqual(called, canvas2.getObjects(), 'dispose should fire removed events');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
