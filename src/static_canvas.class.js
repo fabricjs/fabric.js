@@ -1762,6 +1762,7 @@
       }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
+        this._onObjectRemoved(object);
       });
       this._objects = [];
       if (this.backgroundImage && this.backgroundImage.dispose) {
