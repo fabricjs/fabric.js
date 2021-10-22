@@ -1541,7 +1541,8 @@
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     var called = [];
-    canvas2.add(makeRect(), makeRect(), makeRect());
+    var objects = [makeRect(), makeRect(), makeRect()];
+    canvas2.add.apply(canvas2, objects);
     canvas2.forEachObject(function (obj) {
       obj.on('removed', function () {
         called.push(obj);
@@ -1549,7 +1550,7 @@
     });
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
-    assert.deepEqual(called, canvas2.getObjects(), 'dispose should fire removed events');
+    assert.deepEqual(called, objects, 'dispose should fire removed events');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
