@@ -335,10 +335,8 @@
     if (typeof objects === 'string') {
       // it has to be a url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
-        var group = fabric.util.groupSVGElements(elements, object, objects);
-        group.set(options);
-        group._restoreObjectsState();
-        callback && callback(new fabric.Layer(group._objects, options));
+        options = fabric.util.getOptionsFromSVG(elements, object, objects);
+        callback && callback(new fabric.Layer(elements, options));
       });
       return;
     }
