@@ -40,27 +40,17 @@
 
     /**
      * Constructor
-     * 
-     * **Initialization Logic**:
-     * We call `calcOwnMatrix` after initializion and layout in order for the instance's transformation to be cached before setting objects.
-     * This way we don't mutate objects' transformations excessively.
+     * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations.
      * 
      * @param {fabric.Object[]} [objects] layer objects
      * @param {Object} [options] Options object
      * @return {fabric.Layer} thisArg
      */
     initialize: function (objects, options) {
-      options = options || {};
-      //  add layout data
-      extend(options, this._getLayoutStrategyResult(options.layout || 'auto', objects || []) || {});
-      //  we don't want layout logic to run on initialization from `_set`
-      delete options.layout;
-      //  initialize
+      this.disableTransformPropagation = true;
       this.callSuper('initialize', options);
-      //  cache transformation before setting objects
-      this.callSuper('calcOwnMatrix');
-      //  transform is cached, we can safely set objects
       this._objects = objects || [];
+      this._applyLayoutStrategy();
     },
 
     /**
@@ -85,6 +75,7 @@
      * Compares changes made to the transform matrix and applies them to instance's objects.
      * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
+     * Use `disableTransformPropagation` to disable propagation of current transform diff to objects.
      * @returns Transform matrix
      */
     calcOwnMatrix: function () {
@@ -130,8 +121,6 @@
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       this._applyLayoutStrategy();
-      this.calcOwnMatrix();
-      this.disableTransformPropagation = false;
     },
 
     /**
@@ -141,8 +130,6 @@
     _onObjectRemoved: function (object) {
       delete object.canvas;
       this._applyLayoutStrategy();
-      this.calcOwnMatrix();
-      this.disableTransformPropagation = false;
     },
 
     /**
@@ -176,7 +163,10 @@
      * @private
      */
     _applyLayoutStrategy: function () {
+      this.disableTransformPropagation = true;
       this.set(this._getLayoutStrategyResult(this.layout, this._objects));
+      this.calcOwnMatrix();
+      this.disableTransformPropagation = false;
     },
 
     /**
