@@ -91,7 +91,7 @@
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
         dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
       var matrix = this.callSuper('calcOwnMatrix');
-      if (dirty) {
+      if (dirty && !this.disableTransformPropagation) {
         this.forEachObject(function (object) {
           var objectTransform = multiplyTransformMatrices(invertTransform(transform), object.calcTransformMatrix());
           applyTransformToObject(object, multiplyTransformMatrices(matrix, objectTransform));
@@ -100,21 +100,27 @@
       return matrix;
     },
 
-    /**
-     * @private
-     */
-    _onBeforeObjectsAdded: function () {
-      this.calcOwnMatrix();
-    },
-
     add: function () {
-      this._onBeforeObjectsAdded();
+      this._onBeforeObjectsChange();
       fabric.Collection.add.apply(this, arguments);
     },
 
     insertAt: function (object, index, nonSplicing) {
-      this._onBeforeObjectsAdded();
+      this._onBeforeObjectsChange();
       this.callSuper('insertAt', object, index, nonSplicing);
+    },
+
+    remove: function () {
+      this._onBeforeObjectsChange();
+      fabric.Collection.remove.apply(this, arguments);
+    },
+
+    /**
+     * @private
+     */
+    _onBeforeObjectsChange: function () {
+      this.calcOwnMatrix();
+      this.disableTransformPropagation = true;
     },
 
     /**
@@ -124,6 +130,8 @@
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       this._applyLayoutStrategy();
+      this.calcOwnMatrix();
+      this.disableTransformPropagation = false;
     },
 
     /**
@@ -133,6 +141,8 @@
     _onObjectRemoved: function (object) {
       delete object.canvas;
       this._applyLayoutStrategy();
+      this.calcOwnMatrix();
+      this.disableTransformPropagation = false;
     },
 
     /**
