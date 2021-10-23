@@ -44,37 +44,33 @@
      */
     initialize: function (objects, options) {
       if (this.layout === 'auto' && Array.isArray(objects)) {
-        const box = this.getObjectsBoundingBox(objects);
-        box.originX = 'left';
-        box.originY = 'top';
+        var box = this.getObjectsBoundingBox(objects);
         extend(options, box);
       }
       this.callSuper('initialize', options);
+      //  we call calcOwnMatrix after initializion in order for the transformation to be cached before setting objects
+      //  this why it initializes transform without mutating objects' transformations
       this.callSuper('calcOwnMatrix');
       this._objects = objects || [];
     },
 
     /**
-     * apply options to objects, transforming objects is handled by `calcOwnMatrix`
+     * apply options to object, transforming is handled by `calcOwnMatrix`
      * @param {string} key 
      * @param {*} value 
      * @returns true if objects were modified
      */
-    _applyOnObjects: function (key, value) {
+    _applyToObject: function (object, key, value) {
       var modified = false;
       switch (key) {
         case 'canvas':
           //  pass down
-          this.forEachObject(function (object) {
-            object._set(key, value);
-          });
+          object._set(key, value);
           break;
         case 'opacity':
           //  multiply
-          this.forEachObject(function (object) {
-            object._set(key, object[key] * value);
-          });
-          modified = this.size() > 0;
+          object._set(key, object[key] * value);
+          modified = true;
           break;
       }
       return modified;
@@ -87,9 +83,12 @@
      */
     _set: function (key, value) {
       this.callSuper('_set', key, value);
-      this._applyOnObjects(key, value);
+      this.forEachObject(function (object) {
+        this._applyToObject(object, key, value);
+      }, this);
       if (key === 'layout' && value === 'auto') {
-        //  set width and height
+        var box = this.getObjectsBoundingBox(objects);
+        this.set(box);
       }
       return this;
     },
@@ -105,6 +104,15 @@
         });
       }
       return matrix;
+    },
+
+    _applyLayoutStrategy: function () {
+      if (this.layout === 'auto' && this.size() > 0) {
+        var box = this.getObjectsBoundingBox(objects);
+        box.originX = 'left';
+        box.originY = 'top';
+        extend(options, box);
+      }
     },
 
     /**
@@ -139,7 +147,9 @@
         left: left,
         top: top,
         width: width,
-        height: height
+        height: height,
+        originX: 'left',
+        originY: 'top'
       }
     },
 
@@ -151,7 +161,6 @@
       ctx.save();
       var t = invertTransform(this.calcTransformMatrix());
       ctx.transform.apply(ctx, t);
-      console.log('rendering?', t)
       ctx.globalAlpha = 1;
       this.forEachObject(function (object) {
         object.render(ctx);
