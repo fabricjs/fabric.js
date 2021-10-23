@@ -38,24 +38,32 @@
 
     /**
      * Constructor
+     * 
+     * **Initialization Logic**:
+     * We call `calcOwnMatrix` after initializion and layout in order for the instance's transformation to be cached before setting objects.
+     * This way we don't mutate objects' transformations excessively.
+     * 
      * @param {fabric.Object[]} [objects] layer objects
      * @param {Object} [options] Options object
      * @return {fabric.Layer} thisArg
      */
     initialize: function (objects, options) {
-      if (this.layout === 'auto' && Array.isArray(objects)) {
-        var box = this.getObjectsBoundingBox(objects);
-        extend(options, box);
-      }
+      options = options || {};
+      //  add layout data
+      extend(options, this._getLayoutStrategyResult(options.layout || 'auto', objects || []) || {});
+      //  we don't want layout logic to run on initialization from `_set`
+      delete options.layout;
+      //  initialize
       this.callSuper('initialize', options);
-      //  we call calcOwnMatrix after initializion in order for the transformation to be cached before setting objects
-      //  this why it initializes transform without mutating objects' transformations
+      //  cache transformation before setting objects
       this.callSuper('calcOwnMatrix');
+      //  transform is cached, we can safely set objects
       this._objects = objects || [];
     },
 
     /**
-     * apply options to object, transforming is handled by `calcOwnMatrix`
+     * Apply options to object
+     * Transforming is handled by `calcOwnMatrix`
      * @param {string} key 
      * @param {*} value 
      * @returns true if objects were modified
@@ -86,18 +94,17 @@
       this.forEachObject(function (object) {
         this._applyToObject(object, key, value);
       }, this);
-      if (key === 'layout' && value === 'auto') {
-        var box = this.getObjectsBoundingBox(objects);
-        this.set(box);
+      if (key === 'layout') {
+        this._applyLayoutStrategy();
       }
       return this;
     },
 
     /**
      * Compares changes made to the transform matrix and applies them to instance's objects.
-     * Call this method before adding objects to prevent the transform diff from being applied to them.
+     * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
-     * @returns 
+     * @returns Transform matrix
      */
     calcOwnMatrix: function () {
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
@@ -112,6 +119,13 @@
       return matrix;
     },
 
+    /**
+     * @private
+     */
+    _onBeforeObjectsAdded: function () {
+      this.calcOwnMatrix();
+    },
+
     add: function () {
       this._onBeforeObjectsAdded();
       fabric.Collection.add.apply(this, arguments);
@@ -124,18 +138,12 @@
 
     /**
      * @private
-     */
-    _onBeforeObjectsAdded: function () {
-      this.calcOwnMatrix();
-    },
-
-    /**
-     * @private
      * @param {fabric.Object} object 
      */
     _onObjectAdded: function (object) {
       this._applyToObject(object, 'canvas', this.canvas);
       this._applyToObject(object, 'opacity', this.opacity);
+      this._applyLayoutStrategy();
     },
 
     /**
@@ -145,6 +153,41 @@
     _onObjectRemoved: function (object) {
       delete object.canvas;
       this._applyToObject(object, 'opacity', 1 / this.opacity);
+      this._applyLayoutStrategy();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render: function (ctx) {
+      ctx.save();
+      var t = invertTransform(this.calcTransformMatrix());
+      ctx.transform.apply(ctx, t);
+      ctx.globalAlpha = 1;
+      this.forEachObject(function (object) {
+        object.render(ctx);
+      });
+      ctx.restore();
+    },
+
+    /**
+     * 
+     * @param {string} layoutDirective 
+     * @param {fabric.Object[]} objects 
+     * @returns options object
+     */
+    _getLayoutStrategyResult: function (layoutDirective, objects) {
+      if (layoutDirective === 'auto') {
+        return this.getObjectsBoundingBox(objects);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _applyLayoutStrategy: function () {
+      this.set(this._getLayoutStrategyResult(this.layout, this._objects));
     },
 
     /**
@@ -183,21 +226,6 @@
         originX: 'left',
         originY: 'top'
       }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _render: function (ctx) {
-      ctx.save();
-      var t = invertTransform(this.calcTransformMatrix());
-      ctx.transform.apply(ctx, t);
-      ctx.globalAlpha = 1;
-      this.forEachObject(function (object) {
-        object.render(ctx);
-      });
-      ctx.restore();
     },
 
     /**
