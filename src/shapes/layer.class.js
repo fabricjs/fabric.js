@@ -106,15 +106,6 @@
       return matrix;
     },
 
-    _applyLayoutStrategy: function () {
-      if (this.layout === 'auto' && this.size() > 0) {
-        var box = this.getObjectsBoundingBox(objects);
-        box.originX = 'left';
-        box.originY = 'top';
-        extend(options, box);
-      }
-    },
-
     /**
      * 
      * @param {fabric.Object[]} objects 
