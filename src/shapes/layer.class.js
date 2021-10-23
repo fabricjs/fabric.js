@@ -297,7 +297,7 @@
      * @returns 
      */
     getSvgTransform: function (full, additionalTransform) {
-      var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabirc.iMatrix);
+      var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabric.iMatrix);
       return svgTransform +
         (additionalTransform || '') + '" ';
     },
