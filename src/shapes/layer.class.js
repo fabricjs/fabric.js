@@ -140,7 +140,6 @@
       ctx.save();
       var t = invertTransform(this.calcTransformMatrix());
       ctx.transform.apply(ctx, t);
-      ctx.globalAlpha = 1;
       this.forEachObject(function (object) {
         object.render(ctx);
       });
