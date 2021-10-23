@@ -3,13 +3,12 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
-    multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
-    invertTransform = fabric.util.invertTransform,
-    applyTransformToObject = fabric.util.applyTransformToObject,
-    extend = fabric.util.object.extend,
-    clone = fabric.util.object.clone,
-    min = fabric.util.array.min,
-    max = fabric.util.array.max;
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
+      invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      clone = fabric.util.object.clone,
+      min = fabric.util.array.min,
+      max = fabric.util.array.max;
 
   if (fabric.Layer) {
     fabric.warn('fabric.Layer is already defined');
@@ -41,7 +40,7 @@
     /**
      * Constructor
      * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations during initializion.
-     * 
+     *
      * @param {fabric.Object[]} [objects] layer objects
      * @param {Object} [options] Options object
      * @return {fabric.Layer} thisArg
@@ -80,7 +79,7 @@
      */
     calcOwnMatrix: function () {
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
-        dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
+          dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
       var matrix = this.callSuper('calcOwnMatrix');
       if (dirty && !this.disableTransformPropagation) {
         this.forEachObject(function (object) {
@@ -116,7 +115,7 @@
 
     /**
      * @private
-     * @param {fabric.Object} object 
+     * @param {fabric.Object} object
      */
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
@@ -147,9 +146,9 @@
     },
 
     /**
-     * 
-     * @param {string} layoutDirective 
-     * @param {fabric.Object[]} objects 
+     *
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
      * @returns options object
      */
     _getLayoutStrategyResult: function (layoutDirective, objects) {
@@ -169,17 +168,17 @@
     },
 
     /**
-     * 
-     * @param {fabric.Object[]} objects 
-     * @returns 
+     *
+     * @param {fabric.Object[]} objects
+     * @returns
      */
     getObjectsBoundingBox: function (objects) {
       var aX = [],
-        aY = [],
-        o, prop, coords,
-        props = ['tr', 'br', 'bl', 'tl'],
-        i = 0, iLen = objects.length,
-        j, jLen = props.length;
+          aY = [],
+          o, prop, coords,
+          props = ['tr', 'br', 'bl', 'tl'],
+          i = 0, iLen = objects.length,
+          j, jLen = props.length;
 
       for (; i < iLen; ++i) {
         o = objects[i];
@@ -192,10 +191,10 @@
         o.aCoords = coords;
       }
       var minXY = new fabric.Point(min(aX), min(aY)),
-        maxXY = new fabric.Point(max(aX), max(aY)),
-        top = minXY.y || 0, left = minXY.x || 0,
-        width = (maxXY.x - minXY.x) || 0,
-        height = (maxXY.y - minXY.y) || 0;
+          maxXY = new fabric.Point(max(aX), max(aY)),
+          top = minXY.y || 0, left = minXY.x || 0,
+          width = (maxXY.x - minXY.x) || 0,
+          height = (maxXY.y - minXY.y) || 0;
       return {
         left: left,
         top: top,
@@ -203,7 +202,7 @@
         height: height,
         originX: 'left',
         originY: 'top'
-      }
+      };
     },
 
     /**
@@ -282,8 +281,8 @@
      */
     getSvgStyles: function () {
       var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
-        'opacity: ' + this.opacity + ';' : '',
-        visibility = this.visible ? '' : ' visibility: hidden;';
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
       return [
         opacity,
         this.getSvgFilter(),
@@ -293,9 +292,9 @@
 
     /**
      * @override instance's transformations are excessive
-     * @param {boolean} full 
-     * @param {string} additionalTransform 
-     * @returns 
+     * @param {boolean} full
+     * @param {string} additionalTransform
+     * @returns
      */
     getSvgTransform: function (full, additionalTransform) {
       var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabric.iMatrix);
@@ -329,7 +328,7 @@
    */
   fabric.Layer.fromObject = function (object, callback) {
     var objects = object.objects,
-      options = clone(object, true);
+        options = clone(object, true);
     delete options.objects;
     if (typeof objects === 'string') {
       // it has to be a url or something went wrong.
