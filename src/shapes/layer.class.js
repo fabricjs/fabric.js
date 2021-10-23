@@ -93,6 +93,12 @@
       return this;
     },
 
+    /**
+     * Compares changes made to the transform matrix and applies them to instance's objects.
+     * Call this method before adding objects to prevent the transform diff from being applied to them.
+     * In other words, call this method to make the current transform the starting point of a transform diff for objects.
+     * @returns 
+     */
     calcOwnMatrix: function () {
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
         dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
@@ -104,6 +110,41 @@
         });
       }
       return matrix;
+    },
+
+    add: function () {
+      this._onBeforeObjectsAdded();
+      fabric.Collection.add.apply(this, arguments);
+    },
+
+    insertAt: function (object, index, nonSplicing) {
+      this._onBeforeObjectsAdded();
+      this.callSuper('insertAt', object, index, nonSplicing);
+    },
+
+    /**
+     * @private
+     */
+    _onBeforeObjectsAdded: function () {
+      this.calcOwnMatrix();
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object 
+     */
+    _onObjectAdded: function (object) {
+      this._applyToObject(object, 'canvas', this.canvas);
+      this._applyToObject(object, 'opacity', this.opacity);
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     */
+    _onObjectRemoved: function (object) {
+      delete object.canvas;
+      this._applyToObject(object, 'opacity', 1 / this.opacity);
     },
 
     /**
