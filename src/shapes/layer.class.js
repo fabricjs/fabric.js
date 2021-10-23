@@ -34,6 +34,8 @@
 
     layout: 'auto',
 
+    fill: '',
+
     objectCaching: false,
 
     /**
@@ -331,7 +333,7 @@
       options = clone(object, true);
     delete options.objects;
     if (typeof objects === 'string') {
-      // it has to be an url or something went wrong.
+      // it has to be a url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
