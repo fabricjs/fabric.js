@@ -5,8 +5,11 @@
   var fabric = global.fabric || (global.fabric = {}),
     multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
     invertTransform = fabric.util.invertTransform,
-    addTransformToObject = fabric.util.addTransformToObject,
-    clone = fabric.util.object.clone;
+    applyTransformToObject = fabric.util.applyTransformToObject,
+    extend = fabric.util.object.extend,
+    clone = fabric.util.object.clone,
+    min = fabric.util.array.min,
+    max = fabric.util.array.max;
 
   if (fabric.Layer) {
     fabric.warn('fabric.Layer is already defined');
@@ -29,6 +32,10 @@
      */
     type: 'layer',
 
+    layout: 'auto',
+
+    objectCaching: false,
+
     /**
      * Constructor
      * @param {fabric.Object[]} [objects] layer objects
@@ -36,42 +43,40 @@
      * @return {fabric.Layer} thisArg
      */
     initialize: function (objects, options) {
-      this._objects = objects || [];
+      if (this.layout === 'auto' && Array.isArray(objects)) {
+        const box = this.getObjectsBoundingBox(objects);
+        box.originX = 'left';
+        box.originY = 'top';
+        extend(options, box);
+      }
       this.callSuper('initialize', options);
+      this.callSuper('calcOwnMatrix');
+      this._objects = objects || [];
     },
 
     /**
-     * 
+     * apply options to objects, transforming objects is handled by `calcOwnMatrix`
      * @param {string} key 
      * @param {*} value 
+     * @returns true if objects were modified
      */
     _applyOnObjects: function (key, value) {
       var modified = false;
       switch (key) {
-        case 'left':
-        case 'top':
-        case 'angle':
-        case 'skewX':
-        case 'skewY':
-          // add action
+        case 'canvas':
+          //  pass down
           this.forEachObject(function (object) {
-            object._set(key, object[key] + value);
+            object._set(key, value);
           });
-          modified = true;
           break;
         case 'opacity':
-        case 'scaleX':
-        case 'scaleY':
-        case 'flipX':
-        case 'flipY':
-          //  multiply action
+          //  multiply
           this.forEachObject(function (object) {
             object._set(key, object[key] * value);
           });
-          modified = true;
+          modified = this.size() > 0;
           break;
       }
-      this.calcOwnMatrix();
       return modified;
     },
 
@@ -82,6 +87,7 @@
      */
     _set: function (key, value) {
       this.callSuper('_set', key, value);
+      this._applyOnObjects(key, value);
       if (key === 'layout' && value === 'auto') {
         //  set width and height
       }
@@ -89,13 +95,51 @@
     },
 
     calcOwnMatrix: function () {
-      var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}), dirty = cache.key !== key;
+      var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
+        dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
       var matrix = this.callSuper('calcOwnMatrix');
       if (dirty) {
-        var matrixDiff = multiplyTransformMatrices(invertTransform(cache.value), matrix);
         this.forEachObject(function (object) {
-          addTransformToObject(object, matrixDiff);
+          var objectTransform = multiplyTransformMatrices(invertTransform(transform), object.calcTransformMatrix());
+          applyTransformToObject(object, multiplyTransformMatrices(matrix, objectTransform));
         });
+      }
+      return matrix;
+    },
+
+    /**
+     * 
+     * @param {fabric.Object[]} objects 
+     * @returns 
+     */
+    getObjectsBoundingBox: function (objects) {
+      var aX = [],
+        aY = [],
+        o, prop, coords,
+        props = ['tr', 'br', 'bl', 'tl'],
+        i = 0, iLen = objects.length,
+        j, jLen = props.length;
+
+      for (; i < iLen; ++i) {
+        o = objects[i];
+        coords = o.calcACoords();
+        for (j = 0; j < jLen; j++) {
+          prop = props[j];
+          aX.push(coords[prop].x);
+          aY.push(coords[prop].y);
+        }
+        o.aCoords = coords;
+      }
+      var minXY = new fabric.Point(min(aX), min(aY)),
+        maxXY = new fabric.Point(max(aX), max(aY)),
+        top = minXY.y || 0, left = minXY.x || 0,
+        width = (maxXY.x - minXY.x) || 0,
+        height = (maxXY.y - minXY.y) || 0;
+      return {
+        left: left,
+        top: top,
+        width: width,
+        height: height
       }
     },
 
@@ -107,6 +151,7 @@
       ctx.save();
       var t = invertTransform(this.calcTransformMatrix());
       ctx.transform.apply(ctx, t);
+      console.log('rendering?', t)
       ctx.globalAlpha = 1;
       this.forEachObject(function (object) {
         object.render(ctx);
@@ -232,7 +277,8 @@
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
-        callback && callback(group);
+        group._restoreObjectsState();
+        callback && callback(new fabric.Layer(group._objects, options));
       });
       return;
     }
