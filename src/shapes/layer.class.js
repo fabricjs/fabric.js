@@ -40,7 +40,7 @@
 
     /**
      * Constructor
-     * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations.
+     * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations during initializion.
      * 
      * @param {fabric.Object[]} [objects] layer objects
      * @param {Object} [options] Options object
