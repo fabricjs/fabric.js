@@ -37,6 +37,8 @@
 
     objectCaching: false,
 
+    subTargetCheck: true,
+
     /**
      * Constructor
      * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations during initializion.
