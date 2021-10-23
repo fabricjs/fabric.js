@@ -62,38 +62,17 @@
     },
 
     /**
-     * Apply options to object
-     * Transforming is handled by `calcOwnMatrix`
-     * @param {string} key 
-     * @param {*} value 
-     * @returns true if objects were modified
-     */
-    _applyToObject: function (object, key, value) {
-      var modified = false;
-      switch (key) {
-        case 'canvas':
-          //  pass down
-          object._set(key, value);
-          break;
-        case 'opacity':
-          //  multiply
-          object._set(key, object[key] * value);
-          modified = true;
-          break;
-      }
-      return modified;
-    },
-
-    /**
      * @private
      * @param {string} key
      * @param {*} value
      */
     _set: function (key, value) {
       this.callSuper('_set', key, value);
-      this.forEachObject(function (object) {
-        this._applyToObject(object, key, value);
-      }, this);
+      if (key === 'canvas') {
+        this.forEachObject(function (object) {
+          object._set(key, value);
+        });
+      }
       if (key === 'layout') {
         this._applyLayoutStrategy();
       }
@@ -141,8 +120,7 @@
      * @param {fabric.Object} object 
      */
     _onObjectAdded: function (object) {
-      this._applyToObject(object, 'canvas', this.canvas);
-      this._applyToObject(object, 'opacity', this.opacity);
+      object._set('canvas', this.canvas);
       this._applyLayoutStrategy();
     },
 
@@ -152,7 +130,6 @@
      */
     _onObjectRemoved: function (object) {
       delete object.canvas;
-      this._applyToObject(object, 'opacity', 1 / this.opacity);
       this._applyLayoutStrategy();
     },
 
@@ -311,6 +288,18 @@
         this.getSvgFilter(),
         visibility
       ].join('');
+    },
+
+    /**
+     * @override instance's transformations are excessive
+     * @param {boolean} full 
+     * @param {string} additionalTransform 
+     * @returns 
+     */
+    getSvgTransform: function (full, additionalTransform) {
+      var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabirc.iMatrix);
+      return svgTransform +
+        (additionalTransform || '') + '" ';
     },
 
     /**
