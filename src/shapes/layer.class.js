@@ -52,6 +52,9 @@
       this.callSuper('initialize', options);
       this._objects = objects || [];
       this._applyLayoutStrategy();
+      if (!this.subTargetCheck) {
+        this.ownMatrixCache.initialValue = this.calcOwnMatrix();
+      }
     },
 
     /**
@@ -60,6 +63,17 @@
      * @param {*} value
      */
     _set: function (key, value) {
+      if (key === 'subTargetCheck' && this.ownMatrixCache) {
+        //  we want to avoid setting `initialValue` during initializion
+        var initialValue = this.ownMatrixCache.initialValue;
+        if (value && initialValue) {
+          this._applyMatrixDiff(initialValue, this.callSuper('calcOwnMatrix'));
+          delete this.ownMatrixCache.initialValue;
+        } else if (!value && !initialValue) {
+          //  we want to prevent this logic from writing over the exisitng value before it has been applied to objects
+          this.ownMatrixCache.initialValue = this.calcOwnMatrix();
+        }
+      }
       this.callSuper('_set', key, value);
       if (key === 'canvas') {
         this.forEachObject(function (object) {
@@ -73,6 +87,18 @@
     },
 
     /**
+     * Applies the matrix diff on all objects.
+     * @param {number[]} from The matrix objects are curretly relating to
+     * @param {number[]} to The matrix objects should relate to
+     */
+    _applyMatrixDiff: function (from, to) {
+      this.forEachObject(function (object) {
+        var objectTransform = multiplyTransformMatrices(invertTransform(from), object.calcTransformMatrix());
+        applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
+      });
+    },
+
+    /**
      * Compares changes made to the transform matrix and applies them to instance's objects.
      * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
@@ -83,11 +109,8 @@
       var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
           dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
       var matrix = this.callSuper('calcOwnMatrix');
-      if (dirty && !this.disableTransformPropagation) {
-        this.forEachObject(function (object) {
-          var objectTransform = multiplyTransformMatrices(invertTransform(transform), object.calcTransformMatrix());
-          applyTransformToObject(object, multiplyTransformMatrices(matrix, objectTransform));
-        });
+      if (dirty && !this.disableTransformPropagation && this.subTargetCheck) {
+        this._applyMatrixDiff(transform, matrix);
       }
       return matrix;
     },
@@ -134,13 +157,23 @@
     },
 
     /**
+     * Performance optimization, `subTargetCheck === false`:
+     * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
+     * We transform the entire ctx with the diff instead.
+     * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
+     * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
+     * This optimization is crucial for an instance that contains a very large amount of objects. 
+     * In case you need to select objects toggle `subTargetCheck` accordingly.
+     * 
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function (ctx) {
       ctx.save();
-      var t = invertTransform(this.calcTransformMatrix());
-      ctx.transform.apply(ctx, t);
+      //  if `subTargetCheck === true` then we transform ctx back to canvas plane, objects are up to date with the latest diff
+      //  else we apply the matrix diif on ctx by transforming it back by the initial matrix, while objects relate (but not relative) to the initial matrix
+      var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
+      ctx.transform.apply(ctx, invertTransform(t));
       this.forEachObject(function (object) {
         object.render(ctx);
       });
