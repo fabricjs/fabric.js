@@ -144,6 +144,7 @@
      */
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
+      object._set('parent', this);
       this._applyLayoutStrategy();
     },
 
@@ -153,6 +154,7 @@
      */
     _onObjectRemoved: function (object) {
       delete object.canvas;
+      delete object.parent;
       this._applyLayoutStrategy();
     },
 
