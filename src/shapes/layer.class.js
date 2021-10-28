@@ -69,7 +69,8 @@
         if (value && initialValue) {
           this._applyMatrixDiff(initialValue, this.callSuper('calcOwnMatrix'));
           delete this.ownMatrixCache.initialValue;
-        } else if (!value && !initialValue) {
+        }
+        else if (!value && !initialValue) {
           //  we want to prevent this logic from writing over the exisitng value before it has been applied to objects
           this.ownMatrixCache.initialValue = this.calcOwnMatrix();
         }
@@ -164,9 +165,9 @@
      * We transform the entire ctx with the diff instead.
      * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
      * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
-     * This optimization is crucial for an instance that contains a very large amount of objects. 
+     * This optimization is crucial for an instance that contains a very large amount of objects.
      * In case you need to select objects toggle `subTargetCheck` accordingly.
-     * 
+     *
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
