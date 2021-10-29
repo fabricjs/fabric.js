@@ -35,6 +35,12 @@
 
     fill: '',
 
+    /**
+     * controls `objectCaching` and `subTargetCheck`
+     * toggle at will
+     */
+    interactive: true,
+
     objectCaching: false,
 
     subTargetCheck: true,
@@ -49,8 +55,10 @@
      */
     initialize: function (objects, options) {
       this.disableTransformPropagation = true;
-      this.callSuper('initialize', options);
+      options = options || {};
+      options.interactive = typeof options.interactive === 'boolean' ? options.interactive : true;
       this._objects = objects || [];
+      this.callSuper('initialize', options);
       this._applyLayoutStrategy();
       if (!this.subTargetCheck) {
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
@@ -83,6 +91,15 @@
       }
       if (key === 'layout') {
         this._applyLayoutStrategy();
+      }
+      if (key === 'interactive') {
+        this._set('objectCaching', !value);
+        this._set('subTargetCheck', value);
+      }
+      if (key === 'objectCaching') {
+        this.forEachObject(function (object) {
+          object._set('objectCaching', !value);
+        });
       }
       return this;
     },
