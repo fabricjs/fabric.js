@@ -1138,16 +1138,17 @@
      * @param {Event} [e] Event (passed along when firing "object:selected")
      * @return {Boolean} true if the selection happened
      */
-    _setActiveObject: function(object, e) {
-      if (this._activeObject === object) {
+    _setActiveObject: function (object, e) {
+      var isCollection = Array.isArray(object._objects);
+      if (this._activeObject === object && !isCollection) {
         return false;
       }
-      if (!this._discardActiveObject(e, object)) {
+      if (!isCollection && !this._discardActiveObject(e, object)) {
         return false;
       }
       var result = object.onSelect({
         e: e,
-        subTargets: Array.isArray(object._objects) ? this.targets.concat() : undefined
+        subTargets: isCollection ? this.targets.concat() : undefined
       });
       if (result === true) {
         return false;
