@@ -1145,10 +1145,17 @@
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      if (object.onSelect({ e: e })) {
+      var result = object.onSelect({
+        e: e,
+        subTargets: Array.isArray(object._objects) ? this.targets.concat() : undefined
+      });
+      if (result === true) {
         return false;
+      } else if (result && result instanceof fabric.Object) {
+        this._activeObject = result;
+      } else {
+        this._activeObject = object;
       }
-      this._activeObject = object;
       return true;
     },
 
