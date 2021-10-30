@@ -269,24 +269,27 @@
      * @returns
      */
     getObjectsBoundingBox: function (objects) {
-      var aX = [], aY = [];
-
+      var minX = 0, minY = 0, maxX = 0, maxY = 0;
       for (var i = 0, o; i < objects.length; ++i) {
         o = objects[i];
         var box = o.getBoundingRect();
-        aX.push(box.left, box.left + box.width);
-        aY.push(box.top, box.top + box.height);
+        if (i === 0) {
+          minX = box.left;
+          maxX = box.left + box.width;
+          minY = box.top;
+          maxY = box.top + box.height;
+        } else {
+          minX = Math.min(minX, box.left);
+          maxX = Math.max(maxX, box.left + box.width);
+          minY = Math.min(minY, box.top);
+          maxY = Math.max(maxY, box.top + box.height);
+        }
       }
-      var minXY = new fabric.Point(min(aX), min(aY)),
-          maxXY = new fabric.Point(max(aX), max(aY)),
-          top = minXY.y || 0, left = minXY.x || 0,
-          width = (maxXY.x - minXY.x) || 0,
-          height = (maxXY.y - minXY.y) || 0;
       return {
-        left: left,
-        top: top,
-        width: width / (this.scaleX || 1),
-        height: height / (this.scaleY || 1),
+        left: minX,
+        top: minY,
+        width: (maxX - minX) / (this.scaleX || 1),
+        height: (maxY - minY) / (this.scaleY || 1),
         originX: 'left',
         originY: 'top'
       };
