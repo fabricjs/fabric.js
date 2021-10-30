@@ -7,6 +7,7 @@
       invertTransform = fabric.util.invertTransform,
       applyTransformToObject = fabric.util.applyTransformToObject,
       clone = fabric.util.object.clone,
+      extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max;
 
@@ -58,8 +59,9 @@
       options = options || {};
       options.interactive = typeof options.interactive === 'boolean' ? options.interactive : true;
       this._objects = objects || [];
+      this.__objectMonitor = this.__objectMonitor.bind(this);
       this.callSuper('initialize', options);
-      this._applyLayoutStrategy();
+      this._applyLayoutStrategy({ type: 'initializion' });
       if (!this.subTargetCheck) {
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
       }
@@ -90,7 +92,7 @@
         });
       }
       if (key === 'layout') {
-        this._applyLayoutStrategy();
+        this._applyLayoutStrategy({ type: 'layout_change' });
       }
       if (key === 'interactive') {
         this._set('objectCaching', !value);
@@ -100,6 +102,9 @@
         this.forEachObject(function (object) {
           object._set('objectCaching', !value);
         });
+      }
+      if (key === 'subTargetCheck') {
+        this.forEachObject(this._watchObject.bind(this, value));
       }
       return this;
     },
@@ -156,6 +161,21 @@
       this.disableTransformPropagation = true;
     },
 
+    __objectMonitor: function (opt) {
+      this._applyLayoutStrategy(extend(opt, {
+        type: 'object_modified'
+      }));
+    },
+
+    /**
+     * @private
+     * @param {boolean} watch 
+     * @param {fabric.Object} object 
+     */
+    _watchObject: function (watch, object) {
+      object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
+    },
+
     /**
      * @private
      * @param {fabric.Object} object
@@ -163,7 +183,11 @@
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       object._set('parent', this);
-      this._applyLayoutStrategy();
+      this._watchObject(true, object);
+      this._applyLayoutStrategy({
+        type: 'object_added',
+        target: object
+      });
     },
 
     /**
@@ -173,7 +197,15 @@
     _onObjectRemoved: function (object) {
       delete object.canvas;
       delete object.parent;
-      this._applyLayoutStrategy();
+      this._watchObject(false, object);
+      this._applyLayoutStrategy({
+        type: 'object_removed',
+        target: object
+      });
+    },
+
+    onSelect: function (opt) {
+      return opt.subTargets[0];
     },
 
     /**
@@ -201,12 +233,14 @@
     },
 
     /**
-     *
+     * @public
      * @param {string} layoutDirective
      * @param {fabric.Object[]} objects
+     * @param {object} context object with data regarding what triggered the call
+     * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
      * @returns options object
      */
-    _getLayoutStrategyResult: function (layoutDirective, objects) {
+    getLayoutStrategyResult: function (layoutDirective, objects, context) {
       if (layoutDirective === 'auto') {
         return this.getObjectsBoundingBox(objects);
       }
@@ -214,10 +248,11 @@
 
     /**
      * @private
+     * @param {object} context see `getLayoutStrategyResult`
      */
-    _applyLayoutStrategy: function () {
+    _applyLayoutStrategy: function (context) {
       this.disableTransformPropagation = true;
-      this.set(this._getLayoutStrategyResult(this.layout, this._objects));
+      this.set(this.getLayoutStrategyResult(this.layout, this._objects, context));
       this.calcOwnMatrix();
       this.disableTransformPropagation = false;
     },
