@@ -1143,7 +1143,7 @@
       if (this._activeObject === object && !isCollection) {
         return false;
       }
-      if (!isCollection && !this._discardActiveObject(e, object)) {
+      if (!this._discardActiveObject(e, object)) {
         return false;
       }
       var result = object.onSelect({
