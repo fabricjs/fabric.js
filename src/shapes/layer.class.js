@@ -64,6 +64,10 @@
       this._applyLayoutStrategy({ type: 'initializion' });
       if (!this.subTargetCheck) {
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
+      } else {
+        this.forEachObject(function (object) {
+          object.setCoords();
+        });
       }
     },
 
@@ -118,6 +122,7 @@
       this.forEachObject(function (object) {
         var objectTransform = multiplyTransformMatrices(invertTransform(from), object.calcTransformMatrix());
         applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
+        object.setCoords();
       });
     },
 
@@ -263,22 +268,13 @@
      * @returns
      */
     getObjectsBoundingBox: function (objects) {
-      var aX = [],
-          aY = [],
-          o, prop, coords,
-          props = ['tr', 'br', 'bl', 'tl'],
-          i = 0, iLen = objects.length,
-          j, jLen = props.length;
+      var aX = [], aY = [];
 
-      for (; i < iLen; ++i) {
+      for (var i = 0, o; i < objects.length; ++i) {
         o = objects[i];
-        coords = o.calcACoords();
-        for (j = 0; j < jLen; j++) {
-          prop = props[j];
-          aX.push(coords[prop].x);
-          aY.push(coords[prop].y);
-        }
-        o.aCoords = coords;
+        var box = o.getBoundingRect();
+        aX.push(box.left, box.left + box.width);
+        aY.push(box.top, box.top + box.height);
       }
       var minXY = new fabric.Point(min(aX), min(aY)),
           maxXY = new fabric.Point(max(aX), max(aY)),
@@ -288,8 +284,8 @@
       return {
         left: left,
         top: top,
-        width: width,
-        height: height,
+        width: width / (this.scaleX || 1),
+        height: height / (this.scaleY || 1),
         originX: 'left',
         originY: 'top'
       };
