@@ -64,7 +64,8 @@
       this._applyLayoutStrategy({ type: 'initializion' });
       if (!this.subTargetCheck) {
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
-      } else {
+      }
+      else {
         this.forEachObject(function (object) {
           object.setCoords();
         });
@@ -174,8 +175,8 @@
 
     /**
      * @private
-     * @param {boolean} watch 
-     * @param {fabric.Object} object 
+     * @param {boolean} watch
+     * @param {fabric.Object} object
      */
     _watchObject: function (watch, object) {
       object[watch ? 'on' : 'off']('modified', this.__objectMonitor);

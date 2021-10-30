@@ -1152,9 +1152,11 @@
       });
       if (result === true) {
         return false;
-      } else if (result && result instanceof fabric.Object) {
+      }
+      else if (result && result instanceof fabric.Object) {
         this._activeObject = result;
-      } else {
+      }
+      else {
         this._activeObject = object;
       }
       return true;
