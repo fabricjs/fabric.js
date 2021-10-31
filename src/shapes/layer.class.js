@@ -210,6 +210,12 @@
       });
     },
 
+    /**
+     * 
+     * @param {object} opt 
+     * @param {fabric.Object[]} opt.subTargets 
+     * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
+     */
     onSelect: function (opt) {
       return opt.subTargets[0] || false;
     },
