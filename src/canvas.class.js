@@ -1139,14 +1139,15 @@
      * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function (object, e) {
-      var isCollection = Array.isArray(object._objects);
+      var result, isCollection = Array.isArray(object._objects);
       if (this._activeObject === object && !isCollection) {
         return false;
       }
+      //  return if active object doesn't allow to be deselected
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      var result = object.onSelect({
+      result = object.onSelect({
         e: e,
         subTargets: isCollection ? this.targets.concat() : undefined
       });
@@ -1155,11 +1156,13 @@
       }
       else if (result && result instanceof fabric.Object) {
         this._activeObject = result;
+        return true;
       }
       else {
+        var current = this._activeObject;
         this._activeObject = object;
+        return current !== this._activeObject;
       }
-      return true;
     },
 
     /**
