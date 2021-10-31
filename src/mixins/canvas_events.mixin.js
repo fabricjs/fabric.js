@@ -726,8 +726,10 @@
         if (target.selectable && target.activeOn === 'down') {
           this.setActiveObject(target, e);
           //  reassign in case a different object was selected
-          if (target !== this._activeObject) shouldRender = true;
-          target = this._activeObject;
+          if (target !== this._activeObject) {
+            shouldRender = true;
+            target = this._target = this._activeObject;
+          }
         }
         var alreadySelected = target === this._activeObject;
         var corner = target._findTargetCorner(
