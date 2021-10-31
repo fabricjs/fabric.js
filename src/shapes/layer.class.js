@@ -217,7 +217,9 @@
      * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
      */
     onSelect: function (opt) {
-      return opt.subTargets[0] || false;
+      return opt.subTargets && opt.subTargets.length > 0 ?
+        opt.subTargets[0] :
+        false;
     },
 
     /**
@@ -347,6 +349,10 @@
       var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
       obj.objects = objsToObject;
       return obj;
+    },
+
+    toString: function () {
+      return '#<fabric.Layer: (' + this.complexity() + ')>';
     },
 
     dispose: function () {
