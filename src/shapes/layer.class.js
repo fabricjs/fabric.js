@@ -211,7 +211,7 @@
     },
 
     onSelect: function (opt) {
-      return opt.subTargets[0];
+      return opt.subTargets[0] || false;
     },
 
     /**
