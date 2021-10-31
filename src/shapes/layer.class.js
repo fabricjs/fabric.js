@@ -222,6 +222,10 @@
         false;
     },
 
+    shouldCache: function () {
+      return this.ownCaching = !this.interactive && (this.needsItsOwnCache() || this.objectCaching);
+    },
+
     /**
      * Performance optimization, `subTargetCheck === false`:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
