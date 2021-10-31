@@ -102,10 +102,8 @@
       if (key === 'interactive') {
         this._set('objectCaching', !value);
         this._set('subTargetCheck', value);
-      }
-      if (key === 'objectCaching') {
         this.forEachObject(function (object) {
-          object._set('objectCaching', !value);
+          object.isType('layer') ? object._set('interactive', value) : object._set('objectCaching', value);
         });
       }
       if (key === 'subTargetCheck') {
