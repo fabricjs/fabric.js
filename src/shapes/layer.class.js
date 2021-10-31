@@ -65,11 +65,10 @@
       if (!this.subTargetCheck) {
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
       }
-      else {
-        this.forEachObject(function (object) {
-          object.setCoords();
-        });
-      }
+      this.forEachObject(function (object) {
+        this.subTargetCheck && object.setCoords();
+        object.set('parent', this);
+      }, this);
     },
 
     /**
