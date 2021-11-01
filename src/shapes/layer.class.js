@@ -281,22 +281,23 @@
       var minX = 0, minY = 0, maxX = 0, maxY = 0;
       for (var i = 0, o; i < objects.length; ++i) {
         o = objects[i];
-        var box = o.getBoundingRect();
+        var box = o.getBoundingRect(true, true);
         if (i === 0) {
-          minX = box.left;
-          maxX = box.left + box.width;
-          minY = box.top;
-          maxY = box.top + box.height;
+          minX = Math.min(box.left, box.left + box.width);
+          maxX = Math.max(box.left, box.left + box.width);
+          minY = Math.min(box.top, box.top + box.height);
+          maxY = Math.max(box.top, box.top + box.height);
         } else {
-          minX = Math.min(minX, box.left);
-          maxX = Math.max(maxX, box.left + box.width);
-          minY = Math.min(minY, box.top);
-          maxY = Math.max(maxY, box.top + box.height);
+          minX = Math.min(minX, box.left, box.left + box.width);
+          maxX = Math.max(maxX, box.left, box.left + box.width);
+          minY = Math.min(minY, box.top, box.top + box.height);
+          maxY = Math.max(maxY, box.top, box.top + box.height);
         }
       }
+      var p = fabric.util.rotatePoint(new fabric.Point(minX, minY), this.getCenterPoint(), /*fabric.util.degreesToRadians(-this.angle)*/0);
       return {
-        left: minX,
-        top: minY,
+        left: p.x,
+        top: p.y,
         width: (maxX - minX) / (this.scaleX || 1),
         height: (maxY - minY) / (this.scaleY || 1),
         originX: 'left',
