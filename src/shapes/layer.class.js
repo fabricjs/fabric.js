@@ -7,9 +7,7 @@
       invertTransform = fabric.util.invertTransform,
       applyTransformToObject = fabric.util.applyTransformToObject,
       clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend,
-      min = fabric.util.array.min,
-      max = fabric.util.array.max;
+      extend = fabric.util.object.extend;
 
   if (fabric.Layer) {
     fabric.warn('fabric.Layer is already defined');
@@ -102,7 +100,12 @@
         this._set('objectCaching', !value);
         this._set('subTargetCheck', value);
         this.forEachObject(function (object) {
-          object.isType('layer') ? object._set('interactive', value) : object._set('objectCaching', value);
+          if (object.isType('layer')) {
+            object._set('interactive', value);
+          }
+          else {
+            object._set('objectCaching', value);
+          }
         });
       }
       if (key === 'subTargetCheck') {
@@ -208,9 +211,9 @@
     },
 
     /**
-     * 
-     * @param {object} opt 
-     * @param {fabric.Object[]} opt.subTargets 
+     *
+     * @param {object} opt
+     * @param {fabric.Object[]} opt.subTargets
      * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
      */
     onSelect: function (opt) {
@@ -255,7 +258,7 @@
      * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
      * @returns options object
      */
-    getLayoutStrategyResult: function (layoutDirective, objects, context) {
+    getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
       if (layoutDirective === 'auto') {
         return this.getObjectsBoundingBox(objects);
       }
@@ -287,17 +290,17 @@
           maxX = Math.max(box.left, box.left + box.width);
           minY = Math.min(box.top, box.top + box.height);
           maxY = Math.max(box.top, box.top + box.height);
-        } else {
+        }
+        else {
           minX = Math.min(minX, box.left, box.left + box.width);
           maxX = Math.max(maxX, box.left, box.left + box.width);
           minY = Math.min(minY, box.top, box.top + box.height);
           maxY = Math.max(maxY, box.top, box.top + box.height);
         }
       }
-      var p = fabric.util.rotatePoint(new fabric.Point(minX, minY), this.getCenterPoint(), /*fabric.util.degreesToRadians(-this.angle)*/0);
       return {
-        left: p.x,
-        top: p.y,
+        left: minX,
+        top: minY,
         width: (maxX - minX) / (this.scaleX || 1),
         height: (maxY - minY) / (this.scaleY || 1),
         originX: 'left',
