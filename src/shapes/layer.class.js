@@ -219,7 +219,7 @@
     onSelect: function (opt) {
       return opt.subTargets && opt.subTargets.length > 0 ?
         opt.subTargets[0] :
-        false;
+        this.callSuper('onSelect', opt);
     },
 
     shouldCache: function () {
