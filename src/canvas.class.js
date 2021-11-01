@@ -392,9 +392,12 @@
       if (activeObjects.length > 0 && !this.preserveObjectStacking) {
         objsToRender = [];
         activeGroupObjects = [];
+        var ancestors = activeObjects.map(function (obj) {
+          return obj.getFirstAncestor();
+        });
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if (activeObjects.indexOf(object) === -1 ) {
+          if (activeObjects.indexOf(object) === -1 && ancestors.indexOf(object) === -1) {
             objsToRender.push(object);
           }
           else {
