@@ -1148,7 +1148,7 @@
      * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function (object, e) {
-      var result, isCollection = Array.isArray(object._objects);
+      var result, isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
       if (this._activeObject === object && !isCollection) {
         return false;
       }
@@ -1158,13 +1158,16 @@
       }
       result = object.onSelect({
         e: e,
+        object: activeObject,
         subTargets: isCollection ? this.targets.concat() : undefined
       });
       if (result === true) {
         return false;
       }
       else if (result && result instanceof fabric.Object) {
-        this._activeObject = result;
+        //  prepare `subTargets` and re-run
+        this._searchPossibleTargets([result], this.getPointer(e, true));
+        this._setActiveObject(result, e);
         return true;
       }
       else {
