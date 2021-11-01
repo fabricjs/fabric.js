@@ -1776,13 +1776,7 @@
       this.contextContainer = null;
       // restore canvas style
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      // some browsers (IE) don't allow to redefine style
-      try {
-        this.lowerCanvasEl.style = this._originalCanvasStyle;
-      }
-      catch (err) {
-        fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
-      }
+      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
       delete this._originalCanvasStyle;
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
