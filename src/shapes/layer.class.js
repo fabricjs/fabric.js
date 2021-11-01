@@ -273,6 +273,7 @@
       this.disableTransformPropagation = true;
       this.set(this.getLayoutStrategyResult(this.layout, this._objects, context));
       this.calcOwnMatrix();
+      context.type !== 'initialization' && this.setCoords();
       this.disableTransformPropagation = false;
     },
 
