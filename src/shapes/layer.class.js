@@ -239,6 +239,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function (ctx) {
+      fabric.Rect.prototype._render.call(this, ctx);
       ctx.save();
       //  if `subTargetCheck === true` then we transform ctx back to canvas plane, objects are up to date with the latest diff
       //  else we apply the matrix diif on ctx by transforming it back by the initial matrix, while objects relate (but not relative) to the initial matrix
