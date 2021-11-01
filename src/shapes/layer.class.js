@@ -34,14 +34,6 @@
 
     fill: '',
 
-    /**
-     * controls `objectCaching` and `subTargetCheck`
-     * toggle at will
-     */
-    interactive: true,
-
-    objectCaching: false,
-
     subTargetCheck: true,
 
     /**
@@ -54,8 +46,6 @@
      */
     initialize: function (objects, options) {
       this.disableTransformPropagation = true;
-      options = options || {};
-      options.interactive = typeof options.interactive === 'boolean' ? options.interactive : true;
       this._objects = objects || [];
       this.__objectMonitor = this.__objectMonitor.bind(this);
       this.callSuper('initialize', options);
@@ -65,6 +55,7 @@
       }
       this.forEachObject(function (object) {
         this.subTargetCheck && object.setCoords();
+        this.objectCaching && object._set('objectCaching', false);
         object.set('parent', this);
       }, this);
     },
@@ -96,20 +87,13 @@
       if (key === 'layout') {
         this._applyLayoutStrategy({ type: 'layout_change' });
       }
-      if (key === 'interactive') {
-        this._set('objectCaching', !value);
-        this._set('subTargetCheck', value);
-        this.forEachObject(function (object) {
-          if (object.isType('layer')) {
-            object._set('interactive', value);
-          }
-          else {
-            object._set('objectCaching', value);
-          }
-        });
-      }
       if (key === 'subTargetCheck') {
         this.forEachObject(this._watchObject.bind(this, value));
+      }
+      if (key === 'objectCaching' && value) {
+        this.forEachObject(function(object) {
+          object._set('objectCaching', false);
+        });
       }
       return this;
     },
@@ -189,6 +173,7 @@
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       object._set('parent', this);
+      this.objectCaching && object._set('objectCaching', false);
       this._watchObject(true, object);
       this._applyLayoutStrategy({
         type: 'object_added',
@@ -222,8 +207,11 @@
         this.callSuper('onSelect', opt);
     },
 
-    shouldCache: function () {
-      return this.ownCaching = !this.interactive && (this.needsItsOwnCache() || this.objectCaching);
+    isCacheDirty: function (skipCanvas) {
+      return this.callSuper('isCacheDirty', skipCanvas)
+        || this._objects.some(function (object) {
+          return object.isCacheDirty(skipCanvas);
+        });
     },
 
     /**
@@ -385,7 +373,7 @@
     },
 
     /**
-     * Returns styles-string for svg-export, specific version for group
+     * Returns styles-string for svg-export, specific version for layer
      * @return {String}
      */
     getSvgStyles: function () {
