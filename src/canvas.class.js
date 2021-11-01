@@ -386,14 +386,17 @@
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
     _chooseObjectsToRender: function() {
-      var activeObjects = this.getActiveObjects(),
+      var activeObjects = this.getActiveObjects(), objects = this._objects,
           object, objsToRender, activeGroupObjects;
 
       if (activeObjects.length > 0 && !this.preserveObjectStacking) {
         objsToRender = [];
         activeGroupObjects = [];
         var ancestors = activeObjects.map(function (obj) {
-          return obj.getFirstAncestor();
+          while (obj && objects.indexOf(obj) === -1) {
+            obj = obj.parent || obj.group;
+          }
+          return obj;
         });
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
@@ -406,6 +409,9 @@
         }
         if (activeObjects.length > 1) {
           this._activeObject._objects = activeGroupObjects;
+        }
+        else if (activeObjects[0].parent) {
+          activeGroupObjects.push(activeObjects[0]);
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
       }

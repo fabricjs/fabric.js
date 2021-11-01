@@ -979,12 +979,6 @@
       return opacity;
     },
 
-    getFirstAncestor: function () {
-      var parent = this.group || this.parent;
-      if (!parent) {return this;}
-      return parent.getFirstAncestor();
-    },
-
     /**
      * @private
      * @param {String} key
