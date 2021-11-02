@@ -554,7 +554,7 @@
       },
 
       /**
-       * 
+       *
        * @param {CanvasRenderingContext2D} ctx
        */
       preparePattern: function (ctx) {
@@ -588,7 +588,8 @@
         if (ctx === this.canvas.getContext()) {
           this._setBrushStyles(ctx);
           ctx.globalCompositeOperation = 'destination-out';
-        } else {
+        }
+        else {
           this.preparePattern(ctx);
         }
       },
