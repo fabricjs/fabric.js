@@ -238,6 +238,7 @@
     }
   });
 
+  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
   /**
    * @fires erasing:start
    * @fires erasing:end
@@ -262,6 +263,7 @@
      *
      * @returns fabric.Canvas
      */
+    /*
     renderAll: function () {
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
@@ -278,6 +280,13 @@
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
       return this;
+    },
+*/
+    _renderOverlay: function (ctx) {
+      __renderOverlay.call(this, ctx);
+      if (this.isErasing()) {
+        this.freeDrawingBrush._render();
+      }
     }
   });
 
@@ -431,16 +440,28 @@
        *
        * @param {fabric.Collection} collection
        */
-      prepareCollectionTraversal: function (collection) {
-        var _this = this;
+      prepareCollectionTraversal: function (collection, ctx) {
+        var backgroundImage = this.canvas.backgroundImage, overlayImage = this.canvas.overlayImage;
+        if ((backgroundImage && !this._isErasable(backgroundImage)) || !!this.canvas.backgroundColor) {
+          this.canvas._renderBackground(ctx);
+        }
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            _this.prepareCollectionTraversal(obj);
+            if (obj.isType('group')) {
+              obj.transform(ctx);
+              this.prepareCollectionTraversal(obj, ctx);
+              ctx.restore();
+            } else {
+              this.prepareCollectionTraversal(obj, ctx);
+            }
           }
-          else if (obj.erasable) {
-            _this.hideObject(obj);
+          else if (!obj.erasable) {
+            obj.render(ctx);
           }
-        });
+        }, this);
+        if ((overlayImage && !this._isErasable(overlayImage)) || !!this.canvas.overlayColor) {
+          __renderOverlay.call(this.canvas, ctx);
+        }
       },
 
       /**
@@ -546,12 +567,33 @@
       },
 
       /**
+       * 
+       * @param {CanvasRenderingContext2D} ctx
+       */
+      preparePattern: function (ctx) {
+        if (!this._patternCanvas) {
+          this._patternCanvas = fabric.util.createCanvasElement();
+        }
+        var canvas = this._patternCanvas;
+        canvas.width = this.canvas.width;
+        canvas.height = this.canvas.height;
+        var patternCtx = canvas.getContext('2d');
+        this.prepareCollectionTraversal(this.canvas, patternCtx);
+        ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
+      },
+
+      /**
        * @extends @class fabric.BaseBrush
        * @param {CanvasRenderingContext2D} ctx
        */
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
-        ctx.globalCompositeOperation = 'destination-out';
+        if (ctx === this.canvas.getContext()) {
+          this._setBrushStyles(ctx);
+          ctx.globalCompositeOperation = 'destination-out';
+        } else {
+          this.preparePattern(ctx);
+        }
       },
 
       /**
@@ -559,7 +601,7 @@
        * @returns
        */
       needsFullRender: function () {
-        return this.callSuper('needsFullRender') || this._drawOverlayOnTop;
+        return true;
       },
 
       /**
@@ -590,16 +632,23 @@
        * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
        * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
        *
-       * @param {fabric.Canvas} canvas
        */
       _render: function () {
         if (!this._ready) {
           return;
         }
         this.isRendering = 1;
-        this.renderBottomLayer();
-        this.renderTopLayer();
-        this.renderOverlay();
+        var ctx = this.canvas.getContext();
+        this.callSuper('_render', ctx);
+        ctx.restore();
+        ctx = this.canvas.contextTop;
+        this.canvas.clearContext(ctx);
+        this.callSuper('_render', ctx);
+        ctx.restore();
+        //this.renderBottomLayer();
+        //this.renderTopLayer();
+        //this.renderOverlay();
+
         this.isRendering = 0;
       },
 
