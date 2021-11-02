@@ -441,27 +441,14 @@
        * @param {fabric.Collection} collection
        */
       prepareCollectionTraversal: function (collection, ctx) {
-        var backgroundImage = this.canvas.backgroundImage, overlayImage = this.canvas.overlayImage;
-        if ((backgroundImage && !this._isErasable(backgroundImage)) || !!this.canvas.backgroundColor) {
-          this.canvas._renderBackground(ctx);
-        }
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            if (obj.isType('group')) {
-              obj.transform(ctx);
-              this.prepareCollectionTraversal(obj, ctx);
-              ctx.restore();
-            } else {
-              this.prepareCollectionTraversal(obj, ctx);
-            }
+            this.prepareCollectionTraversal(obj, ctx);
           }
           else if (!obj.erasable) {
             obj.render(ctx);
           }
         }, this);
-        if ((overlayImage && !this._isErasable(overlayImage)) || !!this.canvas.overlayColor) {
-          __renderOverlay.call(this.canvas, ctx);
-        }
       },
 
       /**
@@ -578,7 +565,17 @@
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
+        var backgroundImage = this.canvas.backgroundImage, overlayImage = this.canvas.overlayImage;
+        if ((backgroundImage && !this._isErasable(backgroundImage)) || !!this.canvas.backgroundColor) {
+          this.canvas._renderBackground(patternCtx);
+        }
+        patternCtx.save();
+        patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         this.prepareCollectionTraversal(this.canvas, patternCtx);
+        patternCtx.restore();
+        if ((overlayImage && !this._isErasable(overlayImage)) || !!this.canvas.overlayColor) {
+          __renderOverlay.call(this.canvas, patternCtx);
+        }
         ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
       },
 
