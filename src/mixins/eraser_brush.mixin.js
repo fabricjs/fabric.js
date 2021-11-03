@@ -554,7 +554,8 @@
       },
 
       /**
-       *
+       * Prepare the pattern for the erasing brush including all non-erasables objects
+       * This pattern will be drawn over the erased path, achieving a visual effect of erasing only erasable objects
        * @param {CanvasRenderingContext2D} ctx
        */
       preparePattern: function (ctx) {
@@ -565,16 +566,21 @@
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
-        var backgroundImage = this.canvas.backgroundImage, overlayImage = this.canvas.overlayImage;
-        if ((backgroundImage && !this._isErasable(backgroundImage)) || !!this.canvas.backgroundColor) {
+        var backgroundImage = this.canvas.backgroundImage, bgErasable = this._isErasable(backgroundImage),
+          overlayImage = this.canvas.overlayImage, overlayErasable = this._isErasable(overlayImage);
+        if ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor) {
+          if (bgErasable) this.canvas.backgroundImage = undefined;
           this.canvas._renderBackground(patternCtx);
+          if (bgErasable) this.canvas.backgroundImage = backgroundImage;
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         this.prepareCollectionTraversal(this.canvas, patternCtx);
         patternCtx.restore();
-        if ((overlayImage && !this._isErasable(overlayImage)) || !!this.canvas.overlayColor) {
+        if ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor) {
+          if (overlayErasable) this.canvas.overlayImage = undefined;
           __renderOverlay.call(this.canvas, patternCtx);
+          if (overlayErasable) this.canvas.overlayImage = overlayImage;
         }
         ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
       },
