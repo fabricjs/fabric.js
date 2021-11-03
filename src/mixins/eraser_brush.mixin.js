@@ -261,9 +261,9 @@
     },
 
     /**
-     * While erasing the brush clips out the erasing path from canvas 
+     * While erasing the brush clips out the erasing path from canvas
      * so we need to render it on top of canvas every render
-     * @param {CanvasRenderingContext2D} ctx 
+     * @param {CanvasRenderingContext2D} ctx
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
@@ -277,8 +277,8 @@
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
    * Supports **inverted** erasing meaning that the brush can "undo" erasing.
-   * 
-   * In order to support selective erasing, the brush clips the entire canvas 
+   *
+   * In order to support selective erasing, the brush clips the entire canvas
    * and then draws all non-erasable objects over the erased path using a pattern brush.
    * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
    * This achieves the desired effect of seeming to erase or unerase only erasable objects.
@@ -371,12 +371,14 @@
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
-        var backgroundImage = this.canvas.backgroundImage, bgErasable = backgroundImage && this._isErasable(backgroundImage),
-          overlayImage = this.canvas.overlayImage, overlayErasable = overlayImage && this._isErasable(overlayImage);
+        var backgroundImage = this.canvas.backgroundImage,
+            bgErasable = backgroundImage && this._isErasable(backgroundImage),
+            overlayImage = this.canvas.overlayImage,
+            overlayErasable = overlayImage && this._isErasable(overlayImage);
         if (!this.inverted && ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)) {
-          if (bgErasable) this.canvas.backgroundImage = undefined;
+          if (bgErasable) { this.canvas.backgroundImage = undefined; }
           this.canvas._renderBackground(patternCtx);
-          if (bgErasable) this.canvas.backgroundImage = backgroundImage;
+          if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
         }
         else if (this.inverted && (backgroundImage && bgErasable)) {
           var color = this.canvas.backgroundColor;
@@ -389,9 +391,9 @@
         this._prepareCollectionTraversal(this.canvas, patternCtx);
         patternCtx.restore();
         if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
-          if (overlayErasable) this.canvas.overlayImage = undefined;
+          if (overlayErasable) { this.canvas.overlayImage = undefined; }
           __renderOverlay.call(this.canvas, patternCtx);
-          if (overlayErasable) this.canvas.overlayImage = overlayImage;
+          if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
         }
         else if (this.inverted && (overlayImage && overlayErasable)) {
           var color = this.canvas.overlayColor;
