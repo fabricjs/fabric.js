@@ -258,33 +258,13 @@
     },
 
     /**
-     * While erasing, the brush is in charge of rendering the canvas
-     * It uses both layers to achieve diserd erasing effect
-     *
-     * @returns fabric.Canvas
+     * While erasing the brush clips out the erasing path from canvas 
+     * so we need to render it on top of canvas every render
+     * @param {CanvasRenderingContext2D} ctx 
      */
-    /*
-    renderAll: function () {
-      if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
-        this.clearContext(this.contextTop);
-        this.contextTopDirty = false;
-      }
-      // while erasing the brush is in charge of rendering the canvas so we return
-      if (this.isErasing()) {
-        this.freeDrawingBrush._render();
-        return;
-      }
-      if (this.hasLostContext) {
-        this.renderTopLayer(this.contextTop);
-      }
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
-      return this;
-    },
-*/
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      if (this.isErasing()) {
+      if (this.isErasing() && !this.freeDrawingBrush.inverted) {
         this.freeDrawingBrush._render();
       }
     }
@@ -310,6 +290,11 @@
       type: 'eraser',
 
       /**
+       * When set to `true` the brush will create a visual effect of undoing erasing
+       */
+      inverted: false,
+
+      /**
        * Indicates that the ctx is ready and rendering can begin.
        * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
        *
@@ -327,35 +312,6 @@
        */
       _isErasing: false,
 
-      initialize: function (canvas) {
-        this.callSuper('initialize', canvas);
-        this._renderBound = this._render.bind(this);
-        this.render = this.render.bind(this);
-      },
-
-      /**
-       * Used to hide a drawable from the rendering process
-       * @param {fabric.Object} object
-       */
-      hideObject: function (object) {
-        if (object) {
-          object._originalOpacity = object.opacity;
-          object.set({ opacity: 0 });
-        }
-      },
-
-      /**
-       * Restores hiding an object
-       * {@link fabric.EraserBrush#hideObject}
-       * @param {fabric.Object} object
-       */
-      restoreObjectVisibility: function (object) {
-        if (object && object._originalOpacity) {
-          object.set({ opacity: object._originalOpacity });
-          object._originalOpacity = undefined;
-        }
-      },
-
       /**
        *
        * @private
@@ -367,76 +323,11 @@
       },
 
       /**
-       * Drawing Logic For background drawables: (`backgroundImage`)
-       * 1. if erasable = true:
-       *    we need to hide the drawable on the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
-       * 2. if erasable = false:
-       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      prepareCanvasBackgroundForLayer: function (layer) {
-        if (layer === 'overlay') {
-          return;
-        }
-        var canvas = this.canvas;
-        var image = canvas.backgroundImage;
-        var erasablesOnLayer = layer === 'top';
-        if (image && this._isErasable(image) === !erasablesOnLayer) {
-          this.hideObject(image);
-        }
-      },
-
-      /**
-       * Drawing Logic For overlay drawables (`overlayImage`)
-       * We must draw on top ctx to be on top of visible canvas
-       * 1. if erasable = true:
-       *    we need to draw the drawable on the top ctx as a normal object
-       * 2. if erasable = false:
-       *    we need to draw the drawable on top of the brush,
-       *    this means we need to repaint for every stroke
-       *
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       * @returns boolean render overlay above brush
-       */
-      prepareCanvasOverlayForLayer: function (layer) {
-        var canvas = this.canvas;
-        var image = canvas.overlayImage;
-        var hasOverlayColor = !!canvas.overlayColor;
-        if (canvas.overlayColor && layer !== 'overlay') {
-          this.__overlayColor = canvas.overlayColor;
-          delete canvas.overlayColor;
-        }
-        if (layer === 'bottom') {
-          this.hideObject(image);
-          return false;
-        };
-        var erasablesOnLayer = layer === 'top';
-        var renderOverlayOnTop = (image && !this._isErasable(image)) || hasOverlayColor;
-        if (image && this._isErasable(image) === !erasablesOnLayer) {
-          this.hideObject(image);
-        }
-        return renderOverlayOnTop;
-      },
-
-      /**
-       * @private
-       */
-      restoreCanvasDrawables: function () {
-        var canvas = this.canvas;
-        if (this.__overlayColor) {
-          canvas.overlayColor = this.__overlayColor;
-          delete this.__overlayColor;
-        }
-        this.restoreObjectVisibility(canvas.backgroundImage);
-        this.restoreObjectVisibility(canvas.overlayImage);
-      },
-
-      /**
        * @private
        * This is designed to support erasing a group with both erasable and non-erasable objects.
        * Iterates over collections to allow nested selective erasing.
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
-       * to prepare the bottom layer by hiding erasable nested objects
+       * Used to prepare the pattern brush by rendering onto it all non-erasable objects if bruh is **NOT** inverted
+       * or all erasable objects without their eraser if brush is inverted.
        *
        * @param {fabric.Collection} collection
        */
@@ -445,112 +336,20 @@
           if (obj.forEachObject && obj.erasable === 'deep') {
             this.prepareCollectionTraversal(obj, ctx);
           }
-          else if (!obj.erasable) {
+          else if (!obj.erasable && !this.inverted) {
             obj.render(ctx);
           }
+          else if (obj.erasable && this.inverted) {
+            var eraser = obj.getEraser();
+            if (eraser) {
+              obj.clipPath = eraser._objects[0].clipPath;
+              obj.dirty = true;
+              obj.render(ctx);
+              obj.clipPath = eraser;
+              obj.dirty = true;
+            }
+          }
         }, this);
-      },
-
-      /**
-       * @private
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
-       * to reverse the action of {@link fabric.EraserBrush#prepareCollectionTraversal}
-       *
-       * @param {fabric.Collection} collection
-       */
-      restoreCollectionTraversal: function (collection) {
-        var _this = this;
-        collection.forEachObject(function (obj) {
-          if (obj.forEachObject && obj.erasable === 'deep') {
-            _this.restoreCollectionTraversal(obj);
-          }
-          else {
-            _this.restoreObjectVisibility(obj);
-          }
-        });
-      },
-
-      /**
-       * @private
-       * This is designed to support erasing a group with both erasable and non-erasable objects.
-       *
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      prepareCanvasObjectsForLayer: function (layer) {
-        if (layer !== 'bottom') { return; }
-        this.prepareCollectionTraversal(this.canvas);
-      },
-
-      /**
-       * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      restoreCanvasObjectsFromLayer: function (layer) {
-        if (layer !== 'bottom') { return; }
-        this.restoreCollectionTraversal(this.canvas);
-      },
-
-      /**
-       * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       * @returns boolean render overlay above brush
-       */
-      prepareCanvasForLayer: function (layer) {
-        this.prepareCanvasBackgroundForLayer(layer);
-        this.prepareCanvasObjectsForLayer(layer);
-        return this.prepareCanvasOverlayForLayer(layer);
-      },
-
-      /**
-      * @private
-      * @param {'bottom' | 'top' | 'overlay'} layer
-      */
-      restoreCanvasFromLayer: function (layer) {
-        this.restoreCanvasDrawables();
-        this.restoreCanvasObjectsFromLayer(layer);
-      },
-
-      /**
-       * Render all non-erasable objects on bottom layer with the exception of overlays to avoid being clipped by the brush.
-       * Groups are rendered for nested selective erasing, non-erasable objects are visible while erasable objects are not.
-       */
-      renderBottomLayer: function () {
-        var canvas = this.canvas;
-        this.prepareCanvasForLayer('bottom');
-        canvas.renderCanvas(
-          canvas.getContext(),
-          canvas.getObjects().filter(function (obj) {
-            return !obj.erasable || obj.forEachObject;
-          })
-        );
-        this.restoreCanvasFromLayer('bottom');
-      },
-
-      /**
-       * 1. Render all objects on top layer, erasable and non-erasable
-       *    This is important for cases such as overlapping objects, the background object erasable and the foreground object not erasable.
-       * 2. Render the brush
-       */
-      renderTopLayer: function () {
-        var canvas = this.canvas;
-        this._drawOverlayOnTop = this.prepareCanvasForLayer('top');
-        canvas.renderCanvas(
-          canvas.contextTop,
-          canvas.getObjects()
-        );
-        this.callSuper('_render');
-        this.restoreCanvasFromLayer('top');
-      },
-
-      /**
-       * Render all non-erasable overlays on top of the brush so that they won't get erased
-       */
-      renderOverlay: function () {
-        this.prepareCanvasForLayer('overlay');
-        var canvas = this.canvas;
-        var ctx = canvas.contextTop;
-        canvas._renderOverlay(ctx);
-        this.restoreCanvasFromLayer('overlay');
       },
 
       /**
@@ -568,19 +367,31 @@
         var patternCtx = canvas.getContext('2d');
         var backgroundImage = this.canvas.backgroundImage, bgErasable = backgroundImage && this._isErasable(backgroundImage),
           overlayImage = this.canvas.overlayImage, overlayErasable = overlayImage && this._isErasable(overlayImage);
-        if ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor) {
+        if (!this.inverted && ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)) {
           if (bgErasable) this.canvas.backgroundImage = undefined;
           this.canvas._renderBackground(patternCtx);
           if (bgErasable) this.canvas.backgroundImage = backgroundImage;
+        }
+        else if (this.inverted && (backgroundImage && bgErasable)) {
+          var color = this.canvas.backgroundColor;
+          this.canvas.backgroundColor = undefined;
+          this.canvas._renderBackground(patternCtx);
+          this.canvas.backgroundColor = color;
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         this.prepareCollectionTraversal(this.canvas, patternCtx);
         patternCtx.restore();
-        if ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor) {
+        if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
           if (overlayErasable) this.canvas.overlayImage = undefined;
           __renderOverlay.call(this.canvas, patternCtx);
           if (overlayErasable) this.canvas.overlayImage = overlayImage;
+        }
+        else if (this.inverted && (overlayImage && overlayErasable)) {
+          var color = this.canvas.overlayColor;
+          this.canvas.overlayColor = undefined;
+          __renderOverlay.call(this.canvas, patternCtx);
+          this.canvas.overlayColor = color;
         }
         ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
       },
@@ -641,35 +452,15 @@
         if (!this._ready) {
           return;
         }
-        this.isRendering = 1;
-        var ctx = this.canvas.getContext();
-        this.callSuper('_render', ctx);
-        ctx.restore();
+        if (!this.inverted) {
+          var ctx = this.canvas.getContext();
+          this.callSuper('_render', ctx);
+          ctx.restore();
+        }
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
         ctx.restore();
-        //this.renderBottomLayer();
-        //this.renderTopLayer();
-        //this.renderOverlay();
-
-        this.isRendering = 0;
-      },
-
-      /**
-       * @public
-       */
-      render: function () {
-        if (this._isErasing) {
-          if (this.isRendering) {
-            this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
-          }
-          else {
-            this._render();
-          }
-          return true;
-        }
-        return false;
       },
 
       createPath: function (pathData) {
