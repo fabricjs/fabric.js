@@ -107,6 +107,7 @@
     /**
      * use <mask> to achieve erasing for svg
      * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * @todo support inverted erasing
      * @param {Function} reviver
      * @returns {string} markup
      */
