@@ -21,7 +21,7 @@
     erasable: true,
 
     /**
-     *
+     * @public
      * @returns {fabric.Group | undefined}
      */
     getEraser: function () {
@@ -29,6 +29,7 @@
     },
 
     /**
+     * @public
      * Get the object's actual clip path regardless of clipping done by erasing
      * @returns {fabric.Object | undefined}
      */
@@ -38,6 +39,7 @@
     },
 
     /**
+     * @public
      * Set the object's actual clip path regardless of clipping done by erasing
      * @param {fabric.Object} [clipPath]
      */
@@ -273,11 +275,12 @@
   /**
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
-   * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx
-   * while the entire canvas is rendered on the top ctx.
-   * Canvas background/overlay images are handled as well.
-   * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
-   * This achieves the desired effect of seeming to erase only erasable objects.
+   * Supports **inverted** erasing meaning that the brush can "undo" erasing.
+   * 
+   * In order to support selective erasing, the brush clips the entire canvas 
+   * and then draws all non-erasable objects over the erased path using a pattern brush.
+   * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
+   * This achieves the desired effect of seeming to erase or unerase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
    *
    * @tutorial {@link http://fabricjs.com/erasing}
@@ -327,14 +330,14 @@
        * This is designed to support erasing a group with both erasable and non-erasable objects.
        * Iterates over collections to allow nested selective erasing.
        * Used to prepare the pattern brush by rendering onto it all non-erasable objects if bruh is **NOT** inverted
-       * or all erasable objects without their eraser if brush is inverted.
+       * **OR** all erasable objects without their eraser (clip path) if brush is inverted.
        *
        * @param {fabric.Collection} collection
        */
-      prepareCollectionTraversal: function (collection, ctx) {
+      _prepareCollectionTraversal: function (collection, ctx) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            this.prepareCollectionTraversal(obj, ctx);
+            this._prepareCollectionTraversal(obj, ctx);
           }
           else if (!obj.erasable && !this.inverted) {
             obj.render(ctx);
@@ -353,8 +356,10 @@
       },
 
       /**
-       * Prepare the pattern for the erasing brush including all non-erasables objects
-       * This pattern will be drawn over the erased path, achieving a visual effect of erasing only erasable objects
+       * Prepare the pattern for the erasing brush
+       * This pattern will be drawn on the top context, achieving a visual effect of erasing only erasable objects
+       * @todo decide how overlay color should behave when `inverted === true`, currently draws over it which is undesirable
+       * @private
        * @param {CanvasRenderingContext2D} ctx
        */
       preparePattern: function (ctx) {
@@ -380,7 +385,7 @@
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        this.prepareCollectionTraversal(this.canvas, patternCtx);
+        this._prepareCollectionTraversal(this.canvas, patternCtx);
         patternCtx.restore();
         if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
           if (overlayErasable) this.canvas.overlayImage = undefined;
@@ -441,11 +446,9 @@
       },
 
       /**
-       * Rendering is done in 4 steps:
-       * 1. Draw all non-erasable objects on bottom ctx with the exception of overlays {@link fabric.EraserBrush#renderBottomLayer}
-       * 2. Draw all objects on top ctx including erasable drawables {@link fabric.EraserBrush#renderTopLayer}
-       * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
-       * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
+       * Rendering Logic:
+       * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
+       * 2. Render brush with canvas pattern on top context
        *
        */
       _render: function () {
@@ -453,10 +456,12 @@
           return;
         }
         if (!this.inverted) {
+          //  clip canvas
           var ctx = this.canvas.getContext();
           this.callSuper('_render', ctx);
           ctx.restore();
         }
+        //  render pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
