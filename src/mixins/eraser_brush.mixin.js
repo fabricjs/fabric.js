@@ -566,8 +566,8 @@
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
-        var backgroundImage = this.canvas.backgroundImage, bgErasable = this._isErasable(backgroundImage),
-          overlayImage = this.canvas.overlayImage, overlayErasable = this._isErasable(overlayImage);
+        var backgroundImage = this.canvas.backgroundImage, bgErasable = backgroundImage && this._isErasable(backgroundImage),
+          overlayImage = this.canvas.overlayImage, overlayErasable = overlayImage && this._isErasable(overlayImage);
         if ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor) {
           if (bgErasable) this.canvas.backgroundImage = undefined;
           this.canvas._renderBackground(patternCtx);
@@ -672,6 +672,12 @@
         return false;
       },
 
+      createPath: function (pathData) {
+        var path = this.callSuper('createPath', pathData);
+        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        return path;
+      },
+
       /**
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
@@ -765,7 +771,6 @@
         }
 
         path.clone(function (path) {
-          path.globalCompositeOperation = 'destination-out';
           // http://fabricjs.com/using-transformations
           var desiredTransform = fabric.util.multiplyTransformMatrices(
             fabric.util.invertTransform(
