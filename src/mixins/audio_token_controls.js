@@ -44,6 +44,8 @@
         var canvas = target.canvas;
         canvas.remove(target);
         canvas.requestRenderAll();
+        // events are not yet implemented but this will eventually go here
+        // sendTextboxEvent(WORKSHEET_EVENT.DELETED_AUDIO_TOKEN, target.width, target.height)
       },
       render: function (ctx, left, top, styleOverride, fabricObject) {
         // fabricObject.scale is the 'base' scale NOT affected by canvas size,
@@ -91,6 +93,7 @@
       },
       mouseUpHandler: function (eventData, target) {
         var canvas = target.canvas;
+
         target.controls.playControl.heldDown = false;
         target.playControlPressed && target.playControlPressed(eventData);
         canvas.requestRenderAll();
