@@ -328,10 +328,12 @@
 
       /**
        * @private
-       * This is designed to support erasing a group with both erasable and non-erasable objects.
+       * This is designed to support erasing a collection with both erasable and non-erasable objects.
        * Iterates over collections to allow nested selective erasing.
-       * Used to prepare the pattern brush by rendering onto it all non-erasable objects if bruh is **NOT** inverted
-       * **OR** all erasable objects without their eraser (clip path) if brush is inverted.
+       * Prepares the pattern brush that will draw on the top context to achieve the desired visual effect.
+       * If brush is **NOT** inverted render all non-erasable objects.
+       * If brush is inverted render all erasable objects with their clip path inverted.
+       * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
        */
@@ -346,10 +348,10 @@
           else if (obj.erasable && this.inverted) {
             var eraser = obj.getEraser();
             if (eraser) {
-              obj.clipPath = eraser._objects[0].clipPath;
+              eraser.inverted = true;
               obj.dirty = true;
               obj.render(ctx);
-              obj.clipPath = eraser;
+              eraser.inverted = false;
               obj.dirty = true;
             }
           }
