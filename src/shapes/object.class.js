@@ -1003,8 +1003,9 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
-      else if (key === 'dirty' && this.group) {
-        this.group.set('dirty', value);
+      else if (key === 'dirty') {
+        this.group && this.group.set('dirty', value);
+        this.parent && this.parent.set('dirty', value);
       }
 
       this[key] = value;
@@ -1014,9 +1015,11 @@
         if (this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
           groupNeedsUpdate && this.group.set('dirty', true);
+          this.parent && this.parent.set('dirty', true);
         }
-        else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
-          this.group.set('dirty', true);
+        else if (this.stateProperties.indexOf(key) > -1) {
+          groupNeedsUpdate && this.group.set('dirty', true);
+          this.parent && this.parent.set('dirty', true);
         }
       }
       return this;

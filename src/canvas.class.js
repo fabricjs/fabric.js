@@ -386,15 +386,21 @@
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
     _chooseObjectsToRender: function() {
-      var activeObjects = this.getActiveObjects(),
+      var activeObjects = this.getActiveObjects(), objects = this._objects,
           object, objsToRender, activeGroupObjects;
 
       if (activeObjects.length > 0 && !this.preserveObjectStacking) {
         objsToRender = [];
         activeGroupObjects = [];
+        var ancestors = activeObjects.map(function (obj) {
+          while (obj && objects.indexOf(obj) === -1) {
+            obj = obj.parent || obj.group;
+          }
+          return obj;
+        });
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if (activeObjects.indexOf(object) === -1 ) {
+          if (activeObjects.indexOf(object) === -1 && ancestors.indexOf(object) === -1) {
             objsToRender.push(object);
           }
           else {
@@ -403,6 +409,9 @@
         }
         if (activeObjects.length > 1) {
           this._activeObject._objects = activeGroupObjects;
+        }
+        else if (activeObjects[0].parent) {
+          activeGroupObjects.push(activeObjects[0]);
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
       }
@@ -823,7 +832,7 @@
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
-          if (target.subTargetCheck && target instanceof fabric.Group) {
+          if (target.subTargetCheck && Array.isArray(target._objects)) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
@@ -1138,18 +1147,34 @@
      * @param {Event} [e] Event (passed along when firing "object:selected")
      * @return {Boolean} true if the selection happened
      */
-    _setActiveObject: function(object, e) {
-      if (this._activeObject === object) {
+    _setActiveObject: function (object, e) {
+      var result, isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
+      if (this._activeObject === object && !isCollection) {
         return false;
       }
+      //  return if active object doesn't allow to be deselected
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      if (object.onSelect({ e: e })) {
+      result = object.onSelect({
+        e: e,
+        object: activeObject,
+        subTargets: isCollection ? this.targets.concat() : undefined
+      });
+      if (result === true) {
         return false;
       }
-      this._activeObject = object;
-      return true;
+      else if (result && result instanceof fabric.Object) {
+        //  prepare `subTargets` and re-run
+        this._searchPossibleTargets([result], this.getPointer(e, true));
+        this._setActiveObject(result, e);
+        return true;
+      }
+      else {
+        var current = this._activeObject;
+        this._activeObject = object;
+        return current !== this._activeObject;
+      }
     },
 
     /**

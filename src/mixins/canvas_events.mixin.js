@@ -450,9 +450,12 @@
           );
         }
       }
+      var actualTarget = target;
       if (target) {
         if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
           this.setActiveObject(target, e);
+          //  reassign in case a different object was selected
+          actualTarget = this._activeObject;
           shouldRender = true;
         }
         else {
@@ -469,7 +472,7 @@
         }
         target.isMoving = false;
       }
-      this._setCursorFromEvent(e, target);
+      this._setCursorFromEvent(e, actualTarget);
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
       this._groupSelector = null;
       this._currentTransform = null;
@@ -720,10 +723,15 @@
       }
 
       if (target) {
-        var alreadySelected = target === this._activeObject;
         if (target.selectable && target.activeOn === 'down') {
           this.setActiveObject(target, e);
+          //  reassign in case a different object was selected
+          if (target !== this._activeObject) {
+            shouldRender = true;
+            target = this._target = this._activeObject;
+          }
         }
+        var alreadySelected = target === this._activeObject;
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
           fabric.util.isTouchEvent(e)
