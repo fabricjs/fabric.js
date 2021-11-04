@@ -136,9 +136,9 @@
      * The transformation (a Canvas 2D API transform matrix) which focuses the viewport
      * @type Array
      * @example <caption>Default transform</caption>
-     * canvas.viewportTransform = [1, 0, 0, 1, 0, 0]; 
+     * canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
      * @example <caption>Scale by 70% and translate toward bottom-right by 50, without skewing</caption>
-     * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50]; 
+     * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
      * @default
      */
     viewportTransform: fabric.iMatrix.concat(),
@@ -1776,7 +1776,7 @@
       this.contextContainer = null;
       // restore canvas style
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      this.lowerCanvasEl.style = this._originalCanvasStyle;
+      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
       delete this._originalCanvasStyle;
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
