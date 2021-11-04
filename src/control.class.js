@@ -132,9 +132,10 @@
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
      * @param {fabric.Object} object on which the control is displayed
+     * @param {Boolean} isClickEvent true if the event is a click event
      * @return {Function}
      */
-    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
+    mouseUpHandler: function(/* eventData, transformData, fabricObject, isClickEvent */) { },
 
     /**
      * Returns control actionHandler

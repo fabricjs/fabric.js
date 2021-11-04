@@ -7126,9 +7126,10 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {Event} eventData the native mouse event
      * @param {Object} transformData properties of the current transform
      * @param {fabric.Object} object on which the control is displayed
+     * @param {Boolean} isClickEvent true if the event is a click event
      * @return {Function}
      */
-    mouseUpHandler: function(/* eventData, transformData, fabricObject */) { },
+    mouseUpHandler: function(/* eventData, transformData, fabricObject, isClickEvent */) { },
 
     /**
      * Returns control actionHandler
@@ -11311,6 +11312,20 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _indicatedObject: undefined,
 
+
+    /**
+     * reference to the target that the mouse was over when mousedown occurred
+     * used to distinguish between click events (mousedown and up on same target) vs
+     * vs simple mouseup events
+    */
+    _mousedownTarget: undefined,
+
+    /**
+      * the index of the control on the target object that the mouse was over
+      * when mousedown occurred, undefined if not applicable
+     */
+    _mousedownControl: undefined,
+
     /**
      * @private
      */
@@ -12900,6 +12915,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       this._cacheTransformEventData(e);
       target = this._target;
+
+      // if mouseup happens on the same target and same control that
+      // mousedown occurred on, this is a click
+      var controlClicked =
+        target === this._mousedownTarget &&
+        target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)) === this._mousedownControl;
+
+      this._mousedownTarget = undefined;
+      this._mousedownControl = undefined;
+
       this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
@@ -12948,7 +12975,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         var control = target.controls[corner],
             mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
-          mouseUpHandler(e, target, control);
+          mouseUpHandler(e, target, control, controlClicked);
         }
         target.isMoving = false;
       }
@@ -13173,6 +13200,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
         return;
       }
+
+      // keep track of target/control we mousedown on (to detect clicks on mouseup)
+      this._mousedownTarget = target;
+      this._mousedownControl = target._findTargetCorner(
+        this.getPointer(e, true),
+        fabric.util.isTouchEvent(e)
+      ) || undefined;
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);

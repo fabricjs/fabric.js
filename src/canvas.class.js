@@ -367,6 +367,20 @@
      */
     _indicatedObject: undefined,
 
+
+    /**
+     * reference to the target that the mouse was over when mousedown occurred
+     * used to distinguish between click events (mousedown and up on same target) vs
+     * vs simple mouseup events
+    */
+    _mousedownTarget: undefined,
+
+    /**
+      * the index of the control on the target object that the mouse was over
+      * when mousedown occurred, undefined if not applicable
+     */
+    _mousedownControl: undefined,
+
     /**
      * @private
      */

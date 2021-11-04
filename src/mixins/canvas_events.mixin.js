@@ -433,6 +433,18 @@
           isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       this._cacheTransformEventData(e);
       target = this._target;
+
+      // if mouseup happens on the same target and same control that
+      // mousedown occurred on, this is a click
+      var controlClicked =
+        target === this._mousedownTarget &&
+        target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)) === this._mousedownControl;
+
+      this._mousedownTarget = undefined;
+      this._mousedownControl = undefined;
+
       this._handleEvent(e, 'up:before');
       // if right/middle click just fire events and return
       // target undefined will make the _handleEvent search the target
@@ -481,7 +493,7 @@
         var control = target.controls[corner],
             mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
-          mouseUpHandler(e, target, control);
+          mouseUpHandler(e, target, control, controlClicked);
         }
         target.isMoving = false;
       }
@@ -706,6 +718,13 @@
         }
         return;
       }
+
+      // keep track of target/control we mousedown on (to detect clicks on mouseup)
+      this._mousedownTarget = target;
+      this._mousedownControl = target._findTargetCorner(
+        this.getPointer(e, true),
+        fabric.util.isTouchEvent(e)
+      ) || undefined;
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
