@@ -23335,7 +23335,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-
+      svgString.push(new fabric.Rect(this.toObject()).toSVG());
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
