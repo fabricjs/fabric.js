@@ -70,7 +70,7 @@
         //  we want to avoid setting `initialValue` during initializion
         var initialValue = this.ownMatrixCache.initialValue;
         if (value && initialValue) {
-          this._applyMatrixDiff(initialValue, this.callSuper('calcOwnMatrix'));
+          this._applyMatrixDiffToObjects(initialValue, this.calcOwnMatrix());
           delete this.ownMatrixCache.initialValue;
         }
         else if (!value && !initialValue) {
@@ -103,7 +103,7 @@
      * @param {number[]} from The matrix objects are curretly relating to
      * @param {number[]} to The matrix objects should relate to
      */
-    _applyMatrixDiff: function (from, to) {
+    _applyMatrixDiffToObjects: function (from, to) {
       this.forEachObject(function (object) {
         var objectTransform = multiplyTransformMatrices(invertTransform(from), object.calcTransformMatrix());
         applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
@@ -116,16 +116,20 @@
      * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
      * Use `disableTransformPropagation` to disable propagation of current transform diff to objects.
-     * @returns Transform matrix
      */
-    calcOwnMatrix: function () {
-      var key = this.transformMatrixKey(true), cache = this.ownMatrixCache || (this.ownMatrixCache = {}),
-          dirty = cache.key !== key, transform = cache.value || fabric.iMatrix;
-      var matrix = this.callSuper('calcOwnMatrix');
-      if (dirty && !this.disableTransformPropagation && this.subTargetCheck) {
-        this._applyMatrixDiff(transform, matrix);
+    _applyMatrixDiff: function () {
+      var key = this.transformMatrixKey(true);
+      if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && !this.disableTransformPropagation && this.subTargetCheck) {
+        var transform = this.calcOwnMatrix();
+        if (this.prevMatrixCache) {
+          this._applyMatrixDiffToObjects(this.prevMatrixCache.cache, transform);
+          this._set('dirty', true);
+        }
+        this.prevMatrixCache = {
+          key: key,
+          cache: transform
+        }
       }
-      return matrix;
     },
 
     add: function () {
@@ -147,7 +151,7 @@
      * @private
      */
     _onBeforeObjectsChange: function () {
-      this.calcOwnMatrix();
+      this._applyMatrixDiff();
       this.disableTransformPropagation = true;
     },
 
@@ -214,6 +218,20 @@
         });
     },
 
+    setCoords: function () {
+      this._applyMatrixDiff();
+      this.callSuper('setCoords');
+    },
+
+    /**
+     * 
+     * @param {CanvasRenderingContext2D} ctx 
+     */
+    render: function (ctx) {
+      this._applyMatrixDiff();
+      this.callSuper('render', ctx);
+    },
+
     /**
      * Performance optimization, `subTargetCheck === false`:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
@@ -260,7 +278,7 @@
     _applyLayoutStrategy: function (context) {
       this.disableTransformPropagation = true;
       this.set(this.getLayoutStrategyResult(this.layout, this._objects, context));
-      this.calcOwnMatrix();
+      this._applyMatrixDiff();
       context.type !== 'initialization' && this.setCoords();
       this.disableTransformPropagation = false;
     },
