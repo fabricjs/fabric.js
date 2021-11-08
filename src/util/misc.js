@@ -140,6 +140,54 @@
     },
 
     /**
+     * Creates a vetor from points represented as a point
+     * @static
+     * @memberOf fabric.util
+     * 
+     * @typedef {Object} Point
+     * @property {number} x
+     * @property {number} y
+     * 
+     * @param {Point} from 
+     * @param {Point} to
+     * @returns {fabric.Point} vector
+     */
+    createVector: function (from, to) {
+      return new fabric.Point(to.x - from.x, to.y - from.y);
+    },
+
+    /**
+     * Calculates angle between 2 vectors using dot product
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} a
+     * @param {Point} b
+     * @returns the angle in radian between the vectors
+     */
+    calcAngleBetweenVectors: function (a, b) {
+      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
+    },
+
+    /**
+     * Calculates the projection of given stroke width on point A.
+     * **The returned vector's direction might be opposite to the normal direction**
+     * @param {Point} A the point to move
+     * @param {Point} B point next to A
+     * @param {Point} C point next to A
+     * @param {number} strokeWidth normally half the object's stroke width
+     * @returns {fabric.Point} vector describing stroke projection to apply on A
+     */
+    calculateStrokeProjectionOnPoint(A, B, C, strokeWidth) {
+      var AB = createVector(A, B), AC = createVector(A, C);
+      var alpha = calcAngleBetweenVectors(AB, AC);
+      var sharpFactor = alpha < Math.PI / 2 ? 1 : -1;
+      var ro = calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
+      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
+      var bisectorVector = new fabric.Point().setFromPoint(fabric.util.rotateVector(AB, phi));
+      return bisectorVector.multiply(sharpFactor * strokeWidth / (Math.sin(-sharpFactor * alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
+    }
+
+    /**
      * Apply transform t to point p
      * @static
      * @memberOf fabric.util
