@@ -7,7 +7,7 @@
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       toFixed = fabric.util.toFixed,
-      calculateStrokeProjectionOnPoint = fabric.util.calculateStrokeProjectionOnPoint;
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -69,16 +69,7 @@
      * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
      */
     _projectStrokeOnPoints: function () {
-      var strokeWidth = this.strokeWidth / 2;
-      var coords = [];
-      this.points.forEach(function (A, index, points) {
-        var B = points[(index - 1 + points.length) % points.length],
-          C = points[(index + 1) % points.length],
-          v = calculateStrokeProjectionOnPoint(A, B, C, strokeWidth);
-        coords.push(new fabric.Point(A.x, A.y).addEquals(v));
-        coords.push(new fabric.Point(A.x, A.y).subtractEquals(v));
-      });
-      return coords;
+      return projectStrokeOnPoints(this.points, this.strokeWidth / 2);
     },
 
     _setPositionDimensions: function(options) {
