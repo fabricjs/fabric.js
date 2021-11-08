@@ -171,6 +171,8 @@
     /**
      * Calculates the projection of given stroke width on point A.
      * **The returned vector's direction might be opposite to the normal direction**
+     * @static
+     * @memberOf fabric.util
      * @param {Point} A the point to move
      * @param {Point} B point next to A
      * @param {Point} C point next to A
@@ -186,6 +188,27 @@
       var phi = alpha * (ro === 0 ? 1 : -1) / 2;
       var bisectorVector = new fabric.Point().setFromPoint(fabric.util.rotateVector(AB, phi));
       return bisectorVector.multiply(sharpFactor * strokeWidth / (Math.sin(-sharpFactor * alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
+    },
+
+    /**
+     * Project stroke width on points returning 2 projections for each point, one for the outer boundary and one for the inner boundary of stroke.
+     * Used to calculate object's bounding box
+     * @static
+     * @memberOf fabric.util
+     * @param {Point[]} points
+     * @param {number} strokeWidth normally half the object's stroke width
+     * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
+     */
+    projectStrokeOnPoints: function (points, strokeWidth) {
+      var coords = [];
+      points.forEach(function (A, index) {
+        var B = points[(index - 1 + points.length) % points.length],
+          C = points[(index + 1) % points.length],
+          v = fabric.util.calculateStrokeProjectionOnPoint(A, B, C, strokeWidth);
+        coords.push(new fabric.Point(A.x, A.y).addEquals(v));
+        coords.push(new fabric.Point(A.x, A.y).subtractEquals(v));
+      });
+      return coords;
     },
 
     /**
