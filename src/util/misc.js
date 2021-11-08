@@ -182,12 +182,11 @@
     calculateStrokeProjectionOnPoint(A, B, C, strokeWidth) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      var sharpFactor = alpha < Math.PI / 2 ? 1 : -1;
       //  check if alpha is relative to AB->BC
       var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
       var phi = alpha * (ro === 0 ? 1 : -1) / 2;
       var bisectorVector = new fabric.Point().setFromPoint(fabric.util.rotateVector(AB, phi));
-      return bisectorVector.multiply(sharpFactor * strokeWidth / (Math.sin(-sharpFactor * alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
+      return bisectorVector.multiply(-strokeWidth / (Math.sin(alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
     },
 
     /**
