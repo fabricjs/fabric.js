@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -63,13 +64,21 @@
       this._setPositionDimensions(options);
     },
 
+    /**
+     * @private
+     * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
+     */
+    _projectStrokeOnPoints: function () {
+      return projectStrokeOnPoints(this.points, this.strokeWidth / 2);
+    },
+
     _setPositionDimensions: function(options) {
       var calcDim = this._calcDimensions(options), correctLeftTop;
-      this.width = calcDim.width;
-      this.height = calcDim.height;
+      this.width = calcDim.width - this.strokeWidth;
+      this.height = calcDim.height - this.strokeWidth;
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
-          { x: calcDim.left - this.strokeWidth / 2, y: calcDim.top - this.strokeWidth / 2 },
+          { x: calcDim.left, y: calcDim.top },
           'left',
           'top',
           this.originX,
@@ -83,8 +92,8 @@
         this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
       }
       this.pathOffset = {
-        x: calcDim.left + this.width / 2,
-        y: calcDim.top + this.height / 2
+        x: calcDim.left + calcDim.width / 2,
+        y: calcDim.top + calcDim.height / 2
       };
     },
 
@@ -100,7 +109,7 @@
      */
     _calcDimensions: function() {
 
-      var points = this.points,
+      var points = this._projectStrokeOnPoints(),
           minX = min(points, 'x') || 0,
           minY = min(points, 'y') || 0,
           maxX = max(points, 'x') || 0,

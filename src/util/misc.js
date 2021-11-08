@@ -140,6 +140,78 @@
     },
 
     /**
+     * Creates a vetor from points represented as a point
+     * @static
+     * @memberOf fabric.util
+     * 
+     * @typedef {Object} Point
+     * @property {number} x
+     * @property {number} y
+     * 
+     * @param {Point} from 
+     * @param {Point} to
+     * @returns {fabric.Point} vector
+     */
+    createVector: function (from, to) {
+      return new fabric.Point(to.x - from.x, to.y - from.y);
+    },
+
+    /**
+     * Calculates angle between 2 vectors using dot product
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} a
+     * @param {Point} b
+     * @returns the angle in radian between the vectors
+     */
+    calcAngleBetweenVectors: function (a, b) {
+      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
+    },
+
+    /**
+     * Calculates the projection of given stroke width on point A.
+     * **The returned vector's direction might be opposite to the normal direction**
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} A the point to move
+     * @param {Point} B point next to A
+     * @param {Point} C point next to A
+     * @param {number} strokeWidth normally half the object's stroke width
+     * @returns {fabric.Point} vector describing stroke projection to apply on A
+     */
+    calculateStrokeProjectionOnPoint(A, B, C, strokeWidth) {
+      var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
+      var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
+      var sharpFactor = alpha < Math.PI / 2 ? 1 : -1;
+      //  check if alpha is relative to AB->BC
+      var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
+      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
+      var bisectorVector = new fabric.Point().setFromPoint(fabric.util.rotateVector(AB, phi));
+      return bisectorVector.multiply(sharpFactor * strokeWidth / (Math.sin(-sharpFactor * alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
+    },
+
+    /**
+     * Project stroke width on points returning 2 projections for each point, one for the outer boundary and one for the inner boundary of stroke.
+     * Used to calculate object's bounding box
+     * @static
+     * @memberOf fabric.util
+     * @param {Point[]} points
+     * @param {number} strokeWidth normally half the object's stroke width
+     * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
+     */
+    projectStrokeOnPoints: function (points, strokeWidth) {
+      var coords = [];
+      points.forEach(function (A, index) {
+        var B = points[(index - 1 + points.length) % points.length],
+          C = points[(index + 1) % points.length],
+          v = fabric.util.calculateStrokeProjectionOnPoint(A, B, C, strokeWidth);
+        coords.push(new fabric.Point(A.x, A.y).addEquals(v));
+        coords.push(new fabric.Point(A.x, A.y).subtractEquals(v));
+      });
+      return coords;
+    },
+
+    /**
      * Apply transform t to point p
      * @static
      * @memberOf fabric.util
