@@ -170,7 +170,7 @@
 
     /**
      * Calculates the projection of given stroke width on point A.
-     * **The returned vector's direction might be opposite to the normal direction**
+     * **The returned vector's direction might be opposite, pointing inside instead of outside**
      * @static
      * @memberOf fabric.util
      * @param {Point} A the point to move
@@ -179,7 +179,7 @@
      * @param {number} strokeWidth normally half the object's stroke width
      * @returns {fabric.Point} vector describing stroke projection to apply on A
      */
-    calculateStrokeProjectionOnPoint(A, B, C, strokeWidth) {
+    calcStrokeMiterForPoint(A, B, C, strokeWidth) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
       //  check if alpha is relative to AB->BC
@@ -190,22 +190,45 @@
     },
 
     /**
-     * Project stroke width on points returning 2 projections for each point, one for the outer boundary and one for the inner boundary of stroke.
+     * Project stroke width on points returning 2 projections for each point as follows:
+     * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
+     * - `bevel`: 2 points corresponding to the bevel boundaries, tangent to the bisector.
+     * - `round`: same as `bevel`
      * Used to calculate object's bounding box
      * @static
      * @memberOf fabric.util
      * @param {Point[]} points
-     * @param {number} strokeWidth normally half the object's stroke width
-     * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
+     * @param {Object} options
+     * @param {number} options.strokeWidth 
+     * @param {'miter'|'bevel'|'round'} options.strokeLineJoin 
+     * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+     * @param {boolean} [openPath] 
+     * @returns {fabric.Point[]} array of size 2n of all suspected points
      */
-    projectStrokeOnPoints: function (points, strokeWidth) {
-      var coords = [];
-      points.forEach(function (A, index) {
-        var B = points[(index - 1 + points.length) % points.length],
-          C = points[(index + 1) % points.length],
-          v = fabric.util.calculateStrokeProjectionOnPoint(A, B, C, strokeWidth);
-        coords.push(new fabric.Point(A.x, A.y).addEquals(v));
-        coords.push(new fabric.Point(A.x, A.y).subtractEquals(v));
+    projectStrokeOnPoints: function (points, options, openPath) {
+      var coords = [], s = options.strokeWidth / 2;
+      points.forEach(function (p, index) {
+        var A = new fabric.Point(p.x, p.y),
+          B = points[(index - 1 + points.length) % points.length],
+          C = points[(index + 1) % points.length];
+        if (openPath && index === 0) {
+          B = new fabric.Point(C.x, C.y).multiply(-1);
+        } else if (openPath && index === points.length - 1) {
+          C = new fabric.Point(B.x, B.y).multiply(-1);
+        }
+        var v, miterVector = fabric.util.calcStrokeMiterForPoint(A, B, C, s);
+        if (options.strokeLineJoin === 'round') {
+          v = miterVector.multiply(s / Math.hypot(miterVector.x, miterVector.y));
+        }
+        else if (options.strokeLineJoin === 'miter' && Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
+          v = miterVector;
+        }
+        else {
+          var tangentVector = fabric.util.rotateVector(miterVector, PiBy2);
+          v = new fabric.Point(tangentVector.x, tangentVector.y).multiply(s / Math.hypot(tangentVector.x, tangentVector.y));
+        }
+        coords.push(A.add(v));
+        coords.push(A.subtract(v));
       });
       return coords;
     },

@@ -66,10 +66,9 @@
 
     /**
      * @private
-     * @returns {fabric.Point[]} array of size n*2 of all suspected points (a point can be on both sides of stroke)
      */
     _projectStrokeOnPoints: function () {
-      return projectStrokeOnPoints(this.points, this.strokeWidth / 2);
+      return projectStrokeOnPoints(this.points, this, true);
     },
 
     _setPositionDimensions: function(options) {
