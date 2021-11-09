@@ -150,7 +150,7 @@
      * 
      * @param {Point} from 
      * @param {Point} to
-     * @returns {fabric.Point} vector
+     * @returns {Point} vector
      */
     createVector: function (from, to) {
       return new fabric.Point(to.x - from.x, to.y - from.y);
@@ -169,24 +169,33 @@
     },
 
     /**
-     * Calculates the projection of given stroke width on point A.
-     * **The returned vector's direction might be opposite, pointing inside instead of outside**
      * @static
      * @memberOf fabric.util
-     * @param {Point} A the point to move
-     * @param {Point} B point next to A
-     * @param {Point} C point next to A
-     * @param {number} strokeWidth normally half the object's stroke width
-     * @returns {fabric.Point} vector describing stroke projection to apply on A
+     * @param {Point} v
+     * @returns {Point} vector representing the unit vector in stroke width units
      */
-    calcStrokeMiterForPoint(A, B, C, strokeWidth) {
+    getHatVector: function (v) {
+      return new fabric.Point(v.x, v.y).multiply(1 / Math.hypot(v.x, v.y));
+    },
+
+    /**
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} A 
+     * @param {Point} B
+     * @param {Point} C
+     * @returns {{ vector: Point, angle: number }} vector representing the bisector of A, A's angle
+     */
+    getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
       //  check if alpha is relative to AB->BC
       var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
       var phi = alpha * (ro === 0 ? 1 : -1) / 2;
-      var bisectorVector = new fabric.Point().setFromPoint(fabric.util.rotateVector(AB, phi));
-      return bisectorVector.multiply(-strokeWidth / (Math.sin(alpha / 2) * Math.hypot(bisectorVector.x, bisectorVector.y)));
+      return {
+        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
+        angle: alpha
+      }
     },
 
     /**
@@ -202,33 +211,56 @@
      * @param {number} options.strokeWidth 
      * @param {'miter'|'bevel'|'round'} options.strokeLineJoin 
      * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+     * @param {boolean} options.strokeUniform 
+     * @param {number} options.scaleX 
+     * @param {number} options.scaleY 
      * @param {boolean} [openPath] 
-     * @returns {fabric.Point[]} array of size 2n of all suspected points
+     * @returns {fabric.Point[]} array of size 2n/4n of all suspected points
      */
     projectStrokeOnPoints: function (points, options, openPath) {
-      var coords = [], s = options.strokeWidth / 2;
+      var coords = [], s = options.strokeWidth / 2,
+        strokeUniformScalar = options.strokeUniform ? new fabric.Point(1 / options.scaleX, 1 / options.scaleY) : new fabric.Point(1, 1),
+        /**
+         * @param {Point} v vector
+         * @returns vector representing the unit vector in stroke width units
+         */
+        getStrokeHatVector = function (v) {
+          var scalar = s / (Math.hypot(v.x, v.y));
+          return new fabric.Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
+        };
+      if (points.length <= 1) return coords;
       points.forEach(function (p, index) {
-        var A = new fabric.Point(p.x, p.y),
-          B = points[(index - 1 + points.length) % points.length],
-          C = points[(index + 1) % points.length];
-        if (openPath && index === 0) {
-          B = new fabric.Point(C.x, C.y).multiply(-1);
-        } else if (openPath && index === points.length - 1) {
-          C = new fabric.Point(B.x, B.y).multiply(-1);
+        var A = new fabric.Point(p.x, p.y), B, C;
+        if (index === 0) {
+          C = points[index + 1];
+          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).addEquals(A) : points[points.length - 1];
         }
-        var v, miterVector = fabric.util.calcStrokeMiterForPoint(A, B, C, s);
-        if (options.strokeLineJoin === 'round') {
-          v = miterVector.multiply(s / Math.hypot(miterVector.x, miterVector.y));
-        }
-        else if (options.strokeLineJoin === 'miter' && Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
-          v = miterVector;
+        else if (index === points.length - 1) {
+          B = points[index - 1];
+          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).addEquals(A) : points[0];
         }
         else {
-          var tangentVector = fabric.util.rotateVector(miterVector, PiBy2);
-          v = new fabric.Point(tangentVector.x, tangentVector.y).multiply(s / Math.hypot(tangentVector.x, tangentVector.y));
+          B = points[index - 1];
+          C = points[index + 1];
         }
-        coords.push(A.add(v));
-        coords.push(A.subtract(v));
+        var bisector = fabric.util.getBisector(A, B, C),
+          bisectorVector = bisector.vector,
+          alpha = bisector.angle,
+          scalar,
+          miterVector;
+        if (options.strokeLineJoin === 'miter') {
+          scalar = -s / Math.sin(alpha / 2);
+          miterVector = new fabric.Point(bisectorVector.x * scalar * strokeUniformScalar.x, bisectorVector.y * scalar * strokeUniformScalar.y);
+          if (Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
+            coords.push(A.add(miterVector));
+            coords.push(A.subtract(miterVector));
+            return;
+          }
+        }
+        scalar = -s * Math.SQRT2;
+        miterVector = new fabric.Point(bisectorVector.x * scalar * strokeUniformScalar.x, bisectorVector.y * scalar * strokeUniformScalar.y);
+        coords.push(A.add(miterVector));
+        coords.push(A.subtract(miterVector));
       });
       return coords;
     },
