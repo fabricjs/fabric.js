@@ -1012,7 +1012,7 @@
 
       if (isChanged) {
         var parent = this.group || this.parent;
-        var parentNeedsUpdate = (parent && parent.isOnACache()) || !!this.parent;
+        var parentNeedsUpdate = parent && parent.isOnACache();
         if (parentNeedsUpdate && this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
           parent.set('dirty', true);
