@@ -254,7 +254,9 @@
     },
 
     /**
-     * Performance optimization, `subTargetCheck === false`:
+     * Performance optimizations:
+     * 
+     * **`subTargetCheck === false`**:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
      * We transform the entire ctx with the diff instead.
      * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
@@ -262,9 +264,11 @@
      * This optimization is crucial for an instance that contains a very large amount of objects.
      * In case you need to select objects toggle `subTargetCheck` accordingly.
      * 
-     * Caching Performance optimization:
+     * **caching**:
+     * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
+     * This means that even though objects' transform matrices change they do not trigger rendering.
      * Once an object is selected, instance is rendered without the selected object.
-     * This way caching is run only once for the entire interaction with the selected object.
+     * This way instance is cached only once for the entire interaction with the selected object.
      *
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
