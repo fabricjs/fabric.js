@@ -260,9 +260,18 @@
     _applyLayoutStrategy: function (context) {
       var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
       this.set(result);
+      //  refresh matrix cache
       this.calcOwnMatrix();
       this._applyMatrixDiff(context.type === 'object_modified');
       context.type !== 'initialization' && this.callSuper('setCoords');
+      //  recursive up
+      if (this.parent && this.parent._applyLayoutStrategy) {
+        if (!context.path) {
+          context.path = [];
+        }
+        context.path.push(this);
+        this.parent._applyLayoutStrategy(context);
+      }
     },
 
     /**
@@ -271,6 +280,7 @@
      * @param {fabric.Object[]} objects
      * @param {object} context object with data regarding what triggered the call
      * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
      * @returns options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
