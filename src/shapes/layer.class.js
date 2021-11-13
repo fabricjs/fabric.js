@@ -37,6 +37,14 @@
     subTargetCheck: true,
 
     /**
+     * Used internally to optimize performance
+     * Once an object is selected instance is rendered without the selected object
+     * This way caching runs only once for the entire interaction with the object
+     * @private
+     */
+    _activeObject: undefined,
+
+    /**
      * Constructor
      * Guard objects' transformations from excessive mutations during initializion.
      *
@@ -119,7 +127,6 @@
         var transform = this.calcOwnMatrix();
         if (this.prevMatrixCache && !disablePropagation) {
           this._applyMatrixDiffToObjects(this.prevMatrixCache.cache, transform);
-          this._set('dirty', true);
         }
         this.prevMatrixCache = {
           key: this.ownMatrixCache.key,
@@ -150,10 +157,28 @@
       this._applyMatrixDiff();
     },
 
+    /**
+     * @private
+     */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(opt, {
+      this._applyLayoutStrategy(extend(clone(opt), {
         type: 'object_modified'
       }));
+      this._set('dirty', true);
+    },
+
+    /**
+     * @private
+     */
+    __objectSelectionMonitor: function (object, selected, /* opt */) {
+      if (selected) {
+        this._activeObject = object;
+        this._set('dirty', true);
+      }
+      else if (this._activeObject === object) {
+        this._activeObject = undefined;
+        this._set('dirty', true);
+      }
     },
 
     /**
@@ -163,6 +188,8 @@
      */
     _watchObject: function (watch, object) {
       object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
+      object[watch ? 'on' : 'off']('selected', this.__objectSelectionMonitor.bind(this, object, true));
+      object[watch ? 'on' : 'off']('deselected', this.__objectSelectionMonitor.bind(this, object, false));
     },
 
     /**
@@ -218,16 +245,14 @@
       return this.ownCaching || (this.parent && this.parent.isOnACache());
     },
 
+    /**
+     * hook used to apply matrix diff on objects
+     */
     setCoords: function () {
       this._applyMatrixDiff();
       this.callSuper('setCoords');
     },
-/*
-    render: function (ctx) {
-      this._applyMatrixDiff();
-      this.callSuper('render', ctx);
-    },
-*/
+
     /**
      * Performance optimization, `subTargetCheck === false`:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
@@ -236,6 +261,10 @@
      * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
      * This optimization is crucial for an instance that contains a very large amount of objects.
      * In case you need to select objects toggle `subTargetCheck` accordingly.
+     * 
+     * Caching Performance optimization:
+     * Once an object is selected, instance is rendered without the selected object.
+     * This way caching is run only once for the entire interaction with the selected object.
      *
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -248,8 +277,9 @@
       var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
       ctx.transform.apply(ctx, invertTransform(t));
       this.forEachObject(function (object) {
-        object.render(ctx);
-      });
+        //  do not render the selected object
+        object !== this._activeObject && object.render(ctx);
+      }, this);
       ctx.restore();
     },
 
@@ -275,6 +305,7 @@
     },
 
     /**
+     * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
      * @param {fabric.Object[]} objects
@@ -290,7 +321,7 @@
     },
 
     /**
-     *
+     * @public
      * @param {fabric.Object[]} objects
      * @returns
      */
