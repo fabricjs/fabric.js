@@ -296,7 +296,7 @@
       this.set(result);
       //  refresh matrix cache
       this.calcOwnMatrix();
-      this._applyMatrixDiff(context.type === 'object_modified');
+      this._applyMatrixDiff(context.type === 'object_modified' || context.type === 'object_added' || context.type === 'object_removed');
       context.type !== 'initialization' && this.callSuper('setCoords');
       //  recursive up
       if (this.parent && this.parent._applyLayoutStrategy) {
