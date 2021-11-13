@@ -55,7 +55,6 @@
       }
       this.forEachObject(function (object) {
         this.subTargetCheck && object.setCoords();
-        this.objectCaching && object._set('objectCaching', false);
         object.set('parent', this);
       }, this);
     },
