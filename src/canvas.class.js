@@ -1163,11 +1163,12 @@
         target = this._searchPossibleTargets([activeObject], pointer);
         target && this.targets.push(target);
       }
-      //  push siblings and parent to `targets`
+      //  push siblings and parents to `targets` recursively up
       var parent = activeObject && activeObject.parent;
-      if (parent && Array.isArray(parent._objects)) {
+      while (parent) {
         target = this._searchPossibleTargets([parent], pointer);
         target && this.targets.push(target);
+        parent = parent.parent;
       }
       //  prepare subTargets
       var subTargets = this.targets;
