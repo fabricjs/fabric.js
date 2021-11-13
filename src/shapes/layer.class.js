@@ -34,12 +34,16 @@
 
     fill: '',
 
+    /**
+     * Used to optimize performance
+     * set to `false` if you don't need objects to be interactive
+     */
     subTargetCheck: true,
 
     /**
      * Used internally to optimize performance
-     * Once an object is selected instance is rendered without the selected object
-     * This way caching runs only once for the entire interaction with the object
+     * Once an object is selected, instance is rendered without the selected object.
+     * This way instance is cached only once for the entire interaction with the selected object.
      * @private
      */
     _activeObject: undefined,
