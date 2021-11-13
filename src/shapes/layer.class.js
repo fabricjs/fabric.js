@@ -90,11 +90,6 @@
       if (key === 'subTargetCheck') {
         this.forEachObject(this._watchObject.bind(this, value));
       }
-      if (key === 'objectCaching' && value) {
-        this.forEachObject(function(object) {
-          object._set('objectCaching', false);
-        });
-      }
       return this;
     },
 
@@ -178,7 +173,6 @@
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       object._set('parent', this);
-      this.objectCaching && object._set('objectCaching', false);
       this._watchObject(true, object);
       this._applyLayoutStrategy({
         type: 'object_added',
@@ -215,6 +209,14 @@
         || this._objects.some(function (object) {
           return object.isCacheDirty(skipCanvas);
         });
+    },
+
+    /**
+     * Check if instance or its parent are caching, recursively up
+     * @return {Boolean}
+     */
+    isOnACache: function () {
+      return this.ownCaching || (this.parent && this.parent.isOnACache());
     },
 
     setCoords: function () {

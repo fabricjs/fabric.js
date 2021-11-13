@@ -987,7 +987,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value, groupNeedsUpdate = false;
+          isChanged = this[key] !== value;
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1011,15 +1011,14 @@
       this[key] = value;
 
       if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
-        if (this.cacheProperties.indexOf(key) > -1) {
+        var parent = this.group || this.parent;
+        var parentNeedsUpdate = (parent && parent.isOnACache()) || !!this.parent;
+        if (parentNeedsUpdate && this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
-          this.parent && this.parent.set('dirty', true);
+          parent.set('dirty', true);
         }
-        else if (this.stateProperties.indexOf(key) > -1) {
-          groupNeedsUpdate && this.group.set('dirty', true);
-          this.parent && this.parent.set('dirty', true);
+        else if (parentNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
+          parent.set('dirty', true);
         }
       }
       return this;
@@ -1170,11 +1169,9 @@
      * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
      * @return {Boolean}
      */
-    shouldCache: function() {
-      this.ownCaching = this.needsItsOwnCache() || (
-        this.objectCaching &&
-        (!this.group || !this.group.isOnACache())
-      );
+    shouldCache: function () {
+      var parent = this.group || this.parent;
+      this.ownCaching = this.needsItsOwnCache() || (this.objectCaching && (!parent || !parent.isOnACache()));
       return this.ownCaching;
     },
 
