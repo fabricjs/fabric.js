@@ -1148,7 +1148,7 @@
      * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function (object, e) {
-      var result, isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
+      var isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
       if (this._activeObject === object && !isCollection) {
         return false;
       }
@@ -1156,25 +1156,56 @@
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      result = object.onSelect({
+      var pointer = this.getPointer(e, true), targets = this.targets, target;
+      this.targets = [];
+      //  push children and `activeObject` to `targets`
+      if (activeObject && Array.isArray(activeObject._objects)) {
+        target = this._searchPossibleTargets([activeObject], pointer);
+        target && this.targets.push(target);
+      }
+      //  push siblings and parent to `targets`
+      var parent = activeObject && activeObject.parent;
+      if (parent && Array.isArray(parent._objects)) {
+        target = this._searchPossibleTargets([parent], pointer);
+        target && this.targets.push(target);
+      }
+      //  prepare subTargets
+      var subTargets = this.targets;
+      var lastIndex = subTargets.lastIndexOf(activeObject);
+      //  it is possible that `activeObject` exists twice in `subTargets`
+      //  if so we remove the last ref that was pushed as part of siblings check because we want it to be on top of all it's siblings
+      if (subTargets.indexOf(activeObject) !== lastIndex) {
+        subTargets.splice(lastIndex, 1);
+      }
+      this.targets = targets;
+      return this.__setActiveObject(object, e, subTargets);
+    },
+
+    __setActiveObject: function (object, e, subTargets) {
+      var activeObject = this._activeObject;
+      var result = object.onSelect({
         e: e,
         object: activeObject,
-        subTargets: isCollection ? this.targets.concat() : undefined
+        subTargets: this.targets.concat(),
+        activeSubTargets: subTargets
       });
       if (result === true) {
         return false;
       }
-      else if (result && result instanceof fabric.Object) {
-        //  prepare `subTargets` and re-run
+      else if (result && result instanceof fabric.Object && result !== object) {
+        //  prepare `targets`
+        var targets = this.targets;
+        this.targets = [];
         this._searchPossibleTargets([result], this.getPointer(e, true));
-        this._setActiveObject(result, e);
-        return true;
+        if (this.__setActiveObject(result, e) === true) {
+          //  restore `targets` if object declined selection
+          this.targets = targets;
+        };
       }
       else {
-        var current = this._activeObject;
         this._activeObject = object;
-        return current !== this._activeObject;
       }
+      return activeObject !== this._activeObject;
     },
 
     /**
