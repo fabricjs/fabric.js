@@ -119,7 +119,8 @@
      */
     _applyMatrixDiff: function () {
       var key = this.transformMatrixKey(true);
-      if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && !this.disableTransformPropagation && this.subTargetCheck) {
+      if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key)
+        && !this.disableTransformPropagation && this.subTargetCheck) {
         var transform = this.calcOwnMatrix();
         if (this.prevMatrixCache) {
           this._applyMatrixDiffToObjects(this.prevMatrixCache.cache, transform);
@@ -128,7 +129,7 @@
         this.prevMatrixCache = {
           key: key,
           cache: transform
-        }
+        };
       }
     },
 
@@ -222,8 +223,8 @@
     },
 
     /**
-     * 
-     * @param {CanvasRenderingContext2D} ctx 
+     *
+     * @param {CanvasRenderingContext2D} ctx
      */
     render: function (ctx) {
       this._applyMatrixDiff();
