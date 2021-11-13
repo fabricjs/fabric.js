@@ -121,9 +121,8 @@
 
     /**
      * Compares changes made to the transform matrix and applies them to instance's objects.
-     * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
-     * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects.
+     * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects, preventing the existing transform diff from being applied to them unnecessarily.
      */
     _applyMatrixDiff: function (disablePropagation) {
       var key = this.ownMatrixCache && this.ownMatrixCache.key;
@@ -174,7 +173,7 @@
     /**
      * @private
      */
-    __objectSelectionMonitor: function (object, selected, /* opt */) {
+    __objectSelectionMonitor: function (object, selected) {
       if (selected) {
         this._activeObject = object;
         this._set('dirty', true);
@@ -259,7 +258,7 @@
 
     /**
      * Performance optimizations:
-     * 
+     *
      * **`subTargetCheck === false`**:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
      * We transform the entire ctx with the diff instead.
@@ -267,7 +266,7 @@
      * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
      * This optimization is crucial for an instance that contains a very large amount of objects.
      * In case you need to select objects toggle `subTargetCheck` accordingly.
-     * 
+     *
      * **caching**:
      * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
      * This means that even though objects' transform matrices change they do not trigger rendering.
@@ -298,9 +297,9 @@
     _applyLayoutStrategy: function (context) {
       var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
       this.set(result);
-      //  refresh matrix cache
+      //  refresh matrix cache and set diff point
       this.calcOwnMatrix();
-      this._applyMatrixDiff(context.type === 'object_modified' || context.type === 'object_added' || context.type === 'object_removed');
+      this._applyMatrixDiff(true);
       context.type !== 'initialization' && this.callSuper('setCoords');
       //  recursive up
       if (this.parent && this.parent._applyLayoutStrategy) {
