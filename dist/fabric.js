@@ -14815,7 +14815,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {Boolean} true if the selection happened
      */
     _setActiveObject: function (object, e) {
-      var result, isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
+      var isCollection = Array.isArray(object._objects), activeObject = this._activeObject;
       if (this._activeObject === object && !isCollection) {
         return false;
       }
@@ -14823,25 +14823,57 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      result = object.onSelect({
+      var pointer = this.getPointer(e, true), targets = this.targets, target;
+      this.targets = [];
+      //  push children and `activeObject` to `targets`
+      if (activeObject && Array.isArray(activeObject._objects)) {
+        target = this._searchPossibleTargets([activeObject], pointer);
+        target && this.targets.push(target);
+      }
+      //  push siblings and parents to `targets` recursively up
+      var parent = activeObject && activeObject.parent;
+      while (parent) {
+        target = this._searchPossibleTargets([parent], pointer);
+        target && this.targets.push(target);
+        parent = parent.parent;
+      }
+      //  prepare subTargets
+      var subTargets = this.targets;
+      var lastIndex = subTargets.lastIndexOf(activeObject);
+      //  it is possible that `activeObject` exists twice in `subTargets`
+      //  if so we remove the last ref that was pushed as part of siblings check because we want it to be on top of all it's siblings
+      if (subTargets.indexOf(activeObject) !== lastIndex) {
+        subTargets.splice(lastIndex, 1);
+      }
+      this.targets = targets;
+      return this.__setActiveObject(object, e, subTargets);
+    },
+
+    __setActiveObject: function (object, e, subTargets) {
+      var activeObject = this._activeObject;
+      var result = object.onSelect({
         e: e,
         object: activeObject,
-        subTargets: isCollection ? this.targets.concat() : undefined
+        subTargets: this.targets.concat(),
+        activeSubTargets: subTargets
       });
       if (result === true) {
         return false;
       }
-      else if (result && result instanceof fabric.Object) {
-        //  prepare `subTargets` and re-run
+      else if (result && result instanceof fabric.Object && result !== object) {
+        //  prepare `targets`
+        var targets = this.targets;
+        this.targets = [];
         this._searchPossibleTargets([result], this.getPointer(e, true));
-        this._setActiveObject(result, e);
-        return true;
+        if (this.__setActiveObject(result, e) === true) {
+          //  restore `targets` if object declined selection
+          this.targets = targets;
+        };
       }
       else {
-        var current = this._activeObject;
         this._activeObject = object;
-        return current !== this._activeObject;
       }
+      return activeObject !== this._activeObject;
     },
 
     /**
@@ -17680,7 +17712,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value, groupNeedsUpdate = false;
+          isChanged = this[key] !== value;
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -17704,15 +17736,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this[key] = value;
 
       if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
-        if (this.cacheProperties.indexOf(key) > -1) {
+        var parent = this.group;
+        var parentNeedsUpdate = parent && parent.isOnACache();
+        if (parentNeedsUpdate && this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
-          this.parent && this.parent.set('dirty', true);
+          parent.set('dirty', true);
         }
-        else if (this.stateProperties.indexOf(key) > -1) {
-          groupNeedsUpdate && this.group.set('dirty', true);
-          this.parent && this.parent.set('dirty', true);
+        else if (parentNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
+          parent.set('dirty', true);
         }
       }
       return this;
@@ -17863,11 +17894,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
      * @return {Boolean}
      */
-    shouldCache: function() {
-      this.ownCaching = this.needsItsOwnCache() || (
-        this.objectCaching &&
-        (!this.group || !this.group.isOnACache())
-      );
+    shouldCache: function () {
+      var parent = this.group || this.parent;
+      this.ownCaching = this.needsItsOwnCache() || (this.objectCaching && (!parent || !parent.isOnACache()));
       return this.ownCaching;
     },
 
@@ -20396,11 +20425,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] options sent from the upper functions
      * @param {Event} [options.e] event if the process is generated by an event
      * @param {fabric.Object} [options.object] the object that was deselected
+     * @param {fabric.Object} [options.subTaregts] instance sub targets for current action
+     * @param {fabric.Object[]} [options.activeSubTargets] sub targets related to `options.object` (children, self, siblings, parent) to help manage selection
+     * @returns {boolean | fabric.Object | undefined} `true` to cancel selection, an object to select instead of this one, `false` for default behavior
      */
-    onSelect: function (opt) {
+    onSelect: function (options) {
       // implemented by sub-classes, as needed.
-      if (opt.object && opt.object.parent && opt.object.parent !== this.parent
-        && opt.object.parent !== this && opt.object !== this) {return opt.object.parent;}
+      if (options.activeSubTargets) {
+        return options.activeSubTargets[0];
+      }
     }
   });
 })();
@@ -22987,18 +23020,29 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     fill: '',
 
+    /**
+     * Used to optimize performance
+     * set to `false` if you don't need objects to be interactive
+     */
     subTargetCheck: true,
 
     /**
+     * Used internally to optimize performance
+     * Once an object is selected, instance is rendered without the selected object.
+     * This way instance is cached only once for the entire interaction with the selected object.
+     * @private
+     */
+    _activeObject: undefined,
+
+    /**
      * Constructor
-     * We set `disableTransformPropagation=true` in order to guard objects' transformations from excessive mutations during initializion.
+     * Guard objects' transformations from excessive mutations during initializion.
      *
      * @param {fabric.Object[]} [objects] layer objects
      * @param {Object} [options] Options object
      * @return {fabric.Layer} thisArg
      */
     initialize: function (objects, options) {
-      this.disableTransformPropagation = true;
       this._objects = objects || [];
       this.__objectMonitor = this.__objectMonitor.bind(this);
       this.callSuper('initialize', options);
@@ -23007,8 +23051,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.ownMatrixCache.initialValue = this.calcOwnMatrix();
       }
       this.forEachObject(function (object) {
-        this.subTargetCheck && object.setCoords();
-        this.objectCaching && object._set('objectCaching', false);
+        if (this.subTargetCheck) {
+          object.setCoords();
+          this._watchObject(true, object);
+        }
         object.set('parent', this);
       }, this);
     },
@@ -23043,11 +23089,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (key === 'subTargetCheck') {
         this.forEachObject(this._watchObject.bind(this, value));
       }
-      if (key === 'objectCaching' && value) {
-        this.forEachObject(function(object) {
-          object._set('objectCaching', false);
-        });
-      }
       return this;
     },
 
@@ -23066,22 +23107,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Compares changes made to the transform matrix and applies them to instance's objects.
-     * Call this method before adding objects to prevent the existing transform diff from being applied to them unnecessarily.
      * In other words, call this method to make the current transform the starting point of a transform diff for objects.
-     * Use `disableTransformPropagation` to disable propagation of current transform diff to objects.
+     * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects, preventing the existing transform diff from being applied to them unnecessarily.
      */
-    _applyMatrixDiff: function () {
-      var key = this.transformMatrixKey(true);
-      if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && !this.disableTransformPropagation && this.subTargetCheck) {
+    _applyMatrixDiff: function (disablePropagation) {
+      var key = this.ownMatrixCache && this.ownMatrixCache.key;
+      if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && this.subTargetCheck) {
         var transform = this.calcOwnMatrix();
-        if (this.prevMatrixCache) {
+        if (this.prevMatrixCache && !disablePropagation) {
           this._applyMatrixDiffToObjects(this.prevMatrixCache.cache, transform);
-          this._set('dirty', true);
         }
         this.prevMatrixCache = {
-          key: key,
+          key: this.ownMatrixCache.key,
           cache: transform
-        }
+        };
       }
     },
 
@@ -23105,13 +23144,30 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _onBeforeObjectsChange: function () {
       this._applyMatrixDiff();
-      this.disableTransformPropagation = true;
     },
 
+    /**
+     * @private
+     */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(opt, {
+      this._applyLayoutStrategy(extend(clone(opt), {
         type: 'object_modified'
       }));
+      this._set('dirty', true);
+    },
+
+    /**
+     * @private
+     */
+    __objectSelectionMonitor: function (object, selected) {
+      if (selected) {
+        this._activeObject = object;
+        this._set('dirty', true);
+      }
+      else if (this._activeObject === object) {
+        this._activeObject = undefined;
+        this._set('dirty', true);
+      }
     },
 
     /**
@@ -23121,6 +23177,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _watchObject: function (watch, object) {
       object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
+      object[watch ? 'on' : 'off']('selected', this.__objectSelectionMonitor.bind(this, object, true));
+      object[watch ? 'on' : 'off']('deselected', this.__objectSelectionMonitor.bind(this, object, false));
     },
 
     /**
@@ -23130,7 +23188,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _onObjectAdded: function (object) {
       object._set('canvas', this.canvas);
       object._set('parent', this);
-      this.objectCaching && object._set('objectCaching', false);
       this._watchObject(true, object);
       this._applyLayoutStrategy({
         type: 'object_added',
@@ -23159,9 +23216,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
      */
     onSelect: function (opt) {
-      return opt.subTargets && opt.subTargets.length > 0 ?
-        opt.subTargets[0] :
-        this.callSuper('onSelect', opt);
+      return this.callSuper('onSelect', opt) || (opt.subTargets && opt.subTargets.length > 0 && opt.subTargets[0]);
     },
 
     isCacheDirty: function (skipCanvas) {
@@ -23171,28 +23226,38 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         });
     },
 
+    /**
+     * Check if instance or its parent are caching, recursively up
+     * @return {Boolean}
+     */
+    isOnACache: function () {
+      return this.ownCaching || (this.parent && this.parent.isOnACache());
+    },
+
+    /**
+     * hook used to apply matrix diff on objects
+     */
     setCoords: function () {
       this._applyMatrixDiff();
       this.callSuper('setCoords');
     },
 
     /**
-     * 
-     * @param {CanvasRenderingContext2D} ctx 
-     */
-    render: function (ctx) {
-      this._applyMatrixDiff();
-      this.callSuper('render', ctx);
-    },
-
-    /**
-     * Performance optimization, `subTargetCheck === false`:
+     * Performance optimizations:
+     *
+     * **`subTargetCheck === false`**:
      * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
      * We transform the entire ctx with the diff instead.
      * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
      * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
      * This optimization is crucial for an instance that contains a very large amount of objects.
      * In case you need to select objects toggle `subTargetCheck` accordingly.
+     *
+     * **caching**:
+     * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
+     * This means that even though objects' transform matrices change they do not trigger rendering.
+     * Once an object is selected, instance is rendered without the selected object.
+     * This way instance is cached only once for the entire interaction with the selected object.
      *
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -23205,17 +23270,41 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
       ctx.transform.apply(ctx, invertTransform(t));
       this.forEachObject(function (object) {
-        object.render(ctx);
-      });
+        //  do not render the selected object
+        object !== this._activeObject && object.render(ctx);
+      }, this);
       ctx.restore();
     },
 
     /**
+     * @private
+     * @param {object} context see `getLayoutStrategyResult`
+     */
+    _applyLayoutStrategy: function (context) {
+      var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
+      this.set(result);
+      //  refresh matrix cache and set diff point
+      this.calcOwnMatrix();
+      this._applyMatrixDiff(true);
+      context.type !== 'initialization' && this.callSuper('setCoords');
+      //  recursive up
+      if (this.parent && this.parent._applyLayoutStrategy) {
+        if (!context.path) {
+          context.path = [];
+        }
+        context.path.push(this);
+        this.parent._applyLayoutStrategy(context);
+      }
+    },
+
+    /**
+     * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
      * @param {fabric.Object[]} objects
      * @param {object} context object with data regarding what triggered the call
      * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
      * @returns options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
@@ -23225,19 +23314,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * @private
-     * @param {object} context see `getLayoutStrategyResult`
-     */
-    _applyLayoutStrategy: function (context) {
-      this.disableTransformPropagation = true;
-      this.set(this.getLayoutStrategyResult(this.layout, this._objects, context));
-      this._applyMatrixDiff();
-      context.type !== 'initialization' && this.setCoords();
-      this.disableTransformPropagation = false;
-    },
-
-    /**
-     *
+     * @public
      * @param {fabric.Object[]} objects
      * @returns
      */
