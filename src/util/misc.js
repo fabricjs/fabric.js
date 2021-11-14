@@ -172,7 +172,7 @@
      * @static
      * @memberOf fabric.util
      * @param {Point} v
-     * @returns {Point} vector representing the unit vector in stroke width units
+     * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
      */
     getHatVector: function (v) {
       return new fabric.Point(v.x, v.y).multiply(1 / Math.hypot(v.x, v.y));
@@ -184,7 +184,7 @@
      * @param {Point} A 
      * @param {Point} B
      * @param {Point} C
-     * @returns {{ vector: Point, angle: number }} vector representing the bisector of A, A's angle
+     * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
      */
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
@@ -214,7 +214,7 @@
      * @param {boolean} options.strokeUniform 
      * @param {number} options.scaleX 
      * @param {number} options.scaleY 
-     * @param {boolean} [openPath] 
+     * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
      * @returns {fabric.Point[]} array of size 2n/4n of all suspected points
      */
     projectStrokeOnPoints: function (points, options, openPath) {
