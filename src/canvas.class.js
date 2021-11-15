@@ -1187,8 +1187,8 @@
       var result = object.onSelect({
         e: e,
         object: activeObject,
-        subTargets: this.targets.concat(),
-        activeSubTargets: subTargets
+        subTargets: this.targets.filter(function (object) { return object.selectable && object.evented; }),
+        activeSubTargets: subTargets && subTargets.filter(function (object) { return object.selectable && object.evented; })
       });
       if (result === true) {
         return false;
