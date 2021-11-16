@@ -108,6 +108,7 @@
 
     /**
      * Applies the matrix diff on all objects.
+     * @private
      * @param {number[]} from The matrix objects are curretly relating to
      * @param {number[]} to The matrix objects should relate to
      */
@@ -118,6 +119,19 @@
         applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
         object.setCoords();
       });
+    },
+
+    /**
+     * Use the matrix diff to keep clip path in place after resizing instance by applying the inverted diff to it
+     * @private
+     */
+    _applyMatrixDiffToClipPath: function () {
+      var clipPath = this.clipPath;
+      if (clipPath && !clipPath.absolutePositioned && this.prevMatrixCache && this.ownMatrixCache.key !== this.prevMatrixCache.key) {
+        var from = this.prevMatrixCache.cache, to = this.calcOwnMatrix();
+        var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
+        applyTransformToObject(clipPath, multiplyTransformMatrices(transformDiff, clipPath.calcTransformMatrix()));
+      }
     },
 
     /**
@@ -299,23 +313,21 @@
       var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
       this.set(result);
       //  refresh matrix cache
-      var to = this.calcOwnMatrix();
+      this.calcOwnMatrix();
       //  keep clip path in place
-      if (this.clipPath && !this.clipPath.absolutePositioned && this.prevMatrixCache) {
-        var object = this.clipPath;
-        var from = this.prevMatrixCache.cache;
-        var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
-        applyTransformToObject(object, multiplyTransformMatrices(transformDiff, object.calcTransformMatrix()));
-      }
-      //  set diff point
+      this._applyMatrixDiffToClipPath();
+      //  set diff point without changing objects matrices
       this._applyMatrixDiff(true);
+      //  make sure coords are up to date
       context.type !== 'initialization' && this.callSuper('setCoords');
       //  recursive up
       if (this.parent && this.parent._applyLayoutStrategy) {
+        //  append the path recursion to context
         if (!context.path) {
           context.path = [];
         }
         context.path.push(this);
+        //  all parents should invalidate their layout
         this.parent._applyLayoutStrategy(context);
       }
     },
