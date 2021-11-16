@@ -176,6 +176,7 @@
     },
 
     /**
+     * invalidates layout on object modified
      * @private
      */
     __objectMonitor: function (opt) {
@@ -186,6 +187,7 @@
     },
 
     /**
+     * keeps track of the selected object
      * @private
      */
     __objectSelectionMonitor: function (object, selected) {
