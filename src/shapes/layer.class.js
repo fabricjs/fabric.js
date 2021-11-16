@@ -112,8 +112,9 @@
      * @param {number[]} to The matrix objects should relate to
      */
     _applyMatrixDiffToObjects: function (from, to) {
+      var invTransform = invertTransform(from);
       this.forEachObject(function (object) {
-        var objectTransform = multiplyTransformMatrices(invertTransform(from), object.calcTransformMatrix());
+        var objectTransform = multiplyTransformMatrices(invTransform, object.calcTransformMatrix());
         applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
         object.setCoords();
       });
@@ -319,7 +320,7 @@
      * @param {object} context object with data regarding what triggered the call
      * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
      * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-     * @returns options object
+     * @returns {Object} options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
       if (layoutDirective === 'auto') {
