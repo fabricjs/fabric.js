@@ -249,10 +249,15 @@
     },
 
     isCacheDirty: function (skipCanvas) {
-      return this.callSuper('isCacheDirty', skipCanvas)
-        || this._objects.some(function (object) {
-          return object.isCacheDirty(skipCanvas);
-        });
+      if (this.callSuper('isCacheDirty', skipCanvas)) {
+        return true;
+      }
+      if (!this.statefullCache) {
+        return false;
+      }
+      return this._objects.some(function (object) {
+        return object.isCacheDirty(true);
+      });
     },
 
     /**
