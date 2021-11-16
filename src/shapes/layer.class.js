@@ -298,8 +298,16 @@
     _applyLayoutStrategy: function (context) {
       var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
       this.set(result);
-      //  refresh matrix cache and set diff point
-      this.calcOwnMatrix();
+      //  refresh matrix cache
+      var to = this.calcOwnMatrix();
+      //  keep clip path in place
+      if (this.clipPath && !this.clipPath.absolutePositioned && this.prevMatrixCache) {
+        var object = this.clipPath;
+        var from = this.prevMatrixCache.cache;
+        var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
+        applyTransformToObject(object, multiplyTransformMatrices(transformDiff, object.calcTransformMatrix()));
+      }
+      //  set diff point
       this._applyMatrixDiff(true);
       context.type !== 'initialization' && this.callSuper('setCoords');
       //  recursive up
