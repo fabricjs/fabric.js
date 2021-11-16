@@ -1187,8 +1187,8 @@
       var result = object.onSelect({
         e: e,
         object: activeObject,
-        subTargets: this.targets.filter(function (object) { return object.selectable && object.evented; }),
-        activeSubTargets: subTargets && subTargets.filter(function (object) { return object.selectable && object.evented; })
+        subTargets: this.targets.filter(function (object) { return object.isSelectable(); }),
+        activeSubTargets: subTargets && subTargets.filter(function (object) { return object.isSelectable(); })
       });
       if (result === true) {
         return false;

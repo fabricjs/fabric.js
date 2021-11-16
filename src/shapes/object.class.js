@@ -1059,6 +1059,10 @@
         !this.visible;
     },
 
+    isSelectable() {
+      return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
+    },
+
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
