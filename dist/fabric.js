@@ -14854,8 +14854,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var result = object.onSelect({
         e: e,
         object: activeObject,
-        subTargets: this.targets.filter(function (object) { return object.selectable && object.evented; }),
-        activeSubTargets: subTargets && subTargets.filter(function (object) { return object.selectable && object.evented; })
+        subTargets: this.targets.filter(function (object) { return object.isSelectable(); }),
+        activeSubTargets: subTargets && subTargets.filter(function (object) { return object.isSelectable(); })
       });
       if (result === true) {
         return false;
@@ -17782,6 +17782,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return this.opacity === 0 ||
         (!this.width && !this.height && this.strokeWidth === 0) ||
         !this.visible;
+    },
+
+    isSelectable() {
+      return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
     },
 
     /**
@@ -23094,15 +23098,30 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Applies the matrix diff on all objects.
+     * @private
      * @param {number[]} from The matrix objects are curretly relating to
      * @param {number[]} to The matrix objects should relate to
      */
     _applyMatrixDiffToObjects: function (from, to) {
+      var invTransform = invertTransform(from);
       this.forEachObject(function (object) {
-        var objectTransform = multiplyTransformMatrices(invertTransform(from), object.calcTransformMatrix());
+        var objectTransform = multiplyTransformMatrices(invTransform, object.calcTransformMatrix());
         applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
         object.setCoords();
       });
+    },
+
+    /**
+     * Use the matrix diff to keep clip path in place after resizing instance by applying the inverted diff to it
+     * @private
+     */
+    _applyMatrixDiffToClipPath: function () {
+      var clipPath = this.clipPath;
+      if (clipPath && !clipPath.absolutePositioned && this.prevMatrixCache && this.ownMatrixCache.key !== this.prevMatrixCache.key) {
+        var from = this.prevMatrixCache.cache, to = this.calcOwnMatrix();
+        var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
+        applyTransformToObject(clipPath, multiplyTransformMatrices(transformDiff, clipPath.calcTransformMatrix()));
+      }
     },
 
     /**
@@ -23283,16 +23302,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _applyLayoutStrategy: function (context) {
       var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
       this.set(result);
-      //  refresh matrix cache and set diff point
+      //  refresh matrix cache
       this.calcOwnMatrix();
+      //  keep clip path in place
+      this._applyMatrixDiffToClipPath();
+      //  set diff point without changing objects matrices
       this._applyMatrixDiff(true);
+      //  make sure coords are up to date
       context.type !== 'initialization' && this.callSuper('setCoords');
       //  recursive up
       if (this.parent && this.parent._applyLayoutStrategy) {
+        //  append the path recursion to context
         if (!context.path) {
           context.path = [];
         }
         context.path.push(this);
+        //  all parents should invalidate their layout
         this.parent._applyLayoutStrategy(context);
       }
     },
@@ -23305,7 +23330,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {object} context object with data regarding what triggered the call
      * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
      * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-     * @returns options object
+     * @returns {Object} options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
       if (layoutDirective === 'auto') {
