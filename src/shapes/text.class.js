@@ -1343,13 +1343,13 @@
      * @return {Number} Line width
      */
     getLineWidth: function(lineIndex) {
-      if (this.__lineWidths[lineIndex]) {
+      if (this.__lineWidths[lineIndex] !== undefined) {
         return this.__lineWidths[lineIndex];
       }
 
       var width, line = this._textLines[lineIndex], lineInfo;
 
-      if (line === '') {
+      if (!line || line.join('') === '') {
         width = 0;
       }
       else {
