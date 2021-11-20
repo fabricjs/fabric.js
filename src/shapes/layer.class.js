@@ -34,7 +34,6 @@
         skewY: 0,
         originX: 'left',
         originY: 'top',
-        lockRotation: true,
         strokeWidth: 0,
         hasControls: false,
         hasBorders: false,
