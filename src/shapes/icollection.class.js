@@ -408,9 +408,10 @@
      * 
      * @private
      * @param {'toObject'|'toDatalessObject'} [method]
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @returns {Object[]} serialized objects
      */
-    __serializeObjects: function (method) {
+    __serializeObjects: function (method, propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
       return this._objects
         .filter(function (obj) {
@@ -427,23 +428,23 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
-      obj.objects = this.__serializeObjects('toObject');
+      obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
       return obj;
     },
 
     /**
      * Returns object representation of an instance, in dataless mode.
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
       var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
-      obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject');
+      obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
       return obj;
     },
 
