@@ -9,26 +9,26 @@
       clone = fabric.util.object.clone,
       extend = fabric.util.object.extend;
 
-  if (fabric.Layer) {
-    fabric.warn('fabric.Layer is already defined');
+  if (fabric.ICollection) {
+    fabric.warn('fabric.ICollection is already defined');
     return;
   }
 
   /**
-   * Layer class
-   * @class fabric.Layer
+   * ICollection class
+   * @class fabric.ICollection
    * @extends fabric.Object
    * @mixes fabric.Collection
-   * @see {@link fabric.Layer#initialize} for constructor definition
+   * @see {@link fabric.ICollection#initialize} for constructor definition
    */
-  fabric.Layer = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Layer.prototype */ {
+  fabric.ICollection = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.ICollection.prototype */ {
 
     /**
      * Type of an object
      * @type String
      * @default
      */
-    type: 'layer',
+    type: 'i-collection',
 
     layout: 'auto',
 
@@ -52,9 +52,9 @@
      * Constructor
      * Guard objects' transformations from excessive mutations during initializion.
      *
-     * @param {fabric.Object[]} [objects] layer objects
+     * @param {fabric.Object[]} [objects] instance objects
      * @param {Object} [options] Options object
-     * @return {fabric.Layer} thisArg
+     * @return {fabric.ICollection} thisArg
      */
     initialize: function (objects, options) {
       this._objects = objects || [];
@@ -443,7 +443,7 @@
     },
 
     toString: function () {
-      return '#<fabric.Layer: (' + this.complexity() + ')>';
+      return '#<fabric.ICollection: (' + this.complexity() + ')>';
     },
 
     dispose: function () {
@@ -469,7 +469,7 @@
     },
 
     /**
-     * Returns styles-string for svg-export, specific version for layer
+     * Returns styles-string for svg-export, specific version for ICollection
      * @return {String}
      */
     getSvgStyles: function () {
@@ -513,13 +513,13 @@
   });
 
   /**
-   * Returns fabric.Layer instance from an object representation
+   * Returns fabric.ICollection instance from an object representation
    * @static
-   * @memberOf fabric.Layer
+   * @memberOf fabric.ICollection
    * @param {Object} object Object to create an instance from
    * @param {function} [callback] invoked with new instance as first argument
    */
-  fabric.Layer.fromObject = function (object, callback) {
+  fabric.ICollection.fromObject = function (object, callback) {
     var objects = object.objects,
         options = clone(object, true);
     delete options.objects;
@@ -529,7 +529,7 @@
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
         group._restoreObjectsState();
-        callback && callback(new fabric.Layer(group._objects, options));
+        callback && callback(new fabric.ICollection(group._objects, options));
       });
       return;
     }
@@ -538,15 +538,15 @@
         var options = clone(object, true);
         options.clipPath = enlivedClipPath[0];
         delete options.objects;
-        callback && callback(new fabric.Layer(enlivenedObjects, options));
+        callback && callback(new fabric.ICollection(enlivenedObjects, options));
       });
     });
   };
 
 
-  fabric.Layer2 = fabric.util.createClass(fabric.Layer, {
+  fabric.Layer = fabric.util.createClass(fabric.ICollection, {
 
-    type: 'layer2',
+    type: 'layer',
 
     layout: 'spread',
 
@@ -554,8 +554,8 @@
       this.callSuper('initialize', objects, extend(options || {}, {
         left: 0,
         top: 0,
-        width: options.width || 500,
-        height: options.height || 500,
+        width: options ? options.width : 0,
+        height: options ? options.height : 0,
         angle: 0,
         scaleX: 1,
         scaleY: 1,
