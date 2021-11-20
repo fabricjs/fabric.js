@@ -23021,10 +23021,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @fires removed on removed object before layout
    * @see {@link fabric.ICollection#initialize} for constructor definition
    */
-  fabric.ICollection = fabric.util.createClass(
-    fabric.Object,
-    fabric.Collection,
-    /** @lends fabric.ICollection.prototype */ {
+  fabric.ICollection = fabric.util.createClass(fabric.Object, fabric.Collection,
+    /** @lends fabric.ICollection.prototype */
+    {
 
       /**
        * Type of an object
@@ -23038,27 +23037,27 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       fill: '',
 
       /**
-     * Used to optimize performance
-     * set to `false` if you don't need objects to be interactive
-     */
+       * Used to optimize performance
+       * set to `false` if you don't need objects to be interactive
+       */
       subTargetCheck: true,
 
       /**
-     * Used internally to optimize performance
-     * Once an object is selected, instance is rendered without the selected object.
-     * This way instance is cached only once for the entire interaction with the selected object.
-     * @private
-     */
+       * Used internally to optimize performance
+       * Once an object is selected, instance is rendered without the selected object.
+       * This way instance is cached only once for the entire interaction with the selected object.
+       * @private
+       */
       _activeObject: undefined,
 
       /**
-     * Constructor
-     * Guard objects' transformations from excessive mutations during initializion.
-     *
-     * @param {fabric.Object[]} [objects] instance objects
-     * @param {Object} [options] Options object
-     * @return {fabric.ICollection} thisArg
-     */
+       * Constructor
+       * Guard objects' transformations from excessive mutations during initializion.
+       *
+       * @param {fabric.Object[]} [objects] instance objects
+       * @param {Object} [options] Options object
+       * @return {fabric.ICollection} thisArg
+       */
       initialize: function (objects, options) {
         this._objects = objects || [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
@@ -23077,10 +23076,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     * @param {string} key
-     * @param {*} value
-     */
+       * @private
+       * @param {string} key
+       * @param {*} value
+       */
       _set: function (key, value) {
         if (key === 'subTargetCheck' && this.ownMatrixCache) {
           //  we want to avoid setting `initialValue` during initializion
@@ -23110,11 +23109,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Applies the matrix diff on all objects.
-     * @private
-     * @param {number[]} from The matrix objects are curretly relating to
-     * @param {number[]} to The matrix objects should relate to
-     */
+       * Applies the matrix diff on all objects.
+       * @private
+       * @param {number[]} from The matrix objects are curretly relating to
+       * @param {number[]} to The matrix objects should relate to
+       */
       _applyMatrixDiffToObjects: function (from, to) {
         var invTransform = invertTransform(from);
         this.forEachObject(function (object) {
@@ -23125,9 +23124,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Use the matrix diff to keep clip path in place after resizing instance by applying the inverted diff to it
-     * @private
-     */
+       * Use the matrix diff to keep clip path in place after resizing instance by applying the inverted diff to it
+       * @private
+       */
       _applyMatrixDiffToClipPath: function () {
         var clipPath = this.clipPath;
         if (clipPath && !clipPath.absolutePositioned
@@ -23139,10 +23138,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Compares changes made to the transform matrix and applies them to instance's objects.
-     * In other words, call this method to make the current transform the starting point of a transform diff for objects.
-     * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects, preventing the existing transform diff from being applied to them unnecessarily.
-     */
+       * Compares changes made to the transform matrix and applies them to instance's objects.
+       * In other words, call this method to make the current transform the starting point of a transform diff for objects.
+       * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects, preventing the existing transform diff from being applied to them unnecessarily.
+       */
       _applyMatrixDiff: function (disablePropagation) {
         var key = this.ownMatrixCache && this.ownMatrixCache.key;
         if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && this.subTargetCheck) {
@@ -23158,8 +23157,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     */
+       * @private
+       */
       _onBeforeObjectsChange: function () {
         this._applyMatrixDiff();
       },
@@ -23180,9 +23179,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * invalidates layout on object modified
-     * @private
-     */
+       * invalidates layout on object modified
+       * @private
+       */
       __objectMonitor: function (opt) {
         this._applyLayoutStrategy(extend(clone(opt), {
           type: 'object_modified'
@@ -23191,9 +23190,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * keeps track of the selected object
-     * @private
-     */
+       * keeps track of the selected object
+       * @private
+       */
       __objectSelectionMonitor: function (object, selected) {
         if (selected) {
           this._activeObject = object;
@@ -23206,10 +23205,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     * @param {boolean} watch
-     * @param {fabric.Object} object
-     */
+       * @private
+       * @param {boolean} watch
+       * @param {fabric.Object} object
+       */
       _watchObject: function (watch, object) {
         object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
         object[watch ? 'on' : 'off']('selected', this.__objectSelectionMonitor.bind(this, object, true));
@@ -23217,9 +23216,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     * @param {fabric.Object} object
-     */
+       * @private
+       * @param {fabric.Object} object
+       */
       _onObjectAdded: function (object) {
         object._set('parent', this);
         object._set('canvas', this.canvas);
@@ -23233,9 +23232,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     * @param {fabric.Object} object
-     */
+       * @private
+       * @param {fabric.Object} object
+       */
       _onObjectRemoved: function (object) {
         delete object.canvas;
         delete object.parent;
@@ -23252,11 +23251,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     *
-     * @param {object} opt
-     * @param {fabric.Object[]} opt.subTargets
-     * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
-     */
+       *
+       * @param {object} opt
+       * @param {fabric.Object[]} opt.subTargets
+       * @returns true to abort selection, a `subTarget` to select that or false to defer to default behavior and allow selection to take place
+       */
       onSelect: function (opt) {
         return this.callSuper('onSelect', opt) || (opt.subTargets && opt.subTargets.length > 0 && opt.subTargets[0]);
       },
@@ -23274,41 +23273,41 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Check if instance or its parent are caching, recursively up
-     * @return {Boolean}
-     */
+       * Check if instance or its parent are caching, recursively up
+       * @return {Boolean}
+       */
       isOnACache: function () {
         return this.ownCaching || (this.parent && this.parent.isOnACache());
       },
 
       /**
-     * hook used to apply matrix diff on objects
-     */
+       * hook used to apply matrix diff on objects
+       */
       setCoords: function () {
         this._applyMatrixDiff();
         this.callSuper('setCoords');
       },
 
       /**
-     * Performance optimizations:
-     *
-     * **`subTargetCheck === false`**:
-     * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
-     * We transform the entire ctx with the diff instead.
-     * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
-     * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
-     * This optimization is crucial for an instance that contains a very large amount of objects.
-     * In case you need to select objects toggle `subTargetCheck` accordingly.
-     *
-     * **caching**:
-     * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
-     * This means that even though objects' transform matrices change they do not trigger rendering.
-     * Once an object is selected, instance is rendered without the selected object.
-     * This way instance is cached only once for the entire interaction with the selected object.
-     *
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
+       * Performance optimizations:
+       *
+       * **`subTargetCheck === false`**:
+       * In case we don't need instance to be interactive (selectable objects etc.) we don't apply the transform diff to the objects in order to minimize the number of iterations.
+       * We transform the entire ctx with the diff instead.
+       * We store the initial value of the transform matrix to do so, leaving objects as they were when the initial value was stored, rather than updating them continueously.
+       * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
+       * This optimization is crucial for an instance that contains a very large amount of objects.
+       * In case you need to select objects toggle `subTargetCheck` accordingly.
+       *
+       * **caching**:
+       * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
+       * This means that even though objects' transform matrices change they do not trigger rendering.
+       * Once an object is selected, instance is rendered without the selected object.
+       * This way instance is cached only once for the entire interaction with the selected object.
+       *
+       * @private
+       * @param {CanvasRenderingContext2D} ctx Context to render on
+       */
       _render: function (ctx) {
         fabric.Rect.prototype._render.call(this, ctx);
         ctx.save();
@@ -23324,9 +23323,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @private
-     * @param {object} context see `getLayoutStrategyResult`
-     */
+       * @private
+       * @param {object} context see `getLayoutStrategyResult`
+       */
       _applyLayoutStrategy: function (context) {
         var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
         this.set(result);
@@ -23351,15 +23350,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Override this method to customize layout
-     * @public
-     * @param {string} layoutDirective
-     * @param {fabric.Object[]} objects
-     * @param {object} context object with data regarding what triggered the call
-     * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
-     * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-     * @returns {Object} options object
-     */
+       * Override this method to customize layout
+       * @public
+       * @param {string} layoutDirective
+       * @param {fabric.Object[]} objects
+       * @param {object} context object with data regarding what triggered the call
+       * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+       * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
+       * @returns {Object} options object
+       */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         if (layoutDirective === 'auto') {
           return this.getObjectsBoundingBox(objects);
@@ -23367,11 +23366,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @todo support instance rotation
-     * @public
-     * @param {fabric.Object[]} objects
-     * @returns
-     */
+       * @todo support instance rotation
+       * @public
+       * @param {fabric.Object[]} objects
+       * @returns
+       */
       getObjectsBoundingBox: function (objects) {
         var coords = [];
         for (var i = 0, o; i < objects.length; ++i) {
@@ -23407,12 +23406,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     *
-     * @private
-     * @param {'toObject'|'toDatalessObject'} [method]
-     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @returns {Object[]} serialized objects
-     */
+       *
+       * @private
+       * @param {'toObject'|'toDatalessObject'} [method]
+       * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @returns {Object[]} serialized objects
+       */
       __serializeObjects: function (method, propertiesToInclude) {
         var _includeDefaultValues = this.includeDefaultValues;
         return this._objects
@@ -23429,10 +23428,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Returns object representation of an instance
-     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
+       * Returns object representation of an instance
+       * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @return {Object} object representation of an instance
+       */
       toObject: function (propertiesToInclude) {
         var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
@@ -23440,10 +23439,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Returns object representation of an instance, in dataless mode.
-     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
+       * Returns object representation of an instance, in dataless mode.
+       * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @return {Object} object representation of an instance
+       */
       toDatalessObject: function (propertiesToInclude) {
         var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
         obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
@@ -23462,10 +23461,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       /* _TO_SVG_START_ */
       /**
-     * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
         svgString.push(new fabric.Rect(this.toObject()).toSVG());
@@ -23477,9 +23476,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Returns styles-string for svg-export, specific version for ICollection
-     * @return {String}
-     */
+       * Returns styles-string for svg-export, specific version for ICollection
+       * @return {String}
+       */
       getSvgStyles: function () {
         var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
               'opacity: ' + this.opacity + ';' : '',
@@ -23492,11 +23491,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * @override instance's transformations are excessive
-     * @param {boolean} full
-     * @param {string} additionalTransform
-     * @returns
-     */
+       * @override instance's transformations are excessive
+       * @param {boolean} full
+       * @param {string} additionalTransform
+       * @returns
+       */
       getSvgTransform: function (full, additionalTransform) {
         var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabric.iMatrix);
         return svgTransform +
@@ -23504,10 +23503,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-     * Returns svg clipPath representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
+       * Returns svg clipPath representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
       toClipPathSVG: function (reviver) {
         var svgString = [];
 
