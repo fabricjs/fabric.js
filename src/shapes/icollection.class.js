@@ -3,11 +3,11 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
-    multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
-    invertTransform = fabric.util.invertTransform,
-    applyTransformToObject = fabric.util.applyTransformToObject,
-    clone = fabric.util.object.clone,
-    extend = fabric.util.object.extend;
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
+      invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      clone = fabric.util.object.clone,
+      extend = fabric.util.object.extend;
 
   if (fabric.ICollection) {
     fabric.warn('fabric.ICollection is already defined');
@@ -23,8 +23,7 @@
    * @fires removed on removed object before layout
    * @see {@link fabric.ICollection#initialize} for constructor definition
    */
-  fabric.ICollection = fabric.util.createClass(fabric.Object,
-    fabric.Collection, /** @lends fabric.ICollection.prototype */ {
+  fabric.ICollection = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.ICollection.prototype */ {
 
     /**
      * Type of an object
@@ -391,11 +390,11 @@
         };
       }, { min: coords[0], max: coords[0] });
       var center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
-        width = (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
-        height = (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
-        rad = fabric.util.degreesToRadians(this.angle || 0),
-        cos = Math.abs(Math.cos(rad)),
-        sin = Math.abs(Math.sin(rad));
+          width = (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
+          height = (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
+          rad = fabric.util.degreesToRadians(this.angle || 0),
+          cos = Math.abs(Math.cos(rad)),
+          sin = Math.abs(Math.sin(rad));
       return {
         left: center.x,
         top: center.y,
@@ -482,8 +481,8 @@
      */
     getSvgStyles: function () {
       var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
-        'opacity: ' + this.opacity + ';' : '',
-        visibility = this.visible ? '' : ' visibility: hidden;';
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
       return [
         opacity,
         this.getSvgFilter(),
@@ -530,7 +529,7 @@
    */
   fabric.ICollection._fromObject = function (object, callback) {
     var objects = object.objects,
-      options = clone(object, true);
+        options = clone(object, true);
     delete options.objects;
     if (typeof objects === 'string') {
       // it has to be a url or something went wrong.
