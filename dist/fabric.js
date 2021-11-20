@@ -13497,7 +13497,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       rects = this._getOptimizedRects(rects);
     }
 
-    var group = new fabric.Group(rects);
+    var group = new fabric.Layer(rects, { subTargetCheck: false });
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
@@ -14475,6 +14475,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             return true;
           }
         }
+        else if (this.parent) {
+          return obj.isContainedWithinObject(this.parent) || obj.intersectsWithObject(this.parent);
+        }
+          /*
+        else if (this.group) {
+          
+        }
+        */
         else {
           return true;
         }
@@ -20435,7 +20443,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     onSelect: function (options) {
       // implemented by sub-classes, as needed.
-      if (options.activeSubTargets) {
+      if (options.activeSubTargets && (!options.e || !options.e.ctrlKey)) {
         return options.activeSubTargets[0];
       }
     }
@@ -22999,26 +23007,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       clone = fabric.util.object.clone,
       extend = fabric.util.object.extend;
 
-  if (fabric.Layer) {
-    fabric.warn('fabric.Layer is already defined');
+  if (fabric.ICollection) {
+    fabric.warn('fabric.ICollection is already defined');
     return;
   }
 
   /**
-   * Layer class
-   * @class fabric.Layer
+   * ICollection class
+   * @class fabric.ICollection
    * @extends fabric.Object
    * @mixes fabric.Collection
-   * @see {@link fabric.Layer#initialize} for constructor definition
+   * @fires added on added object before layout
+   * @fires removed on removed object before layout
+   * @see {@link fabric.ICollection#initialize} for constructor definition
    */
-  fabric.Layer = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Layer.prototype */ {
+  fabric.ICollection = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.ICollection.prototype */ {
 
     /**
      * Type of an object
      * @type String
      * @default
      */
-    type: 'layer',
+    type: 'i-collection',
 
     layout: 'auto',
 
@@ -23042,9 +23052,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Constructor
      * Guard objects' transformations from excessive mutations during initializion.
      *
-     * @param {fabric.Object[]} [objects] layer objects
+     * @param {fabric.Object[]} [objects] instance objects
      * @param {Object} [options] Options object
-     * @return {fabric.Layer} thisArg
+     * @return {fabric.ICollection} thisArg
      */
     initialize: function (objects, options) {
       this._objects = objects || [];
@@ -23143,6 +23153,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
     },
 
+    /**
+     * @private
+     */
+    _onBeforeObjectsChange: function () {
+      this._applyMatrixDiff();
+    },
+
     add: function () {
       this._onBeforeObjectsChange();
       fabric.Collection.add.apply(this, arguments);
@@ -23159,13 +23176,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * @private
-     */
-    _onBeforeObjectsChange: function () {
-      this._applyMatrixDiff();
-    },
-
-    /**
+     * invalidates layout on object modified
      * @private
      */
     __objectMonitor: function (opt) {
@@ -23176,6 +23187,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * keeps track of the selected object
      * @private
      */
     __objectSelectionMonitor: function (object, selected) {
@@ -23205,13 +23217,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {fabric.Object} object
      */
     _onObjectAdded: function (object) {
-      object._set('canvas', this.canvas);
       object._set('parent', this);
+      object._set('canvas', this.canvas);
       this._watchObject(true, object);
+      object.fire('added', { target: this });
       this._applyLayoutStrategy({
         type: 'object_added',
         target: object
       });
+      this._set('dirty', true);
     },
 
     /**
@@ -23222,10 +23236,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       delete object.canvas;
       delete object.parent;
       this._watchObject(false, object);
+      object.fire('removed', { target: this });
       this._applyLayoutStrategy({
         type: 'object_removed',
         target: object
       });
+      if (this._activeObject === object) {
+        this._activeObject = undefined;
+      }
+      this._set('dirty', true);
     },
 
     /**
@@ -23239,10 +23258,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     isCacheDirty: function (skipCanvas) {
-      return this.callSuper('isCacheDirty', skipCanvas)
-        || this._objects.some(function (object) {
-          return object.isCacheDirty(skipCanvas);
-        });
+      if (this.callSuper('isCacheDirty', skipCanvas)) {
+        return true;
+      }
+      if (!this.statefullCache) {
+        return false;
+      }
+      return this._objects.some(function (object) {
+        return object.isCacheDirty(true);
+      });
     },
 
     /**
@@ -23339,88 +23363,91 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * @todo support instance rotation
      * @public
      * @param {fabric.Object[]} objects
      * @returns
      */
     getObjectsBoundingBox: function (objects) {
-      var minX = 0, minY = 0, maxX = 0, maxY = 0;
+      var coords = [];
       for (var i = 0, o; i < objects.length; ++i) {
         o = objects[i];
-        var box = o.getBoundingRect(true, true);
-        if (i === 0) {
-          minX = Math.min(box.left, box.left + box.width);
-          maxX = Math.max(box.left, box.left + box.width);
-          minY = Math.min(box.top, box.top + box.height);
-          maxY = Math.max(box.top, box.top + box.height);
-        }
-        else {
-          minX = Math.min(minX, box.left, box.left + box.width);
-          maxX = Math.max(maxX, box.left, box.left + box.width);
-          minY = Math.min(minY, box.top, box.top + box.height);
-          maxY = Math.max(maxY, box.top, box.top + box.height);
-        }
+        coords.push.apply(coords, o.getCoords(true, true));
       }
+      var bounds = coords.reduce(function (acc, point) {
+        return {
+          min: {
+            x: Math.min(acc.min.x, point.x),
+            y: Math.min(acc.min.y, point.y)
+          },
+          max: {
+            x: Math.max(acc.max.x, point.x),
+            y: Math.max(acc.max.y, point.y)
+          }
+        }
+      }, { min: coords[0], max: coords[0] });
+      var center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
+        width = (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
+        height = (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
+        rad = fabric.util.degreesToRadians(this.angle || 0),
+        cos = Math.abs(Math.cos(rad)),
+        sin = Math.abs(Math.sin(rad));
       return {
-        left: minX,
-        top: minY,
-        width: (maxX - minX) / (this.scaleX || 1),
-        height: (maxY - minY) / (this.scaleY || 1),
-        originX: 'left',
-        originY: 'top'
+        left: center.x,
+        top: center.y,
+        width: width * cos + height * sin,
+        height: width * sin + height * cos,
+        originX: 'center',
+        originY: 'center'
       };
     },
 
     /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
+     * 
+     * @private
+     * @param {'toObject'|'toDatalessObject'} [method]
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @returns {Object[]} serialized objects
      */
-    toObject: function (propertiesToInclude) {
+    __serializeObjects: function (method, propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects
+      return this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
         })
         .map(function (obj) {
           var originalDefaults = obj.includeDefaultValues;
           obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toObject(propertiesToInclude);
+          var data = obj[method || 'toObject'](propertiesToInclude);
           obj.includeDefaultValues = originalDefaults;
-          return _obj;
+          return data;
         });
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toObject: function (propertiesToInclude) {
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
+      obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
       return obj;
     },
 
     /**
      * Returns object representation of an instance, in dataless mode.
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
-      var objsToObject, sourcePath = this.sourcePath;
-      if (sourcePath) {
-        objsToObject = sourcePath;
-      }
-      else {
-        var _includeDefaultValues = this.includeDefaultValues;
-        objsToObject = this._objects.map(function (obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toDatalessObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
-      }
       var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
+      obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
       return obj;
     },
 
     toString: function () {
-      return '#<fabric.Layer: (' + this.complexity() + ')>';
+      return '#<fabric.ICollection: (' + this.complexity() + ')>';
     },
 
     dispose: function () {
@@ -23446,7 +23473,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Returns styles-string for svg-export, specific version for layer
+     * Returns styles-string for svg-export, specific version for ICollection
      * @return {String}
      */
     getSvgStyles: function () {
@@ -23490,13 +23517,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   });
 
   /**
-   * Returns fabric.Layer instance from an object representation
+   * @todo support loading from svg
+   * @private
    * @static
-   * @memberOf fabric.Layer
+   * @memberOf fabric.ICollection
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
+   * @param {(objects: fabric.Object[], options?: Object) => any} [callback] 
    */
-  fabric.Layer.fromObject = function (object, callback) {
+  fabric.ICollection._fromObject = function (object, callback) {
     var objects = object.objects,
         options = clone(object, true);
     delete options.objects;
@@ -23506,7 +23534,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
         group._restoreObjectsState();
-        callback && callback(new fabric.Layer(group._objects, options));
+        callback && callback(group._objects, options);
       });
       return;
     }
@@ -23515,8 +23543,123 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         var options = clone(object, true);
         options.clipPath = enlivedClipPath[0];
         delete options.objects;
-        callback && callback(new fabric.Layer(enlivenedObjects, options));
+        callback && callback(enlivenedObjects, options);
       });
+    });
+  };
+
+  /**
+   * Returns fabric.ICollection instance from an object representation
+   * @static
+   * @memberOf fabric.ICollection
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] invoked with new instance as first argument
+   */
+  fabric.ICollection.fromObject = function (object, callback) {
+    callback && fabric.ICollection._fromObject(object, function (object, options) {
+      callback(new fabric.ICollection(object, options));
+    });
+  };
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function (global) {
+
+  'use strict';
+
+  var fabric = global.fabric || (global.fabric = {}),
+      extend = fabric.util.object.extend;
+
+  if (fabric.Layer) {
+    fabric.warn('fabric.Layer is already defined');
+    return;
+  }
+
+  /**
+   * Layer class
+   * @class fabric.Layer
+   * @extends fabric.Object
+   * @mixes fabric.Collection
+   * @see {@link fabric.Layer#initialize} for constructor definition
+   */
+  fabric.Layer = fabric.util.createClass(fabric.ICollection, /** @lends fabric.ICollection.prototype */ {
+
+    type: 'layer',
+
+    initialize: function (objects, options) {
+      this.callSuper('initialize', objects, extend(options || {}, {
+        left: 0,
+        top: 0,
+        width: options ? options.width : 0,
+        height: options ? options.height : 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        originX: 'left',
+        originY: 'top',
+        lockRotation: true,
+        strokeWidth: 0,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+      }));
+    },
+
+    _set: function (key, value) {
+      this.callSuper('_set', key, value);
+      if (key === 'canvas') {
+        this._applyLayoutStrategy({ type: 'canvas' });
+      }        
+    },
+
+    /**
+     * @override
+     * @private
+     */
+    __objectMonitor: function (opt) {
+      //  we do not need to invalidate layout
+    },
+
+    /**
+     * Override this method to customize layout
+     * @public
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
+     * @param {object} context object with data regarding what triggered the call
+     * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
+     * @returns {Object} options object
+     */
+    getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+      if (context.type === 'canvas' && this.canvas) {
+        return {
+          left: 0,
+          top: 0,
+          originX: 'left',
+          originY: 'top',
+          width: this.canvas.width,
+          height: this.canvas.height
+        };
+      }
+      return {};
+    },
+
+  });
+
+  /**
+   * Returns fabric.Layer instance from an object representation
+   * @static
+   * @memberOf fabric.Layer
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] invoked with new instance as first argument
+   */
+  fabric.Layer.fromObject = function (object, callback) {
+    callback && fabric.ICollection._fromObject(object, function (object, options) {
+      callback(new fabric.Layer(object, options));
     });
   };
 
