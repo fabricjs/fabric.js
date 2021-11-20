@@ -361,10 +361,9 @@
      * @returns
      */
     getObjectsBoundingBox: function (objects) {
-      var coords = [], rotated = typeof this.angle === 'number';
-      for (var i = 0, o, needsRotation; i < objects.length; ++i) {
+      var coords = [];
+      for (var i = 0, o; i < objects.length; ++i) {
         o = objects[i];
-        needsRotation = typeof o.angle === 'number' && rotated;
         coords.push.apply(coords, o.getCoords(true, true));
       }
       var bounds = coords.reduce(function (acc, point) {
@@ -379,13 +378,19 @@
           }
         }
       }, { min: coords[0], max: coords[0] });
+      var center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
+        width = (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
+        height = (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
+        rad = fabric.util.degreesToRadians(this.angle || 0),
+        cos = Math.abs(Math.cos(rad)),
+        sin = Math.abs(Math.sin(rad));
       return {
-        left: bounds.min.x,
-        top: bounds.min.y,
-        width: (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
-        height: (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
-        originX: 'left',
-        originY: 'top'
+        left: center.x,
+        top: center.y,
+        width: width * cos + height * sin,
+        height: width * sin + height * cos,
+        originX: 'center',
+        originY: 'center'
       };
     },
 
