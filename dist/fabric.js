@@ -23026,11 +23026,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     fabric.Collection,
     /** @lends fabric.ICollection.prototype */ {
 
-    /**
-     * Type of an object
-     * @type String
-     * @default
-     */
+      /**
+       * Type of an object
+       * @type String
+       * @default
+       */
       type: 'i-collection',
 
       layout: 'auto',
@@ -23083,14 +23083,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
       _set: function (key, value) {
         if (key === 'subTargetCheck' && this.ownMatrixCache) {
-        //  we want to avoid setting `initialValue` during initializion
+          //  we want to avoid setting `initialValue` during initializion
           var initialValue = this.ownMatrixCache.initialValue;
           if (value && initialValue) {
             this._applyMatrixDiffToObjects(initialValue, this.calcOwnMatrix());
             delete this.ownMatrixCache.initialValue;
           }
           else if (!value && !initialValue) {
-          //  we want to prevent this logic from writing over the exisitng value before it has been applied to objects
+            //  we want to prevent this logic from writing over the exisitng value before it has been applied to objects
             this.ownMatrixCache.initialValue = this.calcOwnMatrix();
           }
         }
@@ -23131,7 +23131,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       _applyMatrixDiffToClipPath: function () {
         var clipPath = this.clipPath;
         if (clipPath && !clipPath.absolutePositioned
-        && this.prevMatrixCache && this.ownMatrixCache.key !== this.prevMatrixCache.key) {
+          && this.prevMatrixCache && this.ownMatrixCache.key !== this.prevMatrixCache.key) {
           var from = this.prevMatrixCache.cache, to = this.calcOwnMatrix();
           var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
           applyTransformToObject(clipPath, multiplyTransformMatrices(transformDiff, clipPath.calcTransformMatrix()));
@@ -23317,7 +23317,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
         ctx.transform.apply(ctx, invertTransform(t));
         this.forEachObject(function (object) {
-        //  do not render the selected object
+          //  do not render the selected object
           object !== this._activeObject && object.render(ctx);
         }, this);
         ctx.restore();
@@ -23340,7 +23340,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         context.type !== 'initialization' && this.callSuper('setCoords');
         //  recursive up
         if (this.parent && this.parent._applyLayoutStrategy) {
-        //  append the path recursion to context
+          //  append the path recursion to context
           if (!context.path) {
             context.path = [];
           }
@@ -23500,7 +23500,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       getSvgTransform: function (full, additionalTransform) {
         var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabric.iMatrix);
         return svgTransform +
-        (additionalTransform || '') + '" ';
+          (additionalTransform || '') + '" ';
       },
 
       /**
@@ -23517,7 +23517,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
       },
-    /* _TO_SVG_END_ */
+      /* _TO_SVG_END_ */
     });
 
   /**
