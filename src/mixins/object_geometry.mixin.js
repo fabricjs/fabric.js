@@ -639,9 +639,17 @@
      * @return {Object} .y height dimension
      */
     _getNonTransformedDimensions: function() {
-      var strokeWidth = this.strokeWidth,
-          w = this.width + strokeWidth,
-          h = this.height + strokeWidth;
+      var strokeWidth = this.strokeWidth, w, h;
+      if (this.clipPath) {
+        w = this.clipPath.width;
+        h = this.clipPath.height;
+      }
+      else {
+        w = this.width;
+        h = this.height;
+      }
+      w += strokeWidth;
+      h += strokeWidth;
       return { x: w, y: h };
     },
 
