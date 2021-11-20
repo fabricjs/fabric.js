@@ -83,4 +83,18 @@
     },
 
   });
+
+  /**
+   * Returns fabric.Layer instance from an object representation
+   * @static
+   * @memberOf fabric.Layer
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] invoked with new instance as first argument
+   */
+  fabric.Layer.fromObject = function (object, callback) {
+    callback && fabric.ICollection._fromObject(object, function (object, options) {
+      callback(new fabric.Layer(object, options));
+    });
+  };
+
 })(typeof exports !== 'undefined' ? exports : this);

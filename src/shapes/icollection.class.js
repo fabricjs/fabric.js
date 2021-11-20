@@ -405,25 +405,34 @@
     },
 
     /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
+     * 
+     * @private
+     * @param {'toObject'|'toDatalessObject'} [method]
+     * @returns {Object[]} serialized objects
      */
-    toObject: function (propertiesToInclude) {
+    __serializeObjects: function (method) {
       var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects
+      return this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
         })
         .map(function (obj) {
           var originalDefaults = obj.includeDefaultValues;
           obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toObject(propertiesToInclude);
+          var data = obj[method || 'toObject'](propertiesToInclude);
           obj.includeDefaultValues = originalDefaults;
-          return _obj;
+          return data;
         });
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toObject: function (propertiesToInclude) {
       var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
+      obj.objects = this.__serializeObjects('toObject');
       return obj;
     },
 
@@ -433,22 +442,8 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
-      var objsToObject, sourcePath = this.sourcePath;
-      if (sourcePath) {
-        objsToObject = sourcePath;
-      }
-      else {
-        var _includeDefaultValues = this.includeDefaultValues;
-        objsToObject = this._objects.map(function (obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toDatalessObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
-      }
       var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
+      obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject');
       return obj;
     },
 
@@ -523,13 +518,14 @@
   });
 
   /**
-   * Returns fabric.ICollection instance from an object representation
+   * @todo support loading from svg
+   * @private
    * @static
    * @memberOf fabric.ICollection
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
+   * @param {(objects: fabric.Object[], options?: Object) => any} [callback] 
    */
-  fabric.ICollection.fromObject = function (object, callback) {
+  fabric.ICollection._fromObject = function (object, callback) {
     var objects = object.objects,
         options = clone(object, true);
     delete options.objects;
@@ -539,7 +535,7 @@
         var group = fabric.util.groupSVGElements(elements, object, objects);
         group.set(options);
         group._restoreObjectsState();
-        callback && callback(new fabric.ICollection(group._objects, options));
+        callback && callback(group._objects, options);
       });
       return;
     }
@@ -548,8 +544,21 @@
         var options = clone(object, true);
         options.clipPath = enlivedClipPath[0];
         delete options.objects;
-        callback && callback(new fabric.ICollection(enlivenedObjects, options));
+        callback && callback(enlivenedObjects, options);
       });
+    });
+  };
+
+  /**
+   * Returns fabric.ICollection instance from an object representation
+   * @static
+   * @memberOf fabric.ICollection
+   * @param {Object} object Object to create an instance from
+   * @param {function} [callback] invoked with new instance as first argument
+   */
+  fabric.ICollection.fromObject = function (object, callback) {
+    callback && fabric.ICollection._fromObject(object, function (object, options) {
+      callback(new fabric.ICollection(object, options));
     });
   };
 
