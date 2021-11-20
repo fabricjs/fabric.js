@@ -47,14 +47,14 @@
       this.callSuper('_set', key, value);
       if (key === 'canvas') {
         this._applyLayoutStrategy({ type: 'canvas' });
-      }        
+      }
     },
 
     /**
      * @override
      * @private
      */
-    __objectMonitor: function (opt) {
+    __objectMonitor: function () {
       //  we do not need to invalidate layout
     },
 
