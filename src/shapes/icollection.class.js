@@ -19,6 +19,8 @@
    * @class fabric.ICollection
    * @extends fabric.Object
    * @mixes fabric.Collection
+   * @fires added on added object before layout
+   * @fires removed on removed object before layout
    * @see {@link fabric.ICollection#initialize} for constructor definition
    */
   fabric.ICollection = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.ICollection.prototype */ {
@@ -153,6 +155,13 @@
       }
     },
 
+    /**
+     * @private
+     */
+    _onBeforeObjectsChange: function () {
+      this._applyMatrixDiff();
+    },
+
     add: function () {
       this._onBeforeObjectsChange();
       fabric.Collection.add.apply(this, arguments);
@@ -166,13 +175,6 @@
     remove: function () {
       this._onBeforeObjectsChange();
       fabric.Collection.remove.apply(this, arguments);
-    },
-
-    /**
-     * @private
-     */
-    _onBeforeObjectsChange: function () {
-      this._applyMatrixDiff();
     },
 
     /**
@@ -217,13 +219,15 @@
      * @param {fabric.Object} object
      */
     _onObjectAdded: function (object) {
-      object._set('canvas', this.canvas);
       object._set('parent', this);
+      object._set('canvas', this.canvas);
       this._watchObject(true, object);
+      object.fire('added', { target: this });
       this._applyLayoutStrategy({
         type: 'object_added',
         target: object
       });
+      this._set('dirty', true);
     },
 
     /**
@@ -234,10 +238,15 @@
       delete object.canvas;
       delete object.parent;
       this._watchObject(false, object);
+      object.fire('removed', { target: this });
       this._applyLayoutStrategy({
         type: 'object_removed',
         target: object
       });
+      if (this._activeObject === object) {
+        this._activeObject = undefined;
+      }
+      this._set('dirty', true);
     },
 
     /**
@@ -356,6 +365,7 @@
     },
 
     /**
+     * @todo support instance rotation
      * @public
      * @param {fabric.Object[]} objects
      * @returns

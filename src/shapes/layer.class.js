@@ -21,8 +21,6 @@
 
     type: 'layer',
 
-    layout: 'spread',
-
     initialize: function (objects, options) {
       this.callSuper('initialize', objects, extend(options || {}, {
         left: 0,
@@ -43,7 +41,21 @@
         lockMovementX: true,
         lockMovementY: true,
       }));
-      this.once('added', this._applyLayoutStrategy.bind(this, { type: 'added' }));
+    },
+
+    _set: function (key, value) {
+      this.callSuper('_set', key, value);
+      if (key === 'canvas') {
+        this._applyLayoutStrategy({ type: 'canvas' });
+      }        
+    },
+
+    /**
+     * @override
+     * @private
+     */
+    __objectMonitor: function (opt) {
+      //  we do not need to invalidate layout
     },
 
     /**
@@ -57,7 +69,7 @@
      * @returns {Object} options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-      if (layoutDirective === 'spread' && this.canvas) {
+      if (context.type === 'canvas' && this.canvas) {
         return {
           left: 0,
           top: 0,
