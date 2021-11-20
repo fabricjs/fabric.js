@@ -361,28 +361,29 @@
      * @returns
      */
     getObjectsBoundingBox: function (objects) {
-      var minX = 0, minY = 0, maxX = 0, maxY = 0;
-      for (var i = 0, o; i < objects.length; ++i) {
+      var coords = [], rotated = typeof this.angle === 'number';
+      for (var i = 0, o, needsRotation; i < objects.length; ++i) {
         o = objects[i];
-        var box = o.getBoundingRect(true, true);
-        if (i === 0) {
-          minX = Math.min(box.left, box.left + box.width);
-          maxX = Math.max(box.left, box.left + box.width);
-          minY = Math.min(box.top, box.top + box.height);
-          maxY = Math.max(box.top, box.top + box.height);
-        }
-        else {
-          minX = Math.min(minX, box.left, box.left + box.width);
-          maxX = Math.max(maxX, box.left, box.left + box.width);
-          minY = Math.min(minY, box.top, box.top + box.height);
-          maxY = Math.max(maxY, box.top, box.top + box.height);
-        }
+        needsRotation = typeof o.angle === 'number' && rotated;
+        coords.push.apply(coords, o.getCoords(true, true));
       }
+      var bounds = coords.reduce(function (acc, point) {
+        return {
+          min: {
+            x: Math.min(acc.min.x, point.x),
+            y: Math.min(acc.min.y, point.y)
+          },
+          max: {
+            x: Math.max(acc.max.x, point.x),
+            y: Math.max(acc.max.y, point.y)
+          }
+        }
+      }, { min: coords[0], max: coords[0] });
       return {
-        left: minX,
-        top: minY,
-        width: (maxX - minX) / (this.scaleX || 1),
-        height: (maxY - minY) / (this.scaleY || 1),
+        left: bounds.min.x,
+        top: bounds.min.y,
+        width: (bounds.max.x - bounds.min.x) / (this.scaleX || 1),
+        height: (bounds.max.y - bounds.min.y) / (this.scaleY || 1),
         originX: 'left',
         originY: 'top'
       };
