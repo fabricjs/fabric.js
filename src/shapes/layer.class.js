@@ -543,4 +543,59 @@
     });
   };
 
+
+  fabric.Layer2 = fabric.util.createClass(fabric.Layer, {
+
+    type: 'layer2',
+
+    layout: 'spread',
+
+    initialize: function (objects, options) {
+      this.callSuper('initialize', objects, extend(options || {}, {
+        left: 0,
+        top: 0,
+        width: options.width || 500,
+        height: options.height || 500,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        originX: 'left',
+        originY: 'top',
+        lockRotation: true,
+        strokeWidth: 0,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+      }));
+      this.once('added', this._applyLayoutStrategy.bind(this, { type: 'added' }));
+    },
+
+    /**
+     * Override this method to customize layout
+     * @public
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
+     * @param {object} context object with data regarding what triggered the call
+     * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
+     * @returns {Object} options object
+     */
+    getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+      if (layoutDirective === 'spread' && this.canvas) {
+        return {
+          left: 0,
+          top: 0,
+          originX: 'left',
+          originY: 'top',
+          width: this.canvas.width,
+          height: this.canvas.height
+        };
+      }
+      return {};
+    },
+
+  });
 })(typeof exports !== 'undefined' ? exports : this);
