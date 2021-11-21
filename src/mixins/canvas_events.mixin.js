@@ -722,15 +722,15 @@
         };
       }
 
-      if (target) {
-        if (target.selectable && target.activeOn === 'down') {
-          this.setActiveObject(target, e);
-          //  reassign in case a different object was selected
-          if (target !== this._activeObject) {
-            shouldRender = true;
-            target = this._target = this._activeObject;
-          }
+      if (target && target.selectable && target.activeOn === 'down') {
+        this.setActiveObject(target, e);
+        //  reassign in case a different object was selected
+        if (target !== this._activeObject) {
+          shouldRender = true;
+          target = this._target = this._activeObject;
         }
+      }
+      if (target) {
         var alreadySelected = target === this._activeObject;
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
