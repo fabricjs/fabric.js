@@ -37,12 +37,13 @@
     points: null,
 
     /**
+     * WARNING: Feature in progress
      * Calculate the exact bounding box taking in account strokeWidth on acute angles
      * this will be turned to true by default on fabric 5.0
      * maybe will be left in as an optimization since calculations may be slow
      * @deprecated
-     * @type Array
-     * @default
+     * @type Boolean
+     * @default false
      */
     exactBoundingBox: false,
 
