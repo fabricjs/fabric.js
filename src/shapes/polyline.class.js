@@ -36,6 +36,16 @@
      */
     points: null,
 
+    /**
+     * Calculate the exact bounding box taking in account strokeWidth on acute angles
+     * this will be turned to true by default on fabric 5.0
+     * maybe will be left in as an optimization since calculations may be slow
+     * @deprecated
+     * @type Array
+     * @default
+     */
+    exactBoundingBox: false,
+
     cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
     /**
@@ -72,12 +82,17 @@
     },
 
     _setPositionDimensions: function(options) {
-      var calcDim = this._calcDimensions(options), correctLeftTop;
-      this.width = calcDim.width - this.strokeWidth;
-      this.height = calcDim.height - this.strokeWidth;
+      var calcDim = this._calcDimensions(options), correctLeftTop,
+          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
+      this.width = calcDim.width - correctSize;
+      this.height = calcDim.height - correctSize;
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
-          { x: calcDim.left, y: calcDim.top },
+          {
+            // this looks bad, but is one way to keep it optional for now.
+            x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
+            y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
+          },
           'left',
           'top',
           this.originX,
@@ -91,8 +106,8 @@
         this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
       }
       this.pathOffset = {
-        x: calcDim.left + calcDim.width / 2,
-        y: calcDim.top + calcDim.height / 2
+        x: calcDim.left + this.width / 2 + correctSize / 2,
+        y: calcDim.top + this.height / 2 + correctSize / 2
       };
     },
 
@@ -108,7 +123,7 @@
      */
     _calcDimensions: function() {
 
-      var points = this._projectStrokeOnPoints(),
+      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
           minX = min(points, 'x') || 0,
           minY = min(points, 'y') || 0,
           maxX = max(points, 'x') || 0,
@@ -120,7 +135,7 @@
         left: minX,
         top: minY,
         width: width,
-        height: height
+        height: height,
       };
     },
 
