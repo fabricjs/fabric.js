@@ -507,7 +507,6 @@
         p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
     // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
     // the path
-    
     // floating point made perc <= 1 ignore some calculation, so perc < 1.1 do the trick
     while (tmpLen < distance && perc < 1.1 && nextStep > 0.0001) {
       p = iterator(perc);
