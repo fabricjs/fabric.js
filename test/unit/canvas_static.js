@@ -1771,6 +1771,15 @@
     assert.deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
   });
 
+  QUnit.test('calcViewportBoundaries with flipped zoom and translation', function (assert) {
+    assert.ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, -2, -60, 60]);
+    assert.deepEqual(canvas.vptCoords.tl, new fabric.Point(30, -70), 'tl is 0,0');
+    assert.deepEqual(canvas.vptCoords.tr, new fabric.Point(30 + canvas.getWidth() / 2, -70), 'tl is 0,0');
+    assert.deepEqual(canvas.vptCoords.bl, new fabric.Point(30, canvas.getHeight() / 2 - 70), 'tl is 0,0');
+    assert.deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 70), 'tl is 0,0');
+  });
+
   QUnit.test('_isRetinaScaling', function(assert) {
     canvas.enableRetinaScaling = true;
     fabric.devicePixelRatio = 2;
