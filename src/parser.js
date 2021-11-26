@@ -1012,7 +1012,7 @@
 
           var match = rule.split('{'),
               ruleObj = { }, declaration = match[1].trim(),
-              propertyValuePairs = declaration.split(';');
+              propertyValuePairs = declaration.split(';').filter(function(pair) { return pair.trim(); });
 
           for (i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(':'),
