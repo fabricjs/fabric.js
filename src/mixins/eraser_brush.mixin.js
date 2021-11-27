@@ -414,7 +414,7 @@
       _setBrushStyles: function (ctx) {
         ctx = ctx || this.canvas.contextTop;
         this.callSuper('_setBrushStyles', ctx);
-        ctx.strokeStyle = 'transparent';
+        ctx.strokeStyle = null;
       },
 
       /**
