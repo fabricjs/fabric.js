@@ -1319,7 +1319,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setOpacity: function(ctx) {
-      if ((this.group && !this.group._transformDone) || (this.parent && !this.parent.isOnACache())) {
+      if ((this.group && !this.group._transformDone) || this.parent) {
         ctx.globalAlpha = this.getObjectOpacity();
       }
       else {
