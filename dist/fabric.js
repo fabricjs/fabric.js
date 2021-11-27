@@ -14475,14 +14475,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             return true;
           }
         }
-        else if (this.parent) {
-          return obj.isContainedWithinObject(this.parent) || obj.intersectsWithObject(this.parent);
-        }
-        /*
-        else if (this.group) {
-
-        }
-        */
         else {
           return true;
         }
@@ -15775,15 +15767,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         };
       }
 
-      if (target) {
-        if (target.selectable && target.activeOn === 'down') {
-          this.setActiveObject(target, e);
-          //  reassign in case a different object was selected
-          if (target !== this._activeObject) {
-            shouldRender = true;
-            target = this._target = this._activeObject;
-          }
+      if (target && target.selectable && target.activeOn === 'down') {
+        this.setActiveObject(target, e);
+        //  reassign in case a different object was selected
+        if (target !== this._activeObject) {
+          shouldRender = true;
+          target = this._target = this._activeObject;
         }
+      }
+      if (target) {
         var alreadySelected = target === this._activeObject;
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
@@ -17780,7 +17772,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return fabric.iMatrix.concat();
     },
 
-    /*
+    /**
      * @private
      * return if the object would be visible in rendering
      * @memberOf fabric.Object.prototype
@@ -17792,6 +17784,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         !this.visible;
     },
 
+    /**
+     * used by canvas' active object logic to determine `subTargets`
+     * @private
+     * @memberOf fabric.Object.prototype
+     * @returns {boolean}
+     */
     isSelectable() {
       return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
     },
@@ -23027,20 +23025,38 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       /**
        * Type of an object
-       * @type String
+       * @type string
        * @default
        */
       type: 'i-collection',
 
-      layout: 'auto',
+      /**
+       * Specifies the **layout strategy** for instance
+       * Used by `getLayoutStrategyResult` to calculate layout
+       * @type string
+       * @default
+       */
+      layout: 'fit-content',
 
+      /**
+       * @default
+       * @override
+       */
       fill: '',
 
       /**
        * Used to optimize performance
        * set to `false` if you don't need objects to be interactive
+       * @default
+       * @type boolean
        */
       subTargetCheck: true,
+
+      /**
+       * @override
+       * @default
+       */
+      erasable: 'deep',
 
       /**
        * Used internally to optimize performance
@@ -23062,7 +23078,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this._objects = objects || [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.callSuper('initialize', options);
-        this._applyLayoutStrategy({ type: 'initializion' });
+        this._applyLayoutStrategy({ type: 'initializion', options });
         if (!this.subTargetCheck) {
           this.ownMatrixCache.initialValue = this.calcOwnMatrix();
         }
@@ -23260,6 +23276,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return this.callSuper('onSelect', opt) || (opt.subTargets && opt.subTargets.length > 0 && opt.subTargets[0]);
       },
 
+      /**
+       * @override
+       * @param {boolean} [skipCanvas]
+       * @returns {boolean}
+       */
       isCacheDirty: function (skipCanvas) {
         if (this.callSuper('isCacheDirty', skipCanvas)) {
           return true;
@@ -23360,8 +23381,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @returns {Object} options object
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-        if (layoutDirective === 'auto') {
+        if (layoutDirective === 'fit-content') {
           return this.getObjectsBoundingBox(objects);
+        }
+        else if (layoutDirective === 'fixed' && context.type === 'initializion') {
+          var bbox = this.getObjectsBoundingBox(objects),
+            hasX = typeof context.options.left === 'number',
+            hasY = typeof context.options.top === 'number';
+          return {
+            left: hasX ? this.left : bbox.left,
+            top: hasY ? this.top : bbox.top,
+            width: this.width || bbox.width,
+            height: this.height || bbox.height,
+            originX: hasX ? this.originX : 'center',
+            originY: hasY ? this.originY : 'center'
+          };
         }
       },
 
@@ -23433,7 +23467,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @return {Object} object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
+        var obj = fabric.Object.prototype.toObject.call(this, ['layout'].concat(propertiesToInclude));
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
         return obj;
       },
@@ -23444,7 +23478,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @return {Object} object representation of an instance
        */
       toDatalessObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
+        var obj = fabric.Object.prototype.toDatalessObject.call(this, ['layout'].propertiesToInclude);
         obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
         return obj;
       },
@@ -23571,8 +23605,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Layer) {
     fabric.warn('fabric.Layer is already defined');
@@ -23588,29 +23621,53 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Layer = fabric.util.createClass(fabric.ICollection, /** @lends fabric.ICollection.prototype */ {
 
+    /**
+     * @default
+     * @type string
+     */
     type: 'layer',
 
-    initialize: function (objects, options) {
-      this.callSuper('initialize', objects, extend(options || {}, {
-        left: 0,
-        top: 0,
-        width: options ? options.width : 0,
-        height: options ? options.height : 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        originX: 'left',
-        originY: 'top',
-        strokeWidth: 0,
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-      }));
-    },
+    /**
+     * @override
+     * @default
+     */
+    layout: 'auto',
 
+    /**
+     * @override
+     * @default
+     */
+    strokeWidth: 0,
+
+    /**
+     * @override
+     * @default
+     */
+    hasControls: false,
+
+    /**
+     * @override
+     * @default
+     */
+    hasBorders: false,
+
+    /**
+     * @override
+     * @default
+     */
+    lockMovementX: true,
+
+    /**
+     * @override
+     * @default
+     */
+    lockMovementY: true,
+
+    /**
+     * 
+     * @param {string} key 
+     * @param {*} value 
+     */
     _set: function (key, value) {
       this.callSuper('_set', key, value);
       if (key === 'canvas') {
@@ -23619,11 +23676,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * used by canvas' active object logic to determine `subTargets`
+     * @private
+     * @memberOf fabric.Object.prototype
+     * @returns {boolean}
+     */
+    isSelectable: function () {
+      return false;
+    },
+
+    /**
+     * we do not need to invalidate layout because layer fills the entire canvas
      * @override
      * @private
      */
     __objectMonitor: function () {
-      //  we do not need to invalidate layout
+      //  noop
     },
 
     /**
@@ -23647,7 +23715,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height: this.canvas.height
         };
       }
-      return {};
     },
 
   });
