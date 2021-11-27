@@ -882,18 +882,18 @@
      */
     calcViewportBoundaries: function() {
       var width = this.width, height = this.height,
-        iVpt = invertTransform(this.viewportTransform),
-        a = transformPoint({ x: 0, y: 0 }, iVpt),
-        b = transformPoint({ x: width, y: height }, iVpt),
-        //  in case vpt is flipped
-        min = a.min(b),
-        max = a.max(b);
+          iVpt = invertTransform(this.viewportTransform),
+          a = transformPoint({ x: 0, y: 0 }, iVpt),
+          b = transformPoint({ x: width, y: height }, iVpt),
+          //  in case vpt is flipped
+          min = a.min(b),
+          max = a.max(b);
       return this.vptCoords = {
         tl: min,
         tr: new fabric.Point(max.x, min.y),
         bl: new fabric.Point(min.x, max.y),
         br: max,
-      }
+      };
     },
 
     cancelRequestedRender: function() {
