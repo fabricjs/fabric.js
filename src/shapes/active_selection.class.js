@@ -15,7 +15,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
    * @see {@link fabric.ActiveSelection#initialize} for constructor definition
    */
-  fabric.ActiveSelection = fabric.util.createClass(fabric.Layer, /** @lends fabric.ActiveSelection.prototype */ {
+  fabric.ActiveSelection = fabric.util.createClass(fabric.ICollection, /** @lends fabric.ActiveSelection.prototype */ {
 
     /**
      * Type of an object
