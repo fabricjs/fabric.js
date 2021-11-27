@@ -114,6 +114,10 @@
       }
     },
 
+    toString: function () {
+      return '#<fabric.Layer: (' + this.complexity() + ')>';
+    },
+
   });
 
   /**
