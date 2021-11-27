@@ -371,6 +371,19 @@
        */
       _applyLayoutStrategy: function (context) {
         var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
+        this.set({ width: result.width, height: result.height });
+        var originPoint = this.translateToGivenOrigin(
+          new fabric.Point(result.x, result.y),
+          result.originX, result.originY,
+          this.originX, this.originY);
+        delete result.x;
+        delete result.y;
+        delete result.originX;
+        delete result.originY;
+        delete result.width;
+        delete result.height;
+        result.left = originPoint.x;
+        result.top = originPoint.y;
         this.set(result);
         //  refresh matrix cache
         this.calcOwnMatrix();
@@ -414,8 +427,8 @@
               hasX = typeof context.options.left === 'number',
               hasY = typeof context.options.top === 'number';
           return {
-            left: hasX ? this.left : bbox.left,
-            top: hasY ? this.top : bbox.top,
+            x: hasX ? this.left : bbox.left,
+            y: hasY ? this.top : bbox.top,
             width: this.width || bbox.width,
             height: this.height || bbox.height,
             originX: hasX ? this.originX : 'center',
@@ -467,8 +480,8 @@
             cos = Math.abs(Math.cos(rad)),
             sin = Math.abs(Math.sin(rad));
         return {
-          left: center.x,
-          top: center.y,
+          x: center.x,
+          y: center.y,
           width: width * cos + height * sin,
           height: width * sin + height * cos,
           originX: 'center',
