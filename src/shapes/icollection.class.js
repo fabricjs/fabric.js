@@ -83,7 +83,7 @@
         this._activeObjects = [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.callSuper('initialize', options);
-        this._applyLayoutStrategy({ type: 'initializion', options });
+        this._applyLayoutStrategy({ type: 'initializion', options: options });
         if (!this.subTargetCheck) {
           this.ownMatrixCache.initialValue = this.calcOwnMatrix();
         }
