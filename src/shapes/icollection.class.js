@@ -68,7 +68,7 @@
        * This way instance is cached only once for the entire interaction with the selected object.
        * @private
        */
-      _activeObject: undefined,
+      _activeObjects: undefined,
 
       /**
        * Constructor
@@ -80,6 +80,7 @@
        */
       initialize: function (objects, options) {
         this._objects = objects || [];
+        this._activeObjects = [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.callSuper('initialize', options);
         this._applyLayoutStrategy({ type: 'initializion', options });
@@ -215,12 +216,15 @@
        */
       __objectSelectionMonitor: function (object, selected) {
         if (selected) {
-          this._activeObject = object;
+          this._activeObjects.push(object);
           this._set('dirty', true);
         }
-        else if (this._activeObject === object) {
-          this._activeObject = undefined;
-          this._set('dirty', true);
+        else if (this._activeObjects.length > 0) {
+          var index = this._activeObjects.indexOf(object);
+          if (index > -1) {
+            this._activeObjects.splice(index, 1);
+            this._set('dirty', true);
+          }
         }
       },
 
@@ -264,8 +268,11 @@
           type: 'object_removed',
           target: object
         });
-        if (this._activeObject === object) {
-          this._activeObject = undefined;
+        if (this._activeObjects.length > 0) {
+          var index = this._activeObjects.indexOf(object);
+          if (index > -1) {
+            this._activeObjects.splice(index, 1);
+          }
         }
         this._set('dirty', true);
       },
@@ -314,6 +321,16 @@
       },
 
       /**
+       * objects are in charge of handling opacity of context
+       * this is important for selection
+       * @override
+       * @private
+       */
+      _setOpacity: function () {
+        //  disabled
+      },
+
+      /**
        * Performance optimizations:
        *
        * **`subTargetCheck === false`**:
@@ -340,8 +357,10 @@
         var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
         ctx.transform.apply(ctx, invertTransform(t));
         this.forEachObject(function (object) {
-          //  do not render the selected object
-          object !== this._activeObject && object.render(ctx);
+          //  render only non-selected objects, canvas is in charge of rendering the selected objects
+          if (this._activeObjects.length === 0 || this._activeObjects.indexOf(object) === -1) {
+            object.render(ctx);
+          }          
         }, this);
         ctx.restore();
       },
@@ -414,7 +433,7 @@
        * @param {Object} result layout result
        */
       onLayout: function () {
-        //  noop
+        //  override by subclass
       },
 
       /**
