@@ -50,6 +50,16 @@
     },
 
     /**
+     * used by canvas' active object logic to determine `subTargets`
+     * @private
+     * @memberOf fabric.Object.prototype
+     * @returns {boolean}
+     */
+    isSelectable: function () {
+      return false;
+    },
+
+    /**
      * @override
      * @private
      */

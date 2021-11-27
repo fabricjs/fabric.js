@@ -1047,7 +1047,7 @@
       return fabric.iMatrix.concat();
     },
 
-    /*
+    /**
      * @private
      * return if the object would be visible in rendering
      * @memberOf fabric.Object.prototype
@@ -1059,6 +1059,12 @@
         !this.visible;
     },
 
+    /**
+     * used by canvas' active object logic to determine `subTargets`
+     * @private
+     * @memberOf fabric.Object.prototype
+     * @returns {boolean}
+     */
     isSelectable() {
       return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
     },
