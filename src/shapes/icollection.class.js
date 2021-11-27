@@ -57,6 +57,12 @@
       subTargetCheck: true,
 
       /**
+       * @override
+       * @default
+       */
+      erasable: 'deep',
+
+      /**
        * Used internally to optimize performance
        * Once an object is selected, instance is rendered without the selected object.
        * This way instance is cached only once for the entire interaction with the selected object.
