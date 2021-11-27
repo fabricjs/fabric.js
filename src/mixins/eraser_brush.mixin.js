@@ -340,10 +340,7 @@
       _prepareCollectionTraversal: function (collection, ctx) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            ctx.save();
-            ctx.globalAlpha *= obj.opacity;
             this._prepareCollectionTraversal(obj, ctx);
-            ctx.restore();
           }
           else if (!obj.erasable && !this.inverted) {
             obj.render(ctx);
