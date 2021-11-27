@@ -17790,7 +17790,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @memberOf fabric.Object.prototype
      * @returns {boolean}
      */
-    isSelectable() {
+    isSelectable: function() {
       return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
     },
 
@@ -23356,7 +23356,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           //  render only non-selected objects, canvas is in charge of rendering the selected objects
           if (this._activeObjects.length === 0 || this._activeObjects.indexOf(object) === -1) {
             object.render(ctx);
-          }          
+          }
         }, this);
         ctx.restore();
       },
@@ -23407,8 +23407,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
         else if (layoutDirective === 'fixed' && context.type === 'initializion') {
           var bbox = this.getObjectsBoundingBox(objects),
-            hasX = typeof context.options.left === 'number',
-            hasY = typeof context.options.top === 'number';
+              hasX = typeof context.options.left === 'number',
+              hasY = typeof context.options.top === 'number';
           return {
             left: hasX ? this.left : bbox.left,
             top: hasY ? this.top : bbox.top,
