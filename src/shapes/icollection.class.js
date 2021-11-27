@@ -32,7 +32,7 @@
        * @type string
        * @default
        */
-      type: 'i-collection',
+      type: 'iCollection',
 
       /**
        * Specifies the **layout strategy** for instance
@@ -361,6 +361,8 @@
         this._applyMatrixDiff(true);
         //  make sure coords are up to date
         context.type !== 'initialization' && this.callSuper('setCoords');
+        //  fire layout hook
+        this.onLayout(context, result);
         //  recursive up
         if (this.parent && this.parent._applyLayoutStrategy) {
           //  append the path recursion to context
@@ -374,7 +376,8 @@
       },
 
       /**
-       * Override this method to customize layout
+       * Override this method to customize layout.
+       * If you need to run logic once layout completes use `onLayout`
        * @public
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
@@ -400,6 +403,18 @@
             originY: hasY ? this.originY : 'center'
           };
         }
+      },
+
+      /**
+       * Hook that is called once layout has completed.
+       * Provided for layout customization, override if necessary.
+       * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
+       * @public
+       * @param {*} context layout context
+       * @param {Object} result layout result
+       */
+      onLayout: function () {
+        //  noop
       },
 
       /**
