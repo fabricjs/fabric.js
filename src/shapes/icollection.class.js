@@ -29,18 +29,30 @@
 
       /**
        * Type of an object
-       * @type String
+       * @type string
        * @default
        */
       type: 'i-collection',
 
-      layout: 'auto',
+      /**
+       * Specifies the **layout strategy** for instance
+       * Used by `getLayoutStrategyResult` to calculate layout
+       * @type string
+       * @default
+       */
+      layout: 'fit-content',
 
+      /**
+       * @default
+       * @override
+       */
       fill: '',
 
       /**
        * Used to optimize performance
        * set to `false` if you don't need objects to be interactive
+       * @default
+       * @type boolean
        */
       subTargetCheck: true,
 
@@ -64,7 +76,7 @@
         this._objects = objects || [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.callSuper('initialize', options);
-        this._applyLayoutStrategy({ type: 'initializion' });
+        this._applyLayoutStrategy({ type: 'initializion', options });
         if (!this.subTargetCheck) {
           this.ownMatrixCache.initialValue = this.calcOwnMatrix();
         }
@@ -262,6 +274,11 @@
         return this.callSuper('onSelect', opt) || (opt.subTargets && opt.subTargets.length > 0 && opt.subTargets[0]);
       },
 
+      /**
+       * @override
+       * @param {boolean} [skipCanvas]
+       * @returns {boolean}
+       */
       isCacheDirty: function (skipCanvas) {
         if (this.callSuper('isCacheDirty', skipCanvas)) {
           return true;
@@ -362,8 +379,21 @@
        * @returns {Object} options object
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-        if (layoutDirective === 'auto') {
+        if (layoutDirective === 'fit-content') {
           return this.getObjectsBoundingBox(objects);
+        }
+        else if (layoutDirective === 'fixed' && context.type === 'initializion') {
+          var bbox = this.getObjectsBoundingBox(objects),
+            hasX = typeof context.options.left === 'number',
+            hasY = typeof context.options.top === 'number';
+          return {
+            left: hasX ? this.left : bbox.left,
+            top: hasY ? this.top : bbox.top,
+            width: this.width || bbox.width,
+            height: this.height || bbox.height,
+            originX: hasX ? this.originX : 'center',
+            originY: hasY ? this.originY : 'center'
+          };
         }
       },
 
@@ -435,7 +465,7 @@
        * @return {Object} object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
+        var obj = fabric.Object.prototype.toObject.call(this, ['layout'].concat(propertiesToInclude));
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
         return obj;
       },
@@ -446,7 +476,7 @@
        * @return {Object} object representation of an instance
        */
       toDatalessObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
+        var obj = fabric.Object.prototype.toDatalessObject.call(this, ['layout'].propertiesToInclude);
         obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
         return obj;
       },
