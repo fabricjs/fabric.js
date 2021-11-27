@@ -188,9 +188,9 @@
         fabric.Collection.add.apply(this, arguments);
       },
 
-      insertAt: function (object, index, nonSplicing) {
+      insertAt: function () {
         this._onBeforeObjectsChange();
-        this.callSuper('insertAt', object, index, nonSplicing);
+        fabric.Collection.insertAt.apply(this, arguments);
       },
 
       remove: function () {
