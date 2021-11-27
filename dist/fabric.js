@@ -17697,9 +17697,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Number}
      */
     getObjectOpacity: function() {
-      var opacity = this.opacity;
-      if (this.group) {
-        opacity *= this.group.getObjectOpacity();
+      var opacity = this.opacity, parent = this.parent || this.group;
+      if (parent) {
+        opacity *= parent.getObjectOpacity();
       }
       return opacity;
     },
@@ -18044,7 +18044,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setOpacity: function(ctx) {
-      if (this.group && !this.group._transformDone) {
+      if ((this.group && !this.group._transformDone) || this.parent) {
         ctx.globalAlpha = this.getObjectOpacity();
       }
       else {
@@ -23028,7 +23028,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @type string
        * @default
        */
-      type: 'i-collection',
+      type: 'iCollection',
 
       /**
        * Specifies the **layout strategy** for instance
@@ -23064,7 +23064,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * This way instance is cached only once for the entire interaction with the selected object.
        * @private
        */
-      _activeObject: undefined,
+      _activeObjects: undefined,
 
       /**
        * Constructor
@@ -23076,6 +23076,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        */
       initialize: function (objects, options) {
         this._objects = objects || [];
+        this._activeObjects = [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.callSuper('initialize', options);
         this._applyLayoutStrategy({ type: 'initializion', options });
@@ -23184,9 +23185,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         fabric.Collection.add.apply(this, arguments);
       },
 
-      insertAt: function (object, index, nonSplicing) {
+      insertAt: function () {
         this._onBeforeObjectsChange();
-        this.callSuper('insertAt', object, index, nonSplicing);
+        fabric.Collection.insertAt.apply(this, arguments);
       },
 
       remove: function () {
@@ -23211,12 +23212,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        */
       __objectSelectionMonitor: function (object, selected) {
         if (selected) {
-          this._activeObject = object;
+          this._activeObjects.push(object);
           this._set('dirty', true);
         }
-        else if (this._activeObject === object) {
-          this._activeObject = undefined;
-          this._set('dirty', true);
+        else if (this._activeObjects.length > 0) {
+          var index = this._activeObjects.indexOf(object);
+          if (index > -1) {
+            this._activeObjects.splice(index, 1);
+            this._set('dirty', true);
+          }
         }
       },
 
@@ -23260,8 +23264,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           type: 'object_removed',
           target: object
         });
-        if (this._activeObject === object) {
-          this._activeObject = undefined;
+        if (this._activeObjects.length > 0) {
+          var index = this._activeObjects.indexOf(object);
+          if (index > -1) {
+            this._activeObjects.splice(index, 1);
+          }
         }
         this._set('dirty', true);
       },
@@ -23310,6 +23317,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
+       * objects are in charge of handling opacity of context
+       * this is important for selection
+       * @override
+       * @private
+       */
+      _setOpacity: function () {
+        //  disabled
+      },
+
+      /**
        * Performance optimizations:
        *
        * **`subTargetCheck === false`**:
@@ -23330,15 +23347,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
       _render: function (ctx) {
-        fabric.Rect.prototype._render.call(this, ctx);
         ctx.save();
         //  if `subTargetCheck === true` then we transform ctx back to canvas plane, objects are up to date with the latest diff
         //  else we apply the matrix diif on ctx by transforming it back by the initial matrix, while objects relate (but not relative) to the initial matrix
         var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
         ctx.transform.apply(ctx, invertTransform(t));
         this.forEachObject(function (object) {
-          //  do not render the selected object
-          object !== this._activeObject && object.render(ctx);
+          //  render only non-selected objects, canvas is in charge of rendering the selected objects
+          if (this._activeObjects.length === 0 || this._activeObjects.indexOf(object) === -1) {
+            object.render(ctx);
+          }          
         }, this);
         ctx.restore();
       },
@@ -23358,6 +23376,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this._applyMatrixDiff(true);
         //  make sure coords are up to date
         context.type !== 'initialization' && this.callSuper('setCoords');
+        //  fire layout hook
+        this.onLayout(context, result);
         //  recursive up
         if (this.parent && this.parent._applyLayoutStrategy) {
           //  append the path recursion to context
@@ -23371,7 +23391,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-       * Override this method to customize layout
+       * Override this method to customize layout.
+       * If you need to run logic once layout completes use `onLayout`
        * @public
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
@@ -23397,6 +23418,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             originY: hasY ? this.originY : 'center'
           };
         }
+      },
+
+      /**
+       * Hook that is called once layout has completed.
+       * Provided for layout customization, override if necessary.
+       * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
+       * @public
+       * @param {*} context layout context
+       * @param {Object} result layout result
+       */
+      onLayout: function () {
+        //  override by subclass
       },
 
       /**
@@ -23752,7 +23785,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
    * @see {@link fabric.ActiveSelection#initialize} for constructor definition
    */
-  fabric.ActiveSelection = fabric.util.createClass(fabric.Layer, /** @lends fabric.ActiveSelection.prototype */ {
+  fabric.ActiveSelection = fabric.util.createClass(fabric.ICollection, /** @lends fabric.ActiveSelection.prototype */ {
 
     /**
      * Type of an object
