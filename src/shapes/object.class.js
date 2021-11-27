@@ -1065,7 +1065,7 @@
      * @memberOf fabric.Object.prototype
      * @returns {boolean}
      */
-    isSelectable() {
+    isSelectable: function() {
       return this.selectable && this.evented && !this.isNotVisible() && this.isOnScreen();
     },
 
