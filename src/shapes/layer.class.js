@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = {});
 
   if (fabric.Layer) {
     fabric.warn('fabric.Layer is already defined');
@@ -19,29 +18,53 @@
    */
   fabric.Layer = fabric.util.createClass(fabric.ICollection, /** @lends fabric.ICollection.prototype */ {
 
+    /**
+     * @default
+     * @type string
+     */
     type: 'layer',
 
-    initialize: function (objects, options) {
-      this.callSuper('initialize', objects, extend(options || {}, {
-        left: 0,
-        top: 0,
-        width: options ? options.width : 0,
-        height: options ? options.height : 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        originX: 'left',
-        originY: 'top',
-        strokeWidth: 0,
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-      }));
-    },
+    /**
+     * @override
+     * @default
+     */
+    layout: 'auto',
 
+    /**
+     * @override
+     * @default
+     */
+    strokeWidth: 0,
+
+    /**
+     * @override
+     * @default
+     */
+    hasControls: false,
+
+    /**
+     * @override
+     * @default
+     */
+    hasBorders: false,
+
+    /**
+     * @override
+     * @default
+     */
+    lockMovementX: true,
+
+    /**
+     * @override
+     * @default
+     */
+    lockMovementY: true,
+
+    /**
+     * 
+     * @param {string} key 
+     * @param {*} value 
+     */
     _set: function (key, value) {
       this.callSuper('_set', key, value);
       if (key === 'canvas') {
@@ -60,11 +83,12 @@
     },
 
     /**
+     * we do not need to invalidate layout because layer fills the entire canvas
      * @override
      * @private
      */
     __objectMonitor: function () {
-      //  we do not need to invalidate layout
+      //  noop
     },
 
     /**
@@ -88,7 +112,6 @@
           height: this.canvas.height
         };
       }
-      return {};
     },
 
   });
