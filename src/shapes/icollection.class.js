@@ -71,6 +71,12 @@
       _activeObject: undefined,
 
       /**
+       * Used to reference the original opacity of the selected object
+       * @private
+       */
+      _activeObjectOpacity: 1,
+
+      /**
        * Constructor
        * Guard objects' transformations from excessive mutations during initializion.
        *
@@ -216,10 +222,16 @@
       __objectSelectionMonitor: function (object, selected) {
         if (selected) {
           this._activeObject = object;
+          this._activeObjectOpacity = object.opacity;
+          //  set opacity for selection
+          object._set('opacity', this._activeObjectOpacity * this.opacity);
           this._set('dirty', true);
         }
         else if (this._activeObject === object) {
           this._activeObject = undefined;
+          //  restore opacity
+          object._set('opacity', this._activeObjectOpacity);
+          this._activeObjectOpacity = 1;
           this._set('dirty', true);
         }
       },
