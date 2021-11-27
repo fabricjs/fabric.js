@@ -42,6 +42,8 @@
        */
       layout: 'fit-content',
 
+      stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
+
       /**
        * @default
        * @override
