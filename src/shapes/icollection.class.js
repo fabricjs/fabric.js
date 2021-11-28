@@ -348,6 +348,9 @@
       },
 
       /**
+       * If `subTargetCheck === true` we transform `ctx` back to canvas plane, objects are up to date with the latest diff
+       * otherwise we transform ctx back to canvas plane by applying the initial matrix, objects relating accordingly
+       * 
        * Performance optimizations:
        *
        * **`subTargetCheck === false`**:
@@ -369,8 +372,6 @@
        */
       _render: function (ctx) {
         ctx.save();
-        //  if `subTargetCheck === true` we transform ctx back to canvas plane, objects are up to date with the latest diff
-        //  otherwise we transform ctx back to canvas plane by applying the initial matrix, objects relating accordingly
         var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
         ctx.transform.apply(ctx, invertTransform(t));
         this._renderObjects(ctx);
@@ -378,7 +379,8 @@
       },
 
       /**
-       * render only non-selected objects
+       * **Performance optimization**:
+       * render only non-selected objects, 
        * canvas is in charge of rendering the selected objects
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
