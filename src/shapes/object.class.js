@@ -1012,12 +1012,10 @@
 
       if (isChanged) {
         var parent = this.group || this.parent;
-        var invalidate = false;
         if (this.cacheProperties.indexOf(key) > -1) {
           this.dirty = true;
-          invalidate = true;
         }
-        if (parent && parent.isOnACache() && (invalidate || this.stateProperties.indexOf(key) > -1)) {
+        if (parent && parent.isOnACache() && (this.dirty || this.stateProperties.indexOf(key) > -1)) {
           parent.set('dirty', true);
         }
       }
