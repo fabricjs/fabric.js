@@ -84,6 +84,8 @@
         this._objects = objects || [];
         this._activeObjects = [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
+        this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
+        this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
         this.callSuper('initialize', options);
         this._applyLayoutStrategy({ type: 'initializion', options: options });
         if (!this.subTargetCheck) {
@@ -189,16 +191,36 @@
       add: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.add.apply(this, arguments);
+        this._onAfterObjectsChange('added', arguments);
       },
 
       insertAt: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.insertAt.apply(this, arguments);
+        this._onAfterObjectsChange('added', arguments);
       },
 
       remove: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.remove.apply(this, arguments);
+        this._onAfterObjectsChange('removed', arguments);
+      },
+
+      removeAll: function () {
+        this._activeObjects = [];
+        this.remove.apply(this, this._objects);
+      },
+
+      /**
+       * @private
+       * @param {'added'|'removed'} type 
+       */
+      _onAfterObjectsChange: function (type) {
+        this._applyLayoutStrategy({
+          type: type,
+          targets: arguments
+        });
+        this._set('dirty', true);
       },
 
       /**
@@ -216,7 +238,8 @@
        * keeps track of the selected object
        * @private
        */
-      __objectSelectionMonitor: function (object, selected) {
+      __objectSelectionMonitor: function (selected, opt) {
+        var object = opt.target;
         if (selected) {
           this._activeObjects.push(object);
           this._set('dirty', true);
@@ -237,8 +260,8 @@
        */
       _watchObject: function (watch, object) {
         object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
-        object[watch ? 'on' : 'off']('selected', this.__objectSelectionMonitor.bind(this, object, true));
-        object[watch ? 'on' : 'off']('deselected', this.__objectSelectionMonitor.bind(this, object, false));
+        object[watch ? 'on' : 'off']('selected', this.__objectSelectionTracker);
+        object[watch ? 'on' : 'off']('deselected', this.__objectSelectionDisposer);
       },
 
       /**
@@ -250,11 +273,10 @@
         object._set('canvas', this.canvas);
         this._watchObject(true, object);
         object.fire('added', { target: this });
-        this._applyLayoutStrategy({
-          type: 'object_added',
-          target: object
-        });
-        this._set('dirty', true);
+        var activeObject = this.canvas && this.canvas.getActiveObject();
+        if (activeObject && (activeObject === object || activeObject.contains(object, true))) {
+          this._activeObjects.push(true);
+        }
       },
 
       /**
@@ -266,17 +288,10 @@
         delete object.parent;
         this._watchObject(false, object);
         object.fire('removed', { target: this });
-        this._applyLayoutStrategy({
-          type: 'object_removed',
-          target: object
-        });
-        if (this._activeObjects.length > 0) {
-          var index = this._activeObjects.indexOf(object);
-          if (index > -1) {
-            this._activeObjects.splice(index, 1);
-          }
+        var index = this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
+        if (index > -1) {
+          this._activeObjects.splice(index, 1);
         }
-        this._set('dirty', true);
       },
 
       /**
@@ -354,17 +369,26 @@
        */
       _render: function (ctx) {
         ctx.save();
-        //  if `subTargetCheck === true` then we transform ctx back to canvas plane, objects are up to date with the latest diff
-        //  else we apply the matrix diif on ctx by transforming it back by the initial matrix, while objects relate (but not relative) to the initial matrix
+        //  if `subTargetCheck === true` we transform ctx back to canvas plane, objects are up to date with the latest diff
+        //  otherwise we transform ctx back to canvas plane by applying the initial matrix, objects relating accordingly
         var t = this.subTargetCheck ? this.calcTransformMatrix() : this.ownMatrixCache.initialValue;
         ctx.transform.apply(ctx, invertTransform(t));
+        this._renderObjects(ctx);
+        ctx.restore();
+      },
+
+      /**
+       * render only non-selected objects
+       * canvas is in charge of rendering the selected objects
+       * @private
+       * @param {CanvasRenderingContext2D} ctx Context to render on
+       */
+      _renderObjects: function (ctx) {
         this.forEachObject(function (object) {
-          //  render only non-selected objects, canvas is in charge of rendering the selected objects
           if (this._activeObjects.length === 0 || this._activeObjects.indexOf(object) === -1) {
             object.render(ctx);
           }
         }, this);
-        ctx.restore();
       },
 
       /**
@@ -374,19 +398,7 @@
       _applyLayoutStrategy: function (context) {
         var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
         this.set({ width: result.width, height: result.height });
-        var originPoint = this.translateToGivenOrigin(
-          new fabric.Point(result.x, result.y),
-          result.originX, result.originY,
-          this.originX, this.originY);
-        delete result.x;
-        delete result.y;
-        delete result.originX;
-        delete result.originY;
-        delete result.width;
-        delete result.height;
-        result.left = originPoint.x;
-        result.top = originPoint.y;
-        this.set(result);
+        this.setPositionByOrigin(new fabric.Point(result.x, result.y), result.originX, result.originY);
         //  refresh matrix cache
         this.calcOwnMatrix();
         //  keep clip path in place
@@ -416,7 +428,7 @@
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
        * @param {object} context object with data regarding what triggered the call
-       * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+       * @param {'initializion'|'object_modified'|'added'|'removed'|'layout_change'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
        * @returns {Object} options object
        */
@@ -458,6 +470,9 @@
        * @returns
        */
       getObjectsBoundingBox: function (objects) {
+        if (objects.length === 0) {
+          return {};
+        }
         var coords = [];
         for (var i = 0, o; i < objects.length; ++i) {
           o = objects[i];
@@ -540,7 +555,9 @@
       },
 
       dispose: function () {
+        delete this._activeObjects;
         this.forEachObject(function (object) {
+          this._watchObject(false, object);
           object.dispose && object.dispose();
         });
       },
