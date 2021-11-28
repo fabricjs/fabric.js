@@ -192,23 +192,26 @@
         this._onBeforeObjectsChange();
         fabric.Collection.add.apply(this, arguments);
         this._onAfterObjectsChange('added', arguments);
+        return this;
       },
 
       insertAt: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.insertAt.apply(this, arguments);
         this._onAfterObjectsChange('added', arguments);
+        return this;
       },
 
       remove: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.remove.apply(this, arguments);
         this._onAfterObjectsChange('removed', arguments);
+        return this;
       },
 
       removeAll: function () {
         this._activeObjects = [];
-        this.remove.apply(this, this._objects);
+        return this.remove.apply(this, this._objects);
       },
 
       /**
@@ -273,7 +276,7 @@
         object._set('canvas', this.canvas);
         this._watchObject(true, object);
         object.fire('added', { target: this });
-        var activeObject = this.canvas && this.canvas.getActiveObject();
+        var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
         if (activeObject && (activeObject === object || activeObject.contains(object, true))) {
           this._activeObjects.push(true);
         }
@@ -326,7 +329,7 @@
        * @return {Boolean}
        */
       isOnACache: function () {
-        return this.ownCaching || (this.parent && this.parent.isOnACache());
+        return this.ownCaching || (!!this.parent && this.parent.isOnACache());
       },
 
       /**
