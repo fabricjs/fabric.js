@@ -41,9 +41,8 @@
    * @param {Function} [callback] Callback to invoke when an ActiveSelection instance is created
    */
   fabric.ActiveSelection.fromObject = function(object, callback) {
-    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      delete object.objects;
-      callback && callback(new fabric.ActiveSelection(enlivenedObjects, object));
+    callback && fabric.ICollection._fromObject(object, function (objects, options) {
+      callback(new fabric.ActiveSelection(objects, options));
     });
   };
 
