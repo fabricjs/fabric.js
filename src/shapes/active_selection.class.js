@@ -24,6 +24,15 @@
      */
     type: 'activeSelection',
 
+    objectCaching: false,
+
+    /**
+     * @override we want to render selected objects
+     * @private
+     */
+    __objectSelectionMonitor: function () {
+      //  disabled
+    },
 
     /**
      * Renders controls and borders for the object
