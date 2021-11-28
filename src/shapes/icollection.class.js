@@ -561,7 +561,7 @@
         this.forEachObject(function (object) {
           this._watchObject(false, object);
           object.dispose && object.dispose();
-        });
+        }, this);
       },
 
       /* _TO_SVG_START_ */
