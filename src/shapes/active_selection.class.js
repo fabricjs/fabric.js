@@ -24,6 +24,28 @@
      */
     type: 'activeSelection',
 
+
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} [styleOverride] properties to override the object style
+     * @param {Object} [childrenOverride] properties to override the children overrides
+     */
+    _renderControls: function (ctx, styleOverride, childrenOverride) {
+      ctx.save();
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      this.callSuper('_renderControls', ctx, styleOverride);
+      childrenOverride = childrenOverride || {};
+      if (typeof childrenOverride.hasControls === 'undefined') {
+        childrenOverride.hasControls = false;
+      }
+      childrenOverride.forActiveSelection = true;
+      this.forEachObject(function (object) {
+        object._renderControls(ctx, childrenOverride);
+      });
+      ctx.restore();
+    },
+
     /**
      * Returns string representation of a group
      * @return {String}
