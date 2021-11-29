@@ -26,7 +26,8 @@
         methodName = transparentCorners ? 'stroke' : 'fill',
         stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
         myLeft = left,
-        myTop = top, size;
+        myTop = top, size,
+        lineWidth = this.lineWidth || 1;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
@@ -44,8 +45,8 @@
     else {
       size = xSize;
     }
-    // this is still wrong
-    ctx.lineWidth = 1;
+    // this is still wrong (what is still wrong? original [ctx.lineWidth = 1])
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
     ctx[methodName]();
@@ -75,12 +76,13 @@
         methodName = transparentCorners ? 'stroke' : 'fill',
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
-        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
+        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2,
+        lineWidth = this.lineWidth || 1;
     ctx.save();
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-    // this is still wrong
-    ctx.lineWidth = 1;
+    // this is still wrong (what is still wrong? original [ctx.lineWidth = 1])
+    ctx.lineWidth = lineWidth;
     ctx.translate(left, top);
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.

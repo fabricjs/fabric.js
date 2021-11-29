@@ -127,6 +127,13 @@
     cursorStyle: 'crosshair',
 
     /**
+     * Defines the line width the Context2D will use to draw a stroke around the control.
+     * @type {Number}
+     * @default 1
+     */
+    lineWidth: 1,
+
+    /**
      * If controls has an offsetY or offsetX, draw a line that connects
      * the control to the bounding box
      * @type {Boolean}
