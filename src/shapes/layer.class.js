@@ -34,6 +34,12 @@
      * @override
      * @default
      */
+    objectCaching: false,
+
+    /**
+     * @override
+     * @default
+     */
     strokeWidth: 0,
 
     /**
