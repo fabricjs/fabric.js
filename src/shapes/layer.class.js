@@ -103,7 +103,7 @@
      * @param {string} layoutDirective
      * @param {fabric.Object[]} objects
      * @param {object} context object with data regarding what triggered the call
-     * @param {'initializion'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {'initializion'|'canvas'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
      * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
      * @returns {Object} options object
      */
