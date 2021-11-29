@@ -378,10 +378,8 @@
        * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
        * This optimization is crucial for an instance that contains a very large amount of objects.
        * In case you need to select objects toggle `subTargetCheck` accordingly.
-       *
-       * **caching**:
-       * Objects get updated by `_applyMatrixDiff` that is hooked to `setCoords`.
-       * This means that even though objects' transform matrices change they do not trigger rendering.
+       * 
+       * **caching and selection**:
        * Once an object is selected, instance is rendered without the selected object.
        * This way instance is cached only once for the entire interaction with the selected object.
        *
@@ -417,6 +415,9 @@
        */
       _applyLayoutStrategy: function (context) {
         var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
+        if (!result) {
+          return;
+        }
         this.set({ width: result.width, height: result.height });
         this.setPositionByOrigin(new fabric.Point(result.x, result.y), result.originX, result.originY);
         //  refresh matrix cache
