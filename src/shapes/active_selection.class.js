@@ -27,7 +27,7 @@
     objectCaching: false,
 
     /**
-     * @override we want to render selected objects
+     * @override we want instance to render selected objects
      * @private
      */
     __objectSelectionMonitor: function () {
