@@ -320,11 +320,21 @@
       },
 
       /**
+       * Check if instance or its parent are caching, recursively up
+       * @return {Boolean}
+       */
+      isOnACache: function () {
+        return this.ownCaching || (!!this.parent && this.parent.isOnACache());
+      },
+
+      /**
+       * hook used to apply matrix diff on objects
        * @override
        * @param {boolean} [skipCanvas]
        * @returns {boolean}
        */
       isCacheDirty: function (skipCanvas) {
+        this._applyMatrixDiff();
         if (this.callSuper('isCacheDirty', skipCanvas)) {
           return true;
         }
@@ -334,14 +344,6 @@
         return this._objects.some(function (object) {
           return object.isCacheDirty(true);
         });
-      },
-
-      /**
-       * Check if instance or its parent are caching, recursively up
-       * @return {Boolean}
-       */
-      isOnACache: function () {
-        return this.ownCaching || (!!this.parent && this.parent.isOnACache());
       },
 
       /**
