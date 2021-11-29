@@ -334,6 +334,7 @@
        * @returns {boolean}
        */
       isCacheDirty: function (skipCanvas) {
+        //  apply matrix diff before deciding if cache isn't dirty
         this._applyMatrixDiff();
         if (this.callSuper('isCacheDirty', skipCanvas)) {
           return true;
