@@ -835,10 +835,9 @@
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance `includeDefaultValues`
      * @return {Object} Object representation of an instance
      */
-    toObject: function (propertiesToInclude, includeDefaultValues) {
+    toObject: function(propertiesToInclude) {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -882,7 +881,7 @@
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (typeof includeDefaultValues === 'boolean' ? !includeDefaultValues : !this.includeDefaultValues) {
+      if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
 
