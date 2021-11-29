@@ -98,6 +98,17 @@
     },
 
     /**
+     * we do not want to transform ctx
+     */
+    transform: function () {
+      //  disabled
+    },
+
+    _render: function (ctx) {
+      this._renderObjects(ctx);
+    },
+
+    /**
      * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
@@ -110,8 +121,8 @@
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
       if (context.type === 'canvas' && this.canvas) {
         return {
-          left: 0,
-          top: 0,
+          x: 0,
+          y: 0,
           originX: 'left',
           originY: 'top',
           width: this.canvas.width,
