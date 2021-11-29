@@ -24,12 +24,12 @@
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
-        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || this.stroke),
         myLeft = left,
         myTop = top, size;
     ctx.save();
-    ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
-    ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    ctx.fillStyle = this.fill || styleOverride.cornerColor || fabricObject.cornerColor;
+    ctx.strokeStyle = this.stroke || styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
     // as soon as fabric react v5, remove ie11, use proper ellipse code.
     if (xSize > ySize) {
       size = xSize;
@@ -77,8 +77,8 @@
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
         ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
     ctx.save();
-    ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
-    ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    ctx.fillStyle = this.fill || styleOverride.cornerColor || fabricObject.cornerColor;
+    ctx.strokeStyle = this.stroke || styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.translate(left, top);

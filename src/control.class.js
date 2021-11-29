@@ -127,6 +127,20 @@
     cursorStyle: 'crosshair',
 
     /**
+     * Sets the fill color of the control. If null, defaults to object's cornerColor
+     * @type {?String}
+     * @default null
+     */
+    fill: null,
+
+    /**
+     * Sets the stroke color of the control. If null, defaults to object's cornerStrokeColor
+     * @type {?String}
+     * @default null
+     */
+    stroke: null,
+
+    /**
      * If controls has an offsetY or offsetX, draw a line that connects
      * the control to the bounding box
      * @type {Boolean}
