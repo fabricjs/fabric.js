@@ -46,6 +46,27 @@
     return new fabric.ICollection(get4Objects());
   }
 
+  function serializeObjects(arg, includeDefaultValues = false) {
+    if (arg._objects) {
+      var defaults = arg.includeDefaultValues;
+      arg.includeDefaultValues = includeDefaultValues;
+      var data = arg.toObject().objects;
+      arg.includeDefaultValues = defaults;
+      return data;
+    }
+    else if (Array.isArray(arg)) {
+      return arg.map(o => {
+        var defaults = o.includeDefaultValues;
+        o.includeDefaultValues = includeDefaultValues;
+        var data = o.toObject();
+        o.includeDefaultValues = defaults;
+        delete data.version;
+        return data;
+      });
+    }
+    throw new Error('bad input, can\'t serialize');
+  }
+
   QUnit.module('fabric.ICollection', {
     afterEach: function() {
       fabric.Object.__uid = 0;
@@ -229,7 +250,7 @@
       top:                      100,
       width:                    80,
       height:                   60,
-      fill:                     'rgb(0,0,0)',
+      fill:                     '',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -251,7 +272,7 @@
       globalCompositeOperation: 'source-over',
       skewX:                    0,
       skewY:                    0,
-      objects:                  clone.objects,
+      objects:                  serializeObjects(collection, true),
       strokeUniform:            false
     };
 
@@ -273,26 +294,26 @@
       top: 100,
       width: 80,
       height: 60,
-      objects: get2Objects()
+      objects: serializeObjects(get2Objects())
     };
     assert.deepEqual(clone, expectedObject);
   });
 
   QUnit.test('toObject with excludeFromExport set on an object', function (assert) {
-    var collection = makeCollectionWith2Objects();
-    var group2 = makeCollectionWith2ObjectsAndNoExport();
-    var clone = collection.toObject();
-    var clone2 = group2.toObject();
-    assert.deepEqual(clone2.objects, group2._objects.filter(obj => !obj.excludeFromExport).map(obj => obj.toObject()));
+    var c1 = makeCollectionWith2Objects();
+    var c2 = makeCollectionWith2ObjectsAndNoExport();
+    assert.deepEqual(serializeObjects(c2), serializeObjects(c2._objects.filter(obj => !obj.excludeFromExport)));
+    var clone = c1.toObject();
+    var clone2 = c2.toObject();
     delete clone.objects;
     delete clone2.objects;
     assert.deepEqual(clone, clone2);
   });
 
   QUnit.test('Collection does not mutate objects', function (assert) {
-    assert.deepEqual(makeCollectionWith2Objects().toObject().objects, get2Objects(), 'should return deepEqual objects as those passed to constructor');
-    assert.deepEqual(makeCollectionWith2ObjectsWithOpacity().toObject().objects, get2ObjectsWithOpacity(), 'should return deepEqual objects as those passed to constructor');
-    assert.deepEqual(makeCollectionWith4Objects().toObject().objects, get4Objects(), 'should return deepEqual objects as those passed to constructor');
+    assert.deepEqual(serializeObjects(makeCollectionWith2Objects()), serializeObjects(get2Objects()), 'should return deepEqual objects as those passed to constructor');
+    assert.deepEqual(serializeObjects(makeCollectionWith2ObjectsWithOpacity()), serializeObjects(get2ObjectsWithOpacity()), 'should return deepEqual objects as those passed to constructor');
+    assert.deepEqual(serializeObjects(makeCollectionWith4Objects()), serializeObjects(get4Objects()), 'should return deepEqual objects as those passed to constructor');
   });
 
   QUnit.test('render', function(assert) {
