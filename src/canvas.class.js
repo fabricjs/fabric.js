@@ -1159,7 +1159,7 @@
       var pointer = this.getPointer(e, true), targets = this.targets, target;
       this.targets = [];
       //  push children and `activeObject` to `targets`
-      if (activeObject && Array.isArray(activeObject._objects)) {
+      if (activeObject && activeObject.subTargetCheck && Array.isArray(activeObject._objects)) {
         target = this._searchPossibleTargets([activeObject], pointer);
         target && this.targets.push(target);
       }
