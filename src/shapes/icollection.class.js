@@ -42,6 +42,12 @@
        */
       layout: 'fit-content',
 
+      /**
+       * List of properties to consider when checking if state
+       * of an object is changed (fabric.Object#hasStateChanged)
+       * as well as for history (undo/redo) purposes
+       * @type string[]
+       */
       stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
 
       /**
@@ -519,16 +525,14 @@
        * @returns {Object[]} serialized objects
        */
       __serializeObjects: function (method, propertiesToInclude) {
-        var _includeDefaultValues = this.includeDefaultValues;
+        var includeDefaultValues = this.includeDefaultValues;
         return this._objects
           .filter(function (obj) {
             return !obj.excludeFromExport;
           })
           .map(function (obj) {
-            var originalDefaults = obj.includeDefaultValues;
-            obj.includeDefaultValues = _includeDefaultValues;
-            var data = obj[method || 'toObject'](propertiesToInclude);
-            obj.includeDefaultValues = originalDefaults;
+            var data = obj[method || 'toObject'](propertiesToInclude, includeDefaultValues);
+            delete data.version;
             return data;
           });
       },
