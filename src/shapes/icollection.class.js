@@ -42,6 +42,12 @@
        */
       layout: 'fit-content',
 
+      /**
+       * List of properties to consider when checking if state
+       * of an object is changed (fabric.Object#hasStateChanged)
+       * as well as for history (undo/redo) purposes
+       * @type string[]
+       */
       stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
 
       /**
