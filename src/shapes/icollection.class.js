@@ -57,6 +57,12 @@
       fill: '',
 
       /**
+       * @default
+       * @override
+       */
+      strokeWidth: 0,
+
+      /**
        * Used to optimize performance
        * set to `false` if you don't need objects to be interactive
        * @default
@@ -535,6 +541,7 @@
             obj.includeDefaultValues = _includeDefaultValues;
             var data = obj[method || 'toObject'](propertiesToInclude);
             obj.includeDefaultValues = originalDefaults;
+            delete data.version;
             return data;
           });
       },
