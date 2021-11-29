@@ -581,20 +581,6 @@
       },
 
       /* _TO_SVG_START_ */
-      /**
-       * Returns svg representation of an instance
-       * @param {Function} [reviver] Method for further parsing of svg representation.
-       * @return {String} svg representation of an instance
-       */
-      _toSVG: function (reviver) {
-        var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        svgString.push(new fabric.Rect(this.toObject()).toSVG());
-        for (var i = 0, len = this._objects.length; i < len; i++) {
-          svgString.push('\t\t', this._objects[i].toSVG(reviver));
-        }
-        svgString.push('</g>\n');
-        return svgString;
-      },
 
       /**
        * Returns styles-string for svg-export, specific version for ICollection
@@ -624,17 +610,29 @@
       },
 
       /**
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      _toSVG: function (reviver) {
+        var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+        for (var i = 0, len = this._objects.length; i < len; i++) {
+          svgString.push('\t\t', this._objects[i].toSVG(reviver));
+        }
+        svgString.push('</g>\n');
+        return svgString;
+      },
+
+      /**
        * Returns svg clipPath representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       toClipPathSVG: function (reviver) {
         var svgString = [];
-
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
         }
-
         return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
       },
       /* _TO_SVG_END_ */
