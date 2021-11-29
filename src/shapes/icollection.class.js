@@ -602,28 +602,17 @@
       },
 
       /**
-       * @override instance's transformations are excessive
-       * @param {boolean} full
-       * @param {string} additionalTransform
-       * @returns
-       */
-      getSvgTransform: function (full, additionalTransform) {
-        var svgTransform = 'transform="' + fabric.util.matrixToSVG(fabric.iMatrix);
-        return svgTransform +
-          (additionalTransform || '') + '" ';
-      },
-
-      /**
        * Returns svg representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+        svgString.push('<g ', 'transform="' + fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix())), '">\n');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
-        svgString.push('</g>\n');
+        svgString.push('</g>\n', '</g>\n');
         return svgString;
       },
 
@@ -634,9 +623,11 @@
        */
       toClipPathSVG: function (reviver) {
         var svgString = [];
+        svgString.push('\t<g ', 'transform="' + fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix())), '">\t');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
         }
+        svgString.push('</g>\t');
         return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
       },
       /* _TO_SVG_END_ */
