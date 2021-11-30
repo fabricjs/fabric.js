@@ -587,6 +587,18 @@
       /* _TO_SVG_START_ */
 
       /**
+       * Returns id attribute for svg output
+       * @return {String}
+       */
+      getSvgCommons: function () {
+        if (this.layout !== fabric.util.getKlass(this.type).prototype.layout) {
+          var layout = 'fabric-layout="' + this.layout + '"';
+          return this.callSuper('getSvgCommons') + ' ' + layout;
+        }
+        return this.callSuper('getSvgCommons');
+      },
+
+      /**
        * Returns styles-string for svg-export, specific version for ICollection
        * @return {String}
        */
@@ -632,6 +644,16 @@
       },
       /* _TO_SVG_END_ */
     });
+  
+  /* _FROM_SVG_START_ */
+  /**
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
+   * @static
+   * @memberOf fabric.Circle
+   * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
+   */
+  fabric.ICollection.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('fabric-layout');
+  /* _FROM_SVG_END_ */
 
   /**
    * @todo support loading from svg
