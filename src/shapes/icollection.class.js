@@ -274,9 +274,10 @@
        * @param {fabric.Object} object
        */
       _watchObject: function (watch, object) {
-        object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
-        object[watch ? 'on' : 'off']('selected', this.__objectSelectionTracker);
-        object[watch ? 'on' : 'off']('deselected', this.__objectSelectionDisposer);
+        var directive = watch ? 'on' : 'off';
+        object[directive]('modified', this.__objectMonitor);
+        object[directive]('selected', this.__objectSelectionTracker);
+        object[directive]('deselected', this.__objectSelectionDisposer);
       },
 
       /**
@@ -289,7 +290,7 @@
         this._watchObject(true, object);
         object.fire('added', { target: this });
         var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
-        if (activeObject && (activeObject === object || activeObject.contains(object, true))) {
+        if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
           this._activeObjects.push(true);
         }
       },
