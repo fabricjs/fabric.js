@@ -717,8 +717,8 @@
       rect3Selected = true;
     });
     var currentObjects = canvas.getActiveObjects();
-    activeSelection.removeWithUpdate(rect1);
-    activeSelection.addWithUpdate(rect3);
+    activeSelection.remove(rect1);
+    activeSelection.add(rect3);
     canvas._fireSelectionEvents(currentObjects, {});
     assert.ok(rect3Selected, 'rect 3 selected');
     assert.ok(rect1Deselected, 'rect 1 deselected');
@@ -1093,23 +1093,23 @@
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
-    assert.equal(target, group, 'Should return the activegroup');
+    assert.ok(target === group, 'Should return the activegroup');
     target = canvas.findTarget({
       clientX: 40, clientY: 15
     });
-    assert.equal(target, null, 'Should miss the activegroup');
+    assert.ok(target === null, 'Should miss the activegroup');
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
-    assert.equal(target, rect1, 'Should return the rect inside activegroup');
+    assert.ok(target === rect1, 'Should return the rect inside activegroup');
     target = canvas.findTarget({
       clientX: 25, clientY: 5
     });
-    assert.equal(target, group, 'Should return the activegroup');
+    assert.ok(target === group, 'Should return the activegroup');
     target = canvas.findTarget({
       clientX: 25, clientY: 5
     }, true);
-    assert.equal(target, rect3, 'Should return the rect behind activegroup');
+    assert.ok(target === rect3, 'Should return the rect behind activegroup');
   });
 
   QUnit.test('findTarget on activegroup with perPixelTargetFind', function(assert) {
