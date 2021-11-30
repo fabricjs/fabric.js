@@ -1941,6 +1941,27 @@
     },
 
     /**
+     * Checks if object is decendant of target
+     * Should be used instead of @link {fabric.Collection.contains} for performance reasons
+     * @param {fabric.Object|fabric.StaticCanvas} target 
+     * @returns {boolean}
+     */
+    isDescendantOf: function (target) {
+      var parent = this.group || this.parent || this.canvas;
+      while (parent) {
+        if (target === parent) {
+          return true;
+        }
+        else if (parent instanceof fabric.StaticCanvas) {
+          //  happens after all parents were traversed through without a match
+          return false;
+        }
+        parent = parent.group || parent.parent || parent.canvas;
+      }
+      return false;
+    },
+
+    /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
