@@ -492,18 +492,17 @@
     },
 
     /**
-     * Groups SVG elements (usually those retrieved from SVG document)
+     * prepares options object from svg
      * @static
      * @memberOf fabric.util
      * @param {Array} elements SVG elements to group
      * @param {Object} [options] Options object
      * @param {String} path Value to set sourcePath to
-     * @return {fabric.Object|fabric.Group}
+     * @return {Object|undefined} options
      */
-    groupSVGElements: function(elements, options, path) {
-      var object;
+    getOptionsFromSVG: function (elements, options, path) {
       if (elements && elements.length === 1) {
-        return elements[0];
+        return;
       }
       if (options) {
         if (options.width && options.height) {
@@ -517,10 +516,27 @@
           delete options.height;
         }
       }
-      object = new fabric.Group(elements, options);
       if (typeof path !== 'undefined') {
-        object.sourcePath = path;
+        options.sourcePath = path;
       }
+      return options;
+    },
+
+    /**
+     * Groups SVG elements (usually those retrieved from SVG document)
+     * @static
+     * @memberOf fabric.util
+     * @param {Array} elements SVG elements to group
+     * @param {Object} [options] Options object
+     * @param {String} path Value to set sourcePath to
+     * @return {fabric.Object|fabric.Group}
+     */
+    groupSVGElements: function(elements, options, path) {
+      var object;
+      if (elements && elements.length === 1) {
+        return elements[0];
+      }
+      object = new fabric.Group(elements, fabric.util.getOptionsFromSVG(elements, options, path));
       return object;
     },
 

@@ -649,6 +649,14 @@
     var objects = object.objects,
         options = clone(object, true);
     delete options.objects;
+    if (typeof objects === 'string') {
+      // it has to be a url or something went wrong.
+      fabric.loadSVGFromURL(objects, function (elements) {
+        options = fabric.util.getOptionsFromSVG(elements, object, objects);
+        callback && callback(elements, options);
+      });
+      return;
+    }
     fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
       fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
         var options = clone(object, true);
