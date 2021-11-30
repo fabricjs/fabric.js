@@ -228,7 +228,7 @@
 
       /**
        * @private
-       * @param {'added'|'removed'} type 
+       * @param {'added'|'removed'} type
        */
       _onAfterObjectsChange: function (type) {
         this._applyLayoutStrategy({
@@ -368,7 +368,7 @@
       /**
        * If `subTargetCheck === true` we transform `ctx` back to canvas plane, objects are up to date with the latest diff
        * otherwise we transform ctx back to canvas plane by applying the initial matrix, objects relating accordingly
-       * 
+       *
        * Performance optimizations:
        *
        * **`subTargetCheck === false`**:
@@ -378,7 +378,7 @@
        * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
        * This optimization is crucial for an instance that contains a very large amount of objects.
        * In case you need to select objects toggle `subTargetCheck` accordingly.
-       * 
+       *
        * **caching and selection**:
        * Once an object is selected, instance is rendered without the selected object.
        * This way instance is cached only once for the entire interaction with the selected object.
@@ -396,7 +396,7 @@
 
       /**
        * **Performance optimization**:
-       * render only non-selected objects, 
+       * render only non-selected objects,
        * canvas is in charge of rendering the selected objects
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -605,7 +605,8 @@
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        svgString.push('<g ', 'transform="' + fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix())), '">\n');
+        var t = fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix()));
+        svgString.push('<g ', 'transform="', t, '">\n');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
@@ -627,7 +628,7 @@
       },
       /* _TO_SVG_END_ */
     });
-  
+
   /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.ICollection.fromElement})
