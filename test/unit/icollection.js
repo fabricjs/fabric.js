@@ -33,7 +33,7 @@
   }
 
   function makeCollectionWith2ObjectsWithOpacity() {
-    return new fabric.ICollection(get2ObjectsWithOpacity(), {strokeWidth: 0});
+    return new fabric.ICollection(get2ObjectsWithOpacity(), {strokeWidth: 0,opacity:0.7});
   }
 
   function makeCollectionWith2ObjectsAndNoExport() {
@@ -135,6 +135,22 @@
     assert.strictEqual(collection.item(collection.size() - 1), rect3, 'last object should be last added one');
     assert.equal(collection.size(), 5, 'there should be 5 objects');
     assert.deepEqual(fired, [rect1, rect2, rect3]);
+  });
+
+  QUnit.test('insertAt', function (assert) {
+    var rect1 = new fabric.Rect(),
+      rect2 = new fabric.Rect(),
+      collection = new fabric.ICollection();
+
+    collection.add(rect1, rect2);
+
+    assert.ok(typeof collection.insertAt === 'function', 'should respond to `insertAt` method');
+
+    collection.insertAt(rect1, 1);
+    assert.equal(collection.item(1), rect1);
+    collection.insertAt(rect2, 2);
+    assert.equal(collection.item(2), rect2);
+    assert.equal(collection.insertAt(rect1, 2), collection, 'should be chainable');
   });
 
   QUnit.test('remove', function(assert) {
@@ -498,17 +514,17 @@
     });
   });
 
-  QUnit.test('toSVG', function(assert) {
+  QUnit.test('toSVG', function (assert) {
     var collection = makeCollectionWith2Objects();
     assert.ok(typeof collection.toSVG === 'function');
-    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
+    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;\"   >\n<g transform=\"matrix(1 0 0 1 -90 -130)\">\n\t\t<g transform=\"matrix(1 0 0 1 115 105)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 55 140)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
     assert.equal(collection.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
     var collection = makeCollectionWith2Objects();
     collection.clipPath = new fabric.Rect({ width: 100, height: 100 });
-    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
+    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;\"   >\n<g transform=\"matrix(1 0 0 1 -90 -130)\">\n\t\t<g transform=\"matrix(1 0 0 1 115 105)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 55 140)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
     assert.equal(collection.toSVG(), expectedSVG);
   });
 
@@ -516,14 +532,14 @@
     var collection = makeCollectionWith2Objects();
     collection.clipPath = new fabric.Rect({ width: 100, height: 100 });
     collection.clipPath.absolutePositioned = true;
-    var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
+    var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;\"   >\n<g transform=\"matrix(1 0 0 1 -90 -130)\">\n\t\t<g transform=\"matrix(1 0 0 1 115 105)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 55 140)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n</g>\n';
     assert.equal(collection.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a collection as a clipPath', function(assert) {
     var collection = makeCollectionWith2Objects();
     collection.clipPath = makeCollectionWith2Objects();
-    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t<rect transform=\"matrix(1 0 0 1 115 105)\" x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n\t\t<rect transform=\"matrix(1 0 0 1 55 140)\" x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
+    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t<rect transform=\"matrix(1 0 0 1 115 105)\" x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n\t\t<rect transform=\"matrix(1 0 0 1 55 140)\" x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</clipPath>\n<g style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;\"   >\n<g transform=\"matrix(1 0 0 1 -90 -130)\">\n\t\t<g transform=\"matrix(1 0 0 1 115 105)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 55 140)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
     assert.equal(collection.toSVG(), expectedSVG);
   });
 
@@ -578,22 +594,6 @@
     assert.ok(typeof firstObjInGroup.collection === 'undefined');
   });
 
-  QUnit.test('insertAt', function(assert) {
-    var rect1 = new fabric.Rect(),
-        rect2 = new fabric.Rect(),
-        collection = new fabric.ICollection();
-
-    collection.add(rect1, rect2);
-
-    assert.ok(typeof collection.insertAt === 'function', 'should respond to `insertAt` method');
-
-    collection.insertAt(rect1, 1);
-    assert.equal(collection.item(1), rect1);
-    collection.insertAt(rect2, 2);
-    assert.equal(collection.item(2), rect2);
-    assert.equal(collection.insertAt(rect1, 2), collection, 'should be chainable');
-  });
-
   QUnit.test('dirty flag propagation from children up', function(assert) {
     var g1 = makeCollectionWith4Objects();
     var obj = g1.item(0);
@@ -645,16 +645,17 @@
     assert.equal(obj.dirty, false, 'Obj has dirty flag still false');
     assert.equal(g1.dirty, true, 'ICollection has dirty flag set');
   });
-/*
+
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by collection', function(assert) {
     var g1 = makeCollectionWith4Objects();
     var obj = g1.item(0);
     var dims = obj._getCacheCanvasDimensions();
     g1.scaleX = 2;
     var dims2 = obj._getCacheCanvasDimensions();
-    assert.equal((dims2.width - 2), (dims.width - 2) * g1.scaleX, 'width of cache has increased with collection scale');
+    g1._applyMatrixDiff();
+    assert.deepEqual(dims, dims2, 'width of cache has increased with collection scale');
   });
-*/
+
   QUnit.test('test collection - pixels.', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
@@ -683,80 +684,7 @@
 
     assert.equal(dataless.objects[0].objects, 'sourcePath', 'the paths have been changed with the sourcePath');
   });
-/*
-  QUnit.test('collection willDrawShadow', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        collection = new fabric.ICollection([rect1, rect2]),
-        group2 = new fabric.ICollection([rect3, rect4]),
-        group3 = new fabric.ICollection([collection, group2]);
 
-    assert.equal(group3.willDrawShadow(), false, 'collection will not cast shadow because objects do not have it');
-    group3.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself has shadow');
-    delete group3.shadow;
-    group2.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because inner group2 has shadow');
-    delete group2.shadow;
-    rect1.shadow = { offsetX: 1, offsetY: 2, };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because inner rect1 has shadow');
-    assert.equal(collection.willDrawShadow(), true, 'collection will cast shadow because inner rect1 has shadow');
-    assert.equal(group2.willDrawShadow(), false, 'collection will not cast shadow because no child has shadow');
-  });
-
-  QUnit.test('collection willDrawShadow with no offsets', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        collection = new fabric.ICollection([rect1, rect2]),
-        group2 = new fabric.ICollection([rect3, rect4]),
-        group3 = new fabric.ICollection([collection, group2]);
-
-    assert.equal(group3.willDrawShadow(), false, 'collection will not cast shadow because objects do not have it');
-    group3.shadow = { offsetX: 0, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), false, 'collection will NOT cast shadow because collection itself has shadow but not offsets');
-    group3.shadow = { offsetX: 2, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself has shadow and one offsetX different than 0');
-    group3.shadow = { offsetX: 0, offsetY: 2 };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself has shadow and one offsetY different than 0');
-    group3.shadow = { offsetX: -2, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself has shadow and one offsetX different than 0');
-    group3.shadow = { offsetX: 0, offsetY: -2 };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself has shadow and one offsetY different than 0');
-    rect1.shadow = { offsetX: 1, offsetY: 2, };
-    group3.shadow = { offsetX: 0, offsetY: 0 };
-    assert.equal(group3.willDrawShadow(), true, 'collection will cast shadow because collection itself will not, but rect 1 will');
-
-  });
-
-  QUnit.test('collection shouldCache', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        collection = new fabric.ICollection([rect1, rect2], { objectCaching: true}),
-        group2 = new fabric.ICollection([rect3, rect4], { objectCaching: true}),
-        group3 = new fabric.ICollection([collection, group2], { objectCaching: true});
-
-    assert.equal(group3.shouldCache(), true, 'group3 will cache because no child has shadow');
-    assert.equal(group2.shouldCache(), false, 'group2 will not cache because is drawing on parent group3 cache');
-    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because is drawing on parent2 collection cache');
-
-    group2.shadow = { offsetX: 2, offsetY: 0 };
-    rect1.shadow = { offsetX: 0, offsetY: 2 };
-
-    assert.equal(group3.shouldCache(), false, 'group3 will cache because children have shadow');
-    assert.equal(group2.shouldCache(), true, 'group2 will cache because is not drawing on parent group3 cache and no children have shadow');
-    assert.equal(collection.shouldCache(), false, 'collection will not cache because even if is not drawing on parent group3 cache children have shadow');
-
-    assert.equal(rect1.shouldCache(), true, 'rect1 will cache because none of its parent is caching');
-    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because group2 is caching');
-
-  });
-*/
   QUnit.test('canvas prop propagation with set', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
