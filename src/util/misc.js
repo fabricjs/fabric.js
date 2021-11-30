@@ -492,37 +492,6 @@
     },
 
     /**
-     * prepares options object from svg
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} elements SVG elements to group
-     * @param {Object} [options] Options object
-     * @param {String} path Value to set sourcePath to
-     * @return {Object|undefined} options
-     */
-    getOptionsFromSVG: function (elements, options, path) {
-      if (elements && elements.length === 1) {
-        return;
-      }
-      if (options) {
-        if (options.width && options.height) {
-          options.centerPoint = {
-            x: options.width / 2,
-            y: options.height / 2
-          };
-        }
-        else {
-          delete options.width;
-          delete options.height;
-        }
-      }
-      if (typeof path !== 'undefined') {
-        options.sourcePath = path;
-      }
-      return options;
-    },
-
-    /**
      * Groups SVG elements (usually those retrieved from SVG document)
      * @static
      * @memberOf fabric.util
@@ -536,7 +505,22 @@
       if (elements && elements.length === 1) {
         return elements[0];
       }
-      object = new fabric.Group(elements, fabric.util.getOptionsFromSVG(elements, options, path));
+      if (options) {
+        if (options.width && options.height) {
+          options.centerPoint = {
+            x: options.width / 2,
+            y: options.height / 2
+          };
+        }
+        else {
+          delete options.width;
+          delete options.height;
+        }
+      }
+      object = new fabric.Group(elements, options);
+      if (typeof path !== 'undefined') {
+        object.sourcePath = path;
+      }
       return object;
     },
 
