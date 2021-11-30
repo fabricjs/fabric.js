@@ -98,17 +98,6 @@
     },
 
     /**
-     * we do not want to transform ctx
-     */
-    transform: function () {
-      //  disabled
-    },
-
-    _render: function (ctx) {
-      this._renderObjects(ctx);
-    },
-
-    /**
      * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
