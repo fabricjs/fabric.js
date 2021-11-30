@@ -749,4 +749,46 @@
     assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should not be transformed by diff when `subTargetCheck = false`');
   });
 
+
+  QUnit.test('render objects without selected objects', function (assert) {
+    var collection = makeCollectionWith4Objects();
+    var rendered = [],
+      ctx = {
+        transform() { },
+        save() { },
+        restore() { },
+      };
+    var fireSelectionEvent = (type, target) => {
+      collection.forEachObject(object => {
+        object.fire(type, { target });
+      });
+    }
+    collection.forEachObject(object => {
+      object.render = () => rendered.push(object);
+    });
+    var render = () => {
+      rendered = [];
+      collection.render(ctx);
+    }
+    assert.deepEqual(rendered, [], 'initial state');
+    render();
+    assert.deepEqual(rendered, collection._objects, 'initial state');
+    fireSelectionEvent('selected', collection.item(0));
+    render();
+    assert.deepEqual(rendered, collection._objects.slice(1), 'initial state');
+    fireSelectionEvent('deselected', collection.item(0));
+    render();
+    assert.deepEqual(rendered, collection._objects, 'initial state');
+    fireSelectionEvent('selected', collection.item(1));
+    render();
+    var objects = collection._objects.slice();
+    objects.splice(1, 1);
+    assert.deepEqual(rendered, objects, 'initial state');
+    fireSelectionEvent('selected', collection.item(2));
+    objects.splice(1, 1);
+    render();
+    assert.equal(rendered.length, objects.length, 'initial state');
+    assert.deepEqual(rendered, objects, 'initial state');
+  });
+
 })();
