@@ -320,6 +320,17 @@
       },
 
       /**
+       * Check if this object or a child object will cast a shadow
+       * @return {Boolean}
+       */
+      willDrawShadow: function () {
+        return this.callSuper('willDrawShadow')
+          || this._objects.some(function (object) {
+            return object.willDrawShadow();
+          });
+      },
+
+      /**
        * Check if instance or its parent are caching, recursively up
        * @return {Boolean}
        */
