@@ -599,21 +599,6 @@
       },
 
       /**
-       * Returns styles-string for svg-export, specific version for ICollection
-       * @return {String}
-       */
-      getSvgStyles: function () {
-        var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
-              'opacity: ' + this.opacity + ';' : '',
-            visibility = this.visible ? '' : ' visibility: hidden;';
-        return [
-          opacity,
-          this.getSvgFilter(),
-          visibility
-        ].join('');
-      },
-
-      /**
        * Returns svg representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
@@ -635,11 +620,9 @@
        */
       toClipPathSVG: function (reviver) {
         var svgString = [];
-        svgString.push('\t<g ', 'transform="' + fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix())), '">\t');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
         }
-        svgString.push('</g>\t');
         return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
       },
       /* _TO_SVG_END_ */
