@@ -320,37 +320,14 @@
       },
 
       /**
-       * Decide if the object should cache or not. Create its own cache level
-       * needsItsOwnCache should be used when the object drawing method requires
-       * a cache step. None of the fabric classes requires it.
-       * Generally you do not cache objects in a collection because it is already cached.
-       * @return {Boolean}
-       */
-      shouldCache: function () {
-        var ownCache = this.callSuper('shouldCache');
-        if (ownCache && this._childrenWillDrawShadow()) {
-          this.ownCaching = false;
-          return false;
-        }
-        return ownCache;
-      },
-
-      /**
-       * @private
-       * @returns {boolean}
-       */
-      _childrenWillDrawShadow: function () {
-        return this._objects.some(function (object) {
-          return object.willDrawShadow();
-        });
-      },
-
-      /**
        * Check if this object or a child object will cast a shadow
        * @return {Boolean}
        */
       willDrawShadow: function () {
-        return this.callSuper('willDrawShadow') || this._childrenWillDrawShadow();
+        return this.callSuper('willDrawShadow')
+          || this._objects.some(function (object) {
+            return object.willDrawShadow();
+          });
       },
 
       /**
