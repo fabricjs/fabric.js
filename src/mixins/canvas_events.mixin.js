@@ -371,7 +371,7 @@
      */
     _onResize: function (e) {
       this.calcOffset();
-      this.fire('resize', { e });
+      this.fire('resize', { e: e });
     },
 
     /**
