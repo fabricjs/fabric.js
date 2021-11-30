@@ -577,7 +577,7 @@
       },
 
       dispose: function () {
-        delete this._activeObjects;
+        this._activeObjects = [];
         this.forEachObject(function (object) {
           this._watchObject(false, object);
           object.dispose && object.dispose();
