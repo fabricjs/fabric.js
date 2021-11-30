@@ -35,6 +35,17 @@
     },
 
     /**
+     * @private
+     * @override
+     * @param {fabric.Object} object
+     */
+    _onObjectRemoved: function (object) {
+      delete object.parent;
+      this._watchObject(false, object);
+      object.fire('removed', { target: this });
+    },
+
+    /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
