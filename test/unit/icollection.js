@@ -521,6 +521,16 @@
     assert.equal(collection.toSVG(), expectedSVG);
   });
 
+  QUnit.test('toSVG with unapplied matrix diff', function (assert) {
+    var collection = makeCollectionWith2Objects();
+    collection.subTargetCheck = false;
+    collection.set({ scaleX: 2 });
+    collection.calcOwnMatrix();
+    collection._applyMatrixDiff();
+    var expectedSVG = '<g transform=\"matrix(2 0 0 1 130 130)\"  >\n<g style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;\"   >\n<g transform=\"matrix(0.5 0 0 1 -65 -130)\">\n\t\t<g transform=\"matrix(1 0 0 1 115 105)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 55 140)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
+    assert.equal(collection.toSVG(), expectedSVG);
+  });
+
   QUnit.test('toSVG with a clipPath', function(assert) {
     var collection = makeCollectionWith2Objects();
     collection.clipPath = new fabric.Rect({ width: 100, height: 100 });
@@ -708,6 +718,35 @@
     collection.insertAt(rect4, 0);
     assert.equal(collection.canvas, canvas, 'canvas has been set');
     collection.forEachObject(obj => assert.equal(obj.canvas, canvas, 'canvas has been set on object'));
+  });
+
+  QUnit.test('apply matrix diff', function (assert) {
+    var rect = new fabric.Rect({ width: 10, height: 10 });
+    var rStart = rect.calcTransformMatrix();
+    var collection = new fabric.ICollection([rect]);
+    var cStart = collection.calcOwnMatrix();
+    var transform = { scaleX: 2 };
+    collection.set(transform);
+    assert.deepEqual(rect.calcTransformMatrix(), rStart, 'object should not be transformed by diff');
+    collection.calcOwnMatrix()
+    collection._applyMatrixDiff();
+    var expected = fabric.util.multiplyTransformMatrices(fabric.util.composeMatrix(transform), rStart);
+    assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should be transformed by diff');
+    transform = { scaleX: 1, left: 50 };
+    expected = fabric.util.multiplyTransformMatrices(fabric.util.composeMatrix(transform), expected);
+    assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should be transformed by diff');
+    collection.set(transform);
+    collection.calcOwnMatrix()
+    collection._applyMatrixDiff();
+    expected = rStart.concat();
+    expected[4] += 50;
+    assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should be transformed by diff');
+    transform = { scaleY: 0.5 };
+    collection.subTargetCheck = false;
+    collection.set(transform);
+    assert.notDeepEqual(collection.calcOwnMatrix(), cStart, 'matrix should be different');
+    collection._applyMatrixDiff();
+    assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should not be transformed by diff when `subTargetCheck = false`');
   });
 
 })();
