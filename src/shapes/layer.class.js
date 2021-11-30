@@ -67,13 +67,39 @@
     lockMovementY: true,
 
     /**
+     * Constructor
+     *
+     * @param {fabric.Object[]} [objects] instance objects
+     * @param {Object} [options] Options object
+     * @return {fabric.ICollection} thisArg
+     */
+    initialize: function (objects, options) {
+      this.callSuper('initialize', objects, options);
+      this.__canvasMonitor = this.__canvasMonitor.bind(this);
+    },
+
+    /**
      * 
      * @param {string} key 
      * @param {*} value 
      */
     _set: function (key, value) {
+      var settingCanvas = key === 'canvas';
+      if (settingCanvas) {
+        if (!value && this.canvas) {
+          //  detach canvas resize handler
+          this.canvas.off('resize', this.__canvasMonitor);
+        }
+        else if (value && (!this.canvas || this.canvas !== value)) {
+          //  attach canvas resize handler, make sure we listen to the resize event only once
+          this.canvas && this.canvas.off('resize', this.__canvasMonitor);
+          value.off('resize', this.__canvasMonitor);
+          value.on('resize', this.__canvasMonitor);
+        }
+      }
       this.callSuper('_set', key, value);
-      if (key === 'canvas') {
+      //  apply layout after canvas is set
+      if (settingCanvas) {
         this._applyLayoutStrategy({ type: 'canvas' });
       }
     },
@@ -98,17 +124,24 @@
     },
 
     /**
+     * @private
+     */
+    __canvasMonitor: function () {
+      this._applyLayoutStrategy({ type: 'canvas_resize' });
+    },
+
+    /**
      * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
      * @param {fabric.Object[]} objects
      * @param {object} context object with data regarding what triggered the call
-     * @param {'initializion'|'canvas'|'object_modified'|'object_added'|'object_removed'|'layout_change'} context.type
+     * @param {'initializion'|'canvas'|'canvas_resize'|'layout_change'} context.type
      * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
      * @returns {Object} options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-      if (context.type === 'canvas' && this.canvas) {
+      if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas) {
         return {
           x: 0,
           y: 0,
