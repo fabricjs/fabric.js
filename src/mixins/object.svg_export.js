@@ -36,7 +36,7 @@
           strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
           strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
           strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
-          opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+          opacity = this.parent ? this.getObjectOpacity() : typeof this.opacity !== 'undefined' ? this.opacity : '1',
           visibility = this.visible ? '' : ' visibility: hidden;',
           filter = skipShadow ? '' : this.getSvgFilter(),
           fill = getSvgColorString('fill', this.fill),
