@@ -495,7 +495,8 @@ fabric.Collection = {
   },
 
   /**
-   * Returns true if collection contains an object
+   * Returns true if collection contains an object.\
+   * **Prefer using `Object.isDescendantOf` for performance reasons**
    * @param {Object} object Object to check against
    * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
@@ -16147,6 +16148,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * Checks if object is decendant of target
+     * Should be used instead of @link {fabric.Collection.contains} for performance reasons
+     * @param {fabric.Object|fabric.StaticCanvas} target 
+     * @returns {boolean}
+     */
+    isDescendantOf: function (target) {
+      var parent = this.group || this.parent || this.canvas;
+      while (parent) {
+        if (target === parent) {
+          return true;
+        }
+        else if (parent instanceof fabric.StaticCanvas) {
+          //  happens after all parents were traversed through without a match
+          return false;
+        }
+        parent = parent.group || parent.parent || parent.canvas;
+      }
+      return false;
+    },
+
+    /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
@@ -20703,7 +20725,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       /**
        * @private
-       * @param {'added'|'removed'} type 
+       * @param {'added'|'removed'} type
        */
       _onAfterObjectsChange: function (type) {
         this._applyLayoutStrategy({
@@ -20725,7 +20747,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
 
       /**
-       * keeps track of the selected object
+       * keeps track of the selected objects
        * @private
        */
       __objectSelectionMonitor: function (selected, opt) {
@@ -20749,9 +20771,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * @param {fabric.Object} object
        */
       _watchObject: function (watch, object) {
-        object[watch ? 'on' : 'off']('modified', this.__objectMonitor);
-        object[watch ? 'on' : 'off']('selected', this.__objectSelectionTracker);
-        object[watch ? 'on' : 'off']('deselected', this.__objectSelectionDisposer);
+        var directive = watch ? 'on' : 'off';
+        object[directive]('modified', this.__objectMonitor);
+        object[directive]('selected', this.__objectSelectionTracker);
+        object[directive]('deselected', this.__objectSelectionDisposer);
       },
 
       /**
@@ -20764,7 +20787,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this._watchObject(true, object);
         object.fire('added', { target: this });
         var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
-        if (activeObject && (activeObject === object || activeObject.contains(object, true))) {
+        if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
           this._activeObjects.push(true);
         }
       },
@@ -20843,7 +20866,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       /**
        * If `subTargetCheck === true` we transform `ctx` back to canvas plane, objects are up to date with the latest diff
        * otherwise we transform ctx back to canvas plane by applying the initial matrix, objects relating accordingly
-       * 
+       *
        * Performance optimizations:
        *
        * **`subTargetCheck === false`**:
@@ -20853,7 +20876,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        * This means that objects will render correctly on screen, **BUT** that's it. All geometry methods will **NOT WORK**.
        * This optimization is crucial for an instance that contains a very large amount of objects.
        * In case you need to select objects toggle `subTargetCheck` accordingly.
-       * 
+       *
        * **caching and selection**:
        * Once an object is selected, instance is rendered without the selected object.
        * This way instance is cached only once for the entire interaction with the selected object.
@@ -20871,7 +20894,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       /**
        * **Performance optimization**:
-       * render only non-selected objects, 
+       * render only non-selected objects,
        * canvas is in charge of rendering the selected objects
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -21080,7 +21103,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        svgString.push('<g ', 'transform="' + fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix())), '">\n');
+        //  in case there's an unapplied matrix diff (`subTargetCheck = false`) we need to use `ownMatrixCache.initialValue`
+        var t = invertTransform(this.ownMatrixCache.initialValue || this.calcTransformMatrix());
+        svgString.push('<g ', 'transform="', fabric.util.matrixToSVG(t), '">\n');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
@@ -21102,7 +21127,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       },
       /* _TO_SVG_END_ */
     });
-  
+
   /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.ICollection.fromElement})
