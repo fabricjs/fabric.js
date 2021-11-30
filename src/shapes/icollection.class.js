@@ -605,8 +605,8 @@
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        var t = fabric.util.matrixToSVG(invertTransform(this.calcTransformMatrix()));
-        svgString.push('<g ', 'transform="', t, '">\n');
+        var t = invertTransform(this.ownMatrixCache.initialValue || this.calcTransformMatrix());
+        svgString.push('<g ', 'transform="', fabric.util.matrixToSVG(t), '">\n');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
