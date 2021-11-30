@@ -1156,29 +1156,32 @@
       if (!this._discardActiveObject(e, object)) {
         return false;
       }
-      var pointer = this.getPointer(e, true), targets = this.targets, target;
-      this.targets = [];
-      //  push children and `activeObject` to `targets`
-      if (activeObject && activeObject.subTargetCheck && Array.isArray(activeObject._objects)) {
-        target = this._searchPossibleTargets([activeObject], pointer);
-        target && this.targets.push(target);
+      var subTargets;
+      if (e) {
+        //  prepare subTargets
+        var pointer = this.getPointer(e, true), targets = this.targets, target;
+        this.targets = [];
+        //  push children and `activeObject` to `targets`
+        if (activeObject && activeObject.subTargetCheck && Array.isArray(activeObject._objects)) {
+          target = this._searchPossibleTargets([activeObject], pointer);
+          target && this.targets.push(target);
+        }
+        //  push siblings and parents to `targets` recursively up
+        var parent = activeObject && activeObject.parent;
+        while (parent) {
+          target = this._searchPossibleTargets([parent], pointer);
+          target && this.targets.push(target);
+          parent = parent.parent;
+        }
+        subTargets = this.targets;
+        var lastIndex = subTargets.lastIndexOf(activeObject);
+        //  it is possible that `activeObject` exists twice in `subTargets`
+        //  if so we remove the last ref that was pushed as part of siblings check because we want it to be on top of all it's siblings
+        if (subTargets.indexOf(activeObject) !== lastIndex) {
+          subTargets.splice(lastIndex, 1);
+        }
+        this.targets = targets;
       }
-      //  push siblings and parents to `targets` recursively up
-      var parent = activeObject && activeObject.parent;
-      while (parent) {
-        target = this._searchPossibleTargets([parent], pointer);
-        target && this.targets.push(target);
-        parent = parent.parent;
-      }
-      //  prepare subTargets
-      var subTargets = this.targets;
-      var lastIndex = subTargets.lastIndexOf(activeObject);
-      //  it is possible that `activeObject` exists twice in `subTargets`
-      //  if so we remove the last ref that was pushed as part of siblings check because we want it to be on top of all it's siblings
-      if (subTargets.indexOf(activeObject) !== lastIndex) {
-        subTargets.splice(lastIndex, 1);
-      }
-      this.targets = targets;
       return this.__setActiveObject(object, e, subTargets);
     },
 
