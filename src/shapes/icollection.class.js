@@ -630,10 +630,9 @@
   
   /* _FROM_SVG_START_ */
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.ICollection.fromElement})
    * @static
-   * @memberOf fabric.Circle
-   * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
+   * @memberOf fabric.ICollection
    */
   fabric.ICollection.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('fabric-layout');
   /* _FROM_SVG_END_ */
