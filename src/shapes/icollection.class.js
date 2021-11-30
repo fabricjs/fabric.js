@@ -250,7 +250,7 @@
       },
 
       /**
-       * keeps track of the selected object
+       * keeps track of the selected objects
        * @private
        */
       __objectSelectionMonitor: function (selected, opt) {
