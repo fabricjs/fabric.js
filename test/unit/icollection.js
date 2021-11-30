@@ -749,6 +749,47 @@
     assert.deepEqual(rect.calcTransformMatrix(), expected, 'object should not be transformed by diff when `subTargetCheck = false`');
   });
 
+  QUnit.test('object monitors', function (assert) {
+    var collection = makeCollectionWith4Objects();
+    var fired = false;
+    collection.__objectMonitor = () => {
+      fired = true;
+    }
+    collection.forEachObject(object => {
+      assert.deepEqual(Object.keys(object.__eventListeners), ['modified', 'selected', 'deselected']);
+    });
+    var item = collection.item(0);
+    collection.remove(item);
+    item.fire('modified');
+    assert.equal(fired, false, 'removed object should not trigger monitor');
+    collection.add(item);
+    item.fire('modified');
+    assert.equal(fired, true, 'added object should trigger monitor');
+  });
+
+  QUnit.test('selection monitor', function (assert) {
+    var collection = makeCollectionWith4Objects();
+    var fireSelectionEvent = (type, target) => {
+      target.fire(type, { target });
+    }
+    assert.deepEqual(collection._activeObjects, [], 'initial state');
+    fireSelectionEvent('selected', collection.item(0));
+    assert.equal(collection._activeObjects.length, 1, 'item(0) should be selected');
+    assert.deepEqual(collection._activeObjects, [collection.item(0)], 'item(0) should be selected');
+    fireSelectionEvent('deselected', collection.item(0));
+    assert.deepEqual(collection._activeObjects, [], 'initial state');
+    fireSelectionEvent('selected', collection.item(3));
+    assert.deepEqual(collection._activeObjects, [collection.item(3)], 'item(3) should be selected');
+    var removed = collection.item(3);
+    collection.remove(removed);
+    assert.deepEqual(collection._activeObjects, [], 'item(3) should not be selected');
+    fireSelectionEvent('selected', removed);
+    assert.deepEqual(collection._activeObjects, [], 'item(3) should not be selected');
+    fireSelectionEvent('selected', collection.item(1));
+    fireSelectionEvent('selected', collection.item(2));
+    assert.equal(collection._activeObjects.length, collection._objects.slice(1).length, 'item(1) item(2) should be selected');
+    assert.deepEqual(collection._activeObjects, collection._objects.slice(1), 'item(1) item(2) should be selected');
+  });
 
   QUnit.test('render objects without selected objects', function (assert) {
     var collection = makeCollectionWith4Objects();
@@ -759,9 +800,7 @@
         restore() { },
       };
     var fireSelectionEvent = (type, target) => {
-      collection.forEachObject(object => {
-        object.fire(type, { target });
-      });
+      target.fire(type, { target });
     }
     collection.forEachObject(object => {
       object.render = () => rendered.push(object);
@@ -772,23 +811,22 @@
     }
     assert.deepEqual(rendered, [], 'initial state');
     render();
-    assert.deepEqual(rendered, collection._objects, 'initial state');
+    assert.deepEqual(rendered, collection._objects, 'should render all objects');
     fireSelectionEvent('selected', collection.item(0));
     render();
-    assert.deepEqual(rendered, collection._objects.slice(1), 'initial state');
+    assert.deepEqual(rendered, collection._objects.slice(1), 'should render all objects except item(0)');
     fireSelectionEvent('deselected', collection.item(0));
     render();
-    assert.deepEqual(rendered, collection._objects, 'initial state');
+    assert.deepEqual(rendered, collection._objects, 'should render all objects');
     fireSelectionEvent('selected', collection.item(1));
     render();
     var objects = collection._objects.slice();
     objects.splice(1, 1);
-    assert.deepEqual(rendered, objects, 'initial state');
+    assert.deepEqual(rendered, objects, 'should render all objects except item(1)');
     fireSelectionEvent('selected', collection.item(2));
     objects.splice(1, 1);
     render();
-    assert.equal(rendered.length, objects.length, 'initial state');
-    assert.deepEqual(rendered, objects, 'initial state');
+    assert.deepEqual(rendered, objects, 'should render all objects except item(1) & item(2)');
   });
 
 })();
