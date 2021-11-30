@@ -1197,10 +1197,12 @@
         return false;
       }
       else if (result && result instanceof fabric.Object && result !== object) {
-        //  prepare `targets`
         var targets = this.targets;
-        this.targets = [];
-        this._searchPossibleTargets([result], this.getPointer(e, true));
+        if (e) {
+          //  prepare `targets`          
+          this.targets = [];
+          this._searchPossibleTargets([result], this.getPointer(e, true));
+        }
         if (this.__setActiveObject(result, e) === true) {
           //  restore `targets` if object declined selection
           this.targets = targets;
