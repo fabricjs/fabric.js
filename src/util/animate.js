@@ -31,7 +31,7 @@
      * cancel all running animations
      */
     cancelAll: function () {
-      var animations = this.slice();
+      var animations = this.splice(0, this.length);
       animations.forEach(function (animation) {
         animation.cancel();
       });

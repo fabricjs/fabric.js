@@ -121,6 +121,11 @@
     assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
     fabric.runningAnimations.cancelAll();
     assert.equal(fabric.runningAnimations.length, 0, 'should have registered animations');
+    //  make sure splice didn't destroy instance
+    assert.ok(fabric.runningAnimations instanceof Array);
+    assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
   });
 
   QUnit.test('animate', function(assert) {
