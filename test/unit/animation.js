@@ -112,6 +112,17 @@
     assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
   });
 
+  QUnit.test('fabric.runningAnimations cancelAll', function (assert) {
+    var options = { foo: 'bar' };
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    fabric.runningAnimations.cancelAll();
+    assert.equal(fabric.runningAnimations.length, 0, 'should have registered animations');
+  });
+
   QUnit.test('animate', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
