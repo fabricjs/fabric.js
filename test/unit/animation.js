@@ -1,5 +1,9 @@
 (function() {
-  QUnit.module('fabric.util.animate');
+  QUnit.module('fabric.util.animate', {
+    afterEach: function () {
+      fabric.runningAnimations.cancelAll();
+    }
+  });
 
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
@@ -41,6 +45,72 @@
   //     onChange: testing,
   //   });
   // });
+
+  QUnit.test('animation context', function (assert) {
+    var options = { foo: 'bar' };
+    fabric.util.animate(options);
+    assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
+  });
+
+  QUnit.test('fabric.runningAnimations', function (assert) {
+    var done = assert.async();
+    assert.ok(fabric.runningAnimations instanceof Array);
+    assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
+    assert.equal(fabric.runningAnimations.length, 0, 'should have registered animation');
+    var options = {
+      onChange() {
+        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+      },
+      onComplete() {
+        setTimeout(() => {
+          assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+          done();
+        }, 0);
+      }
+    };
+    var abort = fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+  });
+
+  QUnit.test('fabric.runningAnimations with abort', function (assert) {
+    var done = assert.async();
+    var _abort = false;
+    var options = {
+      onStart() {
+        setTimeout(() => {
+          _abort = true;
+        }, 100);
+      },
+      abort() {
+        if (_abort) {
+          setTimeout(() => {
+            assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+            done();
+          }, 0);
+        }
+        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+        return _abort;
+      }
+    };
+    var abort = fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+  });
+
+  QUnit.test('fabric.runningAnimations with imperative abort', function (assert) {
+    var options = { foo: 'bar' };
+    var abort = fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+    abort();
+    assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+  });
 
   QUnit.test('animate', function(assert) {
     var done = assert.async();
