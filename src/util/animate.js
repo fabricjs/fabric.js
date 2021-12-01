@@ -1,8 +1,8 @@
 (function () {
-  
+
   var extend = fabric.util.object.extend,
-    clone = fabric.util.object.clone;
-  
+      clone = fabric.util.object.clone;
+
   /**
    * @typedef {Object} AnimationOptions
    * @property {Function} [options.onChange] Callback; invoked on every value change
@@ -13,9 +13,9 @@
    * @property {Function} [options.easing] Easing function
    * @property {Number} [options.duration=500] Duration of change (in ms)
    * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
-   * 
+   *
    * @typedef {() => void} CancelFunction
-   * 
+   *
    * @typedef {(AnimationOptions & { cancel: CancelFunction }} AnimationContext
    */
 
@@ -35,9 +35,9 @@
         animation.cancel();
       });
     },
-    
+
     /**
-     * 
+     *
      * @param {CancelFunction} cancelFunc the function returned by animate
      * @returns {number}
      */
@@ -76,12 +76,12 @@
   function animate(options) {
     options || (options = {});
     var cancel = false,
-      context,
-      removeFromRegistry = function () {
-        var index = fabric.runningAnimations.indexOf(context);
-        index > -1 && fabric.runningAnimations.splice(index, 1);
-      };
-    
+        context,
+        removeFromRegistry = function () {
+          var index = fabric.runningAnimations.indexOf(context);
+          index > -1 && fabric.runningAnimations.splice(index, 1);
+        };
+
     context = extend(clone(options), {
       cancel: function () {
         cancel = true;
