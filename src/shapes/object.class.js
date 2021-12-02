@@ -972,7 +972,7 @@
      * @return {Number}
      */
     getObjectOpacity: function() {
-      var opacity = this.opacity, parent = this.parent || this.group;
+      var opacity = this.opacity, parent = this.group || this.parent;
       if (parent) {
         opacity *= parent.getObjectOpacity();
       }
@@ -1316,8 +1316,9 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _setOpacity: function(ctx) {
-      if ((this.group && !this.group._transformDone) || this.parent) {
+    _setOpacity: function (ctx) {
+      var parent = this.group || this.parent;
+      if (parent && !parent._transformDone) {
         ctx.globalAlpha = this.getObjectOpacity();
       }
       else {

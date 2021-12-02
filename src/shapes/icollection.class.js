@@ -357,13 +357,13 @@
       },
 
       /**
-       * objects are in charge of handling opacity of context
-       * this is important for selection
-       * @override
-       * @private
+       * Renders instance on a given context
+       * @param {CanvasRenderingContext2D} ctx context to render instance on
        */
-      _setOpacity: function () {
-        //  disabled
+      render: function (ctx) {
+        this._transformDone = true;
+        this.callSuper('render', ctx);
+        this._transformDone = false;
       },
 
       /**
