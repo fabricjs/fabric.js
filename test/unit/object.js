@@ -805,6 +805,168 @@
     assert.equal(object.moveTo(), object, 'should be chainable');
   });
 
+  QUnit.test('isDescendantOf', function (assert) {
+    var object = new fabric.Object();
+    var parent = new fabric.Object();
+    var canvas = new fabric.Object();
+    assert.ok(typeof object.isDescendantOf === 'function');
+    parent.canvas = canvas;
+    object.parent = parent;
+    assert.ok(object.isDescendantOf(parent));
+    object.parent = {
+      parent
+    }
+    assert.ok(object.isDescendantOf(parent));
+    object.parent = {
+      group: parent
+    }
+    assert.ok(object.isDescendantOf(parent));
+    assert.ok(object.isDescendantOf(canvas));
+    object.parent = undefined;
+    assert.ok(object.isDescendantOf(parent) === false);
+    assert.ok(object.isDescendantOf(canvas) === false);
+    object.canvas = canvas;
+    assert.ok(object.isDescendantOf(canvas));
+    assert.ok(object.isDescendantOf(object) === false);
+  });
+
+  QUnit.test('getAncestors', function (assert) {
+    var object = new fabric.Object();
+    var parent = new fabric.Object();
+    var other = new fabric.Object();
+    var canvas = new fabric.Object();
+    assert.ok(typeof object.getAncestors === 'function');
+    assert.deepEqual(object.getAncestors(), []);
+    object.parent = parent;
+    assert.deepEqual(object.getAncestors(), [parent]);
+    parent.canvas = canvas;
+    assert.deepEqual(object.getAncestors(), [parent, canvas]);
+    parent.group = other;
+    assert.deepEqual(object.getAncestors(), [parent, other]);
+    other.canvas = canvas;
+    assert.deepEqual(object.getAncestors(), [parent, other, canvas]);
+    delete object.parent;
+    assert.deepEqual(object.getAncestors(), []);
+  });
+
+  QUnit.assert.isInFrontOf = function (object, other, expected) {
+    var actual = object.isInFrontOf(other);
+    this.pushResult({
+      expected: expected,
+      actual: actual,
+      result: actual === expected,
+      message: `'${expected ? object.id : other.id}' should be in front of '${expected ? other.id : object.id}'`
+    });
+    if (actual === expected && typeof expected === 'boolean') {
+      var actual2 = other.isInFrontOf(object);
+      this.pushResult({
+        expected: !expected,
+        actual: actual2,
+        result: actual2 === !expected,
+        message: `should match opposite check between '${object.id}' and '${other.id}'`
+      });
+    }
+  };
+
+  QUnit.test('isInFrontOf', function (assert) {
+    var Object = fabric.util.createClass(fabric.Object, {
+      toJSON: function () {
+        return {
+          id: this.id,
+          objects: this._objects?.map(o => o.id),
+          parent: this.parent?.id,
+          canvas: this.canvas?.id
+        }
+      },
+      toString: function () {
+        return JSON.stringify(this.toJSON(), null, '\t');
+      }
+    })
+    var object = new Object({ id: 'object' });
+    var other = new Object({ id: 'other' });
+    var Collection = fabric.util.createClass(Object, fabric.Collection, {
+      initialize: function () {
+        this._objects = [];
+      },
+      _onObjectAdded: function (object) {
+        object.parent = this;
+      },
+      _onObjectRemoved: function (object) {
+        delete object.parent;
+      },
+      removeAll: function () {
+        this.remove.apply(this, this._objects);
+      }
+    });
+    var a = new Collection({ id: 'a' });
+    var b = new Collection({ id: 'b' });
+    var c = new Collection({ id: 'c' });
+    var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
+      _onObjectAdded: function (object) {
+        object.canvas = this;
+      },
+      _onObjectRemoved: function (object) {
+        delete object.canvas;
+      },
+    });
+    assert.ok(typeof object.isInFrontOf === 'function');
+    assert.ok(Array.isArray(a._objects));
+    assert.ok(a._objects !== b._objects);
+    //  same object
+    assert.isInFrontOf(object, object, undefined);
+    //  foreign objects
+    assert.isInFrontOf(object, other, undefined);
+    //  same level
+    a.add(object, other);
+    assert.isInFrontOf(object, other, false);
+    assert.isInFrontOf(object, a, true);
+    assert.isInFrontOf(other, a, true);
+    // different level
+    a.remove(object);
+    b.add(object);
+    a.add(b);
+    assert.isInFrontOf(object, b, true);
+    assert.isInFrontOf(b, a, true);
+    assert.isInFrontOf(object, other, true);
+    //  with common ancestor
+    assert.equal(c.size(), 0, 'c should be empty');
+    c.add(a);
+    assert.equal(c.size(), 1, 'c should contain a');
+    assert.isInFrontOf(object, b, true);
+    assert.isInFrontOf(b, a, true);
+    assert.isInFrontOf(object, other, true);
+    assert.isInFrontOf(object, c, true);
+    assert.isInFrontOf(other, c, true);
+    assert.isInFrontOf(b, c, true);
+    assert.isInFrontOf(a, c, true);
+    //  deeper asymmetrical
+    c.removeAll();
+    assert.equal(c.size(), 0, 'c should be cleared');
+    a.remove(other);
+    c.add(other, a);
+    assert.isInFrontOf(object, b, true);
+    assert.isInFrontOf(b, a, true);
+    assert.isInFrontOf(a, other, true);
+    assert.isInFrontOf(object, other, true);
+    assert.isInFrontOf(object, c, true);
+    assert.isInFrontOf(object, c, true);
+    assert.isInFrontOf(other, c, true);
+    assert.isInFrontOf(b, c, true);
+    assert.isInFrontOf(a, c, true);
+    //  with canvas
+    a.removeAll();
+    b.removeAll();
+    c.removeAll();
+    canvas.add(object, other);
+    assert.isInFrontOf(object, other, false);
+    //  parent precedes canvas when checking ancestor
+    a.add(object);
+    assert.isInFrontOf(object, other, undefined);
+    canvas.insertAt(a, 0);
+    assert.isInFrontOf(object, other, false);
+    assert.isInFrontOf(a, other, false);
+  });
+
   QUnit.test('getTotalObjectScaling with zoom', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     canvas.setZoom(3);
@@ -1206,26 +1368,4 @@
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
   });
 
-  QUnit.test('isDescendantOf', function (assert) {
-    var object = new fabric.Object();
-    var parent = new fabric.Object();
-    var canvas = new fabric.Object();
-    parent.canvas = canvas;
-    object.parent = parent;
-    assert.ok(object.isDescendantOf(parent));
-    object.parent = {
-      parent
-    }
-    assert.ok(object.isDescendantOf(parent));
-    object.parent = {
-      group: parent
-    }
-    assert.ok(object.isDescendantOf(parent));
-    assert.ok(object.isDescendantOf(canvas));
-    object.parent = undefined;
-    assert.ok(object.isDescendantOf(parent) === false);
-    assert.ok(object.isDescendantOf(canvas) === false);
-    object.canvas = canvas;
-    assert.ok(object.isDescendantOf(canvas));
-  });
 })();
