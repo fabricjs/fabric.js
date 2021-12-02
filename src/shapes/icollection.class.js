@@ -361,6 +361,7 @@
        * @param {CanvasRenderingContext2D} ctx context to render instance on
        */
       render: function (ctx) {
+        //  used to inform objects not to double opacity
         this._transformDone = true;
         this.callSuper('render', ctx);
         this._transformDone = false;
