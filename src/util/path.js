@@ -507,15 +507,15 @@
         p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
     // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
     // the path
-    while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
+    while (tmpLen < distance && nextStep > 0.0001) {
       p = iterator(perc);
       lastPerc = perc;
       nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
       // compare tmpLen each cycle with distance, decide next perc to test.
       if ((nextLen + tmpLen) > distance) {
         // we discard this step and we make smaller steps.
-        nextStep /= 2;
         perc -= nextStep;
+        nextStep /= 2;
       }
       else {
         tempP = p;
