@@ -959,12 +959,17 @@
     c.removeAll();
     canvas.add(object, other);
     assert.isInFrontOf(object, other, false);
+    assert.isInFrontOf(object, canvas, true);
+    assert.isInFrontOf(other, canvas, true);
     //  parent precedes canvas when checking ancestor
     a.add(object);
     assert.isInFrontOf(object, other, undefined);
     canvas.insertAt(a, 0);
     assert.isInFrontOf(object, other, false);
     assert.isInFrontOf(a, other, false);
+    assert.isInFrontOf(a, canvas, true);
+    assert.isInFrontOf(object, canvas, true);
+    assert.isInFrontOf(other, canvas, true);
   });
 
   QUnit.test('getTotalObjectScaling with zoom', function(assert) {
