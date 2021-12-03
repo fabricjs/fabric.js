@@ -963,6 +963,7 @@
     assert.isInFrontOf(other, canvas, true);
     //  parent precedes canvas when checking ancestor
     a.add(object);
+    assert.ok(object.canvas === canvas, 'object should have canvas set');
     assert.isInFrontOf(object, other, undefined);
     canvas.insertAt(a, 0);
     assert.isInFrontOf(object, other, false);
