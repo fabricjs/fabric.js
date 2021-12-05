@@ -31,7 +31,7 @@
      * cancel all running animations
      */
     cancelAll: function () {
-      var animations = this.splice(0, this.length);
+      var animations = this.splice(0);
       animations.forEach(function (animation) {
         animation.cancel();
       });
@@ -43,9 +43,7 @@
      * @returns {number}
      */
     findAnimationIndex: function (cancelFunc) {
-      return this.findIndex(function (animation) {
-        return animation.cancel === cancelFunc;
-      });
+      return this.indexOf(this.findAnimation(cancelFunc));
     },
 
     /**
