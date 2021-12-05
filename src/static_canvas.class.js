@@ -240,7 +240,7 @@
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
     getRetinaScaling: function() {
-      return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
+      return Math.max(1, fabric.devicePixelRatio);
     },
 
     /**
