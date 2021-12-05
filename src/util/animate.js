@@ -35,6 +35,7 @@
       animations.forEach(function (animation) {
         animation.cancel();
       });
+      return animations;
     },
 
     /**
