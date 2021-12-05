@@ -116,10 +116,10 @@
           return;
         }
         if (abort(current, valuePerc, timePerc)) {
-          removeFromRegistry();
           // remove this in 5.0
           // does to even make sense to abort and run onComplete?
           onComplete(endValue, 1, 1);
+          removeFromRegistry();
           return;
         }
         if (time > finish) {
