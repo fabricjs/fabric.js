@@ -72,7 +72,7 @@
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
    * @param {AnimationOptions} [options] Animation options
-   * @returns {CancelFunction} cencel function
+   * @returns {CancelFunction} cancel function
    */
   function animate(options) {
     options || (options = {});
