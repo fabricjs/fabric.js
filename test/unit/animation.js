@@ -119,7 +119,8 @@
     fabric.util.animate(options);
     fabric.util.animate(options);
     assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
-    fabric.runningAnimations.cancelAll();
+    var cancelledAnimations = fabric.runningAnimations.cancelAll();
+    assert.equal(cancelledAnimations.length, 4, 'should return cancelled animations');
     assert.equal(fabric.runningAnimations.length, 0, 'should have registered animations');
     //  make sure splice didn't destroy instance
     assert.ok(fabric.runningAnimations instanceof Array);
