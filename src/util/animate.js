@@ -106,6 +106,8 @@
       options.onStart && options.onStart();
 
       (function tick(ticktime) {
+        // TODO: move abort call after calculation
+        // and pass (current,valuePerc, timePerc) as arguments
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
@@ -116,6 +118,9 @@
         }
         if (abort(current, valuePerc, timePerc)) {
           removeFromRegistry();
+          // remove this in 5.0
+          // does to even make sense to abort and run onComplete?
+          onComplete(endValue, 1, 1);
           return;
         }
         if (time > finish) {
