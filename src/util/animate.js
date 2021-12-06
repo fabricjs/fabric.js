@@ -15,8 +15,13 @@
    * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
+   * 
+   * @typedef {Object} AnimationCurrentState
+   * @property {number} currentValue value in range [`startValue`, `endValue`]
+   * @property {number} completionRate value in range [0, 1]
+   * @property {number} durationRate value in range [0, 1]
    *
-   * @typedef {(AnimationOptions & { cancel: CancelFunction }} AnimationContext
+   * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
    */
 
   /**
