@@ -86,7 +86,10 @@
       cancel: function () {
         cancel = true;
         removeFromRegistry();
-      }
+      },
+      currentValue: 'startValue' in options ? options.startValue : 0,
+      completionRate: 0,
+      durationRate: 0
     });
     fabric.runningAnimations.push(context);
 
@@ -111,7 +114,11 @@
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
-            valuePerc = Math.abs((current - startValue) / byValue);
+          valuePerc = Math.abs((current - startValue) / byValue);
+        //  update context
+        context.currentValue = current;
+        context.completionRate = valuePerc;
+        context.durationRate = timePerc;
         if (cancel) {
           return;
         }
@@ -123,6 +130,10 @@
           return;
         }
         if (time > finish) {
+          //  update context
+          context.currentValue = endValue;
+          context.completionRate = 1;
+          context.durationRate = 1;
           onChange(endValue, 1, 1);
           onComplete(endValue, 1, 1);
           removeFromRegistry();
