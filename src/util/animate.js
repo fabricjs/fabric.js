@@ -15,7 +15,7 @@
    * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
-   * 
+   *
    * @typedef {Object} AnimationCurrentState
    * @property {number} currentValue value in range [`startValue`, `endValue`]
    * @property {number} completionRate value in range [0, 1]
@@ -119,7 +119,7 @@
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
             current = easing(currentTime, startValue, byValue, duration),
-          valuePerc = Math.abs((current - startValue) / byValue);
+            valuePerc = Math.abs((current - startValue) / byValue);
         //  update context
         context.currentValue = current;
         context.completionRate = valuePerc;
