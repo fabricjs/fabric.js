@@ -59,8 +59,13 @@
     assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
     assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
     assert.equal(fabric.runningAnimations.length, 0, 'should have registered animation');
+    var abort;
     var options = {
-      onChange() {
+      onChange(currentValue, completionRate, durationRate) {
+        var context = fabric.runningAnimations.findAnimation(abort);
+        assert.equal(context.currentValue, currentValue, 'context.currentValue is wrong');
+        assert.equal(context.completionRate, completionRate, 'context.completionRate is wrong');
+        assert.equal(context.durationRate, durationRate, 'context.durationRate is wrong');
         assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
       },
       onComplete() {
@@ -70,10 +75,14 @@
         }, 0);
       }
     };
-    var abort = fabric.util.animate(options);
+    abort = fabric.util.animate(options);
+    var context = fabric.runningAnimations.findAnimation(abort);
     assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
     assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
-    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+    assert.equal(context.cancel, abort, 'animation should exist in registry');
+    assert.equal(context.currentValue, 0, 'context.currentValue is wrong');
+    assert.equal(context.completionRate, 0, 'context.completionRate is wrong');
+    assert.equal(context.durationRate, 0, 'context.durationRate is wrong');
   });
 
   QUnit.test('fabric.runningAnimations with abort', function (assert) {
