@@ -101,6 +101,8 @@
       actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
+      resizingStrokeColor: '#9c0d63',
+      // resizingStrokeColor: fabric.Textbox.resizingStrokeColor,
     });
 
     textBoxControls.ml = new fabric.Control({
@@ -109,6 +111,7 @@
       actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
+      resizingStrokeColor: '#9c0d63',
     });
   }
 })();
