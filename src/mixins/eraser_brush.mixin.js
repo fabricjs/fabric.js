@@ -84,7 +84,7 @@
      * @returns {string} markup
      */
     eraserToSVG: function (options) {
-      var eraser = this.getEraser();
+      var eraser = this.eraser;
       if (eraser) {
         var fill = eraser._objects[0].fill;
         eraser._objects[0].fill = 'white';
@@ -107,7 +107,7 @@
      * @returns
      */
     _createBaseSVGMarkup: function (objectMarkup, options) {
-      var eraser = this.getEraser();
+      var eraser = this.eraser;
       if (eraser) {
         var eraserMarkup = this.eraserToSVG(options);
         //this.clipPath = null;
