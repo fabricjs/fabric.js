@@ -43,22 +43,17 @@
     },
 
     /**
-     * If eraser exists add the instance clip path as it's clip path and draw it so instance will be clipped by both eraser and clip path
+     * draw eraser above clip path
      * @override 
      * @private
      * @param {CanvasRenderingContext2D} ctx 
      */
     _drawClipPath: function (ctx) {
+      __drawClipPath.call(this, ctx);
       if (this.eraser) {
-        var clipPath = this.eraser;
         var size = this._getNonTransformedDimensions();
-        clipPath._updateDimensions(size.x, size.y);
-        clipPath.clipPath = this.clipPath;
-        __drawClipPath.call(this, ctx, clipPath);
-        delete clipPath.clipPath;
-      }
-      else {
-        __drawClipPath.call(this, ctx);
+        this.eraser._updateDimensions(size.x, size.y);
+        __drawClipPath.call(this, ctx, this.eraser);
       }
     },
 
