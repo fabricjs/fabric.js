@@ -299,14 +299,6 @@
       inverted: false,
 
       /**
-       * Indicates that the ctx is ready and rendering can begin.
-       * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
-       *
-       * @private
-       */
-      _ready: false,
-
-      /**
        * @private
        */
       _drawOverlayOnTop: false,
@@ -457,7 +449,6 @@
 
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this._ready = true;
         this._render();
       },
 
@@ -468,9 +459,6 @@
        *
        */
       _render: function () {
-        if (!this._ready) {
-          return;
-        }
         if (!this.inverted) {
           //  clip canvas
           var ctx = this.canvas.getContext();
