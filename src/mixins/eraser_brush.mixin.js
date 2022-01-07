@@ -1,5 +1,13 @@
 (function () {
   /** ERASER_START */
+
+  /**
+   * add `eraser` to enlived props
+   */
+  fabric.Object.ENLIVEN_PROPS.push('eraser');
+
+  var __drawClipPath = fabric.Object.prototype._drawClipPath;
+  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var __set = fabric.Object.prototype._set;
   var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
@@ -21,76 +29,39 @@
     erasable: true,
 
     /**
-     *
-     * @returns {fabric.Group | undefined}
+     * @public
+     * @returns {fabric.Eraser | undefined}
      */
     getEraser: function () {
-      return this.clipPath && this.clipPath.eraser ? this.clipPath : undefined;
+      return this.eraser;
     },
 
     /**
-     * Get the object's actual clip path regardless of clipping done by erasing
-     * @returns {fabric.Object | undefined}
+     * @override
+     * @returns Boolean
      */
-    getClipPath: function () {
-      var eraser = this.getEraser();
-      return eraser ? eraser._objects[0].clipPath : this.clipPath;
+    needsItsOwnCache: function () {
+      return _needsItsOwnCache.call(this) || !!this.eraser;
     },
 
     /**
-     * Set the object's actual clip path regardless of clipping done by erasing
-     * @param {fabric.Object} [clipPath]
-     */
-    setClipPath: function (clipPath) {
-      var eraser = this.getEraser();
-      var target = eraser ? eraser._objects[0] : this;
-      target.set('clipPath', clipPath);
-      this.set('dirty', true);
-    },
-
-    /**
-     * Updates eraser size and position to match object's size
+     * If eraser exists add the instance clip path as it's clip path and draw it so instance will be clipped by both eraser and clip path
+     * @override 
      * @private
-     * @param {Object} [dimensions] uses object's dimensions if unspecified
-     * @param {number} [dimensions.width]
-     * @param {number} [dimensions.height]
-     * @param {boolean} [center=false] postion the eraser relative to object's center or it's top left corner
+     * @param {CanvasRenderingContext2D} ctx 
      */
-    _updateEraserDimensions: function (dimensions, center) {
-      var eraser = this.getEraser();
-      if (eraser) {
-        var rect = eraser._objects[0];
-        var eraserSize = { width: rect.width, height: rect.height };
+    _drawClipPath: function (ctx) {
+      if (this.eraser) {
+        var clipPath = this.eraser;
         var size = this._getNonTransformedDimensions();
-        var newSize = fabric.util.object.extend({ width: size.x, height: size.y }, dimensions);
-        if (eraserSize.width === newSize.width && eraserSize.height === newSize.height) {
-          return;
-        }
-        var offset = new fabric.Point((eraserSize.width - newSize.width) / 2, (eraserSize.height - newSize.height) / 2);
-        eraser.set(newSize);
-        eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
-        rect.set(newSize);
-        eraser.set('dirty', true);
-        if (!center) {
-          eraser.getObjects('path').forEach(function (path) {
-            path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
-          });
-        }
-        this.setCoords();
+        clipPath._updateDimensions(size.x, size.y);
+        clipPath.clipPath = this.clipPath;
+        __drawClipPath.call(this, ctx, clipPath);
+        delete clipPath.clipPath;
       }
-    },
-
-    _set: function (key, value) {
-      __set.call(this, key, value);
-      if (key === 'width' || key === 'height') {
-        this._updateEraserDimensions();
+      else {
+        __drawClipPath.call(this, ctx);
       }
-      return this;
-    },
-
-    render: function (ctx) {
-      this._updateEraserDimensions();
-      _render.call(this, ctx);
     },
 
     /**
@@ -98,8 +69,12 @@
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
-    toObject: function (additionalProperties) {
-      return _toObject.call(this, ['erasable'].concat(additionalProperties));
+    toObject: function (propertiesToInclude) {
+      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
+      if (this.eraser && !this.eraser.excludeFromExport) {
+        object.eraser = this.eraser.toObject(propertiesToInclude);
+      }
+      return object;
     },
 
     /**
@@ -135,9 +110,9 @@
       var eraser = this.getEraser();
       if (eraser) {
         var eraserMarkup = this.eraserToSVG(options);
-        this.clipPath = null;
+        //this.clipPath = null;
         var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
-        this.clipPath = eraser;
+        //this.clipPath = eraser;
         return [
           eraserMarkup,
           markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
@@ -150,23 +125,7 @@
   });
 
   var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
-  var _groupToObject = fabric.Group.prototype.toObject;
-  var __getBounds = fabric.Group.prototype._getBounds;
   fabric.util.object.extend(fabric.Group.prototype, {
-
-    /**
-     * If group is an eraser then dimensions should not change when paths are added or removed and should remain the size of the base rect
-     * @private
-     */
-    _getBounds: function (aX, aY, onlyWidthHeight) {
-      if (this.eraser) {
-        this.width = this._objects[0].width;
-        this.height = this._objects[0].height;
-        return;
-      }
-      __getBounds.call(this, aX, aY, onlyWidthHeight);
-    },
-
     /**
      * @private
      * @param {fabric.Path} path
@@ -186,12 +145,12 @@
      * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
      */
     applyEraserToObjects: function () {
-      var _this = this;
-      if (this.getEraser()) {
+      var _this = this, eraser = this.eraser;
+      if (eraser) {
+        delete this.eraser;
         var transform = _this.calcTransformMatrix();
-        _this.getEraser().clone(function (eraser) {
-          var clipPath = eraser._objects[0].clipPath;
-          _this.clipPath = clipPath ? clipPath : undefined;
+        eraser.clone(function (eraser) {
+          var clipPath = _this.clipPath;
           eraser.getObjects('path')
             .forEach(function (path) {
               //  first we transform the path from the group's coordinate system to the canvas'
@@ -226,18 +185,96 @@
     _restoreObjectsState: function () {
       this.erasable === true && this.applyEraserToObjects();
       return __restoreObjectsState.call(this);
+    }    
+  });
+
+  /**
+   * An object's Eraser
+   * @private
+   * @class fabric.Eraser
+   * @extends fabric.Group
+   * @memberof fabric
+   */
+  fabric.Eraser = fabric.util.createClass(fabric.Group, {
+    /**
+     * @readonly
+     * @static
+     */
+    type: 'eraser',
+
+    /**
+     * @default
+     */
+    originX: 'center',
+
+    /**
+     * @default
+     */
+    originY: 'center',
+
+    drawObject: function (ctx) {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+      this.callSuper('drawObject', ctx);
     },
 
     /**
-     * Returns an object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of an instance
+     * eraser should retain size
+     * dimensions should not change when paths are added or removed
+     * @see {@link fabric.Eraser#_updateDimensions}
+     * @override
+     * @private
      */
-    toObject: function (additionalProperties) {
-      return _groupToObject.call(this, ['eraser'].concat(additionalProperties));
-    }
+    _getBounds: function () {
+      //  noop
+    },
+
+    /**
+     * Update eraser size
+     * @private
+     * @param {number} width
+     * @param {number} height
+     * @returns {boolean} true if dimensions have changed
+     */
+    _updateDimensions: function (width, height) {
+      var prevWidth = this.width, prevHeight = this.height;
+      if (prevWidth === width && prevHeight === height) {
+        return false;
+      }
+      this.set({
+        width: width,
+        height: height,
+        dirty: true
+      });
+      return true;
+    },
   });
 
+  /**
+   * Returns {@link fabric.Eraser} instance from an object representation
+   * @static
+   * @memberOf fabric.Eraser
+   * @param {Object} object Object to create an Eraser from
+   * @param {Function} [callback] Callback to invoke when an eraser instance is created
+   */
+  fabric.Eraser.fromObject = function (object, callback) {
+    var objects = object.objects;
+    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
+    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+        var options = fabric.util.object.clone(object, true);
+        delete options.objects;
+        enlivenProps.forEach(function (key, index) {
+          options[key] = enlivedProps[index];
+        });
+        callback && callback(new fabric.Eraser(enlivenedObjects, options, true));
+      });
+    });
+  };
+
+  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
   /**
    * @fires erasing:start
    * @fires erasing:end
@@ -294,6 +331,7 @@
    * @tutorial {@link http://fabricjs.com/erasing}
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
+   * @memberof fabric
    */
   fabric.EraserBrush = fabric.util.createClass(
     fabric.PencilBrush,
@@ -546,7 +584,7 @@
       },
 
       /**
-       * @extends @class fabric.BaseBrush
+       * @override fabric.BaseBrush#_saveAndTransform
        * @param {CanvasRenderingContext2D} ctx
        */
       _saveAndTransform: function (ctx) {
@@ -656,7 +694,7 @@
        */
       clonePathWithClipPath: function (path, object, callback) {
         var objTransform = object.calcTransformMatrix();
-        var clipPath = object.getClipPath();
+        var clipPath = object.clipPath;
         var _this = this;
         path.clone(function (_path) {
           clipPath.clone(function (_clipPath) {
@@ -672,7 +710,6 @@
        * @param {fabric.Path} path
        */
       _addPathToObjectEraser: function (obj, path) {
-        var clipObject;
         var _this = this;
         //  object is collection, i.e group
         if (obj.forEachObject && obj.erasable === 'deep') {
@@ -693,24 +730,13 @@
           }
           return;
         }
-        if (!obj.getEraser()) {
-          var size = obj._getNonTransformedDimensions();
-          var rect = new fabric.Rect({
-            fill: 'rgb(0,0,0)',
-            width: size.x,
-            height: size.y,
-            clipPath: obj.clipPath,
-            originX: 'center',
-            originY: 'center'
-          });
-          clipObject = new fabric.Group([rect], {
-            eraser: true
-          });
+        //  prepare eraser
+        var clipObject = obj.eraser;
+        if (!clipObject) {
+          clipObject = new fabric.Eraser();
+          obj.eraser = clipObject;
         }
-        else {
-          clipObject = obj.clipPath;
-        }
-
+        //  clone and add path
         path.clone(function (path) {
           path.globalCompositeOperation = 'destination-out';
           // http://fabricjs.com/using-transformations
@@ -722,10 +748,7 @@
           );
           fabric.util.applyTransformToObject(path, desiredTransform);
           clipObject.addWithUpdate(path);
-          obj.set({
-            clipPath: clipObject,
-            dirty: true
-          });
+          obj.set('dirty', true);
           obj.fire('erasing:end', {
             path: path
           });
