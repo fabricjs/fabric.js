@@ -9,6 +9,7 @@
   var __drawClipPath = fabric.Object.prototype._drawClipPath;
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
+  var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   /**
    * @fires erasing:end
@@ -68,51 +69,38 @@
       return object;
     },
 
+    /* _TO_SVG_START_ */
     /**
-     * use <mask> to achieve erasing for svg
-     * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * @param {Function} reviver
-     * @returns {string} markup
+     * Returns id attribute for svg output
+     * @override
+     * @return {String}
      */
-    eraserToSVG: function (options) {
-      var eraser = this.eraser;
-      if (eraser) {
-        var fill = eraser._objects[0].fill;
-        eraser._objects[0].fill = 'white';
-        eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var commons = [
-          'id="' + eraser.clipPathId + '"',
-          /*options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/
-        ].join(' ');
-        var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
-        eraser._objects[0].fill = fill;
-        return objectMarkup.join('\n');
-      }
-      return '';
+    getSvgCommons: function () {
+      return _getSvgCommons.call(this) + (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '');
     },
 
     /**
-     * use <mask> to achieve erasing for svg, override <clipPath>
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * @param {string[]} objectMarkup
      * @param {Object} options
      * @returns
      */
     _createBaseSVGMarkup: function (objectMarkup, options) {
-      var eraser = this.eraser;
-      if (eraser) {
-        var eraserMarkup = this.eraserToSVG(options);
-        //this.clipPath = null;
-        var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
-        //this.clipPath = eraser;
+      if (this.eraser) {
+        this.eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        var maskDefSvg = [
+          '<mask id="', this.eraser.clipPathId, '" >',
+          this.eraser.toSVG(options.reviver),
+          '</mask>', '\n'
+        ].join('');
         return [
-          eraserMarkup,
-          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
-        ].join('\n');
+          maskDefSvg,
+          __createBaseSVGMarkup.call(this, objectMarkup, options)
+        ].join('');
       }
-      else {
-        return __createBaseSVGMarkup.call(this, objectMarkup, options);
-      }
+      return __createBaseSVGMarkup.call(this, objectMarkup, options);
     }
+    /* _TO_SVG_END_ */
   });
 
   var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
@@ -241,6 +229,33 @@
       });
       return true;
     },
+
+    /* _TO_SVG_START_ */
+    /**
+     * Returns svg representation of an instance
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * for masking we need to add a white rect before all paths
+     * 
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    _toSVG: function (reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+      var x = -this.width / 2, y = -this.height / 2;
+      var rectSvg = [
+        '<rect ', 'fill="white" ',
+        'x="', x, '" y="', y,
+        '" width="', this.width, '" height="', this.height,
+        '" />\n'
+      ].join('');
+      svgString.push('\t\t', rectSvg);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
+      }
+      svgString.push('</g>\n');
+      return svgString;
+    },
+    /* _TO_SVG_END_ */
   });
 
   /**
