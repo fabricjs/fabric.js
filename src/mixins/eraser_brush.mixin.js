@@ -10,6 +10,7 @@
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
+  var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   /**
    * @fires erasing:end
@@ -84,25 +85,42 @@
     },
 
     /**
+     * create svg markup for eraser
      * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * @param {string[]} objectMarkup
-     * @param {Object} options
+     * must be called before object markup creation as it relies on the `clipPathId` property of the mask
+     * @param {Function} [reviver]
      * @returns
      */
-    _createBaseSVGMarkup: function (objectMarkup, options) {
+    _createEraserSVGMarkup: function (reviver) {
       if (this.eraser) {
         this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
-        var maskDefSvg = [
+        return [
           '<mask id="', this.eraser.clipPathId, '" >',
-          this.eraser.toSVG(options.reviver),
+          this.eraser.toSVG(reviver),
           '</mask>', '\n'
         ].join('');
-        return [
-          maskDefSvg,
-          __createBaseSVGMarkup.call(this, objectMarkup, options)
-        ].join('');
       }
-      return __createBaseSVGMarkup.call(this, objectMarkup, options);
+      return '';
+    },
+
+    /**
+     * @private
+     */
+    _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
+    },
+
+    /**
+     * @private
+     */
+    _createBaseSVGMarkup: function (objectMarkup, options) {
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
     }
     /* _TO_SVG_END_ */
   });
