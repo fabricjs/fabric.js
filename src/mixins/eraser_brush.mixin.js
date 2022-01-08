@@ -343,11 +343,6 @@
       /**
        * @private
        */
-      _drawOverlayOnTop: false,
-
-      /**
-       * @private
-       */
       _isErasing: false,
 
       /**
