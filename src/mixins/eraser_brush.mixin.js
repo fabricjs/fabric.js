@@ -2,7 +2,7 @@
   /** ERASER_START */
 
   /**
-   * add `eraser` to enlived props
+   * add `eraser` to enlivened props
    */
   fabric.Object.ENLIVEN_PROPS.push('eraser');
 
@@ -27,9 +27,15 @@
     erasable: true,
 
     /**
-     * @public
-     * @returns {fabric.Eraser | undefined}
+     * @tutorial {@link http://fabricjs.com/erasing#eraser}
+     * @type fabric.Eraser
      */
+    eraser: undefined,
+
+    /**
+    * @public
+    * @returns {fabric.Eraser | undefined}
+    */
     getEraser: function () {
       return this.eraser;
     },
@@ -52,7 +58,7 @@
       __drawClipPath.call(this, ctx);
       if (this.eraser) {
         var size = this._getNonTransformedDimensions();
-        this.eraser._updateDimensions(size.x, size.y);
+        this.eraser._updateDimensions && this.eraser._updateDimensions(size.x, size.y);
         __drawClipPath.call(this, ctx, this.eraser);
       }
     },
@@ -154,13 +160,13 @@
               fabric.util.applyTransformToObject(path, originalTransform);
               if (clipPath) {
                 clipPath.clone(function (_clipPath) {
-                  fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                  var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
                     fabric.EraserBrush.prototype,
                     path,
                     _clipPath,
                     transform
                   );
-                  _this._addEraserPathToObjects(path);
+                  _this._addEraserPathToObjects(eraserPath);
                 });
               }
               else {
@@ -654,16 +660,17 @@
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path
+       * @param {fabric.Path} path The eraser path in canvas plane coords
        * @param {fabric.Object} clipPath The clipPath to apply to the path
        * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
        * @returns {fabric.Path} path with clip path
        */
       applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathTransform = path.calcTransformMatrix();
-        var clipPathTransform = clipPath.calcTransformMatrix();
+        var pathTransform = path.calcTransformMatrix(),
+          pathInvTransform = fabric.util.invertTransform(pathTransform),
+          clipPathTransform = clipPath.calcTransformMatrix();
         var transform = fabric.util.multiplyTransformMatrices(
-          fabric.util.invertTransform(pathTransform),
+          pathInvTransform,
           clipPathContainerTransformMatrix
         );
         fabric.util.applyTransformToObject(
@@ -673,7 +680,16 @@
             clipPathTransform
           )
         );
-        path.clipPath = clipPath;
+        if (path.clipPath) {
+          //  we use the path's clipPath to clip the new clip path so content is kept where both overlap
+          //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, 
+          //  regardless of how many there are
+          path.clipPath.set('globalCompositeOperation', 'destination-in');
+          path.clipPath = new fabric.Group([clipPath, path.clipPath]);
+        } 
+        else {
+          path.clipPath = clipPath; 
+        }
         return path;
       },
 
