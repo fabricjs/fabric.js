@@ -260,7 +260,6 @@
     /* _TO_SVG_END_ */
   });
 
-  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
   /**
    * Returns {@link fabric.Eraser} instance from an object representation
    * @static
