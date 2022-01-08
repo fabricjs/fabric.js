@@ -20028,15 +20028,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _createBaseClipPathSVGMarkup: function(objectMarkup, options) {
       options = options || {};
       var reviver = options.reviver,
-          additionalTransform = options.additionalTransform || '',
-          commonPieces = [
-            this.getSvgTransform(true, additionalTransform),
-            this.getSvgCommons(),
-          ].join(''),
-          // insert commons in the markup, style and svgCommons
-          index = objectMarkup.indexOf('COMMON_PARTS');
+        additionalTransform = options.additionalTransform || '',
+        clipPath = this.clipPath;
+      var markup = [];
+      //  first handle clip path
+      if (clipPath) {
+        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        var clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
+          clipPath.toClipPathSVG(reviver) +
+          '</clipPath>\n';
+        markup.unshift(clipPathMarkup);
+      }
+      var commonPieces = [
+        this.getSvgTransform(true, additionalTransform),
+        this.getSvgCommons(),
+      ].join(''),
+        // insert commons in the markup, style and svgCommons
+        index = objectMarkup.indexOf('COMMON_PARTS');
       objectMarkup[index] = commonPieces;
-      return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
+      markup.push(objectMarkup.join(''));
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
 
     /**
@@ -33585,15 +33596,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /** ERASER_START */
 
   /**
-   * add `eraser` to enlived props
+   * add `eraser` to enlivened props
    */
   fabric.Object.ENLIVEN_PROPS.push('eraser');
 
   var __drawClipPath = fabric.Object.prototype._drawClipPath;
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
-  var __set = fabric.Object.prototype._set;
-  var _render = fabric.Object.prototype.render;
   var _toObject = fabric.Object.prototype.toObject;
+  var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
+  var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
   /**
    * @fires erasing:end
@@ -33612,12 +33623,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     erasable: true,
 
     /**
-     * @public
-     * @returns {fabric.Eraser | undefined}
+     * @tutorial {@link http://fabricjs.com/erasing#eraser}
+     * @type fabric.Eraser
      */
-    getEraser: function () {
-      return this.eraser;
-    },
+    eraser: undefined,
 
     /**
      * @override
@@ -33628,22 +33637,21 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     },
 
     /**
-     * If eraser exists add the instance clip path as it's clip path and draw it so instance will be clipped by both eraser and clip path
+     * draw eraser above clip path
      * @override 
      * @private
      * @param {CanvasRenderingContext2D} ctx 
      */
     _drawClipPath: function (ctx) {
+      __drawClipPath.call(this, ctx);
       if (this.eraser) {
-        var clipPath = this.eraser;
+        //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
-        clipPath._updateDimensions(size.x, size.y);
-        clipPath.clipPath = this.clipPath;
-        __drawClipPath.call(this, ctx, clipPath);
-        delete clipPath.clipPath;
-      }
-      else {
-        __drawClipPath.call(this, ctx);
+        this.eraser.isType('eraser') && this.eraser.set({
+          width: size.x,
+          height: size.y
+        });
+        __drawClipPath.call(this, ctx, this.eraser);
       }
     },
 
@@ -33660,51 +33668,55 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return object;
     },
 
+    /* _TO_SVG_START_ */
     /**
-     * use <mask> to achieve erasing for svg
-     * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * @param {Function} reviver
-     * @returns {string} markup
+     * Returns id attribute for svg output
+     * @override
+     * @return {String}
      */
-    eraserToSVG: function (options) {
-      var eraser = this.eraser;
-      if (eraser) {
-        var fill = eraser._objects[0].fill;
-        eraser._objects[0].fill = 'white';
-        eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var commons = [
-          'id="' + eraser.clipPathId + '"',
-          /*options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/
-        ].join(' ');
-        var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
-        eraser._objects[0].fill = fill;
-        return objectMarkup.join('\n');
+    getSvgCommons: function () {
+      return _getSvgCommons.call(this) + (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '');
+    },
+
+    /**
+     * create svg markup for eraser
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * must be called before object markup creation as it relies on the `clipPathId` property of the mask
+     * @param {Function} [reviver]
+     * @returns
+     */
+    _createEraserSVGMarkup: function (reviver) {
+      if (this.eraser) {
+        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
+        return [
+          '<mask id="', this.eraser.clipPathId, '" >',
+          this.eraser.toSVG(reviver),
+          '</mask>', '\n'
+        ].join('');
       }
       return '';
     },
 
     /**
-     * use <mask> to achieve erasing for svg, override <clipPath>
-     * @param {string[]} objectMarkup
-     * @param {Object} options
-     * @returns
+     * @private
+     */
+    _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
+    },
+
+    /**
+     * @private
      */
     _createBaseSVGMarkup: function (objectMarkup, options) {
-      var eraser = this.eraser;
-      if (eraser) {
-        var eraserMarkup = this.eraserToSVG(options);
-        //this.clipPath = null;
-        var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
-        //this.clipPath = eraser;
-        return [
-          eraserMarkup,
-          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
-        ].join('\n');
-      }
-      else {
-        return __createBaseSVGMarkup.call(this, objectMarkup, options);
-      }
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
     }
+    /* _TO_SVG_END_ */
   });
 
   var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
@@ -33744,14 +33756,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
               fabric.util.applyTransformToObject(path, originalTransform);
               if (clipPath) {
                 clipPath.clone(function (_clipPath) {
-                  fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                  var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
                     fabric.EraserBrush.prototype,
                     path,
                     _clipPath,
                     transform
                   );
-                  _this._addEraserPathToObjects(path);
-                });
+                  _this._addEraserPathToObjects(eraserPath);
+                }, ['absolutePositioned', 'inverted']);
               }
               else {
                 _this._addEraserPathToObjects(path);
@@ -33814,25 +33826,32 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //  noop
     },
 
+    /* _TO_SVG_START_ */
     /**
-     * Update eraser size
-     * @private
-     * @param {number} width
-     * @param {number} height
-     * @returns {boolean} true if dimensions have changed
+     * Returns svg representation of an instance
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * for masking we need to add a white rect before all paths
+     * 
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
      */
-    _updateDimensions: function (width, height) {
-      var prevWidth = this.width, prevHeight = this.height;
-      if (prevWidth === width && prevHeight === height) {
-        return false;
+    _toSVG: function (reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+      var x = -this.width / 2, y = -this.height / 2;
+      var rectSvg = [
+        '<rect ', 'fill="white" ',
+        'x="', x, '" y="', y,
+        '" width="', this.width, '" height="', this.height,
+        '" />\n'
+      ].join('');
+      svgString.push('\t\t', rectSvg);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
-      this.set({
-        width: width,
-        height: height,
-        dirty: true
-      });
-      return true;
+      svgString.push('</g>\n');
+      return svgString;
     },
+    /* _TO_SVG_END_ */
   });
 
   /**
@@ -34244,18 +34263,23 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path
+       * @param {fabric.Path} path The eraser path in canvas coordinate plane
        * @param {fabric.Object} clipPath The clipPath to apply to the path
        * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
        * @returns {fabric.Path} path with clip path
        */
       applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathTransform = path.calcTransformMatrix();
-        var clipPathTransform = clipPath.calcTransformMatrix();
-        var transform = fabric.util.multiplyTransformMatrices(
-          fabric.util.invertTransform(pathTransform),
-          clipPathContainerTransformMatrix
-        );
+        var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
+          clipPathTransform = clipPath.calcTransformMatrix(),
+          transform = clipPath.absolutePositioned ?
+            pathInvTransform :
+            fabric.util.multiplyTransformMatrices(
+              pathInvTransform,
+              clipPathContainerTransformMatrix
+            );
+        //  when passing down a clip path it becomes relative to the parent 
+        //  so we transform it acoordingly and set `absolutePositioned` to false
+        clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
           clipPath,
           fabric.util.multiplyTransformMatrices(
@@ -34263,7 +34287,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
             clipPathTransform
           )
         );
-        path.clipPath = clipPath;
+        if (path.clipPath) {
+          //  we use the path's clipPath to clip the new clip path so content is kept where both overlap
+          //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, 
+          //  regardless of how many there are
+          //  we wrap `clipPath` with group in case it has a clip path of it's own and clip group with the the path's existing clip path
+          //  this is why we transform the path's existing clip path to `clipPath` coordinate plane
+          fabric.util.applyTransformToObject(
+            path.clipPath,
+            fabric.util.multiplyTransformMatrices(
+              fabric.util.invertTransform(clipPath.calcTransformMatrix()),
+              path.clipPath.calcTransformMatrix()
+            )
+          );
+          path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath });
+        } 
+        else {
+          path.clipPath = clipPath; 
+        }
         return path;
       },
 
@@ -34282,12 +34323,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         path.clone(function (_path) {
           clipPath.clone(function (_clipPath) {
             callback(_this.applyClipPathToPath(_path, _clipPath, objTransform));
-          });
+          }, ['absolutePositioned', 'inverted']);
         });
       },
 
       /**
-       * Adds path to existing clipPath of object
+       * Adds path to object's eraser, walks down object's descendants if necessary
        *
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
