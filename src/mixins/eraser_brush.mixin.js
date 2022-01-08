@@ -381,7 +381,7 @@
             obj.render(ctx);
           }
           else if (obj.erasable && this.inverted) {
-            var eraser = obj.getEraser();
+            var eraser = obj.eraser;
             if (eraser) {
               eraser.inverted = true;
               obj.dirty = true;
