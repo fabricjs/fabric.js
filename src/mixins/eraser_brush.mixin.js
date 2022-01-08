@@ -50,8 +50,12 @@
     _drawClipPath: function (ctx) {
       __drawClipPath.call(this, ctx);
       if (this.eraser) {
+        //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
-        this.eraser._updateDimensions && this.eraser._updateDimensions(size.x, size.y);
+        this.eraser.isType('eraser') && this.eraser.set({
+          width: size.x,
+          height: size.y
+        });
         __drawClipPath.call(this, ctx, this.eraser);
       }
     },
@@ -208,26 +212,6 @@
      */
     _getBounds: function () {
       //  noop
-    },
-
-    /**
-     * Update eraser size
-     * @private
-     * @param {number} width
-     * @param {number} height
-     * @returns {boolean} true if dimensions have changed
-     */
-    _updateDimensions: function (width, height) {
-      var prevWidth = this.width, prevHeight = this.height;
-      if (prevWidth === width && prevHeight === height) {
-        return false;
-      }
-      this.set({
-        width: width,
-        height: height,
-        dirty: true
-      });
-      return true;
     },
 
     /* _TO_SVG_START_ */
