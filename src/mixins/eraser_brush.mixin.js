@@ -651,7 +651,7 @@
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path in canvas plane coords
+       * @param {fabric.Path} path The eraser path in canvas coordinate plane
        * @param {fabric.Object} clipPath The clipPath to apply to the path
        * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
        * @returns {fabric.Path} path with clip path
@@ -679,8 +679,16 @@
           //  we use the path's clipPath to clip the new clip path so content is kept where both overlap
           //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, 
           //  regardless of how many there are
-          path.clipPath.set('globalCompositeOperation', 'destination-in');
-          path.clipPath = new fabric.Group([clipPath, path.clipPath]);
+          //  we wrap `clipPath` with group in case it has a clip path of it's own and clip group with the the path's existing clip path
+          //  this is why we transform the path's existing clip path to `clipPath` coordinate plane
+          fabric.util.applyTransformToObject(
+            path.clipPath,
+            fabric.util.multiplyTransformMatrices(
+              fabric.util.invertTransform(clipPath.calcTransformMatrix()),
+              path.clipPath.calcTransformMatrix()
+            )
+          );
+          path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath });
         } 
         else {
           path.clipPath = clipPath; 
