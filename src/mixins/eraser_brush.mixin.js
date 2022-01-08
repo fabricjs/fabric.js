@@ -91,7 +91,7 @@
      */
     _createBaseSVGMarkup: function (objectMarkup, options) {
       if (this.eraser) {
-        this.eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
         var maskDefSvg = [
           '<mask id="', this.eraser.clipPathId, '" >',
           this.eraser.toSVG(options.reviver),
