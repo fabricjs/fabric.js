@@ -588,11 +588,14 @@
       });
       return;
     }
+    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
-      fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
         var options = fabric.util.object.clone(object, true);
-        options.clipPath = enlivedClipPath[0];
         delete options.objects;
+        enlivenProps.forEach(function (key, index) {
+          options[key] = enlivedProps[index];
+        });
         callback && callback(new fabric.Group(enlivenedObjects, options, true));
       });
     });

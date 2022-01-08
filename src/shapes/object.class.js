@@ -1188,8 +1188,8 @@
      * Execute the drawing operation for an object clipPath
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawClipPathOnCache: function(ctx) {
-      var path = this.clipPath;
+    drawClipPathOnCache: function(ctx, path) {
+      path = path || this.clipPath;
       ctx.save();
       // DEBUG: uncomment this line, comment the following
       // ctx.globalAlpha = 0.4
@@ -1225,13 +1225,13 @@
         this._renderBackground(ctx);
       }
       this._render(ctx);
-      this._drawClipPath(ctx);
+      this._drawClipPath(ctx, this.clipPath);
       this.fill = originalFill;
       this.stroke = originalStroke;
     },
 
-    _drawClipPath: function(ctx) {
-      var path = this.clipPath;
+    _drawClipPath: function (ctx, path) {
+      path = path || this.clipPath;
       if (!path) { return; }
       // needed to setup a couple of variables
       // path canvas gets overridden with this one.
@@ -1240,7 +1240,7 @@
       path.shouldCache();
       path._transformDone = true;
       path.renderCache({ forClipping: true });
-      this.drawClipPathOnCache(ctx);
+      this.drawClipPathOnCache(ctx, path);
     },
 
     /**
@@ -1958,6 +1958,15 @@
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
+  /**
+   * Defines which properties should be enlivened from the object passed to {@link fabric.Object._fromObject}
+   * @static
+   * @memberOf fabric.Object
+   * @constant
+   * @type string[] 
+   */
+  fabric.Object.ENLIVEN_PROPS = ['clipPath'];
+
   fabric.Object._fromObject = function(className, object, callback, extraParam) {
     var klass = fabric[className];
     object = clone(object, true);
@@ -1968,8 +1977,11 @@
       if (typeof patterns[1] !== 'undefined') {
         object.stroke = patterns[1];
       }
-      fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
-        object.clipPath = enlivedProps[0];
+      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+        enlivenProps.forEach(function (key, index) {
+          object[key] = enlivedProps[index];
+        });
         var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
         callback && callback(instance);
       });
