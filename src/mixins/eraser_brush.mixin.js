@@ -33,14 +33,6 @@
     eraser: undefined,
 
     /**
-    * @public
-    * @returns {fabric.Eraser | undefined}
-    */
-    getEraser: function () {
-      return this.eraser;
-    },
-
-    /**
      * @override
      * @returns Boolean
      */
