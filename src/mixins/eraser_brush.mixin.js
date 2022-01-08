@@ -517,6 +517,7 @@
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
         path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        path.stroke = this.inverted ? 'white' : 'black';
         return path;
       },
 
