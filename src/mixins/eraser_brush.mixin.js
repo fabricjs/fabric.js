@@ -159,7 +159,7 @@
                     transform
                   );
                   _this._addEraserPathToObjects(eraserPath);
-                });
+                }, ['absolutePositioned', 'inverted']);
               }
               else {
                 _this._addEraserPathToObjects(path);
@@ -658,13 +658,17 @@
        * @returns {fabric.Path} path with clip path
        */
       applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathTransform = path.calcTransformMatrix(),
-          pathInvTransform = fabric.util.invertTransform(pathTransform),
-          clipPathTransform = clipPath.calcTransformMatrix();
-        var transform = fabric.util.multiplyTransformMatrices(
-          pathInvTransform,
-          clipPathContainerTransformMatrix
-        );
+        var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
+          clipPathTransform = clipPath.calcTransformMatrix(),
+          transform = clipPath.absolutePositioned ?
+            pathInvTransform :
+            fabric.util.multiplyTransformMatrices(
+              pathInvTransform,
+              clipPathContainerTransformMatrix
+            );
+        //  when passing down a clip path it becomes relative to the parent 
+        //  so we transform it acoordingly and set `absolutePositioned` to false
+        clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
           clipPath,
           fabric.util.multiplyTransformMatrices(
@@ -700,12 +704,12 @@
         path.clone(function (_path) {
           clipPath.clone(function (_clipPath) {
             callback(_this.applyClipPathToPath(_path, _clipPath, objTransform));
-          });
+          }, ['absolutePositioned', 'inverted']);
         });
       },
 
       /**
-       * Adds path to existing clipPath of object
+       * Adds path to object's eraser, walks down object's descendants if necessary
        *
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
