@@ -885,7 +885,8 @@
           iVpt = invertTransform(this.viewportTransform),
           a = transformPoint({ x: 0, y: 0 }, iVpt),
           b = transformPoint({ x: width, y: height }, iVpt),
-          //  in case vpt is flipped
+          // we don't support vpt flipping
+          // but the code is robust enough to mostly work with flipping
           min = a.min(b),
           max = a.max(b);
       return this.vptCoords = {
