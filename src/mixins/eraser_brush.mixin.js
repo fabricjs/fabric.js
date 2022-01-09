@@ -324,6 +324,9 @@
    * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
    * This achieves the desired effect of seeming to erase or unerase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * 
+   * In order to update the EraserBrush call `preparePattern`. 
+   * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
    *
    * @tutorial {@link http://fabricjs.com/erasing}
    * @class fabric.EraserBrush
@@ -395,6 +398,7 @@
        * @param {CanvasRenderingContext2D} ctx
        */
       preparePattern: function (ctx) {
+        ctx = ctx || this.canvas.contextTop;
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
@@ -447,6 +451,16 @@
       },
 
       /**
+       * **Customiztion** 
+       * 
+       * if you need the eraser to update on each render (i.e animating during erasing) override this method by **adding** the following (performance may suffer):
+       * @example
+       * ```
+       * if(ctx === this.canvas.contextTop) {
+       *  this.preparePattern();
+       * }
+       * ```
+       * 
        * @override fabric.BaseBrush#_saveAndTransform
        * @param {CanvasRenderingContext2D} ctx
        */
@@ -455,9 +469,6 @@
         if (ctx === this.canvas.getContext()) {
           this._setBrushStyles(ctx);
           ctx.globalCompositeOperation = 'destination-out';
-        }
-        else {
-          this.preparePattern(ctx);
         }
       },
 
@@ -484,6 +495,8 @@
         // this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(pointer);
 
+        //  prepare for erasing
+        this.preparePattern();
         this._isErasing = true;
         this.canvas.fire('erasing:start');
         this._render();
