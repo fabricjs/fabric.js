@@ -368,23 +368,33 @@
        * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
+       * @param {CanvasRenderingContext2D} ctx
+       * @param {{ visibility: fabric.Object[], clipPath: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
-      _prepareCollectionTraversal: function (collection, ctx) {
+      _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            this._prepareCollectionTraversal(obj, ctx);
+            this._prepareCollectionTraversal(obj, ctx, restorationContext);
           }
-          else if (!obj.erasable && !this.inverted) {
-            obj.render(ctx);
+          else if (!this.inverted && obj.erasable && obj.visible) {
+            obj.visible = false;
+            collection.dirty = true;
+            restorationContext.visibility.push(obj);
+            restorationContext.collection.push(collection);
           }
-          else if (obj.erasable && this.inverted) {
-            var eraser = obj.eraser;
-            if (eraser) {
-              eraser.inverted = true;
+          else if (this.inverted && obj.visible) {
+            if (!obj.erasable) {
+              obj.visible = false;
+              collection.dirty = true;
+              restorationContext.visibility.push(obj);
+              restorationContext.collection.push(collection);
+            }
+            else if (obj.erasable && obj.eraser) {
+              obj.eraser.inverted = true;
               obj.dirty = true;
-              obj.render(ctx);
-              eraser.inverted = false;
-              obj.dirty = true;
+              collection.dirty = true;
+              restorationContext.clipPath.push(obj);
+              restorationContext.collection.push(collection);
             }
           }
         }, this);
@@ -423,7 +433,15 @@
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        this._prepareCollectionTraversal(this.canvas, patternCtx);
+        var restorationContext = { visibility: [], clipPath: [], collection: [] };
+        this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
+        this.canvas._renderObjects(patternCtx, this.canvas._objects);
+        restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
+        restorationContext.clipPath.forEach(function (obj) {
+          obj.eraser.inverted = false;
+          obj.dirty = true;
+        });
+        restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
         patternCtx.restore();
         if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
           if (overlayErasable) { this.canvas.overlayImage = undefined; }
