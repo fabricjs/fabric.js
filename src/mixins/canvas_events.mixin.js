@@ -219,7 +219,10 @@
     },
 
     /**
-     * fire `drop:before` to allow objects to perform logic before canvas
+     * `drop:before` is a an event that allow you to schedule logic
+     * before the `drop` event. Prefer `drop` event always, but if you need
+     * to run some drop-disabling logic on an event, since there is no way
+     * to handle event handlers ordering, use `drop:before`
      * @param {Event} e
      */
     _onDrop: function (e) {
