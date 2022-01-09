@@ -1977,8 +1977,8 @@
       if (typeof patterns[1] !== 'undefined') {
         object.stroke = patterns[1];
       }
-      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
         enlivenProps.forEach(function (key, index) {
           object[key] = enlivedProps[index];
         });
