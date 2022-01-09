@@ -207,6 +207,14 @@
         return this;
       },
 
+      /**
+       * backward compatibility
+       * @deprecated 
+       */
+      addWithUpdate: function () {
+        this.add.apply(this, arguments);
+      },
+
       insertAt: function () {
         this._onBeforeObjectsChange();
         fabric.Collection.insertAt.apply(this, arguments);
@@ -224,6 +232,14 @@
       removeAll: function () {
         this._activeObjects = [];
         return this.remove.apply(this, this._objects);
+      },
+
+      /**
+       * backward compatibility
+       * @deprecated
+       */
+      removeWithUpdate: function () {
+        this.remove.apply(this, arguments);
       },
 
       /**
