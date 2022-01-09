@@ -527,17 +527,16 @@
        *
        */
       _render: function () {
+        var ctx;
         if (!this.inverted) {
           //  clip canvas
-          var ctx = this.canvas.getContext();
+          ctx = this.canvas.getContext();
           this.callSuper('_render', ctx);
-          ctx.restore();
         }
         //  render pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
-        ctx.restore();
       },
 
       createPath: function (pathData) {
