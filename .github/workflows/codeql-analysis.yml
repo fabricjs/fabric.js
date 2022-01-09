@@ -20,7 +20,6 @@ on:
     paths-ignore:
       - 'dist/*'
       - 'test/*'
-      - 'test/*'
   schedule:
     - cron: '28 13 * * 4'
 
