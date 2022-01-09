@@ -180,8 +180,8 @@
     _createBaseClipPathSVGMarkup: function(objectMarkup, options) {
       options = options || {};
       var reviver = options.reviver,
-        additionalTransform = options.additionalTransform || '',
-        clipPath = this.clipPath;
+          additionalTransform = options.additionalTransform || '',
+          clipPath = this.clipPath;
       var markup = [];
       //  first handle clip path
       if (clipPath) {
@@ -192,11 +192,11 @@
         markup.unshift(clipPathMarkup);
       }
       var commonPieces = [
-        this.getSvgTransform(true, additionalTransform),
-        this.getSvgCommons(),
-      ].join(''),
-        // insert commons in the markup, style and svgCommons
-        index = objectMarkup.indexOf('COMMON_PARTS');
+            this.getSvgTransform(true, additionalTransform),
+            this.getSvgCommons(),
+          ].join(''),
+          // insert commons in the markup, style and svgCommons
+          index = objectMarkup.indexOf('COMMON_PARTS');
       objectMarkup[index] = commonPieces;
       markup.push(objectMarkup.join(''));
       return reviver ? reviver(markup.join('')) : markup.join('');
