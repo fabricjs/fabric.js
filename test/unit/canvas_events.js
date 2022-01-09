@@ -459,7 +459,7 @@
     });
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver'].forEach(function(eventType) {
     QUnit.test('Fabric event fired - ' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
@@ -474,8 +474,23 @@
     });
   });
 
+  QUnit.test('Fabric event fired - Drop', function (assert) {
+    var eventNames = ['drop:before', 'drop'];
+    var c = new fabric.Canvas();
+    var fired = [];
+    eventNames.forEach(function (eventName) {
+      c.on(eventName, function () {
+        fired.push(eventName);
+      });
+    });
+    var event = fabric.document.createEvent('HTMLEvents');
+    event.initEvent('drop', true, true);
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.deepEqual(fired, eventNames, 'bad drop event fired');
+  });
+
   ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('_simpleEventHandler fires on object and canvas' + eventType, function(assert) {
+    QUnit.test('_simpleEventHandler fires on object and canvas - ' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
       var target;
