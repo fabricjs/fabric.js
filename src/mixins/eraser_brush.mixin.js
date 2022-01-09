@@ -44,9 +44,9 @@
 
     /**
      * draw eraser above clip path
-     * @override 
+     * @override
      * @private
-     * @param {CanvasRenderingContext2D} ctx 
+     * @param {CanvasRenderingContext2D} ctx
      */
     _drawClipPath: function (ctx) {
       __drawClipPath.call(this, ctx);
@@ -186,7 +186,7 @@
     _restoreObjectsState: function () {
       this.erasable === true && this.applyEraserToObjects();
       return __restoreObjectsState.call(this);
-    }    
+    }
   });
 
   /**
@@ -237,7 +237,7 @@
      * Returns svg representation of an instance
      * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * for masking we need to add a white rect before all paths
-     * 
+     *
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
@@ -269,9 +269,9 @@
    */
   fabric.Eraser.fromObject = function (object, callback) {
     var objects = object.objects;
-    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
+    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
     fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
         var options = fabric.util.object.clone(object, true);
         delete options.objects;
         enlivenProps.forEach(function (key, index) {
@@ -324,8 +324,8 @@
    * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
    * This achieves the desired effect of seeming to erase or unerase only erasable objects.
    * After erasing is done the created path is added to all intersected objects' `clipPath` property.
-   * 
-   * In order to update the EraserBrush call `preparePattern`. 
+   *
+   * In order to update the EraserBrush call `preparePattern`.
    * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
    *
    * @tutorial {@link http://fabricjs.com/erasing}
@@ -469,8 +469,8 @@
       },
 
       /**
-       * **Customiztion** 
-       * 
+       * **Customiztion**
+       *
        * if you need the eraser to update on each render (i.e animating during erasing) override this method by **adding** the following (performance may suffer):
        * @example
        * ```
@@ -478,7 +478,7 @@
        *  this.preparePattern();
        * }
        * ```
-       * 
+       *
        * @override fabric.BaseBrush#_saveAndTransform
        * @param {CanvasRenderingContext2D} ctx
        */
@@ -557,14 +557,14 @@
        */
       applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
         var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
-          clipPathTransform = clipPath.calcTransformMatrix(),
-          transform = clipPath.absolutePositioned ?
-            pathInvTransform :
-            fabric.util.multiplyTransformMatrices(
-              pathInvTransform,
-              clipPathContainerTransformMatrix
-            );
-        //  when passing down a clip path it becomes relative to the parent 
+            clipPathTransform = clipPath.calcTransformMatrix(),
+            transform = clipPath.absolutePositioned ?
+              pathInvTransform :
+              fabric.util.multiplyTransformMatrices(
+                pathInvTransform,
+                clipPathContainerTransformMatrix
+              );
+        //  when passing down a clip path it becomes relative to the parent
         //  so we transform it acoordingly and set `absolutePositioned` to false
         clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
@@ -576,7 +576,7 @@
         );
         if (path.clipPath) {
           //  we use the path's clipPath to clip the new clip path so content is kept where both overlap
-          //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, 
+          //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths,
           //  regardless of how many there are
           //  we wrap `clipPath` with group in case it has a clip path of it's own and clip group with the the path's existing clip path
           //  this is why we transform the path's existing clip path to `clipPath` coordinate plane
@@ -588,9 +588,9 @@
             )
           );
           path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath });
-        } 
+        }
         else {
-          path.clipPath = clipPath; 
+          path.clipPath = clipPath;
         }
         return path;
       },
