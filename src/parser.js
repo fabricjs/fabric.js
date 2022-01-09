@@ -29,7 +29,6 @@
         display:              'visible',
         visibility:           'visible',
         transform:            'transformMatrix',
-        'fabric-layout':      'layout',
         'fill-opacity':       'fillOpacity',
         'fill-rule':          'fillRule',
         'font-family':        'fontFamily',

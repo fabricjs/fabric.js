@@ -605,18 +605,6 @@
       /* _TO_SVG_START_ */
 
       /**
-       * Returns id attribute for svg output
-       * @return {String}
-       */
-      getSvgCommons: function () {
-        if (this.layout !== fabric.util.getKlass(this.type).prototype.layout) {
-          var layout = 'fabric-layout="' + this.layout + '"';
-          return this.callSuper('getSvgCommons') + ' ' + layout;
-        }
-        return this.callSuper('getSvgCommons');
-      },
-
-      /**
        * Returns svg representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
@@ -647,15 +635,6 @@
       },
       /* _TO_SVG_END_ */
     });
-
-  /* _FROM_SVG_START_ */
-  /**
-   * List of attribute names to account for when parsing SVG element (used by {@link fabric.ICollection.fromElement})
-   * @static
-   * @memberOf fabric.ICollection
-   */
-  fabric.ICollection.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('fabric-layout');
-  /* _FROM_SVG_END_ */
 
   /**
    * @todo support loading from svg
