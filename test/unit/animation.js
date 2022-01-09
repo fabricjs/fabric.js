@@ -3,10 +3,14 @@
 
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
-    function testing(val, changePerc) {
-      if (changePerc !== 1) {
+    function testing(val, complete) {
+      if (complete !== 1) {
         assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
       }
+      else {
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+      }
+      assert.ok(typeof val === 'string', 'expected type is String');
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor('red', 'blue', 16, {
@@ -20,6 +24,23 @@
       onChange: testing,
     });
   });
+
+  // QUnit.test('fabric.util.animate', function(assert) {
+  //   var done = assert.async();
+  //   function testing(val) {
+  //     assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+  //     assert.ok(typeof val === 'String');
+  //   }
+  //   assert.ok(typeof fabric.util.animate === 'function', 'fabric.util.animate is a function');
+  //   fabric.util.animate('red', 'blue', 16, {
+  //     onComplete: function() {
+  //       // animate color need some fixing
+  //       // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
+  //       done();
+  //     },
+  //     onChange: testing,
+  //   });
+  // });
 
   QUnit.test('animate', function(assert) {
     var done = assert.async();
@@ -169,6 +190,28 @@
       assert.equal(123, Math.round(object.get('left')));
       assert.equal(124, Math.round(object.get('top')));
       assert.equal(context, object, 'abort should be called in context of an object');
+      done();
+    }, 100);
+  });
+
+  QUnit.test('animate with imperative abort', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    var context;
+    var abort = object._animate('left', 223, {
+      abort: function () {
+        context = this;
+        return false;
+      }
+    });
+
+    assert.ok(typeof abort === 'function');
+    abort();
+
+    setTimeout(function () {
+      assert.equal(123, Math.round(object.get('left')));
+      assert.equal(context, undefined, 'declarative abort should not be called after imperative abort was called');
       done();
     }, 100);
   });

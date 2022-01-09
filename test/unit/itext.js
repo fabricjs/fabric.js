@@ -44,10 +44,13 @@
     skewX:                    0,
     skewY:                    0,
     charSpacing:              0,
-    styles:                     { },
+    styles:                   { },
     strokeUniform:            false,
     path:                     null,
     direction:                'ltr',
+    pathStartOffset:          0,
+    pathSide:                 'left',
+    pathAlign:                'baseline'
   };
 
 
