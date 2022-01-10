@@ -138,7 +138,9 @@
     toLocalPoint: function(point, originX, originY) {
       var center = this.getCenterPoint(),
           p, p2;
-
+      if (this.group) {
+        center = fabric.util.transformPoint(center, this.group.calcTransformMatrix());
+      }
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
