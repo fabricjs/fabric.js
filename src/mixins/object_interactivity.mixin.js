@@ -12,10 +12,12 @@
     _findTargetCorner: function(pointer, forTouch) {
       // objects in group, anykind, are not self modificable,
       // must not return an hovered corner.
-      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
+      if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-
+      if (this.group) {
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix()));
+      }
       var ex = pointer.x,
           ey = pointer.y,
           xPoints,
