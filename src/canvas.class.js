@@ -386,32 +386,34 @@
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
     _chooseObjectsToRender: function() {
-      var activeObjects = this.getActiveObjects(), objects = this._objects,
-          object, objsToRender, activeGroupObjects;
+      var activeObjects = this.getActiveObjects()
+        //  sort active objects to preserve stack order for nested objects
+        .sort(function (a, b) {
+          return a.isInFrontOf(b) ? 1 : -1;
+        }),
+        _activeObjects = activeObjects.slice(),
+        object, index, objsToRender, activeGroupObjects;
 
       if (activeObjects.length > 0 && !this.preserveObjectStacking) {
         objsToRender = [];
         activeGroupObjects = [];
-        var ancestors = activeObjects.map(function (obj) {
-          while (obj && objects.indexOf(obj) === -1) {
-            obj = obj.parent || obj.group;
-          }
-          return obj;
-        });
         for (var i = 0, length = this._objects.length; i < length; i++) {
           object = this._objects[i];
-          if (activeObjects.indexOf(object) === -1 && ancestors.indexOf(object) === -1) {
+          index = _activeObjects.indexOf(object);
+          if (index === -1) {
             objsToRender.push(object);
           }
           else {
-            activeGroupObjects.push(object);
+            //  push all active (nested) objects up to object, including
+            activeGroupObjects.push.apply(activeGroupObjects, _activeObjects.splice(0, index + 1));
           }
+        }
+        if (_activeObjects.length > 0) {
+          //  push all remaining (nested) active objects
+          activeGroupObjects.push.apply(activeGroupObjects, _activeObjects);
         }
         if (activeObjects.length > 1) {
           this._activeObject._objects = activeGroupObjects;
-        }
-        else if (activeObjects[0].parent) {
-          activeGroupObjects.push(activeObjects[0]);
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
       }

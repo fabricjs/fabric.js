@@ -1963,6 +1963,20 @@
     },
 
     /**
+     * 
+     * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
+     */
+    getAncestors: function () {
+      var ancestors = [];
+      var parent = this.group || this.parent || this.canvas;
+      while (parent) {
+        ancestors.push(parent);
+        parent = parent.group || parent.parent || parent.canvas;
+      }
+      return ancestors;
+    },
+
+    /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
