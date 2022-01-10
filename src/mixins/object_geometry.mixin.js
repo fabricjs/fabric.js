@@ -89,11 +89,14 @@
      * @return {Array} [tl, tr, br, bl] of points
      */
     getCoords: function (absolute, calculate) {
-      var t = this.group && this.group.calcTransformMatrix();
-      return arrayFromCoords(this._getCoords(absolute, calculate))
-        .map(function (p) {
-          return t ? util.transformPoint(p, t) : p;
+      var coords = arrayFromCoords(this._getCoords(absolute, calculate));
+      if (this.group) {
+        var t = this.group.calcTransformMatrix();
+        return coords.map(function (p) {
+          return util.transformPoint(p, t);
         });
+      }
+      return coords;
     },
 
     /**
