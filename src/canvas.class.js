@@ -634,6 +634,7 @@
       }
       var pointer = this.getPointer(e);
       if (target.group) {
+        //  transform pointer to target's coordinate plane
         pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
       }
       var corner = target.__corner,
