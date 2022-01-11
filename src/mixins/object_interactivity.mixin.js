@@ -15,11 +15,11 @@
       if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-      if (this.group) {
-        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix()));
-      }
-      var ex = pointer.x,
-          ey = pointer.y,
+      var p = this.group ?
+        fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
+        pointer;
+      var ex = p.x,
+          ey = p.y,
           xPoints,
           lines, keys = Object.keys(this.oCoords),
           j = keys.length - 1, i;
