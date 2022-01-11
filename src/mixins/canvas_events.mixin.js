@@ -939,8 +939,12 @@
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
-
+        transform = this._currentTransform,
+        target = transform.target;
+      if (target.group) {
+        //  transform pointer to target's coordinate plane
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];

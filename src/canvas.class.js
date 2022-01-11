@@ -632,14 +632,18 @@
       if (!target) {
         return;
       }
-
-      var pointer = this.getPointer(e), corner = target.__corner,
+      var pointer = this.getPointer(e);
+      if (target.group) {
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
+      var corner = target.__corner,
           control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
             control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
+          /**relative to target's coordinate plane */
           transform = {
             target: target,
             action: action,
