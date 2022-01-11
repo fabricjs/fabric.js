@@ -130,8 +130,7 @@
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls,
-          shouldStroke = false;
+            styleOverride.hasControls : this.hasControls;
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -143,26 +142,8 @@
         width,
         height
       );
-
-      if (hasControls) {
-        ctx.beginPath();
-        this.forEachControl(function(control, key, fabricObject) {
-          // in this moment, the ctx is centered on the object.
-          // width and height of the above function are the size of the bbox.
-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
-            // reset movement for each control
-            shouldStroke = true;
-            ctx.moveTo(control.x * width, control.y * height);
-            ctx.lineTo(
-              control.x * width + control.offsetX,
-              control.y * height + control.offsetY
-            );
-          }
-        });
-        if (shouldStroke) {
-          ctx.stroke();
-        }
-      }
+      hasControls && this.drawControlsConnectingLines(ctx);
+  
       ctx.restore();
       return this;
     },
@@ -186,7 +167,9 @@
           width =
             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
+            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+            styleOverride.hasControls : this.hasControls;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -196,8 +179,43 @@
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
       ctx.restore();
+      return this;
+    },
+
+    /**
+     * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawControlsConnectingLines: function (ctx) {
+      var wh = this._calculateCurrentDimensions(),
+        strokeWidth = this.borderScaleFactor,
+        width = wh.x + strokeWidth,
+        height = wh.y + strokeWidth,
+        shouldStroke = false;
+      
+      ctx.beginPath();
+      this.forEachControl(function (control, key, fabricObject) {
+        // in this moment, the ctx is centered on the object.
+        // width and height of the above function are the size of the bbox.
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
+          // reset movement for each control
+          shouldStroke = true;
+          ctx.moveTo(control.x * width, control.y * height);
+          ctx.lineTo(
+            control.x * width + control.offsetX,
+            control.y * height + control.offsetY
+          );
+        }
+      });
+      shouldStroke && ctx.stroke();
+      
       return this;
     },
 
