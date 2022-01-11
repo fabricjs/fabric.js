@@ -82,6 +82,7 @@
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.translate(left, top);
+    //  angle is relative to canvas plane
     var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
     ctx.rotate(degreesToRadians(angle));
     // this does not work, and fixed with ( && ) does not make sense.
