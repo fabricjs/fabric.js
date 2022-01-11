@@ -9003,7 +9003,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    * @return {Number} 0 - 7 a quadrant number
    */
   function findCornerQuadrant(fabricObject, control) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+    //  angle is relative to canvas plane
+    var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
+    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -9210,7 +9212,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         control = target.controls[transform.corner],
         zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
-        localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
+        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }
@@ -9803,7 +9805,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.translate(left, top);
-    ctx.rotate(degreesToRadians(fabricObject.angle));
+    //  angle is relative to canvas plane
+    var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
+    ctx.rotate(degreesToRadians(angle));
     // this does not work, and fixed with ( && ) does not make sense.
     // to have real transparent corners we need the controls on upperCanvas
     // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
@@ -14432,14 +14436,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (!target) {
         return;
       }
-
-      var pointer = this.getPointer(e), corner = target.__corner,
+      var pointer = this.getPointer(e);
+      if (target.group) {
+        //  transform pointer to target's coordinate plane
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
+      var corner = target.__corner,
           control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
             control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
+          /**relative to target's coordinate plane */
           transform = {
             target: target,
             action: action,
@@ -16060,8 +16069,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
-
+          transform = this._currentTransform,
+          target = transform.target;
+      if (target.group) {
+        //  transform pointer to target's coordinate plane
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
@@ -18922,18 +18935,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Returns the point in local coordinates
-     * @param {fabric.Point} point The point relative to the global coordinate system
+     * Returns the normalized point (rotated relative to center) in local coordinates
+     * @param {fabric.Point} point The point relative to canvas coordinate system
      * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint(),
-          p, p2;
+    toLocalPoint: function (point, originX, originY) {
       if (this.group) {
-        center = fabric.util.transformPoint(center, this.group.calcTransformMatrix());
+        point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.group.calcTransformMatrix()));
       }
+      return this.normalizePoint(point, originX, originY);
+    },
+
+    /**
+     * Returns the normalized point (rotated relative to center) in local coordinates
+     * @param {fabric.Point} point The point relative to instance coordinate system
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @return {fabric.Point}
+     */
+    normalizePoint: function(point, originX, originY) {
+      var center = this.getCenterPoint(), p, p2;
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
@@ -19141,11 +19164,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Array} [tl, tr, br, bl] of points
      */
     getCoords: function (absolute, calculate) {
-      var t = this.group && this.group.calcTransformMatrix();
-      return arrayFromCoords(this._getCoords(absolute, calculate))
-        .map(function (p) {
-          return t ? util.transformPoint(p, t) : p;
+      var coords = arrayFromCoords(this._getCoords(absolute, calculate));
+      if (this.group) {
+        var t = this.group.calcTransformMatrix();
+        return coords.map(function (p) {
+          return util.transformPoint(p, t);
         });
+      }
+      return coords;
     },
 
     /**
@@ -20239,11 +20265,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-      if (this.group) {
-        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix()));
-      }
-      var ex = pointer.x,
-          ey = pointer.y,
+      var p = this.group ?
+        fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
+        pointer;
+      var ex = p.x,
+          ey = p.y,
           xPoints,
           lines, keys = Object.keys(this.oCoords),
           j = keys.length - 1, i;
@@ -20354,8 +20380,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls,
-          shouldStroke = false;
+            styleOverride.hasControls : this.hasControls;
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -20367,26 +20392,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         width,
         height
       );
-
-      if (hasControls) {
-        ctx.beginPath();
-        this.forEachControl(function(control, key, fabricObject) {
-          // in this moment, the ctx is centered on the object.
-          // width and height of the above function are the size of the bbox.
-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
-            // reset movement for each control
-            shouldStroke = true;
-            ctx.moveTo(control.x * width, control.y * height);
-            ctx.lineTo(
-              control.x * width + control.offsetX,
-              control.y * height + control.offsetY
-            );
-          }
-        });
-        if (shouldStroke) {
-          ctx.stroke();
-        }
-      }
+      hasControls && this.drawControlsConnectingLines(ctx);
+  
       ctx.restore();
       return this;
     },
@@ -20410,7 +20417,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           width =
             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
+            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+            styleOverride.hasControls : this.hasControls;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -20420,8 +20429,43 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
       ctx.restore();
+      return this;
+    },
+
+    /**
+     * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawControlsConnectingLines: function (ctx) {
+      var wh = this._calculateCurrentDimensions(),
+        strokeWidth = this.borderScaleFactor,
+        width = wh.x + strokeWidth,
+        height = wh.y + strokeWidth,
+        shouldStroke = false;
+      
+      ctx.beginPath();
+      this.forEachControl(function (control, key, fabricObject) {
+        // in this moment, the ctx is centered on the object.
+        // width and height of the above function are the size of the bbox.
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
+          // reset movement for each control
+          shouldStroke = true;
+          ctx.moveTo(control.x * width, control.y * height);
+          ctx.lineTo(
+            control.x * width + control.offsetX,
+            control.y * height + control.offsetY
+          );
+        }
+      });
+      shouldStroke && ctx.stroke();
+      
       return this;
     },
 
