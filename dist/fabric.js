@@ -19617,7 +19617,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.
      * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-     * 
+     *
      * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
@@ -20409,7 +20409,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         height
       );
       hasControls && this.drawControlsConnectingLines(ctx);
-  
+
       ctx.restore();
       return this;
     },
@@ -20461,11 +20461,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     drawControlsConnectingLines: function (ctx) {
       var wh = this._calculateCurrentDimensions(),
-        strokeWidth = this.borderScaleFactor,
-        width = wh.x + strokeWidth,
-        height = wh.y + strokeWidth,
-        shouldStroke = false;
-      
+          strokeWidth = this.borderScaleFactor,
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth,
+          shouldStroke = false;
+
       ctx.beginPath();
       this.forEachControl(function (control, key, fabricObject) {
         // in this moment, the ctx is centered on the object.
@@ -20481,7 +20481,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
       });
       shouldStroke && ctx.stroke();
-      
+
       return this;
     },
 
