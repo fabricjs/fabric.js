@@ -1918,13 +1918,18 @@
      * @param {Object} [pointer] Pointer to operate upon (instead of event)
      * @return {Object} Coordinates of a pointer (x, y)
      */
-    getLocalPointer: function(e, pointer) {
+    getLocalPointer: function (e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
       var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords();
+        objectLeftTop = this._getLeftTopCoords(),
+        angle = this.angle;
+      if (this.group) {
+        objectLeftTop = fabric.util.transformPoint(objectLeftTop, this.group.calcTransformMatrix());
+        angle = fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
+      }
       if (this.angle) {
         pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
+          pClicked, objectLeftTop, degreesToRadians(-angle));
       }
       return {
         x: pClicked.x - objectLeftTop.x,
