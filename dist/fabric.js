@@ -17804,7 +17804,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     getTotalAngle: function () {
       var angle = this.angle;
       if (this.group) {
-        angle += this.getTotalAngle();
+        angle += this.group.getTotalAngle();
       }
       return angle;
     },
