@@ -25,6 +25,11 @@
     type: 'activeSelection',
 
     /**
+     * disabled for proper functionality
+     */
+    subTargetCheck: false,
+
+    /**
      * Constructor
      * @param {Object} objects ActiveSelection objects
      * @param {Object} [options] Options object
