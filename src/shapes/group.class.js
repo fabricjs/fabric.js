@@ -39,7 +39,7 @@
      * @type Boolean
      * @default
      */
-    subTargetCheck: false,
+    subTargetCheck: true,
 
     /**
      * Groups are container, do not render anything on theyr own, ence no cache properties
@@ -106,7 +106,7 @@
      * @private
      */
     _updateObjectsACoords: function() {
-      var skipControls = true;
+      var skipControls = false;
       for (var i = this._objects.length; i--; ){
         this._objects[i].setCoords(skipControls);
       }
@@ -131,7 +131,7 @@
     _updateObjectCoords: function(object, center) {
       var objectLeft = object.left,
           objectTop = object.top,
-          skipControls = true;
+          skipControls = false;
 
       object.set({
         left: objectLeft - center.x,
