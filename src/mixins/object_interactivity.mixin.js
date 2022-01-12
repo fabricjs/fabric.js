@@ -143,7 +143,7 @@
         height
       );
       hasControls && this.drawControlsConnectingLines(ctx);
-  
+
       ctx.restore();
       return this;
     },
@@ -195,11 +195,11 @@
      */
     drawControlsConnectingLines: function (ctx) {
       var wh = this._calculateCurrentDimensions(),
-        strokeWidth = this.borderScaleFactor,
-        width = wh.x + strokeWidth,
-        height = wh.y + strokeWidth,
-        shouldStroke = false;
-      
+          strokeWidth = this.borderScaleFactor,
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth,
+          shouldStroke = false;
+
       ctx.beginPath();
       this.forEachControl(function (control, key, fabricObject) {
         // in this moment, the ctx is centered on the object.
@@ -215,7 +215,7 @@
         }
       });
       shouldStroke && ctx.stroke();
-      
+
       return this;
     },
 

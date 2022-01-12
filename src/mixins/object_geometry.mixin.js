@@ -526,7 +526,7 @@
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.
      * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-     * 
+     *
      * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
