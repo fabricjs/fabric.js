@@ -9004,7 +9004,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    */
   function findCornerQuadrant(fabricObject, control) {
     //  angle is relative to canvas plane
-    var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
+    var angle = fabricObject.getTotalAngle();
     var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
@@ -9806,7 +9806,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     ctx.lineWidth = 1;
     ctx.translate(left, top);
     //  angle is relative to canvas plane
-    var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
+    var angle = fabricObject.getTotalAngle();
     ctx.rotate(degreesToRadians(angle));
     // this does not work, and fixed with ( && ) does not make sense.
     // to have real transparent corners we need the controls on upperCanvas
@@ -17798,6 +17798,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * Returns the object angle relative to canvas counting also the group property
+     * @returns {number}
+     */
+    getTotalAngle: function () {
+      var angle = this.angle;
+      if (this.group) {
+        angle += this.getTotalAngle();
+      }
+      return angle;
+    },
+
+    /**
      * @private
      * @param {String} key
      * @param {*} value
@@ -18736,13 +18748,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Object} [pointer] Pointer to operate upon (instead of event)
      * @return {Object} Coordinates of a pointer (x, y)
      */
-    getLocalPointer: function(e, pointer) {
+    getLocalPointer: function (e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
       var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords();
+          objectLeftTop = this._getLeftTopCoords(),
+          angle = this.getTotalAngle();
+      if (this.group) {
+        objectLeftTop = fabric.util.transformPoint(objectLeftTop, this.group.calcTransformMatrix());
+      }
       if (this.angle) {
         pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
+          pClicked, objectLeftTop, degreesToRadians(-angle));
       }
       return {
         x: pClicked.x - objectLeftTop.x,
@@ -22599,7 +22615,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Boolean
      * @default
      */
-    subTargetCheck: false,
+    subTargetCheck: true,
 
     /**
      * Groups are container, do not render anything on theyr own, ence no cache properties
@@ -22666,7 +22682,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _updateObjectsACoords: function() {
-      var skipControls = true;
+      var skipControls = false;
       for (var i = this._objects.length; i--; ){
         this._objects[i].setCoords(skipControls);
       }
@@ -22691,7 +22707,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _updateObjectCoords: function(object, center) {
       var objectLeft = object.left,
           objectTop = object.top,
-          skipControls = true;
+          skipControls = false;
 
       object.set({
         left: objectLeft - center.x,
@@ -23186,6 +23202,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'activeSelection',
+
+    /**
+     * disabled for proper functionality
+     */
+    subTargetCheck: false,
 
     /**
      * Constructor
@@ -31990,7 +32011,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   mouseUpHandler: function(options) {
     this.__isMousedown = false;
-    if (!this.editable || this.group ||
+    if (!this.editable ||
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)) {
       return;
