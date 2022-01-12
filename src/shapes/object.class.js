@@ -986,7 +986,7 @@
     getTotalAngle: function () {
       var angle = this.angle;
       if (this.group) {
-        angle += this.getTotalAngle();
+        angle += this.group.getTotalAngle();
       }
       return angle;
     },
