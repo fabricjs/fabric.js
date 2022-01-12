@@ -980,6 +980,18 @@
     },
 
     /**
+     * Returns the object angle relative to canvas counting also the group property
+     * @returns {number}
+     */
+    getTotalAngle: function () {
+      var angle = this.angle;
+      if (this.group) {
+        angle += this.getTotalAngle();
+      }
+      return angle;
+    },
+
+    /**
      * @private
      * @param {String} key
      * @param {*} value
@@ -1921,11 +1933,10 @@
     getLocalPointer: function (e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
       var pClicked = new fabric.Point(pointer.x, pointer.y),
-        objectLeftTop = this._getLeftTopCoords(),
-        angle = this.angle;
+          objectLeftTop = this._getLeftTopCoords(),
+          angle = this.getTotalAngle();
       if (this.group) {
         objectLeftTop = fabric.util.transformPoint(objectLeftTop, this.group.calcTransformMatrix());
-        angle = fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
       }
       if (this.angle) {
         pClicked = fabric.util.rotatePoint(

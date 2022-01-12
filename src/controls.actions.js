@@ -25,7 +25,7 @@
    */
   function findCornerQuadrant(fabricObject, control) {
     //  angle is relative to canvas plane
-    var angle = fabricObject.group ? fabric.util.qrDecompose(fabricObject.calcTransformMatrix()).angle : fabricObject.angle;
+    var angle = fabricObject.getTotalAngle();
     var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
