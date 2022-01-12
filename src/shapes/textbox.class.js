@@ -87,6 +87,12 @@
     splitByGrapheme: false,
 
     /**
+     * Color used for focusing the resizing stroke.
+     * @type string
+     */
+    resizingStrokeColor: '#9c0d63',
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private

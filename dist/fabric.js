@@ -30162,6 +30162,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     splitByGrapheme: false,
 
     /**
+     * Color used for focusing the resizing stroke.
+     * @type string
+     */
+    resizingStrokeColor: '#9c0d63',
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -30644,7 +30650,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
-      resizingStrokeColor: '#9c0d63',
+      resizingStrokeColor: fabric.Textbox.prototype.resizingStrokeColor,
     });
 
     textBoxControls.ml = new fabric.Control({
@@ -30653,7 +30659,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       actionHandler: controlsUtils.changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
-      resizingStrokeColor: '#9c0d63',
+      resizingStrokeColor: fabric.Textbox.prototype.resizingStrokeColor,
     });
   }
 })();
