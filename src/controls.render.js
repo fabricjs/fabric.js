@@ -55,7 +55,7 @@
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
-        resizingStroke = styleOverride.resizingStrokeColor || '',
+        resizingStroke = styleOverride.resizingStrokeColor || fabricObject.resizingStrokeColor,
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
         ), sizeBy2 = size / 2;

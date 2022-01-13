@@ -6966,7 +6966,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
-        resizingStroke = styleOverride.resizingStrokeColor || '',
+        resizingStroke = styleOverride.resizingStrokeColor || fabricObject.resizingStrokeColor,
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
         ), sizeBy2 = size / 2;
@@ -7243,7 +7243,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     */
     render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      styleOverride.resizingStrokeColor = this.resizingStrokeColor;
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
           fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
