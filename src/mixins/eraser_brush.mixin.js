@@ -191,6 +191,8 @@
 
   /**
    * An object's Eraser
+   * eraser paths are drawn black
+   * 
    * @private
    * @class fabric.Eraser
    * @extends fabric.Group
@@ -213,13 +215,12 @@
      */
     originY: 'center',
 
-    drawObject: function (ctx) {
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.restore();
-      this.callSuper('drawObject', ctx);
-    },
+    /**
+     * crucial for proper rendering
+     * @default
+     * @private
+     */
+    inverted: true,
 
     /**
      * eraser should retain size
@@ -548,7 +549,7 @@
 
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        path.globalCompositeOperation = this.inverted ? 'destination-out' : 'source-over';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
       },
