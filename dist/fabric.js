@@ -5294,7 +5294,7 @@ fabric.CommonMethods = {
 
   /**
    * Creates an empty object and copies all enumerable properties of another object to it
-   * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
+   * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
    * @memberOf fabric.util.object
    * @param {Object} object Object to clone
    * @param {Boolean} [deep] Whether to clone nested objects
@@ -27590,7 +27590,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Saturation value, from -1 to 1.
      * Increases/decreases the color saturation.
      * A value of 0 has no effect.
-     *
+     * 
      * @param {Number} saturation
      * @default
      */
@@ -27712,7 +27712,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Vibrance value, from -1 to 1.
      * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
-     *
+     * 
      * @param {Number} vibrance
      * @default
      */
@@ -33830,10 +33830,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * An object's Eraser
-   *
-   * Eraser paths are rendered as regular paths, inverted paths clip out eraser paths
-   * In an object's rendering cycle the eraser is rendered as an inverted clip path
-   *
    * @private
    * @class fabric.Eraser
    * @extends fabric.Group
@@ -33856,17 +33852,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     originY: 'center',
 
-    /**
-     * crucial for proper rendering
-     * @default
-     * @private
-     */
-    inverted: true,
+    drawObject: function (ctx) {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+      this.callSuper('drawObject', ctx);
+    },
 
     /**
      * eraser should retain size
      * dimensions should not change when paths are added or removed
-     * @see {@link fabric.Eraser#_updateDimensions}
+     * handled by {@link fabric.Object#_drawClipPath}
      * @override
      * @private
      */
@@ -33879,7 +33876,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * Returns svg representation of an instance
      * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * for masking we need to add a white rect before all paths
-     * @todo this might break once svg export is fixed to support `inverted` prop, then probably the white rect will need to be removed or https://github.com/fabricjs/fabric.js/pull/7470/commits/3235dab170591522ba1b1cccf1af8aa2d9be1c04.
+     *
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
@@ -34006,7 +34003,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        * Iterates over collections to allow nested selective erasing.
        * Prepares the pattern brush that will draw on the top context to achieve the desired visual effect.
        * If brush is **NOT** inverted render all non-erasable objects.
-       * If brush is inverted render all erasable objects with their clip path inverted.
+       * If brush is inverted render all erasable objects that have been erased with their clip path inverted.
        * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
@@ -34016,26 +34013,28 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
+            //  traverse
             this._prepareCollectionTraversal(obj, ctx, restorationContext);
           }
           else if (!this.inverted && obj.erasable && obj.visible) {
+            //  render only non-erasable objects
             obj.visible = false;
             collection.dirty = true;
             restorationContext.visibility.push(obj);
             restorationContext.collection.push(collection);
           }
           else if (this.inverted && obj.visible) {
-            if (!obj.erasable) {
-              obj.visible = false;
-              collection.dirty = true;
-              restorationContext.visibility.push(obj);
-              restorationContext.collection.push(collection);
-            }
-            else if (obj.erasable && obj.eraser) {
+            //  render only erasable objects that were erased
+            if (obj.erasable && obj.eraser) {
               obj.eraser.inverted = true;
               obj.dirty = true;
               collection.dirty = true;
               restorationContext.eraser.push(obj);
+              restorationContext.collection.push(collection);
+            } else {
+              obj.visible = false;
+              collection.dirty = true;
+              restorationContext.visibility.push(obj);
               restorationContext.collection.push(collection);
             }
           }
@@ -34186,9 +34185,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         ctx.restore();
       },
 
+      /**
+       * Creates fabric.Path object
+       * @override
+       * @private
+       * @param {(string|number)[][]} pathData Path data
+       * @return {fabric.Path} Path to add on canvas
+       * @returns 
+       */
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'destination-out' : 'source-over';
+        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
       },
@@ -34251,6 +34258,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       /**
        * Adds path to object's eraser, walks down object's descendants if necessary
        *
+       * @fires erasing:end on object
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -34357,6 +34365,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         var path = this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
+        //  commense event sequence
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
@@ -34370,6 +34379,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
             targets.push(obj);
           }
         });
+        //  fire erasing:end
         canvas.fire('erasing:end', {
           path: path,
           targets: targets,
@@ -34379,7 +34389,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         delete this.__subTargets;
 
         canvas.requestRenderAll();
-        path.setCoords();
         this._resetShadow();
 
         // fire event 'path' created
