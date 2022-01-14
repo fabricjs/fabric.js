@@ -5294,7 +5294,7 @@ fabric.CommonMethods = {
 
   /**
    * Creates an empty object and copies all enumerable properties of another object to it
-   * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
+   * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
    * @memberOf fabric.util.object
    * @param {Object} object Object to clone
    * @param {Boolean} [deep] Whether to clone nested objects
@@ -27590,7 +27590,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Saturation value, from -1 to 1.
      * Increases/decreases the color saturation.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} saturation
      * @default
      */
@@ -27712,7 +27712,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Vibrance value, from -1 to 1.
      * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} vibrance
      * @default
      */
@@ -34031,7 +34031,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
               collection.dirty = true;
               restorationContext.eraser.push(obj);
               restorationContext.collection.push(collection);
-            } else {
+            }
+            else {
               obj.visible = false;
               collection.dirty = true;
               restorationContext.visibility.push(obj);
@@ -34191,7 +34192,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        * @private
        * @param {(string|number)[][]} pathData Path data
        * @return {fabric.Path} Path to add on canvas
-       * @returns 
+       * @returns
        */
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
