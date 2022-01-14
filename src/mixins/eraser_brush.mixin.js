@@ -191,7 +191,9 @@
 
   /**
    * An object's Eraser
-   * eraser paths are drawn black
+   * 
+   * Eraser paths are rendered as regular paths, inverted paths clip out eraser paths
+   * In an object's rendering cycle the eraser is rendered as an inverted clip path
    * 
    * @private
    * @class fabric.Eraser
