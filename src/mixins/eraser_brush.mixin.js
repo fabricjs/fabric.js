@@ -619,6 +619,7 @@
       /**
        * Adds path to object's eraser, walks down object's descendants if necessary
        *
+       * @fires erasing:end on object
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
        */
@@ -725,6 +726,7 @@
         var path = this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
+        //  commense event sequence
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
@@ -738,6 +740,7 @@
             targets.push(obj);
           }
         });
+        //  fire erasing:end
         canvas.fire('erasing:end', {
           path: path,
           targets: targets,
