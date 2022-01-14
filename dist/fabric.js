@@ -3783,21 +3783,21 @@ fabric.CommonMethods = {
 
     /**
      * Merges 2 clip paths into one visually equal clip path
-     * 
+     *
      * **IMPORTANT**:\
      * Does **NOT** clone the arguments, clone them proir if necessary.
-     * 
+     *
      * Creates a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
      * Use this method if both the clip paths may have nested clip paths of their own, so assigning one to the other's clip path property is not possible.
-     * 
+     *
      * In order to handle the `inverted` property we follow logic described in the following cases:\
      * **(1)** both clip paths are inverted - the clip paths pass the inverted prop to the wrapper and loose it themselves.\
      * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
      * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
-     * 
+     *
      * @memberOf fabric.util
-     * @param {fabric.Object} c1 
-     * @param {fabric.Object} c2 
+     * @param {fabric.Object} c1
+     * @param {fabric.Object} c2
      * @returns {fabric.Object} merged clip path
      */
     mergeClipPaths: function (c1, c2) {
@@ -5294,7 +5294,7 @@ fabric.CommonMethods = {
 
   /**
    * Creates an empty object and copies all enumerable properties of another object to it
-   * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
+   * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
    * @memberOf fabric.util.object
    * @param {Object} object Object to clone
    * @param {Boolean} [deep] Whether to clone nested objects
@@ -18801,7 +18801,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @static
    * @memberOf fabric.Object
    * @constant
-   * @type string[] 
+   * @type string[]
    */
   fabric.Object.ENLIVEN_PROPS = ['clipPath'];
 
@@ -27590,7 +27590,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Saturation value, from -1 to 1.
      * Increases/decreases the color saturation.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} saturation
      * @default
      */
@@ -27712,7 +27712,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * Vibrance value, from -1 to 1.
      * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} vibrance
      * @default
      */
@@ -33830,6 +33830,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * An object's Eraser
+   *
+   * Eraser paths are rendered as regular paths, inverted paths clip out eraser paths
+   * In an object's rendering cycle the eraser is rendered as an inverted clip path
+   *
    * @private
    * @class fabric.Eraser
    * @extends fabric.Group
@@ -33852,13 +33856,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     originY: 'center',
 
-    drawObject: function (ctx) {
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.restore();
-      this.callSuper('drawObject', ctx);
-    },
+    /**
+     * crucial for proper rendering
+     * @default
+     * @private
+     */
+    inverted: true,
 
     /**
      * eraser should retain size
@@ -33876,7 +33879,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * Returns svg representation of an instance
      * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * for masking we need to add a white rect before all paths
-     *
+     * @todo this might break once svg export is fixed to support `inverted` prop, then probably the white rect will need to be removed or https://github.com/fabricjs/fabric.js/pull/7470/commits/3235dab170591522ba1b1cccf1af8aa2d9be1c04.
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
@@ -33959,10 +33962,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Supports **inverted** erasing meaning that the brush can "undo" erasing.
    *
    * In order to support selective erasing, the brush clips the entire canvas
-   * and then draws all non-erasable objects over the erased path using a pattern brush.
+   * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
    * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
    * This achieves the desired effect of seeming to erase or unerase only erasable objects.
-   * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * After erasing is done the created path is added to all intersected objects' `eraser` property.
    *
    * In order to update the EraserBrush call `preparePattern`.
    * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
@@ -34008,7 +34011,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
-       * @param {{ visibility: fabric.Object[], clipPath: fabric.Object[], collection: fabric.Object[] }} restorationContext
+       * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
       _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
@@ -34032,7 +34035,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
               obj.eraser.inverted = true;
               obj.dirty = true;
               collection.dirty = true;
-              restorationContext.clipPath.push(obj);
+              restorationContext.eraser.push(obj);
               restorationContext.collection.push(collection);
             }
           }
@@ -34044,10 +34047,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        * This pattern will be drawn on the top context, achieving a visual effect of erasing only erasable objects
        * @todo decide how overlay color should behave when `inverted === true`, currently draws over it which is undesirable
        * @private
-       * @param {CanvasRenderingContext2D} ctx
        */
-      preparePattern: function (ctx) {
-        ctx = ctx || this.canvas.contextTop;
+      preparePattern: function () {
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
@@ -34076,11 +34077,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        var restorationContext = { visibility: [], clipPath: [], collection: [] };
+        var restorationContext = { visibility: [], eraser: [], collection: [] };
         this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
         this.canvas._renderObjects(patternCtx, this.canvas._objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
-        restorationContext.clipPath.forEach(function (obj) {
+        restorationContext.eraser.forEach(function (obj) {
           obj.eraser.inverted = false;
           obj.dirty = true;
         });
@@ -34187,50 +34188,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        path.globalCompositeOperation = this.inverted ? 'destination-out' : 'source-over';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
-      },
-
-      /**
-       * 
-       * In some cases we need to clip an eraser path with 2 clip paths
-       * e.g. we erased a collection that has a clip path and now we pass down the eraser to the collection's objects and an object has a clip path of it's own
-       * to handle this we create a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
-       * this is done because both clip paths may have nested clip paths of their own, so we can't assign one to the other's clip path property.
-       * this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, regardless of how many there are.
-       * this is why we transform `b` to `a` coordinate plane.
-       * to handle the `inverted` property we follow logic described in the following cases:
-       * (1) both clip paths are inverted - the clip paths pass the inverted prop to the wrapper and loose it themselves.
-       * (2) one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one.
-       * (3) both clip paths are not inverted - wrapper and clip paths remain not inverted.
-       * @private
-       * @param {fabric.Object} c1 
-       * @param {fabric.Object} c2 
-       * @returns {fabric.Object} merged clip path
-       */
-      _mergeClipPaths: function (c1, c2) {
-        var a = c1, b = c2;
-        if (a.inverted && !b.inverted) {
-          //  case (2)
-          a = c2;
-          b = c1;
-        }
-        //  transform `b` to `a` coordinate plane
-        fabric.util.applyTransformToObject(
-          b,
-          fabric.util.multiplyTransformMatrices(
-            fabric.util.invertTransform(a.calcTransformMatrix()),
-            b.calcTransformMatrix()
-          )
-        );
-        //  assign the `inverted` prop to the wrapping group
-        var inverted = a.inverted && b.inverted;
-        if (inverted) {
-          //  case (1)
-          a.inverted = b.inverted = false;
-        }
-        return new fabric.Group([a], { clipPath: b, inverted: inverted });
       },
 
       /**
@@ -34263,7 +34223,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         );
         //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
         //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
-        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur), 
+        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
         //  so we can't assign one to the other's clip path property.
         path.clipPath = path.clipPath ? fabric.util.mergeClipPaths(clipPath, path.clipPath) : clipPath;
         return path;
@@ -34316,10 +34276,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           return;
         }
         //  prepare eraser
-        var clipObject = obj.eraser;
-        if (!clipObject) {
-          clipObject = new fabric.Eraser();
-          obj.eraser = clipObject;
+        var eraser = obj.eraser;
+        if (!eraser) {
+          eraser = new fabric.Eraser();
+          obj.eraser = eraser;
         }
         //  clone and add path
         path.clone(function (path) {
@@ -34331,7 +34291,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
             path.calcTransformMatrix()
           );
           fabric.util.applyTransformToObject(path, desiredTransform);
-          clipObject.addWithUpdate(path);
+          eraser.addWithUpdate(path);
           obj.set('dirty', true);
           obj.fire('erasing:end', {
             path: path
