@@ -240,7 +240,7 @@
      * Returns svg representation of an instance
      * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
      * for masking we need to add a white rect before all paths
-     * @todo this might break once svg export is fixed to support `inverted` prop, then probably the white rect will need to be removed or (https://github.com/fabricjs/fabric.js/pull/7470/commits/3235dab170591522ba1b1cccf1af8aa2d9be1c04).
+     * @todo this might break once svg export is fixed to support `inverted` prop, then probably the white rect will need to be removed or https://github.com/fabricjs/fabric.js/pull/7470/commits/3235dab170591522ba1b1cccf1af8aa2d9be1c04.
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
