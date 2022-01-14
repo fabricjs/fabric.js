@@ -369,7 +369,7 @@
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
-       * @param {{ visibility: fabric.Object[], clipPath: fabric.Object[], collection: fabric.Object[] }} restorationContext
+       * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
       _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
@@ -393,7 +393,7 @@
               obj.eraser.inverted = true;
               obj.dirty = true;
               collection.dirty = true;
-              restorationContext.clipPath.push(obj);
+              restorationContext.eraser.push(obj);
               restorationContext.collection.push(collection);
             }
           }
@@ -437,11 +437,11 @@
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        var restorationContext = { visibility: [], clipPath: [], collection: [] };
+        var restorationContext = { visibility: [], eraser: [], collection: [] };
         this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
         this.canvas._renderObjects(patternCtx, this.canvas._objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
-        restorationContext.clipPath.forEach(function (obj) {
+        restorationContext.eraser.forEach(function (obj) {
           obj.eraser.inverted = false;
           obj.dirty = true;
         });
@@ -636,10 +636,10 @@
           return;
         }
         //  prepare eraser
-        var clipObject = obj.eraser;
-        if (!clipObject) {
-          clipObject = new fabric.Eraser();
-          obj.eraser = clipObject;
+        var eraser = obj.eraser;
+        if (!eraser) {
+          eraser = new fabric.Eraser();
+          obj.eraser = eraser;
         }
         //  clone and add path
         path.clone(function (path) {
@@ -651,7 +651,7 @@
             path.calcTransformMatrix()
           );
           fabric.util.applyTransformToObject(path, desiredTransform);
-          clipObject.addWithUpdate(path);
+          eraser.addWithUpdate(path);
           obj.set('dirty', true);
           obj.fire('erasing:end', {
             path: path
