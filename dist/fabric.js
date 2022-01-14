@@ -18772,8 +18772,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (typeof patterns[1] !== 'undefined') {
         object.stroke = patterns[1];
       }
-      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
         enlivenProps.forEach(function (key, index) {
           object[key] = enlivedProps[index];
         });
@@ -23108,9 +23108,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
       return;
     }
-    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key] });
+    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key] }), function (enlivedProps) {
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
         var options = fabric.util.object.clone(object, true);
         delete options.objects;
         enlivenProps.forEach(function (key, index) {
@@ -34012,6 +34012,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
+        if (this.canvas._isRetinaScaling()) {
+          var retinaScaling = this.canvas.getRetinaScaling();
+          this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
+        }
         var backgroundImage = this.canvas.backgroundImage,
             bgErasable = backgroundImage && this._isErasable(backgroundImage),
             overlayImage = this.canvas.overlayImage,
@@ -34050,7 +34054,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           __renderOverlay.call(this.canvas, patternCtx);
           this.canvas.overlayColor = color;
         }
-        ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
       },
 
       /**
@@ -34061,7 +34064,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       _setBrushStyles: function (ctx) {
         ctx = ctx || this.canvas.contextTop;
         this.callSuper('_setBrushStyles', ctx);
-        ctx.strokeStyle = null;
+        ctx.strokeStyle = 'black';
       },
 
       /**
@@ -34080,10 +34083,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
        */
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
-        if (ctx === this.canvas.getContext()) {
-          this._setBrushStyles(ctx);
-          ctx.globalCompositeOperation = 'destination-out';
-        }
+        this._setBrushStyles(ctx);
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
       },
 
       /**
@@ -34129,10 +34130,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           ctx = this.canvas.getContext();
           this.callSuper('_render', ctx);
         }
-        //  render pattern
+        //  render brush and mask it with image of non erasables
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
+        ctx.save();
+        var t = this.canvas.getRetinaScaling(), s = 1 / t;
+        ctx.scale(s, s);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.drawImage(this._patternCanvas, 0, 0);
+        ctx.restore();
       },
 
       createPath: function (pathData) {
