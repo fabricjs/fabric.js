@@ -33917,14 +33917,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   fabric.Eraser.fromObject = function (object, callback) {
     var objects = object.objects;
-    var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
     fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
-        var options = fabric.util.object.clone(object, true);
-        delete options.objects;
-        enlivenProps.forEach(function (key, index) {
-          options[key] = enlivedProps[index];
-        });
+      var options = fabric.util.object.clone(object, true);
+      delete options.objects;
+      fabric.util.enlivenObjectEnlivables(object, options, function () {
         callback && callback(new fabric.Eraser(enlivenedObjects, options, true));
       });
     });
