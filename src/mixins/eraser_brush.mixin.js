@@ -191,10 +191,10 @@
 
   /**
    * An object's Eraser
-   * 
+   *
    * Eraser paths are rendered as regular paths, inverted paths clip out eraser paths
    * In an object's rendering cycle the eraser is rendered as an inverted clip path
-   * 
+   *
    * @private
    * @class fabric.Eraser
    * @extends fabric.Group
@@ -408,10 +408,8 @@
        * This pattern will be drawn on the top context, achieving a visual effect of erasing only erasable objects
        * @todo decide how overlay color should behave when `inverted === true`, currently draws over it which is undesirable
        * @private
-       * @param {CanvasRenderingContext2D} ctx
        */
-      preparePattern: function (ctx) {
-        ctx = ctx || this.canvas.contextTop;
+      preparePattern: function () {
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
@@ -586,7 +584,7 @@
         );
         //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
         //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
-        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur), 
+        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
         //  so we can't assign one to the other's clip path property.
         path.clipPath = path.clipPath ? fabric.util.mergeClipPaths(clipPath, path.clipPath) : clipPath;
         return path;

@@ -1963,7 +1963,7 @@
    * @static
    * @memberOf fabric.Object
    * @constant
-   * @type string[] 
+   * @type string[]
    */
   fabric.Object.ENLIVEN_PROPS = ['clipPath'];
 
