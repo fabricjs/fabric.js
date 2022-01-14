@@ -191,10 +191,6 @@
 
   /**
    * An object's Eraser
-   *
-   * Eraser paths are rendered as regular paths, inverted paths clip out eraser paths
-   * In an object's rendering cycle the eraser is rendered as an inverted clip path
-   *
    * @private
    * @class fabric.Eraser
    * @extends fabric.Group
@@ -217,12 +213,13 @@
      */
     originY: 'center',
 
-    /**
-     * crucial for proper rendering
-     * @default
-     * @private
-     */
-    inverted: true,
+    drawObject: function (ctx) {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+      this.callSuper('drawObject', ctx);
+    },
 
     /**
      * eraser should retain size
@@ -549,7 +546,7 @@
 
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'destination-out' : 'source-over';
+        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
       },
