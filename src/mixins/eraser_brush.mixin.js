@@ -392,7 +392,8 @@
               collection.dirty = true;
               restorationContext.eraser.push(obj);
               restorationContext.collection.push(collection);
-            } else {
+            }
+            else {
               obj.visible = false;
               collection.dirty = true;
               restorationContext.visibility.push(obj);
@@ -552,7 +553,7 @@
        * @private
        * @param {(string|number)[][]} pathData Path data
        * @return {fabric.Path} Path to add on canvas
-       * @returns 
+       * @returns
        */
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
