@@ -554,6 +554,47 @@
       },
 
       /**
+       * 
+       * In some cases we need to clip an eraser path with 2 clip paths
+       * e.g. we erased a collection that has a clip path and now we pass down the eraser to the collection's objects and an object has a clip path of it's own
+       * to handle this we create a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
+       * this is done because both clip paths may have nested clip paths of their own, so we can't assign one to the other's clip path property.
+       * this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, regardless of how many there are.
+       * this is why we transform `b` to `a` coordinate plane.
+       * to handle the `inverted` property we follow logic described in the following cases:
+       * (1) both clip paths are inverted - the clip paths pass the inverted prop to the wrapper and loose it themselves.
+       * (2) one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one.
+       * (3) both clip paths are not inverted - wrapper and clip paths remain not inverted.
+       * @private
+       * @param {fabric.Object} c1 
+       * @param {fabric.Object} c2 
+       * @returns {fabric.Object} merged clip path
+       */
+      _mergeClipPaths: function (c1, c2) {
+        var a = c1, b = c2;
+        if (a.inverted && !b.inverted) {
+          //  case (2)
+          a = c2;
+          b = c1;
+        }
+        //  transform `b` to `a` coordinate plane
+        fabric.util.applyTransformToObject(
+          b,
+          fabric.util.multiplyTransformMatrices(
+            fabric.util.invertTransform(a.calcTransformMatrix()),
+            b.calcTransformMatrix()
+          )
+        );
+        //  assign the `inverted` prop to the wrapping group
+        var inverted = a.inverted && b.inverted;
+        if (inverted) {
+          //  case (1)
+          a.inverted = b.inverted = false;
+        }
+        return new fabric.Group([a], { clipPath: b, inverted: inverted });
+      },
+
+      /**
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
@@ -581,27 +622,7 @@
             clipPathTransform
           )
         );
-        if (path.clipPath) {
-          //  we use the path's clipPath to clip the new clip path so content is kept where both overlap
-          //  this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths,
-          //  regardless of how many there are
-          //  we wrap `clipPath` with group in case it has a clip path of it's own and clip group with the the path's existing clip path
-          //  this is why we transform the path's existing clip path to `clipPath` coordinate plane
-          fabric.util.applyTransformToObject(
-            path.clipPath,
-            fabric.util.multiplyTransformMatrices(
-              fabric.util.invertTransform(clipPath.calcTransformMatrix()),
-              path.clipPath.calcTransformMatrix()
-            )
-          );
-          //  assign the `inverted` prop to the wrapping group because it will act as the clip path
-          var inverted = clipPath.inverted;
-          clipPath.inverted = false;
-          path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath, inverted: inverted });
-        }
-        else {
-          path.clipPath = clipPath;
-        }
+        path.clipPath = path.clipPath ? this._mergeClipPaths(clipPath, path.clipPath) : clipPath;
         return path;
       },
 
