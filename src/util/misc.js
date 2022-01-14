@@ -581,6 +581,24 @@
     },
 
     /**
+     * Creates corresponding fabric instances residing in an object, see {@link fabric.Object.ENLIVEN_PROPS}
+     * @param {Object} object 
+     * @param {Object} [context] assign enlived props to this object (pass null to skip this)  
+     * @param {(objects:fabric.Object[]) => void} callback 
+     */
+    enlivenObjectEnlivables: function (object, context, callback) {
+      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
+      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
+        var objects = {};
+        enlivenProps.forEach(function (key, index) {
+          objects[key] = enlivedProps[index];
+          context && (context[key] = enlivedProps[index]);
+        });
+        callback && callback(objects);
+      });
+    },
+
+    /**
      * Create and wait for loading of patterns
      * @static
      * @memberOf fabric.util
