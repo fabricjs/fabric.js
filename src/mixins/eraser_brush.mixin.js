@@ -320,10 +320,10 @@
    * Supports **inverted** erasing meaning that the brush can "undo" erasing.
    *
    * In order to support selective erasing, the brush clips the entire canvas
-   * and then draws all non-erasable objects over the erased path using a pattern brush.
+   * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
    * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
    * This achieves the desired effect of seeming to erase or unerase only erasable objects.
-   * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * After erasing is done the created path is added to all intersected objects' `eraser` property.
    *
    * In order to update the EraserBrush call `preparePattern`.
    * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
@@ -551,47 +551,6 @@
         path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
-      },
-
-      /**
-       * 
-       * In some cases we need to clip an eraser path with 2 clip paths
-       * e.g. we erased a collection that has a clip path and now we pass down the eraser to the collection's objects and an object has a clip path of it's own
-       * to handle this we create a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
-       * this is done because both clip paths may have nested clip paths of their own, so we can't assign one to the other's clip path property.
-       * this guarantees that the path is clipped properly so in turn it erases an object only where it overlaps with all clip paths, regardless of how many there are.
-       * this is why we transform `b` to `a` coordinate plane.
-       * to handle the `inverted` property we follow logic described in the following cases:
-       * (1) both clip paths are inverted - the clip paths pass the inverted prop to the wrapper and loose it themselves.
-       * (2) one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one.
-       * (3) both clip paths are not inverted - wrapper and clip paths remain not inverted.
-       * @private
-       * @param {fabric.Object} c1 
-       * @param {fabric.Object} c2 
-       * @returns {fabric.Object} merged clip path
-       */
-      _mergeClipPaths: function (c1, c2) {
-        var a = c1, b = c2;
-        if (a.inverted && !b.inverted) {
-          //  case (2)
-          a = c2;
-          b = c1;
-        }
-        //  transform `b` to `a` coordinate plane
-        fabric.util.applyTransformToObject(
-          b,
-          fabric.util.multiplyTransformMatrices(
-            fabric.util.invertTransform(a.calcTransformMatrix()),
-            b.calcTransformMatrix()
-          )
-        );
-        //  assign the `inverted` prop to the wrapping group
-        var inverted = a.inverted && b.inverted;
-        if (inverted) {
-          //  case (1)
-          a.inverted = b.inverted = false;
-        }
-        return new fabric.Group([a], { clipPath: b, inverted: inverted });
       },
 
       /**
