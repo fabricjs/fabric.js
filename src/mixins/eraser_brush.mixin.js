@@ -747,7 +747,6 @@
         delete this.__subTargets;
 
         canvas.requestRenderAll();
-        path.setCoords();
         this._resetShadow();
 
         // fire event 'path' created
