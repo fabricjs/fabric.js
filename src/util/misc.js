@@ -581,10 +581,11 @@
     },
 
     /**
-     * Creates corresponding fabric instances residing in an object, see {@link fabric.Object.ENLIVEN_PROPS}
-     * @param {Object} object 
-     * @param {Object} [context] assign enlived props to this object (pass null to skip this)  
-     * @param {(objects:fabric.Object[]) => void} callback 
+     * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
+     * @see {@link fabric.Object.ENLIVEN_PROPS}
+     * @param {Object} object
+     * @param {Object} [context] assign enlived props to this object (pass null to skip this)
+     * @param {(objects:fabric.Object[]) => void} callback
      */
     enlivenObjectEnlivables: function (object, context, callback) {
       var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
