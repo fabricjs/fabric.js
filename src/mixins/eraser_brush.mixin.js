@@ -364,7 +364,7 @@
        * Iterates over collections to allow nested selective erasing.
        * Prepares the pattern brush that will draw on the top context to achieve the desired visual effect.
        * If brush is **NOT** inverted render all non-erasable objects.
-       * If brush is inverted render all erasable objects with their clip path inverted.
+       * If brush is inverted render all erasable objects that have been erased with their clip path inverted.
        * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
@@ -374,26 +374,28 @@
       _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
+            //  traverse
             this._prepareCollectionTraversal(obj, ctx, restorationContext);
           }
           else if (!this.inverted && obj.erasable && obj.visible) {
+            //  render only non-erasable objects
             obj.visible = false;
             collection.dirty = true;
             restorationContext.visibility.push(obj);
             restorationContext.collection.push(collection);
           }
           else if (this.inverted && obj.visible) {
-            if (!obj.erasable) {
-              obj.visible = false;
-              collection.dirty = true;
-              restorationContext.visibility.push(obj);
-              restorationContext.collection.push(collection);
-            }
-            else if (obj.erasable && obj.eraser) {
+            //  render only erasable objects that were erased
+            if (obj.erasable && obj.eraser) {
               obj.eraser.inverted = true;
               obj.dirty = true;
               collection.dirty = true;
               restorationContext.eraser.push(obj);
+              restorationContext.collection.push(collection);
+            } else {
+              obj.visible = false;
+              collection.dirty = true;
+              restorationContext.visibility.push(obj);
               restorationContext.collection.push(collection);
             }
           }
