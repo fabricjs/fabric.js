@@ -34190,7 +34190,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
               path.clipPath.calcTransformMatrix()
             )
           );
-          path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath });
+          //  assign the `inverted` prop to the wrapping group because it will act as the clip path
+          var inverted = clipPath.inverted;
+          clipPath.inverted = false;
+          path.clipPath = new fabric.Group([clipPath], { clipPath: path.clipPath, inverted: inverted });
         }
         else {
           path.clipPath = clipPath;
