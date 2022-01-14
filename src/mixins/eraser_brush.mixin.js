@@ -224,7 +224,7 @@
     /**
      * eraser should retain size
      * dimensions should not change when paths are added or removed
-     * @see {@link fabric.Eraser#_updateDimensions}
+     * handled by {@link fabric.Object#_drawClipPath}
      * @override
      * @private
      */
@@ -546,6 +546,14 @@
         ctx.restore();
       },
 
+      /**
+       * Creates fabric.Path object
+       * @override
+       * @private
+       * @param {(string|number)[][]} pathData Path data
+       * @return {fabric.Path} Path to add on canvas
+       * @returns 
+       */
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
         path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
