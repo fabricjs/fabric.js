@@ -416,6 +416,10 @@
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
+        if (this.canvas._isRetinaScaling()) {
+          var retinaScaling = this.canvas.getRetinaScaling();
+          this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
+        }
         var backgroundImage = this.canvas.backgroundImage,
             bgErasable = backgroundImage && this._isErasable(backgroundImage),
             overlayImage = this.canvas.overlayImage,
@@ -454,7 +458,6 @@
           __renderOverlay.call(this.canvas, patternCtx);
           this.canvas.overlayColor = color;
         }
-        ctx.strokeStyle = ctx.createPattern(canvas, 'no-repeat');
       },
 
       /**
@@ -465,7 +468,7 @@
       _setBrushStyles: function (ctx) {
         ctx = ctx || this.canvas.contextTop;
         this.callSuper('_setBrushStyles', ctx);
-        ctx.strokeStyle = null;
+        ctx.strokeStyle = 'black';
       },
 
       /**
@@ -484,10 +487,8 @@
        */
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
-        if (ctx === this.canvas.getContext()) {
-          this._setBrushStyles(ctx);
-          ctx.globalCompositeOperation = 'destination-out';
-        }
+        this._setBrushStyles(ctx);
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
       },
 
       /**
@@ -533,10 +534,16 @@
           ctx = this.canvas.getContext();
           this.callSuper('_render', ctx);
         }
-        //  render pattern
+        //  render brush and mask it with image of non erasables
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
+        ctx.save();
+        var t = this.canvas.getRetinaScaling(), s = 1 / t;
+        ctx.scale(s, s);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.drawImage(this._patternCanvas, 0, 0);
+        ctx.restore();
       },
 
       createPath: function (pathData) {
