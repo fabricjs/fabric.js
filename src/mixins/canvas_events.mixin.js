@@ -482,7 +482,8 @@
         }
         target.isMoving = false;
       }
-      // if we are ending up a transform
+      // if we are ending up a transform on a different control or a new object
+      // fire the original mouse up from the corner that started the transform
       if (transform && (transform.target !== target || transform.corner !== corner)) {
         var originalControl = transform.target && transform.target.controls[transform.corner],
             originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
